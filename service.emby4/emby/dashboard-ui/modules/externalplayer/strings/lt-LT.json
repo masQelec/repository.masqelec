@@ -1,0 +1,19 @@
+{
+    "Save": "Saugoti",
+    "Video": "Video",
+    "Add": "Prid\u0117ti",
+    "Game": "\u017daidimas",
+    "MediaType": "Medijos tipas",
+    "ExternalPlayers": "I\u0161oriniai grotuvai",
+    "ExternalPlayer": "I\u0161orinis grotuvas",
+    "PlayerPath": "Kelias \u012f grotuv\u0105",
+    "ArgumentsHelp": "\u012era\u0161ykite kiekvien\u0105 argument\u0105 skirtingoje eilut\u0117je.",
+    "TokenPath": "{path} = kelias iki medijos failo",
+    "EnableFor": "\u012ejungti kam:",
+    "VideoFiles": "Vaizdo failai",
+    "InternetStreams": "Interneto srautai",
+    "CommandLineArguments": "Komandin\u0117s eilut\u0117s argumentai",
+    "TokenStartPosMs": "{ms} = prad\u017eios pad\u0117tis ms",
+    "AdditionalFilters": "Papildomi filtrai:",
+    "GameSystem": "\u017daidimo sistema:"
+}

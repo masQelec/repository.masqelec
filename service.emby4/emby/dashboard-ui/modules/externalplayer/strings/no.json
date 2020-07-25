@@ -1,0 +1,19 @@
+{
+    "Save": "Lagre",
+    "Video": "Video",
+    "Add": "Tilf\u00f8y",
+    "Game": "Spill",
+    "MediaType": "Media type",
+    "ExternalPlayers": "Eksterne avspillere",
+    "ExternalPlayer": "Eksterne avspiller",
+    "PlayerPath": "Avspilling sti",
+    "ArgumentsHelp": "Plasser hvert argumenter p\u00e5 hver sin linje",
+    "TokenPath": "{path} = Stien til innholdfilen",
+    "EnableFor": "Aktivert for",
+    "VideoFiles": "video filer",
+    "InternetStreams": "internet str\u00f8mmer",
+    "CommandLineArguments": "Kommandolinje argumenter",
+    "TokenStartPosMs": "{ms}  = startposisjon i millisekunder",
+    "AdditionalFilters": "Ekstra filter:",
+    "GameSystem": "Spill system:"
+}

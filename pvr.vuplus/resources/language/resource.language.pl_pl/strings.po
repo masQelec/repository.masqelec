@@ -1,0 +1,201 @@
+# Kodi Media Center language file
+# Addon Name: Enigma2 Client
+# Addon id: pvr.vuplus
+# Addon Provider: Joerg Dembski and Ross Nicholson
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Main\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: Polish (Poland) (http://www.transifex.com/projects/p/kodi-main/language/pl_PL/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pl_PL\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgctxt "#30003"
+msgid "Username"
+msgstr "Użytkownik"
+
+msgctxt "#30004"
+msgid "Password"
+msgstr "Hasło"
+
+msgctxt "#30005"
+msgid "Connection"
+msgstr "Połączenie"
+
+msgctxt "#30006"
+msgid "Icons"
+msgstr "Plakaty"
+
+msgctxt "#30007"
+msgid "Response timeout in seconds"
+msgstr "Limit czasu odpowiedzi w sekundach"
+
+msgctxt "#30010"
+msgid "Update Interval in minutes"
+msgstr "Częstotliwość aktualizacji w minutach"
+
+msgctxt "#30014"
+msgid "Folder for channeldata"
+msgstr "Folder danych kanałów"
+
+msgctxt "#30015"
+msgid "Update interval"
+msgstr "Częstotliwość aktualizacji"
+
+msgctxt "#30016"
+msgid "Check for channel updates"
+msgstr "Sprawdzaj aktualizacje kanałów"
+
+msgctxt "#30017"
+msgid "Use only the DVB boxes' current recording path"
+msgstr "Używaj tylko bieżącego folderu nagrywania dekodera"
+
+msgctxt "#30018"
+msgid "General"
+msgstr "Ogólne"
+
+msgctxt "#30019"
+msgid "Channels"
+msgstr "Kanały"
+
+msgctxt "#30020"
+msgid "Advanced"
+msgstr "Zaawansowane"
+
+msgctxt "#30021"
+msgid "HTTP"
+msgstr "HTTP"
+
+msgctxt "#30022"
+msgid "Recordings / Timer"
+msgstr "Nagrania / Harmonogram"
+
+msgctxt "#30023"
+msgid "Recording folder on the receiver"
+msgstr "Folder nagrywania na dekoderze"
+
+msgctxt "#30029"
+msgid "Enable automatic configuration for live streams"
+msgstr "Konfiguruj transmisje na żywo automatycznie"
+
+msgctxt "#30030"
+msgid "Keep folder structure for records"
+msgstr "Zachowuj strukturę folderów nagrań"
+
+msgctxt "#30032"
+msgid "EPG"
+msgstr "Przewodnik"
+
+msgctxt "#30039"
+msgid "Streaming"
+msgstr "Strumieniowanie"
+
+msgctxt "#30042"
+msgid "Never"
+msgstr "Nigdy"
+
+msgctxt "#30043"
+msgid "In EPG only"
+msgstr "W przewodniku"
+
+msgctxt "#30044"
+msgid "In recordings only"
+msgstr "W nagraniach"
+
+msgctxt "#30045"
+msgid "Always"
+msgstr "Zawsze"
+
+msgctxt "#30051"
+msgid "Login"
+msgstr "Użytkownik"
+
+msgctxt "#30052"
+msgid "Misc"
+msgstr "Dodatkowe"
+
+msgctxt "#30056"
+msgid "TV"
+msgstr "TELEWIZJA"
+
+msgctxt "#30057"
+msgid "Radio"
+msgstr "Radio"
+
+msgctxt "#30060"
+msgid "Timeshift"
+msgstr "Przesunięcie czasowe"
+
+msgctxt "#30062"
+msgid "Timeshift buffer path"
+msgstr "Folderu bufora przesunięcia czasowego"
+
+msgctxt "#30063"
+msgid "Off"
+msgstr "Nieaktywne"
+
+msgctxt "#30064"
+msgid "On playback"
+msgstr "Po rozpoczęciu odtwarzania"
+
+msgctxt "#30065"
+msgid "On pause"
+msgstr "Po wstrzymaniu odtwarzania"
+
+msgctxt "#30071"
+msgid "Recordings"
+msgstr "Nagrania"
+
+msgctxt "#30072"
+msgid "Timers"
+msgstr "Zadania"
+
+msgctxt "#30085"
+msgid "OK"
+msgstr "OK"
+
+msgctxt "#30094"
+msgid "N/A"
+msgstr "Brak"
+
+msgctxt "#30095"
+msgid "True"
+msgstr "Prawda"
+
+msgctxt "#30096"
+msgid "False"
+msgstr "Fałsz"
+
+msgctxt "#30410"
+msgid "Automatic"
+msgstr "Automat"
+
+msgctxt "#30420"
+msgid "One time (Scheduled by guide-based timer rule)"
+msgstr "Jednorazowo (zaplanowane przez regułę bazująca na przewodniku)"
+
+msgctxt "#30430"
+msgid "Disabled"
+msgstr "Nieaktywny"
+
+msgctxt "#30431"
+msgid "Record if EPG title differs"
+msgstr "Nagrywaj, gdy tytuł w przewodniku się różni"
+
+msgctxt "#30500"
+msgid "Disconnected from '%s'"
+msgstr "Rozłączono od '%s'"
+
+msgctxt "#30501"
+msgid "Reconnected to '%s'"
+msgstr "Połączono ponownie z '%s'"
+
+msgctxt "#30514"
+msgid "Timeshift buffer path does not exist"
+msgstr "Folderu bufora przesunięcia czasowego nie istnieje"

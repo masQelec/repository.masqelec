@@ -1,0 +1,19 @@
+{
+    "Save": "\u4fdd\u5b58",
+    "Video": "\u89c6\u9891",
+    "Add": "\u6dfb\u52a0",
+    "Game": "\u6e38\u620f",
+    "MediaType": "\u5a92\u4f53\u7c7b\u578b",
+    "ExternalPlayers": "\u5916\u90e8\u64ad\u653e\u5668",
+    "ExternalPlayer": "\u5916\u90e8\u64ad\u653e\u5668",
+    "PlayerPath": "\u64ad\u653e\u5668\u8def\u5f84",
+    "ArgumentsHelp": "\u6bcf\u4e2a\u53c2\u6570\u5360\u4e00\u884c\u3002",
+    "TokenPath": "{path} = \u5a92\u4f53\u6587\u4ef6\u8def\u5f84",
+    "EnableFor": "\u5f00\u542f\uff1a",
+    "VideoFiles": "\u89c6\u9891\u6587\u4ef6",
+    "InternetStreams": "\u7f51\u7edc\u6d41",
+    "CommandLineArguments": "\u547d\u4ee4\u884c\u53c2\u6570",
+    "TokenStartPosMs": "{ms} = \u5f00\u59cb\u4f4d\u7f6e\u7684\u6beb\u79d2",
+    "AdditionalFilters": "\u989d\u5916\u8fc7\u6ee4\u5668\uff1a",
+    "GameSystem": "\u6e38\u620f\u7cfb\u7edf\uff1a"
+}

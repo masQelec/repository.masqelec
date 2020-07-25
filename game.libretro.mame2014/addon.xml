@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="game.libretro.mame2014"
+       name="game.libretro.mame2014"
+       version="9.2.106"
+       provider-name="Team CoreELEC">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+
+  </requires>
+  <extension point="xbmc.service" library="default.py">
+    <provides></provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Arcade (MAME 2014): Add-on removed</summary>
+    <description>
+Arcade (MAME 2014) Add-on removed
+    </description>
+    <disclaimer>
+
+    </disclaimer>
+    <broken>
+Arcade (MAME 2014) is superseeded by Arcade (MAME 2015)
+    </broken>
+    <platform>all</platform>
+    <news>
+
+    </news>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.png</fanart>
+
+    </assets>
+  </extension>
+</addon>

@@ -1,0 +1,19 @@
+{
+    "Save": "Spara",
+    "Video": "Video",
+    "Add": "L\u00e4gg till",
+    "Game": "Spel",
+    "MediaType": "Typ av media",
+    "ExternalPlayers": "Externa spelare",
+    "ExternalPlayer": "Extern spelare",
+    "PlayerPath": "S\u00f6kv\u00e4g till spelare",
+    "ArgumentsHelp": "Ange 1 argument per rad.",
+    "TokenPath": "{path} = s\u00f6kv\u00e4g till mediafil",
+    "EnableFor": "Aktivera f\u00f6r:",
+    "VideoFiles": "Videofiler",
+    "InternetStreams": "Internet-str\u00f6mmar",
+    "CommandLineArguments": "Argument f\u00f6r kommandorad",
+    "TokenStartPosMs": "{ms} = startposition i ms",
+    "AdditionalFilters": "Ytterligare filter:",
+    "GameSystem": "Spelsystem:"
+}

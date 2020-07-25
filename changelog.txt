@@ -1,0 +1,27 @@
+1.2.0
+- Removed version.txt
+- Added Python 3 support (tested with v.3.6.5)
+- Added script settings
+  > key press for exiting
+  > overwrite existing files
+  > rename older files
+  > copy additional files
+  > replace ampersand
+  > Compress with either deflate or store
+  > Ignored directories
+  > Ignored files
+- Various bug fixes and enhancements
+
+1.1.2
+- Made several variables global
+- Separated "_copy_additional_files" function to the new Copier class
+- "_copy_additional_files" now properly loops through ever changelog, icons, fanarts
+
+1.1.1
+- New function to copy changelogs, icons, fanarts
+- Changed from deprecated md5 module to hashlib
+
+1.1.0
+- Added a file with version number
+- Only read folders with addon.xml files in it
+- Changed output to output_path in config.ini

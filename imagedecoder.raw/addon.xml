@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="imagedecoder.raw" version="2.0.1.2" name="libraw image decoder" provider-name="spiff">
+  <requires>
+    <import addon="kodi.binary.global.main" version="1.0.14"/>
+    <import addon="kodi.binary.instance.imagedecoder" version="2.0.0"/>
+  </requires>
+  <extension point="kodi.imagedecoder" library_linux="imagedecoder.raw.so.2.0.1" extension=".dng|.cr2|.nef|.arw" mimetype="image/dng|image/cr2|image/nef|image/arw"/>
+  <extension point="xbmc.addon.metadata">
+    <summary>libraw based image decoder</summary>
+    <description>libraw based image decoder</description>
+    <platform/>
+  </extension>
+</addon>

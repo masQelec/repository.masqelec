@@ -1,0 +1,32 @@
+﻿<div is="emby-scroller" class="view flex flex-direction-column scrollFrameY flex-grow" data-mousewheel="true" data-horizontal="false" data-centerfocus="card">
+    <div class="scrollSlider flex-grow flex-direction-column padded-left padded-right padded-top-page padded-bottom-page settingsContainer">
+        <form class="userProfileSettingsForm auto-center">
+
+            <h2>
+                ${HeaderCameraUpload}
+            </h2>
+
+            <div style="margin:1em 0;">
+                <div class="premiereInfo"></div>
+            </div>
+
+            <div style="margin: 2em 0;" class="progressContainer hide">
+                <div class="secondaryText progressDescription" style="margin:0 0 .5em;"></div>
+                <div class="itemProgressBar"><div class="itemProgressBarForeground" style="width:50%;"></div></div>
+            </div>
+
+            <div class="checkboxList" style="margin: 1.5em 0;">
+                <h3 class="checkboxListLabel">${UploadToFollowingServers}</h3>
+
+                <div class="uploadServerList">
+
+                </div>
+            </div>
+
+            <label class="checkboxContainer">
+                <input type="checkbox" is="emby-checkbox" id="chkWifi" />
+                <span>${UploadOnlyOnWifi}</span>
+            </label>
+        </form>
+    </div>
+</div>

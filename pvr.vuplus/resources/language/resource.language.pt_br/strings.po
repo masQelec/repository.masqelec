@@ -1,0 +1,237 @@
+# Kodi Media Center language file
+# Addon Name: Enigma2 Client
+# Addon id: pvr.vuplus
+# Addon Provider: Joerg Dembski and Ross Nicholson
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Main\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/kodi-main/language/pt_BR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgctxt "#30003"
+msgid "Username"
+msgstr "Nome do usuário"
+
+msgctxt "#30004"
+msgid "Password"
+msgstr "Senha"
+
+msgctxt "#30005"
+msgid "Connection"
+msgstr "Conexão"
+
+msgctxt "#30006"
+msgid "Icons"
+msgstr "Ícones"
+
+msgctxt "#30007"
+msgid "Response timeout in seconds"
+msgstr "Tempo limite para resposta em segundos"
+
+msgctxt "#30008"
+msgid "Icon path"
+msgstr "Caminho para o ícone"
+
+msgctxt "#30010"
+msgid "Update Interval in minutes"
+msgstr "Intervalo de atualizações em minutos"
+
+msgctxt "#30014"
+msgid "Folder for channeldata"
+msgstr "Pasta para dados dos canais"
+
+msgctxt "#30015"
+msgid "Update interval"
+msgstr "Intervalo de atualização"
+
+msgctxt "#30016"
+msgid "Check for channel updates"
+msgstr "Verificar atualizações de canal"
+
+msgctxt "#30017"
+msgid "Use only the DVB boxes' current recording path"
+msgstr "Usar somente o caminho de gravação atual do conversor DVB"
+
+msgctxt "#30018"
+msgid "General"
+msgstr "Geral"
+
+msgctxt "#30019"
+msgid "Channels"
+msgstr "Canais"
+
+msgctxt "#30020"
+msgid "Advanced"
+msgstr "Avançado"
+
+msgctxt "#30021"
+msgid "HTTP"
+msgstr "HTTP"
+
+msgctxt "#30022"
+msgid "Recordings / Timer"
+msgstr "Gravações / Agendamentos"
+
+msgctxt "#30023"
+msgid "Recording folder on the receiver"
+msgstr "Pasta de gravações no receptor"
+
+msgctxt "#30029"
+msgid "Enable automatic configuration for live streams"
+msgstr "Ativar configuração automática para streams ao vivo"
+
+msgctxt "#30030"
+msgid "Keep folder structure for records"
+msgstr "Mantenha estrutura da pasta para gravações"
+
+msgctxt "#30031"
+msgid "Seasons and Episodes"
+msgstr "Temporadas e Episódios"
+
+msgctxt "#30032"
+msgid "EPG"
+msgstr "Guia"
+
+msgctxt "#30039"
+msgid "Streaming"
+msgstr "Streaming"
+
+msgctxt "#30042"
+msgid "Never"
+msgstr "Nunca"
+
+msgctxt "#30043"
+msgid "In EPG only"
+msgstr "Somente no EPG"
+
+msgctxt "#30044"
+msgid "In recordings only"
+msgstr "Somente em gravações"
+
+msgctxt "#30045"
+msgid "Always"
+msgstr "Sempre"
+
+msgctxt "#30051"
+msgid "Login"
+msgstr "Login"
+
+msgctxt "#30052"
+msgid "Misc"
+msgstr "Misc"
+
+msgctxt "#30056"
+msgid "TV"
+msgstr "TV"
+
+msgctxt "#30057"
+msgid "Radio"
+msgstr "Rádio"
+
+msgctxt "#30060"
+msgid "Timeshift"
+msgstr "Mudança de horário"
+
+msgctxt "#30062"
+msgid "Timeshift buffer path"
+msgstr "Caminho do buffer de gravação"
+
+msgctxt "#30063"
+msgid "Off"
+msgstr "Desligado"
+
+msgctxt "#30064"
+msgid "On playback"
+msgstr "Na reprodução"
+
+msgctxt "#30065"
+msgid "On pause"
+msgstr "Na pausa"
+
+msgctxt "#30067"
+msgid "Use login for streams"
+msgstr "Usar login para streams"
+
+msgctxt "#30071"
+msgid "Recordings"
+msgstr "Gravações"
+
+msgctxt "#30072"
+msgid "Timers"
+msgstr "Agendamentos"
+
+msgctxt "#30078"
+msgid "Favourites group"
+msgstr "Grupo de favoritos"
+
+msgctxt "#30079"
+msgid "Favourites (TV)"
+msgstr "Favoritos (TV)"
+
+msgctxt "#30080"
+msgid "Favourites (Radio)"
+msgstr "Favoritos (Rádio)"
+
+msgctxt "#30081"
+msgid "unknown"
+msgstr "desconhecido"
+
+msgctxt "#30082"
+msgid " (Not connected!)"
+msgstr "(Não conectado!)"
+
+msgctxt "#30083"
+msgid "addon error"
+msgstr "Erro no add-on"
+
+msgctxt "#30085"
+msgid "OK"
+msgstr "OK"
+
+msgctxt "#30090"
+msgid "Device Info"
+msgstr "Informações do dispositivo"
+
+msgctxt "#30094"
+msgid "N/A"
+msgstr "N/D"
+
+msgctxt "#30095"
+msgid "True"
+msgstr "Verdadeiro"
+
+msgctxt "#30096"
+msgid "False"
+msgstr "Falso"
+
+msgctxt "#30101"
+msgid "Timers and recordings"
+msgstr "Agendamentos e gravações"
+
+msgctxt "#30102"
+msgid "Timers only"
+msgstr "Somente agendamentos"
+
+msgctxt "#30410"
+msgid "Automatic"
+msgstr "Automático"
+
+msgctxt "#30430"
+msgid "Disabled"
+msgstr "Desabilitado"
+
+msgctxt "#30500"
+msgid "Disconnected from '%s'"
+msgstr "Desconectado de  '%s'"
+
+msgctxt "#30501"
+msgid "Reconnected to '%s'"
+msgstr "Reconectado a '%s'"

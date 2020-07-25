@@ -1,0 +1,72 @@
+﻿<div id="librarySettingsPage" data-role="page" class="page type-interior withTabs">
+
+    <div>
+        <div class="content-primary">
+            <form class="librarySettingsForm padded-top">
+
+                <div class="selectContainer">
+                    <select is="emby-select" id="selectDateAdded" data-mini="true" label="${LabelDateAddedBehavior}">
+                        <option value="0">${OptionDateAddedImportTime}</option>
+                        <option value="1">${OptionDateAddedFileTime}</option>
+                    </select>
+                    <div class="fieldDescription">${LabelDateAddedBehaviorHelp}</div>
+                </div>
+                <div class="inputContainer">
+                    <div class="flex align-items-center">
+                        <div class="flex-grow">
+                            <input is="emby-input" id="txtMetadataPath" label="${LabelMetadataPath}" autocomplete="off" />
+                        </div>
+                        <button type="button" is="paper-icon-button-light" id="btnSelectMetadataPath" title="${ButtonSelectDirectory}" class="emby-input-iconbutton"><i class="md-icon">search</i></button>
+                    </div>
+                    <div class="fieldDescription">${LabelMetadataPathHelp}</div>
+                    <input type="hidden" id="txtMetadataNetworkPath" />
+                </div>
+                <div class="checkboxContainer checkboxContainer-withDescription fldSaveMetadataHidden hide">
+                    <label>
+                        <input type="checkbox" is="emby-checkbox" class="chkAirDays" id="chkSaveMetadataHidden" data-filter="Sunday" />
+                        <span>${OptionSaveMetadataAsHidden}</span>
+                    </label>
+                    <div class="fieldDescription checkboxFieldDescription">${OptionSaveMetadataAsHiddenHelp}</div>
+                </div>
+
+                <div class="selectContainer">
+                    <select is="emby-select" id="selectTrackTitleDisplay" data-mini="true" label="${LabelTrackTitleDisplay}">
+                        <option value="">${GenerateUserFriendlyTrackTitles}</option>
+                        <option value="original">${PreferOriginalTrackTitles}</option>
+                    </select>
+                    <div class="fieldDescription">${TrackTitleDisplayHelp}</div>
+                </div>
+
+                <label class="checkboxContainer">
+                    <input type="checkbox" is="emby-checkbox" class="chkDisplaySpecialsWithinSeasons" />
+                    <span>${LabelDisplaySpecialsWithinSeasons}</span>
+                </label>
+
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label>
+                        <input class="chkExternalContentInSuggestions" type="checkbox" is="emby-checkbox" />
+                        <span>${OptionEnableExternalContentInSuggestions}</span>
+                    </label>
+                    <div class="fieldDescription checkboxFieldDescription">${OptionEnableExternalContentInSuggestionsHelp}</div>
+                </div>
+
+                <h2>${HeaderPreferredMetadataLanguage}</h2>
+
+                <p style="margin:1.5em 0;">${DefaultMetadataLangaugeDescription}</p>
+
+                <div class="selectContainer">
+                    <select is="emby-select" id="selectLanguage" required="required" label="${LabelLanguage}"></select>
+                </div>
+
+                <div class="selectContainer">
+                    <select is="emby-select" id="selectCountry" required="required" label="${LabelCountry}"></select>
+                </div>
+
+                <br />
+                <button is="emby-button" type="submit" class="raised button-submit block"><span>${ButtonSave}</span></button>
+
+            </form>
+
+        </div>
+    </div>
+</div>

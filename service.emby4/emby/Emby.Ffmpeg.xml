@@ -1,0 +1,1445 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Emby.Ffmpeg</name>
+    </assembly>
+    <members>
+        <member name="T:Emby.Ffmpeg.Common.EscapingHelpers">
+            <summary>
+            Escaping helper methods.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.EscapingHelpers.EscapeUnixFilePath(System.String)">
+            <summary>Escapes a unix file path.</summary>
+            <param name="path">The path.</param>
+            <returns>An escaped path string.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.EscapingHelpers.DoubleQuote(System.String)">
+            <summary>Surrounds a string with double quotes.</summary>
+            <param name="value">The value.</param>
+            <returns>A quoted string.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Common.FlagsConverter">
+            <summary>
+            Extensions for converting flags to and from strings.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.FlagsConverter.ParseAsFlags``1(System.String)">
+            <summary>Parse flags from string.</summary>
+            <typeparam name="T">A flags enum type.</typeparam>
+            <param name="value">The string value.</param>
+            <returns>The flags enum value.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.FlagsConverter.ToFlagsString``1(System.Nullable{``0})">
+            <summary>Convert a flags enum to an ffmpeg flags string.</summary>
+            <typeparam name="T">A flags enum.</typeparam>
+            <param name="flagsValue">The enum value.</param>
+            <returns>A flags string.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Common.Globals">
+            <summary>
+            Extensions for working with enums.
+            </summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Common.Globals.Format">
+            <summary>Gets the format.</summary>
+            <value>The format.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Common.NumericConstants">
+            <summary>NumericConstant conversions.</summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.NumericConstants.GetConstant(System.Nullable{System.Int32})">
+            <summary>Gets the constant.</summary>
+            <param name="value">The value.</param>
+            <returns>A string.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.NumericConstants.GetConstant(System.Nullable{System.Int64})">
+            <summary>Gets the constant.</summary>
+            <param name="value">The value.</param>
+            <returns>A string.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.NumericConstants.GetConstant(System.Nullable{System.Single})">
+            <summary>Gets the constant.</summary>
+            <param name="value">The value.</param>
+            <returns>A string.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.NumericConstants.GetConstant(System.Nullable{System.Double})">
+            <summary>Gets the constant.</summary>
+            <param name="value">The value.</param>
+            <returns>A string.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.NumericConstants.ParseDouble(System.String)">
+            <summary>Parses the double.</summary>
+            <param name="str">The string.</param>
+            <returns>A value.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.NumericConstants.ParseFloat(System.String)">
+            <summary>Parses the float.</summary>
+            <param name="str">The string.</param>
+            <returns>A value.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.NumericConstants.ParseInt32(System.String)">
+            <summary>Parses the int32.</summary>
+            <param name="str">The string.</param>
+            <returns>A value.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.NumericConstants.ParseInt64(System.String)">
+            <summary>Parses the int64.</summary>
+            <param name="str">The string.</param>
+            <returns>A value.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Common.UrlHelpers">
+            <summary>
+            URL helper methods.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Common.UrlHelpers.GetExtensionFromUrl(System.String)">
+            <summary>Gets the extension from a file path or url.</summary>
+            <param name="urlString">The path or url.</param>
+            <returns>The extension.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Configuration.CommandConfiguration">
+            <summary>
+            Ffmpeg Command Configuration.
+            </summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Configuration.CommandConfiguration.SpecifyDemuxerFormat">
+            <summary>Gets or sets a value indicating whether the demuxer format should be set explicitly (-f option).</summary>
+            <value><c>true</c> to specify; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Configuration.CommandConfiguration.EscapingStyle">
+            <summary>Gets or sets the escaping style.</summary>
+            <value>The escaping style.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Configuration.CommandConfiguration.FeatureSelectors">
+            <summary>Gets or sets the feature selectors.</summary>
+            <value>The feature selectors.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Configuration.Enums.PathEscapingStyle">
+            <summary>
+            Escaping style for file paths.
+            </summary>
+        </member>
+        <member name="F:Emby.Ffmpeg.Model.Configuration.Enums.PathEscapingStyle.Windows">
+            <summary>Escape for Windows.</summary>
+        </member>
+        <member name="F:Emby.Ffmpeg.Model.Configuration.Enums.PathEscapingStyle.Unix">
+            <summary>Escape for Unix.</summary>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Configuration.SelectorConfiguration">
+            <summary>
+            Feature Selector Configuration.
+            </summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Configuration.SelectorConfiguration.DemuxerSelector">
+            <summary>Gets or sets the demuxer selector.</summary>
+            <value>The demuxer selector.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Configuration.SelectorConfiguration.MuxerSelector">
+            <summary>Gets or sets the muxer selector.</summary>
+            <value>The muxer selector.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Configuration.SelectorConfiguration.InputProtocolSelector">
+            <summary>Gets or sets the input protocol selector.</summary>
+            <value>The input protocol selector.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Configuration.SelectorConfiguration.OutputProtocolSelector">
+            <summary>Gets or sets the output protocol selector.</summary>
+            <value>The output protocol selector.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Containers.InputStreamContainer">
+            <summary>
+            Input stream container.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Containers.InputStreamContainer.#ctor(System.Collections.Generic.IEnumerable{Emby.Media.Model.Streams.StreamBase})">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Containers.InputStreamContainer"/> class.</summary>
+            <param name="streams">The streams.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Containers.InputStreamContainer.#ctor(System.Collections.Generic.IEnumerable{Emby.Media.Model.Streams.StreamBase},Emby.Ffmpeg.Model.Containers.InputStreamContainer)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Containers.InputStreamContainer" /> class.</summary>
+            <param name="streams">The streams.</param>
+            <param name="cloneFrom">Container to copy properties from.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Containers.InputStreamContainer.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Containers.InputStreamContainer"/> class.</summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.InputStreamContainer.Demuxer">
+            <summary>Gets or sets the demuxer.</summary>
+            <value>The demuxer.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Containers.OutputStreamContainer">
+            <summary>
+            Input stream container.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Containers.OutputStreamContainer.#ctor(System.Collections.Generic.IEnumerable{Emby.Media.Model.Streams.StreamBase})">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Containers.OutputStreamContainer"/> class.</summary>
+            <param name="streams">The streams.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Containers.OutputStreamContainer.#ctor(System.Collections.Generic.IEnumerable{Emby.Media.Model.Streams.StreamBase},Emby.Ffmpeg.Model.Containers.OutputStreamContainer)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Containers.OutputStreamContainer" /> class.</summary>
+            <param name="streams">The streams.</param>
+            <param name="cloneFrom">Container to copy properties from.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Containers.OutputStreamContainer.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Containers.OutputStreamContainer"/> class.</summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.OutputStreamContainer.Muxer">
+            <summary>Gets or sets the demuxer.</summary>
+            <value>The demuxer.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Containers.StreamContainerBase">
+            <summary>
+            Stream container base class.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Containers.StreamContainerBase.#ctor(System.Collections.Generic.IEnumerable{Emby.Media.Model.Streams.StreamBase})">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Containers.StreamContainerBase"/> class.</summary>
+            <param name="streams">The streams.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Containers.StreamContainerBase.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Containers.StreamContainerBase"/> class.</summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.Protocol">
+            <summary>Gets or sets the protocol.</summary>
+            <value>The protocol.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.Url">
+            <summary>Gets or sets the URL.</summary>
+            <value>The URL.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.ContainerFormat">
+            <summary>Gets or sets the container format.</summary>
+            <value>The container format.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.Streams">
+            <summary>Gets the streams.</summary>
+            <value>The streams.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.VideoStreams">
+            <summary>Gets the streams.</summary>
+            <value>The streams.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.AudioStreams">
+            <summary>Gets the streams.</summary>
+            <value>The streams.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.SubtitleStreams">
+            <summary>Gets the streams.</summary>
+            <value>The streams.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.VideoStream0">
+            <summary>Gets the video stream #0.</summary>
+            <value>The video stream #0.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.AudioStream0">
+            <summary>Gets the audio stream #0.</summary>
+            <value>The audio stream #0.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.AudioStream1">
+            <summary>Gets the audio stream #1.</summary>
+            <value>The audio stream #1.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.SubtitleStream0">
+            <summary>Gets the subtitle stream #0.</summary>
+            <value>The subtitle stream #0.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Containers.StreamContainerBase.SubtitleStream1">
+            <summary>Gets the subtitle stream #1.</summary>
+            <value>The subtitle stream #1.</value>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Containers.StreamContainerBase.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FeatureSelection.DefaultSelectors.DefaultDemuxerSelector">
+            <summary>
+            Default Implementation for automatic demuxer selection.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.FeatureSelection.IDemuxerSelector" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FeatureSelection.DefaultSelectors.DefaultDemuxerSelector.SelectDemuxer(System.String,System.String)">
+            <summary>Selects a demuxer.</summary>
+            <param name="containerFormat">The container format.</param>
+            <param name="fileExtension">The file extension.</param>
+            <returns>A Demuxer feature.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FeatureSelection.DefaultSelectors.DefaultInputProtocolSelector">
+            <summary>
+            Default Implementation for automatic selection of input protocol.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.FeatureSelection.IInputProtocolSelector" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FeatureSelection.DefaultSelectors.DefaultInputProtocolSelector.SelectInputProtocol(System.String,System.String)">
+            <summary>Selects an input protocol.</summary>
+            <param name="protocol">The protocol.</param>
+            <param name="url">The URL.</param>
+            <returns>An InputProtocol feature.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FeatureSelection.DefaultSelectors.DefaultMuxerSelector">
+            <summary>
+            Default Implementation for automatic muxer selection.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.FeatureSelection.IMuxerSelector" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FeatureSelection.DefaultSelectors.DefaultMuxerSelector.SelectMuxer(System.String,System.String)">
+            <summary>Selects a muxer.</summary>
+            <param name="containerFormat">The container format.</param>
+            <param name="fileExtension">The file extension.</param>
+            <returns>A Muxer feature.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FeatureSelection.DefaultSelectors.DefaultOutputProtocolSelector">
+            <summary>
+            Default Implementation for automatic selection of output protocol.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.FeatureSelection.IOutputProtocolSelector" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FeatureSelection.DefaultSelectors.DefaultOutputProtocolSelector.SelectOutputProtocol(System.String,System.String)">
+            <summary>Selects an output protocol.</summary>
+            <param name="protocol">The protocol.</param>
+            <param name="url">The URL.</param>
+            <returns>An OutputProtocol feature.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FeatureSelection.IDemuxerSelector">
+            <summary>
+            Automatic demuxer selection.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FeatureSelection.IDemuxerSelector.SelectDemuxer(System.String,System.String)">
+            <summary>Selects a demuxer.</summary>
+            <param name="containerFormat">The container format.</param>
+            <param name="fileExtension">The file extension.</param>
+            <returns>A Demuxer feature.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FeatureSelection.IInputProtocolSelector">
+            <summary>
+            Automatic input protocol selection.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FeatureSelection.IInputProtocolSelector.SelectInputProtocol(System.String,System.String)">
+            <summary>Selects an input protocol.</summary>
+            <param name="protocol">The protocol.</param>
+            <param name="url">The URL.</param>
+            <returns>An InputProtocol feature.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FeatureSelection.IMuxerSelector">
+            <summary>
+            Automatic muxer selection.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FeatureSelection.IMuxerSelector.SelectMuxer(System.String,System.String)">
+            <summary>Selects a muxer.</summary>
+            <param name="containerFormat">The container format.</param>
+            <param name="fileExtension">The file extension.</param>
+            <returns>A Muxer feature.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FeatureSelection.IOutputProtocolSelector">
+            <summary>
+            Automatic output protocol selection.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FeatureSelection.IOutputProtocolSelector.SelectOutputProtocol(System.String,System.String)">
+            <summary>Selects an output protocol.</summary>
+            <param name="protocol">The protocol.</param>
+            <param name="url">The URL.</param>
+            <returns>An OutputProtocol feature.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FfmpegCommand">
+            <summary>
+            Ffmpeg command model.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.#ctor(Emby.Ffmpeg.Model.Configuration.CommandConfiguration)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.FfmpegCommand" /> class.</summary>
+            <param name="configuration">The configuration.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.FfmpegCommand"/> class.</summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FfmpegCommand.Configuration">
+            <summary>Gets the configuration.</summary>
+            <value>The configuration.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FfmpegCommand.Connections">
+            <summary>Gets the connections.</summary>
+            <value>The connections.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FfmpegCommand.Filters">
+            <summary>Gets the filters.</summary>
+            <value>The filters.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FfmpegCommand.Input0">
+            <summary>Gets the input0.</summary>
+            <value>The input0.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FfmpegCommand.Inputs">
+            <summary>Gets the inputs.</summary>
+            <value>The inputs.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FfmpegCommand.Options">
+            <summary>Gets the global options.</summary>
+            <value>The global options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FfmpegCommand.Output0">
+            <summary>Gets the output0.</summary>
+            <value>The output0.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FfmpegCommand.Outputs">
+            <summary>Gets the outputs.</summary>
+            <value>The outputs.</value>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.AddInput(Emby.Ffmpeg.Model.Containers.InputStreamContainer)">
+            <summary>Add input from stream container.</summary>
+            <param name="container">The container.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Input.InputFile"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.AddOutput(System.String,Emby.Ffmpeg.Model.Features.Protocols.OutputProtocolBase,Emby.Ffmpeg.Model.Features.Muxers.MuxerBase)">
+            <summary>Add output.</summary>
+            <param name="outputUrl">The output URL.</param>
+            <param name="outputProtocol">The output protocol.</param>
+            <param name="muxer">The muxer.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Output.OutputFile"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.BuildCommandLine">
+            <summary>Builds the ffmpeg command line.</summary>
+            <returns>The command line as string.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.Connect(Emby.Ffmpeg.Model.Interfaces.IStreamSource,Emby.Ffmpeg.Model.Interfaces.IStreamSink)">
+            <summary>Connects the specified source.</summary>
+            <param name="source">The source.</param>
+            <param name="sink">The sink.</param>
+            <returns>A <see cref="T:Emby.Ffmpeg.Model.FilterGraph.StreamConnection"/> object.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.Connect(Emby.Ffmpeg.Model.Interfaces.IStreamSource,Emby.Ffmpeg.Model.Features.Filters.Pins.InputPin)">
+            <summary>Connects the specified source.</summary>
+            <param name="source">The source.</param>
+            <param name="overlayFilterInput">A filter input pin.</param>
+            <returns>A <see cref="T:Emby.Ffmpeg.Model.FilterGraph.StreamConnection"/> object.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.Disconnect(Emby.Ffmpeg.Model.Interfaces.IStreamSink)">
+            <summary>Disconnects the specified sink.</summary>
+            <param name="sink">The sink.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.AddInput(Emby.Ffmpeg.Model.Input.InputFile)">
+            <summary>Adds the input.</summary>
+            <param name="input">The input.</param>
+            <returns>An <see cref="T:Emby.Ffmpeg.Model.Input.InputFile"/> instance.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.AddOutput(Emby.Ffmpeg.Model.Output.OutputFile)">
+            <summary>Adds the output.</summary>
+            <param name="output">The output.</param>
+            <returns>An <see cref="T:Emby.Ffmpeg.Model.Output.OutputFile"/> instance.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.FindStreamSource(System.String)">
+            <summary>Finds the stream source.</summary>
+            <param name="connectedSourceId">The connected source identifier.</param>
+            <returns>A stream source implementing <see cref="T:Emby.Ffmpeg.Model.Interfaces.IStreamSource"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommand.CreatInputFromContainer(Emby.Ffmpeg.Model.Containers.InputStreamContainer)">
+            <summary>Froms the container.</summary>
+            <param name="container">The container.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Input.InputFile"/>.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FfmpegCommandBase">
+            <summary>
+            Ffmpeg base command model.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FfmpegCommandBase.BuildCommandLine">
+            <summary>Builds the ffmpeg command line.</summary>
+            <returns>The command line as string.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph">
+            <summary>
+            Ffmpeg filtergraph model.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph.#ctor(Emby.Ffmpeg.Model.FfmpegCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph" /> class.</summary>
+            <param name="command">The command.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph.Count">
+            <summary>Gets the number of elements in the collection.</summary>
+            <returns>The number of elements in the collection.</returns>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph.Item(System.Int32)">
+            <summary>Gets the element at the specified index in the read-only list.</summary>
+            <param name="index">The zero-based index of the element to get.</param>
+            <returns>The element at the specified index in the read-only list.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph.AddFilter``1(``0)">
+            <summary>Adds the filter.</summary>
+            <typeparam name="T">A filter type.</typeparam>
+            <param name="filter">The filter.</param>
+            <returns>A <see cref="T:Emby.Ffmpeg.Model.FilterGraph.FilterInstance" />.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph.AddFilter``1(``0,Emby.Ffmpeg.Model.Interfaces.IVideoStreamSource)">
+            <summary>Adds a video filter and connects its input to the specified stream source.</summary>
+            <typeparam name="T">A filter type.</typeparam>
+            <param name="filter">The filter.</param>
+            <param name="videoStreamSource">The video stream source.</param>
+            <returns>A <see cref="T:Emby.Ffmpeg.Model.FilterGraph.FilterInstance" />.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph.BuildFilterString">
+            <summary>Builds the filter string.</summary>
+            <returns>A filter string.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph.GetEnumerator">
+            <summary>Returns an enumerator that iterates through the collection.</summary>
+            <returns>An enumerator that can be used to iterate through the collection.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph.System#Collections#IEnumerable#GetEnumerator">
+            <summary>Returns an enumerator that iterates through a collection.</summary>
+            <returns>An <see cref="T:System.Collections.IEnumerator"></see> object that can be used to iterate through the collection.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph.AddFilterInstance(Emby.Ffmpeg.Model.FilterGraph.FilterInstance)">
+            <summary>Adds the filter instance.</summary>
+            <param name="filterInstance">The filter instance.</param>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FilterGraph.FilterInstance">
+            <summary>
+            The FilterInstance class.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.FilterInstance.#ctor(Emby.Ffmpeg.Model.Features.Filters.FilterBase,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.FilterGraph.FilterInstance" /> class.</summary>
+            <param name="filter">The filter.</param>
+            <param name="filterId">The filter identifier.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FilterInstance.Filter">
+            <summary>Gets the filter.</summary>
+            <value>The filter.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FilterInstance.FilterName">
+            <summary>Gets the name of the filter.</summary>
+            <value>The name of the filter.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FilterInstance.FilterId">
+            <summary>Gets the filter identifier.</summary>
+            <value>The filter identifier.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FilterInstance.InputPin0">
+            <summary>Gets the input pin0.</summary>
+            <value>The input pin0.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FilterInstance.InputPin1">
+            <summary>Gets the input pin1.</summary>
+            <value>The input pin1.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FilterInstance.InputPins">
+            <summary>Gets the input pins.</summary>
+            <value>The input pins.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FilterInstance.OutputPin0">
+            <summary>Gets the output pin0.</summary>
+            <value>The output pin0.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FilterInstance.OutputPin1">
+            <summary>Gets the output pin1.</summary>
+            <value>The output pin1.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FilterInstance.OutputPins">
+            <summary>Gets the output pins.</summary>
+            <value>The output pins.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FilterGraph.FilterInstance`1">
+            <summary>
+            Generic typed FilterInstance.
+            </summary>
+            <typeparam name="T">A filter type.</typeparam>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.FilterInstance`1.#ctor(`0,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.FilterGraph.FilterInstance`1"/> class.</summary>
+            <param name="filter">The filter.</param>
+            <param name="filterId">The filter identifier.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.FilterInstance`1.Filter">
+            <summary>Gets the filter.</summary>
+            <value>The filter.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance">
+            <summary>
+            The InputPinInstance class.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Interfaces.IStreamSink" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance.#ctor(Emby.Ffmpeg.Model.FilterGraph.FilterInstance,Emby.Ffmpeg.Model.Features.Filters.Pins.InputPin)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance"/> class.</summary>
+            <param name="ownerFilter">The owner filter.</param>
+            <param name="inputPin">The input pin.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance.ConnectedSource">
+            <summary>Gets the connected source.</summary>
+            <value>The connected source.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance.Emby#Ffmpeg#Model#Interfaces#IStreamSinkInternal#ConnectedSource">
+            <inheritdoc/>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance.FilterPin">
+            <summary>Gets the filter pin.</summary>
+            <value>The filter pin.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance.OwnerFilter">
+            <summary>Gets the owner filter.</summary>
+            <value>The owner filter.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance.PinIndex">
+            <summary>Gets the index of the pin.</summary>
+            <value>The index of the pin.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance.Emby#Ffmpeg#Model#Interfaces#IStreamSink#Feature">
+            <summary>Gets the feature.</summary>
+            <value>The feature.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstanceVideo">
+            <summary>
+            The InputPinInstance class.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Interfaces.IStreamSink" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstanceVideo.#ctor(Emby.Ffmpeg.Model.FilterGraph.FilterInstance,Emby.Ffmpeg.Model.Features.Filters.Pins.InputPin)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstanceVideo" /> class.</summary>
+            <param name="ownerFilter">The owner filter.</param>
+            <param name="inputPin">The input pin.</param>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FilterGraph.Pins.OutputPinInstance">
+            <summary>
+            The OutputPinInstance class.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Interfaces.IStreamSource" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.Pins.OutputPinInstance.#ctor(Emby.Ffmpeg.Model.FilterGraph.FilterInstance,Emby.Ffmpeg.Model.Features.Filters.Pins.OutputPin)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.FilterGraph.Pins.OutputPinInstance"/> class.</summary>
+            <param name="ownerFilter">The owner filter.</param>
+            <param name="outputPin">The output pin.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.OutputPinInstance.ConnectedSink">
+            <summary>Gets the connected sink.</summary>
+            <value>The connected sink.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.OutputPinInstance.Emby#Ffmpeg#Model#Interfaces#IStreamSourceInternal#ConnectedSink">
+            <inheritdoc/>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.OutputPinInstance.FilterPin">
+            <summary>Gets the filter pin.</summary>
+            <value>The filter pin.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.OutputPinInstance.OwnerFilter">
+            <summary>Gets the owner filter.</summary>
+            <value>The owner filter.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.OutputPinInstance.PinIndex">
+            <summary>Gets the index of the pin.</summary>
+            <value>The index of the pin.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.Pins.OutputPinInstance.Emby#Ffmpeg#Model#Interfaces#IStreamSource#Feature">
+            <summary>Gets the feature.</summary>
+            <value>The feature.</value>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.Pins.OutputPinInstance.GetStreamSpecifier">
+            <summary>Gets the stream specifier.</summary>
+            <returns>A stream specifier.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.FilterGraph.StreamConnection">
+            <summary>
+            Class representing a connection between inputs, outputs and filter pins.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.FilterGraph.StreamConnection.#ctor(System.String,Emby.Ffmpeg.Model.Interfaces.IStreamSource,Emby.Ffmpeg.Model.Interfaces.IStreamSink)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.FilterGraph.StreamConnection"/> class.</summary>
+            <param name="name">The name.</param>
+            <param name="streamSource">The stream source.</param>
+            <param name="streamSink">The stream sink.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.StreamConnection.Name">
+            <summary>Gets the name.</summary>
+            <value>The name.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.StreamConnection.StreamSink">
+            <summary>Gets the stream target.</summary>
+            <value>The stream target.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.FilterGraph.StreamConnection.StreamSource">
+            <summary>Gets the stream source.</summary>
+            <value>The stream source.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Input.InputFile">
+            <summary>
+            Input model.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputFile.#ctor(Emby.Ffmpeg.Model.Features.Protocols.InputProtocolBase,Emby.Ffmpeg.Model.Features.Muxers.DemuxerBase,Emby.Ffmpeg.Model.Containers.InputStreamContainer)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Input.InputFile" /> class.</summary>
+            <param name="inputProtocol">The input protocol.</param>
+            <param name="demuxer">The demuxer.</param>
+            <param name="container">The container.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputFile.#ctor(Emby.Ffmpeg.Model.Features.Protocols.InputProtocolBase,Emby.Ffmpeg.Model.Features.Muxers.DemuxerBase,System.String,System.Collections.Generic.IEnumerable{Emby.Media.Model.Streams.StreamBase})">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Input.InputFile"/> class.</summary>
+            <param name="inputProtocol">The input protocol.</param>
+            <param name="demuxer">The demuxer.</param>
+            <param name="url">The URL.</param>
+            <param name="streams">The streams.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputFile.#ctor(Emby.Ffmpeg.Model.Features.Protocols.InputProtocolBase,Emby.Ffmpeg.Model.Features.Muxers.DemuxerBase,System.String,System.Collections.Generic.IEnumerable{Emby.Ffmpeg.Model.Input.InputStreamBase})">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Input.InputFile"/> class.</summary>
+            <param name="inputProtocol">The input protocol.</param>
+            <param name="demuxer">The demuxer.</param>
+            <param name="url">The URL.</param>
+            <param name="streams">The streams.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.InputIndex">
+            <summary>Gets the index of the input.</summary>
+            <value>The index of the input.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.Options">
+            <summary>Gets the options.</summary>
+            <value>The options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.Url">
+            <summary>Gets or sets the input URL.</summary>
+            <value>The URL.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.Audio0">
+            <summary>Gets the audio input.</summary>
+            <value>The first audio input.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.AudioStreams">
+            <summary>Gets the audio streams.</summary>
+            <value>The audio streams.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.InputProtocol">
+            <summary>Gets or sets the input protocol.</summary>
+            <value>The input protocol.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.Demuxer">
+            <summary>Gets or sets the demuxer.</summary>
+            <value>The demuxer.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.Streams">
+            <summary>Gets the streams.</summary>
+            <value>The streams.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.SubtitleStreams">
+            <summary>Gets the subtitle streams.</summary>
+            <value>The subtitle streams.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.Subtitles0">
+            <summary>Gets the first subtitle input.</summary>
+            <value>The subtitle input.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.Video0">
+            <summary>Gets the first video input.</summary>
+            <value>The first video input.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputFile.VideoStreams">
+            <summary>Gets the video streams.</summary>
+            <value>The video streams.</value>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputFile.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputFile.BuildParameters(Emby.Ffmpeg.Model.Configuration.CommandConfiguration)">
+            <summary>Builds the input parameters.</summary>
+            <param name="configuration">The configuration.</param>
+            <returns>A parameter string.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Input.InputStreamAudio">
+            <summary>
+            Audio input stream.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Input.InputStreamBase" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputStreamAudio.#ctor(Emby.Media.Model.Streams.AudioStream,Emby.Ffmpeg.Model.Features.Decoders.AudioDecoderBase)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Input.InputStreamAudio"/> class.</summary>
+            <param name="stream">The stream.</param>
+            <param name="decoder">The decoder.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamAudio.Options">
+            <summary>Gets the options.</summary>
+            <value>The options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamAudio.Decoder">
+            <summary>Gets the decoder.</summary>
+            <value>The decoder.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamAudio.Stream">
+            <summary>Gets the Audio stream.</summary>
+            <value>The stream.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamAudio.DecoderCore">
+            <summary>Gets the decoder core.</summary>
+            <value>The decoder core.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamAudio.StreamCore">
+            <summary>Gets the common options internally.</summary>
+            <value>The common options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamAudio.OptionsCore">
+            <summary>Gets the core options.</summary>
+            <value>The core options.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Input.InputStreamBase">
+            <summary>
+            Input stream model.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputStreamBase.#ctor(MediaBrowser.Model.Entities.MediaStreamType)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Input.InputStreamBase"/> class.</summary>
+            <param name="mediaKind">Kind of the media.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.Decoder">
+            <summary>Gets the decoder.</summary>
+            <value>The decoder.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.Options">
+            <summary>Gets the options.</summary>
+            <value>The options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.IsAutoDecoder">
+            <summary>Gets or sets a value indicating whether the decoder has been selected automatically.</summary>
+            <value><c>true</c> if the decoder has been auto-selected; <c>false</c> in case the decoder has been set explicitly.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.MediaKind">
+            <summary>Gets the kind of the media.</summary>
+            <value>The kind of the media.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.ConnectedSink">
+            <summary>Gets the connected sink.</summary>
+            <value>The connected sink.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.Stream">
+            <summary>Gets the stream.</summary>
+            <value>The stream.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.Emby#Ffmpeg#Model#Interfaces#IStreamSource#Feature">
+            <summary>Gets the feature.</summary>
+            <value>The feature.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.InputIndex">
+            <summary>Gets the index of the input.</summary>
+            <value>The index of the input.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.DecoderCore">
+            <summary>Gets the decoder core.</summary>
+            <value>The decoder core.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.StreamCore">
+            <summary>Gets the common options internally.</summary>
+            <value>The common options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamBase.OptionsCore">
+            <summary>Gets the core options.</summary>
+            <value>The core options.</value>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputStreamBase.FromStream(Emby.Media.Model.Streams.StreamBase)">
+            <summary>Froms the stream.</summary>
+            <param name="stream">The stream.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Input.InputStreamBase"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputStreamBase.GetStreamSpecifier">
+            <summary>Gets the stream specifier.</summary>
+            <returns>A stream specifier.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputStreamBase.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputStreamBase.BuildParameters(System.Collections.Generic.List{System.String},System.String,Emby.Ffmpeg.Model.Configuration.CommandConfiguration)">
+            <summary>Builds the parameters.</summary>
+            <param name="paramList">The parameter list.</param>
+            <param name="streamSpecifier">The stream specifier.</param>
+            <param name="configuration">The configuration.</param>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Input.InputStreamSubtitle">
+            <summary>
+            Subtitle input stream.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Input.InputStreamBase" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputStreamSubtitle.#ctor(Emby.Media.Model.Streams.SubtitleStream,Emby.Ffmpeg.Model.Features.Decoders.SubtitleDecoderBase)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Input.InputStreamSubtitle"/> class.</summary>
+            <param name="stream">The stream.</param>
+            <param name="decoder">The decoder.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamSubtitle.Options">
+            <summary>Gets the options.</summary>
+            <value>The options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamSubtitle.Decoder">
+            <summary>Gets the decoder.</summary>
+            <value>The decoder.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamSubtitle.Stream">
+            <summary>Gets the Subtitle stream.</summary>
+            <value>The stream.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamSubtitle.DecoderCore">
+            <summary>Gets the decoder core.</summary>
+            <value>The decoder core.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamSubtitle.StreamCore">
+            <summary>Gets the common options internally.</summary>
+            <value>The common options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamSubtitle.OptionsCore">
+            <summary>Gets the core options.</summary>
+            <value>The core options.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Input.InputStreamVideo">
+            <summary>
+            Video input stream.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Input.InputStreamBase" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Input.InputStreamVideo.#ctor(Emby.Media.Model.Streams.VideoStream,Emby.Ffmpeg.Model.Features.Decoders.VideoDecoderBase)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Input.InputStreamVideo"/> class.</summary>
+            <param name="stream">The stream.</param>
+            <param name="decoder">The decoder.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamVideo.Options">
+            <summary>Gets the options.</summary>
+            <value>The options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamVideo.Decoder">
+            <summary>Gets or sets the decoder.</summary>
+            <value>The decoder.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamVideo.Stream">
+            <summary>Gets the video stream.</summary>
+            <value>The stream.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamVideo.DecoderCore">
+            <summary>Gets the decoder core.</summary>
+            <value>The decoder core.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamVideo.StreamCore">
+            <summary>Gets the common options internally.</summary>
+            <value>The common options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Input.InputStreamVideo.OptionsCore">
+            <summary>Gets the core options.</summary>
+            <value>The core options.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Interfaces.ICommandContext">
+            <summary>
+            The IStreamSink interface.
+            </summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Interfaces.ICommandContext.Inputs">
+            <summary>Gets the inputs.</summary>
+            <value>The inputs.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Interfaces.ICommandContext.Outputs">
+            <summary>Gets the outputs.</summary>
+            <value>The outputs.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Interfaces.ICommandContext.Filters">
+            <summary>Gets the filters.</summary>
+            <value>The filters.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Interfaces.IStreamSink">
+            <summary>
+            The IStreamSink interface.
+            </summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Interfaces.IStreamSink.ConnectedSource">
+            <summary>Gets the connected source.</summary>
+            <value>The connected source.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Interfaces.IStreamSink.Feature">
+            <summary>Gets the feature.</summary>
+            <value>The feature.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Interfaces.IStreamSinkInternal">
+            <summary>
+            The IStreamSink interface.
+            </summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Interfaces.IStreamSinkInternal.ConnectedSource">
+            <summary>Gets or sets the connected source.</summary>
+            <value>The connected source.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Interfaces.IStreamSource">
+            <summary>
+            The IStreamSource interface.
+            </summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Interfaces.IStreamSource.Feature">
+            <summary>Gets the feature.</summary>
+            <value>The feature.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Interfaces.IStreamSource.ConnectedSink">
+            <summary>Gets the connected sink.</summary>
+            <value>The connected sink.</value>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Interfaces.IStreamSource.GetStreamSpecifier">
+            <summary>Gets the stream specifier.</summary>
+            <returns>A stream specifier.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Interfaces.IVideoStreamSource">
+            <summary>
+            The IVideoStreamSource interface.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Interfaces.IStreamSource" />
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Interfaces.IAudioStreamSource">
+            <summary>
+            The IAudioStreamSource interface.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Interfaces.IStreamSource" />
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Interfaces.ISubtitleStreamSource">
+            <summary>
+            The ISubtitleStreamSource interface.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Interfaces.IStreamSource" />
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Interfaces.IStreamSourceInternal">
+            <summary>
+            The IStreamSourceInternal interface.
+            </summary>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Interfaces.IStreamSourceInternal.ConnectedSink">
+            <summary>Gets or sets the connected sink.</summary>
+            <value>The connected sink.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Output.OutputFile">
+            <summary>
+            Output model.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputFile.#ctor(System.String,Emby.Ffmpeg.Model.Features.Protocols.OutputProtocolBase,Emby.Ffmpeg.Model.Features.Muxers.MuxerBase)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Output.OutputFile" /> class.</summary>
+            <param name="outputUrl">The output URL.</param>
+            <param name="outputProtocol">The Output protocol.</param>
+            <param name="muxer">The muxer.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputFile.#ctor(System.String,Emby.Ffmpeg.Model.Features.Protocols.OutputProtocolBase,Emby.Ffmpeg.Model.Features.Muxers.MuxerBase,System.Collections.Generic.IEnumerable{Emby.Ffmpeg.Model.Output.OutputStreamBase})">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Output.OutputFile"/> class.</summary>
+            <param name="outputUrl">The output URL.</param>
+            <param name="outputProtocol">The output protocol.</param>
+            <param name="muxer">The muxer.</param>
+            <param name="streams">The streams.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.Options">
+            <summary>Gets the options.</summary>
+            <value>The options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.Url">
+            <summary>Gets the Output URL.</summary>
+            <value>The URL.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.Audio0">
+            <summary>Gets the audio Output.</summary>
+            <value>The first audio Output.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.AudioStreams">
+            <summary>Gets the audio streams.</summary>
+            <value>The audio streams.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.OutputProtocol">
+            <summary>Gets the Output protocol.</summary>
+            <value>The Output protocol.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.Muxer">
+            <summary>Gets or sets the demuxer.</summary>
+            <value>The demuxer.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.Streams">
+            <summary>Gets the streams.</summary>
+            <value>The streams.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.Subtitles0">
+            <summary>Gets the first subtitle output.</summary>
+            <value>The first subtitle output.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.SubtitleStreams">
+            <summary>Gets the subtitle streams.</summary>
+            <value>The subtitle streams.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.Video0">
+            <summary>Gets the first video Output.</summary>
+            <value>The first video Output.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputFile.VideoStreams">
+            <summary>Gets the video streams.</summary>
+            <value>The video streams.</value>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputFile.MapInputStream(Emby.Ffmpeg.Model.Interfaces.IVideoStreamSource,Emby.Ffmpeg.Model.Features.Encoders.VideoEncoderBase)">
+            <summary>Maps the input stream.</summary>
+            <param name="inputStream">The input stream.</param>
+            <param name="encoder">The encoder.</param>
+            <returns>An output stream.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputFile.MapInputStream(Emby.Ffmpeg.Model.Input.InputStreamAudio,Emby.Ffmpeg.Model.Features.Encoders.AudioEncoderBase)">
+            <summary>Maps the input stream.</summary>
+            <param name="inputStream">The input stream.</param>
+            <param name="encoder">The encoder.</param>
+            <returns>An output stream.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputFile.MapInputStream(Emby.Ffmpeg.Model.Input.InputStreamSubtitle,Emby.Ffmpeg.Model.Features.Encoders.SubtitleEncoderBase)">
+            <summary>Maps the input stream.</summary>
+            <param name="inputStream">The input stream.</param>
+            <param name="encoder">The encoder.</param>
+            <returns>An output stream.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputFile.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputFile.BuildParameters(Emby.Ffmpeg.Model.Configuration.CommandConfiguration)">
+            <summary>Builds the Output parameters.</summary>
+            <param name="configuration">The configuration.</param>
+            <returns>A parameter string.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Output.OutputStreamAudio">
+            <summary>
+            Audio Output stream.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Output.OutputStreamBase" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputStreamAudio.#ctor(Emby.Ffmpeg.Model.Interfaces.IAudioStreamSource,Emby.Ffmpeg.Model.Features.Encoders.AudioEncoderBase)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Output.OutputStreamAudio" /> class.</summary>
+            <param name="inputStream">The input stream.</param>
+            <param name="encoder">The encoder.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamAudio.Options">
+            <summary>Gets the options.</summary>
+            <value>The options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamAudio.Encoder">
+            <summary>Gets or sets the encoder.</summary>
+            <value>The encoder.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamAudio.InputStream">
+            <summary>Gets the Audio stream.</summary>
+            <value>The stream.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamAudio.EncoderCore">
+            <summary>Gets the encoder core.</summary>
+            <value>The encoder core.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamAudio.InputStreamCore">
+            <summary>Gets the common options internally.</summary>
+            <value>The common options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamAudio.OptionsCore">
+            <summary>Gets the core options.</summary>
+            <value>The core options.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Output.OutputStreamBase">
+            <summary>
+            Output stream model.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputStreamBase.#ctor(MediaBrowser.Model.Entities.MediaStreamType)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Output.OutputStreamBase"/> class.</summary>
+            <param name="mediaKind">Kind of the media.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamBase.Encoder">
+            <summary>Gets the encoder.</summary>
+            <value>The encoder.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamBase.InputStream">
+            <summary>Gets the stream.</summary>
+            <value>The stream.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamBase.MediaKind">
+            <summary>Gets the kind of the media.</summary>
+            <value>The kind of the media.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamBase.Options">
+            <summary>Gets the options.</summary>
+            <value>The options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamBase.Emby#Ffmpeg#Model#Interfaces#IStreamSink#ConnectedSource">
+            <summary>Gets the connected source.</summary>
+            <value>The connected source.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamBase.Emby#Ffmpeg#Model#Interfaces#IStreamSink#Feature">
+            <summary>Gets the feature.</summary>
+            <value>The feature.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamBase.EncoderCore">
+            <summary>Gets the encoder core.</summary>
+            <value>The encoder core.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamBase.InputStreamCore">
+            <summary>Gets the common options internally.</summary>
+            <value>The common options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamBase.OptionsCore">
+            <summary>Gets the core options.</summary>
+            <value>The core options.</value>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputStreamBase.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputStreamBase.BuildParameters(System.Collections.Generic.List{System.String},System.String,Emby.Ffmpeg.Model.Configuration.CommandConfiguration)">
+            <summary>Builds the parameters.</summary>
+            <param name="paramList">The parameter list.</param>
+            <param name="streamSpecifier">The stream specifier.</param>
+            <param name="configuration">The configuration.</param>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Output.OutputStreamSubtitle">
+            <summary>
+            Subtitle Output stream.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Output.OutputStreamBase" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputStreamSubtitle.#ctor(Emby.Ffmpeg.Model.Interfaces.ISubtitleStreamSource,Emby.Ffmpeg.Model.Features.Encoders.SubtitleEncoderBase)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Output.OutputStreamSubtitle"/> class.</summary>
+            <param name="inputStream">The stream.</param>
+            <param name="encoder">The encoder.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamSubtitle.Options">
+            <summary>Gets the options.</summary>
+            <value>The options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamSubtitle.Encoder">
+            <summary>Gets or sets the encoder.</summary>
+            <value>The encoder.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamSubtitle.InputStream">
+            <summary>Gets the Subtitle stream.</summary>
+            <value>The stream.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamSubtitle.EncoderCore">
+            <summary>Gets the encoder core.</summary>
+            <value>The encoder core.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamSubtitle.InputStreamCore">
+            <summary>Gets the common options internally.</summary>
+            <value>The common options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamSubtitle.OptionsCore">
+            <summary>Gets the core options.</summary>
+            <value>The core options.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Output.OutputStreamVideo">
+            <summary>
+            Video Output stream.
+            </summary>
+            <seealso cref="T:Emby.Ffmpeg.Model.Output.OutputStreamBase" />
+        </member>
+        <member name="M:Emby.Ffmpeg.Model.Output.OutputStreamVideo.#ctor(Emby.Ffmpeg.Model.Interfaces.IVideoStreamSource,Emby.Ffmpeg.Model.Features.Encoders.VideoEncoderBase)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Model.Output.OutputStreamVideo"/> class.</summary>
+            <param name="inputStream">The stream.</param>
+            <param name="encoder">The encoder.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamVideo.Encoder">
+            <summary>Gets or sets the encoder.</summary>
+            <value>The encoder.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamVideo.InputStream">
+            <summary>Gets the video stream.</summary>
+            <value>The stream.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamVideo.Options">
+            <summary>Gets the options.</summary>
+            <value>The options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamVideo.Emby#Ffmpeg#Model#Interfaces#IStreamSinkInternal#ConnectedSource">
+            <summary>Gets or sets the connected source.</summary>
+            <value>The connected source.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamVideo.EncoderCore">
+            <summary>Gets the encoder core.</summary>
+            <value>The encoder core.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamVideo.InputStreamCore">
+            <summary>Gets the common options internally.</summary>
+            <value>The common options.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Model.Output.OutputStreamVideo.OptionsCore">
+            <summary>Gets the core options.</summary>
+            <value>The core options.</value>
+        </member>
+        <member name="T:Emby.Ffmpeg.Model.Serialization.CommandElementInfo">
+            <summary>
+            Serialization element base class.
+            </summary>
+        </member>
+        <member name="T:Emby.Ffmpeg.Operations.Builders.VideoFilterChainBuilder">
+            <summary>
+            Helps building filter chains.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Builders.VideoFilterChainBuilder.#ctor(Emby.Ffmpeg.Model.FfmpegCommand,Emby.Ffmpeg.Model.Interfaces.IVideoStreamSource)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Ffmpeg.Operations.Builders.VideoFilterChainBuilder"/> class.</summary>
+            <param name="command">The command.</param>
+            <param name="chainInput">The chain input.</param>
+        </member>
+        <member name="P:Emby.Ffmpeg.Operations.Builders.VideoFilterChainBuilder.ChainInput">
+            <summary>Gets the chain input.</summary>
+            <value>The chain input.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Operations.Builders.VideoFilterChainBuilder.ChainOutput">
+            <summary>Gets the chain output.</summary>
+            <value>The chain output.</value>
+        </member>
+        <member name="P:Emby.Ffmpeg.Operations.Builders.VideoFilterChainBuilder.Command">
+            <summary>Gets the command.</summary>
+            <value>The command.</value>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Builders.VideoFilterChainBuilder.AppendFilter``1(``0)">
+            <summary>Appends a video filter and connects its input to the previous chain filter.</summary>
+            <typeparam name="T">A filter type.</typeparam>
+            <param name="filter">The filter.</param>
+            <returns>A <see cref="T:Emby.Ffmpeg.Model.FilterGraph.FilterInstance" />.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Operations.Extensions.ContainerExtensions">
+            <summary>
+            Extensions for stream container setup.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Extensions.ContainerExtensions.AsStreamContainer(MediaBrowser.Model.Dto.MediaSourceInfo)">
+            <summary>Converts a <see cref="T:MediaBrowser.Model.Dto.MediaSourceInfo"/> into an <see cref="T:Emby.Ffmpeg.Model.Containers.InputStreamContainer"/>.</summary>
+            <param name="mediaSource">The media source.</param>
+            <returns>An <see cref="T:Emby.Ffmpeg.Model.Containers.InputStreamContainer"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Extensions.ContainerExtensions.AsStreamContainer(Emby.Media.Model.ProbeModel.ProbeResult)">
+            <summary>Converts a <see cref="T:Emby.Media.Model.ProbeModel.ProbeResult" /> into an <see cref="T:Emby.Ffmpeg.Model.Containers.InputStreamContainer" />.</summary>
+            <param name="probeResult">The probe result.</param>
+            <returns>An <see cref="T:Emby.Ffmpeg.Model.Containers.InputStreamContainer" />.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Operations.Extensions.FeatureExtensions">
+            <summary>
+            Feature extension methods.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Extensions.FeatureExtensions.Cast``1(Emby.Ffmpeg.Model.Features.Muxers.DemuxerBase)">
+            <summary>Casts the specified feature.</summary>
+            <typeparam name="T">A feature type.</typeparam>
+            <param name="feature">The feature.</param>
+            <returns>An instance of <typeparamref name="T"/> or null.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Extensions.FeatureExtensions.GetAtOrDefault``1(System.Collections.Generic.List{``0},System.Int32)">
+            <summary>Gets a list item at the specified position or the default when the item does not exist.</summary>
+            <typeparam name="T">Type of list items.</typeparam>
+            <param name="list">The list.</param>
+            <param name="position">The position.</param>
+            <returns>A list element of <typeparamref name="T"/> or default(T).</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Operations.Serialization.Deserialize">
+            <summary>
+            Feature extension methods.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Deserialize.CreateFromSerializationModel(Emby.Ffmpeg.Model.Serialization.FfmpegCommandInfo)">
+            <summary>Creates an <see cref="T:Emby.Ffmpeg.Model.FfmpegCommand"/> from serialization model.</summary>
+            <param name="info">The information.</param>
+            <returns>An <see cref="T:Emby.Ffmpeg.Model.FfmpegCommand"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Deserialize.CreateFromSerializationModel(Emby.Ffmpeg.Model.Serialization.InputFileInfo)">
+            <summary>Creates an <see cref="T:Emby.Ffmpeg.Model.Input.InputFile"/> from serialization model.</summary>
+            <param name="info">The information.</param>
+            <returns>An <see cref="T:Emby.Ffmpeg.Model.Input.InputFile"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Deserialize.CreateFromSerializationModel(Emby.Ffmpeg.Model.Serialization.OutputFileInfo,Emby.Ffmpeg.Model.FfmpegCommand)">
+            <summary>Creates an <see cref="T:Emby.Ffmpeg.Model.Output.OutputFile"/> from serialization model.</summary>
+            <param name="info">The information.</param>
+            <param name="command">The command.</param>
+            <returns>An <see cref="T:Emby.Ffmpeg.Model.Output.OutputFile"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Deserialize.CreateFromSerializationModel(Emby.Ffmpeg.Model.Serialization.InputStreamInfo)">
+            <summary>Creates an <see cref="T:Emby.Ffmpeg.Model.Input.InputStreamBase"/> from serialization model.</summary>
+            <param name="info">The information.</param>
+            <returns>An <see cref="T:Emby.Ffmpeg.Model.Input.InputStreamBase"/>.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Deserialize.CreateFromSerializationModel(Emby.Ffmpeg.Model.Serialization.OutputStreamInfo,Emby.Ffmpeg.Model.FfmpegCommand)">
+            <summary>Creates an <see cref="T:Emby.Ffmpeg.Model.Output.OutputStreamBase"/> from serialization model.</summary>
+            <param name="info">The information.</param>
+            <param name="command">The command.</param>
+            <returns>An <see cref="T:Emby.Ffmpeg.Model.Output.OutputStreamBase"/>.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Deserialize.CreateFromSerializationModel(Emby.Ffmpeg.Model.Serialization.FeatureInfo)">
+            <summary>Creates a <see cref="T:Emby.Ffmpeg.Model.Features.FeatureBase"/> from serialization model.</summary>
+            <param name="info">The information.</param>
+            <returns>A <see cref="T:Emby.Ffmpeg.Model.Features.FeatureBase"/>.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Deserialize.ApplyFromSerializationModel(Emby.Ffmpeg.Model.Options.Collections.BaseOptions,Emby.Ffmpeg.Model.Serialization.OptionsInfo)">
+            <summary>Applies from serialization model.</summary>
+            <param name="options">The options.</param>
+            <param name="optionsInfo">The options information.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Deserialize.AddFromSerializationModel(Emby.Ffmpeg.Model.Serialization.FfFilterGraphInfo,Emby.Ffmpeg.Model.FfmpegCommand)">
+            <summary>Adds from serialization model.</summary>
+            <param name="info">The information.</param>
+            <param name="command">The command.</param>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Deserialize.CreateFromSerializationModel(Emby.Ffmpeg.Model.Serialization.FilterInstanceInfo,Emby.Ffmpeg.Model.FfmpegCommand)">
+            <summary>Creates a <see cref="T:Emby.Ffmpeg.Model.FilterGraph.FilterInstance"/> from serialization model.</summary>
+            <param name="info">The information.</param>
+            <param name="command">The command.</param>
+            <returns>A <see cref="T:Emby.Ffmpeg.Model.FilterGraph.FilterInstance"/>.</returns>
+        </member>
+        <member name="T:Emby.Ffmpeg.Operations.Serialization.Serialize">
+            <summary>
+            Feature extension methods.
+            </summary>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Serialize.ToSerializationModel(Emby.Ffmpeg.Model.FfmpegCommand)">
+            <summary>Converts an <see cref="T:Emby.Ffmpeg.Model.FfmpegCommand"/> to its serialization model <see cref="T:Emby.Ffmpeg.Model.Serialization.FfmpegCommandInfo"/>.</summary>
+            <param name="command">The command.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Serialization.FfmpegCommandInfo"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Serialize.ToSerializationModel(Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph)">
+            <summary>Converts a <see cref="T:Emby.Ffmpeg.Model.FilterGraph.FfFilterGraph"/> to its serialization model <see cref="T:Emby.Ffmpeg.Model.Serialization.FfFilterGraphInfo"/>.</summary>
+            <param name="graph">The graph.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Serialization.FfFilterGraphInfo"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Serialize.ToSerializationModel(Emby.Ffmpeg.Model.FilterGraph.FilterInstance)">
+            <summary>Converts a <see cref="T:Emby.Ffmpeg.Model.FilterGraph.FilterInstance"/> to its serialization model <see cref="T:Emby.Ffmpeg.Model.Serialization.FilterInstanceInfo"/>.</summary>
+            <param name="filter">The filter.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Serialization.FilterInstanceInfo"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Serialize.ToSerializationModel(Emby.Ffmpeg.Model.Options.Collections.BaseOptions)">
+            <summary>Converts a <see cref="T:Emby.Ffmpeg.Model.Options.Collections.BaseOptions"/> instance to its serialization model <see cref="T:Emby.Ffmpeg.Model.Serialization.OptionsInfo"/>.</summary>
+            <param name="options">The options.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Serialization.OptionsInfo"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Serialize.ToSerializationModel(Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance)">
+            <summary>Converts an <see cref="T:Emby.Ffmpeg.Model.FilterGraph.Pins.InputPinInstance"/> to its serialization model <see cref="T:Emby.Ffmpeg.Model.Serialization.InputPinInfo"/>.</summary>
+            <param name="pin">The pin.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Serialization.InputPinInfo"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Serialize.ToSerializationModel(Emby.Ffmpeg.Model.Features.FeatureBase)">
+            <summary>Converts a <see cref="T:Emby.Ffmpeg.Model.Features.FeatureBase"/> instance to its serialization model <see cref="T:Emby.Ffmpeg.Model.Serialization.FeatureInfo"/>.</summary>
+            <param name="feature">The feature.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Serialization.FeatureInfo"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Serialize.ToSerializationModel(Emby.Ffmpeg.Model.Input.InputStreamBase)">
+            <summary>Converts an <see cref="T:Emby.Ffmpeg.Model.Input.InputStreamBase"/> instance to its serialization model <see cref="T:Emby.Ffmpeg.Model.Serialization.InputStreamInfo"/>.</summary>
+            <param name="stream">The stream.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Serialization.InputStreamInfo"/>.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Serialize.ToSerializationModel(Emby.Ffmpeg.Model.Output.OutputStreamBase)">
+            <summary>Converts an <see cref="T:Emby.Ffmpeg.Model.Output.OutputStreamBase"/> instance to its serialization model <see cref="T:Emby.Ffmpeg.Model.Serialization.OutputStreamInfo"/>.</summary>
+            <param name="stream">The stream.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Serialization.OutputStreamInfo"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Serialize.ToSerializationModel(Emby.Ffmpeg.Model.Input.InputFile)">
+            <summary>Converts an <see cref="T:Emby.Ffmpeg.Model.Input.InputFile"/> instance to its serialization model <see cref="T:Emby.Ffmpeg.Model.Serialization.InputFileInfo"/>.</summary>
+            <param name="file">The file.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Serialization.InputFileInfo"/>.</returns>
+        </member>
+        <member name="M:Emby.Ffmpeg.Operations.Serialization.Serialize.ToSerializationModel(Emby.Ffmpeg.Model.Output.OutputFile)">
+            <summary>Converts an <see cref="T:Emby.Ffmpeg.Model.Output.OutputFile"/> instance to its serialization model <see cref="T:Emby.Ffmpeg.Model.Serialization.OutputFileInfo"/>.</summary>
+            <param name="file">The file.</param>
+            <returns>An instance of <see cref="T:Emby.Ffmpeg.Model.Serialization.OutputFileInfo"/>.</returns>
+        </member>
+    </members>
+</doc>

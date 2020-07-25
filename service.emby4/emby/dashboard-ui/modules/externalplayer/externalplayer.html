@@ -1,0 +1,66 @@
+<div is="emby-scroller" class="view scrollFrameY flex flex-grow" data-mousewheel="true" data-horizontal="false" data-centerfocus="true">
+    <div class="scrollSlider flex-grow flex-direction-column padded-left padded-right settingsContainer padded-top-page padded-bottom-page">
+        <form class="auto-center">
+
+            <div class="selectContainer">
+                <select is="emby-select" class="selectMediaType" label="${MediaType}">
+                    <option value="Video">${Video}</option>
+                    <option value="Game">${Game}</option>
+                </select>
+            </div>
+
+            <div class="inputContainer">
+                <input is="emby-input" type="text" class="txtPath" label="${PlayerPath}" required />
+            </div>
+
+            <div class="checkboxList mediaTypeField" data-mediatype="Video">
+                <h3>${EnableFor}</h3>
+                <label>
+                    <input type="checkbox" is="emby-checkbox" class="videoType" data-type="file" />
+                    <span>${VideoFiles}</span>
+                </label>
+                <label>
+                    <input type="checkbox" is="emby-checkbox" class="videoType" data-type="stream" />
+                    <span>${InternetStreams}</span>
+                </label>
+                <label>
+                    <input type="checkbox" is="emby-checkbox" class="videoType" data-type="bluray" />
+                    <span>Blu-ray</span>
+                </label>
+                <label>
+                    <input type="checkbox" is="emby-checkbox" class="videoType" data-type="dvd" />
+                    <span>Dvd</span>
+                </label>
+                <label>
+                    <input type="checkbox" is="emby-checkbox" class="videoType" data-type="iso" />
+                    <span>ISO</span>
+                </label>
+            </div>
+
+            <div class="mediaTypeField" data-mediatype="Game">
+                <div class="selectContainer">
+                    <select is="emby-select" class="selectGameSystem" label="${GameSystem}"></select>
+                </div>
+            </div>
+
+            <div class="checkboxList mediaTypeField" data-mediatype="Video">
+                <h3>${AdditionalFilters}</h3>
+                <label>
+                    <input type="checkbox" is="emby-checkbox" class="videoType" data-type="3d" />
+                    <span>3D</span>
+                </label>
+            </div>
+            <br />
+
+            <div class="inputContainer">
+                <textarea is="emby-textarea" class="txtArguments" label="${CommandLineArguments}" data-keyboard="false"></textarea>
+                <div class="fieldDescription">${ArgumentsHelp}</div>
+                <div class="fieldDescription">${TokenPath}</div>
+                <div class="fieldDescription mediaTypeField" data-mediatype="Video">${TokenStartPosMs}</div>
+            </div>
+
+            <br />
+            <button is="emby-button" type="submit" class="raised block btnSave hide"><span>${Save}</span></button>
+        </form>
+    </div>
+</div>

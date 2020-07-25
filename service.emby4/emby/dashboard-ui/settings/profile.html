@@ -1,0 +1,44 @@
+﻿<div is="emby-scroller" class="view flex flex-direction-column scrollFrameY flex-grow" data-mousewheel="true" data-horizontal="false" data-centerfocus="card">
+    <div class="scrollSlider flex-grow flex-direction-column padded-left padded-left-page padded-right padded-top-page padded-bottom-page settingsContainer">
+
+        <div class="readOnlyContent padded-top auto-center flex align-items-center">
+
+            <div id="fldImage"></div>
+
+            <div>
+                <h2 class="username" style="margin: 0 0 .5em;"></h2>
+
+                <button is="emby-button" type="button" class="raised hide" id="btnDeleteImage" style="margin-left:0;">
+                    <span>${HeaderDeleteImage}</span>
+                </button>
+            </div>
+        </div>
+
+        <form class="newImageForm userProfileSettingsForm hide auto-center" style="margin-top:2em;">
+
+            <div class="flex align-items-center" style="margin:1.5em 0;">
+                <h2 style="margin:0;">${HeaderUploadNewImage}</h2>
+
+                <button is="emby-button" type="button" class="fab btnBrowse" style="margin-left:1em;" title="${Browse}">
+                    <i class="md-icon">folder</i>
+                </button>
+            </div>
+
+            <div id="fldNewImage">
+
+                <div id="userImageDropZone" class="imageDropZone fieldDescription">
+                    <div>${LabelDropImageHere}</div>
+
+                    <output id="userImageOutput" class="flex align-items-center justify-content-center" style="position: absolute;top:0;left:0;right:0;bottom:0;width:100%;"></output>
+
+                    <input type="file" accept="image/*" id="uploadUserImage" name="uploadUserImage" style="position: absolute;top:0;left:0;right:0;bottom:0;width:100%;opacity:0;" />
+                </div>
+            </div>
+
+            <div id="fldUpload" class="hide" style="margin-top:1em;">
+                <button is="emby-button" type="submit" class="raised button-submit block">${Upload}</button>
+            </div>
+
+        </form>
+    </div>
+</div>

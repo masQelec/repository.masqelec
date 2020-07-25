@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="service.system.syncthing"
+       name="Syncthing"
+       version="9.2.109"
+       provider-name="Anton Voyl (awiouy)">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+
+  </requires>
+  <extension point="xbmc.service" library="default.py">
+    <provides></provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Syncthing: open source continuous file synchronization</summary>
+    <description>
+Syncthing (1.4.2) replaces proprietary sync and cloud services with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it's transmitted over the Internet.
+    </description>
+    <disclaimer>
+
+    </disclaimer>
+    <platform>all</platform>
+    <news>
+109
+- Update to 1.4.2
+
+108
+- Update to 1.2.0
+
+107
+- Update to 1.0.0
+
+106
+- Update to 0.14.49
+
+105
+- Update to 0.14.29
+
+103
+- Update to 0.14.3
+
+102
+- Enable automatic upgrades
+
+101
+- Update to 0.12.24
+
+100
+- Initial addon
+    </news>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.png</fanart>
+
+    </assets>
+  </extension>
+</addon>

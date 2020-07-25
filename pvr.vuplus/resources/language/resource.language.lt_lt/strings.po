@@ -1,0 +1,481 @@
+# Kodi Media Center language file
+# Addon Name: Enigma2 Client
+# Addon id: pvr.vuplus
+# Addon Provider: Joerg Dembski and Ross Nicholson
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Main\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: Lithuanian (Lithuania) (http://www.transifex.com/projects/p/kodi-main/language/lt_LT/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lt_LT\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgctxt "#30000"
+msgid "Enigma2 hostname or IP address"
+msgstr "Enigma2 kompiuterio vardas arba IP adresas"
+
+msgctxt "#30002"
+msgid "Streaming port"
+msgstr "Srauto prievadas"
+
+msgctxt "#30003"
+msgid "Username"
+msgstr "Vartotojo vardas"
+
+msgctxt "#30004"
+msgid "Password"
+msgstr "Slaptažodis"
+
+msgctxt "#30005"
+msgid "Connection"
+msgstr "Prijungimas"
+
+msgctxt "#30006"
+msgid "Icons"
+msgstr "Piktogramos"
+
+msgctxt "#30007"
+msgid "Response timeout in seconds"
+msgstr "Reakcijos laikas, sekundėmis"
+
+msgctxt "#30008"
+msgid "Icon path"
+msgstr "Piktogramos kelias"
+
+msgctxt "#30009"
+msgid "Update Interval"
+msgstr "Atnaujinimo intervalas"
+
+msgctxt "#30010"
+msgid "Update Interval in minutes"
+msgstr "Naujinimo intervalas minutėmis"
+
+msgctxt "#30011"
+msgid "Automatic timerlist cleanup"
+msgstr "Automatinis laikmačio sąrašo išvalymas"
+
+msgctxt "#30012"
+msgid "Web interface port"
+msgstr "Žiniatinklio sąsajos prievadas"
+
+msgctxt "#30013"
+msgid "Zap before channelswitch (i.e. for single tuner boxes)"
+msgstr "Uždaryti prieš kanalo perjungimą (pvz., vieno imtuvo priedėliams)"
+
+msgctxt "#30014"
+msgid "Folder for channeldata"
+msgstr "Aplankas kanalo duomenims"
+
+msgctxt "#30015"
+msgid "Update interval"
+msgstr "Atnaujinimo intervalas"
+
+msgctxt "#30016"
+msgid "Check for channel updates"
+msgstr "Patikrinkite kanalo atnaujinimus"
+
+msgctxt "#30017"
+msgid "Use only the DVB boxes' current recording path"
+msgstr "Naudokite tik DVB neužpildyti langeliai 'Esamasis įrašymo kelias'"
+
+msgctxt "#30018"
+msgid "General"
+msgstr "Pagrindinis"
+
+msgctxt "#30019"
+msgid "Channels"
+msgstr "Kanalai"
+
+msgctxt "#30020"
+msgid "Advanced"
+msgstr "Išplėstinis"
+
+msgctxt "#30021"
+msgid "HTTP"
+msgstr "HTTP"
+
+msgctxt "#30022"
+msgid "Recordings / Timer"
+msgstr "Įrašas / Laikmatis"
+
+msgctxt "#30023"
+msgid "Recording folder on the receiver"
+msgstr "Įrašymo aplankas į imtuvą"
+
+msgctxt "#30024"
+msgid "Send powerstate mode on addon exit"
+msgstr "Siųsti maitinimo būsenos režimą išjungiant priedą"
+
+msgctxt "#30025"
+msgid "TV bouquet fetch mode"
+msgstr "TV puokštės gavimo būdas"
+
+msgctxt "#30026"
+msgid "TV bouquet"
+msgstr "TV puokštė"
+
+msgctxt "#30027"
+msgid "Fetch picons from web interface"
+msgstr "Įkelti piktogramas iš žiniatinklio sąsajos"
+
+msgctxt "#30028"
+msgid "Use secure HTTP (https)"
+msgstr "Naudoti saugų HTTP (https)"
+
+msgctxt "#30029"
+msgid "Enable automatic configuration for live streams"
+msgstr "Įjungti automatinę vaizdo transliacijų konfigūraciją"
+
+msgctxt "#30030"
+msgid "Keep folder structure for records"
+msgstr "Išlaikyti aplanko struktūrą įrašams"
+
+msgctxt "#30031"
+msgid "Seasons and Episodes"
+msgstr "Sezonai ir epizodai"
+
+msgctxt "#30032"
+msgid "EPG"
+msgstr "EPG"
+
+msgctxt "#30033"
+msgid "Extract season, episode and year info where possible"
+msgstr "Išgauti sezono, epizodo ir metų informaciją, jei įmanoma"
+
+msgctxt "#30034"
+msgid "Enable autotimers"
+msgstr "Įjungti automatinius laikmačius"
+
+msgctxt "#30035"
+msgid "Use picons.eu file format"
+msgstr "Naudoti picons.eu failo formatą"
+
+msgctxt "#30036"
+msgid "Enable generate repeat timers"
+msgstr "Įjungti pakartotinių laikmačių generavimą"
+
+msgctxt "#30037"
+msgid "Log missing genre text mappings"
+msgstr "Įrašyti į žurnalą trūkstamų žanrų teksto sužymėjimą"
+
+msgctxt "#30038"
+msgid "Web Interface"
+msgstr "Žiniatinklio sąsaja"
+
+msgctxt "#30039"
+msgid "Streaming"
+msgstr "Transliuojama"
+
+msgctxt "#30040"
+msgid "Put outline (e.g. sub-title) before plot"
+msgstr "Įdėti pagrindinę informaciją (pvz., subtitrus) prieš siužetą"
+
+msgctxt "#30041"
+msgid "Stream read chunk size"
+msgstr "Srauto skaitymo dalies dydis"
+
+msgctxt "#30042"
+msgid "Never"
+msgstr "Niekada"
+
+msgctxt "#30043"
+msgid "In EPG only"
+msgstr "Tik EPG lange"
+
+msgctxt "#30044"
+msgid "In recordings only"
+msgstr "Tik įrašymuose"
+
+msgctxt "#30045"
+msgid "Always"
+msgstr "Visada"
+
+msgctxt "#30046"
+msgid "Extract show info file"
+msgstr "Išgauti laidos informacijos failą"
+
+msgctxt "#30047"
+msgid "Rytec genre text Mappings"
+msgstr "Rytec žanrų teksto sužymėjimas"
+
+msgctxt "#30048"
+msgid "Enable Rytec genre text mappings"
+msgstr "Įjungti Rytec žanrų teksto sužymėjimą"
+
+msgctxt "#30049"
+msgid "Rytec genre text mappings file"
+msgstr "Rytec žanrų teksto sužymėjimo failas"
+
+msgctxt "#30050"
+msgid "Custom live TV timeout (0 to use default)"
+msgstr "Savas televizijos laukimo laikas (0 norint naudoti numatytąjį)"
+
+msgctxt "#30051"
+msgid "Login"
+msgstr "Prisijungimo vardas"
+
+msgctxt "#30052"
+msgid "Misc"
+msgstr "Įvairūs"
+
+msgctxt "#30053"
+msgid "Genre ID Mappings"
+msgstr "Žanrų ID sužymėjimas"
+
+msgctxt "#30054"
+msgid "Enable genre ID Mappings"
+msgstr "Įjungti žanrų ID sužymėjimą"
+
+msgctxt "#30055"
+msgid "Genre ID mappings file"
+msgstr "Žanrų ID sužymėjimo failas"
+
+msgctxt "#30056"
+msgid "TV"
+msgstr "TV"
+
+msgctxt "#30057"
+msgid "Radio"
+msgstr "Radijas"
+
+msgctxt "#30058"
+msgid "Radio bouquet fetch mode"
+msgstr "Radijo puokštės gavimo būdas"
+
+msgctxt "#30059"
+msgid "Radio bouquet"
+msgstr "Radijo puokštė"
+
+msgctxt "#30060"
+msgid "Timeshift"
+msgstr "Laiko poslinkis"
+
+msgctxt "#30061"
+msgid "Enable timeshift"
+msgstr "Įjungti laiko poslinkį"
+
+msgctxt "#30062"
+msgid "Timeshift buffer path"
+msgstr "Laiko poslinkio buferio kelias"
+
+msgctxt "#30063"
+msgid "Off"
+msgstr "Išjungta"
+
+msgctxt "#30064"
+msgid "On playback"
+msgstr "Atkuriant"
+
+msgctxt "#30065"
+msgid "On pause"
+msgstr "Pristabdžius"
+
+msgctxt "#30066"
+msgid "Use secure HTTP (https) for streams"
+msgstr "Naudoti saugų HTTP (https) srautams"
+
+msgctxt "#30067"
+msgid "Use login for streams"
+msgstr "Naudoti prisijungimą srautams"
+
+msgctxt "#30068"
+msgid "Fetch TV favourites bouquet"
+msgstr "Gauti TV mėgstamiausiųjų puokštę"
+
+msgctxt "#30069"
+msgid "Fetch radio favourites bouquet"
+msgstr "Gauti radijo mėgstamiausiųjų puokštę"
+
+msgctxt "#30070"
+msgid "Recordings & Timers"
+msgstr "Įrašai ir laikmačiai"
+
+msgctxt "#30071"
+msgid "Recordings"
+msgstr "Įrašai"
+
+msgctxt "#30072"
+msgid "Timers"
+msgstr "Laikmačiai"
+
+msgctxt "#30073"
+msgid "Number of repeat timers to generate"
+msgstr "Kartojimo laikmačių skaičius generavimui"
+
+msgctxt "#30074"
+msgid "All bouquets"
+msgstr "Visos puokštės"
+
+msgctxt "#30075"
+msgid "Only one bouquet"
+msgstr "Tik viena puokštė"
+
+msgctxt "#30076"
+msgid "As first bouquet"
+msgstr "Kaip pirma puokštė"
+
+msgctxt "#30077"
+msgid "As last bouquet"
+msgstr "Kaip paskutinė puokštė"
+
+msgctxt "#30078"
+msgid "Favourites group"
+msgstr "Mėgstamiausiųjų grupė"
+
+msgctxt "#30079"
+msgid "Favourites (TV)"
+msgstr "Mėgstamiausieji (TV)"
+
+msgctxt "#30080"
+msgid "Favourites (Radio)"
+msgstr "Mėgstamiausieji (radijas)"
+
+msgctxt "#30081"
+msgid "unknown"
+msgstr "nežinomas"
+
+msgctxt "#30082"
+msgid " (Not connected!)"
+msgstr "(Neprisijungta!)"
+
+msgctxt "#30083"
+msgid "addon error"
+msgstr "priedo klaida"
+
+msgctxt "#30084"
+msgid "Enigma2 Media Server"
+msgstr "Enigma2 medijos serveris"
+
+msgctxt "#30085"
+msgid "OK"
+msgstr "OK"
+
+msgctxt "#30086"
+msgid "Backend"
+msgstr "Posistemė"
+
+msgctxt "#30087"
+msgid "Recording Padding"
+msgstr "Įrašo paraštė"
+
+msgctxt "#30088"
+msgid "Global start padding"
+msgstr "Globali pradžios paraštė"
+
+msgctxt "#30089"
+msgid "Global end padding"
+msgstr "Globali pabaigos paraštė"
+
+msgctxt "#30090"
+msgid "Device Info"
+msgstr "Įrenginio informacija"
+
+msgctxt "#30091"
+msgid "WebIf version"
+msgstr "WebIf versija"
+
+msgctxt "#30092"
+msgid "AutoTimer tag in timer tags"
+msgstr "Automatinio laikmačio žymė laikmačio žymėse"
+
+msgctxt "#30093"
+msgid "AutoTimer name in timer tags"
+msgstr "Automatinio laikmačio pavadinimas laikmačio žymėse"
+
+msgctxt "#30094"
+msgid "N/A"
+msgstr "N/A"
+
+msgctxt "#30095"
+msgid "True"
+msgstr "Taip"
+
+msgctxt "#30096"
+msgid "False"
+msgstr "Ne"
+
+msgctxt "#30097"
+msgid "Standby"
+msgstr "Budėjimo režimas"
+
+msgctxt "#30098"
+msgid "Deep standby"
+msgstr "Gilus budėjimo režimas"
+
+msgctxt "#30099"
+msgid "Wakeup, then standby"
+msgstr "Pažadinti, tada pereiti į budėjimo režimą"
+
+msgctxt "#30100"
+msgid "Update mode"
+msgstr "Atnaujinimo režimas"
+
+msgctxt "#30101"
+msgid "Timers and recordings"
+msgstr "Laikmačiai ir įrašai"
+
+msgctxt "#30102"
+msgid "Timers only"
+msgstr "Tik laikmačiai"
+
+msgctxt "#30103"
+msgid "Use OpenWebIf picon path"
+msgstr "Naudoti OpenWebIf piktogramos kelią"
+
+msgctxt "#30410"
+msgid "Automatic"
+msgstr "Automatiškai"
+
+msgctxt "#30420"
+msgid "One time (Scheduled by guide-based timer rule)"
+msgstr "Vieną kartą (suplanuota gidu paremtos laikmačio taisyklės)"
+
+msgctxt "#30421"
+msgid "One time (Scheduled by repeating timer rule)"
+msgstr "Vienkartinis (suplanuotas pasikartojančio laikmačio taisyklės)"
+
+msgctxt "#30430"
+msgid "Disabled"
+msgstr "Atjungta"
+
+msgctxt "#30431"
+msgid "Record if EPG title differs"
+msgstr "Įrašyti, jei skiriasi EPG pavadinimas"
+
+msgctxt "#30432"
+msgid "Record if EPG title and short description differs"
+msgstr "Įrašyti jei EPG pavadinimas ir trumpas aprašymas skiriasi"
+
+msgctxt "#30433"
+msgid "Record if EPG title and all descriptions differ"
+msgstr "Įrašyti jei EPG pavadinimas ir visi aprašymai skiriasi"
+
+msgctxt "#30500"
+msgid "Disconnected from '%s'"
+msgstr "Atjungtas nuo '%s'"
+
+msgctxt "#30501"
+msgid "Reconnected to '%s'"
+msgstr "Prijungtas prie '%s'"
+
+msgctxt "#30514"
+msgid "Timeshift buffer path does not exist"
+msgstr "Laiko poslinkio buferio kelias neegzistuoja"
+
+msgctxt "#30515"
+msgid "Enigma2: Could not reach web interface"
+msgstr "Enigma2: neįmanoma pasiekti žiniatinklio sąsajos"
+
+msgctxt "#30516"
+msgid "Enigma2: No channel groups found"
+msgstr "Enigma2: kanalų grupių nerasta"
+
+msgctxt "#30517"
+msgid "Enigma2: No channels found"
+msgstr "Enigma2: kanalų nerasta"

@@ -1,0 +1,197 @@
+# Kodi Media Center language file
+# Addon Name: Enigma2 Client
+# Addon id: pvr.vuplus
+# Addon Provider: Joerg Dembski and Ross Nicholson
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Main\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: Slovak (Slovakia) (http://www.transifex.com/projects/p/kodi-main/language/sk_SK/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sk_SK\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+msgctxt "#30003"
+msgid "Username"
+msgstr "Užívateľské meno"
+
+msgctxt "#30004"
+msgid "Password"
+msgstr "Heslo"
+
+msgctxt "#30005"
+msgid "Connection"
+msgstr "Pripojenie"
+
+msgctxt "#30006"
+msgid "Icons"
+msgstr "Ikony"
+
+msgctxt "#30007"
+msgid "Response timeout in seconds"
+msgstr "Časový limit pre odozvu v sekundách"
+
+msgctxt "#30010"
+msgid "Update Interval in minutes"
+msgstr "Interval aktualizácie v minútach"
+
+msgctxt "#30014"
+msgid "Folder for channeldata"
+msgstr "Priečinok pre dáta kanálov"
+
+msgctxt "#30015"
+msgid "Update interval"
+msgstr "Doba aktualizácie"
+
+msgctxt "#30016"
+msgid "Check for channel updates"
+msgstr "Kontrolovať dostupnosť aktualizácií kanálov"
+
+msgctxt "#30017"
+msgid "Use only the DVB boxes' current recording path"
+msgstr "Použiť iba aktuálny priečinok pre nahrávky z DVB prijímača"
+
+msgctxt "#30018"
+msgid "General"
+msgstr "Hlavné"
+
+msgctxt "#30019"
+msgid "Channels"
+msgstr "Kanály"
+
+msgctxt "#30020"
+msgid "Advanced"
+msgstr "Pokročilé nastavenia"
+
+msgctxt "#30021"
+msgid "HTTP"
+msgstr "HTTP"
+
+msgctxt "#30022"
+msgid "Recordings / Timer"
+msgstr "Nahrávky / časovač"
+
+msgctxt "#30023"
+msgid "Recording folder on the receiver"
+msgstr "Priečinok pre nahrávky v prijímači"
+
+msgctxt "#30029"
+msgid "Enable automatic configuration for live streams"
+msgstr "Povoliť automatickú konfiguráciu pre živé streamy"
+
+msgctxt "#30030"
+msgid "Keep folder structure for records"
+msgstr "Zachovať pri nahrávkach štruktúru priečinkov"
+
+msgctxt "#30032"
+msgid "EPG"
+msgstr "EPG"
+
+msgctxt "#30042"
+msgid "Never"
+msgstr "Nikdy"
+
+msgctxt "#30043"
+msgid "In EPG only"
+msgstr "Iba v EPG"
+
+msgctxt "#30044"
+msgid "In recordings only"
+msgstr "Iba v nahrávkach"
+
+msgctxt "#30045"
+msgid "Always"
+msgstr "Vždy"
+
+msgctxt "#30051"
+msgid "Login"
+msgstr "Prihlasovavie meno"
+
+msgctxt "#30052"
+msgid "Misc"
+msgstr "Rôzne"
+
+msgctxt "#30056"
+msgid "TV"
+msgstr "TV"
+
+msgctxt "#30057"
+msgid "Radio"
+msgstr "Rádio"
+
+msgctxt "#30060"
+msgid "Timeshift"
+msgstr "Časový posun"
+
+msgctxt "#30062"
+msgid "Timeshift buffer path"
+msgstr "Cesta k zásobníku časového posunu"
+
+msgctxt "#30063"
+msgid "Off"
+msgstr "Vypnuté"
+
+msgctxt "#30064"
+msgid "On playback"
+msgstr "Pri prehrávaní"
+
+msgctxt "#30065"
+msgid "On pause"
+msgstr "Pri pozastavení"
+
+msgctxt "#30071"
+msgid "Recordings"
+msgstr "Nahrávky"
+
+msgctxt "#30072"
+msgid "Timers"
+msgstr "Časovače"
+
+msgctxt "#30085"
+msgid "OK"
+msgstr "OK"
+
+msgctxt "#30094"
+msgid "N/A"
+msgstr "N/A"
+
+msgctxt "#30095"
+msgid "True"
+msgstr "Pravdivé"
+
+msgctxt "#30096"
+msgid "False"
+msgstr "Nepravdivé"
+
+msgctxt "#30410"
+msgid "Automatic"
+msgstr "Automaticky"
+
+msgctxt "#30420"
+msgid "One time (Scheduled by guide-based timer rule)"
+msgstr "Jednorazovo (naplánované pravidlom časovača TV programu)"
+
+msgctxt "#30430"
+msgid "Disabled"
+msgstr "Zakázané"
+
+msgctxt "#30431"
+msgid "Record if EPG title differs"
+msgstr "Nahrávať, ak sa titul v EPG odlišuje"
+
+msgctxt "#30500"
+msgid "Disconnected from '%s'"
+msgstr "Odpojený od '%s'"
+
+msgctxt "#30501"
+msgid "Reconnected to '%s'"
+msgstr "Opätovne pripojený k '%s'"
+
+msgctxt "#30514"
+msgid "Timeshift buffer path does not exist"
+msgstr "Cesta k zásobníku časového posunu neexistuje"

@@ -1,0 +1,19 @@
+{
+    "Save": "Snimi",
+    "Video": "Video",
+    "Add": "Dodaj",
+    "Game": "Igrica",
+    "MediaType": "Medijski tip",
+    "ExternalPlayers": "Vanjski pokreta\u010di",
+    "ExternalPlayer": "Vanjski pokreta\u010d",
+    "PlayerPath": "Putanja pokreta\u010da",
+    "ArgumentsHelp": "Smjesti svaki argument u zaseban redak.",
+    "TokenPath": "{path} = putanja do medijske datoteke",
+    "EnableFor": "Omogu\u0107i za:",
+    "VideoFiles": "Datoteke videa",
+    "InternetStreams": "Internet strujanje",
+    "CommandLineArguments": "Argumenti naredbenog retka",
+    "TokenStartPosMs": "{ms} = po\u010detna pozicija ms",
+    "AdditionalFilters": "Dodatni filtri:",
+    "GameSystem": "Sistemi igrica:"
+}

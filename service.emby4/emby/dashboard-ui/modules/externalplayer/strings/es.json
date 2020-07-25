@@ -1,0 +1,19 @@
+{
+    "Save": "Grabar",
+    "Video": "Video",
+    "Add": "A\u00f1adir",
+    "Game": "Juego",
+    "MediaType": "Tipo de medio",
+    "ExternalPlayers": "Reproductores externos",
+    "ExternalPlayer": "Reproductor externo",
+    "PlayerPath": "Ruta del reproductor",
+    "ArgumentsHelp": "Coloque cada argumento en una l\u00ednea separada.",
+    "TokenPath": "{path} = ruta al archivo de medios",
+    "EnableFor": "Habilitar para:",
+    "VideoFiles": "Archivos de video",
+    "InternetStreams": "Internet streams",
+    "CommandLineArguments": "Argumentos de l\u00ednea de comando",
+    "TokenStartPosMs": "{ms} = posici\u00f3n inicial ms",
+    "AdditionalFilters": "Filtros adicionales:",
+    "GameSystem": "Sistema de juego"
+}

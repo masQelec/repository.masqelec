@@ -1,0 +1,19 @@
+{
+    "Save": "Ment\u00e9s",
+    "Video": "Vide\u00f3",
+    "Add": "Hozz\u00e1ad",
+    "Game": "J\u00e1t\u00e9k",
+    "MediaType": "M\u00e9dia t\u00edpus",
+    "ExternalPlayers": "K\u00fcls\u0151 lej\u00e1tsz\u00f3k",
+    "ExternalPlayer": "K\u00fcls\u0151 lej\u00e1tsz\u00f3",
+    "PlayerPath": "Lej\u00e1tsz\u00f3 \u00fatvonal",
+    "ArgumentsHelp": "Minden param\u00e9tert k\u00fcl\u00f6n sorba \u00edrj be.",
+    "TokenPath": "{path} = a m\u00e9diaf\u00e1jl el\u00e9r\u00e9si \u00fatvonala",
+    "EnableFor": "Enged\u00e9lyez\u00e9s ehhez:",
+    "VideoFiles": "Vide\u00f3f\u00e1jlok",
+    "InternetStreams": "Internetes k\u00f6zvet\u00edt\u00e9sek",
+    "CommandLineArguments": "Parancssori param\u00e9terek",
+    "TokenStartPosMs": "{ms} = kezd\u0151 poz\u00edci\u00f3 m\u00e1sodpercben",
+    "AdditionalFilters": "Tov\u00e1bbi sz\u0171r\u0151k:",
+    "GameSystem": "J\u00e1t\u00e9k rendszer:"
+}

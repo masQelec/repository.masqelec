@@ -1,0 +1,193 @@
+# Kodi Media Center language file
+# Addon Name: Enigma2 Client
+# Addon id: pvr.vuplus
+# Addon Provider: Joerg Dembski and Ross Nicholson
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Main\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: Croatian (Croatia) (http://www.transifex.com/projects/p/kodi-main/language/hr_HR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hr_HR\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+msgctxt "#30003"
+msgid "Username"
+msgstr "Korisničko ime"
+
+msgctxt "#30004"
+msgid "Password"
+msgstr "Lozinka"
+
+msgctxt "#30005"
+msgid "Connection"
+msgstr "Povezivanje"
+
+msgctxt "#30006"
+msgid "Icons"
+msgstr "Ikone"
+
+msgctxt "#30007"
+msgid "Response timeout in seconds"
+msgstr "Vrijeme odaziva u sekundama"
+
+msgctxt "#30010"
+msgid "Update Interval in minutes"
+msgstr "Interval osvježavanja u minutama"
+
+msgctxt "#30014"
+msgid "Folder for channeldata"
+msgstr "Mapa za podatke programa"
+
+msgctxt "#30015"
+msgid "Update interval"
+msgstr "Razdoblje nadopune"
+
+msgctxt "#30016"
+msgid "Check for channel updates"
+msgstr "Provjeri nadopune programa"
+
+msgctxt "#30017"
+msgid "Use only the DVB boxes' current recording path"
+msgstr "Koristi samo za DVB uređaje, trenutna putanja snimanja"
+
+msgctxt "#30018"
+msgid "General"
+msgstr "Općenito"
+
+msgctxt "#30019"
+msgid "Channels"
+msgstr "Programi"
+
+msgctxt "#30020"
+msgid "Advanced"
+msgstr "Napredno"
+
+msgctxt "#30021"
+msgid "HTTP"
+msgstr "HTTP"
+
+msgctxt "#30022"
+msgid "Recordings / Timer"
+msgstr "Snimanja / Zakazana snimanja"
+
+msgctxt "#30023"
+msgid "Recording folder on the receiver"
+msgstr "Mapa snimanja na prijemniku"
+
+msgctxt "#30032"
+msgid "EPG"
+msgstr "EPG vodič"
+
+msgctxt "#30039"
+msgid "Streaming"
+msgstr "Streamanje"
+
+msgctxt "#30042"
+msgid "Never"
+msgstr "Nikada"
+
+msgctxt "#30043"
+msgid "In EPG only"
+msgstr "Samo u EPG-u"
+
+msgctxt "#30044"
+msgid "In recordings only"
+msgstr "Samo u snimkama"
+
+msgctxt "#30045"
+msgid "Always"
+msgstr "Uvijek"
+
+msgctxt "#30051"
+msgid "Login"
+msgstr "Prijava"
+
+msgctxt "#30052"
+msgid "Misc"
+msgstr "Ostalo"
+
+msgctxt "#30056"
+msgid "TV"
+msgstr "Televizija"
+
+msgctxt "#30057"
+msgid "Radio"
+msgstr "Radio"
+
+msgctxt "#30060"
+msgid "Timeshift"
+msgstr "Vremensko premotavanje"
+
+msgctxt "#30062"
+msgid "Timeshift buffer path"
+msgstr "Putanja međuspremnika premotavanja u vremenu"
+
+msgctxt "#30063"
+msgid "Off"
+msgstr "Isključeno"
+
+msgctxt "#30064"
+msgid "On playback"
+msgstr "Pri reprodukciji"
+
+msgctxt "#30065"
+msgid "On pause"
+msgstr "Pri pauzi"
+
+msgctxt "#30071"
+msgid "Recordings"
+msgstr "Snimke"
+
+msgctxt "#30072"
+msgid "Timers"
+msgstr "Snimanja"
+
+msgctxt "#30085"
+msgid "OK"
+msgstr "U redu"
+
+msgctxt "#30094"
+msgid "N/A"
+msgstr "N/A"
+
+msgctxt "#30095"
+msgid "True"
+msgstr "Istina"
+
+msgctxt "#30096"
+msgid "False"
+msgstr "Nesipravan"
+
+msgctxt "#30410"
+msgid "Automatic"
+msgstr "Automatski"
+
+msgctxt "#30420"
+msgid "One time (Scheduled by guide-based timer rule)"
+msgstr "Jednom (zakazano rasporedom EPG vodiča)"
+
+msgctxt "#30430"
+msgid "Disabled"
+msgstr "Onemogućeno"
+
+msgctxt "#30431"
+msgid "Record if EPG title differs"
+msgstr "Snimi ako se EPG naslov razlikuje"
+
+msgctxt "#30500"
+msgid "Disconnected from '%s'"
+msgstr "Odspojen s '%s'"
+
+msgctxt "#30501"
+msgid "Reconnected to '%s'"
+msgstr "Ponovno povezan s '%s'"
+
+msgctxt "#30514"
+msgid "Timeshift buffer path does not exist"
+msgstr "Putanja međuspremnika premotavanja u vremenu ne postoji"

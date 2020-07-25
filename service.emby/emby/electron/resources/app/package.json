@@ -1,0 +1,30 @@
+{
+  "name": "emby.tray",
+  "productName": "Emby Tray",
+  "version": "1.0.0",
+  "description": "Emby Tray Icon",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MediaBrowser/Emby.git"
+  },
+  "keywords": [
+    "Electron",
+    "Emby"
+  ],
+  "author": "GitHub",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MediaBrowser/Emby/issues"
+  },
+  "homepage": "https://github.com/MediaBrowser/Emby#readme",
+  "devDependencies": {
+    
+  },
+  "dependencies": {
+    
+  }
+}

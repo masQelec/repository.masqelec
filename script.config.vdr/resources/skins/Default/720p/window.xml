@@ -1,0 +1,354 @@
+<window id="5533">
+    <defaultcontrol always="true">1000</defaultcontrol>
+    <allowoverlay>yes</allowoverlay>
+    <controls>
+        <control type="group">
+            <left>240</left>
+            <top>60</top>
+            <animation type="WindowOpen" reversible="false">
+                <effect type="zoom" start="80" end="100" center="640,360" easing="out" tween="back" time="300" />
+                <effect type="fade" start="0" end="100" time="300" />
+            </animation>
+            <animation type="WindowClose" reversible="false">
+                <effect type="zoom" start="100" end="80" center="640,360" easing="in" tween="back" time="300" />
+                <effect type="fade" start="100" end="0" time="300" />
+            </animation>
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>800</width>
+                <height>600</height>
+                <texture border="15">ContentPanel.png</texture>
+            </control>
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>800</width>
+                <height>600</height>
+                <texture border="15">ContentPanel.png</texture>
+            </control>
+            <control type="button">
+                <description>Close Window button</description>
+                <left>730</left>
+                <top>11</top>
+                <width>64</width>
+                <height>32</height>
+                <label>-</label>
+                <font>-</font>
+                <onclick>PreviousMenu</onclick>
+                <texturefocus>DialogCloseButton-focus.png</texturefocus>
+                <texturenofocus>DialogCloseButton.png</texturenofocus>
+                <onleft>1</onleft>
+                <onright>1</onright>
+                <onup>1</onup>
+                <ondown>1</ondown>
+                <visible>system.getbool(input.enablemouse)</visible>
+            </control>
+            <control type="image">
+                <left>5</left>
+                <top>6</top>
+                <width>794</width>
+                <height>50</height>
+                <aspectratio>stretch</aspectratio>
+                <texture>dialogheader.png</texture>
+            </control>
+			<control type="label" id="1399">
+				<left>15</left>
+				<top>17</top>
+				<width>770</width>
+				<height>40</height>
+				<font>font24_title</font>
+				<label>$ADDON[script.config.vdr 32053]</label>
+				<align>center</align>
+				<textcolor>blue</textcolor>
+				<shadowcolor>black</shadowcolor>
+			</control>
+			<control type="list" id="1000">
+				<visible>true</visible>
+				<left>10</left>
+				<top>60</top>
+				<width>780</width>
+				<height>350</height>
+				<onright>1001</onright>
+				<ondown>1020</ondown>
+				<onleft>1001</onleft>
+				<onup>1001</onup>
+				<itemlayout height="40" width="780">
+					<control type="group">
+						<visible>String.IsEqual(ListItem.Property(typ), separator)</visible>
+						<control type="image">
+							<left>0</left>
+							<top>36</top>
+							<width>796</width>
+							<height>3</height>
+							<texture border="1">separator2.png</texture>
+						</control>
+						<control type="label">
+							<left>15</left>
+							<top>5</top>
+							<width>400</width>
+							<height>35</height>
+							<font>font13_title</font>
+							<textcolor>blue</textcolor>
+							<info>$INFO[ListItem.Label]</info>
+						</control>
+					</control>
+					<control type="group">
+						<visible>!String.IsEqual(ListItem.Property(typ), separator)</visible>
+						<control type="image">
+							<left>0</left>
+							<top>0</top>
+							<width>780</width>
+							<height>40</height>
+							<texture border="5">MenuItemNF.png</texture>
+						</control>
+						<control type="label">
+							<left>20</left>
+							<top>0</top>
+							<width>360</width>
+							<height>40</height>
+							<textcolor>FF505050</textcolor>
+							<align>left</align>
+							<aligny>center</aligny>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="group">
+							<visible>String.IsEqual(ListItem.Property(typ), list)</visible>
+							<control type="label">
+								<left>390</left>
+								<top>0</top>
+								<width>360</width>
+								<height>40</height>
+								<textcolor>FF505050</textcolor>
+								<align>right</align>
+								<aligny>center</aligny>
+								<label>$INFO[ListItem.Property(value)]</label>
+							</control>
+						</control>
+						<control type="group">
+							<visible>String.IsEqual(ListItem.Property(typ), bool)</visible>
+							<control type="image">
+								<left>725</left>
+								<top>3</top>
+								<width>30</width>
+								<height>30</height>
+								<aspectratio>keep</aspectratio>
+								<texture border="5">radiobutton-nofocus.png</texture>
+								<visible>String.IsEqual(ListItem.Property(value), 0) | String.IsEqual(ListItem.Property(value), false) | String.IsEmpty(ListItem.Property(value))</visible>
+							</control>
+							<control type="image">
+								<left>725</left>
+								<top>3</top>
+								<width>30</width>
+								<height>30</height>
+								<aspectratio>keep</aspectratio>
+								<texture border="5">radiobutton-focus.png</texture>
+								<visible>String.IsEqual(ListItem.Property(value), 1) | String.IsEqual(ListItem.Property(value), true)</visible>
+							</control>
+						</control>
+					</control>
+				</itemlayout>
+				<focusedlayout height="40" width="780">
+					<control type="group">
+						<visible>String.IsEqual(ListItem.Property(typ), separator)</visible>
+						<control type="image">
+							<left>0</left>
+							<top>36</top>
+							<width>796</width>
+							<height>3</height>
+							<texture border="1">separator2.png</texture>
+						</control>
+						<control type="label">
+							<left>15</left>
+							<top>5</top>
+							<width>400</width>
+							<height>35</height>
+							<font>font13_title</font>
+							<textcolor>blue</textcolor>
+							<info>$INFO[ListItem.Label]</info>
+						</control>
+					</control>
+					<control type="group">
+						<visible>!String.IsEqual(ListItem.Property(typ), separator)</visible>
+						<control type="image">
+							<left>0</left>
+							<top>0</top>
+							<width>780</width>
+							<height>40</height>
+							<texture border="5">MenuItemFO.png</texture>
+							<animation effect="fade" end="50" time="10">Unfocus</animation>
+						</control>
+						<control type="image">
+							<left>400</left>
+							<top>4</top>
+							<width>370</width>
+							<height>33</height>
+							<texture border="0,0,14,0">MediaItemDetailBG.png</texture>
+						</control>
+						<control type="label">
+							<left>20</left>
+							<top>0</top>
+							<width>370</width>
+							<height>40</height>
+							<textcolor>white</textcolor>
+							<align>left</align>
+							<aligny>center</aligny>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="group">
+							<visible>String.IsEqual(ListItem.Property(typ), list)</visible>
+							<control type="label">
+								<left>390</left>
+								<top>0</top>
+								<width>360</width>
+								<height>40</height>
+								<textcolor>white</textcolor>
+								<align>right</align>
+								<aligny>center</aligny>
+								<label>$INFO[ListItem.Property(value)]</label>
+							</control>
+						</control>
+						<control type="group">
+							<visible>String.IsEqual(ListItem.Property(typ), bool)</visible>
+							<control type="image">
+								<left>725</left>
+								<top>3</top>
+								<width>30</width>
+								<height>30</height>
+								<aspectratio>keep</aspectratio>
+								<texture border="5">radiobutton-nofocus.png</texture>
+								<visible>String.IsEqual(ListItem.Property(value), 0) | String.IsEqual(ListItem.Property(value),false) | String.IsEmpty(ListItem.Property(value))</visible>
+							</control>
+							<control type="image">
+								<left>725</left>
+								<top>3</top>
+								<width>30</width>
+								<height>30</height>
+								<aspectratio>keep</aspectratio>
+								<texture border="5">radiobutton-focus.png</texture>
+								<visible>String.IsEqual(ListItem.Property(value), 1) | String.IsEqual(ListItem.Property(value),true)</visible>
+							</control>
+						</control>
+					</control>
+				</focusedlayout>
+			</control>
+            <control type="image">
+                <left>7</left>
+                <top>420</top>
+                <width>786</width>
+                <height>165</height>
+                <texture border="15">floor.png</texture>
+            </control>
+           <control type="button" id="1020">
+                <left>577</left>
+                <top>490</top>
+                <width>200</width>
+                <height>40</height>
+                <texturefocus>button-focus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <label>$ADDON[script.config.vdr 32055]</label>
+				<align>center</align>
+                <onup>1000</onup>
+                <ondown>1001</ondown>
+                <onleft>1000</onleft>
+                <onright>1001</onright>
+            </control>
+           <control type="button" id="1001">
+                <left>577</left>
+                <top>540</top>
+                <width>200</width>
+                <height>40</height>
+                <texturefocus>button-focus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <label></label>
+				<align>center</align>
+                <onup>1020</onup>
+                <ondown>1000</ondown>
+                <onleft>1020</onleft>
+                <onright>1000</onright>
+            </control>
+			<control type="group" id="1010">
+				<control type="label">
+					<left>30</left>
+					<top>440</top>
+					<width>120</width>
+					<height>25</height>
+					<textcolor>blue</textcolor>
+					<align>left</align>
+					<label>$ADDON[script.config.vdr 32047]:</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>470</top>
+					<width>120</width>
+					<height>25</height>
+					<textcolor>blue</textcolor>
+					<align>left</align>
+					<label>$ADDON[script.config.vdr 32048]:</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>500</top>
+					<width>120</width>
+					<height>25</height>
+					<textcolor>blue</textcolor>
+					<align>left</align>
+					<label>$ADDON[script.config.vdr 32049]:</label>
+				</control>
+				<control type="label">
+					<left>300</left>
+					<top>500</top>
+					<width>120</width>
+					<height>25</height>
+					<textcolor>blue</textcolor>
+					<align>left</align>
+					<label>$ADDON[script.config.vdr 32050]:</label>
+				</control>
+				<control type="label" id="1002">
+					<left>160</left>
+					<top>440</top>
+					<width>400</width>
+					<height>25</height>
+					<textcolor>white</textcolor>
+					<align>left</align>
+					<label></label>
+				</control>
+				<control type="label" id="1003">
+					<left>160</left>
+					<top>470</top>
+					<width>200</width>
+					<height>25</height>
+					<textcolor>white</textcolor>
+					<align>left</align>
+					<label></label>
+				</control>
+				<control type="label" id="1004">
+					<left>160</left>
+					<top>500</top>
+					<width>120</width>
+					<height>25</height>
+					<textcolor>white</textcolor>
+					<align>left</align>
+					<label></label>
+				</control>
+				<control type="label" id="1005">
+					<left>430</left>
+					<top>500</top>
+					<width>120</width>
+					<height>25</height>
+					<textcolor>white</textcolor>
+					<align>left</align>
+					<label>$INFO[Container(1001).Property(status)]</label>
+				</control>
+				<control type="progress" id="1006">
+					<left>30</left>
+					<top>555</top>
+					<width>520</width>
+					<height>12</height>
+					<info>$INFO[Container(1001).Property(InfoText)]</info>
+					<visible>true</visible>
+				</control>
+			</control>
+        </control>
+    </controls>
+</window>

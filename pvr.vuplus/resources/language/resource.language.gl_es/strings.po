@@ -1,0 +1,177 @@
+# Kodi Media Center language file
+# Addon Name: Enigma2 Client
+# Addon id: pvr.vuplus
+# Addon Provider: Joerg Dembski and Ross Nicholson
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Main\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: Galician (Spain) (http://www.transifex.com/projects/p/kodi-main/language/gl_ES/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gl_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30003"
+msgid "Username"
+msgstr "Nome de usuario"
+
+msgctxt "#30004"
+msgid "Password"
+msgstr "Contrasinal"
+
+msgctxt "#30005"
+msgid "Connection"
+msgstr "Conexión"
+
+msgctxt "#30006"
+msgid "Icons"
+msgstr "Iconas"
+
+msgctxt "#30007"
+msgid "Response timeout in seconds"
+msgstr "Tempo de espera da resposta en segundos"
+
+msgctxt "#30010"
+msgid "Update Interval in minutes"
+msgstr "Intervalo de actualización en minutos"
+
+msgctxt "#30014"
+msgid "Folder for channeldata"
+msgstr "Cartafol para channeldata"
+
+msgctxt "#30015"
+msgid "Update interval"
+msgstr "Intervalo de actualización"
+
+msgctxt "#30016"
+msgid "Check for channel updates"
+msgstr "Verificar actualizacións de canles"
+
+msgctxt "#30017"
+msgid "Use only the DVB boxes' current recording path"
+msgstr "Utilizar só o camiño actual das gravacións das caixas DVB"
+
+msgctxt "#30018"
+msgid "General"
+msgstr "Xeral"
+
+msgctxt "#30019"
+msgid "Channels"
+msgstr "Canles"
+
+msgctxt "#30020"
+msgid "Advanced"
+msgstr "Avanzado"
+
+msgctxt "#30021"
+msgid "HTTP"
+msgstr "HTTP"
+
+msgctxt "#30022"
+msgid "Recordings / Timer"
+msgstr "Gravacións/Temporizador"
+
+msgctxt "#30023"
+msgid "Recording folder on the receiver"
+msgstr "Cartafol de gravacións no receptor"
+
+msgctxt "#30032"
+msgid "EPG"
+msgstr "Guía"
+
+msgctxt "#30042"
+msgid "Never"
+msgstr "Nunca"
+
+msgctxt "#30043"
+msgid "In EPG only"
+msgstr "Só na Guía"
+
+msgctxt "#30044"
+msgid "In recordings only"
+msgstr "Só nas gravacións"
+
+msgctxt "#30045"
+msgid "Always"
+msgstr "Sempre"
+
+msgctxt "#30051"
+msgid "Login"
+msgstr "Usuario"
+
+msgctxt "#30052"
+msgid "Misc"
+msgstr "Miscelánea"
+
+msgctxt "#30056"
+msgid "TV"
+msgstr "TV"
+
+msgctxt "#30057"
+msgid "Radio"
+msgstr "Radio"
+
+msgctxt "#30060"
+msgid "Timeshift"
+msgstr "Timeshift"
+
+msgctxt "#30062"
+msgid "Timeshift buffer path"
+msgstr "Ruta do búfer do Timeshift"
+
+msgctxt "#30063"
+msgid "Off"
+msgstr "Apagado"
+
+msgctxt "#30064"
+msgid "On playback"
+msgstr "En reprodución"
+
+msgctxt "#30065"
+msgid "On pause"
+msgstr "En Pausa"
+
+msgctxt "#30071"
+msgid "Recordings"
+msgstr "Gravacións"
+
+msgctxt "#30072"
+msgid "Timers"
+msgstr "Temporizadores"
+
+msgctxt "#30085"
+msgid "OK"
+msgstr "Aceptar"
+
+msgctxt "#30094"
+msgid "N/A"
+msgstr "N/D"
+
+msgctxt "#30095"
+msgid "True"
+msgstr "Verdadeiro"
+
+msgctxt "#30096"
+msgid "False"
+msgstr "Falso"
+
+msgctxt "#30410"
+msgid "Automatic"
+msgstr "Automático"
+
+msgctxt "#30430"
+msgid "Disabled"
+msgstr "Desactivado"
+
+msgctxt "#30500"
+msgid "Disconnected from '%s'"
+msgstr "Desconectado dende '%s'"
+
+msgctxt "#30501"
+msgid "Reconnected to '%s'"
+msgstr "Reconectado a '%s'"

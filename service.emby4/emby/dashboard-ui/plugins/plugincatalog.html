@@ -1,0 +1,23 @@
+﻿<div id="pluginCatalogPage" data-role="page" class="page type-interior pluginConfigurationPage withTabs">
+    <div class="catalogMain padded-bottom-page">
+
+        <div class="verticalSection controlsSection padded-left padded-left-page padded-right">
+            <div class="sectionTitleContainer sectionTitleContainer-cards">
+
+                <div class="sectionTitle sectionTitle-cards flex align-items-center" style="display:flex!important;">
+                    <div class="selectContainer">
+                        <select is="emby-select" id="selectSystem" label="${LabelDisplayPluginsFor}">
+                            <option value="Server">${HeaderEmbyServer}</option>
+                            <option value="MBClassic">${PluginTabAppClassic}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="noPlugins" class="hide">${MessageNoAvailablePlugins}</div>
+
+        <div id="pluginTiles" style="text-align:left;"></div>
+    </div>
+</div>

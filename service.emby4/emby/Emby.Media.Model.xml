@@ -1,0 +1,1580 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Emby.Media.Model</name>
+    </assembly>
+    <members>
+        <member name="T:Emby.Media.Common.DataConversion.MediaStreamParser">
+            <summary>
+            Handles conversion of string values from ffmpeg outputs.
+            </summary>
+            <remarks>See example at the bottom.</remarks>
+        </member>
+        <member name="M:Emby.Media.Common.DataConversion.ParseHelper.EqualsNoCase(System.String,System.String)">
+            <summary>Compare strings case insensitive.</summary>
+            <param name="str1">The STR1.</param>
+            <param name="str2">The STR2.</param>
+            <returns>A boolean.</returns>
+        </member>
+        <member name="T:Emby.Media.Common.DataConversion.ParsingContext">
+            <summary>Temporary class for recording parsing errors.</summary>
+            <remarks>Can be removed later.</remarks>
+        </member>
+        <member name="M:Emby.Media.Common.DataConversion.ParsingContext.Dispose">
+            <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        </member>
+        <member name="M:Emby.Media.Common.DataConversion.ParsingContext.ParsingError.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Emby.Media.Common.DataConversion.ProbeStreamParser">
+            <summary>
+            Handles conversion of string values from ffmpeg outputs.
+            </summary>
+            <remarks>See example at the bottom.</remarks>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetEnumId(System.Enum)">
+            <summary>Gets an enum identifier like it would be used in code ('MyEnum.MyValue').</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetDescription(System.Enum)">
+            <summary>Gets the content of an enum member's <see cref="T:System.ComponentModel.DescriptionAttribute"/>, or its name in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetDetails(System.Enum)">
+            <summary>Gets the content of an enum member's <see cref="T:MediaBrowser.Model.Attributes.DetailsAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetOrdinal(System.Enum)">
+            <summary>Gets the value of an enum member's <see cref="T:MediaBrowser.Model.Attributes.OrdinalAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetChannelCount(System.Enum)">
+            <summary>Gets the value of an enum member's <see cref="T:Emby.Media.Model.Attributes.ChannelCountAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetValue(System.Enum)">
+            <summary>Gets the content of r the value property of an enum member's <see cref="T:MediaBrowser.Model.Attributes.ValueAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetBitsPerPixel(System.Enum)">
+            <summary>Gets the value of an enum member's <see cref="T:Emby.Media.Model.Attributes.BitsPerPixelAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetBitDepth(System.Enum)">
+            <summary>Gets the value of an enum member's <see cref="T:Emby.Media.Model.Attributes.BitDepthAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.SupportsBitDepth(System.Enum,System.Int32)">
+            <summary>Checks whether an enum member supports a given bit depth (has a BitDepth attribute matching the provided bitDepth).</summary>
+            <param name="enumValue">The enum value.</param>
+            <param name="bitDepth">The bit depth.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetBitRate(System.Enum)">
+            <summary>Gets the value of an enum member's <see cref="T:Emby.Media.Model.Attributes.MaxBitRateKAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetResRates(System.Enum)">
+            <summary>Gets the value of an enum member's <see cref="T:Emby.Media.Model.Attributes.MaxResAndRateAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetIdTag(System.Enum)">
+            <summary>Gets the value of an enum member's <see cref="T:Emby.Media.Model.Attributes.IdTagAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetMimeType(System.Enum)">
+            <summary>Gets the first mime type of an enum member's <see cref="T:Emby.Media.Model.Attributes.MimeTypesAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetMimeTypes(System.Enum)">
+            <summary>Gets all mime types of an enum member's <see cref="T:Emby.Media.Model.Attributes.MimeTypesAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetRelatedGuids(System.Enum)">
+            <summary>Gets all guids of an enum member's <see cref="T:MediaBrowser.Model.Attributes.RelatedGuidAttribute"/>, or null in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.GetFirstRelatedGuid(System.Enum)">
+            <summary>Gets the first guid of an enum member's <see cref="T:MediaBrowser.Model.Attributes.RelatedGuidAttribute"/>, or <see cref="F:System.Guid.Empty"/> in case there is none.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.CreateProfileInformation(System.Enum)">
+            <summary>Creates a <see cref="T:Emby.Media.Model.Types.ProfileInformation"/> object for codec profile enum members based on attributes defined for this member.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.CreateLevelInformation(System.Enum)">
+            <summary>Creates a <see cref="T:Emby.Media.Model.Types.LevelInformation"/> object for codec level enum members based on attributes defined for this member.</summary>
+            <param name="enumValue">The enum value.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.FindByMimeType``1(``0,System.String)">
+            <summary>Finds members of a specified enum that are having the specified mime type defined in by a <see cref="T:Emby.Media.Model.Attributes.MimeTypesAttribute"/>.</summary>
+            <param name="enumType">Type of the enum to search.</param>
+            <param name="mimeType">Mime type to search for.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.FindByAlias``1(System.String)">
+            <summary>Finds members of a specified enum that are having the specified alias name defined in by a <see cref="T:MediaBrowser.Model.Attributes.AliasesAttribute"/>.</summary>
+            <param name="aliasName">Alias name to search for.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumExtensions.FindByRelatedGuid``1(``0,System.Guid)">
+            <summary>Finds members of a specified enum that are having the specified related Guid type defined in by a <see cref="T:MediaBrowser.Model.Attributes.RelatedGuidAttribute"/>.</summary>
+            <param name="enumType">Type of the enum to search.</param>
+            <param name="relatedGuid">Related Guid to search for.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumListExtensions.GetHighestOrdinal``1(System.Collections.Generic.IEnumerable{``0},``0)">
+            <summary>
+            Gets the value of an enum collection having the maximum <see cref="T:MediaBrowser.Model.Attributes.OrdinalAttribute" /> value
+            that is equal or less to the ordinal value of <paramref name="inclusiveMaximum"/>,
+            or null in case there is none matching these conditions.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="enumList">The enum list.</param>
+            <param name="inclusiveMaximum">The inclusive maximum.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.EnumListExtensions.GetAll``1(``0)">
+            <summary>Returns all members of an enum as list.</summary>
+            <param name="enumType">Type of the enum.</param>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.Extensions.GetFriendlyString(System.Guid)">
+            <summary>Gets a  shortend (friendly) string that is still supposed to be locally unique.</summary>
+            <param name="guid">The unique identifier.</param>
+            <returns>A shortend (friendly) string.</returns>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.Extensions.PrefixWith(System.String,System.String)">
+            <summary>Adds the specified prefix to a string if the string is non-empty.</summary>
+            <param name="value">The string to prefix.</param>
+            <param name="prefix">The prefix.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.Extensions.IsNotEmpty(System.String)">
+            <summary>Checks whether the specified string is non-null and non-empty.</summary>
+            <param name="value">The string to check.</param>
+            <remarks>This is an inverted version of <see cref="M:System.String.IsNullOrEmpty(System.String)"/> to be used in Linq expressions.</remarks>
+            <returns>A boolean.</returns>
+        </member>
+        <member name="T:Emby.Media.Common.Extensions.TimeSpanExtensions">
+            <summary>
+            The TimeSpanExtensions class.
+            </summary>
+        </member>
+        <member name="T:Emby.Media.Common.Extensions.ValueExtensions">
+            <summary>
+            These extensions allow simple handling of certain types in code
+            (currently <see cref="T:Emby.Media.Model.Types.BitRate"/> only).
+            </summary>
+            <remarks>See example at the bottom.</remarks>
+        </member>
+        <member name="M:Emby.Media.Common.Extensions.ValueExtensions.Sample(Emby.Media.Model.Types.BitRate)">
+            <summary>Usage samples for above extensions.</summary>
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.BitDepthAttribute">
+            <summary>
+            Attribute for specifying the bit depth (= the maximum bitness of a component/channel).
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.BitsPerPixelAttribute">
+            <summary>
+            Attribute for specifying a 'bits/pixel' value for enum entries.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.BitStreamAttribute">
+            <summary>
+            Attribute indicating that an enum value is applicable to bit-stream formats.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.ChannelCountAttribute">
+            <summary>
+            Attribute for specifying the number of channels for enum entries.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.CompressionAttribute">
+            <summary>
+            Attribute for specifying the kind of compression for a media format.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.HardwareAttribute">
+            <summary>
+            Attribute indicating that an enum value is related to hardware encoding.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.IdTagAttribute">
+            <summary>
+            Attribute for specifying a tag string that is used for creating unique codec IDs.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.InputAttribute">
+            <summary>
+            Attribute indicating that an enum value is applicable to input formats.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.IntraFrameAttribute">
+            <summary>
+            Attribute indicating intra-frame capability of a media type.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.IsGraphicAttribute">
+            <summary>
+            Attribute for marking a subtitle codec format as graphical/image-based instead of text.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.IsHdrAttribute">
+            <summary>
+            Attribute for marking a color space or primary enum value as being HDR.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.MaxBitRateKAttribute">
+            <summary>
+            Attribute for specifying the maximum supported bit rate for an enum entry.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.MaxResAndRateAttribute">
+            <summary>
+            Attribute specifying a maximum supported combination of resolution and rate for an enum value.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="M:Emby.Media.Model.Attributes.MaxResAndRateAttribute.#ctor(System.Int32,System.Int32,System.Double)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Attributes.MaxResAndRateAttribute"/> class.</summary>
+            <param name="width">The resolution width.</param>
+            <param name="height">The resolution height.</param>
+            <param name="frameRate">The maximum frame rate for this resolution.</param>
+        </member>
+        <member name="P:Emby.Media.Model.Attributes.MaxResAndRateAttribute.Width">
+            <summary>Gets the resolution width.</summary>
+            <value>The resolution width.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Attributes.MaxResAndRateAttribute.Height">
+            <summary>Gets the resolution height.</summary>
+            <value>The resolution height.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Attributes.MaxResAndRateAttribute.FrameRate">
+            <summary>Gets the maximum frame rate for the resolution.</summary>
+            <value>The maximum frame rate.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Attributes.MaxResAndRateAttribute.Resolution">
+            <summary>Gets a <see cref="P:Emby.Media.Model.Attributes.MaxResAndRateAttribute.Resolution"/> value.</summary>
+            <value>The resolution.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Attributes.MaxResAndRateAttribute.ResolutionWithRate">
+            <summary>Gets a <see cref="P:Emby.Media.Model.Attributes.MaxResAndRateAttribute.ResolutionWithRate"/> value.</summary>
+            <value>The resolution with rate.</value>
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.MimeTypesAttribute">
+            <summary>
+            Attribute for specifying one or more related mime types for a media type.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.NbCountAttribute">
+            <summary>
+            Attribute for specifying the NB count for color format enum entries.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.OutputAttribute">
+            <summary>
+            Attribute indicating that an enum value is applicable to output formats.
+            </summary>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Attributes.PrimaryAttribute">
+            <summary>
+            Attribute for marking an enum entry as prominent or important.
+            </summary>
+            <remarks>This allows for example pushing certain entries to the top of a selection list
+            or excluding non-primary items for simplified UX scenarios.</remarks>
+            <seealso cref="T:System.Attribute" />
+        </member>
+        <member name="T:Emby.Media.Model.Enums.CodecDirections">
+            <summary>
+            Enum for indicating the processing direction of a codec.
+            </summary>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.CodecKinds">
+            <summary>
+            Enum defining the kind of media a codec is processing.
+            </summary>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.CompressionKinds">
+            <summary>
+            Enum defining compression capabilities.
+            </summary>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.SecondaryFrameworks">
+            <summary>
+            Enum defining secondary frameworks for encoding and decoding.
+            </summary>
+            <remarks>While most of these are hardware acceleration frameworks, this is not a necessity
+            (e.g. Android MediaCodec offers software codecs as well).</remarks>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.HardwareContexts">
+            <summary>
+            Enum defining hardware contexts in ffmpeg.
+            </summary>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.ChannelLayouts">
+            <summary>
+            Enum listing Audio channel layouts.
+            </summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutMono">
+            <summary>The layout mono</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutStereo">
+            <summary>The layout stereo</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout2Point1">
+            <summary>The layout 2 poin t1</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutSurround">
+            <summary>The layout surround</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout21">
+            <summary>The layout 2 1</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout4Point0">
+            <summary>The layout 4 poin t0</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutQuad">
+            <summary>The layout quad</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout22">
+            <summary>The layout 2 2</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout3Point1">
+            <summary>The layout 3 poin t1</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout5Point0Back">
+            <summary>The layout 5 poin t0 back</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout5Point0">
+            <summary>The layout 5 poin t0</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout4Point1">
+            <summary>The layout 4 poin t1</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout5Point1Back">
+            <summary>The layout 5 poin t1 back</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout5Point1">
+            <summary>The layout 5 poin t1</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout6Point0">
+            <summary>The layout 6 poin t0</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout6Point0Front">
+            <summary>The layout 6 poin t0 front</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutHexagonal">
+            <summary>The layout hexagonal</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout6Point1">
+            <summary>The layout 6 poin t1</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout6Point1Back">
+            <summary>The layout 6 poin t1 back</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout6Point1Front">
+            <summary>The layout 6 poin t1 front</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout7Point0">
+            <summary>The layout 7 poin t0</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout7Point0Front">
+            <summary>The layout 7 poin t0 front</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout7Point1">
+            <summary>The layout 7 poin t1</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout7Point1WideBack">
+            <summary>The layout 7 poin t1 wide back</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.Layout7Point1Wide">
+            <summary>The layout 7 poin t1 wide</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutOctagonal">
+            <summary>The layout octagonal</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutHexadecagonal">
+            <summary>The layout hexadecagonal</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutStereoDownmix">
+            <summary>The layout stereo downmix</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutSpecial1">
+            <summary>2 channels (FC+LFE)</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutSpecial2">
+            <summary>4 channels (FL+FR+LFE+BC) </summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutSpecial3">
+            <summary>5 channels (FL+FR+LFE+SL+SR)</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.ChannelLayouts.LayoutSpecial4">
+            <summary>5 channels (FL+FR+LFE+BL+BR)</summary>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.ColorFormats">
+            <summary>
+            Enum listing color formats.
+            </summary>
+            <remarks>
+            The enum member names are matching those that are used by ffmpeg.
+            (execute 'ffmpeg -pix_fmts' to list them)
+            Exception: Items that are starting with a number are prefixed with an underscore here.
+            In ffmpeg code these are prefixed with 'AV_PIX_FMT_' and all-caps.
+            </remarks>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.ColorPrimaries">
+            <summary>
+            Enum listing Chromaticity coordinates of the source primaries.
+            </summary>
+            <remarks>
+            The enum member names are matching those that are used by ffmpeg,
+            which are based on ISO/IEC 23001-8_2013 § 7.1.
+            </remarks>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.ColorSpaces">
+            <summary>
+            Enum listing YUV colorspace types.
+            </summary>
+            <remarks>
+            The enum member names are matching those that are used by ffmpeg,
+            which are based on ISO/IEC 23001-8_2013 § 7.3.
+            </remarks>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.ColorTransfers">
+            <summary>
+            Enum listing Color Transfer Characteristics.
+            </summary>
+            <remarks>
+            The enum member names are matching those that are used by ffmpeg,
+            which are bases on ISO/IEC 23001-8_2013 § 7.2.
+            </remarks>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.Endian">
+            <summary>
+            Endian type.
+            </summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.Endian.Unspecified">
+            <summary>The unspecified</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.Endian.BigEndian">
+            <summary>The big endian</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.Endian.LittleEndian">
+            <summary>The little endian</summary>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.VideoMediaTypes">
+            <summary>
+            Enum listing video media types.
+            </summary>
+            <remarks>
+            The enum member names are matching exactly those that are used by ffmpeg.
+            Exception: Items that are starting with a number are prefixed with an underscore here.
+            </remarks>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.AudioMediaTypes">
+            <summary>
+            Enum listing audio media types.
+            </summary>
+            <remarks>
+            The enum member names are matching exactly those that are used by ffmpeg.
+            Exception: Items that are starting with a number are prefixed with an underscore here.
+            </remarks>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.SubtitleMediaTypes">
+            <summary>
+            Enum listing subtitle media types.
+            </summary>
+            <remarks>
+            The enum member names are matching exactly those that are used by ffmpeg.
+            </remarks>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.SampleFormats">
+            <summary>
+            Audio sample format.
+            </summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.NONE">
+            <summary>No sample format.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.U8">
+            <summary>unsigned 8 bits   .</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.S16">
+            <summary>signed 16 bits.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.S32">
+            <summary>signed 32 bits.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.FLT">
+            <summary>float format.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.DBL">
+            <summary>double format.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.U8P">
+            <summary>unsigned 8 bits, planar.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.S16P">
+            <summary>signed 16 bits, planar.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.S32P">
+            <summary>signed 32 bits, planar.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.FLTP">
+            <summary>float, planar.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.DBLP">
+            <summary>double, planar.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.S64">
+            <summary>signed 64 bits.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleFormats.S64P">
+            <summary>signed 64 bits, planar.</summary>
+        </member>
+        <member name="T:Emby.Media.Model.Enums.SampleRates">
+            <summary>
+            Enum listing sample rates.
+            </summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.SrUnknown">
+            <summary>Unknown Sample Rate</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr7350">
+            <summary>Sample Rate 7350 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr8000">
+            <summary>Sample Rate 8000 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr11025">
+            <summary>Sample Rate 11025 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr12000">
+            <summary>Sample Rate 12000 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr16000">
+            <summary>Sample Rate 16000 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr22050">
+            <summary>Sample Rate 22050 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr24000">
+            <summary>Sample Rate 24000 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr32000">
+            <summary>Sample Rate 32000 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr64000">
+            <summary>Sample Rate 64000 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr44100">
+            <summary>Sample Rate 44100 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr48000">
+            <summary>Sample Rate 48000 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr88200">
+            <summary>Sample Rate 88200 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr96000">
+            <summary>Sample Rate 96000 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr176400">
+            <summary>Sample Rate 176400 Hz</summary>
+        </member>
+        <member name="F:Emby.Media.Model.Enums.SampleRates.Sr192000">
+            <summary>Sample Rate 192000 Hz</summary>
+        </member>
+        <member name="T:Emby.Media.Model.GraphModel.Filter">
+            <summary>
+            A filtergraph filter.
+            </summary>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Filter.Description">
+            <summary>Gets or sets the description.</summary>
+            <value>The description.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Filter.HwDeviceContext">
+            <summary>Gets or sets the hw device context.</summary>
+            <value>The hw device context.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Filter.Inputs">
+            <summary>Gets or sets the inputs.</summary>
+            <value>The inputs.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Filter.Name">
+            <summary>Gets or sets the name.</summary>
+            <value>The name.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Filter.Name2">
+            <summary>Gets or sets the name2.</summary>
+            <value>The name2.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Filter.Outputs">
+            <summary>Gets or sets the outputs.</summary>
+            <value>The outputs.</value>
+        </member>
+        <member name="T:Emby.Media.Model.GraphModel.FilterWrapper">
+            <summary>
+            The wrapper for a single filter.
+            </summary>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.FilterWrapper.Filter">
+            <summary>Gets or sets the filter.</summary>
+            <value>The filter.</value>
+        </member>
+        <member name="T:Emby.Media.Model.GraphModel.Graph">
+            <summary>
+            Represents a single filtergraph.
+            </summary>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Graph.Description">
+            <summary>Gets or sets the description.</summary>
+            <value>The description.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Graph.Filters">
+            <summary>Gets or sets the list of filter wrappers.</summary>
+            <value>The filters of filter wrappers.</value>
+        </member>
+        <member name="T:Emby.Media.Model.GraphModel.GraphData">
+            <summary>
+            Root object for ffmpeg graph data.
+            </summary>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.GraphData.Graphs">
+            <summary>Gets or sets the list of graphs.</summary>
+            <value>The graphs list.</value>
+        </member>
+        <member name="T:Emby.Media.Model.GraphModel.Hwdevicecontext">
+            <summary>
+            The hardware device context.
+            </summary>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Hwdevicecontext.DeviceType">
+            <summary>Gets or sets the type of the device.</summary>
+            <value>The type of the device.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Hwdevicecontext.HasHwDeviceContext">
+            <summary>Gets or sets the has hw device context.</summary>
+            <value>The has hw device context.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Hwframescontext.HasHwFramesContext">
+            <summary>Gets or sets the has hw frames context.</summary>
+            <value>The has hw frames context.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Hwframescontext.Height">
+            <summary>Gets or sets the height.</summary>
+            <value>The height.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Hwframescontext.HwDeviceContext">
+            <summary>Gets or sets the hw device context.</summary>
+            <value>The hw device context.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Hwframescontext.HwPixelFormat">
+            <summary>Gets or sets the hw pixel format.</summary>
+            <value>The hw pixel format.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Hwframescontext.SwPixelFormat">
+            <summary>Gets or sets the sw pixel format.</summary>
+            <value>The sw pixel format.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.Hwframescontext.Width">
+            <summary>Gets or sets the width.</summary>
+            <value>The width.</value>
+        </member>
+        <member name="T:Emby.Media.Model.GraphModel.InputLink">
+            <summary>
+            The input link.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.GraphModel.LinkBase" />
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.InputLink.LinkType">
+            <summary>Gets the type of the link.</summary>
+            <value>The type of the link.</value>
+        </member>
+        <member name="T:Emby.Media.Model.GraphModel.LinkBase">
+            <summary>
+            The link base class.
+            </summary>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.ChannelLayout">
+            <summary>Gets or sets the channel layout.</summary>
+            <value>The channel layout.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.Channels">
+            <summary>Gets or sets the channels.</summary>
+            <value>The channels.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.ChannelString">
+            <summary>Gets or sets the channel string.</summary>
+            <value>The channel string.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.Description">
+            <summary>Gets or sets the description.</summary>
+            <value>The description.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.DestName">
+            <summary>Gets or sets the name of the dest.</summary>
+            <value>The name of the dest.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.DestPadName">
+            <summary>Gets or sets the name of the dest pad.</summary>
+            <value>The name of the dest pad.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.Format">
+            <summary>Gets or sets the format.</summary>
+            <value>The format.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.Height">
+            <summary>Gets or sets the height.</summary>
+            <value>The height.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.HwFramesContext">
+            <summary>Gets or sets the hw frames context.</summary>
+            <value>The hw frames context.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.LinkType">
+            <summary>Gets the type of the link.</summary>
+            <value>The type of the link.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.MediaType">
+            <summary>Gets or sets the type of the media.</summary>
+            <value>The type of the media.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.MediaTypeId">
+            <summary>Gets or sets the media type identifier.</summary>
+            <value>The media type identifier.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.Name1">
+            <summary>Gets or sets the name1.</summary>
+            <value>The name1.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.Name2">
+            <summary>Gets or sets the name2.</summary>
+            <value>The name2.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.Name3">
+            <summary>Gets or sets the name3.</summary>
+            <value>The name3.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.SampleRate">
+            <summary>Gets or sets the sample rate.</summary>
+            <value>The sample rate.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.SAR">
+            <summary>Gets or sets the sar.</summary>
+            <value>The sar.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.SourceName">
+            <summary>Gets or sets the name of the source.</summary>
+            <value>The name of the source.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.SourcePadName">
+            <summary>Gets or sets the name of the source pad.</summary>
+            <value>The name of the source pad.</value>
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.LinkBase.Width">
+            <summary>Gets or sets the width.</summary>
+            <value>The width.</value>
+        </member>
+        <member name="T:Emby.Media.Model.GraphModel.LinkType">
+            <summary>
+            Enum of link typess.
+            </summary>
+        </member>
+        <member name="F:Emby.Media.Model.GraphModel.LinkType.Input">
+            <summary>The input link type.</summary>
+        </member>
+        <member name="F:Emby.Media.Model.GraphModel.LinkType.Output">
+            <summary>The output link type.</summary>
+        </member>
+        <member name="T:Emby.Media.Model.GraphModel.OutputLink">
+            <summary>
+            The output link.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.GraphModel.LinkBase" />
+        </member>
+        <member name="P:Emby.Media.Model.GraphModel.OutputLink.LinkType">
+            <summary>Gets the type of the link.</summary>
+            <value>The type of the link.</value>
+        </member>
+        <member name="T:Emby.Media.Model.ProbeModel.ProbeChapter">
+            <summary>ffprobe chapter class.</summary>
+            <remarks>Based on official spec from: https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/ffprobe.xsd </remarks>
+        </member>
+        <member name="T:Emby.Media.Model.ProbeModel.ProbeError">
+            <summary>ffprobe error class.</summary>
+            <remarks>Based on official spec from: https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/ffprobe.xsd </remarks>
+        </member>
+        <member name="T:Emby.Media.Model.ProbeModel.ProbeFormat">
+            <summary>ffprobe format class.</summary>
+            <remarks>Based on official spec from: https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/ffprobe.xsd </remarks>
+        </member>
+        <member name="T:Emby.Media.Model.ProbeModel.ProbeFrame">
+            <summary>ffprobe frame class.</summary>
+            <remarks>Based on official spec from: https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/ffprobe.xsd </remarks>
+        </member>
+        <member name="M:Emby.Media.Model.ProbeModel.ProbeFrame.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Emby.Media.Model.ProbeModel.ProbeResult">
+            <summary>ffprobe result class.</summary>
+            <remarks>Based on official spec from: https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/ffprobe.xsd </remarks>
+        </member>
+        <member name="M:Emby.Media.Model.ProbeModel.ProbeResult.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Emby.Media.Model.ProbeModel.ProbeStream">
+            <summary>ffprobe stream class.</summary>
+            <remarks>Based on official spec from: https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/ffprobe.xsd </remarks>
+        </member>
+        <member name="M:Emby.Media.Model.ProbeModel.ProbeStream.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.AttachmentStream.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.AttachmentStream.GetShortDescriptionBits">
+            <summary>Gets a short description.</summary>
+            <returns>A string.</returns>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.AudioStream.Profile">
+            <summary>Gets or sets the profile.</summary>
+            <value>The profile.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.AudioStream.Channels">
+            <summary>Gets or sets the channels.</summary>
+            <value>The channels.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.AudioStream.ChannelLayout">
+            <summary>Gets or sets the channel layout.</summary>
+            <value>The channel layout.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.AudioStream.BitRate">
+            <summary>Gets or sets the bit rate.</summary>
+            <value>The bit rate.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.AudioStream.BitsPerSample">
+            <summary>
+            Gets or sets the bit depth.
+            </summary>
+            <value>The bit depth.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.AudioStream.SampleRate">
+            <summary>Gets or sets the sample rate.</summary>
+            <value>The sample rate.</value>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.AudioStream.GetShortDescriptionBits">
+            <summary>Gets a short description.</summary>
+            <returns>A string.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.AudioStream.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.Index">
+            <summary>Gets or sets the index.</summary>
+            <value>The index.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.Id">
+            <summary>Gets or sets the identifier.</summary>
+            <value>The identifier.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.Pid">
+            <summary>Gets or sets the PID.</summary>
+            <value>The PID.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.IsDefault">
+            <summary>Gets or sets a value indicating whether this instance is default.</summary>
+            <value><c>true</c> if this instance is default; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.IsForced">
+            <summary>Gets or sets a value indicating whether this instance is forced.</summary>
+            <value><c>true</c> if this instance is forced; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.Title">
+            <summary>Gets or sets the title.</summary>
+            <value>The title.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.Language">
+            <summary>Gets or sets the language.</summary>
+            <value>The language.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.Comment">
+            <summary>Gets or sets the comment.</summary>
+            <value>The comment.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.AllTags">
+            <summary>Gets or sets all tags.</summary>
+            <value>All tags.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.ParsingErrors">
+            <summary>Gets the parsing errors.</summary>
+            <value>The parsing errors.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.StreamBase.IsExternal">
+            <summary>Gets or sets a value indicating whether this stream is external.</summary>
+            <value><c>true</c> if this instance is external; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.StreamBase.GetShortDescriptionBits">
+            <summary>Gets a short description.</summary>
+            <returns>A string.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.StreamBase.GetShortDescription">
+            <summary>Gets a short description.</summary>
+            <returns>A string.</returns>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.SubtitleStream.IsGraphical">
+            <summary>Gets or sets the size of of graphical subtitles.</summary>
+            <value>The size of of graphical subtitles.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.SubtitleStream.FrameSize">
+            <summary>Gets or sets the size of of graphical subtitles.</summary>
+            <value>The size of of graphical subtitles.</value>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.SubtitleStream.GetShortDescriptionBits">
+            <summary>Gets a short description.</summary>
+            <returns>A string.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.SubtitleStream.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.UnknownStream.GetShortDescriptionBits">
+            <summary>Gets a short description.</summary>
+            <returns>A string.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.UnknownStream.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.PixelFormat">
+            <summary>Gets or sets the pixel format.</summary>
+            <value>The pixel format.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.IsInterlaced">
+            <summary>Gets or sets a value indicating whether this instance is interlaced.</summary>
+            <value><c>true</c> if this instance is interlaced; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.BitRate">
+            <summary>Gets or sets the bit rate.</summary>
+            <value>The bit rate.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.BitsPerPixel">
+            <summary>Gets or sets the number of bits per pixel.</summary>
+            <value>The number of bits per pixel.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.BitDepth">
+            <summary>Gets or sets the bit depth.</summary>
+            <value>The bit depth.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.RefFrames">
+            <summary>Gets or sets the reference frames.</summary>
+            <value>The reference frames.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.VideoSize">
+            <summary>Gets or sets the size of the video.</summary>
+            <value>The size of the video.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.AverageFrameRate">
+            <summary>Gets or sets the average frame rate.</summary>
+            <value>The average frame rate.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.RealFrameRate">
+            <summary>Gets or sets the real frame rate.</summary>
+            <value>The real frame rate.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.AspectRatio">
+            <summary>Gets or sets the display aspect ratio.</summary>
+            <value>The display aspect ratio.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.SampleAspectRatio">
+            <summary>Gets or sets the sample aspect ratio.</summary>
+            <value>The sample aspect ratio.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.Profile">
+            <summary>Gets or sets the profile.</summary>
+            <value>The profile.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.Level">
+            <summary>Gets or sets the level.</summary>
+            <value>The level.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStream.IsAnamorphic">
+            <summary>
+            Gets a value indicating whether this instance is anamorphic.
+            </summary>
+            <value><c>true</c> if this instance is anamorphic; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.VideoStream.GetShortDescriptionBits">
+            <summary>Gets a short description.</summary>
+            <returns>A string.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Streams.VideoStream.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStreamH264.H264Profile">
+            <summary>
+            Gets or sets the H.264 profile.
+            </summary>
+            <value>The H.264 profile.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Streams.VideoStreamH264.H264Level">
+            <summary>
+            Gets or sets the H.264 level.
+            </summary>
+            <value>The H.264 level.</value>
+        </member>
+        <member name="T:Emby.Media.Model.Types.BitRate">
+            <summary>
+            A type for handling bit rates.
+            </summary>
+            <remarks>The purpose of this type is to avoid manual calculations and conversions in code,
+            unified handling and conversion as well as presentation through its various To***String methods.</remarks>
+            <seealso cref="T:System.IComparable" />
+            <seealso cref="T:System.IEquatable`1" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.LevelInformation">
+            <summary>
+            Class for unified presentation of all information associated with a specific codec level.
+            </summary>
+        </member>
+        <member name="P:Emby.Media.Model.Types.LevelInformation.ShortName">
+            <summary>Gets the enum member name of the level.</summary>
+            <value>The enum member name of the level.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.LevelInformation.Description">
+            <summary>Gets the common name of the level.</summary>
+            <value>The common name of the level.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.LevelInformation.Ordinal">
+            <summary>Gets a value indicating the level's ranking relative to other levels.</summary>
+            <value>The level rank.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.LevelInformation.MaxBitRate">
+            <summary>Gets the maximum bit rate supported by this level.</summary>
+            <value>The maximum bit rate.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.LevelInformation.MaxBitRateDisplay">
+            <summary>Gets a display value of the <see cref="P:Emby.Media.Model.Types.LevelInformation.MaxBitRate"/> property.</summary>
+            <value>The maximum bit rate as string.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.LevelInformation.Id">
+            <summary>Gets a unique identifier.</summary>
+            <value>The identifier.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.LevelInformation.ResolutionRates">
+            <summary>Gets examples for the maximum supported combinations of resolution and rate for this level.</summary>
+            <value>A list of <see cref="T:Emby.Media.Model.Types.ResolutionWithRate"/> values.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.LevelInformation.ResolutionRateStrings">
+            <summary>Gets examples for the maximum supported combinations of resolution and rate for this level as string values.</summary>
+            <value>A list of <see cref="T:System.String"/> values.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.LevelInformation.ResolutionRatesDisplay">
+            <summary>Gets a single string from the <see cref="P:Emby.Media.Model.Types.LevelInformation.ResolutionRateStrings"/> list.</summary>
+            <value>A string containing resolutions and rates.</value>
+        </member>
+        <member name="T:Emby.Media.Model.Types.MediaTagList">
+            <summary>
+            Implements a list of tags.
+            </summary>
+            <seealso cref="T:System.Collections.Generic.List`1" />
+        </member>
+        <member name="M:Emby.Media.Model.Types.MediaTagList.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.MediaTagList"/> class.</summary>
+        </member>
+        <member name="M:Emby.Media.Model.Types.MediaTagList.#ctor(System.Int32)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.MediaTagList"/> class.</summary>
+            <param name="capacity">The number of elements that the new list can initially store.</param>
+        </member>
+        <member name="M:Emby.Media.Model.Types.MediaTagList.#ctor(System.Collections.Generic.IEnumerable{Emby.Media.Model.Types.MediaTagList.MediaTag})">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.MediaTagList"/> class.</summary>
+            <param name="collection">The collection whose elements are copied to the new list.</param>
+        </member>
+        <member name="M:Emby.Media.Model.Types.MediaTagList.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.MediaTagList.MediaTag.#ctor(System.String,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
+            <param name="tag">The tag.</param>
+            <param name="value">The value.</param>
+        </member>
+        <member name="M:Emby.Media.Model.Types.MediaTagList.MediaTag.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Emby.Media.Model.Types.PixelFormat">
+            <summary>The Pixel Format.</summary>
+        </member>
+        <member name="M:Emby.Media.Model.Types.PixelFormat.#ctor(Emby.Media.Model.Enums.ColorFormats,Emby.Media.Model.Enums.Endian)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.PixelFormat" /> class.</summary>
+            <param name="colorFormat">The color format.</param>
+            <param name="endian">The endian.</param>
+        </member>
+        <member name="P:Emby.Media.Model.Types.PixelFormat.ColorFormat">
+            <summary>Gets the color format.</summary>
+            <value>The color format.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.PixelFormat.Endian">
+            <summary>Gets the endian.</summary>
+            <value>The endian.</value>
+        </member>
+        <member name="M:Emby.Media.Model.Types.PixelFormat.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Emby.Media.Model.Types.ProfileInformation">
+            <summary>
+            Class for unified presentation of all information associated with a specific codec profile.
+            </summary>
+        </member>
+        <member name="P:Emby.Media.Model.Types.ProfileInformation.ShortName">
+            <summary>Gets the enum member name of the profile.</summary>
+            <value>The enum member name of the profile.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.ProfileInformation.Description">
+            <summary>Gets the common name of the profile.</summary>
+            <value>The common name of the profile.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.ProfileInformation.Details">
+            <summary>Gets detail information about the profile.</summary>
+            <value>A string containing detail information about the profile.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.ProfileInformation.Id">
+            <summary>Gets a unique identifier.</summary>
+            <value>The identifier.</value>
+        </member>
+        <member name="T:Emby.Media.Model.Types.ProfileLevelInformation">
+            <summary>
+            A class combining both <see cref="T:Emby.Media.Model.Types.ProfileInformation"/> and <see cref="T:Emby.Media.Model.Types.LevelInformation"/>.
+            </summary>
+        </member>
+        <member name="P:Emby.Media.Model.Types.ProfileLevelInformation.Profile">
+            <summary>Gets the profile.</summary>
+            <value>The profile as <see cref="T:Emby.Media.Model.Types.ProfileInformation"/>.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.ProfileLevelInformation.Level">
+            <summary>Gets the level.</summary>
+            <value>The level as <see cref="T:Emby.Media.Model.Types.LevelInformation"/>.</value>
+        </member>
+        <member name="T:Emby.Media.Model.Types.ProfileWithLevel`2">
+            <summary>
+            A generic base class combining a profile and level enum value.
+            </summary>
+            <remarks>This is primarily a prerequisite for <see cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3"/>.</remarks>
+            <typeparam name="TP">The type of the profile enum.</typeparam>
+            <typeparam name="TL">The type of the level enum.</typeparam>
+        </member>
+        <member name="P:Emby.Media.Model.Types.ProfileWithLevel`2.Profile">
+            <summary>Gets the profile enum value.</summary>
+            <value>The profile enum value.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.ProfileWithLevel`2.Level">
+            <summary>Gets the level enum value.</summary>
+            <value>The level enum value.</value>
+        </member>
+        <member name="T:Emby.Media.Model.Types.AvcProfileWithLevel">
+            <summary>
+            Class combining profile and level for <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.h264"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevel`2" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.HevcProfileWithLevel">
+            <summary>
+            Class combining profile and level for <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.hevc"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevel`2" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.H263ProfileWithLevel">
+            <summary>
+            Class combining profile and level for <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.h263p"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevel`2" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Mpeg2ProfileWithLevel">
+            <summary>
+            Class combining profile and level for <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.mpeg2video"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevel`2" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Mpeg4ProfileWithLevel">
+            <summary>
+            Class combining profile and level for <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.mpeg4"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevel`2" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Vp8ProfileWithLevel">
+            <summary>
+            Class combining profile and level for <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.vp8"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevel`2" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Vp9ProfileWithLevel">
+            <summary>
+            Class combining profile and level for <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.vp9"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevel`2" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Vc1ProfileWithLevel">
+            <summary>
+            Class combining profile and level for <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.vc1"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevel`2" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.ProfileWithLevelList`3">
+            <summary>
+            A generic base class implementing a list of profiles and associated maximum supported levels.
+            </summary>
+            <typeparam name="T">A profile and level combination, derived from <see cref="T:Emby.Media.Model.Types.ProfileWithLevel`2"/>.</typeparam>
+            <typeparam name="TP">The type of the profile enum.</typeparam>
+            <typeparam name="TL">The type of the level enum.</typeparam>
+            <seealso cref="T:System.Collections.Generic.List`1" />
+        </member>
+        <member name="M:Emby.Media.Model.Types.ProfileWithLevelList`3.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3"/> class.
+            </summary>
+        </member>
+        <member name="M:Emby.Media.Model.Types.ProfileWithLevelList`3.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3"/> class.
+            </summary>
+            <param name="list">The list.</param>
+        </member>
+        <member name="M:Emby.Media.Model.Types.ProfileWithLevelList`3.Add(`1,`2)">
+            <summary>Adds the specified combination of profile and level to the list.</summary>
+            <param name="profile">The profile.</param>
+            <param name="level">The level.</param>
+        </member>
+        <member name="M:Emby.Media.Model.Types.ProfileWithLevelList`3.ContainsProfile(`1)">
+            <summary>Determines whether the list contains profile.</summary>
+            <param name="profile">The profile.</param>
+            <returns><c>true</c> if the specified profile is contained; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.ProfileWithLevelList`3.GetLevel(`1)">
+            <summary>Returns the maximum supported level for the specified profile.</summary>
+            <param name="profile">The profile.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.ProfileWithLevelList`3.RemoveProfile(`1)">
+            <summary>Returns the maximum supported level for the specified profile.</summary>
+            <param name="profile">The profile.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.ProfileWithLevelList`3.GetMaxLevel">
+            <summary>Returns the level having the highest ordinal.</summary>
+        </member>
+        <member name="M:Emby.Media.Model.Types.ProfileWithLevelList`3.GetMaxAndLowerLevels">
+            <summary>Returns a list of the level having the highest ordinal and all lower levels.</summary>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.ProfileWithLevelList`3.GetProfiles">
+            <summary>Returns all profiles.</summary>
+        </member>
+        <member name="M:Emby.Media.Model.Types.ProfileWithLevelList`3.GetProfileLevelInformation">
+            <summary>Creates a list of <see cref="T:Emby.Media.Model.Types.ProfileLevelInformation"/> objects for the contained items.</summary>
+            <returns></returns>
+        </member>
+        <member name="T:Emby.Media.Model.Types.AvcProfileWithLevelList">
+            <summary>
+            Class representing a list of supported profiles and maximum supported levels for  <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.h264"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.HevcProfileWithLevelList">
+            <summary>
+            Class representing a list of supported profiles and maximum supported levels for  <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.hevc"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.H263ProfileWithLevelList">
+            <summary>
+            Class representing a list of supported profiles and maximum supported levels for  <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.h263p"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Mpeg2ProfileWithLevelList">
+            <summary>
+            Class representing a list of supported profiles and maximum supported levels for  <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.mpeg2video"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Mpeg4ProfileWithLevelList">
+            <summary>
+            Class representing a list of supported profiles and maximum supported levels for  <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.mpeg4"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Vp8ProfileWithLevelList">
+            <summary>
+            Class representing a list of supported profiles and maximum supported levels for  <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.vp8"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Vp9ProfileWithLevelList">
+            <summary>
+            Class representing a list of supported profiles and maximum supported levels for  <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.vp9"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Vc1ProfileWithLevelList">
+            <summary>
+            Class representing a list of supported profiles and maximum supported levels for  <see cref="F:Emby.Media.Model.Enums.VideoMediaTypes.vp9"/>.
+            </summary>
+            <seealso cref="T:Emby.Media.Model.Types.ProfileWithLevelList`3" />
+        </member>
+        <member name="T:Emby.Media.Model.Types.Rational">
+            <summary>
+            Implements a rational value.
+            </summary>
+            <seealso cref="T:System.IComparable" />
+            <seealso cref="T:System.IComparable" />
+            <seealso cref="T:System.Runtime.Serialization.IDeserializationCallback" />
+            <seealso cref="T:System.IEquatable`1" />
+            <seealso cref="T:System.Runtime.Serialization.ISerializable" />
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.#ctor(System.Numerics.BigInteger,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.Rational" /> struct.</summary>
+            <param name="numerator">The numerator.</param>
+            <param name="delimiter">The delimiter.</param>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.#ctor(System.Double,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.Rational" /> struct.</summary>
+            <param name="value">The value.</param>
+            <param name="delimiter">The delimiter.</param>
+            <exception cref="T:System.ArgumentException">Argument is not a number - value
+            or
+            Argument is infinity - value</exception>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.#ctor(System.Decimal,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.Rational" /> struct.</summary>
+            <param name="value">The value.</param>
+            <param name="delimiter">The delimiter.</param>
+            <exception cref="T:System.ArgumentException">invalid Decimal - value</exception>
+            <remarks>
+            The Decimal type represents floating point numbers exactly, with no rounding error.
+            Values such as "0.1" in Decimal are actually representable, and convert cleanly
+            to Rational as "11/10"
+            </remarks>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.#ctor(System.Numerics.BigInteger,System.Numerics.BigInteger,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.Rational" /> struct.</summary>
+            <param name="numerator">The numerator.</param>
+            <param name="denominator">The denominator.</param>
+            <param name="delimiter">The delimiter.</param>
+            <exception cref="T:System.DivideByZeroException"></exception>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.#ctor(System.Numerics.BigInteger,System.Numerics.BigInteger,System.Numerics.BigInteger,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.Rational" /> struct.</summary>
+            <param name="whole">The whole.</param>
+            <param name="numerator">The numerator.</param>
+            <param name="denominator">The denominator.</param>
+            <param name="delimiter">The delimiter.</param>
+            <exception cref="T:System.DivideByZeroException"></exception>
+        </member>
+        <member name="P:Emby.Media.Model.Types.Rational.MinusOne">
+            <summary>Gets the minus one.</summary>
+            <value>The minus one.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.Rational.One">
+            <summary>Gets the one.</summary>
+            <value>The one.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.Rational.Zero">
+            <summary>Gets the zero.</summary>
+            <value>The zero.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.Rational.Denominator">
+            <summary>Gets the denominator.</summary>
+            <value>The denominator.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.Rational.Numerator">
+            <summary>Gets the numerator.</summary>
+            <value>The numerator.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.Rational.Sign">
+            <summary>Gets the sign.</summary>
+            <value>The sign.</value>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Abs(Emby.Media.Model.Types.Rational)">
+            <summary>Abses the specified r.</summary>
+            <param name="r">The r.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Add(Emby.Media.Model.Types.Rational,Emby.Media.Model.Types.Rational)">
+            <summary>Adds the specified x.</summary>
+            <param name="x">The x.</param>
+            <param name="y">The y.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Compare(Emby.Media.Model.Types.Rational,Emby.Media.Model.Types.Rational)">
+            <summary>Compares the specified r1.</summary>
+            <param name="r1">The r1.</param>
+            <param name="r2">The r2.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Divide(Emby.Media.Model.Types.Rational,Emby.Media.Model.Types.Rational)">
+            <summary>Divides the specified dividend.</summary>
+            <param name="dividend">The dividend.</param>
+            <param name="divisor">The divisor.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.DivRem(Emby.Media.Model.Types.Rational,Emby.Media.Model.Types.Rational,Emby.Media.Model.Types.Rational@)">
+            <summary>Divs the rem.</summary>
+            <param name="dividend">The dividend.</param>
+            <param name="divisor">The divisor.</param>
+            <param name="remainder">The remainder.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Invert(Emby.Media.Model.Types.Rational)">
+            <summary>Inverts the specified r.</summary>
+            <param name="r">The r.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.LeastCommonDenominator(Emby.Media.Model.Types.Rational,Emby.Media.Model.Types.Rational)">
+            <summary>Least common denominator.</summary>
+            <param name="x">The x.</param>
+            <param name="y">The y.</param>
+            <remarks>
+            The LCD is the least common multiple of the two denominators.  For instance, the LCD of
+            {1/2, 1/4} is 4 because the least common multiple of 2 and 4 is 4.  Likewise, the LCD
+            of {1/2, 1/3} is 6.
+            To find the LCD:
+            1) Find the Greatest Common Divisor (GCD) of the denominators
+            2) Multiply the denominators together
+            3) Divide the product of the denominators by the GCD
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Multiply(Emby.Media.Model.Types.Rational,Emby.Media.Model.Types.Rational)">
+            <summary>Multiplies the specified x.</summary>
+            <param name="x">The x.</param>
+            <param name="y">The y.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Negate(Emby.Media.Model.Types.Rational)">
+            <summary>Negates the specified r.</summary>
+            <param name="r">The r.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Pow(Emby.Media.Model.Types.Rational,System.Numerics.BigInteger)">
+            <summary>Pows the specified base value.</summary>
+            <param name="baseValue">The base value.</param>
+            <param name="exponent">The exponent.</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException">cannot raise zero to a negative power - baseValue</exception>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Remainder(Emby.Media.Model.Types.Rational,Emby.Media.Model.Types.Rational)">
+            <summary>Remainders the specified dividend.</summary>
+            <param name="dividend">The dividend.</param>
+            <param name="divisor">The divisor.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Subtract(Emby.Media.Model.Types.Rational,Emby.Media.Model.Types.Rational)">
+            <summary>Subtracts the specified x.</summary>
+            <param name="x">The x.</param>
+            <param name="y">The y.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.CompareTo(Emby.Media.Model.Types.Rational)">
+            <summary>Compares to.</summary>
+            <param name="other">The other.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Equals(System.Object)">
+            <summary>Determines whether the specified <see cref="T:System.Object" />, is equal to this instance.</summary>
+            <param name="obj">The <see cref="T:System.Object" /> to compare with this instance.</param>
+            <returns><c>true</c> if the specified <see cref="T:System.Object" /> is equal to this instance; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.Equals(Emby.Media.Model.Types.Rational)">
+            <summary>Indicates whether the current object is equal to another object of the same type.</summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the <paramref name="other">other</paramref> parameter; otherwise, false.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.GetFractionPart">
+            <summary>Gets the fraction part.</summary>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.GetHashCode">
+            <summary>Returns a hash code for this instance.</summary>
+            <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. </returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.GetWholePart">
+            <summary>Gets the whole part.</summary>
+            <returns></returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.Rational.ToString">
+            <summary>Converts to string.</summary>
+            <returns>A <see cref="T:System.String" /> that represents this instance.</returns>
+        </member>
+        <member name="M:Emby.Media.Model.Types.RationalTypeConverter.ConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object,System.Type)">
+            <summary>Converts the given value object to the specified type, using the specified context and culture information.</summary>
+            <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"></see> that provides a format context.</param>
+            <param name="culture">A <see cref="T:System.Globalization.CultureInfo"></see>. If null is passed, the current culture is assumed.</param>
+            <param name="value">The <see cref="T:System.Object"></see> to convert.</param>
+            <param name="destinationType">The <see cref="T:System.Type"></see> to convert the value parameter to.</param>
+            <returns>An <see cref="T:System.Object"></see> that represents the converted value.</returns>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="destinationType">destinationType</paramref> parameter is null.</exception>
+            <exception cref="T:System.NotSupportedException">The conversion cannot be performed.</exception>
+        </member>
+        <member name="T:Emby.Media.Model.Types.Resolution">
+            <summary>
+            Struct representing a video resolution specified in X and Y dimension.
+            </summary>
+            <seealso cref="T:System.IComparable" />
+            <seealso cref="T:System.IEquatable`1" />
+        </member>
+        <member name="M:Emby.Media.Model.Types.Resolution.#ctor(System.Int32,System.Int32)">
+            <summary>Initializes a new instance of the <see cref="T:Emby.Media.Model.Types.Resolution"/> struct.</summary>
+            <param name="width">The resolution width.</param>
+            <param name="height">The resolution height.</param>
+        </member>
+        <member name="P:Emby.Media.Model.Types.Resolution.Width">
+            <summary>Gets the resolution width.</summary>
+            <value>The resolution width.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.Resolution.Height">
+            <summary>Gets the resolution height.</summary>
+            <value>The resolution height.</value>
+        </member>
+        <member name="T:Emby.Media.Model.Types.ResolutionWithRate">
+            <summary>
+            Struct representing a combination of video resolution and frame rate.
+            </summary>
+            <seealso cref="T:System.IEquatable`1" />
+        </member>
+        <member name="P:Emby.Media.Model.Types.ResolutionWithRate.Width">
+            <summary>Gets the resolution width.</summary>
+            <value>The resolution width.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.ResolutionWithRate.Height">
+            <summary>Gets the resolution height.</summary>
+            <value>The resolution height.</value>
+        </member>
+        <member name="P:Emby.Media.Model.Types.ResolutionWithRate.FrameRate">
+            <summary>Gets the frame rate in frames/second (fps).</summary>
+            <value>The frame rate.</value>
+        </member>
+    </members>
+</doc>

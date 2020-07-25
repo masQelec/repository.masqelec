@@ -1,0 +1,4 @@
+<settings>
+    <setting id="HOST" value="127.0.0.1" />
+    <setting id="PORT" value="8002" />
+</settings>

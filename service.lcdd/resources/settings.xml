@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+   <category   label="30000">
+      <setting label="30001" id="LCD_DRIVER" type="select" values="none|bayrad|CFontz|CFontzPacket|curses|CwLnx|dm140|ea65|EyeboxOne|futaba|glcd|glk|hd44780|i2500vfd|icp_a106|imon|imonlcd|IOWarrior|irman|irtrans|joy|lb216|lcdm001|lcterm|linux_input|lirc|lis|MD8800|mdm166a|ms6931|mtc_s16209x|MtxOrb|NoritakeVFD|Olimex_MOD_LCD1x9|picolcd|pyramid|sdeclcd|sed1330|sed1520|serialPOS|serialVFD|shuttleVFD|sli|stv5730|SureElec|t6963|text|tyan|ula200|vlsys_m428|rawserial|yard2LCD" default="none" />
+    </category>
+</settings>

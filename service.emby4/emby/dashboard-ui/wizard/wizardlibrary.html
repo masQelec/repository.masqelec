@@ -1,0 +1,25 @@
+﻿<div id="wizardLibraryPage" data-role="page" class="view page wizardPage mediaLibraryPage">
+
+    <div class="padded-left padded-right padded-bottom-page">
+
+        <div class="verticalSection">
+            <div class="sectionTitleContainer flex align-items-center justify-content-center" style="margin-bottom:0;">
+                <h1 class="sectionTitle">${HeaderSetupLibrary}</h1>
+            </div>
+        </div>
+
+        <div class="flex align-items-center justify-content-center focuscontainer-x itemsViewSettingsContainer padded-top padded-bottom">
+            <div class="listTotalRecordCount">
+            </div>
+        </div>
+
+        <div is="emby-itemscontainer" class="vertical-wrap itemsContainer centered" data-multiselect="false">
+        </div>
+
+        <div class="flex justify-content-center padded-top">
+            <button is="emby-button" type="button" class="raised button-cancel" onclick="history.back();"><i class="md-icon button-icon button-icon-left">arrow_back</i><span>${LabelPrevious}</span></button>
+            <button is="emby-button" type="button" class="raised button-submit btnWizardNext"><span>${LabelNext}</span><i class="md-icon button-icon button-icon-right">arrow_forward</i></button>
+        </div>
+    </div>
+
+</div>

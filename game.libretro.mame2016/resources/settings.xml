@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="30000">
+		<setting label="30001" type="select" id="mame2016_alternate_renderer" values="disabled|enabled" default="disabled"/>
+		<setting label="30002" type="select" id="mame2016_auto_save" values="disabled|enabled" default="disabled"/>
+		<setting label="30003" type="select" id="mame2016_boot_from_cli" values="disabled|enabled" default="disabled"/>
+		<setting label="30004" type="select" id="mame2016_boot_to_bios" values="disabled|enabled" default="disabled"/>
+		<setting label="30005" type="select" id="mame2016_boot_to_osd" values="disabled|enabled" default="disabled"/>
+		<setting label="30006" type="select" id="mame2016_cheats_enable" values="disabled|enabled" default="disabled"/>
+		<setting label="30007" type="select" id="mame2016_media_type" values="rom|cart|flop|cdrm|cass|hard|serl|prin" default="rom"/>
+		<setting label="30008" type="select" id="mame2016_mouse_enable" values="disabled|enabled" default="disabled"/>
+		<setting label="30009" type="select" id="mame2016_read_config" values="disabled|enabled" default="disabled"/>
+		<setting label="30010" type="select" id="mame2016_saves" values="game|system" default="game"/>
+		<setting label="30011" type="select" id="mame2016_softlists_auto_media" values="enabled|disabled" default="enabled"/>
+		<setting label="30012" type="select" id="mame2016_softlists_enable" values="enabled|disabled" default="enabled"/>
+		<setting label="30013" type="select" id="mame2016_throttle" values="disabled|enabled" default="disabled"/>
+		<setting label="30014" type="select" id="mame2016_write_config" values="disabled|enabled" default="disabled"/>
+	</category>
+</settings>
