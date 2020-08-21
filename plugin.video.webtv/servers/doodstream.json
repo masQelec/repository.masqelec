@@ -1,0 +1,18 @@
+{
+  "id": "doodstream",
+  "name": "DoodStream",
+
+  "active": false,
+  "notes": "Requiere recaptcha",
+
+  "find_videos": {
+    "ignore_urls": [],
+    "patterns": [
+      {
+        "pattern": "http(?:s|)://(?:doodstream.com|dood.watch|dood.to)/(?:d|e)/(?:embed-|)([A-z0-9]+)",
+        "url": "https://doodstream.com/e/\\1"
+      }
+    ]
+  }
+
+}
