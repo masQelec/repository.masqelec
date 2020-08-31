@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="game.controller.genesis.6button"
+        name="Sega Genesis Controller"
+        version="1.0.8"
+        provider-name="Team Kodi">
+    <extension point="kodi.game.controller" library="resources/layout.xml"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Sega Genesis controller</summary>
+        <description lang="en_GB">The original controller for the Sega Genesis was released in 1988. It had three main face buttons. Sega released a six-button version in 1993.</description>
+        <disclaimer lang="en_GB">Image credit: OpenEmu (openemu.org)</disclaimer>
+		<summary lang = "es_ES"> Controlador Sega Genesis </summary>
+        <description lang = "es_ES"> El controlador original para el Sega Genesis fue lanzado en 1988. Tenía tres botones principales. Sega lanzó una versión de seis botones en 1993. </description>
+        <disclaimer lang = "es_ES"> Crédito de imagen: OpenEmu (openemu.org) </disclaimer>
+        <platform>all</platform>
+        <assets>
+            <icon>resources/icon.png</icon>
+        </assets>
+    </extension>
+</addon>

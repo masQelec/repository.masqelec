@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="game.controller.gamecube"
+        name="Nintendo GameCube Controller"
+        version="1.0.0"
+        provider-name="Team Kodi">
+    <extension point="kodi.game.controller" library="resources/layout.xml"/>
+    <extension point="xbmc.addon.metadata">
+		<summary lang = "es_ES"> Controlador Nintendo GameCube </summary>
+        <description lang = "es_ES"> El controlador Nintendo GameCube fue lanzado en 2001. Los sticks y disparadores analógicos fueron objeto de una demanda de patentes, pero Nintendo se defendió y ganó el caso con éxito. </description>
+        <disclaimer lang = "es_ES"> Crédito de imagen: OpenEmu (openemu.org) </disclaimer>
+        <platform>all</platform>
+        <assets>
+            <icon>resources/icon.png</icon>
+        </assets>
+    </extension>
+</addon>
