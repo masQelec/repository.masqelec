@@ -350,6 +350,22 @@ class Copier:
                 else:
                     pass
 
+		# Resources Media Icon.png
+                if os.path.isfile(addon + os.path.sep + "resources/media/icon.png"):
+                    try:
+                        if os.path.isfile(output_path + addon + os.path.sep + "resources/media/icon.png") and overwrite_existing:                                            
+                            if not os.path.exists(output_path + addon + os.path.sep + "resources/media"):
+                                    os.makedirs(output_path + addon + os.path.sep + "resources/media")
+                            shutil.copy(addon + os.path.sep + "resources/media/icon.png", output_path + addon + os.path.sep + "resources/media/icon.png")
+                        else:
+                            if not os.path.exists(output_path + addon + os.path.sep + "resources/media"):
+                                    os.makedirs(output_path + addon + os.path.sep + "resources/media")
+                            shutil.copy(addon + os.path.sep + "resources/media/icon.png", output_path + addon + os.path.sep + "resources/media/icon.png")
+                    except IOError:
+                        pass
+                else:
+                    pass
+
                 # Fanart.jpg
                 try:
                     if os.path.isfile(output_path + addon + os.path.sep + "fanart.jpg") and overwrite_existing:
@@ -374,6 +390,23 @@ class Copier:
                         pass
                 else:
                     pass
+
+                # Resources Media Fanart.jpg
+                if os.path.isfile(addon + os.path.sep + "resources/media/fanart.jpg"):
+                    try:
+                        if os.path.isfile(output_path + addon + os.path.sep + "resources/media/fanart.jpg") and overwrite_existing:                                            
+                            if not os.path.exists(output_path + addon + os.path.sep + "resources/media"):
+                                    os.makedirs(output_path + addon + os.path.sep + "resources/media")
+                            shutil.copy(addon + os.path.sep + "resources/media/fanart.jpg", output_path + addon + os.path.sep + "resources/media/fanart.jpg")
+                        else:
+                            if not os.path.exists(output_path + addon + os.path.sep + "resources/media"):
+                                    os.makedirs(output_path + addon + os.path.sep + "resources/media")
+                            shutil.copy(addon + os.path.sep + "resources/media/fanart.jpg", output_path + addon + os.path.sep + "resources/media/fanart.jpg")
+                    except IOError:
+                        pass
+                else:
+                    pass
+
                     
                 # Fanart.png
                 try:
@@ -395,6 +428,22 @@ class Copier:
                             if not os.path.exists(output_path + addon + os.path.sep + "resources"):
                                     os.makedirs(output_path + addon + os.path.sep + "resources")
                             shutil.copy(addon + os.path.sep + "resources/fanart.png", output_path + addon + os.path.sep + "resources/fanart.png")
+                    except IOError:
+                        pass
+                else:
+                    pass
+
+                # Resources Media Fanart.png
+                if os.path.isfile(addon + os.path.sep + "resources/media/fanart.png"):
+                    try:
+                        if os.path.isfile(output_path + addon + os.path.sep + "resources/media/fanart.png") and overwrite_existing:                                            
+                            if not os.path.exists(output_path + addon + os.path.sep + "resources/media"):
+                                    os.makedirs(output_path + addon + os.path.sep + "resources/media")
+                            shutil.copy(addon + os.path.sep + "resources/media/fanart.png", output_path + addon + os.path.sep + "resources/media/fanart.png")
+                        else:
+                            if not os.path.exists(output_path + addon + os.path.sep + "resources/media"):
+                                    os.makedirs(output_path + addon + os.path.sep + "resources/media")
+                            shutil.copy(addon + os.path.sep + "resources/media/fanart.png", output_path + addon + os.path.sep + "resources/media/fanart.png")
                     except IOError:
                         pass
                 else:
