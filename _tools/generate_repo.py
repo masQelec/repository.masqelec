@@ -18,7 +18,7 @@ import zipfile
 import shutil
 import datetime
 import os.path
-from xml.dom import minidom
+import xml.dom.minidom
 try:
     from ConfigParser import SafeConfigParser
 except ImportError:
@@ -46,8 +46,8 @@ rename_old = True  # will rename older zip files in output directory
 copy_additional = True  # will copy additional files such as changelog.txt, icon.png, fanart.jpg
 replace_ampersand = True  # will replace solo ampersands (&) with &amp; in order to pass xml validation
 compress = True  # Setting this to True will compress with ZIP_DEFLATED method, if False it will use ZIP_STORED
-ignored_dirs = ['.git', '.idea', '__MACOSX', '.svn', output_path, tools_path]
-ignored_files = ['.gitignore', 'gitattributes']
+ignored_dirs = ['.git', '.idea', '__MACOSX', '.svn', '.github', 'tests', 'packages', 'LICENSES', 'packages', 'docs', output_path, tools_path]
+ignored_files = ['.gitignore', '.gitattributes', '.codeclimate.yml', '.editorconfig', '.flake8', '.pylintrc', 'codecov.yml', 'tox.ini', 'Makefile']
 
 class Generator:
 
@@ -128,7 +128,10 @@ class Generator:
                 _path = os.path.join(addon, "addon.xml")
 
                 # split lines for stripping
-                document = minidom.parse(_path)
+                try:
+                    document = xml.dom.minidom.parse(_path)
+                except IOError:
+                    pass
 
                 for parent in document.getElementsByTagName("addon"):
                     version = parent.getAttribute("version")
@@ -310,7 +313,10 @@ class Copier:
             if not (os.path.isdir(addon) or addon in ignored_dirs):
                 continue
 
-            document = minidom.parse(xml_file)
+            try:
+                document = xml.dom.minidom.parse(xml_file)
+            except IOError:
+                pass
 
             for parent in document.getElementsByTagName("addon"):
 

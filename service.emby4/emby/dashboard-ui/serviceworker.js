@@ -1,1 +1,0 @@
-importScripts("modules/serviceworker/notifications.js","modules/serviceworker/sync.js");
