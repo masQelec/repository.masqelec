@@ -1,0 +1,9 @@
+{
+    "LabelBrowseLibrary": "\u700f\u89bd\u8cc7\u6599\u5eab",
+    "LabelConfigureServer": "\u8a2d\u5b9a Emby",
+    "LabelExit": "\u96e2\u958b",
+    "LabelVisitCommunity": "\u8a2a\u554f\u793e\u7fa4",
+    "LabelRestartServer": "\u91cd\u65b0\u555f\u52d5 Emby \u4f3a\u670d\u5668",
+    "WelcomeToEmbyServer": "\u6b61\u8fce\u4f86\u5230 Emby \u4f3a\u670d\u5668\uff01",
+    "EmbyServer": "Emby \u4f3a\u670d\u5668"
+}

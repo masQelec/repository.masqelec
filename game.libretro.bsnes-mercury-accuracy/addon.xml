@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="game.libretro.bsnes-mercury-accuracy" name="Nintendo - SNES / SFC (bsnes-mercury Accuracy)" version="0.94.0.5.1" provider-name="Libretro">
+  <requires>
+    <import addon="game.libretro" version="1.0.0"/>
+    <import addon="game.controller.snes" version="1.0.0"/>
+    <import addon="game.controller.snes.multitap" version="1.0.0"/>
+    <import addon="game.controller.snes.super.scope" version="1.0.0"/>
+    <import addon="game.controller.konami.justifier.snes" version="1.0.0"/>
+    <import addon="game.controller.konami.justifier.player2" version="1.0.0"/>
+  </requires>
+  <extension point="kodi.gameclient" library_linux="game.libretro.bsnes-mercury-accuracy.so">
+    <platforms>SNES</platforms>
+    <extensions>sfc|smc|bml</extensions>
+    <supports_vfs>true</supports_vfs>
+    <supports_standalone>false</supports_standalone>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Nintendo - SNES / SFC (bsnes-mercury Accuracy) v094 (Accuracy)</summary>
+    <description lang="en_GB">bSNES Mercury is a fork of Higan (originally called bSNES), notable for emulating the original hardware as accurately as possible through low-level, cycle-accurate emulation.
+
+The "Accuracy" profile focuses on accuracy at the cost of performance.
+
+http://byuu.org/
+
+Supported files: .sfc, .smc, .bml</description>
+    <summary lang="es_ES">Nintendo - SNES / SFC (bsnes-mercury Accuracy) v094 (Accuracy)</summary>
+    <description lang="es_ES">bSNES Mercury es una bifurcación de Higan (originalmente llamada bSNES), notable por emular el hardware original con la mayor precisión posible a través de una emulación de bajo nivel y precisión de ciclo.
+
+La "Precisión" El perfil se centra en la precisión a costa del rendimiento.
+
+http://byuu.org/
+
+Archivos compatibles: .sfc, .smc, .bml</description>
+    <license>GPLv3</license>
+    <platform/>
+    <source>https://github.com/kodi-game/game.libretro.bsnes-mercury-accuracy</source>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.ong</fanart>
+    </assets>
+  </extension>
+</addon>

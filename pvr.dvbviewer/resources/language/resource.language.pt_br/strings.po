@@ -1,0 +1,269 @@
+# Kodi Media Center language file
+# Addon Name: DVBViewer Client
+# Addon id: pvr.dvbviewer
+# Addon Provider: Manuel Mausz
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Main\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/kodi-main/language/pt_BR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgctxt "#30001"
+msgid "Webinterface Port"
+msgstr "Porta da Interface Web"
+
+msgctxt "#30002"
+msgid "Username"
+msgstr "Usuário"
+
+msgctxt "#30003"
+msgid "Password"
+msgstr "Senha"
+
+msgctxt "#30004"
+msgid "Use Wake-on-LAN to wake up service"
+msgstr "Usar Wake-on-LAN para despertar o serviço"
+
+msgctxt "#30005"
+msgid "MAC address"
+msgstr "Endereço MAC"
+
+msgctxt "#30010"
+msgid "Use favourites instead of channel list"
+msgstr "Usar favoritos ao invés da lista de canais"
+
+msgctxt "#30011"
+msgid "Use local favourites file"
+msgstr "Usar arquivos favoritos locais"
+
+msgctxt "#30012"
+msgid "Select the favourites.xml file"
+msgstr "Selecione o arquivo favourites.xml"
+
+msgctxt "#30020"
+msgid "Enable Timeshift"
+msgstr "Ativar gravação"
+
+msgctxt "#30021"
+msgid "Timeshift buffer path"
+msgstr "Caminho do buffer de gravação"
+
+msgctxt "#30025"
+msgid "Off"
+msgstr "Desligado"
+
+msgctxt "#30026"
+msgid "On playback"
+msgstr "Na reprodução"
+
+msgctxt "#30027"
+msgid "On pause"
+msgstr "Na pausa"
+
+msgctxt "#30040"
+msgid "Enable low performance mode (disables logos & thumbnails)"
+msgstr "Ativar modo de baixa performance (desabilita logos & miniaturas)"
+
+msgctxt "#30050"
+msgid "Group recordings"
+msgstr "Gravações Agrupadas"
+
+msgctxt "#30051"
+msgid "disabled"
+msgstr "desativado"
+
+msgctxt "#30052"
+msgid "by recording directory"
+msgstr "pelo diretório de gravação"
+
+msgctxt "#30053"
+msgid "by recording date"
+msgstr "pela data da gravação"
+
+msgctxt "#30054"
+msgid "by first letter"
+msgstr "pela primeira letra"
+
+msgctxt "#30055"
+msgid "by tv channel"
+msgstr "por canais tv"
+
+msgctxt "#30056"
+msgid "by series"
+msgstr "por séries"
+
+msgctxt "#30057"
+msgid "by title"
+msgstr "por título"
+
+msgctxt "#30060"
+msgid "Put outline (e.g. subtitles) before plot"
+msgstr "Coloque contorno (legendas) antes do enredo"
+
+msgctxt "#30061"
+msgid "Never"
+msgstr "Nunca"
+
+msgctxt "#30062"
+msgid "In EPG only"
+msgstr "Somente no EPG"
+
+msgctxt "#30063"
+msgid "In recordings only"
+msgstr "Somente em gravações"
+
+msgctxt "#30064"
+msgid "Always"
+msgstr "Sempre"
+
+msgctxt "#30070"
+msgid "Enable transcoding"
+msgstr "Ativar transcodificação"
+
+msgctxt "#30071"
+msgid "Off"
+msgstr "Desligado"
+
+msgctxt "#30072"
+msgid "TS"
+msgstr "TS"
+
+msgctxt "#30073"
+msgid "WebM"
+msgstr "WebM"
+
+msgctxt "#30074"
+msgid "FLV"
+msgstr "FLV"
+
+msgctxt "#30077"
+msgid "Transcoding URL parameters"
+msgstr "Transcodificar parâmetros da URL "
+
+msgctxt "#30080"
+msgid "Enable EDL support"
+msgstr "Ativar suporte EDL"
+
+msgctxt "#30100"
+msgid "General"
+msgstr "Geral"
+
+msgctxt "#30101"
+msgid "Advanced"
+msgstr "Avançado"
+
+msgctxt "#30102"
+msgid "Recordings"
+msgstr "Gravações"
+
+msgctxt "#30103"
+msgid "Live TV"
+msgstr "TV ao Vivo"
+
+msgctxt "#30110"
+msgid "Wake-on-LAN"
+msgstr "Despertar via rede"
+
+msgctxt "#30111"
+msgid "Favourites"
+msgstr "Favoritos"
+
+msgctxt "#30112"
+msgid "Timeshift"
+msgstr "Mudança de horário"
+
+msgctxt "#30113"
+msgid "Edit Decision List"
+msgstr "Editar lista de decisão"
+
+msgctxt "#30114"
+msgid "Transcoding"
+msgstr "Transcodificando"
+
+msgctxt "#30400"
+msgid "Default"
+msgstr "Padrão"
+
+msgctxt "#30401"
+msgid "Unimportant (Lowest)"
+msgstr "Sem importância (mais baixa)"
+
+msgctxt "#30402"
+msgid "Low"
+msgstr "Mínima"
+
+msgctxt "#30403"
+msgid "Normal"
+msgstr "Normal"
+
+msgctxt "#30404"
+msgid "High"
+msgstr "Máxima"
+
+msgctxt "#30405"
+msgid "Important (Highest)"
+msgstr "Importante (mais alto)"
+
+msgctxt "#30410"
+msgid "Automatic"
+msgstr "Automático"
+
+msgctxt "#30430"
+msgid "Disabled"
+msgstr "Desabilitado"
+
+msgctxt "#30501"
+msgid "DVBViewer Media Server version %s or higher required"
+msgstr "Servidor de mídia DVBViewer versão 1%s ou superior é requerido"
+
+msgctxt "#30502"
+msgid "Unable to parse channel list"
+msgstr "Não foi possível analisar a lista de canais"
+
+msgctxt "#30503"
+msgid "Check Kodi log for more information"
+msgstr "Verifique o log do Kodi para maiores informações"
+
+msgctxt "#30504"
+msgid "Unable to open local favourites.xml"
+msgstr "Não foi possível abrir favourites.xml local"
+
+msgctxt "#30505"
+msgid "Unable to parse favourites list"
+msgstr "Não foi possível analisar lista de favoritos"
+
+msgctxt "#30506"
+msgid "Unable to parse timer list"
+msgstr "Não foi possível analisar lista dos agendamentos"
+
+msgctxt "#30507"
+msgid "Please reset the EPG database and restart Kodi afterwards"
+msgstr "Por favor resete o banco de dados do EPG e reinicie o Kodi após isto."
+
+msgctxt "#30508"
+msgid "Favourites contains unresolvable channel: %s"
+msgstr "Favoritos contém canal sem solução:%s"
+
+msgctxt "#30509"
+msgid "Favourites enabled but none defined"
+msgstr "Favoritos ativado mas nenhum definido"
+
+msgctxt "#30511"
+msgid "EDL support requires DVBViewer Media Server %s or higher"
+msgstr "Suporte EDL necessita da versão do Servidor de Mídia DVBViewer 1%s ou superior"
+
+msgctxt "#30512"
+msgid "PVR is running with guest permissions"
+msgstr "PVR está rodando com permissões de convidado"
+
+msgctxt "#30513"
+msgid "Search phrase cannot be empty"
+msgstr "Frase para procurar não pode estar vazia"

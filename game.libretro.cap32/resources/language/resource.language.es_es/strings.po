@@ -1,0 +1,57 @@
+# game.libretro.cap32 language file
+# Addon Name: game.libretro.cap32
+# Addon id: game.libretro.cap32
+# Addon Provider: libretro
+msgid ""
+msgstr ""
+"Project-Id-Version: game.libretro.cap32\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2017-02-04 09:56i\n"
+"PO-Revision-Date: 2017-02-04 09:56i\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: spanish (http://www.transifex.com/projects/p/xbmc-addons/language/es/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Settings"
+msgstr "Configuraciones"
+
+msgctxt "#30001"
+msgid "Autorun"
+msgstr "Ejecución Automática"
+
+msgctxt "#30002"
+msgid "Combo Key"
+msgstr "Teclas Combinadas"
+
+msgctxt "#30003"
+msgid "CPC Language"
+msgstr "Lenguaje CPC"
+
+msgctxt "#30004"
+msgid "Model"
+msgstr "Modelo"
+
+msgctxt "#30005"
+msgid "Ram size"
+msgstr "Tamaño de Ram"
+
+msgctxt "#30006"
+msgid "User 1 Amstrad Joystick Config"
+msgstr "Configuración de joystick Amstrad del usuario 1"
+
+msgctxt "#30007"
+msgid "User 2 Amstrad Joystick Config"
+msgstr "Configuración de joystick Amstrad del usuario 2"
+
+msgctxt "#30008"
+msgid "Monitor Intensity"
+msgstr "Intensidad de monitor"
+
+msgctxt "#30009"
+msgid "Monitor Type"
+msgstr "Tipo de monitor"

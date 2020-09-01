@@ -1,0 +1,49 @@
+# game.libretro.bsnes-mercury-accuracy language file
+# Addon Name: game.libretro.bsnes-mercury-accuracy
+# Addon id: game.libretro.bsnes-mercury-accuracy
+# Addon Provider: libretro
+msgid ""
+msgstr ""
+"Project-Id-Version: game.libretro.bsnes-mercury-accuracy\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2017-02-04 09:56i\n"
+"PO-Revision-Date: 2017-02-04 09:56i\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: spanish (http://www.transifex.com/projects/p/xbmc-addons/language/es/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Settings"
+msgstr "configuraciones"
+
+msgctxt "#30001"
+msgid "Preferred aspect ratio"
+msgstr "Relación de aspecto preferida"
+
+msgctxt "#30002"
+msgid "Special chip accuracy"
+msgstr "Precisión de chip especial"
+
+msgctxt "#30003"
+msgid "Crop overscan"
+msgstr "Recorte Overscan"
+
+msgctxt "#30004"
+msgid "Gamma ramp (Requires restart)"
+msgstr "Rampa gamma (Requiere reinicio)"
+
+msgctxt "#30005"
+msgid "System region"
+msgstr "Región del sistema"
+
+msgctxt "#30006"
+msgid "SuperFX speed"
+msgstr "Velocidad SuperFX"
+
+msgctxt "#30007"
+msgid "Allow settings to reduce accuracy"
+msgstr "Permitir configuraciones para reducir la precisión"

@@ -1,0 +1,25 @@
+﻿<div id="liveTvGuideProviderPage" data-role="page" class="page type-interior">
+
+    <div>
+        <div class="content-primary">
+
+            <form>
+
+                <h2>${HeaderGuideDataSetup}
+                </h2>
+
+                <div class="selectContainer">
+                    <select is="emby-select" class="selectCountry" data-mini="true" required="required" label="${LabelCountry}"></select>
+                </div>
+                <div class="selectContainer fldGuideProvider hide">
+                    <select is="emby-select" class="selectProvider" data-mini="true" required="required" label="${LabelGuideSource}"></select>
+                </div>
+
+                <div class="flex justify-content-flex-end">
+                    <button is="emby-button" type="submit" class="raised button-submit btnSubmit"><span>${ButtonNext}</span><i class="md-icon button-icon button-icon-right">arrow_forward</i></button>
+                    <button is="emby-button" type="button" class="raised button-cancel btnCancel"><span>${Cancel}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

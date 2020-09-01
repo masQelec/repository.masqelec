@@ -1,0 +1,182 @@
+# Kodi Media Center language file
+# Addon Name: tvheadend42
+# Addon id: service.tvheadend42
+# Addon Provider: Team LibreELEC
+msgid ""
+msgstr ""
+
+msgctxt "#30000"
+msgid "XMLTV"
+msgstr "XMLTV"
+
+msgctxt "#30001"
+msgid "DVB"
+msgstr "DVB"
+
+msgctxt "#30002"
+msgid "DEBUG"
+msgstr "DEBUG"
+
+msgctxt "#30003"
+msgid "FRITZ!Box Sat>IP"
+msgstr "FRITZ!Box Sat>IP"
+
+msgctxt "#30004"
+msgid "XMLTV Configuration"
+msgstr "Configuración XMLTV"
+
+msgctxt "#30005"
+msgid "XMLTV source type"
+msgstr "Tipo de fuente XMLTV"
+
+msgctxt "#30006"
+msgid "XMLTV File location"
+msgstr "XMLTV Ubicación del archivo"
+
+msgctxt "#30007"
+msgid "XMLTV Web location"
+msgstr "XMLTV Web location"
+
+msgctxt "#30008"
+msgid "XMLTV Script location"
+msgstr "Ubicación web de XMLTV"
+
+msgctxt "#30009"
+msgid "DVB Configuration"
+msgstr "Configuración DVB"
+
+msgctxt "#30010"
+msgid "Unload DVB modules before suspend"
+msgstr "Descargar módulos DVB antes de suspender"
+
+msgctxt "#30011"
+msgid "Wait for frontend initialization"
+msgstr "Espere a la inicialización de la interfaz"
+
+msgctxt "#30012"
+msgid "Number of adapters to wait for"
+msgstr "Número de adaptadores a esperar"
+
+msgctxt "#30013"
+msgid "Preload capmt_ca.so library"
+msgstr "Librería de precarga capmt_ca.so"
+
+msgctxt "#30014"
+msgid "Delay the start of Tvheadend"
+msgstr "Retrasar el inicio de Tvheadend"
+
+msgctxt "#30015"
+msgid "Seconds delay"
+msgstr "Retraso de segundos"
+
+msgctxt "#30016"
+msgid "Custom start parameter"
+msgstr "Parámetro de inicio personalizado"
+
+msgctxt "#30017"
+msgid "Parameter"
+msgstr "Parámetro"
+
+msgctxt "#30018"
+msgid "FRITZ!Box Sat>IP server"
+msgstr "Servidor FRITZ!Box Sat>IP"
+
+msgctxt "#30019"
+msgid "AVM device"
+msgstr "Dispositivo AVM"
+
+msgctxt "#30020"
+msgid "IP of the AVM Repeater"
+msgstr "IP del repetidor AVM"
+
+msgctxt "#30021"
+msgid "Router IP range (last digits are always .254)"
+msgstr "Rango IP del router (los últimos dígitos son siempre .254)"
+
+msgctxt "#30022"
+msgid "Used network"
+msgstr "Red usada"
+
+msgctxt "#30023"
+msgid "Virtual IP #1"
+msgstr "IP Virtual #1"
+
+msgctxt "#30024"
+msgid "Virtual IP #2"
+msgstr "IP Virtual #2"
+
+msgctxt "#30025"
+msgid "Virtual IP #3"
+msgstr "IP Virtual #3"
+
+msgctxt "#30026"
+msgid "Virtual IP #4"
+msgstr "IP Virtual #4"
+
+msgctxt "#30027"
+msgid "TRACE Configuration"
+msgstr "Configuración TRACE "
+
+msgctxt "#30028"
+msgid "Path"
+msgstr "Ruta"
+
+msgctxt "#30029"
+msgid "Activate TRACE Debug"
+msgstr "Activar depuración TRACE"
+
+msgctxt "#30030"
+msgid "Debug Value #1"
+msgstr "Valor de depuración #1"
+
+msgctxt "#30031"
+msgid "Debug Value #2"
+msgstr "Valor de depuración #2"
+
+msgctxt "#30032"
+msgid "Debug Value #3"
+msgstr "Valor de depuración #3"
+
+msgctxt "#30033"
+msgid "Debug Value #4"
+msgstr "Valor de depuración #4"
+
+msgctxt "#30034"
+msgid "Debug Value #5"
+msgstr "Valor de depuración #5"
+
+msgctxt "#30035"
+msgid "FRITZ!Box Configuration for FRITZ!OS 6.x (do not use for 7.x)"
+msgstr "¡FRITZ!Configuración de caja para FRITZ! OS 6.x (no usar para 7.x) "
+
+msgctxt "#30036"
+msgid "Scan Tables"
+msgstr "Tablas de escaneo"
+
+msgctxt "#30037"
+msgid "Manage Scan-Tables"
+msgstr "Administrar tablas de análisis"
+
+msgctxt "#30038"
+msgid "Download and install Scan-Tables"
+msgstr "Descargar e instalar tablas de escaneo"
+
+msgctxt "#30039"
+msgid "Download completed, tables installed"
+msgstr "Descargar completado, tablas instaladas"
+
+msgctxt "#30040"
+msgid "Could not download Scan-Tables"
+msgstr "No se pudo descargar tablas de escaneo"
+
+msgctxt "#30041"
+msgid "Could not extract zip files"
+msgstr "No se pudieron extraer archivos zip"
+
+msgctxt "#30042"
+msgid "Download Scan-Tables"
+msgstr "Descargar tablas de escaneo"
+
+msgctxt "#30043"
+msgid "Extract Scan-Tables"
+msgstr "Extraer tablas de escaneo"

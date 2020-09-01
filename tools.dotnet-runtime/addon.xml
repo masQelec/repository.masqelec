@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="tools.dotnet-runtime"
+       name=".Net Core Runtime"
+       version="9.2.110"
+       provider-name="Anton Voyl (awiouy)">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+
+  </requires>
+  <extension point="xbmc.python.script" library="default.py">
+    <provides></provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>.NET Core Runtime</summary>
+    <description>
+.NET Core Runtime (3.1.5) runs applications built with .NET Core, a cross-platform .NET implementation.
+    </description>
+    <disclaimer>
+
+    </disclaimer>
+    <platform>all</platform>
+    <news>
+110
+- Update to 3.1.5
+
+109
+- Fix x86_64 url
+
+108
+- Update to 3.1.3
+
+107
+- Update to 2.2.6
+
+106
+- Update to 2.2.4
+
+105
+- Update to 2.2.3
+
+104
+- Update to 2.2.0
+
+103
+- Update to 2.1.6
+
+102
+- Update to 2.1.4
+
+101
+- Update to 2.1.3
+
+100
+- Initial release
+    </news>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.png</fanart>
+
+    </assets>
+  </extension>
+</addon>

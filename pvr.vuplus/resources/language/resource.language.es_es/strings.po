@@ -1,0 +1,481 @@
+# Kodi Media Center language file
+# Addon Name: Enigma2 Client
+# Addon id: pvr.vuplus
+# Addon Provider: Joerg Dembski and Ross Nicholson
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Main\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/kodi-main/language/es_ES/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Enigma2 hostname or IP address"
+msgstr "Dirección IP o nombre de equipo Enigma2"
+
+msgctxt "#30002"
+msgid "Streaming port"
+msgstr "Puerto de emisión"
+
+msgctxt "#30003"
+msgid "Username"
+msgstr "Usuario"
+
+msgctxt "#30004"
+msgid "Password"
+msgstr "Contraseña"
+
+msgctxt "#30005"
+msgid "Connection"
+msgstr "Conexión"
+
+msgctxt "#30006"
+msgid "Icons"
+msgstr "Iconos"
+
+msgctxt "#30007"
+msgid "Response timeout in seconds"
+msgstr "Tiempo de espera de respuesta en segundos"
+
+msgctxt "#30008"
+msgid "Icon path"
+msgstr "Ruta de icono"
+
+msgctxt "#30009"
+msgid "Update Interval"
+msgstr "Intervalo de Actualización"
+
+msgctxt "#30010"
+msgid "Update Interval in minutes"
+msgstr "Intervalo de actualización en minutos"
+
+msgctxt "#30011"
+msgid "Automatic timerlist cleanup"
+msgstr "Limpiar automáticamente la lista de programaciones"
+
+msgctxt "#30012"
+msgid "Web interface port"
+msgstr "Puerto de la interfaz web"
+
+msgctxt "#30013"
+msgid "Zap before channelswitch (i.e. for single tuner boxes)"
+msgstr "Zap antes de cambio de canal (p.e. para sintonizadores únicos)"
+
+msgctxt "#30014"
+msgid "Folder for channeldata"
+msgstr "Carpeta para canales"
+
+msgctxt "#30015"
+msgid "Update interval"
+msgstr "Intervalo de actualización"
+
+msgctxt "#30016"
+msgid "Check for channel updates"
+msgstr "Comprobar actualizaciones de canales"
+
+msgctxt "#30017"
+msgid "Use only the DVB boxes' current recording path"
+msgstr "Utilice sólo la ruta de grabación actual de los sintonizadores DVB"
+
+msgctxt "#30018"
+msgid "General"
+msgstr "General"
+
+msgctxt "#30019"
+msgid "Channels"
+msgstr "Canales"
+
+msgctxt "#30020"
+msgid "Advanced"
+msgstr "Avanzado"
+
+msgctxt "#30021"
+msgid "HTTP"
+msgstr "HTTP"
+
+msgctxt "#30022"
+msgid "Recordings / Timer"
+msgstr "Grabaciones/Temporizador"
+
+msgctxt "#30023"
+msgid "Recording folder on the receiver"
+msgstr "Carpeta de grabaciones en el receptor"
+
+msgctxt "#30024"
+msgid "Send powerstate mode on addon exit"
+msgstr "Enviar apagar al salir del add-on"
+
+msgctxt "#30025"
+msgid "TV bouquet fetch mode"
+msgstr "Modo de conseguir ramo de TV"
+
+msgctxt "#30026"
+msgid "TV bouquet"
+msgstr "Ramo TV"
+
+msgctxt "#30027"
+msgid "Fetch picons from web interface"
+msgstr "Conseguir picons de la interfaz web"
+
+msgctxt "#30028"
+msgid "Use secure HTTP (https)"
+msgstr "Usar HTTP Seguro (https)"
+
+msgctxt "#30029"
+msgid "Enable automatic configuration for live streams"
+msgstr "Actviar configuración automática para emisiones en directo"
+
+msgctxt "#30030"
+msgid "Keep folder structure for records"
+msgstr "Mantener estructura de carpetas para las grabaciones"
+
+msgctxt "#30031"
+msgid "Seasons and Episodes"
+msgstr "Temporadas y Capítulos"
+
+msgctxt "#30032"
+msgid "EPG"
+msgstr "EPG"
+
+msgctxt "#30033"
+msgid "Extract season, episode and year info where possible"
+msgstr "Extraer información de temporada, episodio y año cuando sea posible"
+
+msgctxt "#30034"
+msgid "Enable autotimers"
+msgstr "Activar programaciones automáticas"
+
+msgctxt "#30035"
+msgid "Use picons.eu file format"
+msgstr "Usar formato de archivo picons.eu"
+
+msgctxt "#30036"
+msgid "Enable generate repeat timers"
+msgstr "Activar generación de programaciones repetidas"
+
+msgctxt "#30037"
+msgid "Log missing genre text mappings"
+msgstr "Registrar cuando género esté vacío"
+
+msgctxt "#30038"
+msgid "Web Interface"
+msgstr "Interfaz Web"
+
+msgctxt "#30039"
+msgid "Streaming"
+msgstr "Streaming"
+
+msgctxt "#30040"
+msgid "Put outline (e.g. sub-title) before plot"
+msgstr "Poner frase (p.e. subtítulo) antes del argumento"
+
+msgctxt "#30041"
+msgid "Stream read chunk size"
+msgstr "Tamaño de fragmento de lectura de emisión"
+
+msgctxt "#30042"
+msgid "Never"
+msgstr "Nunca"
+
+msgctxt "#30043"
+msgid "In EPG only"
+msgstr "Solo con EPG"
+
+msgctxt "#30044"
+msgid "In recordings only"
+msgstr "Solo gravaciones"
+
+msgctxt "#30045"
+msgid "Always"
+msgstr "Siempre"
+
+msgctxt "#30046"
+msgid "Extract show info file"
+msgstr "Extraer fichero de información del programa"
+
+msgctxt "#30047"
+msgid "Rytec genre text Mappings"
+msgstr "Mapas Rytec para género"
+
+msgctxt "#30048"
+msgid "Enable Rytec genre text mappings"
+msgstr "Activa los mapeados de Rytec para el género"
+
+msgctxt "#30049"
+msgid "Rytec genre text mappings file"
+msgstr "Fichero de mapas Rytec para género"
+
+msgctxt "#30050"
+msgid "Custom live TV timeout (0 to use default)"
+msgstr "Apagado de TV en directo personalizado (0 por defecto)"
+
+msgctxt "#30051"
+msgid "Login"
+msgstr "Inicio de sesión"
+
+msgctxt "#30052"
+msgid "Misc"
+msgstr "Otros"
+
+msgctxt "#30053"
+msgid "Genre ID Mappings"
+msgstr "Mapas de ID Género"
+
+msgctxt "#30054"
+msgid "Enable genre ID Mappings"
+msgstr "Activa los mapeados ID para el género"
+
+msgctxt "#30055"
+msgid "Genre ID mappings file"
+msgstr "Fichero de mapas ID para género"
+
+msgctxt "#30056"
+msgid "TV"
+msgstr "TV"
+
+msgctxt "#30057"
+msgid "Radio"
+msgstr "Radio"
+
+msgctxt "#30058"
+msgid "Radio bouquet fetch mode"
+msgstr "Modo de conseguir ramo de radio"
+
+msgctxt "#30059"
+msgid "Radio bouquet"
+msgstr "Ramo de radio"
+
+msgctxt "#30060"
+msgid "Timeshift"
+msgstr "Timeshift"
+
+msgctxt "#30061"
+msgid "Enable timeshift"
+msgstr "Activar timeshift"
+
+msgctxt "#30062"
+msgid "Timeshift buffer path"
+msgstr "Ruta del buffer de Timeshift"
+
+msgctxt "#30063"
+msgid "Off"
+msgstr "Desactivado"
+
+msgctxt "#30064"
+msgid "On playback"
+msgstr "Reproduciendo"
+
+msgctxt "#30065"
+msgid "On pause"
+msgstr "Pausado"
+
+msgctxt "#30066"
+msgid "Use secure HTTP (https) for streams"
+msgstr "Usar HTTP seguro (https) para las emisiones"
+
+msgctxt "#30067"
+msgid "Use login for streams"
+msgstr "Usar usuario para las emisiones"
+
+msgctxt "#30068"
+msgid "Fetch TV favourites bouquet"
+msgstr "Conseguir ramo de favoritos de TV"
+
+msgctxt "#30069"
+msgid "Fetch radio favourites bouquet"
+msgstr "Conseguir ramo de favoritos de radio"
+
+msgctxt "#30070"
+msgid "Recordings & Timers"
+msgstr "Grabaciones y Programaciones"
+
+msgctxt "#30071"
+msgid "Recordings"
+msgstr "Grabaciones"
+
+msgctxt "#30072"
+msgid "Timers"
+msgstr "Programaciones"
+
+msgctxt "#30073"
+msgid "Number of repeat timers to generate"
+msgstr "Número de repeticiones de programación a generar"
+
+msgctxt "#30074"
+msgid "All bouquets"
+msgstr "Todos los ramos"
+
+msgctxt "#30075"
+msgid "Only one bouquet"
+msgstr "Solo un ramo"
+
+msgctxt "#30076"
+msgid "As first bouquet"
+msgstr "Como primer ramo"
+
+msgctxt "#30077"
+msgid "As last bouquet"
+msgstr "Como último ramo"
+
+msgctxt "#30078"
+msgid "Favourites group"
+msgstr "Grupo de favoritos"
+
+msgctxt "#30079"
+msgid "Favourites (TV)"
+msgstr "Favoritos (TV)"
+
+msgctxt "#30080"
+msgid "Favourites (Radio)"
+msgstr "Favoritos (Radio)"
+
+msgctxt "#30081"
+msgid "unknown"
+msgstr "desconocido"
+
+msgctxt "#30082"
+msgid " (Not connected!)"
+msgstr "(¡No conectado!)"
+
+msgctxt "#30083"
+msgid "addon error"
+msgstr "error de add-on"
+
+msgctxt "#30084"
+msgid "Enigma2 Media Server"
+msgstr "Servidor de Contenido Enigma2"
+
+msgctxt "#30085"
+msgid "OK"
+msgstr "OK"
+
+msgctxt "#30086"
+msgid "Backend"
+msgstr "Servidor"
+
+msgctxt "#30087"
+msgid "Recording Padding"
+msgstr "Relleno de Grabación"
+
+msgctxt "#30088"
+msgid "Global start padding"
+msgstr "Relleno global al empezar"
+
+msgctxt "#30089"
+msgid "Global end padding"
+msgstr "Relleno global al terminar"
+
+msgctxt "#30090"
+msgid "Device Info"
+msgstr "Info Dispositivo"
+
+msgctxt "#30091"
+msgid "WebIf version"
+msgstr "Version WebIf"
+
+msgctxt "#30092"
+msgid "AutoTimer tag in timer tags"
+msgstr "Etiqueta AutoTimer en etiquetas de programas"
+
+msgctxt "#30093"
+msgid "AutoTimer name in timer tags"
+msgstr "Nombre AutoTimer en etiquetas de programas"
+
+msgctxt "#30094"
+msgid "N/A"
+msgstr "N/D"
+
+msgctxt "#30095"
+msgid "True"
+msgstr "Sí"
+
+msgctxt "#30096"
+msgid "False"
+msgstr "Falso"
+
+msgctxt "#30097"
+msgid "Standby"
+msgstr "Modo de espera"
+
+msgctxt "#30098"
+msgid "Deep standby"
+msgstr "Modo de espera profundo"
+
+msgctxt "#30099"
+msgid "Wakeup, then standby"
+msgstr "Despertar, después modo de espera"
+
+msgctxt "#30100"
+msgid "Update mode"
+msgstr "Modo de actualización"
+
+msgctxt "#30101"
+msgid "Timers and recordings"
+msgstr "Programas y grabaciones"
+
+msgctxt "#30102"
+msgid "Timers only"
+msgstr "Solo programas"
+
+msgctxt "#30103"
+msgid "Use OpenWebIf picon path"
+msgstr "Usar ruta OpenWebIf"
+
+msgctxt "#30410"
+msgid "Automatic"
+msgstr "Automático"
+
+msgctxt "#30420"
+msgid "One time (Scheduled by guide-based timer rule)"
+msgstr "Una vez (Programado por una regla basada en la guía)"
+
+msgctxt "#30421"
+msgid "One time (Scheduled by repeating timer rule)"
+msgstr "Una vez (Programada para repetir por regla de tiempo)"
+
+msgctxt "#30430"
+msgid "Disabled"
+msgstr "Desactivado"
+
+msgctxt "#30431"
+msgid "Record if EPG title differs"
+msgstr "Grabar si el título en EPG difiere"
+
+msgctxt "#30432"
+msgid "Record if EPG title and short description differs"
+msgstr "Grabar aunque el título y la descripción corta en EPG difiera"
+
+msgctxt "#30433"
+msgid "Record if EPG title and all descriptions differ"
+msgstr "Grabar aunque el título y cualquier descripción en EPG difiera"
+
+msgctxt "#30500"
+msgid "Disconnected from '%s'"
+msgstr "Desconectado de '%s'"
+
+msgctxt "#30501"
+msgid "Reconnected to '%s'"
+msgstr "Reconectado a '%s'"
+
+msgctxt "#30514"
+msgid "Timeshift buffer path does not exist"
+msgstr "La ruta para el buffer de timeshift no existe"
+
+msgctxt "#30515"
+msgid "Enigma2: Could not reach web interface"
+msgstr "Enigma2: Interfaz web inalcanzable"
+
+msgctxt "#30516"
+msgid "Enigma2: No channel groups found"
+msgstr "Enigma2: Ningún grupo de canales encontrado"
+
+msgctxt "#30517"
+msgid "Enigma2: No channels found"
+msgstr "Enigma2: Ningún canal encontrado"

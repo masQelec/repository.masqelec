@@ -1,0 +1,185 @@
+# Kodi Media Center language file
+# Addon Name: Enigma2 Client
+# Addon id: pvr.vuplus
+# Addon Provider: Joerg Dembski and Ross Nicholson
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Main\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/kodi-main/language/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgctxt "#30003"
+msgid "Username"
+msgstr "帳號"
+
+msgctxt "#30004"
+msgid "Password"
+msgstr "密碼"
+
+msgctxt "#30005"
+msgid "Connection"
+msgstr "連接"
+
+msgctxt "#30006"
+msgid "Icons"
+msgstr "圖示"
+
+msgctxt "#30007"
+msgid "Response timeout in seconds"
+msgstr "回應逾時 (秒)"
+
+msgctxt "#30010"
+msgid "Update Interval in minutes"
+msgstr "更新頻率 (分)"
+
+msgctxt "#30014"
+msgid "Folder for channeldata"
+msgstr "channeldata的資料夾"
+
+msgctxt "#30015"
+msgid "Update interval"
+msgstr "更新間隔"
+
+msgctxt "#30016"
+msgid "Check for channel updates"
+msgstr "檢查頻道更新"
+
+msgctxt "#30017"
+msgid "Use only the DVB boxes' current recording path"
+msgstr "只使用DVB數位機上盒目前的錄影路徑"
+
+msgctxt "#30018"
+msgid "General"
+msgstr "一般設定"
+
+msgctxt "#30019"
+msgid "Channels"
+msgstr "頻道"
+
+msgctxt "#30020"
+msgid "Advanced"
+msgstr "進階"
+
+msgctxt "#30021"
+msgid "HTTP"
+msgstr "HTTP"
+
+msgctxt "#30022"
+msgid "Recordings / Timer"
+msgstr "錄影／定時器"
+
+msgctxt "#30023"
+msgid "Recording folder on the receiver"
+msgstr "接收器上的錄影資料夾"
+
+msgctxt "#30029"
+msgid "Enable automatic configuration for live streams"
+msgstr "開啟即時串流的自動配置"
+
+msgctxt "#30030"
+msgid "Keep folder structure for records"
+msgstr "保留錄影的資料夾架構"
+
+msgctxt "#30032"
+msgid "EPG"
+msgstr "電子節目表"
+
+msgctxt "#30042"
+msgid "Never"
+msgstr "永不"
+
+msgctxt "#30043"
+msgid "In EPG only"
+msgstr "僅限有在電子節目表中的"
+
+msgctxt "#30044"
+msgid "In recordings only"
+msgstr "僅限有在錄影檔中的"
+
+msgctxt "#30045"
+msgid "Always"
+msgstr "總是"
+
+msgctxt "#30051"
+msgid "Login"
+msgstr "登入"
+
+msgctxt "#30052"
+msgid "Misc"
+msgstr "雜項"
+
+msgctxt "#30056"
+msgid "TV"
+msgstr "電視"
+
+msgctxt "#30057"
+msgid "Radio"
+msgstr "無線電廣播"
+
+msgctxt "#30060"
+msgid "Timeshift"
+msgstr "時間平移"
+
+msgctxt "#30062"
+msgid "Timeshift buffer path"
+msgstr "時間平移緩衝路徑"
+
+msgctxt "#30063"
+msgid "Off"
+msgstr "關閉"
+
+msgctxt "#30064"
+msgid "On playback"
+msgstr "當播放中"
+
+msgctxt "#30065"
+msgid "On pause"
+msgstr "當暫停中"
+
+msgctxt "#30071"
+msgid "Recordings"
+msgstr "錄影檔"
+
+msgctxt "#30072"
+msgid "Timers"
+msgstr "定時"
+
+msgctxt "#30085"
+msgid "OK"
+msgstr "確定"
+
+msgctxt "#30094"
+msgid "N/A"
+msgstr "N/A"
+
+msgctxt "#30095"
+msgid "True"
+msgstr "真實"
+
+msgctxt "#30096"
+msgid "False"
+msgstr "錯誤"
+
+msgctxt "#30410"
+msgid "Automatic"
+msgstr "自動"
+
+msgctxt "#30430"
+msgid "Disabled"
+msgstr "關閉"
+
+msgctxt "#30500"
+msgid "Disconnected from '%s'"
+msgstr "從 '%s' 斷開連線"
+
+msgctxt "#30501"
+msgid "Reconnected to '%s'"
+msgstr "從 '%s' 重新連線"

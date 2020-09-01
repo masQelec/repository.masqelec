@@ -1,0 +1,38 @@
+﻿<div id="embygndataSetupPage" data-role="page" class="page type-interior">
+
+    <div>
+        <div class="content-primary">
+
+            <form>
+
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">${HeaderGuideDataSetup}</h2>
+
+                    <div class="inputContainer">
+                        <input is="emby-input" class="txtZipCode" label="${LabelZipCode}" required="required" />
+                    </div>
+                    <div class="selectContainer">
+                        <select is="emby-select" id="selectListing" data-mini="true" required="required" label="${LabelLineup}"></select>
+                    </div>
+                </div>
+                <div>
+                    <label class="checkboxContainer">
+                        <input type="checkbox" is="emby-checkbox" class="chkAllTuners" checked />
+                        <span>${OptionEnableForAllTuners}</span>
+                    </label>
+                    <div class="selectTunersSection hide">
+                        <h3 class="checkboxListLabel">${HeaderTuners}</h3>
+                        <div class="checkboxList paperList checkboxList-paperList tunerList">
+                        </div>
+                    </div>
+                </div>
+                <br />
+
+                <div>
+                    <button is="emby-button" type="submit" class="raised button-submit block btnSubmitListings"><span>${ButtonSave}</span></button>
+                    <button is="emby-button" type="button" class="raised button-cancel block btnCancel"><span>${Cancel}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

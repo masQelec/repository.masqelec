@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="game.libretro.beetle-psx" name="Sony - PlayStation (Beetle PSX)" version="0.9.44.12.1" provider-name="Libretro">
+  <requires>
+    <import addon="game.libretro" version="1.0.0"/>
+    <import addon="game.controller.ps.gamepad" version="1.0.0"/>
+    <import addon="game.controller.ps.dualshock" version="1.0.0"/>
+    <import addon="game.controller.ps.dualanalog" version="1.0.0"/>
+    <import addon="game.controller.ps.guncon.western" version="1.0.0"/>
+    <import addon="game.controller.ps.guncon.japan" version="1.0.0"/>
+    <import addon="game.controller.konami.justifier.ps" version="1.0.0"/>
+    <import addon="game.controller.ps.mouse" version="1.0.0"/>
+    <import addon="game.controller.ps.multitap" version="1.0.0"/>
+  </requires>
+  <extension point="kodi.gameclient" library_linux="game.libretro.beetle-psx.so">
+    <platforms>PSX</platforms>
+    <extensions>exe|cue|toc|ccd|m3u|pbp|chd</extensions>
+    <supports_vfs>false</supports_vfs>
+    <supports_standalone>false</supports_standalone>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Sony - PlayStation (Beetle PSX) 0.9.44.1</summary>
+    <summary lang="es_ES">Sony - PlayStation (Beetle PSX) 0.9.44.1</summary>
+    <description lang="en_GB">Beetle PSX is the PlayStation module of Beetle, a port of Madnafen.
+
+Supported files: .exe, .cue, .toc, .ccd, .m3u, .pbp, .chd</description>
+    <description lang="es_ES">Beetle PSX es el módulo PlayStation de Beetle, un puerto de Madnafen.
+
+Archivos soportados: .exe, .cue, .toc, .ccd, .m3u, .pbp, .chd</description>
+    <license>GPLv2</license>
+    <platform/>
+    <source>https://github.com/kodi-game/game.libretro.beetle-psx</source>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.png</fanart>
+    </assets>
+  </extension>
+</addon>

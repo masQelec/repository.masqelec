@@ -1,0 +1,100 @@
+#
+# Default keymap from sapphire.c v3.0.
+#
+# Edit this as you please, keeping in mind that spaces are NOT permitted
+# within each column.
+#
+#   Eg. this is INCORRECT:   KEY_F15 | ALT
+#   whereas this is good:    KEY_F15|ALT
+#         
+# Use the provided sapphire_keymap.sh script to install these
+# mappings at runtime in place of the driver's built-in mappings.
+# Keep your own copy of this file separate from the driver source,
+# so that subsequent changes in the driver mappings won't clobber
+# your own definitions here.
+#
+# As in the example above, "KeyCode" values can be combined with
+# any mix of these "modifier" keys:  SHIFT, ALT, CTRL, and/or META.
+#
+#  Eg.  SAPPHIRE_PLAY  KEY_P|CTRL      NO_REPEAT  ## Mythtv Play/Pause function
+#  Or:  SAPPHIRE_PLAY  KEY_P|CTRL|ALT  NO_REPEAT  ## something else
+#
+# The "SpecialOptions" field is used to indicate the desired auto-repeat rate
+# for each button individually.  The choices are:
+#
+#     NO_REPEAT   - the button will not auto-repeat when held down.
+#     SLOW_REPEAT - the button will repeat slowly.
+#     RAMP_REPEAT - the button will repeat slowly at first, but speed up if held down.
+#     LONGKEY     - no auto-repeat: special behaviour described below.
+#
+# The special value "LONGKEY" can be used in "SpecialOptions"
+# insted of an auto-repeat setting.  This causes a button on the remote
+# to have two separate functions, depending upon how quickly it is released.
+#
+# A short-press/release gets the regular "KeyCode" value, but if the button
+# is held down for one second or longer, then an alternate value can be send instead.
+# Just combine the desired alternate keycode with the LONGKEY tag.
+#
+# Eg.  SAPPHIRE_MUTE  KEY_F9  LONGKEY|KEY_F15  ## Mute (tap) or Audiosync (hold)
+#
+# ButtonName             KeyCode          SpecialOptions               ## Comments
+#
+SAPPHIRE_UP              KEY_UP           RAMP_REPEAT                  ## up    (CUSTOM)
+SAPPHIRE_DOWN            KEY_DOWN         RAMP_REPEAT                  ## down  (CUSTOM)
+SAPPHIRE_RIGHT           KEY_RIGHT        SLOW_REPEAT                  ## right
+SAPPHIRE_LEFT            KEY_LEFT         SLOW_REPEAT                  ## left
+SAPPHIRE_ENTEROK         KEY_ENTER        LONGKEY|KEY_F15              ## Select (tap) or Audiosync (hold)
+SAPPHIRE_BACK            KEY_ESC          SLOW_REPEAT                  ## Back
+SAPPHIRE_PLAY            KEY_P|CTRL       NO_REPEAT                    ## Play/Pause
+SAPPHIRE_PAUSE           KEY_P            NO_REPEAT                    ## Play/Pause
+SAPPHIRE_VOLUP           KEY_RIGHTBRACE   FAST_REPEAT                  ## Volume Up
+SAPPHIRE_VOLDOWN         KEY_LEFTBRACE    FAST_REPEAT                  ## Volume Down
+SAPPHIRE_CHUP            KEY_PAGEUP       SLOW_REPEAT                  ## channel up    (CUSTOM)
+SAPPHIRE_CHDOWN          KEY_PAGEDOWN     SLOW_REPEAT                  ## channel down  (CUSTOM)
+SAPPHIRE_MUTE            KEY_F9           LONGKEY|KEY_F15              ## Mute (tap) or Audiosync (hold)
+SAPPHIRE_RECORD          KEY_R            NO_REPEAT                    ## Record/Delete (CUSTOM)
+SAPPHIRE_FWD             KEY_DOT          NO_REPEAT                    ## FFwd
+SAPPHIRE_REW             KEY_COMMA        NO_REPEAT                    ## Rewind
+SAPPHIRE_ANGLE           KEY_W            NO_REPEAT                    ## Adjust Fill
+SAPPHIRE_SAP             KEY_W|CTRL       NO_REPEAT                    ## Toggle Aspect Ratio
+SAPPHIRE_DVDMENU         KEY_M            NO_REPEAT                    ## Menu
+SAPPHIRE_INFOEPG         KEY_I            NO_REPEAT                    ## Info
+SAPPHIRE_TAB             KEY_END          SLOW_REPEAT                  ## Commskip Fwd
+SAPPHIRE_BACKTAB         KEY_HOME         SLOW_REPEAT                  ## Commskip Rev
+SAPPHIRE_RADIO           KEY_F7|ALT       NO_REPEAT                    ## Signal Monitor
+SAPPHIRE_LASTCH          KEY_H            NO_REPEAT                    ## previous chan
+SAPPHIRE_LANGUAGE        KEY_EQUAL|SHIFT  NO_REPEAT                    ## Next Audio Track
+SAPPHIRE_TELETEXTCC      KEY_T            NO_REPEAT                    ## Toggle Closed-Caption
+SAPPHIRE_SUBTITLE        KEY_F17|ALT      NO_REPEAT                    ## Toggle subtitle (CUSTOM)
+SAPPHIRE_HOMEHOUSE       KEY_F18          NO_REPEAT                    ## jump to MainMenu (CUSTOM jumppoint)
+SAPPHIRE_BLUEVIDEOS      KEY_F14          NO_REPEAT                    ## MythVideo        (CUSTOM jumppoint)
+SAPPHIRE_LIVETV          KEY_F16          NO_REPEAT                    ## Program Guide    (CUSTOM jumppoint)
+SAPPHIRE_REDDVDVCD       KEY_F13          LONGKEY|KEY_F13|ALT          ## PlayDVD/DVDMenu (CUSTOM jumppoints)
+SAPPHIRE_YELLOWPICTURES  KEY_F14|ALT      NO_REPEAT                    ## Watch Recordings (CUSTOM jumppoint)
+SAPPHIRE_1               KEY_1            SLOW_REPEAT                  ## 1
+SAPPHIRE_2               KEY_2            SLOW_REPEAT                  ## 2
+SAPPHIRE_3               KEY_3            SLOW_REPEAT                  ## 3
+SAPPHIRE_4               KEY_4            SLOW_REPEAT                  ## 4
+SAPPHIRE_5               KEY_5            SLOW_REPEAT                  ## 5
+SAPPHIRE_6               KEY_6            SLOW_REPEAT                  ## 6
+SAPPHIRE_7               KEY_7            SLOW_REPEAT                  ## 7
+SAPPHIRE_8               KEY_8            SLOW_REPEAT                  ## 8
+SAPPHIRE_9               KEY_9            SLOW_REPEAT                  ## 9
+SAPPHIRE_0               KEY_0            SLOW_REPEAT                  ## 0
+SAPPHIRE_STOP            KEY_MINUS        LONGKEY|KEY_MINUS|SHIFT      ## dash/underscore symbols
+SAPPHIRE_POWER           KEY_F2           NO_REPEAT                    ## start frontend (CUSTOM desktop script)
+SAPPHIRE_CLEAR           KEY_MACRO_0      NO_REPEAT                    ## Adjust audiosync by 90msecs (see below)
+SAPPHIRE_GREENMUSIC      KEY_A            NO_REPEAT                    ## Adjust time stretch
+
+#
+# Now for the macro definitions: each macro sends a list of up to eight keycodes:
+#
+KEY_MACRO_0    KEY_F15 KEY_DOWN KEY_LEFT   ## Adjust AudioSync by +90msecs
+KEY_MACRO_1
+KEY_MACRO_2
+KEY_MACRO_2
+KEY_MACRO_3
+KEY_MACRO_4
+KEY_MACRO_5
+KEY_MACRO_6
+KEY_MACRO_7

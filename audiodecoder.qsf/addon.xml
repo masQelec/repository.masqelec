@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="audiodecoder.qsf" version="2.0.2.1" name="QSF Audio Decoder" provider-name="spiff">
+  <requires>
+    <import addon="kodi.binary.global.main" version="1.0.14"/>
+    <import addon="kodi.binary.global.general" version="1.0.3"/>
+    <import addon="kodi.binary.global.filesystem" version="1.0.2"/>
+    <import addon="kodi.binary.instance.audiodecoder" version="2.0.0"/>
+  </requires>
+  <extension point="kodi.audiodecoder" name="qsf" extension=".miniqsf" tags="true" library_linux="audiodecoder.qsf.so.2.0.2"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">Capcom QSound QSF Audio Decoder</summary>
+    <description lang="en">Adds decoding support for Capcom QSound Sound Format files (.QSF/.MINIQSF).
+
+QSound is the original name for a positional three-dimensional (3D) sound processing algorithm from QSound Labs that creates 3D audio effects from multiple monophonic sources and sums the outputs to two channels for presentation over regular stereo speakers.</description>
+    <platform/>
+    <license>GPL-2.0</license>
+    <source>https://github.com/xbmc/audiodecoder.qsf</source>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
+  </extension>
+</addon>

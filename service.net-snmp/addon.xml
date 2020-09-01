@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="service.net-snmp"
+       name="Net-SNMP"
+       version="9.2.106"
+       provider-name="Team CoreELEC">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+
+  </requires>
+  <extension point="xbmc.service" library="default.py">
+    <provides></provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Simple Network Management Protocol utilities.</summary>
+    <description>
+Simple Network Management Protocol (SNMP) is a widely used protocol for monitoring the health and welfare of network equipment.
+    </description>
+    <disclaimer>
+
+    </disclaimer>
+    <platform>all</platform>
+    <news>
+106
+- update to 5.8
+
+105
+- Improve configuration screen
+- Make snmpv3 work again (missing include)
+- Expose cputemp and/or gputemp with extends optionnaly
+
+104
+- Change daemon startup option
+
+103
+- update config.sub to support new hardware
+- disable mini-agent in config options to get system MIB
+- compile static binary to avoid cross compiling linking issue
+
+102
+-version bump
+
+101
+- make addon configurable
+
+100
+- Initial addon
+- net-snmp 5.7.3
+    </news>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.png</fanart>
+
+    </assets>
+  </extension>
+</addon>

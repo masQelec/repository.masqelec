@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="30000">
+		<setting label="30001" type="select" id="snes9x_next_overclock" values="Disabled(10MHz)|Underclock(5MHz)|Underclock(8MHz)|40MHz|60MHz|80MHz|100MHz" default="Disabled(10MHz)"/>
+		<setting label="30002" type="select" id="snes9x_next_overclock_cycles" values="disabled|compatible|max" default="disabled"/>
+		<setting label="30003" type="select" id="snes9x_next_reduce_sprite_flicker" values="disabled|enabled" default="disabled"/>
+	</category>
+</settings>

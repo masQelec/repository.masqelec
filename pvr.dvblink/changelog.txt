@@ -1,0 +1,122 @@
+[B]Version 4.7.2[/B]
+Added: PVR_RECORDING.iChannelUid and PVR_RECORDING.channelType support
+Added: Setting to change the addon update interval
+Fixed: deleted timers do not remain in the list as disabled
+Removed: start any time flag for EPG recurring timers when working with TVMosaic server due to behavior inconsistency
+
+[B]Version 4.7.1[/B]
+Added: Option to change default 'Prevent duplicate episodes' setting
+Fixed: Incorrect values written to the debug log file when changing addon settings
+Fixed: Long delay in updating recording status when selecting a currently active program to record ( #55630 )
+Fixed: Crash when deleting folder containing multiple TV Recordings ( #55750 )
+Fixed: Long delay in updating recording unwatched/watched/resume status icon after resetting the resume position
+
+[B]Version 4.7.0[/B]
+Added: support for set/get last played position in a recording
+
+[B]Version 4.6.4[/B]
+Bump tinyxml2 to version 6.2.0
+
+[B]Version 4.6.0[/B]
+Updated to PVR API v5.10.0
+
+[B]Version 4.5.2[/B]
+Updated to PVR API v5.9.0
+
+[B]Version 4.5.1[/B]
+Fixed: Reporting incorrect stream stats on 32 bits system
+
+[B]Version 4.5.0[/B]
+Updated to PVR API v5.8.0
+Added official TVMosaic compatibility
+
+[B]Version 4.4.0[/B]
+Updated to PVR API v5.7.0
+
+[B]Version 4.3.0[/B]
+Updated to PVR API v5.6.0
+
+[B]Version 4.2.0[/B]
+Updated to PVR API v5.3.0
+
+[B]Version 4.1.7[/B]
+Removed: Never used addon interface function
+
+[B]Version 4.1.6[/B]
+Changed: Update Debian package control
+Changed: PVR addon callback way
+
+[B]Version 4.1.5[/B]
+Changed: Removed old no more needed version functions
+
+[B]Version 4.1.4[/B]
+Changed: Set dependency versions automatic during build
+Changed: Removed never used kodi to addon functions
+Fixed: Build system
+
+[B]Version 4.1.3[/B]
+Fixed: First channel is not shown in the Guide view ( #81 )
+Fixed: Lock-up on RecTV and Tuning Channel after Idle ( leftover of #64 )
+
+[B]Version 4.1.2[/B]
+Fixed: Incorrectly displayed days of week when editing manual repeating timer ( leftover of #68 )
+
+[B]Version 4.1.1[/B]
+Fixed: Timer Rules incorrectly detected for manual/keyword based timers ( #68 )
+
+[B]Version 4.1.0[/B]
+Fixed: Crash when switching channels with timeshift enabled ( #69 )
+Fixed: Hangup after period of inactivity ( #64 )
+Fixed: Incorrect dvblink server version displayed in addon properties ( #66 )
+Fixed: Timer Rules incorrectly detected ( #68 )
+Changed: default value to "new only" when setting series recording ( #65 )
+Added: timeshift commands to libdvblnikremote
+Changed: dvblink channel id to string for compatibility with future dvblink versions
+Added: margin of 10 seconds to IsRealTimeStream and IsTimeshifting definitions
+General: code refactoring for easier maintenance
+
+[B]Version 4.0.0[/B]
+- Initial Kodi v18 version
+
+[B]Version 3.3.6[/B]
+Fixed: PVR_TIMER.iClientIndex handling bug
+
+[B]Version 3.3.5[/B]
+Fixed: Crash on startup with search timers
+Fixed: Incorrect disk space display if disk size is more than 2TB
+Fixed: tinyxml2 v4 compatibility (XML_NO_ERROR -> XML_SUCCESS)
+
+[B]Version 3.3.4[/B]
+Updated: language files from Transifex
+
+[B]Version 3.3.3[/B]
+Updated: language files from Transifex
+
+[B]Version 3.3.2[/B]
+Updated: language files from Transifex
+
+[B]Version 3.3.1[/B]
+Updated: language files from Transifex
+
+[B]Version 3.3.0[/B]
+Cmake: rename find_package kodi to Kodi
+
+[B]Version 3.2.2[/B]
+Fixed: includes
+
+[B]Version 3.2.1[/B]
+Added: transcoded recordings playback in DVBLink v6
+
+[B]Version 3.2.0[/B]
+Updated to PVR API v5.2.0
+
+[B]Version 3.1.0[/B]
+Fixed: Compatibility with Kodi Krypton PVR API
+Added: Support for the upcoming channel logos
+Fixed: Incorrect date/time presentation on Timer rules page
+
+[B]Version 3.0.1[/B]
+Updated: language files from Transifex
+
+[B]Version 3.0.0[/B]
+- Initial Kodi Krypton version.

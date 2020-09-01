@@ -1,0 +1,46 @@
+﻿<div id="devicesUploadPage" data-role="page" class="page type-interior devicesPage">
+
+    <div>
+        <div class="content-primary">
+
+            <form class="devicesUploadForm">
+
+                <div class="verticalSection">
+                    <div class="sectionTitleContainer flex align-items-center">
+                        <h2 class="sectionTitle">${TabCameraUpload}</h2>
+                    </div>
+
+                    <div style="margin:1em 0;">
+                        <div>${HeaderCameraUploadHelp}</div>
+                        <div class="premiereInfo"></div>
+                    </div>
+                </div>
+
+                <div class="verticalSection">
+                    <div class="inputContainer">
+                        <div class="flex align-items-center">
+                            <div class="flex-grow">
+                                <input is="emby-input" id="txtUploadPath" label="${LabelCameraUploadPath}" autocomplete="off" />
+                            </div>
+                            <button type="button" is="paper-icon-button-light" id="btnSelectUploadPath" title="${ButtonSelectDirectory}" class="emby-input-iconbutton"><i class="md-icon">search</i></button>
+                        </div>
+                        <div class="fieldDescription">${DefaultCameraUploadPathHelp}</div>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input type="checkbox" is="emby-checkbox" id="chkSubfolder" />
+                            <span>${LabelCreateCameraUploadSubfolder}</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">${LabelCreateCameraUploadSubfolderHelp}</div>
+                    </div>
+                </div>
+                <div>
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>${ButtonSave}</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

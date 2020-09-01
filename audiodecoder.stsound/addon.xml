@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="audiodecoder.stsound" version="2.0.2.1" name="YM Audio Decoder" provider-name="spiff">
+  <requires>
+    <import addon="kodi.binary.global.main" version="1.0.14"/>
+    <import addon="kodi.binary.global.filesystem" version="1.0.2"/>
+    <import addon="kodi.binary.instance.audiodecoder" version="2.0.0"/>
+  </requires>
+  <extension point="kodi.audiodecoder" name="ym" extension=".ym" tags="true" library_linux="audiodecoder.stsound.so.2.0.2"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">YM (spectrum) Audio Decoder</summary>
+    <description lang="en">YM (YM2149 Music) is an audio format that logs instructions sent to an AY-3-8910 or YM2149 chip. Playback occurs by emulating the chips and sending the logged data to them. Because the format merely logs the instructions to the chip, it doesn't preserve the original content of the music format.</description>
+    <platform/>
+    <license>GPL-2.0</license>
+    <source>https://github.com/xbmc/audiodecoder.stsound</source>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
+  </extension>
+</addon>

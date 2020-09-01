@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="service.system.tinc"
+       name="tinc"
+       version="9.2.105"
+       provider-name="Anton Voyl (awiouy)">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+
+  </requires>
+  <extension point="xbmc.service" library="default.py">
+    <provides></provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>tinc: a Virtual Private Network daemon</summary>
+    <description>
+tinc (1.1pre17) is a Virtual Private Network (VPN) daemon that uses tunnelling and encryption to create a secure private network between hosts on the Internet. Because the VPN appears to the IP level network code as a normal network device, there is no need to adapt any existing software. This allows VPN sites to share information with each other over the Internet without exposing any information to others.
+    </description>
+    <disclaimer>
+
+    </disclaimer>
+    <platform>all</platform>
+    <news>
+105
+- Update to 1.1pre17
+
+104
+- Update to 1.1pre16
+- Build with ncurses and readline
+- Update miniupnpc to 2.1
+
+103
+- Update to tinc-1.1pre15
+- Rework
+
+102
+- Enable clean building
+
+101
+- Update to tinc-1.1pre14
+
+100
+- Initial addon
+    </news>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.png</fanart>
+
+    </assets>
+  </extension>
+</addon>

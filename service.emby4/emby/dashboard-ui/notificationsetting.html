@@ -1,0 +1,63 @@
+﻿<div id="notificationSettingPage" data-role="page" class="page type-interior notificationConfigurationPage">
+
+    <div>
+        <div class="content-primary">
+
+            <form class="notificationSettingForm">
+
+                <div class="verticalSection">
+                    <div class="sectionTitleContainer flex align-items-center">
+                        <h2 class="notificationType sectionTitle"></h2>
+                    </div>
+                </div>
+
+                <label class="checkboxContainer">
+                    <input type="checkbox" is="emby-checkbox" id="chkEnabled" />
+                    <span>${LabelNotificationEnabled}</span>
+                </label>
+
+                <div class="monitorUsers hide">
+                    <div class="paperLischeckboxListLabeltLabel">${LabelMonitorUsers}</div>
+                    <div class="monitorUsersList">
+                    </div>
+                    <br />
+                </div>
+
+                <div class="verticalSection">
+                    <div class="selectContainer">
+                        <select is="emby-select" id="selectUsers" label="${LabelSendNotificationToUsers}">
+                            <option value="All">${OptionAllUsers}</option>
+                            <option value="Admins">${OptionAdminUsers}</option>
+                            <option value="Custom">${OptionCustomUsers}</option>
+                        </select>
+                    </div>
+                    <div class="selectCustomUsers hide">
+                        <label>${LabelSelectUsers}</label>
+                        <div class="sendToUsersList">
+                        </div>
+                        <br />
+                    </div>
+                </div>
+
+                <div class="verticalSection">
+                    <label>${LabelUseNotificationServices}</label>
+                    <div class="servicesList">
+                    </div>
+                    <div class="fieldDescription additionalServicesDescription"></div>
+                </div>
+
+                <div>
+                    <br />
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>${ButtonSave}</span>
+                    </button>
+
+                    <button is="emby-button" type="button" class="raised button-cancel block btnCancel">
+                        <span>${Cancel}</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

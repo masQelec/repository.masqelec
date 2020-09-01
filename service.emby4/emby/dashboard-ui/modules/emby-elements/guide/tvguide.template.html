@@ -1,0 +1,38 @@
+﻿<div class="flex align-items-center focuscontainer-x itemsViewSettingsContainer padded-bottom padded-top hide">
+
+    <button is="emby-button" class="btnSelectDate btnSelectDate-main raised raised-mini hide">
+        <i class="md-icon button-icon button-icon-left" style="margin-left:0;">date_range</i>
+        <span class="btnDateText btnDateText-main" style="white-space:nowrap;"></span>
+        <i class="md-icon button-icon button-icon-right">arrow_drop_down</i>
+    </button>
+
+    <button is="paper-icon-button-light" class="btnGuideViewSettings">
+        <i class="md-icon">&#xE5D3;</i>
+    </button>
+</div>
+
+<div is="emby-scroller" class="flex-grow virtualScrollerScrollContainer" data-skipfocuswhenvisible="true" data-horizontal="false" data-forcenativescroll="true">
+
+    <div class="scrollSlider epgScrollSlider focuscontainer-x focuscontainer-y focus-bysubcontainer" style="position:relative;">
+
+        <div class="epgScrollSlider-scrolldirectionhack">
+            <div class="guide-headerTimeslots secondaryText">
+                <div class="channelCell firstChannelCell">
+                    <button is="emby-button" class="btnSelectDate btnSelectDate-side hide button-flat">
+                        <span class="btnDateText btnDateText-side" style="white-space:nowrap;"></span>
+                    </button>
+
+                    <button is="paper-icon-button-light" type="button" class="btnGuideViewSettings btnGuideViewSettings-side hide">
+                        <i class="md-icon">&#xE5D3;</i>
+                    </button>
+                </div>
+                <div class="timeslotHeaders flex flex-grow flex-direction-row"></div>
+            </div>
+
+            <div is="emby-itemscontainer" data-virtualscrolllayout="vertical-grid" class="itemsContainer vertical-list padded-bottom-page epgItemsContainer" data-multiselect="false" data-contextmenu="false">
+
+            </div>
+        </div>
+    </div>
+
+</div>

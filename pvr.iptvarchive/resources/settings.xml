@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+  <!-- M3U -->
+  <category label="30010">
+    <setting id="sep1" label="30010" type="lsep"/>
+    <setting id="m3uPathType" type="enum" label="30000" lvalues="30001|30002" default="1" />
+    <setting id="m3uPath" type="file" label="30011" default="" visible="eq(-1,0)"/>
+    <setting id="m3uUrl" type="text" label="30012" default="" visible="eq(-2,1)"/>
+    <setting id="m3uCache" type="bool" label="30025" default="true" visible="eq(-3,1)"/>
+    <setting id="startNum" type="number" label="30013" default="1" />
+    <setting id="userAgent" type="text" label="30045" />
+  </category>
+
+  <!-- EPG -->
+  <category label="30020">
+    <setting id="sep2" label="30020" type="lsep"/>
+    <setting id="epgPathType" type="enum" label="30000" lvalues="30001|30002" default="1" />
+    <setting id="epgPath" type="file" label="30021" default="" visible="eq(-1,0)"/>
+    <setting id="epgUrl" type="text" label="30022" default="" visible="eq(-2,1)"/>
+    <setting id="epgCache" type="bool" label="30026" default="true" visible="eq(-3,1)"/>
+    <setting id="epgTimeShift" type="slider" label="30024" default="0" range="-12,.5,14" option="float"/>
+    <setting id="epgTSOverride" type="bool" label="30023" default="false"/>
+  </category>
+
+  <!-- Logos -->
+  <category label="30030">
+    <setting id="sep3" label="30030" type="lsep"/>
+    <setting id="logoPathType" type="enum" label="30000" lvalues="30001|30002" default="1" />
+    <setting id="logoPath" type="folder" label="30031" default="" visible="eq(-1,0)"/>
+    <setting id="logoBaseUrl" type="text" label="30032" default="" visible="eq(-2,1)"/>
+    <setting id="sep3" label="30040" type="lsep"/>
+    <setting id="logoFromEpg" type="enum" label="30041" default="0" lvalues="30042|30043|30044"/>
+  </category>
+
+  <!-- Archive -->
+  <category label="30060">
+    <setting id="sep4" label="30060" type="lsep"/>
+    <setting id="archEnable" type="bool" label="30061" default="false"/>
+    <setting id="archUrlFormat" type="text" label="30062" default="" visible="eq(-1,true)"/>
+    <setting id="sep4" label="30063" type="lsep" visible="eq(-2,true)"/>
+    <setting id="archTimeshiftBuffer" type="enum" label="30064" lvalues="30090|30091|30092|30093|30094|30095|30096" default="3" visible="eq(-3,true)"/>
+    <setting id="archPlayEpgAsLive" type="bool" label="30068" default="false" visible="eq(-4,true)"/>
+    <setting id="sep4" label="30065" type="lsep" visible="eq(-5,true) + !eq(-1,true)"/>
+    <setting id="archBeginBuffer" type="enum" label="30066" lvalues="30080|30081|30082|30083|30084|30085|30086" default="2" visible="eq(-6,true) + !eq(-2,true)"/>
+    <setting id="archEndBuffer" type="enum" label="30067" lvalues="30080|30081|30082|30083|30084|30085|30086" default="4" visible="eq(-7,true) + !eq(-3,true)"/>
+  </category>
+</settings>

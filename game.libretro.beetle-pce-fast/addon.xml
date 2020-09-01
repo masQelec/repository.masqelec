@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="game.libretro.beetle-pce-fast" name="NEC - PC Engine / CD (Beetle PCE FAST)" version="0.9.38.7.1" provider-name="Libretro">
+  <requires>
+    <import addon="game.libretro" version="1.0.0"/>
+    <import addon="game.controller.pce" version="1.0.0"/>
+  </requires>
+  <extension point="kodi.gameclient" library_linux="game.libretro.beetle-pce-fast.so">
+    <platforms>PCE</platforms>
+    <extensions>pce|cue|ccd|chd</extensions>
+    <supports_vfs>false</supports_vfs>
+    <supports_standalone>false</supports_standalone>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">NEC - PC Engine / CD (Beetle PCE FAST) v0.9.38.7</summary>
+    <summary lang="es_ES">NEC - PC Engine / CD (Beetle PCE FAST) v0.9.38.7</summary>
+    <description lang="en_GB">Beetle PCE Fast, a PC Engine emulator for Libretro, is a fork of Mednafen's PC Engine driver.
+
+Supported files: .pce, .cue, .ccd, .chd</description>
+    <description lang="es_ES">Beetle PCE Fast, un emulador de PC Engine para Libretro, es una bifurcación del controlador de PC Engine de Mednafen.
+
+Archivos soportados: .pce, .cue, .ccd, .chd</description>
+    <license>GPLv2</license>
+    <platform/>
+    <source>https://github.com/kodi-game/game.libretro.beetle-pce-fast</source>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.png</fanart>
+    </assets>
+  </extension>
+</addon>

@@ -1,0 +1,1 @@
+define([],function(){"use strict";return{send:function(info){return Promise.reject()},isSupported:function(){return!1}}});

@@ -1,0 +1,19 @@
+{
+    "Save": "Shrani",
+    "Video": "Video",
+    "Add": "Dodaj",
+    "Game": "Game",
+    "MediaType": "Media type",
+    "ExternalPlayers": "External players",
+    "ExternalPlayer": "External player",
+    "PlayerPath": "Player path",
+    "ArgumentsHelp": "Place each argument on a separate line.",
+    "TokenPath": "{path} = path to media file",
+    "EnableFor": "Enable for:",
+    "VideoFiles": "Video files",
+    "InternetStreams": "Internet streams",
+    "CommandLineArguments": "Command line arguments",
+    "TokenStartPosMs": "{ms} = start position ms",
+    "AdditionalFilters": "Additional filters:",
+    "GameSystem": "Game system:"
+}

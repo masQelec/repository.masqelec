@@ -1,0 +1,317 @@
+# game.libretro.uae language file
+# Addon Name: game.libretro.uae
+# Addon id: game.libretro.uae
+# Addon Provider: libretro
+msgid ""
+msgstr ""
+"Project-Id-Version: game.libretro.uae\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2017-12-03 12:12i\n"
+"PO-Revision-Date: 2017-12-03 12:12i\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: English (http://www.transifex.com/projects/p/xbmc-addons/language/en/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Settings"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Analog Stick Mouse"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Analog Stick Mouse Deadzone"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Analog Stick Mouse Speed"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Show Audio Options"
+msgstr ""
+
+msgctxt "#30005"
+msgid "CD32 Pad Face Button Options"
+msgstr ""
+
+msgctxt "#30006"
+msgid "CD Speed"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Collision Level"
+msgstr ""
+
+msgctxt "#30008"
+msgid "CPU Compatibility"
+msgstr ""
+
+msgctxt "#30009"
+msgid "CPU Cycle-exact Speed"
+msgstr ""
+
+msgctxt "#30010"
+msgid "CPU Speed"
+msgstr ""
+
+msgctxt "#30011"
+msgid "D-Pad Mouse Speed"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Floppy Sound Emulation"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Floppy Sound Emulation Type"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Floppy Speed"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Color Depth"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Frameskip"
+msgstr ""
+
+msgctxt "#30017"
+msgid "Horizontal Position"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Immediate/Waiting Blits"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Keyrah Keypad Mappings"
+msgstr ""
+
+msgctxt "#30020"
+msgid "RetroPad A"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Hotkey: Toggle Aspect Ratio"
+msgstr ""
+
+msgctxt "#30022"
+msgid "RetroPad B"
+msgstr ""
+
+msgctxt "#30023"
+msgid "RetroPad L"
+msgstr ""
+
+msgctxt "#30024"
+msgid "RetroPad L2"
+msgstr ""
+
+msgctxt "#30025"
+msgid "RetroPad L3"
+msgstr ""
+
+msgctxt "#30026"
+msgid "RetroPad L-Down"
+msgstr ""
+
+msgctxt "#30027"
+msgid "RetroPad L-Left"
+msgstr ""
+
+msgctxt "#30028"
+msgid "RetroPad L-Right"
+msgstr ""
+
+msgctxt "#30029"
+msgid "RetroPad L-Up"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Hotkey: Toggle Joystick/Mouse"
+msgstr ""
+
+msgctxt "#30031"
+msgid "RetroPad R"
+msgstr ""
+
+msgctxt "#30032"
+msgid "RetroPad R2"
+msgstr ""
+
+msgctxt "#30033"
+msgid "RetroPad R3"
+msgstr ""
+
+msgctxt "#30034"
+msgid "RetroPad R-Down"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Hotkey: Reset"
+msgstr ""
+
+msgctxt "#30036"
+msgid "RetroPad R-Left"
+msgstr ""
+
+msgctxt "#30037"
+msgid "RetroPad R-Right"
+msgstr ""
+
+msgctxt "#30038"
+msgid "RetroPad R-Up"
+msgstr ""
+
+msgctxt "#30039"
+msgid "RetroPad Select"
+msgstr ""
+
+msgctxt "#30040"
+msgid "RetroPad Start"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Hotkey: Toggle Statusbar"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Hotkey: Toggle Virtual Keyboard"
+msgstr ""
+
+msgctxt "#30043"
+msgid "RetroPad X"
+msgstr ""
+
+msgctxt "#30044"
+msgid "RetroPad Y"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Hotkey: Toggle Zoom Mode"
+msgstr ""
+
+msgctxt "#30046"
+msgid "Show Mapping Options"
+msgstr ""
+
+msgctxt "#30047"
+msgid "Model"
+msgstr ""
+
+msgctxt "#30048"
+msgid "Mouse Speed"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Multiple Physical Mouse"
+msgstr ""
+
+msgctxt "#30050"
+msgid "Physical Keyboard Pass-through"
+msgstr ""
+
+msgctxt "#30051"
+msgid "RetroPad Face Button Options"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Shared CD32 NVRAM"
+msgstr ""
+
+msgctxt "#30053"
+msgid "Sound Filter"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Sound Filter Type"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Sound Interpolation"
+msgstr ""
+
+msgctxt "#30056"
+msgid "Sound Output"
+msgstr ""
+
+msgctxt "#30057"
+msgid "Sound Stereo Separation"
+msgstr ""
+
+msgctxt "#30058"
+msgid "CD Audio Volume"
+msgstr ""
+
+msgctxt "#30059"
+msgid "Statusbar Position & Mode"
+msgstr ""
+
+msgctxt "#30060"
+msgid "RetroPad Turbo Fire"
+msgstr ""
+
+msgctxt "#30061"
+msgid "RetroPad Turbo Pulse"
+msgstr ""
+
+msgctxt "#30062"
+msgid "Global Boot HD"
+msgstr ""
+
+msgctxt "#30063"
+msgid "WHDLoad Support"
+msgstr ""
+
+msgctxt "#30064"
+msgid "WHDLoad Splash Screen Options"
+msgstr ""
+
+msgctxt "#30065"
+msgid "Vertical Position"
+msgstr ""
+
+msgctxt "#30066"
+msgid "Allow PAL/NTSC Hz Change"
+msgstr ""
+
+msgctxt "#30067"
+msgid "Aspect Ratio"
+msgstr ""
+
+msgctxt "#30068"
+msgid "Show Video Options"
+msgstr ""
+
+msgctxt "#30069"
+msgid "Video Resolution"
+msgstr ""
+
+msgctxt "#30070"
+msgid "Video Standard"
+msgstr ""
+
+msgctxt "#30071"
+msgid "Video Line Mode"
+msgstr ""
+
+msgctxt "#30072"
+msgid "Virtual Keyboard Transparency"
+msgstr ""
+
+msgctxt "#30073"
+msgid "Virtual Keyboard Theme"
+msgstr ""
+
+msgctxt "#30074"
+msgid "Zoom Mode"
+msgstr ""
