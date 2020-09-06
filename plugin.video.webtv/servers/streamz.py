@@ -8,7 +8,7 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
-    page_url = page_url.replace('streamz.cc/', 'streamz.vg/')
+    page_url = page_url.replace('streamz.cc/', 'streamz.vg/').replace('streamz.ws/', 'streamz.vg/')
     
     data = httptools.downloadpage(page_url).data
     # ~ logger.debug(data)

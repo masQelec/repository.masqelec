@@ -163,6 +163,7 @@ def _buscar_proxies(canal, url):
         url_provider += '/protocol/' + ('https' if url.startswith('https') else 'http')
 
         resp = httptools.downloadpage(url_provider, raise_weberror=False)
+        # ~ logger.debug(resp.data)
         
         chash = scrapertools.find_single_match(resp.data, "var chash\s*=\s*'([^']+)")
         def decode_puerto(t, e):
@@ -174,7 +175,7 @@ def _buscar_proxies(canal, url):
             return ''.join(a)
 
         proxies = []
-        enlaces = scrapertools.find_multiple_matches(resp.data, '(\d+\.\d+\.\d+\.\d+)</a></td><td><span class="port" data-port="([^"]+)')
+        enlaces = scrapertools.find_multiple_matches(resp.data, '(\d+\.\d+\.\d+\.\d+)</a>\s*</td>\s*<td><span class="port" data-port="([^"]+)')
         for prox, puerto in enlaces:
             proxies.append(prox + ':' + decode_puerto(puerto, chash))
                                                           

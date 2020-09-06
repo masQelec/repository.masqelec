@@ -3,7 +3,7 @@
   "name": "TorrentDivx",
   "thumbnail": "torrentdivx.png",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<addon id="plugin.video.webtv" name="WebTV" version="1.1.0" provider-name="WebTV">
+<addon id="plugin.video.webtv" name="WebTV" version="1.1.1" provider-name="WebTV">
 
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -17,8 +17,8 @@
 
     <news>Últimas modificaciones de Balandro:
 
-    Canales modificados: Inkapelis, Pepecine, Pelispedia, Hdfull, Seriemega, Cuevana3, Torrentdivx.
-    Servidores modificados: Digiload, Gloria, Uploadsmobi.
+    Canales modificados: Hdfull, Cinecalidad, Torrentdivx, Newpct1, Cinemaclasic.
+    Servidores modificados: Tnencloud, Filesim, Doodstream, Streamz.
     </news>
 
     <assets>

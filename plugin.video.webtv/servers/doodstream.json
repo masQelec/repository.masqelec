@@ -2,8 +2,7 @@
   "id": "doodstream",
   "name": "DoodStream",
 
-  "active": false,
-  "notes": "Requiere recaptcha",
+  "active": true,
 
   "find_videos": {
     "ignore_urls": [],

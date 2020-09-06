@@ -62,7 +62,7 @@ def mainlist_pelis_clon(item):
     logger.info()
     itemlist = []
     item.category += '~' + item.title
-
+    
     enlaces = [
         ['Películas en Castellano', 'peliculas/'],
         ['Películas en Latino', 'peliculas-latino/'],
@@ -84,6 +84,18 @@ def mainlist_pelis_clon(item):
         # ~ ['Otras películas', 'otras-peliculas/'],
         # ~ ['Películas en BDremux 1080p', 'peliculas-hd/bdremux-1080p/'],
         # ~ ['Documentales', 'varios/'], # algunos documentales, pero la mayoría de enlaces son pdfs de revistas, etc.
+
+    if 'descargas2020.net' in item.url: 
+        item.url += 'categoria/'
+        enlaces = [
+            ['Películas en Castellano', 'peliculas-castellano/'],
+            ['Películas en Latino', 'peliculas-latino/'],
+            ['Estrenos de cine', 'estrenos-de-cine/'],
+            ['Películas en HD', 'peliculas-hd/'],
+            ['Películas en X264', 'peliculas-x264-mkv/'],
+            ['Películas en 3D', 'peliculas-3d/'],
+            ['Películas en Rip', 'peliculas-rip/']
+        ]
 
     for enlace in enlaces:
         # ~ if item.title == 'planetatorrent' and 'x264' in enlace[1]: continue
@@ -125,6 +137,8 @@ def mainlist_series_clon(item):
         ['Series HD', 'series-hd/'],
         ['Series VO', 'series-vo/']
     ]
+    if 'descargas2020.net' in item.url: 
+        del enlaces[1:]
 
     for enlace in enlaces:
         itemlist.append(item.clone( title = enlace[0], action = 'list_all', url = item.url + enlace[1], search_type = 'tvshow' ))

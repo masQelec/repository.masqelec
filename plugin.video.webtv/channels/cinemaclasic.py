@@ -60,7 +60,8 @@ def anios(item):
     for url, title in matches:
         itemlist.append(item.clone( action='list_all', title=title, url=url ))
 
-    for ano in range(1967, 1914, -1):
+    # ~ for ano in range(1967, 1914, -1):
+    for ano in range(2017, 1914, -1):
         itemlist.append(item.clone( action = 'list_all', title = str(ano), url = host + 'ano/' + str(ano) + '/' ))
 
     return itemlist
