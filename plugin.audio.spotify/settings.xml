@@ -1,0 +1,23 @@
+<settings version="2">
+    <setting id="albumDefaultView" default="true"></setting>
+    <setting id="appendArtistToTitle" default="true">false</setting>
+    <setting id="artistDefaultView" default="true"></setting>
+    <setting id="categoryDefaultView" default="true"></setting>
+    <setting id="connect_player">true</setting>
+    <setting id="multi_account" default="true">false</setting>
+    <setting id="password" default="true"></setting>
+    <setting id="password1" default="true"></setting>
+    <setting id="password2" default="true"></setting>
+    <setting id="password3" default="true"></setting>
+    <setting id="password4" default="true"></setting>
+    <setting id="password5" default="true"></setting>
+    <setting id="playlistDefaultView" default="true"></setting>
+    <setting id="prefer_kodi_osd" default="true">false</setting>
+    <setting id="songDefaultView" default="true"></setting>
+    <setting id="username" default="true"></setting>
+    <setting id="username1" default="true"></setting>
+    <setting id="username2" default="true"></setting>
+    <setting id="username3" default="true"></setting>
+    <setting id="username4" default="true"></setting>
+    <setting id="username5" default="true"></setting>
+</settings>

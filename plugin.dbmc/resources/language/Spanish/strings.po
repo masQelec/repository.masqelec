@@ -1,0 +1,291 @@
+# XBMC Media Center language file
+# Addon Name: Dbmc
+# Addon id: plugin.dbmc
+msgid ""
+msgstr ""
+
+msgctxt "#30000"
+msgid "General"
+msgstr "General"
+ 
+msgctxt "#30001"
+msgid "Follow the instructions and enter PIN: "
+msgstr "Siga las instrucciones e ingrese el PIN: "
+
+msgctxt "#30002"
+msgid "Dropbox authorization required."
+msgstr "Se requiere autorización de Dropbox."
+
+msgctxt "#30003"
+msgid "Go to: http://xbmc-dropbox.sourceforge.net"
+msgstr "Vaya a: http://xbmc-dropbox.sourceforge.net"
+ 
+msgctxt "#30004"
+msgid "Authorization finished. Account added:"
+msgstr "Autorización finalizada. Cuenta agregada:"
+ 
+msgctxt "#30005"
+msgid "Clear Dropbox authorization code"
+msgstr "Borrar el código de autorización de Dropbox"
+
+msgctxt "#30006"
+msgid "Dropbox authorization code"
+msgstr "Código de autorización de Dropbox"
+
+msgctxt "#30007"
+msgid "Location for cached files"
+msgstr "Ubicación para archivos en caché"
+ 
+msgctxt "#30008"
+msgid "View relevant files only"
+msgstr "Ver solo archivos relevantes"
+ 
+msgctxt "#30009"
+msgid "30009"
+msgstr "30009"
+
+msgctxt "#30010"
+msgid "Show me more..."
+msgstr "Muestrame mas..."
+
+msgctxt "#30011"
+msgid "Use passcode lock for account"
+msgstr "Usar bloqueo de contraseña para la cuenta"
+
+msgctxt "#30012"
+msgid "Change passcode..."
+msgstr "Cambiar contraseña..."
+
+msgctxt "#30013"
+msgid "Enter your passcode"
+msgstr "Introduzca su código de acceso"
+
+msgctxt "#30014"
+msgid "Wrong passcode!"
+msgstr "Código de acceso incorrecto!"
+ 
+msgctxt "#30015"
+msgid "Passcode timeout (minutes)"
+msgstr "Tiempo de espera de contraseña (minutos)"
+ 
+msgctxt "#30016"
+msgid "Browse Dropbox"
+msgstr "Examinar Dropbox"
+
+msgctxt "#30017"
+msgid "Search Dropbox"
+msgstr "Buscar en Dropbox"
+
+msgctxt "#30018"
+msgid "Enter the search text"
+msgstr "Ingrese el texto de búsqueda"
+
+msgctxt "#30019"
+msgid "Search text has to be atleast 3 characters"
+msgstr "El texto de búsqueda debe tener al menos 3 caracteres"
+ 
+msgctxt "#30020"
+msgid "Searching in Dropbox for:"
+msgstr "Buscando en Dropbox por:"
+
+msgctxt "#30021"
+msgid "Nothing found!"
+msgstr "¡Nada Encontrado!"
+
+msgctxt "#30022"
+msgid "Delete from Dropbox"
+msgstr "Eliminar de Dropbox"
+
+msgctxt "#30023"
+msgid "Do you want to delete this from Dropbox:"
+msgstr "¿Quieres eliminar esto de Dropbox?"
+
+msgctxt "#30024"
+msgid "Copy in Dropbox"
+msgstr "Copiar en Dropbox"
+ 
+msgctxt "#30025"
+msgid "Select the folder to "
+msgstr "Seleccione la carpeta para "
+
+msgctxt "#30026"
+msgid "copy to"
+msgstr "copiar a"
+
+msgctxt "#30027"
+msgid "Move in Dropbox"
+msgstr "Mover en Dropbox"
+
+msgctxt "#30028"
+msgid "move to"
+msgstr "mover a"
+
+msgctxt "#30029"
+msgid "Create new folder in Dropbox"
+msgstr "Crear nueva carpeta en Dropbox"
+
+msgctxt "#30030"
+msgid "Enter the name of new folder"
+msgstr "Ingrese el nombre de la nueva carpeta"
+
+msgctxt "#30031"
+msgid "Upload to Dropbox"
+msgstr "Subir a Dropbox"
+
+msgctxt "#30032"
+msgid "Select the file to upload"
+msgstr "Seleccione el archivo para cargar"
+
+msgctxt "#30033"
+msgid "Uploading file to Dropbox"
+msgstr "Subir archivo a Dropbox"
+
+msgctxt "#30034"
+msgid "Enter your new passcode"
+msgstr "Ingrese su nueva contraseña"
+
+msgctxt "#30035"
+msgid "Caching media files in background..."
+msgstr "Almacenamiento en caché de archivos multimedia en segundo plano ..."
+ 
+msgctxt "#30036"
+msgid "Stream video and music media (don't cache)"
+msgstr "Transmitir video y música (no almacenar en caché)"
+
+msgctxt "#30037"
+msgid "Download from Dropbox"
+msgstr "Descargar desde Dropbox"
+ 
+msgctxt "#30038"
+msgid "download to"
+msgstr "descargar a"
+
+msgctxt "#30039"
+msgid "Downloading file(s) from Dropbox"
+msgstr "Descargar archivo (s) de Dropbox"
+
+msgctxt "#30040"
+msgid "Finished downloading file(s) to:"
+msgstr "Finalizó la descarga de archivos a:"
+
+msgctxt "#30041"
+msgid "Downloading file:"
+msgstr "Descargando archivo:"
+
+msgctxt "#30042"
+msgid "Add an account..."
+msgstr "Agregar una cuenta..."
+
+msgctxt "#30043"
+msgid "Finish adding account..."
+msgstr "Terminar de agregar cuenta ..."
+ 
+msgctxt "#30044"
+msgid "Remove account"
+msgstr "Eliminar cuenta"
+
+msgctxt "#30045"
+msgid "Do you want to remove this account from Dbmc?"
+msgstr "¿Desea eliminar esta cuenta de Dbmc?"
+
+msgctxt "#30100"
+msgid "Change synchronization..."
+msgstr "Cambiar sincronización ..."
+
+msgctxt "#30101"
+msgid "Enable synchronization"
+msgstr "Habilitar sincronización"
+
+msgctxt "#30102"
+msgid "Select the local folder"
+msgstr "Seleccione la carpeta local"
+
+msgctxt "#30103"
+msgid "Dbmc: Moved files/folders to new synchronization location:"
+msgstr "Dbmc: movió archivos / carpetas a la nueva ubicación de sincronización:"
+
+msgctxt "#30104"
+msgid "New synchronization location is not empty!"
+msgstr "¡La nueva ubicación de sincronización no está vacía!"
+
+msgctxt "#30105"
+msgid "Synchronization interval (minutes)"
+msgstr "Intervalo de sincronización (minutos)"
+
+msgctxt "#30106"
+msgid "Dbmc: Synchronization finished."
+msgstr "Dbmc: Sincronización finalizada."
+
+msgctxt "#30107"
+msgid "Number of items synchronized: "
+msgstr "Número de artículos sincronizados: "
+
+msgctxt "#30108"
+msgid "Synchronization locations"
+msgstr "Ubicaciones de sincronización"
+
+msgctxt "#30109"
+msgid "Select the Dropbox folder to synchronize with"
+msgstr "Seleccione la carpeta de Dropbox para sincronizar con"
+
+msgctxt "#30110"
+msgid "Can't change settings while synchronizing!"
+msgstr "¡No se puede cambiar la configuración mientras se sincroniza!"
+
+msgctxt "#30111"
+msgid "Can't enable synchronization:\n"
+"First set synchronization locations!"
+msgstr "No se puede habilitar la sincronización:\n"
+"Primero establecer ubicaciones de sincronización!"
+
+msgctxt "#30112"
+msgid "Synchronize now"
+msgstr "Sincronizar ahora"
+ 
+msgctxt "#30113"
+msgid "Stop Synchronizing now?"
+msgstr "¿Dejar de sincronizar ahora?"
+
+msgctxt "#30114"
+msgid "Dbmc: Synchronizing files..."
+msgstr "Dbmc: Sincronizando archivos ..."
+
+msgctxt "#30115"
+msgid "Synchronization settings can't be changed here anymore!"
+msgstr "¡La configuración de sincronización ya no se puede cambiar aquí!"
+
+msgctxt "#30200"
+msgid "Problem getting the access code!"
+msgstr "¡Problema al obtener el código de acceso!"
+
+msgctxt "#30201"
+msgid "Authorization failed!"
+msgstr "¡Autorización fallida!"
+ 
+msgctxt "#30202"
+msgid "Did you copy the complete code?"
+msgstr "¿Copiaste el código completo?"
+ 
+msgctxt "#30203"
+msgid "Action cannot be executed"
+msgstr "La acción no se puede ejecutar."
+
+msgctxt "#30204"
+msgid "30204"
+msgstr "30204"
+
+msgctxt "#30205"
+msgid "Dropbox authorization code failure!"
+msgstr "Error de código de autorización de Dropbox"
+
+msgctxt "#30206"
+msgid "Dropbox error occured!"
+msgstr "¡Ocurrió un error de Dropbox!"
+
+msgctxt "#30207"
+msgid "Please enter a valid passcode timeout (1 to 120 minutes)"
+msgstr "Ingrese un tiempo de espera de contraseña válido (1 a 120 minutos)"
+
+msgctxt "#30208"
+msgid "Please enter a valid synchronization interval (5 to 1440 minutes)"
+msgstr "Ingrese un intervalo de sincronización válido (5 a 1440 minutos)"

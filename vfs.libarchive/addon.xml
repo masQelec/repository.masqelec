@@ -9,9 +9,13 @@
   <extension point="kodi.vfs" protocols="archive|rar" extensions=".7z|.tar.gz|.tar.bz2|.tar.xz|.zip|.rar|.tgz|.tbz2|.gz|.bz2|.xz|.cbr" files="true" directories="true" filedirectories="true" encodedhostname="true" library_linux="vfs.libarchive.so.1.0.7"/>
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">Multi-format archive and compression addon</summary>
+    <summary lang="es_ES">Archivo multiformato y complemento de compresión</summary>
     <description lang="en_GB">This add-on uses the libarchive library to read a variety of archive and compression formats.
-
 Supported formats are:
+7z, tar.gz, tar.bz2, tar.xz, zip, rar, tgz, tbz2, gz, bz2, xz, cbr
+</description>
+    <description lang="es_ES">Este complemento utiliza la biblioteca libarchive para leer una variedad de formatos de archivo y compresión.
+Los formatos admitidos son:
 7z, tar.gz, tar.bz2, tar.xz, zip, rar, tgz, tbz2, gz, bz2, xz, cbr
 </description>
     <platform/>

@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="utf-8"?>
+<categories>
+	<category>
+		<label>1</label>
+		<thumb>WaxsEUW.jpg</thumb>
+		<banner>mOdmSGS.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>tJaj9Yd.png</logo>
+		<trailer>8I7KBGn7N1A</trailer>
+		<plot>Juegos con 1 jugador</plot>
+	</category>
+	<category>
+		<label>2</label>
+		<thumb>t2aPdaV.jpg</thumb>
+		<banner>0ZZQ9JT.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>Ir6T2Dp.png</logo>
+		<trailer>VWzfPYXxlqw</trailer>
+		<plot>Juegos con 2 jugadores</plot>
+	</category>
+	<category>
+		<label>1-2</label>
+		<thumb>t2aPdaV.jpg</thumb>
+		<banner>0ZZQ9JT.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>Ir6T2Dp.png</logo>
+		<trailer>VWzfPYXxlqw</trailer>
+		<plot>Juegos con hasta 2 jugadores</plot>
+	</category>
+	<category>
+		<label>1-2 Alt</label>
+		<thumb>eZYER6T.jpg</thumb>
+		<banner>1IS7SGl.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>Gy4AEHS.png</logo>
+		<trailer>VWzfPYXxlqw</trailer>
+		<plot>Partidas con hasta 2 jugadores, turnos alternativos</plot>
+	</category>
+	<category>
+		<label>1-2 Co-Op</label>
+		<thumb>Kfc2qgN.jpg</thumb>
+		<banner>8WcS5i6.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>hbLxt0G.png</logo>
+		<trailer>VWzfPYXxlqw</trailer>
+		<plot>Partidas con hasta 2 jugadores, jugando cooperativamente</plot>
+	</category>
+	<category>
+		<label>1-2 Sim</label>
+		<thumb>lnvsVba.jpg</thumb>
+		<banner>rMLsKUc.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>TvY5lvL.png</logo>
+		<trailer>VWzfPYXxlqw</trailer>
+		<plot>Partidas con hasta 2 jugadores, simultáneamente</plot>
+	</category>
+	<category>
+		<label>1-2 VS</label>
+		<thumb>4bvX4i2.jpg</thumb>
+		<banner>TA6F1RK.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>Afn99qv.png</logo>
+		<trailer>VWzfPYXxlqw</trailer>
+		<plot>Juegos con hasta 2 jugadores, jugando unos contra otros</plot>
+	</category>
+	<category>
+		<label>3</label>
+		<thumb>VhPHs4C.png</thumb>
+		<banner>n0axWIp.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>Ir6T2Dp.png</logo>
+		<trailer>DXOi-9bMTUM</trailer>
+		<plot>Juegos con hasta 3 jugadores</plot>
+	</category>
+	<category>
+		<label>1-3</label>
+		<thumb>VhPHs4C.png</thumb>
+		<banner>n0axWIp.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>Ir6T2Dp.png</logo>
+		<trailer>DXOi-9bMTUM</trailer>
+		<plot>Juegos con hasta 3 jugadores</plot>
+	</category>
+	<category>
+		<label>1-3 Alt</label>
+		<thumb>T2Sb3yU.jpg</thumb>
+		<banner>2FHOfoP.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>tvOJTUx.png</logo>
+		<trailer>DXOi-9bMTUM</trailer>
+		<plot>Partidas con hasta 3 jugadores, turnos alternativos</plot>
+	</category>
+	<category>
+		<label>1-3 Co-Op</label>
+		<thumb>lyZ0nrc.jpg</thumb>
+		<banner>vybQNvM.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>gLdGL1l.png</logo>
+		<trailer>DXOi-9bMTUM</trailer>
+		<plot>Juegos con hasta 3 jugadores, jugando cooperativamente</plot>
+	</category>
+	<category>
+		<label>1-3 Sim</label>
+		<thumb>f2ivxbC.jpg</thumb>
+		<banner>cY4ZXj1.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>iIHrL9V.png</logo>
+		<trailer>DXOi-9bMTUM</trailer>
+		<plot>Partidas con hasta 3 jugadores, simultáneamente</plot>
+	</category>
+	<category>
+		<label>1-3 VS</label>
+		<thumb>CLfwYRL.jpg</thumb>
+		<banner>oHUQVnD.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>q6ZJ2Q5.png</logo>
+		<trailer>DXOi-9bMTUM</trailer>
+		<plot>Juegos con hasta 3 jugadores, jugando unos contra otros</plot>
+	</category>
+	<category>
+		<label>4</label>
+		<thumb>YRFgX7X.jpg</thumb>
+		<banner>m1UjFmm.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>MoZu2r0.png</logo>
+		<trailer>tP9COPW5sLs</trailer>
+		<plot>Juegos con 4 jugadores</plot>
+	</category>
+	<category>
+		<label>1-4</label>
+		<thumb>YRFgX7X.jpg</thumb>
+		<banner>m1UjFmm.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>MoZu2r0.png</logo>
+		<trailer>tP9COPW5sLs</trailer>
+		<plot>Juegos con hasta 4 jugadores</plot>
+	</category>
+	<category>
+		<label>1-4 Alt</label>
+		<thumb>s1lhugb.jpg</thumb>
+		<banner>amwDXdq.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>kjsVxhe.png</logo>
+		<trailer>tP9COPW5sLs</trailer>
+		<plot>Partidas con hasta 4 jugadores, turnos alternativos</plot>
+	</category>
+	<category>
+		<label>1-4 Co-Op</label>
+		<thumb>vECzCeg.jpg</thumb>
+		<banner>JK46PXt.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>Co5dVtd.png</logo>
+		<trailer>tP9COPW5sLs</trailer>
+		<plot>Juegos con hasta 4 jugadores, jugando cooperativamente</plot>
+	</category>
+	<category>
+		<label>1-4 Sim</label>
+		<thumb>StJmIzc.jpg</thumb>
+		<banner>UKUZ2Rd.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>lgssSiH.png</logo>
+		<trailer>tP9COPW5sLs</trailer>
+		<plot>Juegos con hasta 4 jugadores, simultáneamente</plot>
+	</category>
+	<category>
+		<label>1-4 VS</label>
+		<thumb>r0NHM93.jpg</thumb>
+		<banner>th1UVfO.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>w03iQEm.png</logo>
+		<trailer>tP9COPW5sLs</trailer>
+		<plot>Juegos con hasta 4 jugadores, jugando unos contra otros</plot>
+	</category>
+	<category>
+		<label>5</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>w9SU4dXoWh0</trailer>
+		<plot>Juegos con hasta 5 jugadores</plot>
+	</category>
+	<category>
+		<label>6</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>2MT-4ydAZ0o</trailer>
+		<plot>Juegos con hasta 6 jugadores</plot>
+		</category>
+	<category>
+		<label>7</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>GNX3iv8YyMY</trailer>
+		<plot>Juegos con hasta 7 jugadores</plot>
+	</category>
+	<category>
+		<label>8</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>D5m0EsVzc4U</trailer>
+		<plot>Juegos con 8 jugadores</plot>
+	</category>
+	<category>
+		<label>9</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>zYWd_vPoiZY</trailer>
+		<plot>Juegos con hasta 9 jugadores</plot>
+	</category>
+	<category>
+		<label>10</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>dLsam0PYTH8</trailer>
+		<plot>Juegos con hasta 10 jugadores</plot>
+	</category>
+	<category>
+		<label>1-5</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>w9SU4dXoWh0</trailer>
+		<plot>Juegos con hasta 5 jugadores</plot>
+	</category>
+	<category>
+		<label>1-5 Alt</label>
+		<thumb>DxjEQNy.jpg</thumb>
+		<banner>hYsVXMG.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>OK0aE1d.png</logo>
+		<trailer>w9SU4dXoWh0</trailer>
+		<plot>Juegos con hasta 5 jugadores, turnos alternativos</plot>
+	</category>
+	<category>
+		<label>1-5 Co-Op</label>
+		<thumb>aD12K8C.jpg</thumb>
+		<banner>RVqKle3.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>AcZmMnu.png</logo>
+		<trailer>w9SU4dXoWh0</trailer>
+		<plot>Juegos con hasta 5 jugadores, jugando cooperativamente</plot>
+	</category>
+	<category>
+		<label>1-5 Sim</label>
+		<thumb>kZkomy0.jpg</thumb>
+		<banner>ATV14ey.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>YWogZVa.png</logo>
+		<trailer>w9SU4dXoWh0</trailer>
+		<plot>Juegos con hasta 5 jugadores, simultáneamente</plot>
+	</category>
+	<category>
+		<label>1-5 VS</label>
+		<thumb>nyBbVVZ.jpg</thumb>
+		<banner>UMIM1rs.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>XnJTbCR.png</logo>
+		<trailer>w9SU4dXoWh0</trailer>
+		<plot>Juegos con hasta 5 jugadores, jugando unos contra otros</plot>
+	</category>
+	<category>
+		<label>1-6</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>2MT-4ydAZ0o</trailer>
+		<plot>Juegos con hasta 6 jugadores</plot>
+	</category>
+	<category>
+		<label>1-6 Alt</label>
+		<thumb>DxjEQNy.jpg</thumb>
+		<banner>hYsVXMG.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>OK0aE1d.png</logo>
+		<trailer>2MT-4ydAZ0o</trailer>
+		<plot>Juegos con hasta 6 jugadores, turnos alternativos</plot>
+	</category>
+	<category>
+		<label>1-6 Co-Op</label>
+		<thumb>aD12K8C.jpg</thumb>
+		<banner>RVqKle3.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>AcZmMnu.png</logo>
+		<trailer>2MT-4ydAZ0o</trailer>
+		<plot>Juegos con hasta 6 jugadores, jugando cooperativamente</plot>
+	</category>
+	<category>
+		<label>1-6 Sim</label>
+		<thumb>kZkomy0.jpg</thumb>
+		<banner>ATV14ey.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>YWogZVa.png</logo>
+		<trailer>2MT-4ydAZ0o</trailer>
+		<plot>Juegos con hasta 6 jugadores, simultáneamente</plot>
+	</category>
+	<category>
+		<label>1-6 VS</label>
+		<thumb>nyBbVVZ.jpg</thumb>
+		<banner>UMIM1rs.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>XnJTbCR.png</logo>
+		<trailer>2MT-4ydAZ0o</trailer>
+		<plot>Juegos con hasta 6 jugadores, jugando unos contra otros</plot>
+	</category>
+	<category>
+		<label>1-7</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>GNX3iv8YyMY</trailer>
+		<plot>Juegos con hasta 7 jugadores</plot>
+	</category>
+	<category>
+		<label>1-7 Alt</label>
+		<thumb>DxjEQNy.jpg</thumb>
+		<banner>hYsVXMG.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>OK0aE1d.png</logo>
+		<trailer>GNX3iv8YyMY</trailer>
+		<plot>Juegos con hasta 7 jugadores, turnos alternativos</plot>
+	</category>
+	<category>
+		<label>1-7 Co-Op</label>
+		<thumb>aD12K8C.jpg</thumb>
+		<banner>RVqKle3.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>AcZmMnu.png</logo>
+		<trailer>GNX3iv8YyMY</trailer>
+		<plot>Juegos con hasta 7 jugadores, jugando cooperativamente</plot>
+	</category>
+	<category>
+		<label>1-7 Sim</label>
+		<thumb>kZkomy0.jpg</thumb>
+		<banner>ATV14ey.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>YWogZVa.png</logo>
+		<trailer>GNX3iv8YyMY</trailer>
+		<plot>Juegos con hasta 7 jugadores, simultáneamente</plot>
+	</category>
+	<category>
+		<label>1-7 VS</label>
+		<thumb>nyBbVVZ.jpg</thumb>
+		<banner>UMIM1rs.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>XnJTbCR.png</logo>
+		<trailer>GNX3iv8YyMY</trailer>
+		<plot>Juegos con hasta 7 jugadores, jugando unos contra otros</plot>
+	</category>
+	<category>
+		<label>1-8</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>D5m0EsVzc4U</trailer>
+		<plot>Juegos con hasta 8 jugadores</plot>
+	</category>
+	<category>
+		<label>1-8 Alt</label>
+		<thumb>DxjEQNy.jpg</thumb>
+		<banner>hYsVXMG.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>OK0aE1d.png</logo>
+		<trailer>D5m0EsVzc4U</trailer>
+		<plot>Juegos con hasta 8 jugadores, turnos alternativos</plot>
+	</category>
+	<category>
+		<label>1-8 Co-Op</label>
+		<thumb>aD12K8C.jpg</thumb>
+		<banner>RVqKle3.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>AcZmMnu.png</logo>
+		<trailer>D5m0EsVzc4U</trailer>
+		<plot>Juegos con hasta 8 jugadores, jugando cooperativamente</plot>
+	</category>
+	<category>
+		<label>1-8 Sim</label>
+		<thumb>kZkomy0.jpg</thumb>
+		<banner>ATV14ey.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>YWogZVa.png</logo>
+		<trailer>D5m0EsVzc4U</trailer>
+		<plot>Juegos con hasta 8 jugadores, simultáneamente</plot>
+	</category>
+	<category>
+		<label>1-8 VS</label>
+		<thumb>nyBbVVZ.jpg</thumb>
+		<banner>UMIM1rs.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>XnJTbCR.png</logo>
+		<trailer>D5m0EsVzc4U</trailer>
+		<plot>Juegos con hasta 8 jugadores, jugando unos contra otros</plot>
+	</category>
+	<category>
+		<label>1-9</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>zYWd_vPoiZY</trailer>
+		<plot>Juegos con hasta 9 jugadores</plot>
+	</category>
+	<category>
+		<label>1-9 Alt</label>
+		<thumb>DxjEQNy.jpg</thumb>
+		<banner>hYsVXMG.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>OK0aE1d.png</logo>
+		<trailer>zYWd_vPoiZY</trailer>
+		<plot>Juegos con hasta 9 jugadores, turnos alternativos</plot>
+	</category>
+	<category>
+		<label>1-9 Co-Op</label>
+		<thumb>aD12K8C.jpg</thumb>
+		<banner>RVqKle3.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>AcZmMnu.png</logo>
+		<trailer>zYWd_vPoiZY</trailer>
+		<plot>Juegos con hasta 9 jugadores, jugando cooperativamente</plot>
+	</category>
+	<category>
+		<label>1-9 Sim</label>
+		<thumb>kZkomy0.jpg</thumb>
+		<banner>ATV14ey.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>YWogZVa.png</logo>
+		<trailer>zYWd_vPoiZY</trailer>
+		<plot>Juegos con hasta 9 jugadores, simultáneamente</plot>
+	</category>
+	<category>
+		<label>1-9 VS</label>
+		<thumb>nyBbVVZ.jpg</thumb>
+		<banner>UMIM1rs.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>XnJTbCR.png</logo>
+		<trailer>zYWd_vPoiZY</trailer>
+		<plot>Juegos con hasta 9 jugadores, jugando unos contra otros</plot>
+	</category>
+	<category>
+		<label>1-10</label>
+		<thumb>orx4ugG.jpg</thumb>
+		<banner>BKXiyhQ.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>oh2SuhR.png</logo>
+		<trailer>dLsam0PYTH8</trailer>
+		<plot>Juegos con hasta 10 jugadores</plot>
+	</category>
+	<category>
+		<label>1-10 Alt</label>
+		<thumb>DxjEQNy.jpg</thumb>
+		<banner>hYsVXMG.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>OK0aE1d.png</logo>
+		<trailer>dLsam0PYTH8</trailer>
+		<plot>Juegos con hasta 10 jugadores, turnos alternativos</plot>
+	</category>
+	<category>
+		<label>1-10 Co-Op</label>
+		<thumb>aD12K8C.jpg</thumb>
+		<banner>RVqKle3.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>AcZmMnu.png</logo>
+		<trailer>dLsam0PYTH8</trailer>
+		<plot>Juegos con hasta 10 jugadores, jugando cooperativamente</plot>
+	</category>
+	<category>
+		<label>1-10 Sim</label>
+		<thumb>kZkomy0.jpg</thumb>
+		<banner>ATV14ey.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>YWogZVa.png</logo>
+		<trailer>dLsam0PYTH8</trailer>
+		<plot>Juegos con hasta 10 jugadores, simultáneamente</plot>
+	</category>
+	<category>
+		<label>1-16 Sim</label>
+		<thumb>kZkomy0.jpg</thumb>
+		<banner>ATV14ey.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>YWogZVa.png</logo>
+		<trailer>dLsam0PYTH8</trailer>
+		<plot>Juegos con hasta 16 jugadores, simultáneamente</plot>
+	</category>
+	<category>
+		<label>1-10 VS</label>
+		<thumb>nyBbVVZ.jpg</thumb>
+		<banner>UMIM1rs.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>XnJTbCR.png</logo>
+		<trailer>dLsam0PYTH8</trailer>
+		<plot>Juegos con hasta 10 jugadores, jugando unos contra otros</plot>
+	</category>
+	<category>
+		<label>Desconocido</label>
+		<thumb>UKxz9kq.jpg</thumb>
+		<banner>HKlu7NC.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>LL2Oxqf.png</logo>
+		<plot>Estos juegos tienen un género desconocido o ningún género fue identificado</plot>
+		<trailer>EFhii04Piww</trailer>
+	</category>
+	<category>
+		<label>default</label>
+		<thumb>fYMsybe.jpg</thumb>
+		<banner>pc540fV.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>c3MyKNx.png</logo>
+		<plot/>
+		<trailer>LcCtg1D_RIE</trailer>
+	</category>
+</categories>

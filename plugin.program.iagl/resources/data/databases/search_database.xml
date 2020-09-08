@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<categories>
+	<category>
+		<label>Introducir Título</label>
+		<label2>title</label2>
+		<thumb>T49IGlH.jpg</thumb>
+		<banner>f11tQF4.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>6ZXIJra.png</logo>
+		<trailer>EFhii04Piww</trailer>
+		<plot>Introduce el término de búsqueda para el título del juego</plot>
+	</category>
+	<category>
+		<label>Elige listas de juegos</label>
+		<label2>lists</label2>
+		<thumb>esKYPaC.jpg</thumb>
+		<banner>Xu5TeYa.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>jdD2BmX.png</logo>
+		<trailer>EFhii04Piww</trailer>
+		<plot>Elija qué listas de juegos a incluir en la consulta</plot>
+	</category>
+	<category>
+		<label>Filtrar por Géneros</label>
+		<label2>genre</label2>
+		<thumb>dL13gg6.jpg</thumb>
+		<banner>LnX0GVk.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>455nVkc.png</logo>
+		<trailer>EFhii04Piww</trailer>
+		<plot>Filtrar resultados por género</plot>
+	</category>
+	<category>
+		<label>Filtrar por Jugadores</label>
+		<label2>nplayers</label2>
+		<thumb>weZqC8Q.jpg</thumb>
+		<banner>KF3SEwm.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>LoK1XhT.png</logo>
+		<trailer>EFhii04Piww</trailer>
+		<plot>Filtrar resultados por número de jugadores</plot>
+	</category>
+	<category>
+		<label>Filtrar por Años</label>
+		<label2>year</label2>
+		<thumb>Ip0bAWe.jpg</thumb>
+		<banner>eDjzb88.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>IMCevpi.png</logo>
+		<trailer>EFhii04Piww</trailer>
+		<plot>Filtrar resultados por años</plot>
+	</category>
+	<category>
+		<label>Filtrar por Estudios</label>
+		<label2>studio</label2>
+		<thumb>PoQYeoL.jpg</thumb>
+		<banner>6gv3rmV.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>qBjr6ip.png</logo>
+		<trailer>EFhii04Piww</trailer>
+		<plot>Filtrar resultados por estudio</plot>
+	</category>
+	<category>
+		<label>Introducir Etiqueta</label>
+		<label2>tag</label2>
+		<thumb>sGRorAi.jpg</thumb>
+		<banner>VZ6a1iF.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>GASZPAS.png</logo>
+		<trailer>EFhii04Piww</trailer>
+		<plot>Filtrar resultados por etiqueta del juego</plot>
+	</category>
+	<category>
+		<label>Filtrar por Grupos</label>
+		<label2>groups</label2>
+		<thumb>yzczo2u.jpg</thumb>
+		<banner>JcOf9ym.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>Z4Ptsmv.png</logo>
+		<trailer>EFhii04Piww</trailer>
+		<plot>Filtrar resultados por grupos personalizados</plot>
+	</category>
+	<category>
+		<label>[COLOR FFC40300]Ejecutar búsqueda aleatoria[/COLOR]</label>
+		<label2>execute</label2>
+		<thumb>cyDWi3B.jpg</thumb>
+		<banner>jOdzRsq.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>B2CXrhk.png</logo>
+		<trailer>vScJLw_a5RM</trailer>
+		<plot>Ejecuta tu búsqueda aleatoria[CR]</plot>
+	</category>
+	<category>
+		<label>[COLOR FFC40300]Crear enlace de búsqueda[/COLOR]</label>
+		<label2>execute_link</label2>
+		<thumb>cyDWi3B.jpg</thumb>
+		<banner>jOdzRsq.jpg</banner>
+		<fanart>G5PYNPY.jpg</fanart>
+		<logo>B2CXrhk.png</logo>
+		<trailer>vScJLw_a5RM</trailer>
+		<plot>Genera un elemento de búsqueda aleatoria enlazable[CR]</plot>
+	</category>
+</categories>

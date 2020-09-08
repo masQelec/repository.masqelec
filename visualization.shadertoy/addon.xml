@@ -9,7 +9,9 @@
   <extension point="xbmc.addon.metadata">
     <summary lang="en">Visualisations from Shadertoy</summary>
     <description lang="en">This music visualization is based on Shadertoy based GPU programs.</description>
-    <platform/>
+    <summary lang="es">Visualización de Shadertoy</summary>
+    <description lang="es">Esta visualización de música se basa en programas de GPU basados ​​en Shadertoy.</description>
+	<platform/>
     <assets>
       <icon>resources/icon.png</icon>
       <fanart>resources/fanart.jpg</fanart>
