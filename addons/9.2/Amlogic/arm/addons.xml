@@ -4817,7 +4817,7 @@ v1.9.0 (2020-09-06)
 
 </addon>
 
-<addon id="plugin.video.youtube" name="YouTube" version="6.8.3" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.8.4~beta2" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -4831,13 +4831,10 @@ v1.9.0 (2020-09-06)
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fix] playback of some videos
-[fix] notifications for some languages |contrib: Mutronics|
-[fix] fix rating videos causing and error even though it succeeded
-[upd] cache javascript player url for 4 hours, reduces http requests per play by 1
-[upd] use new settings format on Kodi 19
-[lang] el_gr strings |contrib: twilight0|
-[lang] hu_hu strings |contrib: thelacesz|
+[fix] next page now ignores sorting, remains at the end of the directory
+[fix] searching, no longer require remote safe search
+[fix] notifications for some languages
+[chg] only log http server ping failures
         </news>
         <assets>
             <icon>icon.png</icon>
