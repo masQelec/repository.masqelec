@@ -46,7 +46,7 @@ rename_old = True  # will rename older zip files in output directory
 copy_additional = True  # will copy additional files such as changelog.txt, icon.png, fanart.jpg
 replace_ampersand = True  # will replace solo ampersands (&) with &amp; in order to pass xml validation
 compress = True  # Setting this to True will compress with ZIP_DEFLATED method, if False it will use ZIP_STORED
-ignored_dirs = ['.git', '.idea', '__MACOSX', '.svn', '.github', 'tests', 'packages', 'LICENSES', 'packages', 'docs', output_path, tools_path]
+ignored_dirs = ['.git', '.idea', '__MACOSX', '.svn', '.github', 'tests', 'LICENSES', 'docs', output_path, tools_path]
 ignored_files = ['.gitignore', '.gitattributes', '.codeclimate.yml', '.editorconfig', '.flake8', '.pylintrc', 'codecov.yml', 'tox.ini', 'Makefile', '_config.yml']
 
 class Generator:
