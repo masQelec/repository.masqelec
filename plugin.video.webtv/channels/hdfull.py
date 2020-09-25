@@ -44,7 +44,8 @@ def do_downloadpage(url, post=None):
     url = url.replace('hdfull.io', 'hdfull.lv') # por si viene de enlaces guardados
     url = url.replace('hdfull.la', 'hdfull.lv') # por si viene de enlaces guardados
     # ~ data = httptools.downloadpage(url, post=post, headers={'Referer': host, 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0'}).data
-    data = httptools.downloadpage(url, post=post, headers={'Referer': host, 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X)'}).data
+    # ~ data = httptools.downloadpage(url, post=post, headers={'Referer': host, 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X)'}).data
+    data = httptools.downloadpage(url, post=post, headers={'Referer': host}).data
     # ~ data = httptools.downloadpage_proxy('hdfull', url, post=post).data
     return data
 

@@ -3,7 +3,7 @@
 # WebTV - Buscador global
 # ------------------------------------------------------------
 
-import time
+import os, time
 from threading import Thread
 
 from platformcode import config, logger, platformtools
@@ -12,15 +12,20 @@ from core.item import Item
 from core import channeltools
 
 
-
 def mainlist(item):
     logger.info()
     itemlist = []
 
+    thumb_filmaffinity = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'filmaffinity.jpg')
+    thumb_tmdb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'tmdb.png')
+
     item.category = 'Buscar'
-    
-    itemlist.append(item.clone( channel='tmdblists', action='mainlist', title='Listas y búsquedas en TMDB', thumbnail=config.get_thumb('bookshelf'),
+
+    itemlist.append(item.clone( channel='tmdblists', action='mainlist', title='Listas y búsquedas en TMDB', thumbnail=thumb_tmdb,
                                 plot = 'Buscar personas y ver listas de películas y series de la base de datos de The Movie Database' ))
+
+    itemlist.append(item.clone( channel='filmaffinitylists', action='mainlist', title='Listas en Filmaffinity', thumbnail=thumb_filmaffinity,
+                                plot = 'Ver listas de películas, series, documentales y otros de Filmaffinity' ))
 
     itemlist.append(item.clone( action='search', search_type='movie', title='Buscar Película ...', thumbnail=config.get_thumb('movie'),
                                 plot = 'Escribir el nombre de una película para buscarla en los canales de películas' ))
@@ -53,7 +58,6 @@ def show_help(item):
     return True
 
 
-
 def search(item, tecleado):
     logger.info()
 
@@ -76,11 +80,11 @@ def do_search_channel(item, tecleado, ch):
 def do_search(item, tecleado):
     itemlist = []
     # De item se usa .search_type y .from_channel
-    
+
     multithread = config.get_setting('search_multithread', default=True)
     threads = []
     search_limit_by_channel = config.get_setting('search_limit_by_channel', default=2)
-    
+
     progreso = platformtools.dialog_progress('Buscando '+tecleado, '...')
 
     # Seleccionar los canales dónde se puede buscar
@@ -94,7 +98,7 @@ def do_search(item, tecleado):
     if item.search_type == 'all': # descartar documentary cuando 'all'
         ch_list = [ch for ch in ch_list if 'documentary' not in ch['categories']]
     num_canales = float(len(ch_list)) # float para calcular porcentaje
-    
+
     # Hacer la búsqueda en cada canal
     # -------------------------------
     for i, ch in enumerate(ch_list):
@@ -163,7 +167,7 @@ def do_search(item, tecleado):
                     titulo = 'Cancelado antes de buscar en '+ch['name']
                 else:
                     titulo = 'No se puede buscar en '+ch['name']
-            
+
             titulo = '[B][COLOR %s]%s[/COLOR][/B]' % (color, titulo)
             itemlist.append(Item( channel=ch['id'], action='search', buscando=tecleado, title=titulo, thumbnail=ch['thumbnail'], search_type=item.search_type ))
             if 'itemlist_search' in ch:

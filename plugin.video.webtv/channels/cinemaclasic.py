@@ -170,7 +170,7 @@ def extraer_embeds(data):
     itemlist = []
 
     for tipo in ['iframe', 'source']:
-        matches = scrapertools.find_multiple_matches(data, '<%s.*? src="([^"]+)' % tipo)
+        matches = scrapertools.find_multiple_matches(data, '(?i)<%s.*? src=(?:"|\')([^"\']+)' % tipo)
         for url in matches:
             if 'facebook.com' in url or 'twitter.com' in url or 'google.com' in url: continue
             if '.us.archive.org' in url: servidor = 'directo'

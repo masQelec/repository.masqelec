@@ -8,7 +8,13 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
     
-    page_url = page_url.replace('/d/','/e/')
+    if '/d/' in page_url:
+        data = httptools.downloadpage(page_url).data
+        # ~ logger.debug(data)
+        aux = scrapertools.find_single_match(data, '<iframe src="/e/([^"]+)')
+        if aux: page_url = 'https://doodstream.com/e/' + aux
+        else: page_url = page_url.replace('/d/','/e/')
+
 
     data = httptools.downloadpage(page_url).data
     # ~ logger.debug(data)

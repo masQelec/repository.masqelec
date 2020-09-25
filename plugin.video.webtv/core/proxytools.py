@@ -157,10 +157,11 @@ def _buscar_proxies(canal, url):
             proxies.append(prox+':'+puerto)
 
     elif provider == 'proxyservers.pro':
-        url_provider = 'https://es.proxyservers.pro/proxy/list'
+        url_provider = 'https://es.proxyservers.pro/proxy/list?__path2query_param__='
+        url_provider += '/protocol/' + ('https' if url.startswith('https') else 'http')
         if tipo_proxy != '': url_provider += '/anonymity/' + tipo_proxy
         if pais_proxy != '': url_provider += '/country/' + pais_proxy
-        url_provider += '/protocol/' + ('https' if url.startswith('https') else 'http')
+        url_provider += '/order/updated/order_dir/desc/page/1'
 
         resp = httptools.downloadpage(url_provider, raise_weberror=False)
         # ~ logger.debug(resp.data)

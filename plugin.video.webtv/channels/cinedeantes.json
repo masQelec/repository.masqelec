@@ -1,0 +1,15 @@
+{
+  "id": "cinedeantes",
+  "name": "CineDeAntes",
+  "thumbnail": "cinedeantes.png",
+
+  "active": true,
+
+  "searchable": false,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast"],
+
+  "notes": "Películas clásicas por categorias."
+}

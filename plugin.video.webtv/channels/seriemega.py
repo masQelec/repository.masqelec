@@ -53,7 +53,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone ( title = 'Últimas películas', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
+    # ~ itemlist.append(item.clone ( title = 'Últimas películas', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -67,7 +67,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone ( title = 'Últimas series', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
+    # ~ itemlist.append(item.clone ( title = 'Últimas series', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -164,6 +164,7 @@ def temporadas(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    logger.debug(data)
 
     matches = re.compile(' data-tab="(\d+)"', re.DOTALL).findall(data)
     for numtempo in matches:
