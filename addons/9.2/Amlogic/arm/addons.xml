@@ -5080,7 +5080,7 @@ Supports up to 8 players and features like pushing bombs, remote controls and ka
   </extension>
 </addon>
 
-<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="1.0.101" provider-name="Team CoreELEC">
+<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="1.0.102" provider-name="Team CoreELEC">
   <requires><import addon="xbmc.python" version="2.1.0"/>
 
   </requires>
