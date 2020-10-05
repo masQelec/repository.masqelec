@@ -237,6 +237,37 @@ msgctxt "#30057"
 msgid "Choose a backup to restore"
 msgstr "Seleccione una copia de seguridad a restaurar"
 
+msgctxt "#30058"
+msgid "Time remaining: {mins:d}:{secs:02d}"
+msgstr "Tiempo restante: {mins:d}:{secs:02d}"
+
+msgctxt "#30059"
+msgid "Meanwhile, should we try extracting Widevine CDM using the legacy method?"
+msgstr "Mientras tanto, ¿deberíamos intentar extraer Widevine CDM utilizando el método heredado?"
+
+msgctxt "#30060"
+msgid "Identifying wanted partition..."
+msgstr "Identificando la partición deseada..."
+
+msgctxt "#30061"
+msgid "Scanning the filesystem for the Widevine CDM..."
+msgstr "Escaneando el sistema de archivos para el CDM de Widevine..."
+
+msgctxt "#30062"
+msgid "Widevine CDM found, analyzing..."
+msgstr "Widevine CDM encontrado, analizando..."
+
+msgctxt "#30063"
+msgid "Could not make the request. Your internet may be down."
+msgstr "No se pudo realizar la solicitud. Tu internet puede estar caído."
+
+msgctxt "#30064"
+msgid "Could not finish the download."
+msgstr "No se pudo finalizar la descarga."
+
+msgctxt "#30065"
+msgid "Shall we try again?"
+msgstr "¿Lo intentaremos de nuevo?"
 
 ### INFORMATION DIALOG
 msgctxt "#30800"
