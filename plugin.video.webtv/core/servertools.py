@@ -383,6 +383,7 @@ def corregir_servidor(servidor):
     elif servidor in ['jplayer', 'feurl']: return 'fembed'
     elif servidor in ['google', 'google drive', 'gdrive']: return 'gvideo'
     elif servidor in ['vidto','vidtodoo','vixtodo']: return 'vidtodo'
+    elif servidor == 'streamzz': return 'streamz'
     elif servidor == 'vev': return 'vevio'
     elif servidor == 'v-s': return 'vsmobi'
     elif servidor == 'dood': return 'doodstream'

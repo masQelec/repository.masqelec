@@ -1,6 +1,10 @@
 WebTV changelog
 ==================
 
+1.4.21:
+    Canales modificados: Hdfull, Pepecine, Seriemega, Cuevana3, Seriesflix.
+    Servidores modificados: Upstream, Vup, Playtube, Gloria, Streamz.
+
 1.4.20:
     Nuevos canales: Estrenoscinesaa, Peliculasflix, Seriesflix, Repelis, Movidy.
     Canales modificados: Torrentdivx, Newpct1, Cinemaclasic, Tucineclasico, Dospelis, 

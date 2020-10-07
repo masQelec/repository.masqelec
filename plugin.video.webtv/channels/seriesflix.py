@@ -5,7 +5,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 import re
 
-host = 'https://seriesflix.co/'
+host = 'https://seriesflix.to/'
 
 perpage = 24 # preferiblemente un múltiplo de los elementos que salen en la web (6x8=48) para que la subpaginación interna no se descompense
 
@@ -196,9 +196,16 @@ def play(item):
     url = scrapertools.find_single_match(data, 'src="([^"]+)"')
 
     if '/flixplayer.' in url:
-       data = httptools.downloadpage(url).data
-       # ~ logger.debug(data)
-       url = scrapertools.find_single_match(data, 'link":"([^"]+)"')
+        data = httptools.downloadpage(url).data
+        # ~ logger.debug(data)
+        url = scrapertools.find_single_match(data, 'link":"([^"]+)"')
+
+    elif host in url and '?h=' in url:
+        fid = scrapertools.find_single_match(url, "h=([^&]+)")
+        url2 = url.split('?h=')[0] + 'r.php'
+        resp = httptools.downloadpage(url2, post='h='+fid, headers={'Referer': url}, follow_redirects=False)
+        if 'location' in resp.headers: url = resp.headers['location']
+        else: url = None
 
     if url:
         servidor = servertools.get_server_from_url(url)

@@ -167,6 +167,13 @@ def play(item):
        # ~ logger.debug(data)
        url = scrapertools.find_single_match(data, 'link":"([^"]+)"')
 
+    elif host in url and '?h=' in url:
+        fid = scrapertools.find_single_match(url, "h=([^&]+)")
+        url2 = url.split('?h=')[0] + 'r.php'
+        resp = httptools.downloadpage(url2, post='h='+fid, headers={'Referer': url}, follow_redirects=False)
+        if 'location' in resp.headers: url = resp.headers['location']
+        else: url = None
+
     if url:
         servidor = servertools.get_server_from_url(url)
         # ~ if servidor and servidor != 'directo': # descartado pq puede ser 'directo' si viene de flixplayer

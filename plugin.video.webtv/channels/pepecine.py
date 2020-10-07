@@ -7,25 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, jsontools, tmdb
 
 
-# ~ f_y_m
-# http://  https://  pepecine.net    www.pepecine.net   Redirecionan a la vigente
-
-# http://  https://  pepecine.com    www.pepecine.com
-# http://  https://  pepecine.me     www.pepecine.me
-# http://  https://  pepecine.to     www.pepecine.to
-# http://  https://  pepecine.tv     www.pepecine.tv
-# http://  https://  pepecinehd.com  www.pepecinehd.com
-# http://  https://  pepecinehd.tv   www.pepecinehd.tv
-# http://  https://  verencasa.com   www.verencasa.com
-
 host = 'https://verencasa.com'
-
-host_change_pral = 'pepecine.tv'
-
-host_change_last = 'verencasa.com'
-host_change_list = 'pepecine.tv'
-
-referer = 'https://pepecine.to'
 
 ruta_pelis  = '/browse?type=movie'
 ruta_series = '/browse?type=series'
@@ -42,70 +24,18 @@ ruta_series = '/browse?type=series'
 
 
 def do_downloadpage(url, post=None):
-    # ~ f_y_m
     headers = {}
-    headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0'
+    headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36'
+    headers['Referer'] = 'https://pepecine.to/'
 
-    # Solo para Últimas películas y Series
-    if '/last/' in url:
-        refer_last = host + '/'
-        refer_last = refer_last.replace('verencasa.com', host_change_pral)
-        headers['Referer'] = refer_last
-
-        if 'verencasa' in url:
-            url = url.replace('verencasa.com', host_change_last)
-        elif 'pepecinehd' in url:
-            url = url.replace('pepecinehd.com', host_change_last)
-        else:
-            url = url.replace('pepecine.to', host_change_last)
-            url = url.replace('pepecine.tv', host_change_last)
-
-    # Solo para Listas de películas y Series
-    elif '/secure/lists/' in url:
-        refer_list = url.replace('/secure/lists/', '/lists/')
-        refer_list = refer_list.replace('.php', '')
-        refer_list = refer_list.replace('?sortBy=pivot.order&sortDir=asc', '')
-
-        refer_list = refer_list.replace('verencasa.com', host_change_list)
-        headers['Referer'] = refer_list.replace('pepecine.tv', 'pepecine.to')
-
-        if 'verencasa' in url:
-            url = url.replace('verencasa.com', host_change_list)
-        elif 'pepecinehd' in url:
-            url = url.replace('pepecinehd.com', host_change_list)
-        else:
-            url = url.replace('pepecine.to', host_change_list)
-            url = url.replace('pepecine.tv', host_change_list)
-
-        if not 'verencasa' in url: url = url.replace('.php', '')
-
-    # Solo para Búsquedas
-    elif '/secure/search/' in url:
-        headers['Referer'] = referer
-        # ~ url = url # => 403
-        # ~ url = url.replace('verencasa.com', host_change_pral) # => 403
-        # ~ url = url.replace(host, referer) # => 503
-
+    if '/secure/search/' in url: 
+        url = url.replace('verencasa.com', 'pepecine.tv')
+        timeout = config.get_setting('httptools_timeout', default=15)
     else:
-        # ~ por si viene de enlaces guardados
-        headers['Referer'] = referer
-
-        if 'verencasa' in url:
-            url = url.replace('verencasa.com', host_change_pral)
-        elif 'pepecinehd' in url:
-            url = url.replace('pepecinehd.com', host_change_pral)
-        else:
-            url = url.replace('pepecine.to', host_change_pral)
-            url = url.replace('pepecine.tv', host_change_pral)
-
-        if '/secure/titles?' in url:
-            headers['Referer'] = referer
-        else:
-            url = url.replace(host_change_pral, host_change_last)
-            headers['Referer'] =  referer + '/'
+        timeout = 30 # timeout ampliado pq el primer acceso puede tardar en responder
 
     # ~ data = httptools.downloadpage_proxy('pepecine', url, post=post, headers=headers).data
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     return data
 

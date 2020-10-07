@@ -193,7 +193,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
     
-    IDIOMAS = {'spanish':'Esp', 'vose':'VOSE'}
+    IDIOMAS = {'spanish':'Esp', 'vose':'VOSE', 'latino':'Lat'}
 
     data = httptools.downloadpage(item.url).data
     # ~ logger.debug(data)
@@ -227,7 +227,7 @@ def findvideos(item):
                 continue
                 
             tds = scrapertools.find_multiple_matches(enlace, '<td>(.*?)</td>')
-            lang = tds[1].lower()
+            lang = tds[1].lower().replace('.','')
             other = 'hace ' + tds[3]
             # ~ other += ', ' + tipo
 

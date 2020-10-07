@@ -9,9 +9,8 @@ from core import httptools, scrapertools, jsontools, servertools, tmdb
 # ~ host = "https://hdfull.tv"
 # ~ host = "https://hdfull.me"
 # ~ host = "https://hdfull.io"
-# ~ host = "https://hdfull.la"
-
-host = "https://hdfull.lv"
+# ~ host = "https://hdfull.lv"
+host = "https://hdfull.la"
 
 perpage = 20 # preferiblemente un múltiplo de los elementos que salen en la web (40) para que la subpaginación interna no se descompense
 
@@ -38,14 +37,18 @@ perpage = 20 # preferiblemente un múltiplo de los elementos que salen en la web
     # ~ from core import proxytools
     # ~ return proxytools.configurar_proxies_canal(item.channel, host)
 
-def do_downloadpage(url, post=None):
-    url = url.replace('hdfull.tv', 'hdfull.lv') # por si viene de enlaces guardados
-    url = url.replace('hdfull.me', 'hdfull.lv') # por si viene de enlaces guardados
-    url = url.replace('hdfull.io', 'hdfull.lv') # por si viene de enlaces guardados
-    url = url.replace('hdfull.la', 'hdfull.lv') # por si viene de enlaces guardados
-    # ~ data = httptools.downloadpage(url, post=post, headers={'Referer': host, 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0'}).data
+def do_downloadpage(url, post=None, referer=None):
+    url = url.replace('hdfull.tv', 'hdfull.la') # por si viene de enlaces guardados
+    url = url.replace('hdfull.me', 'hdfull.la') # por si viene de enlaces guardados
+    url = url.replace('hdfull.io', 'hdfull.la') # por si viene de enlaces guardados
+    url = url.replace('hdfull.lv', 'hdfull.la') # por si viene de enlaces guardados
+    if not referer: referer = host
+    # ~ if not referer: referer = host+'/peliculas-actualizadas'
+
+    # ~ data = httptools.downloadpage(url, post=post, headers={'Referer': host}).data
     # ~ data = httptools.downloadpage(url, post=post, headers={'Referer': host, 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X)'}).data
-    data = httptools.downloadpage(url, post=post, headers={'Referer': host}).data
+    data = httptools.downloadpage(url, post=post, headers={'Referer': referer, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36'}).data
+
     # ~ data = httptools.downloadpage_proxy('hdfull', url, post=post).data
     return data
 
@@ -219,11 +222,11 @@ def temporadas(item):
         titulo = title
         if retitle != title: titulo += ' - ' + retitle
 
-        itemlist.append(item.clone( action='episodios', url=url, title=titulo, thumbnail=thumb, sid=sid,
+        itemlist.append(item.clone( action='episodios', url=url, title=titulo, thumbnail=thumb, sid=sid, referer=item.url,
                                     contentType='season', contentSeason=numtempo ))
 
     if len(itemlist) == 0: # Alguna serie de una sola temporada que no la tiene identificada
-        itemlist.append(item.clone( action='episodios', url=item.url+'/temporada-1', title='Temporada 1', sid=sid,
+        itemlist.append(item.clone( action='episodios', url=item.url+'/temporada-1', title='Temporada 1', sid=sid, referer=item.url,
                                     contentType='season', contentSeason=1 ))
 
     tmdb.set_infoLabels(itemlist)
@@ -242,11 +245,12 @@ def episodios(item):
         if not item.sid: return itemlist
 
     post = 'action=season&show=%s&season=%s' % (item.sid, item.contentSeason)
-    data = jsontools.load(do_downloadpage(host + '/a/episodes', post=post))
+    data = jsontools.load(do_downloadpage(host + '/a/episodes', post=post, referer=item.referer))
     # ~ logger.debug(data)
 
     for epi in data:
-        tit = epi['title']['es'] if 'es' in epi['title'] and epi['title']['es'] != '' else epi['title']['en'] if 'en' in epi['title'] else ''
+        logger.debug(epi)
+        tit = epi['title']['es'] if 'es' in epi['title'] and epi['title']['es'] else epi['title']['en'] if 'en' in epi['title'] and epi['title']['en'] else ''
         titulo = '%sx%s %s' % (epi['season'], epi['episode'], tit)
 
         langs = ['VOSE' if idio == 'ESPSUB' else idio.capitalize() for idio in epi['languages']]
@@ -344,7 +348,7 @@ def list_episodes(item):
     if not item.desde: item.desde = 0
 
     post = 'action=%s&start=%d&limit=%d&elang=ALL' % (item.opcion, item.desde, perpage)
-    data = jsontools.load(do_downloadpage(host + '/a/episodes', post=post))
+    data = jsontools.load(do_downloadpage(host + '/a/episodes', post=post, referer=host+'episodios'))
     # ~ logger.debug(data)
 
     for epi in data:
