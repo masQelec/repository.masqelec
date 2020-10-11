@@ -7,10 +7,9 @@ from culrcscrapers.genius import lyricsScraper as lyricsScraper_genius
 from culrcscrapers.gomaudio import lyricsScraper as lyricsScraper_gomaudio
 from culrcscrapers.lyricscom import lyricsScraper as lyricsScraper_lyricscom
 from culrcscrapers.lyricsmode import lyricsScraper as lyricsScraper_lyricsmode
-from culrcscrapers.lyricwiki import lyricsScraper as lyricsScraper_lyricwiki
 from culrcscrapers.minilyrics import lyricsScraper as lyricsScraper_minilyrics
 from culrcscrapers.music163 import lyricsScraper as lyricsScraper_music163
-from culrcscrapers.ttplayer import lyricsScraper as lyricsScraper_ttplayer
+from culrcscrapers.syair import lyricsScraper as lyricsScraper_syair
 
 FAILED = []
 
@@ -36,7 +35,7 @@ def test_scrapers():
         return
 
     # test darklyrics
-    dialog.update(10, LANGUAGE(32163) % 'darklyrics')
+    dialog.update(11, LANGUAGE(32163) % 'darklyrics')
     log('==================== darklyrics ====================')
     song = Song('Neurosis', 'Lost')
     st = time.time()
@@ -53,7 +52,7 @@ def test_scrapers():
         return
 
     # test genius
-    dialog.update(20, LANGUAGE(32163) % 'genius')
+    dialog.update(22, LANGUAGE(32163) % 'genius')
     log('==================== genius ====================')
     song = Song('Maren Morris', 'My Church')
     st = time.time()
@@ -70,7 +69,7 @@ def test_scrapers():
         return
 
     # test gomaudio
-    dialog.update(30, LANGUAGE(32163) % 'gomaudio')
+    dialog.update(33, LANGUAGE(32163) % 'gomaudio')
     log('==================== gomaudio ====================')
     song = Song('Lady Gaga', 'Just Dance')
     st = time.time()
@@ -87,7 +86,7 @@ def test_scrapers():
         return
 
     # test lyricscom
-    dialog.update(40, LANGUAGE(32163) % 'lyricscom')
+    dialog.update(44, LANGUAGE(32163) % 'lyricscom')
     log('==================== lyricscom ====================')
     song = Song('Blur', 'You\'re So Great')
     st = time.time()
@@ -104,7 +103,7 @@ def test_scrapers():
         return
 
     # test lyricsmode
-    dialog.update(50, LANGUAGE(32163) % 'lyricsmode')
+    dialog.update(55, LANGUAGE(32163) % 'lyricsmode')
     log('==================== lyricsmode ====================')
     song = Song('Maren Morris', 'My Church')
     st = time.time()
@@ -120,25 +119,8 @@ def test_scrapers():
     if dialog.iscanceled():
         return
 
-    # test lyricwiki
-    dialog.update(60, LANGUAGE(32163) % 'lyricwiki')
-    log('==================== lyricwiki ====================')
-    song = Song('Maren Morris', 'My Church')
-    st = time.time()
-    lyrics = lyricsScraper_lyricwiki.LyricsFetcher().get_lyrics(song)
-    ft = time.time()
-    tt = ft - st
-    TIMINGS.append(['lyricwiki',tt])
-    if lyrics:
-        log(lyrics.lyrics)
-    else:
-        FAILED.append('lyricwiki')
-        log('FAILED: lyricwiki')
-    if dialog.iscanceled():
-        return
-
     # test minilyrics
-    dialog.update(70, LANGUAGE(32163) % 'minilyrics')
+    dialog.update(66, LANGUAGE(32163) % 'minilyrics')
     log('==================== minilyrics ====================')
     song = Song('Chicago', 'Stay The Night')
     st = time.time()
@@ -155,7 +137,7 @@ def test_scrapers():
         return
 
     # test music163
-    dialog.update(80, LANGUAGE(32163) % 'music163')
+    dialog.update(77, LANGUAGE(32163) % 'music163')
     log('==================== music163 ====================')
     song = Song('Chicago', 'Stay The Night')
     st = time.time()
@@ -171,20 +153,20 @@ def test_scrapers():
     if dialog.iscanceled():
         return
 
-    # test ttplayer
-    dialog.update(90, LANGUAGE(32163) % 'ttplayer')
-    log('==================== ttplayer ====================')
-    song = Song('Abba', 'Elaine')
+    # test syair
+    dialog.update(88, LANGUAGE(32163) % 'syair')
+    log('==================== syair ====================')
+    song = Song('Madonna', 'Crazy For You')
     st = time.time()
-    lyrics = lyricsScraper_ttplayer.LyricsFetcher().get_lyrics(song)
+    lyrics = lyricsScraper_syair.LyricsFetcher().get_lyrics(song)
     ft = time.time()
     tt = ft - st
-    TIMINGS.append(['ttplayer',tt])
+    TIMINGS.append(['syair',tt])
     if lyrics:
         log(lyrics.lyrics)
     else:
-        FAILED.append('ttplayer')
-        log('FAILED: ttplayer')
+        FAILED.append('syair')
+        log('FAILED: syair')
     if dialog.iscanceled():
         return
 

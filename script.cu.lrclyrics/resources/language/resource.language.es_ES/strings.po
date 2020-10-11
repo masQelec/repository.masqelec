@@ -208,10 +208,3 @@ msgstr "Ajuste de tiempo para letras sincronizadas"
 msgctxt "#32167"
 msgid "Delete lyrics"
 msgstr "Borrar letra"
-
-#empty strings from id 32168 to 32198
-#Skin labels
-
-msgctxt "#32199"
-msgid "CU LRC Lyrics"
-msgstr ""

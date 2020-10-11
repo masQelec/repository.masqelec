@@ -1,3 +1,18 @@
+v5.8.3
+- add syair scraper
+- fix darklyrics scraper
+
+v5.8.2
+- remove broken lyricwiki scraper
+
+v5.8.1
+- use single monitor class
+
+v5.8.0
+- fix genius scrapers
+- remove broken scrapers
+- remove thread locking
+
 v5.7.4
 - fix osd would interfere with getlines
 
