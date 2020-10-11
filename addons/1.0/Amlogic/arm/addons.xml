@@ -1454,6 +1454,81 @@ Support for this is provided by ISO/IEC 23008-12:2017 compliant libheif.</descri
   </extension>
 </addon>
 
+<addon id="plugin.video.youtube" name="YouTube" version="6.8.5" provider-name="anxdpanic, bromix">
+    <requires>
+        <import addon="xbmc.python" version="2.20.0"/>
+        <import addon="script.module.six" version="1.11.0"/>
+        <import addon="script.module.requests" version="2.12.4"/>
+        <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.service" library="resources/lib/startup.py" start="login"/>
+    <extension point="xbmc.python.module" library="resources/lib/"/>
+    <extension point="xbmc.addon.metadata">
+        <news>
+[fix] playback of purchased movies |contrib: MisterD81|
+[fix] notifications for some languages on Kodi 19
+[fix] searching for some languages
+[fix] loading on some versions of python 3
+[fix] some videos failing to play with an Invalid URL exception
+[upd] use xbmcvfs.translatePath if available, clean up for Kodi 19
+        </news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+        <summary lang="en_GB">Plugin for YouTube</summary>
+        <description lang="en_GB">YouTube is one of the biggest video-sharing websites of the world.</description>
+        <disclaimer lang="en_GB">This plugin is not endorsed by Google</disclaimer>
+        <summary lang="he_IL">תוסף עבור YouTube</summary>
+        <description lang="he_IL">YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם.</description>
+        <summary lang="de_DE">Plugin für YouTube</summary>
+        <description lang="de_DE">YouTube ist eines der größten Video-Sharing-Websites der Welt.</description>
+        <summary lang="pl_PL">Wtyczka YouTube</summary>
+        <description lang="pl_PL">YouTube jest jednym z największych na świecie serwisów udostępniania wideo.</description>
+        <summary lang="hu_HU">YouTube kiegészítő</summary>
+        <description lang="hu_HU">A YouTube világ egyik legnagyobb videómegosztó weboldala.</description>
+        <summary lang="es_ES">Plugin para YouTube</summary>
+        <description lang="es_ES">YouTube es uno de los sitios web más grande del mundo para compartir vídeos.</description>
+        <disclaimer lang="es_ES">Este add-on no está respaldado por Google</disclaimer>
+        <summary lang="es_MX">Plugin para YouTube</summary>
+        <description lang="es_MX">YouTube es uno de los más grandes sitios web de intercambio de videos del mundo.</description>
+        <disclaimer lang="es_MX">Este add-on no está respaldado por Google</disclaimer>
+        <summary lang="ru_RU">Видеодополнение YouTube</summary>
+        <description lang="ru_RU">YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео.</description>
+        <summary lang="fr_FR">Plugin pour YouTube</summary>
+        <description lang="fr_FR">YouTube est l'un des plus grands sites de partage vidéos du monde.</description>
+        <summary lang="zh_CN">YouTube附加元件</summary>
+        <description lang="zh_CN">「Youtube」是全世界最大的影片分享網站</description>
+        <summary lang="zh_TW">YouTube附加元件</summary>
+        <description lang="zh_TW">「Youtube」是全世界最大的影片分享網站</description>
+        <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
+        <summary lang="bg_BG">Добавка за YouTube</summary>
+        <description lang="bg_BG">YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят.</description>
+        <summary lang="el_GR">Πρόσθετο YouTube</summary>
+        <description lang="el_GR">Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο.</description>
+        <disclaimer lang="el_GR">Η παρούσα μικροεφαρμογή δεν έχει υϊοθετηθεί από την Google</disclaimer>
+        <summary lang="nb_NO">Tillegg for YouTube</summary>
+        <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>
+        <summary lang="ko_KR">유튜브 플러그인</summary>
+        <description lang="ko_KR">유튜브는 세상에서 가장 큰 동영상 공유 사이트 중의 하나입니다.</description>
+        <summary lang="cs_CZ">Plugin pro YouTube</summary>
+        <description lang="cs_CZ">YouTube je jedna z největších webových stránek světa sdílející video.</description>
+        <disclaimer lang="cs_CZ">Tento plugin není schválen společností Google</disclaimer>
+        <summary lang="tr_TR">YouTube için eklenti</summary>
+        <description lang="tr_TR">YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir</description>
+        <disclaimer lang="tr_TR">Bu eklenti Google tarafından üretilmemiştir</disclaimer>
+        <platform>all</platform>
+        <license>GPL-2.0-only</license>
+        <forum>https://ytaddon.page.link/forum</forum>
+        <website>https://www.youtube.com</website>
+        <source>https://github.com/anxdpanic/plugin.video.youtube</source>
+        <reuselanguageinvoker>true</reuselanguageinvoker>
+    </extension>
+</addon>
+
 <addon id="script.module.six"
        name="six"
        version="1.13.0"
@@ -4558,6 +4633,103 @@ This bundle currently includes bchunk, ecm-tools, iat, and linuxconsoletools
   </extension>
 </addon>
 
+<addon id="plugin.video.netflix" name="Netflix" version="1.9.1" provider-name="libdev + jojo + asciidisco + caphm + castagnait">
+  <requires>
+    <import addon="xbmc.python" version="2.26.0"/>
+    <import addon="script.module.addon.signals" version="0.0.3"/>
+    <import addon="script.module.future" version="0.17.1"/>
+    <import addon="script.module.inputstreamhelper" version="0.3.3"/>
+    <import addon="script.module.pycryptodome" version="3.4.3"/>
+    <import addon="script.module.requests" version="2.12.4"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py"/>
+  <extension point="xbmc.python.module" library="packages/mysql-connector-python"/>
+  <extension point="xbmc.addon.metadata">
+    <reuselanguageinvoker>true</reuselanguageinvoker>
+    <summary lang="cs_CZ">Netflix</summary>
+    <description lang="cs_CZ">Plugin pro sledování filmů, seriálů online z Netflixu</description>
+    <disclaimer lang="cs_CZ">Použití tohoto doplňku nemusí být ve vaší zemi pobytu legální - před instalací dbejte na vaše zákony.</disclaimer>
+    <summary lang="de_DE">Netflix</summary>
+    <description lang="de_DE">Addon für Netflix VOD-Dienste</description>
+    <disclaimer lang="de_DE">Möglicherweise ist die Verwendung dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen.</disclaimer>
+    <summary lang="en_GB">Netflix</summary>
+    <description lang="en_GB">Netflix VOD Services Add-on</description>
+    <disclaimer lang="en_GB">The use of this add-on may not be legal in your country of residence - please check with your local laws before installing.</disclaimer>
+    <summary lang="el_GR">Νέτφλιξ</summary>
+    <description lang="el_GR">Πρόσθετο υπηρεσιών κατά παραγγελία του Νέτφλιξ</description>
+    <disclaimer lang="el_GR">Η χρήση αυτού του προσθέτου μπορεί να μην είναι νόμιμη στην χώρα που κατοικείτε - παρακαλώ ελέγξτε τους τοπικούς νόμους πριν την εγκατάσταση.</disclaimer>
+    <summary lang="nl_NL">Netflix</summary>
+    <description lang="nl_NL">Bekijk Netflix films en tvprogramma's in Kodi.</description>
+    <disclaimer lang="nl_NL">Sommige delen van deze add-on zijn mogelijk onwettig in jouw land - raadpleeg de lokale wetgeving alvorens deze add-on te installeren.</disclaimer>
+    <summary lang="ja_JP">Netflix</summary>
+    <description lang="ja_JP">Netflix VOD サービスアドオン</description>
+    <disclaimer lang="ja_JP">一部の国では、このアドオンを使用するのが不法でありますので、設置する前に必ず関連法律を確認してください</disclaimer>
+    <summary lang="ko_KR">Netflix</summary>
+    <description lang="ko_KR">Netflix VOD 서비스애드온</description>
+    <disclaimer lang="ko_KR">일부 국가에서는 이 애드온을 사용하는 것이 불법일 수도 있으니, 설치하기전 관련 법을 확인하기 바랍니다.</disclaimer>
+    <description lang="it_IT">Netflix Add-on servizi VOD</description>
+    <disclaimer lang="it_IT">L'utilizzo di questo add-on potrebbe non essere legale nel vostro paese di residenza - si prega di verificare le leggi in vigore prima dell'installazione.</disclaimer>
+    <summary lang="es_ES">Netflix</summary>
+    <description lang="es_ES">Complemento para los Servicios VOD de Netflix</description>
+    <disclaimer lang="es_ES">El uso de este complemento puede no ser legal en su país de residencia - Por favor, consulte las leyes locales antes de instalarlo.</disclaimer>
+    <summary lang="hu_HU">Netflix</summary>
+    <description lang="hu_HU">Netflix VOD kiegészítő a Kodihoz</description>
+    <disclaimer lang="hu_HU">Előfordulhat, hogy a kiegészítő használata nem törvényes az Ön országában - telepítés előtt tájékozódjon a helyi törvényekről</disclaimer>
+    <summary lang="pt_BR">Netflix</summary>
+    <description lang="pt_BR">Add-on para os serviços VOD do Netflix</description>
+    <disclaimer lang="pt_BR">O uso deste addon pode não ser legal no seu país de residência - por favor, verifique as suas leis locais antes de instalar.</disclaimer>
+    <summary lang="tr_TR">Netflix</summary>
+    <description lang="tr_TR">Netflix VOD Hizmetleri Eklentisi</description>
+    <disclaimer lang="tr_TR">Bu eklentinin bazı bölümleri ikamet ettiğiniz ülkede yasal olmayabilir - lütfen yüklemeden önce yerel yasalarınıza bakın.</disclaimer>
+    <summary lang="ro_RO">Netflix</summary>
+    <description lang="ro_RO">Add-on pentru servicii video la cerere Netflix</description>
+    <disclaimer lang="ro_RO">Utilizarea acestui add-on ar putea fi ilegală în țara în care locuiți - vă rugăm să verificați legile locale înainte de instalare.</disclaimer>
+    <summary lang="sv_SE">Netflix</summary>
+    <description lang="sv_SE">Netflix VOD Service-tillägg</description>
+    <disclaimer lang="sv_SE">Användandet av detta tillägg kanske inte är lagligt i ditt hemland - kontrollera med dina lokala lagar innan du installerar.</disclaimer>
+    <summary lang="zh_CN">Netflix</summary>
+    <description lang="zh_CN">Netflix VOD服务附加组件</description>
+    <disclaimer lang="zh_CN">此附加组件在您的居住国可能不合法-请在安装前与您当地的法律核对。</disclaimer>
+    <summary lang="fr_FR">Netflix</summary>
+    <description lang="fr_FR">Extension Netflix SVoD</description>
+    <disclaimer lang="fr_FR">L'utilisation de cette extension n'est peut-être pas légale dans votre pays de résidence - renseignez-vous avant de l'installer</disclaimer>
+    <summary lang="pl_PL">Netflix</summary>
+    <description lang="pl_PL">Wtyczka dla usług VOD serwisu Netflix</description>
+    <disclaimer lang="pl_PL">Korzystanie z tego dodatku może być niezgodne z prawem w twoim kraju zamieszkania - przed zainstalowaniem zapoznaj się z lokalnymi przepisami.</disclaimer>
+    <summary lang="he_IL">Netflix</summary>
+    <description lang="he_IL">תוסף VOD לשירות של Netflix</description>
+    <disclaimer lang="he_IL">השימוש בתוסף זה עלול להיות לא חוקי במדינת מגוריך - אנא בדוק את החוק ברשות המקומית לפני ההתקנה</disclaimer>
+	<assets>
+      <icon>resources/media/icon.png</icon>
+      <fanart>resources/media/fanart.png</fanart>
+      <screenshot>resources/media/screenshot-01.jpg</screenshot>
+      <screenshot>resources/media/screenshot-02.jpg</screenshot>
+      <screenshot>resources/media/screenshot-03.jpg</screenshot>
+      <screenshot>resources/media/screenshot-04.jpg</screenshot>
+      <screenshot>resources/media/screenshot-05.jpg</screenshot>
+    </assets>
+    <language>en cs de es fr he hr hu it ja ko nl pl pt ro sv tr zh</language>
+    <platform>all</platform>
+    <license>MIT</license>
+    <website>https://www.netflix.com</website>
+    <email></email>
+    <forum>https://forum.kodi.tv/showthread.php?tid=329767</forum>
+    <source>https://github.com/CastagnaIT/plugin.video.netflix</source>
+    <news>
+v1.9.1 (2020-09-18)
+-Add TV Shows/Movies Top 10
+-Add support to NFAuthenticationKey for linux
+-Fixed search results via JSON-RPC
+-Fixed an issue that cause to ask to clear search history again when you return to previous menu
+-Fixed possible wrong results on Top 10 menu due to cache TTL
+-Updated translations ro, nl
+    </news>
+  </extension>
+</addon>
+
 <addon id="driver.remote.imon-mce"
        name="iMON-MCE"
        version="9.2.101"
@@ -6914,6 +7086,52 @@ Supported files: .mgw</description>
     </extension>
 </addon>
 
+<addon id="plugin.video.amazon-test"
+       name="Amazon VOD"
+       version="0.8.8"
+       provider-name="Sandmann79, Varstahl">
+  <requires>
+    <import addon="xbmc.python" version="2.24.0"/>
+    <import addon="script.module.beautifulsoup4" version="4.6.2"/>
+    <import addon="script.module.mechanicalsoup" version="0.12.0"/>
+    <import addon="script.module.pydes" version="2.0.1"/>
+    <import addon="script.module.pyxbmct" version="1.1.7"/>
+    <import addon="script.module.inputstreamhelper" version="0.4.4"/>
+    <import addon="script.module.requests" version="2.9.1"/>
+    <import addon="script.module.kodi-six" version="0.0.5"/>
+    <import addon="script.module.pyautogui" version="0.9.49"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource"
+             library="default.py">
+	<provides>video</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py" start="startup" />
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <reuselanguageinvoker>true</reuselanguageinvoker>
+    <summary lang="en_GB">Amazon Prime Video Streaming</summary>
+	<summary lang="es_ES">Amazon Prime Video Streaming</summary>
+    <summary lang="de_DE">Amazon Prime Instant Video</summary>
+    <description lang="en_GB">Movies and Television Shows for Prime Members</description>
+	<description lang="es_ES">Películas y programas de televisión para Miembros Prime</description>
+    <description lang="de_DE">Filme und Serien für Amazon Prime Mitglieder</description>
+    <disclaimer lang="en_GB">Some parts of this addon may not be legal in your country of residence - please check with your local laws before installing.
+This Addon uses pyDes by Todd Whiteman</disclaimer>
+	<disclaimer lang="es_ES">Es posible que algunas partes de este complemento no sean legales en su país de residencia; consulte las leyes locales antes de instalar.
+Este complemento utiliza pyDes por Todd Whiteman</disclaimer>
+    <disclaimer lang="de_DE">Möglicherweise sind einge Teile dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen.
+Diese Addon verwendet pyDes von Todd Whiteman</disclaimer>
+    <forum>http://www.kodinerds.net/index.php/Thread/44211-Release-Amazon-Prime-Instant-Video</forum>
+    <source>https://github.com/Sandmann79/xbmc</source>
+    <license>GPL-3.0-or-later</license>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.png</fanart>
+      <clearlogo>clearlogo.png</clearlogo>
+    </assets>
+  </extension>
+</addon>
+
 <addon id="tools.dotnet-runtime"
        name=".Net Core Runtime"
        version="9.2.110"
@@ -7858,6 +8076,91 @@ Supported files: .mdx, .md, .smd, .gen, .bin, .cue, .iso, .chd, .sms, .gg, .sg</
             <icon>resources/icon.png</icon>
         </assets>
     </extension>
+</addon>
+
+<addon id="plugin.video.hbogoeu" name="hGO EU" provider-name="arvvoid" version="2.6.1">
+  <requires>
+    <import addon="xbmc.python" version="2.26.0" />
+    <import addon="script.module.kodi-six" version="0.1.0" />
+    <import addon="script.module.requests" version="2.12.4" />
+    <import addon="script.module.pyaes" version="1.6.1" />
+    <import addon="script.module.defusedxml" version="0.6.0" />
+    <import addon="script.module.dateutil" version="2.8.1" />
+    <import addon="script.module.inputstreamhelper" version="0.4.2" />
+  </requires>
+  <extension library="main.py" point="xbmc.python.pluginsource">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Watch HBO® GO EU+Nordic content in Kodi. Valid HBO® account required.</summary>
+    <description lang="en_GB">
+Simple, Kodi add-on to access HBO® Go EU content. (This add-on is not officially commissioned/supported by HBO®.)
+
+Important, HBO® Go must be paid for!!!  You need a valid account!
+Register on the official HBO® Go website for your region.
+
+Read the disclaimer!
+
+Curently support: Bosnia and Herzegovina, Bulgaria, Croatia, Czech Republic, Hungary, Macedonia, Montenegro, Polonia, Portugal, Romania, Serbia, Slovakia, Slovenija, Spain, Norway, Denmark, Sweden, Finland
+
+To report bugs or request assistence with the add-on go to: https://github.com/arvvoid/plugin.video.hbogoeu
+    </description>
+    <disclaimer lang="en_GB">
+This add-on is not officially commissioned/supported by HBO®. The trademark HBO® Go is registered by Home Box Office, Inc.
+For more information on HBO® Go visit the official HBO® Go website for your region.
+I do not own any of the content this add-on lists. The content belongs to Home Box Office, Inc.
+All this add-on does is make simple HTTP requests to Hbo go servers to retrieve and display content just like any web browser would do!
+
+Important: HBO® Go must be paid for!!! You need a valid HBO® Go account for the add-on to work! Register on the official HBO® Go website for your region
+
+THERE IS NO WARRANTY FOR THE ADD-ON, IT MIGHT NOT WORK AT ALL AND IT CAN BREAK AND STOP WORKING AT ANY TIME.
+
+If an official app is available for your platform, use it instead of this.
+    </disclaimer>
+<summary lang="es_ES">Mira el contenido HBO® GO EU en Kodi. Se requiere una cuenta válida de HBO®.</summary>
+    <description lang="es_ES">
+Complemento simple de Kodi para acceder al contenido de HBO® Go EU. (Este complemento no está oficialmente comisionado / respaldado por HBO®).
+
+¡Importante, HBO® Go debe pagarse! ¡Necesitas una cuenta válida!
+Regístrese en el sitio web oficial de HBO® Go para su región.
+
+Lea el descargo de responsabilidad!
+
+Apoyo actual: Bosnia y Herzegovina, Bulgaria, Croacia, República Checa, Hungría, Macedonia, Montenegro, Polonia, Portugal, Rumania, Serbia, Eslovaquia, Eslovenia, España, Noruega, Dinamarca, Suecia, Finlandia
+
+Para informar errores o solicitar asistencia con el complemento, vaya a: https://github.com/arvvoid/plugin.video.hbogoeu
+    </description>
+    <disclaimer lang="es_ES">
+Este complemento no está oficialmente comisionado / respaldado por HBO®. La marca registrada HBO® Go está registrada por Home Box Office, Inc.
+Para obtener más información sobre HBO® Go, visite el sitio web oficial de HBO® Go para su región.
+No poseo ninguno de los contenidos que este complemento enumera. El contenido pertenece a Home Box Office, Inc.
+¡Todo este complemento hace solicitudes HTTP simples a los servidores de Hbo go para recuperar y mostrar contenido como lo haría cualquier navegador web!
+
+Importante: ¡HBO® Go debe pagarse! ¡Necesita una cuenta válida de HBO® Go para que el complemento funcione! Regístrese en el sitio web oficial de HBO® Go para su región
+
+NO HAY GARANTÍA PARA EL ADICIONAL, NO PUEDE FUNCIONAR EN absoluto y PUEDE ROMPER Y DEJAR DE FUNCIONAR EN CUALQUIER MOMENTO.
+
+Si hay una aplicación oficial disponible para su plataforma, úsela en lugar de esta.
+    </disclaimer>
+    <language>es</language>
+    <platform>all</platform>
+    <license>GPL-2.0-or-later</license>
+    <forum>https://forum.kodi.tv/showthread.php?tid=339798</forum>
+    <source>https://github.com/arvvoid/plugin.video.hbogoeu</source>
+    <website>https://arvvoid.github.io/plugin.video.hbogoeu</website>
+    <news>
+- Recent Kodi 19 API compatibility changes
+- Swedish translation by @Sopor
+- Minor changes
+    </news>
+    <assets>
+     <icon>resources/icon.png</icon>
+     <fanart>resources/fanart.jpg</fanart>
+     <screenshot>resources/screen1.jpg</screenshot>
+     <screenshot>resources/screen2.jpg</screenshot>
+     <screenshot>resources/screen3.jpg</screenshot>
+    </assets>
+  </extension>
 </addon>
 
 <addon id="game.controller.konami.justifier.player2"
@@ -10527,7 +10830,7 @@ This bundle currently includes bwm-ng, iftop, iperf, irssi, lftp, ncftp, ngrep, 
     </extension>
 </addon>
 
-<addon id="script.cu.lrclyrics" name="CU LRC Lyrics" version="5.7.4" provider-name="Taxigps, ronie">
+<addon id="script.cu.lrclyrics" name="CU LRC Lyrics" version="5.8.3" provider-name="Taxigps, ronie">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0"/>
 		<import addon="script.module.chardet" version="2.2.1"/>
@@ -10535,7 +10838,7 @@ This bundle currently includes bwm-ng, iftop, iperf, irssi, lftp, ncftp, ngrep, 
 		<import addon="script.module.requests" version="2.18.4"/>
 	</requires>
 	<extension point="xbmc.python.lyrics" library="default.py"/>
-	<extension point="xbmc.service" library="default.py" start="login"/>
+	<extension point="xbmc.service" library="default.py"/>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="be_BY">CU LRC Lyrics</summary>
 		<summary lang="bg_BG">CU LRC Лирики</summary>
@@ -10600,12 +10903,15 @@ This bundle currently includes bwm-ng, iftop, iperf, irssi, lftp, ncftp, ngrep, 
 		<description lang="zh_TW">CU LRC Lyrics 是為 Kodi 而設的歌詞腳本。它支援一般格式的歌詞以及 LRC 格式的歌詞。此腳本能夠搜尋歌曲檔案內嵌歌詞的同步及非同步歌詞，同時也能使用刮削器在線搜尋、本地文件或通过刮削器获取同步/非同步歌词。它可以讀取放在同一個資料夾內，而又與歌曲相同命名的 .lrc/.txt 歌詞檔。</description>
 		<language></language>
 		<platform>all</platform>
-		<license>GNU GENERAL PUBLIC LICENSE Version 2</license>
+		<license>GPL-2.0-only</license>
 		<forum>https://forum.kodi.tv/showthread.php?tid=147340</forum>
 		<source>https://gitlab.com/ronie/script.cu.lrclyrics/</source>
 		<assets>
 			<icon>resources/icon.png</icon>
 		</assets>
+		<news>- add syair scraper
+- fix dark lyrics scraper
+- remove broken lyricwiki scraper</news>
 	</extension>
 </addon>
 
@@ -10820,7 +11126,7 @@ Supported files: .gb, .gbc</description>
     </extension>
 </addon>
 
-<addon id="script.tubecast" name="TubeCast" version="1.4.4" provider-name="enen92">
+<addon id="script.tubecast" name="TubeCast" version="1.4.5" provider-name="enen92">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.bottle" version="0.12.0"/>
@@ -10832,23 +11138,23 @@ Supported files: .gb, .gbc</description>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Cast videos from the Youtube application to Kodi</summary>
         <summary lang="pt_PT">Cast de vídeos a partir da aplicação móvel Youtube para o Kodi</summary>
-	<summary lang="es_ES">Transmitir videos desde la aplicación de Youtube a Kodi</summary>
-	<description lang="en_GB">An implementation of the Cast V1 protocol in Kodi to act as a player for the Youtube mobile application</description>
-    <description lang="pt_PT">Uma implementação do protocolo Cast V1 no Kodi para este funcionar como player externo remotamente controlado pela aplicação móvel do YouTube</description>
-	<description lang="es_ES">Una implementación del protocolo Cast V1 en Kodi para actuar como reproductor externo para la aplicación móvil de Youtube</description>
-	<platform>all</platform>
+        <summary lang="es_ES">Transmitir videos desde la aplicación de Youtube a Kodi</summary>
+        <description lang="en_GB">An implementation of the Cast V1 protocol in Kodi to act as a player for the Youtube mobile application</description>
+        <description lang="pt_PT">Uma implementação do protocolo Cast V1 no Kodi para este funcionar como player externo remotamente controlado pela aplicação móvel do YouTube</description>
+        <description lang="es_ES">Una implementación del protocolo Cast V1 en Kodi para actuar como reproductor externo para la aplicación móvil de Youtube</description>
+        <platform>all</platform>
         <license>MIT</license>
         <forum>https://forum.kodi.tv/showthread.php?tid=329153</forum>
         <email>enen92@kodi.tv</email>
         <source>https://github.com/enen92/script.tubecast</source>
         <news>
-            [new] Add spanish translation (tks roliverosc)
-            [fix] Playlist doesn't continue after second video (tks NextLight)
+            [fix] missing ctt key (tks romainreignier)
+            [fix] add default id if friendlyname is missing
         </news>
         <disclaimer lang="en_GB">This is not a full chromecast implementation nor will it ever be. It will only work as long as Google keep backwards compatibility with the cast v1 protocol in the Youtube application. Deeply inspired by Leapcast and gotubecast projects</disclaimer>
         <disclaimer lang="pt_PT">Este addon não é uma implementação completa do protocolo cast nem nunca será. Apenas funcionará enquanto a Google mantiver a retrocompatibilidade com o protocolo cast v1 na aplicação móvel do youtube. Inspirado no Leapcast e gotubecast</disclaimer>
-	<disclaimer lang="es_ES">Esta no es una implementación completa de Chromecast ni lo será nunca. Solo funcionará mientras Google mantenga la compatibilidad con el protocolo Cast v1 en la aplicación Youtube. Profundamente inspirado por los proyectos Leapcast y gotubecast</disclaimer>
-	<assets>
+	    <disclaimer lang="es_ES">Esta no es una implementación completa de Chromecast ni lo será nunca. Solo funcionará mientras Google mantenga la compatibilidad con el protocolo Cast v1 en la aplicación Youtube. Profundamente inspirado por los proyectos Leapcast y gotubecast</disclaimer>
+        <assets>
             <icon>resources/img/icon.png</icon>
             <fanart>resources/img/fanart.jpg</fanart>
             <screenshot>resources/img/screenshot-0.jpg</screenshot>
