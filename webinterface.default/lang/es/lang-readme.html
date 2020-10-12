@@ -1,0 +1,50 @@
+<h1 id="traducciones">Traducciones</h1>
+<p>Para actualizar los archivos de idioma sólo necesita saber un poco de GIT. Esta página debería ayudar 
+a con la estructura de los archivos de idioma. </p>
+<h2 id="-d-nde-est-n-los-archivos-de-idioma-">¿Dónde están los archivos de idioma?</h2>
+<p>Hay dos lugares donde se almacenan los archivos de invalidación de idioma. El LANG_CODE son dos 
+códigos de letra para ese idioma. EG: en, fr, de </p>
+<h3 id="cadenas">Cadenas</h3>
+<p><code>src/lang/_strings/LANG_CODE.po</code></p>
+<ul>
+<li>Se trata de cadenas utilizadas en toda la aplicación. En general, sólo actualizar &#39; msgstr &#39;. </li>
+<li>Si no hay ningún &#39; msgstr &#39; para la cadena, a continuación, copiar de en.po y actualizar, EG de.po. <pre><code>msgctxt <span class="hljs-string">""</span>
+msgid <span class="hljs-string">"Select a filter"</span>
+msgstr <span class="hljs-string">"Filter wählen"</span>
+</code></pre></li>
+</ul>
+<h3 id="p-ginas">Páginas</h3>
+<p><code>src/lang/LANG_CODE/PAGE.md</code></p>
+<ul>
+<li>Estas son páginas completas que pueden ser anuladas con un idioma diferente. </li>
+<li>Las páginas están en <a href="https://en.wikipedia.org/wiki/Markdown">markdown</a>.</li>
+<li>Si no hay <em>PAGE </em>.md para el idioma, copie de la carpeta en y edite. </li>
+<li>Solo crea una <em>PAGE </em>.md para una traducción completa </li>
+</ul>
+<h2 id="a-adiendo-un-nuevo-idioma">Añadiendo un nuevo idioma</h2>
+<p><strong> Ejemplo:</strong> Si su nuevo idioma es <code>French</code> tendría un <em>LANG_KEY</em> de <code>fr</code>.</p>
+<h3 id="cu-ntales-a-la-aplicaci-n">Cuéntales a la aplicación</h3>
+<p>También debe decirle a la aplicación que lo tenga como una opción. Así que edite este 
+<code>/src/js/helpers/translate.js.coffee</code> y añadir <code>fr: &quot;French&quot;</code> a los idiomas en <code>getLanguages</code></p>
+<h3 id="duplica-la-estructura-de-carpeta-archivo-de-en">Duplica la estructura de carpeta/archivo de en</h3>
+<p>Copie los archivos que desea anular con el nuevo idioma: </p>
+<ul>
+<li><strong>Strings:</strong> copiar <code>/src/_strings/en.po</code> a <code>/src/_strings/fr.po</code></li>
+<li><strong>Pages:</strong> copiar <code>/src/en/readme.md</code> a <code>/src/fr/readme.md</code></li>
+</ul>
+<h2 id="probando">Probando</h2>
+<p>Para probar necesita hacer una compilación, sin embargo, si sigue la estructura existente que no lo deberías necesitar. </p>
+<p>Si <strong>deseas</strong> probar tu idioma en la aplicación con una compilación, puedes: </p>
+<ol>
+<li>Asegurarse de que <code>nodejs</code>, <code>npm</code> se instalan</li>
+<li><code>cd /chorus/folder</code></li>
+<li><code>npm install</code> (sólo la primera vez)</li>
+<li><code>grunt lang</code> (Esto reconstruirá sólo los idiomas en el directorio <code>dist/lang</code>)</li>
+<li>Actualizar Chorus</li>
+</ol>
+<h2 id="retroceder">Retroceder</h2>
+<p>Las traducciones deberían cambiar al inglés a menos que <code>msgid</code> se establece en un archivo <code>LANG_CODE.po</code>. 
+O si existe una página <code>LANG_CODE/PAGE.md</code>.</p>
+<h2 id="enviar-una-actualizaci-n">Enviar una actualización</h2>
+<p>Enviar una solicitud de extracción a través de [GitHub] (<a href="https://github.com/jez500/chorus2">https://github.com/jez500/chorus2</a>) en una nueva rama es la mejor manera.
+Consideraría las actualizaciones a través de otros métodos.</p>

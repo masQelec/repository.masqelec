@@ -1,0 +1,29 @@
+<h1 id="informaci-n-para-desarrolladores">Información para desarrolladores</h1>
+<p>¿Quieres ayudar a hacer que Chorus sea aún mejor? Encuentra ayuda debajo ...</p>
+<p>Esta página contiene información sobre cómo poner en marcha su entorno de desarrollo para que pueda construir y probar su
+cambios sin la molestia de configurar todas las dependencias requeridas.</p>
+<h2 id="docker-dev-entorno">Docker dev entorno</h2>
+<p>Incluido en este repositorio hay un <code>Dockerfile</code> que construye la imagen del entorno Chorus 2 dev. Si quisieras desarrollar
+<em>sin</em> uso de un docker, esta es una buena referencia en cuanto a lo que necesita instalar en su PC.</p>
+<p>Si desea hacer su vida mucho más fácil, solo instale el docker y luego tome la imagen preconstruida del centro del docker hub.</p>
+<pre><code>docker pull jez500/chorus2<span class="hljs-attribute">-dev</span>:latest
+</code></pre><h3 id="instalar-dependencias-de-desarrollo">Instalar dependencias de desarrollo</h3>
+<p>Una vez que tenga la imagen de desarrollo del docker, puede usar esto para realizar todas las tareas relacionadas con el desarrollo. El primero de estos debe
+instalar  todas las dependencias nodejs/ruby.</p>
+<pre><code>docker run <span class="hljs-attribute">-tiP</span> <span class="hljs-attribute">-v</span> <span class="hljs-string">`pwd`</span>:/app jez500/chorus2<span class="hljs-attribute">-dev</span>:latest <span class="hljs-built_in">.</span>/build<span class="hljs-built_in">.</span>sh install
+</code></pre><p>Esto ejecutará <code>npm install</code> y<code>bundle install</code> dentro del contenedor dev.</p>
+<p>Solo deberías hacer esto una vez, a menos que... <code>package.json</code> o<code>Gemfile</code> sean actualizados</p>
+<h3 id="construyendo-compilando-el-proyecto">Construyendo/compilando el proyecto</h3>
+<p>Si ha realizado cambios en algún script de coffee o sass, puede crear esos cambios ejecutando comandos dentro de
+el contenedor dev. Para obtener una línea de comando en el contenedor:</p>
+<pre><code>docker run <span class="hljs-attribute">-tiP</span> <span class="hljs-attribute">-v</span> <span class="hljs-string">`pwd`</span>:/app jez500/chorus2<span class="hljs-attribute">-dev</span>:latest bash
+</code></pre><p>Una vez dentro del contenedor dev, puedes hacer lo siguiente:</p>
+<h4 id="construir">Construir</h4>
+<p>Esto construirá lenguajes, documentación, js y css.</p>
+<pre><code>grunt build
+</code></pre><h4 id="est-atento-a-los-cambios-construir-continuamente-">Esté atento a los cambios (construir continuamente)</h4>
+<p>Esto solo construirá js y css.</p>
+<pre><code>grunt
+</code></pre><h2 id="remitiendo-tus-cambios">Remitiendo tus cambios</h2>
+<p>Como regla general, no debe remitir ningún archivo compilado a menos que esté creando una versión. P.ej. solo remitir archivos
+en la carpeta <code>src</code></p>

@@ -1,0 +1,107 @@
+<h1 id="kodi-web-interface-chorus2">Kodi Web Interface - Chorus2</h1>
+<p>La interfaz web por defecto para Kodi.</p>
+<p>Una gran interfaz de usuario web moderna para Kodi. Explore su música, películas o programas de televisión desde la comodidad de su
+navegador web propio. Puedes reproducir contenido multimedia a través de Kodi o transmitirlo en tu navegador. Funciona mejor con Chrome
+Pero juega bien con la mayoría de los navegadores modernos.</p>
+<p>Sucesor de [Chorus] (<a href="https://github.com/jez500/chorus)">https://github.com/jez500/chorus)</a>.
+Una reconstrucción completa utilizando Coffee Script, Backbone, Marionette y mucho, mucho más.</p>
+<h2 id="autor">Autor</h2>
+<p><a href="http://jez.me">Jeremy Graham</a> con la ayuda de <a href="https://github.com/xbmc/chorus2/graphs/contributors">estas grandes personas</a></p>
+<h2 id="estado-actual">Estado actual</h2>
+<p>Bastante bien, la mayoría de las cosas funcionan muy bien. Otras cosas necesitan <a href="https://github.com/xbmc/chorus2/issues">pulido/acabado/fijado</a>.
+Aún se considera software beta, espera errores, cambios, guerra nuclear, etc.</p>
+<h2 id="poni-ndolo-en-funcionamiento">Poniéndolo en funcionamiento</h2>
+<p>A partir de Kodi v17, Chorus2 viene preinstalado de la caja, solo necesita habilitarlo y marcar algunas casillas.</p>
+<h3 id="activando-y-configurando">Activando y Configurando</h3>
+<p>Kodi&gt; Configuraciones&gt; Servicios&gt; Control</p>
+<ul>
+<li>Habilitar &quot;Permitir el control de Kodi a través de HTTP&quot;</li>
+<li>Seleccione la interfaz web</li>
+<li>Seleccione &quot;Interfaz web Kodi - Chorus2&quot;</li>
+<li>Habilitar &quot;Permitir que los programas de este sistema controlen Kodi&quot;</li>
+<li>Habilitar &quot;Permitir que los programas en otros sistemas controlen Kodi&quot;</li>
+</ul>
+<p><strong>Por razones de seguridad, debe establecer un nombre de usuario y una contraseña para evitar el acceso no autorizado</strong></p>
+<h3 id="manual-de-instalaci-n">Manual de instalación</h3>
+<p>Para Kodi v16 y versiones anteriores o si desea obtener la última versión lo antes posible, una instalación a través de zip es la forma más fácil de hacerlo. Toma la
+última versión de <code>webinterface.default.2.X.X.zip</code> de la <a href="https://github.com/xbmc/chorus2/releases">página de versiones</a> luego
+instálelo <a href="http://kodi.wiki/view/Add-on_manager#How_to_install_from_a_ZIP_file">como este</a>. <strong>NOTA:</strong> Chorus2 está destinado a
+poder usarse con la última versión de Kodi y algunas (o todas) las cosas podrían no funcionar en versiones anteriores debido a cambios en la API.</p>
+<h3 id="us-ndolo">Usándolo</h3>
+<p>Dirija su navegador web a <code>http: // localhost: 8080</code> - reemplace <code>localhost</code> con su dirección IP si lo usa de forma remota y si
+ha cambiado su puerto a algo que no sea <code>8080</code>, asegúrese de cambiar eso también. Más información y el uso avanzado
+se puede encontrar en la <a href="http://kodi.wiki/view/Web_interface">página de Kodi Wiki</a>.</p>
+<h2 id="peticiones-de-caracter-sticas-bugs">Peticiones de características / Bugs</h2>
+<p>Agréguelos a la <a href="https://github.com/xbmc/chorus2/issues">lista</a>. Para errores por favor incluya la versión de Kodi, la versión del navegador web,
+Versión de chorus y cualquier error que se muestre en la consola. Para solicitudes de funciones, verifique el navegador API para ver si su
+solicitud es actualmente posible.</p>
+<h2 id="transmisi-n">Transmisión</h2>
+<p>Descargo de responsabilidad: El éxito de esto depende de los formatos de archivo y de lo que admite el navegador. En general la mayoría de las cosas funcionan.</p>
+<h3 id="transmisi-n-auditiva">Transmisión auditiva</h3>
+<p>En la parte superior derecha hay algunas pestañas, dos de ellas se llaman Kodi y Local, así es como alternas el reproductor de la interfaz de usuario<br>que está controlando. En el modo Local, el logotipo y los acentos son rojo rosado, en el modo Kodi, el logotipo es el azul Kodi. Cuando tú
+están en un modo determinado, las acciones afectan a ese reproductor, por lo que si hace clic en Reproducir en una pista cuando está en modo Local, se reproducirá
+a través del navegador, igualmente, cuando en modo Kodi todos los comandos se envían a Kodi. También puede agregar medios a otros,
+haga clic en los botones de menú (tres puntos verticales) en la mayoría de los elementos multimedia.</p>
+<h3 id="v-deo-transmitido-en-vivo">Vídeo transmitido en vivo</h3>
+<p>La transmisión de video a través de HTML5 funciona, realmente depende del codec utilizado. También está disponible un reproductor VLC incorporado con mejor soporte de códec.
+Esto parece lo mejor que podemos obtener hasta que Kodi admita la transcodificación.
+<strong>Usuarios de Chrome</strong>: Chrome ha eliminado la compatibilidad con los complementos vlc/divx, por lo que la transmisión de un video requiere un <a href="https://en.wikipedia.org/wiki/HTML5_video#Browser_support">Codec compatible con Chrome</a>.
+Para obtener los mejores resultados, use Chrome con video mp4 que tenga audio de 2 canales (el audio 5.1 parece no funcionar).</p>
+<h2 id="ajustes-de-kodi-a-trav-s-de-la-interfaz-web-">Ajustes de Kodi a través de la interfaz web.</h2>
+<p>Puede cambiar la mayoría de las configuraciones que encontrará en Kodi a través de la página de configuración en la interfaz web.
+Algunas configuraciones se han omitido ya que requieren interacción con la GUI y otras son solo un campo de texto básico sin opciones.</p>
+<h2 id="navegador-kodi-api">Navegador Kodi API</h2>
+<p>Hay una función oculta en Chorus que te permite jugar con la API de Kodi y ver lo que es capaz a través del JSON-RPC.
+interfaz. Si está creando una aplicación o un complemento que utiliza la API, esto puede ser muy útil tanto para encontrar como para probar
+Todos los métodos y tipos disponibles. Si está pensando en una nueva función para Chorus, este es también un gran lugar para
+comprobar si es posible (y desarrollo de la vía rápida agregando un ejemplo de trabajo a un problema). Puedes encontrar el navegador de la API
+a través de &quot;Chorus Lab&quot; (abajo a la derecha 3 puntos verticales&gt; &quot;The Lab&quot;) o directamente a través de <code>http://localhost:8080/#lab/api-browser</code>.</p>
+<h2 id="contribuyendo">Contribuyendo</h2>
+<p>Si desea mejorar este proyecto, le agradecería cualquier ayuda. Hay una rama de desarrollo para cada versión de
+Kodi. Por favor, realice solicitudes contra la rama <code>dev</code> para obtener la versión correcta (incluso mejor si puede hacer una PR para ambos).
+La rama de desarrollo de Leia (v18) es <code>18.x-dev</code>, Krypton (v17) la rama de desarrollo es <code>17.x-dev</code>. Ver en
+<a href="https://github.com/xbmc/chorus2/tree/master/src/lang/en/developers.md">documentación de los desarrolladores</a> para obtener información sobre
+com poner en marcha un entorno de desarrollo y luego compilar el proyecto utilizando un docker.</p>
+<h3 id="traducciones">Traducciones</h3>
+<p>Sólo sé inglés, así que definitivamente necesito ayuda con esto. También no sé montones de javascript cosas multilingües pero
+Gracias a <a href="https://github.com/mizaki">@mizaki</a> tenemos una estructura lista para funcionar. Así que debería ser agradable y fácil traducir la interfaz de usuario.</p>
+<p>En este momento, hay <a href="https://github.com/xbmc/chorus2/tree/master/src/lang/_strings">un puñado</a> de idiomas disponibles
+pero más se puede agregar fácilmente. Siempre se están agregando más cadenas, así que siempre considere el inglés como la fuente de la verdad.</p>
+<p>Así que si ves algo en inglés pero lo quieres en tu idioma, ¡te necesito! Para contribuir, envíame un RP en una nueva sucursal.
+contra <code>18.x-dev</code> y/o <code>17.x-dev</code>, o si no conoce git, un enlace al archivo de idioma.</p>
+<p>Archivos de idioma <a href="https://github.com/xbmc/chorus2/tree/master/src/lang">aquí</a>.
+<em>El inglés es el único archivo de traducción completo real, así que comienza con eso tu base.</em></p>
+<h2 id="donar">Donar</h2>
+<p>¿Eres un fan del coro? Puede <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=ZCGV976794JHE&amp;lc=AU&amp;item_name=Chorus%20Beer%20Fund&amp;currency_code=AUD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted">comprar una cerveza a Jeremy</a> y decir gracias :)</p>
+<h2 id="licencia">licencia</h2>
+<p>Este programa es software libre; Puedes redistribuirlo y/o modificarlo.
+bajo los términos de la Licencia Pública General GNU tal como fue publicada por
+la Fundación de Software Libre; ya sea la versión 2 de la Licencia, o
+(a su elección) cualquier versión posterior.</p>
+<p>Este programa se distribuye con la esperanza de que sea útil,
+Pero SIN NINGUNA GARANTÍA; sin ni siquiera la garantía implícita de
+COMERCIABILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Ver el
+GNU General Public License para más detalles.</p>
+<p>Debería haber recibido una copia de la Licencia Pública General de GNU
+[junto con este programa] (<a href="https://github.com/xbmc/chorus2/blob/master/LICENSE)">https://github.com/xbmc/chorus2/blob/master/LICENSE)</a>;
+Si no, escriba a la Free Software Foundation, Inc., 51 Franklin Street,
+Quinto piso, Boston, MA 02110-1301 EE. UU.</p>
+<p><a href="https://github.com/xbmc/chorus2/blob/master/src/lang/en/license.md">Haga clic aquí para obtener más información</a>.</p>
+<h2 id="screenshots">Screenshots</h2>
+<h3 id="p-gina-de-inicio-ahora-en-reprocci-n-">Página de inicio (ahora en reprocción)</h3>
+<p><img src="https://raw.githubusercontent.com/xbmc/chorus2/master/dist/screenshots/now-playing.jpg" alt="alt text" title="Página de inicio/En reproducción"></p>
+<h3 id="resultados-de-la-b-squeda">Resultados de la búsqueda</h3>
+<p><img src="https://raw.githubusercontent.com/xbmc/chorus2/master/dist/screenshots/search.jpg" alt="alt text" title="Buscar"></p>
+<h3 id="artistas">Artistas</h3>
+<p><img src="https://raw.githubusercontent.com/xbmc/chorus2/master/dist/screenshots/artists.jpg" alt="alt text" title="Artistas"></p>
+<p><img src="https://raw.githubusercontent.com/xbmc/chorus2/master/dist//screenshots/artist.jpg" alt="alt text" title="Artista"></p>
+<h3 id="biblioteca-de-videos">Biblioteca de videos</h3>
+<p><img src="https://raw.githubusercontent.com/xbmc/chorus2/master/dist/screenshots/tv.jpg" alt="alt text" title="TV"></p>
+<h3 id="filtrado">Filtrado</h3>
+<p><img src="https://raw.githubusercontent.com/xbmc/chorus2/master/dist/screenshots/movie.jpg" alt="alt text" title="Películas"></p>
+<h3 id="configuraci-n">Configuración</h3>
+<p><img src="https://raw.githubusercontent.com/xbmc/chorus2/master/dist/screenshots/settings.jpg" alt="alt text" title="Configuración"></p>
+<h3 id="add-ons">Add-ons</h3>
+<p><img src="https://raw.githubusercontent.com/xbmc/chorus2/master/dist/screenshots/addons.jpg" alt="alt text" title="Add-ons"></p>
+<h3 id="edici-n-de-medios">Edición de medios</h3>
+<p><img src="https://raw.githubusercontent.com/xbmc/chorus2/master/dist/screenshots/edit-media.jpg" alt="alt text" title="Edición de medios"></p>

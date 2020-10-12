@@ -1,0 +1,36 @@
+<h1 id="soporte-adicional">Soporte adicional</h1>
+<p>Chorus admite complementos, pero a un nivel genérico. Como cada complemento hace las cosas de manera diferente, no toda la funcionalidad estará
+disponible. La página <a href="#addons/all">Add-Ons</a> enumera complementos ejecutables (por ejemplo, Búsqueda global) o complementos que proporcionan
+una lista de contenido de audio/video (por ejemplo, YouTube). También se puede acceder a los complementos que proporcionan listas a través del <a href="#browser">browser</a>.</p>
+<h2 id="b-squeda-de-complementos-personalizados">Búsqueda de complementos personalizados</h2>
+<p>Fuera de la caja, Chorus incluye la funcionalidad de búsqueda para algunos de los complementos más populares, esto le permite buscar
+contenido proporcionado por ese complemento a través de la página de búsqueda. Por ejemplo, puede escribir &quot;videos de gatos locos&quot; en el cuadro de búsqueda
+y luego en la página de búsqueda, haga clic en &quot;YouTube&quot; para obtener una lista de los videos proporcionados por YouTube sobre ese tema.</p>
+<p>Si desea buscar contenido proporcionado por un complemento que no está incluido en Chorus, puede agregar el suyo propio.
+<a href="#configuración/búsqueda">búsqueda de complemento personalizado</a> que le dice a Chorus cómo puede buscar el contenido proporcionado por ese complemento.</p>
+<p>Para agregar una búsqueda personalizada, necesita saber qué URL está utilizando internamente el complemento para proporcionar los resultados de la búsqueda. Esto
+no siempre fácil o obvio de descubrir y puede implicar mirar a través del código del complemento o los registros de Kodi para determinar la
+url correcta para usar. Chorus sustituirá el token <code>[QUERY]</code> con el término de búsqueda.</p>
+<h3 id="ejemplos-de-urls-de-b-squeda-adicionales">Ejemplos de urls de búsqueda adicionales</h3>
+<ul>
+<li>YouTube: <code>plugin://plugin.video.youtube/search/?q=[QUERY]</code></li>
+<li>SoundCloud: <code>plugin://plugin.audio.soundcloud/search/query/?q=[QUERY]</code></li>
+<li>Radio: <code>plugin://plugin.audio.radio_de/stations/search/[QUERY]</code></li>
+<li>MixCloud: <code>plugin://plugin.audio.mixcloud/?mode=30&amp;key=cloudcast&amp;offset=0&amp;query=[QUERY]</code></li>
+</ul>
+<h3 id="contribuyendo">Contribuyendo</h3>
+<p>Si encuentra una buena búsqueda de complemento personalizado que debe incluirse en Chorus fuera de la caja, entonces debería considerar
+enviar una <a href="https://github.com/xbmc/chorus2/pulls">solicitud de extracción</a> para ello. Mire el [módulo de SoundCloud] <a href="https://github.com/xbmc/chorus2/blob/master/src/js/apps/addon/soundcloud/addon_soundcloud_app.js.coffee">https://github.com/xbmc/chorus2/blob/master/src/js/apps/addon/soundcloud/addon_soundcloud_app.js.coffee</a>)
+como un ejemplo de la estructura del código. NOTA: Solo se aceptarán los complementos que estén en el repositorio oficial.</p>
+<h2 id="habilitar-y-deshabilitar-complementos">Habilitar y deshabilitar complementos</h2>
+<p>Chorus proporciona una <a href="#configuración/complementos">página de configuración</a> para habilitar y deshabilitar complementos, tenga en cuenta que deshabilitar ciertos
+complementos pueden tener efectos adversos, así que utilícelo con cuidado.</p>
+<h2 id="problemas-conocidos-y-limitaciones">Problemas conocidos y limitaciones</h2>
+<p>Algunas cosas que se han observado con el uso de complementos en Chorus</p>
+<ul>
+<li>No puedes descargar contenido adicional.</li>
+<li>Solo puede reproducir contenido adicional a través de Kodi, no se puede transmitir al navegador web.</li>
+<li>Agregar un único complemento multimedia a la lista de reproducción a menudo da como resultado que la entrada de la lista de reproducción tenga un título extraño o falte un
+título en conjunto. Agregar una carpeta de complemento parece rellenarlo correctamente. Esto parece ser un problema con la API de Kodi.</li>
+<li>Algunos complementos no funcionarán en absoluto, esto debería plantearse con el autor del complemento.</li>
+</ul>
