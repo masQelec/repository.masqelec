@@ -4,9 +4,9 @@
             <import addon="xbmc.addon" version="12.0.0"/>
         </requires>
         <extension point="xbmc.addon.repository" name="masQelec Repository">
-            <info compressed="false">https://raw.githubusercontent.com/masQelec/repository.masQelec/master/addons/9.2/Amlogic/arm/addons.xml</info>
-            <checksum>https://raw.githubusercontent.com/masQelec/repository.masQelec/master/addons/9.2/Amlogic/arm/addons.xml.md5</checksum>
-            <datadir zip="true">https://raw.githubusercontent.com/masQelec/repository.masQelec/master/addons/9.2/Amlogic/arm/</datadir>
+            <info compressed="false">https://raw.githubusercontent.com/masQelec/repository.masQelec/master/addons/1.0/Amlogic/arm/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/masQelec/repository.masQelec/master/addons/1.0/Amlogic/arm/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/masQelec/repository.masQelec/master/addons/1.0/Amlogic/arm/</datadir>
             <hashes>false</hashes>
         </extension>
         <extension point="xbmc.addon.metadata">

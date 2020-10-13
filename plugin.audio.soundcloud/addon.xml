@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.audio.soundcloud" name="SoundCloud" version="3.2.0" provider-name="jaylinski">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.future" version="0.16.0"/>
+        <import addon="script.module.requests" version="2.4.3"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>audio</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="de_DE">SoundCloud – Musik- und Podcast-Streaming-Plattform</summary>
+        <summary lang="en_GB">SoundCloud – Music and podcast streaming platform</summary>
+        <summary lang="es_ES">SoundCloud: plataforma de transmisión de música y podcasts</summary>
+        <description lang="de_DE">SoundCloud ist eine Musik- und Podcast-Streaming-Plattform, mit der Du Millionen von Songs aus der ganzen Welt anhören kannst.</description>
+		<description lang="en_GB">SoundCloud is a music and podcast streaming platform that lets you listen to millions of songs from around the world.</description>
+		<description lang="es_ES">SoundCloud es una plataforma de transmisión de música y podcasts que te permite escuchar millones de canciones de todo el mundo.</description>
+        <disclaimer lang="en_GB">This plugin is not official, approved or endorsed by SoundCloud.</disclaimer>
+        <disclaimer lang="es_ES">Este complemento no es oficial, ni está aprobado ni respaldado por SoundCloud.</disclaimer>
+        <platform>all</platform>
+        <license>MIT</license>
+        <forum>https://forum.kodi.tv/showthread.php?tid=206635</forum>
+        <website>https://soundcloud.com</website>
+        <source>https://github.com/jaylinski/kodi-addon-soundcloud</source>
+        <news>3.2.0 (2020-04-18)
+[fix] Custom client ID won't be overwritten anymore
+[new] Added ability to clear cache in settings
+[new] Track descriptions can now be viewed in info window
+        </news>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
