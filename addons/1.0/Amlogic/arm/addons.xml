@@ -5585,7 +5585,7 @@ Supports up to 8 players and features like pushing bombs, remote controls and ka
   </extension>
 </addon>
 
-<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="1.0.102" provider-name="Team CoreELEC">
+<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="1.0.103" provider-name="masQelec">
   <requires><import addon="xbmc.python" version="2.1.0"/>
 
   </requires>
@@ -5596,13 +5596,11 @@ Supports up to 8 players and features like pushing bombs, remote controls and ka
     <provides></provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <summary>Tvheadend: a TV streaming server for Linux</summary>
-    <description>
-Tvheadend (d37fd06): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T
-    </description>
-    <disclaimer>
-
-    </disclaimer>
+    <summary lang="en">Tvheadend: a TV streaming server for Linux</summary>
+    <description lang="en">Tvheadend (d37fd06): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T</description>
+    <summary lang="es">Tvheadend: un servidor de transmisión de TV para Linux</summary>
+    <description lang="es">Tvheadend (d37fd06): es un servidor de transmisión de TV para Linux compatible DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC y ISDB-T</description>
+    <disclaimer></disclaimer>
     <platform>all</platform>
     <news>
 101
@@ -8712,7 +8710,7 @@ Inadyn (2.5) is a small and simple Dynamic Domain Name System (DDNS) client with
   </extension>
 </addon>
 
-<addon id="service.tvheadend42" name="Tvheadend Server 4.2" version="9.2.123" provider-name="Team CoreELEC">
+<addon id="service.tvheadend42" name="Tvheadend Server 4.2" version="1.0.124" provider-name="masQelec">
   <requires><import addon="xbmc.python" version="2.1.0"/>
 
   </requires>
@@ -8723,13 +8721,11 @@ Inadyn (2.5) is a small and simple Dynamic Domain Name System (DDNS) client with
     <provides></provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <summary>Tvheadend: a TV streaming server for Linux</summary>
-    <description>
-Tvheadend (4.2.8-36): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T
-    </description>
-    <disclaimer>
-
-    </disclaimer>
+    <summary lang="en">Tvheadend: a TV streaming server for Linux</summary>
+    <description lang="en">Tvheadend (4.2.8-36): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T</description>
+    <summary lang="es">Tvheadend: un servidor de transmisión de TV para Linux</summary>
+    <description lang="es">Tvheadend (4.2.8-36): es un servidor de transmisión de TV para Linux compatible DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC y ISDB-T</description>
+    <disclaimer></disclaimer>
     <platform>all</platform>
     <news>
 123
