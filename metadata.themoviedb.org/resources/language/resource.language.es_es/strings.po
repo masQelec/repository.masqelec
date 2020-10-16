@@ -43,3 +43,11 @@ msgstr "Mantener título original"
 msgctxt "#30006"
 msgid "Preferred Certification Country"
 msgstr "Clasificación por edades"
+
+msgctxt "#30007"
+msgid "Add also IMDb ratings"
+msgstr "Agregar también calificaciones de IMDb"
+
+msgctxt "#30008"
+msgid "Enable Landscape"
+msgstr "Habilitar paisaje"
