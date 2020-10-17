@@ -13922,25 +13922,22 @@ Supported files: .j64, .jag</description>
   </extension>
 </addon>
 
-<addon id="service.softcam.oscam"
-       name="OSCam"
-       version="9.2.109"
-       provider-name="Team CoreELEC">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
+<addon id="service.softcam.oscam" name="OSCam" version="1.0.110" provider-name="masQelec">
+  <requires><import addon="xbmc.python" version="2.1.0"/>
 
   </requires>
   <extension point="xbmc.service" library="default.py">
     <provides></provides>
   </extension>
+  <extension point="xbmc.python.script" library="download.py">
+    <provides></provides>
+  </extension>
   <extension point="xbmc.addon.metadata">
-    <summary>OSCam: an Open Source Conditional Access Modul</summary>
-    <description>
-OSCam(11518) is a software to be used to decrypt digital television channels, as an alternative for a conditional access module.
-    </description>
-    <disclaimer>
-
-    </disclaimer>
+    <summary lang="en">OSCam: an Open Source Conditional Access Modul</summary>
+    <description lang="en">OSCam(11518) is a software to be used to decrypt digital television channels, as an alternative for a conditional access module.</description>
+    <summary lang="es">OSCam: es un módulo de acceso condicional de código abierto</summary>
+    <description lang="es">OSCam(11518) es un software que se utilizará para descifrar canales de televisión digital, como alternativa para un módulo de acceso condicional.</description>
+    <disclaimer></disclaimer>
     <platform>all</platform>
     <news>
 109
@@ -13976,9 +13973,7 @@ OSCam(11518) is a software to be used to decrypt digital television channels, as
 100
 - Update for LibreELEC 8.0
     </news>
-    <assets>
-      <icon>resources/icon.png</icon>
-      <fanart>resources/fanart.png</fanart>
+    <assets><icon>resources/icon.png</icon><fanart>resources/fanart.png</fanart>
 
     </assets>
   </extension>
