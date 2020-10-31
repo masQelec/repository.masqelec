@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<addon id="plugin.video.webtv" name="WebTV" version="1.1.5" provider-name="WebTV">
+<addon id="plugin.video.webtv" name="WebTV" version="1.1.6" provider-name="WebTV">
 
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -17,9 +17,8 @@
 
     <news>Últimas modificaciones de Balandro:
 
-    Canales modificados: Hdfull, Torrentdivx, Pelispedia, Tupelihd, Retroseriestv.
-    Servidores modificados: Gamovideo, Streamtape.
-    Imágenes de Tmdb con https para evitar errores en ciertos dispositivos.
+    Canales modificados: Hdfull, Pepecine, Seriespapaya, Dilo, Dospelis, Movidy.
+    Servidores modificados: Gamovideo, Fembed, Playtube, Upstream.
     </news>
 
     <assets>

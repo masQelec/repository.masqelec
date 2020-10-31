@@ -101,6 +101,7 @@ def list_all(item):
 
     post = {'action':'loadmore', 'page':item.page, 'query':post_q}
     data = do_downloadpage(HOST + 'wp-admin/admin-ajax.php', post=post)
+    # ~ data = do_downloadpage(item.url)
     # ~ logger.debug(data)
 
     matches = re.compile('<div class="col-mt-5 postsh">\s*<div class="poster-media-card">\s*<a(.*?)</a>', re.DOTALL).findall(data)

@@ -1,0 +1,15 @@
+{
+  "id": "tekilaz",
+  "name": "Tekilaz",
+  "thumbnail": "tekilaz.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": [ "movie", "tvshow" ],
+  "language": ["cast", "lat", "vose"],
+
+  "notes": "Peliculas y Series en Español, Latino, Subtitulado, por géneros y años."
+}
