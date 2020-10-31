@@ -210,7 +210,7 @@ Supported files: .a26, .bin</description>
   </extension>
 </addon>
 
-<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="1.0.104" provider-name="masQelec">
+<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="1.0.105" provider-name="masQelec">
   <requires><import addon="xbmc.python" version="2.1.0"/>
 
   </requires>
@@ -222,13 +222,23 @@ Supported files: .a26, .bin</description>
   </extension>
   <extension point="xbmc.addon.metadata">
     <summary lang="en">Tvheadend: a TV streaming server for Linux</summary>
-    <description lang="en">Tvheadend (7e1dac8): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T</description>
+    <description lang="en">Tvheadend (c66e3bc): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T</description>
     <summary lang="es">Tvheadend: un servidor de transmisión de TV para Linux</summary>
-    <description lang="es">Tvheadend (7e1dac8): es un servidor de transmisión de TV para Linux compatible DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC y ISDB-T</description>
+    <description lang="es">Tvheadend (c66e3bc): es un servidor de transmisión de TV para Linux compatible DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC y ISDB-T</description>
     <disclaimer></disclaimer>
     <platform>all</platform>
     <news>
+104
+- tvh bump to c66e3bc (master 2020.10.22)
+
+103
+- tvh bump to 0f13f59 (master 2020.07.07)
+
+102
+- tvh bump to 51a4c5b (master 2020.06.10)
+
 101
+- python3, tvh bump to 2af3b9e (master 2020.05.22)
 - update gnutls to 3.6.14
 
 100
