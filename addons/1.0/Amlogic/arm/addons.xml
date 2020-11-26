@@ -3578,7 +3578,7 @@ Supported files: .bin, .cue, .img, .mdf, .pbp, .toc, .cbn, .m3u, .chd</descripti
   </extension>
 </addon>
 
-<addon id="plugin.video.youtube" name="YouTube" version="6.8.7" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.8.8" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -3592,7 +3592,7 @@ Supported files: .bin, .cue, .img, .mdf, .pbp, .toc, .cbn, .m3u, .chd</descripti
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fixup] encoding of titles and authors during playback
+[fixup] encoding of subtitle track names
         </news>
         <assets>
             <icon>icon.png</icon>
@@ -3730,7 +3730,7 @@ Archivos soportados: .ngp, .ngc, .ngpc, .npc</description>
 
 <addon id="metadata.common.themoviedb.org"
        name="The Movie Database Scraper Library"
-       version="3.2.10"
+       version="3.2.11"
        provider-name="Team Kodi">
   <requires>
     <import addon="xbmc.metadata" version="2.1.0"/>
@@ -10887,7 +10887,7 @@ Supported files: .mgw</description>
 
 <addon id="metadata.themoviedb.org"
        name="The Movie Database"
-       version="5.2.2"
+       version="5.2.4"
        provider-name="Team Kodi">
   <requires>
     <import addon="xbmc.metadata" version="2.1.0"/>
@@ -10896,7 +10896,7 @@ Supported files: .mgw</description>
     <import addon="plugin.video.youtube" version="4.4.10" optional="true"/>
   </requires>
   <extension point="xbmc.metadata.scraper.movies"
-             language="en"
+             language="es"
              library="tmdb.xml"/>
   <extension point="xbmc.addon.metadata">
     <summary lang="af_ZA">TMDB Fliek Skraper</summary>
@@ -14602,7 +14602,7 @@ tools for the btrfs filesystem
 
 <addon id="metadata.tvshows.themoviedb.org"
        name="The Movie Database"
-       version="3.5.7"
+       version="3.5.10"
        provider-name="Team Kodi">
   <requires>
     <import addon="xbmc.metadata" version="2.1.0"/>
