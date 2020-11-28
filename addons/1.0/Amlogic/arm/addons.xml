@@ -3311,6 +3311,29 @@ FLAC stands out as the fastest and most widely supported lossless audio codec, a
   </extension>
 </addon>
 
+<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.4.8">
+  <requires>
+    <import addon="script.module.slyguy"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="default.py" provides="video">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <description lang="en">Disney+ is the exclusive home for your favorite movies and TV shows from Disney, Pixar, Marvel, Star Wars, and National Geographic.Subscription required.</description>
+    <description lang="es">Disney + es el hogar exclusivo para tus películas y programas de televisión favoritos de Disney, Pixar, Marvel, Star Wars y National Geographic.Se requiere suscripción.</description>
+    <description lang="it">Disney+ è la casa esclusiva per i tuoi film e programmi TV preferiti di Disney, Pixar, Marvel, Star Wars e National Geographic.Abbonamento richiesto.</description>
+    <reuselanguageinvoker>true</reuselanguageinvoker>
+    <license></license>
+    <language></language>
+    <website></website>
+    <news>Update Sync to Disney setting to sync both ways</news>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
+
 <addon id="game.libretro.beetle-pcfx" name="NEC - PC-FX (Beetle PC-FX)" version="0.9.36.6.1" provider-name="Libretro">
   <requires>
     <import addon="game.libretro" version="1.0.0"/>
@@ -14473,6 +14496,29 @@ Mono is no longer maintained and has been removed.
       <icon>resources/icon.png</icon>
       <fanart>resources/fanart.png</fanart>
 
+    </assets>
+  </extension>
+</addon>
+
+<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.14.8">
+  <requires>
+    <!-- <import addon="xbmc.python" version="2.1.0"/> -->
+  </requires>
+  <!-- <extension point="xbmc.python.script" library="default.py">
+    <provides>executable</provides>
+  </extension> -->
+  <extension point="xbmc.python.module" library="resources/modules" />
+  <extension point="xbmc.service" library="service.py" start="login" />
+  <extension point="xbmc.addon.metadata">
+    <description lang="en"></description>
+    <reuselanguageinvoker>true</reuselanguageinvoker>
+    <license></license>
+    <language></language>
+    <website></website>
+    <news>allow proxy to support mpd multi-adaption sets</news>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.jpg</fanart>
     </assets>
   </extension>
 </addon>

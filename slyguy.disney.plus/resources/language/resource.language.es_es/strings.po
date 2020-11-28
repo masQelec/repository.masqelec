@@ -1,0 +1,242 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: dd\n"
+"Language: es\n"
+
+#: 
+msgctxt "#30001"
+msgid "Email Address"
+msgstr "Dirección de correo electrónico"
+
+#: 
+msgctxt "#30002"
+msgid "Password"
+msgstr "Contraseña"
+
+#: 
+msgctxt "#30003"
+msgid "API request failed\n"
+"Server Error: {msg}"
+msgstr "Error en la solicitud de API\n"
+"Error del servidor: {msg}"
+
+#: 
+msgctxt "#30004"
+msgid "Movies"
+msgstr "Películas"
+
+#: 
+msgctxt "#30005"
+msgid "Series"
+msgstr "Serie"
+
+#: 
+msgctxt "#30006"
+msgid "Originals"
+msgstr "Originales"
+
+#: 
+msgctxt "#30007"
+msgid "Search"
+msgstr "Buscar"
+
+#: 
+msgctxt "#30008"
+msgid "Next Page ({page})"
+msgstr "Página siguiente ({page})"
+
+#: 
+msgctxt "#30009"
+msgid "Widevine L1 Secure Device"
+msgstr "Dispositivo seguro Widevine L1"
+
+#: 
+msgctxt "#30010"
+msgid "Suggested"
+msgstr "Sugirió"
+
+#: 
+msgctxt "#30011"
+msgid "Featured"
+msgstr "Destacados"
+
+#: 
+msgctxt "#30012"
+msgid "Season {season}"
+msgstr "Temporada {season}"
+
+#: 
+msgctxt "#30013"
+msgid "Extras"
+msgstr "Extras"
+
+#: 
+msgctxt "#30014"
+msgid "Full support on Kodi {kodi_ver} requires at least Inputstream Adaptive Version {ver_required}\n"
+"You may experience playback issues with your current version."
+msgstr "El soporte completo en Kodi {kodi_ver} requiere al menos Inputstream Adaptive Version {ver_required}\n"
+"Puede experimentar problemas de reproducción con su versión actual."
+
+#: 
+msgctxt "#30015"
+msgid "Dolby Vision"
+msgstr "Dolby Vision"
+
+#: 
+msgctxt "#30016"
+msgid "Sync with Disney+"
+msgstr "Sincronizar con Disney +"
+
+#: 
+msgctxt "#30018"
+msgid "HDR10"
+msgstr "HDR10"
+
+#: 
+msgctxt "#30019"
+msgid "H.265"
+msgstr "H.265"
+
+#: 
+msgctxt "#30020"
+msgid "Skip Credits"
+msgstr "Saltar créditos"
+
+#: 
+msgctxt "#30021"
+msgid "Play Next Episode"
+msgstr "Reproducir el próximo episodio"
+
+#: 
+msgctxt "#30022"
+msgid "Play Next Recommended Movie"
+msgstr "Reproducir la siguiente película recomendada"
+
+#: 
+msgctxt "#30023"
+msgid "Play without Intro"
+msgstr "Jugar sin Intro"
+
+#: 
+msgctxt "#30024"
+msgid "Skip Intros"
+msgstr "Saltar introducciones"
+
+#: 
+msgctxt "#30025"
+msgid "Play from Start"
+msgstr "Jugar desde el principio"
+
+#: 
+msgctxt "#30026"
+msgid "Watchlist"
+msgstr "Lista de seguimiento"
+
+#: 
+msgctxt "#30027"
+msgid "Add to Watchlist"
+msgstr "Añadir a lista de seguimiento"
+
+#: 
+msgctxt "#30028"
+msgid "Remove from Watchlist"
+msgstr "Eliminar de la lista de seguimiento"
+
+#: 
+msgctxt "#30029"
+msgid "Added to Watchlist"
+msgstr "Agregado a la lista de seguimiento"
+
+#: 
+msgctxt "#30041"
+msgid "Play with Intro"
+msgstr "Jugar con Intro"
+
+#: 
+msgctxt "#30042"
+msgid "Continue Watching"
+msgstr "Continuar viendo"
+
+#: 
+msgctxt "#30043"
+msgid "You are not entitled to access this content.\n"
+"Check your subscription is valid."
+msgstr "No tiene derecho a acceder a este contenido.\n"
+"Comprueba que tu suscripción sea válida."
+
+#: 
+msgctxt "#30044"
+msgid "Your login details are in-correct.\n"
+"Please check them and try again."
+msgstr "Sus datos de inicio de sesión no son correctos.\n"
+"Revíselos y vuelva a intentarlo."
+
+#: 
+msgctxt "#30048"
+msgid "From {time:0>8}"
+msgstr "De {time: 0>8}"
+
+#: 
+msgctxt "#30049"
+msgid "{label} [B](Available {date})[/B]"
+msgstr "{label} [B](Disponible {date})[/ B]"
+
+#: 
+msgctxt "#30050"
+msgid "D/MM/YYYY"
+msgstr "D/MM/AAAA"
+
+#: 
+msgctxt "#30051"
+msgid "Could not find stream data for this content"
+msgstr "No se pudieron encontrar los datos de transmisión para este contenido."
+
+#: 
+msgctxt "#30052"
+msgid "Dolby Atmos"
+msgstr "Dolby Atmos"
+
+#: 
+msgctxt "#30053"
+msgid "Profile Settings"
+msgstr "Configuración de perfil"
+
+#: 
+msgctxt "#30054"
+msgid "Continue Watching"
+msgstr "Continuar viendo"
+
+#: 
+msgctxt "#32055"
+msgid "Ask"
+msgstr "Pedir"
+
+#: 
+msgctxt "#32043"
+msgid "Best"
+msgstr "Mejor"
+
+#: 
+msgctxt "#32060"
+msgid "Lowest"
+msgstr "Más bajo"
+
+#: 
+msgctxt "#32048"
+msgid "Bypass"
+msgstr "Derivación"
+
+#: 
+msgctxt "#32054"
+msgid "Custom"
+msgstr "Personalizado"
+
+#: 
+msgctxt "#32073"
+msgid "Disabled"
+msgstr "Discapacitado"
+
