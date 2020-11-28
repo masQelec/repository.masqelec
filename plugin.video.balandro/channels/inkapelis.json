@@ -1,0 +1,15 @@
+{
+  "id": "inkapelis",
+  "name": "Inkapelis",
+  "thumbnail": "inkapelis.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "notes": "Películas y Series, por género, por año, por idioma, ..."
+}

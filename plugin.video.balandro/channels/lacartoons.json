@@ -1,0 +1,15 @@
+{
+  "id": "lacartoons",
+  "name": "LaCartoons",
+  "thumbnail": "lacartoons.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["lat"],
+
+  "notes": "Muchas series cartoons en español-latino."
+}

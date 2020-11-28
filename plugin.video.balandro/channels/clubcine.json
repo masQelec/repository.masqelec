@@ -1,0 +1,15 @@
+{
+  "id": "clubcine",
+  "name": "ClubCine",
+  "thumbnail": "clubcine.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "lat", "vose"],
+
+  "notes": "Cine clasico, moderno y mas historias."
+}

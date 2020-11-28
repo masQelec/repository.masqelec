@@ -1,0 +1,15 @@
+{
+  "id": "destotal",
+  "name": "DesTotal",
+  "thumbnail": "destotal.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "lat", "vose"],
+
+  "notes": "Peliculas en Español, Latino, Subtitulado, por géneros, años y calidades."
+}

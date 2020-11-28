@@ -1,0 +1,15 @@
+{
+  "id": "cinematteflix",
+  "name": "CinematteFlix",
+  "thumbnail": "cinematteflix.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "vose"],
+
+  "notes": "Películas por categorias, años y colecciones."
+}

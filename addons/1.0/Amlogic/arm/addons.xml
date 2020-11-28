@@ -2324,43 +2324,6 @@ Nitro Composer Sound Format (NCSF) is a PSF-style for Nintendo DS music, specifi
   </extension>
 </addon>
 
-
-<addon id="plugin.video.webtv" name="WebTV" version="1.1.6" provider-name="WebTV">
-
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="default.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <summary lang="es">WebTV addon</summary>
-    <description lang="es">WebTV es un navegador para webs con vídeos de películas y series, derivado de pelisalacarta y alfa.</description>
-    <disclaimer lang="es">[COLOR red]Los propietarios y remitentes de este complemento no alojan ni distribuyen ninguno de los contenidos mostrados por estos complementos ni tienen ninguna afiliación con los proveedores de contenido.[/COLOR]</disclaimer>
-
-    <news>Últimas modificaciones de Balandro:
-
-    Canales modificados: Hdfull, Pepecine, Seriespapaya, Dilo, Dospelis, Movidy.
-    Servidores modificados: Gamovideo, Fembed, Playtube, Upstream.
-    </news>
-
-    <assets>
-      <icon>icon.png</icon>
-	  <fanart>fanart.png</fanart>
-    </assets>
-
-    <platform>all</platform>
-    <license>GNU GPL v3</license>
-    <email>my@email.com</email>
-    <source>...</source>
-  </extension>
-
-  <extension point="xbmc.service" library="services.py" start="login|startup"/>
-
-</addon>
-
 <addon id="game.libretro.beetle-supergrafx" name="NEC - PC Engine SuperGrafx (Beetle SuperGrafx)" version="1.23.0.7.1" provider-name="Libretro">
   <requires>
     <import addon="game.libretro" version="1.0.0"/>
@@ -3003,6 +2966,45 @@ Boblight(478) is an opensource AmbiLight implementation.
 
     </assets>
   </extension>
+</addon>
+
+<addon id="plugin.video.balandro" name="WebTV" version="1.5.0" provider-name="WebTV">
+
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <summary lang="es">WebTV addon</summary>
+    <description lang="es">WebTV es un navegador para webs con vídeos de películas y series, derivado de pelisalacarta y alfa.</description>
+    <disclaimer lang="es">[COLOR red]Los propietarios y remitentes de este complemento no alojan ni distribuyen ninguno de los contenidos mostrados por estos complementos ni tienen ninguna afiliación con los proveedores de contenido.[/COLOR]</disclaimer>
+
+    <news>Últimas modificaciones de WebTV:
+
+    Canales modificados: Hdfull, Seriesdanko, Seriespapaya, Estrenoscinesaa, Allpeliculas,
+    Playview, Dospelis, Inkapelis, Cinecalidad.
+    Servidores modificados: Youtube, Gamovideo, Streamtape.
+    Corrección bug por cambios de tmdb.
+    Opción en Settings para forzar actualizaciones de fixs.
+    </news>
+
+    <assets>
+      <icon>icon.png</icon>
+	  <fanart>fanart.png</fanart>
+    </assets>
+
+    <platform>all</platform>
+    <license>GNU GPL v3</license>
+    <email>masqelec@gmail.com</email>
+    <source>...</source>
+  </extension>
+
+  <extension point="xbmc.service" library="services.py" start="login|startup"/>
+
 </addon>
 
 <addon id="game.controller.genesis.6button"

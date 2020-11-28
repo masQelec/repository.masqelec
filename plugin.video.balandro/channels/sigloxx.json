@@ -1,0 +1,15 @@
+{
+  "id": "sigloxx",
+  "name": "SigloXX",
+  "thumbnail": "sigloxx.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast"],
+
+  "notes": "2000 Películas del Siglo XX."
+}

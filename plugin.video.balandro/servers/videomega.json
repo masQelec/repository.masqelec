@@ -1,0 +1,18 @@
+{
+  "id": "videomega",
+  "name": "VideoMega",
+ 
+  "active": false,
+  "notes": "El dominio ya no existe",
+
+  "find_videos": {
+    "ignore_urls": [],
+    "patterns": [
+      {
+        "pattern": "videomega.co/(?:d/|e/|)([A-z0-9]+)",
+        "url": "https://www.videomega.co/\\1"
+      }
+    ]
+  }
+
+}

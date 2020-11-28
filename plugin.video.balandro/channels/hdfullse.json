@@ -1,0 +1,15 @@
+{
+  "id": "hdfullse",
+  "name": "HdFullSe",
+  "thumbnail": "hdfullse.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": [ "movie", "tvshow" ],
+  "language": ["cast", "lat", "vose"],
+
+  "notes": "Películas y series, por género, años, últimos episodios, ..."
+}

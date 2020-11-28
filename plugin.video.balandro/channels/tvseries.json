@@ -1,0 +1,15 @@
+{
+  "id": "tvseries",
+  "name": "TvSeries",
+  "thumbnail": "tvseries.png",
+
+  "active": true,
+
+  "searchable": false,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["cast"],
+
+  "notes": "Series clásicas de TV."
+}

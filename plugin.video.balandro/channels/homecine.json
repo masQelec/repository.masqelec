@@ -1,0 +1,15 @@
+{
+  "id": "homecine",
+  "name": "HomeCine",
+  "thumbnail": "homecine.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": [ "movie", "tvshow" ],
+  "language": ["cast", "lat", "vose"],
+
+  "notes": "Peliculas y Series en Español, Latino, Subtitulado, por géneros, años y países."
+}

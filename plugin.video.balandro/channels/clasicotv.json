@@ -1,0 +1,15 @@
+{
+  "id": "clasicotv",
+  "name": "ClasicoTv",
+  "thumbnail": "clasicotv.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": [ "movie", "tvshow" ],
+  "language": ["lat"],
+
+  "notes": "Peliculas y series, por géneros."
+}
