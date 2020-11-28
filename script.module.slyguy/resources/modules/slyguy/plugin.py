@@ -81,13 +81,9 @@ def merge():
             except Error as e:
                 log.debug(e, exc_info=True)
                 message = e.message
-                if int(kwargs.get('_interactive', '0')):
-                    gui.ok(e.message, heading=e.heading)
             except Exception as e:
                 log.exception(e)
                 message = str(e)
-                if int(kwargs.get('_interactive', '0')):
-                    gui.exception()
             else:
                 message = 'ok'
 

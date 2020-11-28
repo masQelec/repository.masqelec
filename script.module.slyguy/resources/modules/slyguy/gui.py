@@ -69,21 +69,20 @@ def exception(heading=None):
     text(error, heading=heading)
 
 class Progress(object):
-    def __init__(self, message, heading=None, percent=0):
-        if message is not None and KODI_VERSION < 19:
-            args = message.split('\n')[:3]
-            while len(args) < 3:
-                args.append(' ')
-        else:
-            args = [message]
-
+    def __init__(self, message, heading=None, percent=0, background=False):
         heading = _make_heading(heading)
+        if background:
+            self._dialog = xbmcgui.DialogProgressBG()
+        else:
+            self._dialog = xbmcgui.DialogProgress()
 
-        self._dialog = xbmcgui.DialogProgress()
-        self._dialog.create(heading, *args)
+        self._dialog.create(heading, *self._get_args(message))
         self.update(percent)
 
     def update(self, percent=0, message=None):
+        self._dialog.update(int(percent), *self._get_args(message))
+
+    def _get_args(self, message):
         if message is not None and KODI_VERSION < 19:
             args = message.split('\n')[:3]
             while len(args) < 3:
@@ -91,13 +90,22 @@ class Progress(object):
         else:
             args = [message]
 
-        self._dialog.update(int(percent), *args)
+        return args
 
     def iscanceled(self):
         return self._dialog.iscanceled()
 
     def close(self):
         self._dialog.close()
+
+def progressbg(message='', heading=None, percent=0):
+    heading = _make_heading(heading)
+
+    dialog = xbmcgui.DialogProgressBG()
+    dialog.create(heading, message)
+    dialog.update(percent)
+
+    return dialog
 
 @contextmanager
 def progress(message='', heading=None, percent=0):
