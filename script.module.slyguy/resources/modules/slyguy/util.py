@@ -70,7 +70,7 @@ def get_addon(addon_id, required=False, install=True):
         try: return xbmcaddon.Addon(addon_id)
         except: pass
 
-        if required or install:
+        if install:
             xbmc.executebuiltin('InstallAddon({})'.format(addon_id), True)
             
         kodi_rpc('Addons.SetAddonEnabled', {'addonid': addon_id, 'enabled': True}, raise_on_error=True)

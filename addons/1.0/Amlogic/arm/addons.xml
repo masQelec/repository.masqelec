@@ -10366,7 +10366,8 @@ This addon allows playing of .ORG files for this format.</description>
         </extension>
         <extension point="xbmc.addon.metadata">
             <summary>masQelec Repository</summary>
-            <description>El repositorio de complementos masQelec.</description>
+		<description lang="en">The masQelec add-on repository contains Kodi PVR Clients and Servers, Screensavers, Visualisations, and more. Add-ons in this repository are maintained and supported by masQelec staff and YOU the community. If you find a broken or non-working add-on please report it via the forums, or help by submitting fixes via GitHub.</description>
+		<description lang="es">El repositorio de complementos masQelec contiene clientes y servidores Kodi PVR, protectores de pantalla, visualizaciones y más. Los complementos en este repositorio son mantenidos y respaldados por el personal de masQelec y USTED la comunidad. Si encuentra un complemento roto o que no funciona, infórmelo a través de los foros o ayude enviando soluciones a través de GitHub.</description>
             <platform>all</platform>
     </extension>
 </addon>
@@ -14500,7 +14501,7 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.14.9">
+<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.15.1">
   <requires>
     <!-- <import addon="xbmc.python" version="2.1.0"/> -->
   </requires>

@@ -152,9 +152,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         data = data.replace('</pssh>', '</cenc:pssh>')
 
         try:
-            root = parseString(data)
-        except:
+            root = parseString(data.encode('utf8'))
+        except Exception as e:
             log.debug("Proxy: Failed to parse MPD")
+            log.exception(e)
             return self._output_response(response)
 
         mpd = root.getElementsByTagName("MPD")[0]
