@@ -213,6 +213,12 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             for stream in adap_set.getElementsByTagName("Representation"):
                 attrib = {}
+                multiply = 1
+
+                if adap_set.getAttribute('codecs') == 'ec-3':
+                    multiply = 1000000
+                    adap_set.setAttribute('codecs', 'ac-3')
+                    log.debug('ec-3 set to ac-3 and set to top')
 
                 for key in adap_set.attributes.keys():
                     attrib[key] = adap_set.getAttribute(key)
@@ -221,7 +227,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     attrib[key] = stream.getAttribute(key)
 
                 if 'bandwidth' in attrib:
-                    bandwidth = int(attrib['bandwidth'])
+                    bandwidth = int(attrib['bandwidth'])*multiply
                     if bandwidth > highest_bandwidth:
                         highest_bandwidth = bandwidth
                 
@@ -244,7 +250,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         video_sets.sort(key=lambda  x: x[0], reverse=True)
         audio_sets.sort(key=lambda  x: x[0], reverse=True)
         trick_sets.sort(key=lambda  x: x[0], reverse=True)
-    
+
         select_set = int(self.headers.get('_proxy_adaption_set', 0))
         if select_set > 0 and len(video_sets) > select_set:
             video_sets.insert(0, video_sets.pop(select_set))
