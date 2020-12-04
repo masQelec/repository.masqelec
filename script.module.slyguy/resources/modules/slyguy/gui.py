@@ -129,6 +129,10 @@ def numeric(message, default='', type=0, **kwargs):
     except:
         return None
 
+def error(message, heading=None):
+    heading = heading or _(_.PLUGIN_ERROR, addon=ADDON_NAME)
+    return ok(message, heading)
+
 def ok(message, heading=None):
     heading = _make_heading(heading)
     return xbmcgui.Dialog().ok(heading, message)
@@ -264,6 +268,7 @@ class Item(object):
                 '_proxy_audio_description': str(int(settings.getBool('audio_description', True))),
                 '_proxy_subs_forced': str(int(settings.getBool('subs_forced', True))),
                 '_proxy_subs_non_forced': str(int(settings.getBool('subs_non_forced', True))),
+                '_proxy_addon_id': ADDON_ID,
             })
 
             self.path = u'{}{}'.format(PROXY_PATH, self.path)

@@ -23,7 +23,6 @@ from slyguy import settings
 
 from .constants import PROXY_CACHE, PROXY_CACHE_AHEAD, PROXY_CACHE_BEHIND
 
-patterns = {}
 sessions = OrderedDict()
 
 REMOVE_OUT_HEADERS = ['connection', 'transfer-encoding', 'content-encoding', 'date', 'server', 'content-length']
@@ -160,12 +159,27 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         mpd = root.getElementsByTagName("MPD")[0]
 
-        # if response.url not in patterns:
-        #     patterns[response.url] = {}
+        ## Set publishtime to utctime
+        utc_time = mpd.getElementsByTagName("UTCTiming")
+        if utc_time:
+            value = utc_time[0].getAttribute('value')
+            mpd.setAttribute('publishTime', value)
+            log.debug('publishTime updated to UTCTiming ({})'.format(value))
 
-        base_urls      = []
+        for elem in mpd.getElementsByTagName("SupplementalProperty"):
+            if elem.getAttribute('schemeIdUri') == 'urn:scte:dash:utc-time':
+                value = elem.getAttribute('value')
+                mpd.setAttribute('publishTime', value)
+                log.debug('publishTime updated to urn:scte:dash:utc-time ({})'.format(value))
+                break
+
+        ## FIXED in IA 2.4.6
+        ## Commit: https://github.com/peak3d/inputstream.adaptive/commit/dc7b42783d18c65ebcf205a4979a1c9ea6b825e7
+        if self.headers.get('_proxy_addon_id') == 'plugin.video.skygo.nz' and 'availabilityStartTime' in mpd.attributes.keys():
+            mpd.removeAttribute('availabilityStartTime')
+            log.debug('Sky go fix: Remove availabilityStartTime')
+
         base_url_nodes = []
-
         for node in mpd.childNodes:
             if node.nodeType == node.ELEMENT_NODE:
                 if node.localName == 'BaseURL':
@@ -174,24 +188,14 @@ class RequestHandler(BaseHTTPRequestHandler):
                     if not url.startswith('http'):
                         url = urljoin(response.url, url)
 
-                    base_urls.append(url)
-                    base_url_nodes.append(node)
                     node.firstChild.nodeValue = PROXY_PATH + url
-
-        if not base_urls:
-            base_urls = [response.url]
-
-        ### SKY GO FIX
-        ## FIXED WITH COMMIT: https://github.com/peak3d/inputstream.adaptive/commit/dc7b42783d18c65ebcf205a4979a1c9ea6b825e7
-        if 'availabilityStartTime' in mpd.attributes.keys():
-            mpd.removeAttribute('availabilityStartTime')
-        ##############
+                    base_url_nodes.append(node)
 
         # Keep first base_url node
         if base_url_nodes:
             base_url_nodes.pop(0)
             for e in base_url_nodes:
-                mpd.removeChild(e)
+                e.parentNode.removeChild(e)
         ####################
 
         ## SUPPORT NEW DOLBY FORMAT
@@ -201,12 +205,18 @@ class RequestHandler(BaseHTTPRequestHandler):
                 elem.setAttribute('schemeIdUri', 'urn:dolby:dash:audio_channel_configuration:2011')
         ###########################
 
+        ## Make sure Representation are last in adaptionset
+        for elem in root.getElementsByTagName('Representation'):
+            parent = elem.parentNode
+            parent.removeChild(elem)
+            parent.appendChild(elem)
+
         ## SORT ADAPTION SETS BY BITRATE ##
         video_sets = []
         audio_sets = []
         trick_sets = []
 
-        for idx, adap_set in enumerate(root.getElementsByTagName('AdaptationSet')):
+        for adap_set in root.getElementsByTagName('AdaptationSet'):
             highest_bandwidth = 0
             is_video = False
             is_trick = False
@@ -278,35 +288,44 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 if url.startswith('http'):
                     e.setAttribute(attrib, PROXY_PATH + url)
-                #     pattern = '^' + re.escape(url)
-                # else:
-                #     pattern = '.*' + re.escape(urljoin('.', url))
-
-                # pattern = pattern.replace('\$RepresentationID\$', '(?P<RepresentationID>.+?)')
-                # pattern = re.sub(r'\\\$Number.*?\\\$', '(?P<Number>[0-9]+?)', pattern)
-                # pattern += '$'
-                # pattern = re.compile(pattern)
-
-                # template = url.replace('$RepresentationID$', '%(RepresentationID)s')
-                # match    = re.search('(\$Number(.*?)\$)', template)
-
-                # if match:
-                #     if match.group(2):
-                #         template = template.replace(match.group(0), match.group(2).replace('%', '%(Number)'))
-                #     else:
-                #         template = template.replace(match.group(0), '%(Number)d')
-
-                # patterns[response.url][url] = {'pattern': pattern, 'template': template, 'cached': {}, 'base_urls': base_urls}
 
             process_attrib('initialization')
             process_attrib('media')
 
+            ## FIX FOR BEIN MENA TO GET CORRECT SEGMENT
+            ## PR TO FIX: https://github.com/peak3d/inputstream.adaptive/pull/564
+            if 'presentationTimeOffset' in e.attributes.keys():
+                e.removeAttribute('presentationTimeOffset')
+            ###################
+
+        if ADDON_DEV:
+            text = root.toprettyxml(encoding='utf-8')
+            text = b"\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
+            with open(xbmc.translatePath('special://temp/proxy.mpd'), 'wb') as f:
+                f.write(text)
+
         response.stream.set(root.toxml(encoding='utf-8'))
 
-    def _default_audio_fix(self, m3u8):
-        if '#EXT-X-MEDIA' not in m3u8:
-            return m3u8
+    def _parse_m3u8(self, response):
+        m3u8 = response.stream.read().decode('utf8')
 
+        ## FIX AES-128 streams with KEYFORMAT
+        ## Fixed with this PR: https://github.com/peak3d/inputstream.adaptive/pull/461
+        m3u8 = m3u8.replace('KEYFORMAT="identity"', 'KEYFORMAT=""')
+
+        if '#EXT-X-STREAM-INF' in m3u8:
+            try:
+                m3u8 = self._parse_m3u8_master(m3u8)
+            except Exception as e:
+                log.exception(e)
+                log.debug('failed to parse m3u8 master')
+
+        m3u8 = re.sub(r'^/', r'{}'.format(urljoin(response.url, '/')), m3u8, flags=re.I|re.M)
+        m3u8 = re.sub(r'(https?)://', r'{}\1://'.format(PROXY_PATH), m3u8, flags=re.I)
+
+        response.stream.set(m3u8.encode('utf8'))
+
+    def _parse_m3u8_master(self, m3u8):
         def _process_media(line):
             attribs = {}
 
@@ -399,27 +418,6 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return m3u8
 
-    def _parse_m3u8(self, response):
-        m3u8 = response.stream.read().decode('utf8')
-        is_master = '#EXT-X-STREAM-INF' in m3u8
-
-        ## FIX AES-128 streams with KEYFORMAT
-        ## Fixed with this PR: https://github.com/peak3d/inputstream.adaptive/pull/461
-        m3u8 = m3u8.replace('KEYFORMAT="identity"', 'KEYFORMAT=""')
-
-        if is_master:
-            try:
-                m3u8 = self._default_audio_fix(m3u8)
-            except Exception as e:
-                log.exception(e)
-            else:
-                log.debug('Proxy: Default audio fixed')
-
-        m3u8 = re.sub(r'^/', r'{}'.format(urljoin(response.url, '/')), m3u8, flags=re.I|re.M)
-        m3u8 = re.sub(r'(https?)://', r'{}\1://'.format(PROXY_PATH), m3u8, flags=re.I)
-
-        response.stream.set(m3u8.encode('utf8'))
-
     def _proxy_request(self, method, url):
         parsed = urlparse(url)
 
@@ -448,10 +446,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         if len(sessions) > 5:
             sessions.popitem(last=False)
 
-        devlog('{} OUT: {}'.format(method.upper(), url))
-
         response = session.request(method=method, url=url, headers=headers, data=post_data, allow_redirects=False, stream=True)
         response.stream = ResponseStream(response, self._chunk_size)
+
+        devlog('{} OUT: {} ({})'.format(method.upper(), url, response.status_code))
 
         headers = {}
         for header in response.headers:
@@ -504,124 +502,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         response = self._proxy_request('POST', url)
         self._output_response(response)
 
-    # def _cache(self, response, output=False):
-    #     if output:
-    #         self._output_headers(response)
-
-    #     filepath = os.path.join(PROXY_CACHE, str(uuid.uuid4()))
-
-    #     try:
-    #         f = open(filepath, 'wb')
-    #     except:
-    #         f = None
-
-    #     for chunk in response.stream.iter_content():
-    #         if output:
-    #             try: 
-    #                 self.wfile.write(chunk)
-    #             except Excepton as e:
-    #                 f = None
-    #                 break
-            
-    #         if f:
-    #             try: f.write(chunk)
-    #             except: f = None
-
-    #         elif not output:
-    #             break
-
-    #     if not f:
-    #         devlog('Cache failed')
-    #         try: os.remove(filepath)
-    #         except: pass
-    #         return False
-
-    #     devlog('Cached!')
-    #     return filepath
-
-    # def _search_patterns(self, url):
-    #     for key in patterns:
-    #         pattern = patterns[key]
-    #         for key2 in pattern:
-    #             match = pattern[key2]['pattern'].match(url)
-    #             if match:
-    #                 return self._download_segment(pattern[key2], match.groupdict())
-
-    #     return False
-
-    # def _remove_cache(self, key):
-    #     cached = self.cached.pop(key, None)
-    #     if not cached:
-    #         return
-
-    #     try: os.remove(cached['file_path'])
-    #     except: pass
-
-    # def _check_cache(self, key):
-    #     cached = self.cached.get(key)
-
-    #     try:
-    #         if not cached or not os.path.exists(cached['file_path']):
-    #             return False
-    #     except:
-    #         return False
-
-    #     if cached.get('expires') and cached['expires'] < time.time():
-    #         devlog('Cache Expired')
-    #         self._remove_cache(key)
-    #         return False
-
-    #     devlog('Cache Hit')
-
-    #     self.send_response(200)
-
-    #     for key in cached['headers']:
-    #         self.send_header(key, cached['headers'][key])
-
-    #     self.end_headers()
-
-    #     with open(cached['file_path'], 'rb') as f:
-    #         shutil.copyfileobj(f, self.wfile, length=self._chunk_size)
-
-    #     return True
-
-    # def _download_segment(self, pattern, params):
-    #     params['Number'] = int(params.get('Number', -1))
-    #     if self._check_cache(pattern['cached'], params['Number']):
-    #         return True
-
-    #     seg_url = pattern['template'] % params
-
-    #     if seg_url.startswith('http'):
-    #         response = self._proxy_request('GET', seg_url)
-    #     else:
-    #         good_base = pattern['base_urls'][0]
-
-    #         for base_url in pattern['base_urls']:
-    #             response = self._proxy_request('GET', urljoin(base_url, seg_url))
-    #             if response.ok:
-    #                 good_base = base_url
-    #                 break
-
-    #         pattern['base_urls'].remove(good_base)
-    #         pattern['base_urls'].insert(0, good_base)
-            
-    #     if params['Number'] > -1 and response.ok and PROXY_CACHE_BEHIND > 0:
-    #         file_path = self._cache(response, output=True)  #if want to cache what we have watched (maybe cache either side of current segment for nice rewind)
-    #         pattern['cached'][params['Number']] = {'file_path': file_path, 'headers': response.headers}
-    #     else:
-    #         self._output_response(response)
-        
-    #     return True
-
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     daemon_threads = True
 
 class Proxy(object):
-    def __init__(self):
-        if not os.path.exists(PROXY_CACHE):
-            os.makedirs(PROXY_CACHE)
-
     def start(self):
         self._server = ThreadedHTTPServer((HOST, PORT), RequestHandler)
         self._httpd_thread = threading.Thread(target=self._server.serve_forever)

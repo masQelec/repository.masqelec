@@ -25,6 +25,7 @@ class Session(requests.Session):
         self._timeout     = timeout or settings.getInt('http_timeout', 30)
         self._attempts    = attempts or settings.getInt('http_retries', 2)
         self._verify      = verify if verify is not None else settings.getBool('verify_ssl', True)
+        self.after_request = None
 
         self.headers.update(DEFAULT_HEADERS)
         self.headers.update(self._headers)
@@ -61,10 +62,16 @@ class Session(requests.Session):
                 log('{}{} {}'.format(attempt, method, url))
 
             try:
-                return super(Session, self).request(method, url, **kwargs)
+                resp = super(Session, self).request(method, url, **kwargs)
             except:
+                resp = None
                 if i == attempts:
                     raise
+
+            if resp is not None and self.after_request:
+                self.after_request(resp)
+
+            return resp
 
     def save_cookies(self):
         if not self._cookies_key:
