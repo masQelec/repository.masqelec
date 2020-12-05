@@ -103,7 +103,7 @@ def progressbg(message='', heading=None, percent=0):
 
     dialog = xbmcgui.DialogProgressBG()
     dialog.create(heading, message)
-    dialog.update(percent)
+    dialog.update(int(percent))
 
     return dialog
 

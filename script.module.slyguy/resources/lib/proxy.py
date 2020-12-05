@@ -25,7 +25,7 @@ from .constants import PROXY_CACHE, PROXY_CACHE_AHEAD, PROXY_CACHE_BEHIND
 
 sessions = OrderedDict()
 
-REMOVE_OUT_HEADERS = ['connection', 'transfer-encoding', 'content-encoding', 'date', 'server', 'content-length']
+REMOVE_OUT_HEADERS = ['connection', 'transfer-encoding', 'content-encoding', 'date', 'server', 'content-length', 'set-cookie']
 
 HOST = settings.get('proxy_host')
 PORT = settings.getInt('proxy_port')
@@ -215,6 +215,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         video_sets = []
         audio_sets = []
         trick_sets = []
+        lang_adap_sets = []
+
+        default_language = self.headers.get('_proxy_default_language', '')
+        if default_language:
+            for elem in root.getElementsByTagName('Role'):
+                if elem.getAttribute('schemeIdUri') == 'urn:mpeg:dash:role:2011':
+                    elem.parentNode.removeChild(elem)
 
         for adap_set in root.getElementsByTagName('AdaptationSet'):
             highest_bandwidth = 0
@@ -235,6 +242,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 for key in stream.attributes.keys():
                     attrib[key] = stream.getAttribute(key)
+
+                if default_language and 'audio' in attrib.get('mimeType', '') and attrib.get('lang') == default_language:
+                    lang_adap_sets.append(adap_set)
 
                 if 'bandwidth' in attrib:
                     bandwidth = int(attrib['bandwidth'])*multiply
@@ -275,6 +285,20 @@ class RequestHandler(BaseHTTPRequestHandler):
         for elem in trick_sets:
             elem[2].appendChild(elem[1])
         ##################
+
+        ## Set default languae
+        if lang_adap_sets:
+            for elem in root.getElementsByTagName('Role'):
+                if elem.getAttribute('schemeIdUri') == 'urn:mpeg:dash:role:2011':
+                    elem.parentNode.removeChild(elem)
+
+            for adap_set in lang_adap_sets:
+                elem = root.createElement('Role')
+                elem.setAttribute('schemeIdUri', 'urn:mpeg:dash:role:2011')
+                elem.setAttribute('value', 'main')
+                adap_set.appendChild(elem)
+                log.debug('default language set to: {}'.format(default_language))
+        ####
 
         elems = root.getElementsByTagName('SegmentTemplate')
         elems.extend(root.getElementsByTagName('SegmentURL'))
@@ -446,6 +470,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         if len(sessions) > 5:
             sessions.popitem(last=False)
 
+        # session.cookies.clear()
+        # session.headers.clear()
+
         response = session.request(method=method, url=url, headers=headers, data=post_data, allow_redirects=False, stream=True)
         response.stream = ResponseStream(response, self._chunk_size)
 
@@ -465,6 +492,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                 headers['location'] = urljoin(url, headers['location'])
 
             headers['location']  = PROXY_PATH + headers['location']
+
+        ## NEED TO FIX SET-COOKIE ##
 
         response.headers = headers
 
