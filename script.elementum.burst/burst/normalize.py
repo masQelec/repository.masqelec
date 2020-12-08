@@ -6,12 +6,22 @@
 """
     Normalization strings to Unicode
 """
+
+from __future__ import unicode_literals
+from future.builtins import range, chr
+from future.utils import PY3
+
 import json
 import re
 import unicodedata
-from HTMLParser import HTMLParser
-from urllib import unquote
-
+if PY3:
+    from urllib.parse import unquote
+    from html.parser import HTMLParser
+    unicode = str
+else:
+    from urllib import unquote
+    from .parser.HTMLParser import HTMLParser
+from kodi_six import py2_encode, py2_decode
 
 def clean_title(string=None):
     """
@@ -56,7 +66,7 @@ def remove_accents(string):
         string = normalize_string(string)
 
     nfkd_form = unicodedata.normalize('NFKD', string)
-    only_ascii = nfkd_form.encode('ASCII', 'ignore').strip()
+    only_ascii = py2_encode(nfkd_form, 'ASCII', 'ignore').strip()
     return string if only_ascii == u'' else only_ascii
 
 
@@ -68,10 +78,10 @@ def remove_control_chars(string):
     :return: modified string
     :rtype: unicode
     """
-    control_chars = ''.join(map(unichr, range(0, 32) + range(127, 160)))
+    control_chars = ''.join(map(chr, list(range(0, 32)) + list(range(127, 160))))
     control_char_re = re.compile(u'[%s]' % re.escape(control_chars))
     tem_string = control_char_re.sub('', string)
-    control_char_re = re.compile(u'[%s]' % re.escape(unichr(160)))
+    control_char_re = re.compile(u'[%s]' % re.escape(chr(160)))
     return control_char_re.sub(' ', tem_string)
 
 
@@ -146,7 +156,7 @@ def normalize_string(string, charset=None, replacing=False):
     if not isinstance(string, unicode):
         try:
             if re.search(u'=[0-9a-fA-F]{2}', string):
-                string = string.decode('Quoted-printable')
+                string = py2_decode(string, 'Quoted-printable')
 
             string = json.loads(u'%s' % string, encoding=charset)
 
@@ -155,7 +165,7 @@ def normalize_string(string, charset=None, replacing=False):
                 string = unicode(eval(string), 'raw_unicode_escape')
 
             except (SyntaxError, NameError):
-                string = string.decode('latin-1')
+                string = py2_decode(string, 'latin-1')
                 pass
 
             except TypeError:
@@ -287,8 +297,8 @@ def fix_bad_unicode(string):
 
 
 def reinterpret_latin1_as_utf8(wrong_text):
-    new_bytes = wrong_text.encode('latin-1', 'replace')
-    return new_bytes.decode('utf-8', 'replace')
+    new_bytes = py2_encode(wrong_text, 'latin-1', 'replace')
+    return py2_decode(new_bytes, 'utf-8', 'replace')
 
 
 def reinterpret_windows1252_as_utf8(wrong_text):
@@ -303,12 +313,12 @@ def reinterpret_windows1252_as_utf8(wrong_text):
     altered_bytes = []
     for char in wrong_text:
         if ord(char) in WINDOWS_1252_GREMLINS:
-            altered_bytes.append(char.encode('WINDOWS_1252'))
+            altered_bytes.append(py2_encode(char, 'WINDOWS_1252'))
 
         else:
-            altered_bytes.append(char.encode('latin-1', 'replace'))
+            altered_bytes.append(py2_encode(char, 'latin-1', 'replace'))
 
-    return ''.join(altered_bytes).decode('utf-8', 'replace')
+    return py2_decode(''.join(altered_bytes), 'utf-8', 'replace')
 
 
 def reinterpret_latin1_as_windows1252(wrong_text):
@@ -320,7 +330,7 @@ def reinterpret_latin1_as_windows1252(wrong_text):
     :return: corrected text
     :rtype: str or unicode
     """
-    return wrong_text.encode('latin-1').decode('WINDOWS_1252', 'replace')
+    return py2_decode(py2_encode(wrong_text, 'latin-1'), 'WINDOWS_1252', 'replace')
 
 
 def text_badness(text):
@@ -346,7 +356,7 @@ def text_badness(text):
     very_weird_things = 0
     weird_things = 0
     prev_letter_script = None
-    for pos in xrange(len(text)):
+    for pos in range(len(text)):
         char = text[pos]
         index = ord(char)
         if index < 256:
@@ -445,7 +455,7 @@ WINDOWS_1252_GREMLINS = [
 ]
 
 # a list of Unicode characters that might appear in Windows-1252 text
-WINDOWS_1252_CODEPOINTS = range(256) + WINDOWS_1252_GREMLINS
+WINDOWS_1252_CODEPOINTS = list(range(256)) + WINDOWS_1252_GREMLINS
 
 # Rank the characters typically represented by a single byte -- that is, in
 # Latin-1 or Windows-1252 -- by how weird it would be to see them in running
@@ -471,4 +481,64 @@ SINGLE_BYTE_WEIRDNESS = (
     5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 5,  # 0x00
     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  # 0x10
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # 0x20
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # 0x30
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # 0x40
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # 0x50
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # 0x60
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,  # 0x70
+    2, 5, 1, 4, 1, 1, 3, 3, 4, 3, 1, 1, 1, 5, 1, 5,  # 0x80
+    5, 1, 1, 1, 1, 3, 1, 1, 4, 1, 1, 1, 1, 5, 1, 1,  # 0x90
+    1, 0, 2, 2, 3, 2, 4, 2, 4, 2, 2, 0, 3, 1, 1, 4,  # 0xa0
+    2, 2, 3, 3, 4, 3, 3, 2, 4, 4, 4, 0, 3, 3, 3, 0,  # 0xb0
+    0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # 0xc0
+    1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,  # 0xd0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # 0xe0
+    1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,  # 0xf0
+)
+
+# Pre-cache the Unicode data saying which of these first 256 characters are
+# letters. We'll need it often.
+SINGLE_BYTE_LETTERS = [
+    unicodedata.category(chr(i)).startswith('L')
+    for i in range(256)
+]
+
+# A table telling us how to interpret the first word of a letter's Unicode
+# name. The number indicates how frequently we expect this script to be used
+# on computers. Many scripts not included here are assumed to have a frequency
+# of '0' -- if you're going to write in Linear B using Unicode, you're
+# probably aware enough of encoding issues to get it right.
+#
+# The lowercase name is a general category -- for example, Han characters and
+# Hiragana characters are very frequently adjacent in Japanese, so they all go
+# into category 'cjk'. Letters of different categories are assumed not to
+# appear next to each other often.
+SCRIPT_TABLE = {
+    'LATIN': (3, 'latin'),
+    'CJK': (2, 'cjk'),
+    'ARABIC': (2, 'arabic'),
+    'CYRILLIC': (2, 'cyrillic'),
+    'GREEK': (2, 'greek'),
+    'HEBREW': (2, 'hebrew'),
+    'KATAKANA': (2, 'cjk'),
+    'HIRAGANA': (2, 'cjk'),
+    'HIRAGANA-KATAKANA': (2, 'cjk'),
+    'HANGUL': (2, 'cjk'),
+    'DEVANAGARI': (2, 'devanagari'),
+    'THAI': (2, 'thai'),
+    'FULLWIDTH': (2, 'cjk'),
+    'MODIFIER': (2, None),
+    'HALFWIDTH': (1, 'cjk'),
+    'BENGALI': (1, 'bengali'),
+    'LAO': (1, 'lao'),
+    'KHMER': (1, 'khmer'),
+    'TELUGU': (1, 'telugu'),
+    'MALAYALAM': (1, 'malayalam'),
+    'SINHALA': (1, 'sinhala'),
+    'TAMIL': (1, 'tamil'),
+    'GEORGIAN': (1, 'georgian'),
+    'ARMENIAN': (1, 'armenian'),
+    'KANNADA': (1, 'kannada'),  # mostly used for looks of disapproval
+    'MASCULINE': (1, 'latin'),
+    'FEMININE': (1, 'latin')
+}

@@ -34,7 +34,7 @@ class Parser(object):
             except:
                 fps = ''
 
-            qualities.append([stream['bandwidth'], _(_.QUALITY_BITRATE, bandwidth=float(stream['bandwidth'])/1000000, resolution=stream['resolution'], fps=fps)])
+            qualities.append([stream['bandwidth'], _(_.QUALITY_BITRATE, bandwidth=int((stream['bandwidth']/10000.0))/100.00, resolution=stream['resolution'], fps=fps)])
 
         return qualities
 
@@ -71,6 +71,7 @@ class M3U8(Parser):
         marker = '#EXT-X-STREAM-INF:'
         pattern = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
 
+        suburls = []
         line1 = None
         for line in text.split('\n'):
             line = line.strip()
@@ -99,8 +100,12 @@ class M3U8(Parser):
                 resolution = attributes.get('resolution', '')
                 frame_rate = attributes.get('frame_rate', '')
 
-                if bandwidth and (num_codecs != 1 or resolution or frame_rate):
-                    self._streams.append({'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'adaption_set': 0})
+                url = line.lower().strip()#.split('?')[0]
+                if url not in suburls:
+                    if bandwidth and (num_codecs != 1 or resolution or frame_rate):
+                        self._streams.append({'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'adaption_set': 0})
+
+                    suburls.append(url)
 
                 line1 = None
 

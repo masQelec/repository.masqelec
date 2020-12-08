@@ -195,4 +195,201 @@ msgid "For Developers"
 msgstr "Para desarrolladores"
 
 msgctxt "#32086"
-msgid "Log debug messages for parsi
+msgid "Log debug messages for parsing"
+msgstr "Registrar mensajes de depuración para análisis"
+
+msgctxt "#32087"
+msgid "Filtering"
+msgstr "Filtrado"
+
+msgctxt "#32088"
+msgid "Require matching of these settings"
+msgstr "Concordancias requeridas"
+
+msgctxt "#32089"
+msgid "Resolution"
+msgstr "Resolución"
+
+msgctxt "#32090"
+msgid "Required keywords"
+msgstr "Palabras claves"
+
+msgctxt "#32091"
+msgid "Release type"
+msgstr "Tipo de versión"
+
+msgctxt "#32092"
+msgid "Size"
+msgstr "Tamaño"
+
+msgctxt "#32093"
+msgid "List of public DNS IPs"
+msgstr "DNS Público"
+
+msgctxt "#32094"
+msgid "List of Opennic DNS IPs"
+msgstr "DNS Openic"
+
+msgctxt "#32095"
+msgid "Proxy"
+msgstr "Proxy"
+
+msgctxt "#32096"
+msgid "Enabled"
+msgstr "Habilitado"
+
+msgctxt "#32097"
+msgid "Host"
+msgstr "Host"
+
+msgctxt "#32098"
+msgid "Port"
+msgstr "Puerto"
+
+msgctxt "#32099"
+msgid "Login"
+msgstr "Usuario"
+
+msgctxt "#32100"
+msgid "Password"
+msgstr "Contraseña"
+
+msgctxt "#32101"
+msgid "Proxy type"
+msgstr "Tipo de proxy"
+
+msgctxt "#32102"
+msgid "SOCKS4"
+msgstr "SOCKS4"
+
+msgctxt "#32103"
+msgid "SOCKS5"
+msgstr "SOCKS5"
+
+msgctxt "#32104"
+msgid "HTTP"
+msgstr "HTTP"
+
+msgctxt "#32105"
+msgid "HTTPS"
+msgstr "HTTPS"
+
+msgctxt "#32106"
+msgid "Use proxy settings"
+msgstr "Usar configuración"
+
+msgctxt "#32107"
+msgid "Proxy from Elementum settings"
+msgstr "Elementum"
+
+msgctxt "#32108"
+msgid "Custom settings"
+msgstr "Personalizada"
+
+msgctxt "#32109"
+msgid "Antizapret proxy"
+msgstr "Proxy Antizapret"
+
+msgctxt "#32110"
+msgid "International"
+msgstr "Internacional"
+
+msgctxt "#32111"
+msgid "English"
+msgstr "Inglés"
+
+msgctxt "#32112"
+msgid "Italian"
+msgstr "Italiano"
+
+msgctxt "#32113"
+msgid "French"
+msgstr "Francés"
+
+msgctxt "#32114"
+msgid "Russian"
+msgstr "Ruso"
+
+msgctxt "#32115"
+msgid "Ukrainian"
+msgstr "Ucraniano"
+
+msgctxt "#32116"
+msgid "Bulgarian"
+msgstr "Búlgaro"
+
+msgctxt "#32117"
+msgid "Romanian"
+msgstr "Rumano"
+
+msgctxt "#32118"
+msgid "Hungarian"
+msgstr "Húngaro"
+
+msgctxt "#32119"
+msgid "Sort returned results by"
+msgstr "Ordenar resultados por"
+
+msgctxt "#32120"
+msgid "Resolution"
+msgstr "Resolución"
+
+msgctxt "#32121"
+msgid "Seeds"
+msgstr "Semillas"
+
+msgctxt "#32122"
+msgid "Size"
+msgstr "Tamaño"
+
+msgctxt "#32123"
+msgid "Balanced"
+msgstr "Balanceado"
+
+msgctxt "#32124"
+msgid "Automatically adjust timeout according to Elementum settings"
+msgstr "Ajustar automáticamente tiempo de espera según configuración de elementum"
+
+msgctxt "#32125"
+msgid "Proxy http requests with Elementum"
+msgstr "Usar configuración proxy de Elementum"
+
+msgctxt "#32126"
+msgid "Polish"
+msgstr "Polaco"
+
+msgctxt "#32127"
+msgid "Lithuanian"
+msgstr "Lituano"
+
+msgctxt "#32128"
+msgid "Public trackers [A .. M]"
+msgstr "Trackers públicos [A .. M]"
+
+msgctxt "#32129"
+msgid "Public trackers [N .. ]"
+msgstr "Trackers públicos [N .. Z]"
+
+msgctxt "#32130"
+msgid "Private trackers [A .. M]"
+msgstr "Trackers privados [A .. M]"
+
+msgctxt "#32131"
+msgid "Private trackers [N .. ]"
+msgstr "Trackers privados [N .. Z]"
+
+msgctxt "#32132"
+msgid "Remove quotes from search query"
+msgstr "Eliminar comillas de la consulta de búsqueda"
+
+msgctxt "#32133"
+msgid "Resolution"
+msgstr "Resolución"
+
+msgctxt "#32134"
+msgid "Video quality"
+msgstr "Calidad de vídeo"
+
+#~ msgctxt "#32040"
+#~ msgid "Maximum torrents"
+#~ msgstr "Número máximo de torrents"

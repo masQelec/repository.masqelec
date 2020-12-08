@@ -219,3 +219,181 @@ msgid "Release type"
 msgstr ""
 
 msgctxt "#32092"
+msgid "Size"
+msgstr ""
+
+msgctxt "#32093"
+msgid "List of public DNS IPs"
+msgstr ""
+
+msgctxt "#32094"
+msgid "List of Opennic DNS IPs"
+msgstr ""
+
+msgctxt "#32095"
+msgid "Proxy"
+msgstr ""
+
+msgctxt "#32096"
+msgid "Enabled"
+msgstr ""
+
+msgctxt "#32097"
+msgid "Host"
+msgstr ""
+
+msgctxt "#32098"
+msgid "Port"
+msgstr ""
+
+msgctxt "#32099"
+msgid "Login"
+msgstr ""
+
+msgctxt "#32100"
+msgid "Password"
+msgstr ""
+
+msgctxt "#32101"
+msgid "Proxy type"
+msgstr ""
+
+msgctxt "#32102"
+msgid "SOCKS4"
+msgstr ""
+
+msgctxt "#32103"
+msgid "SOCKS5"
+msgstr ""
+
+msgctxt "#32104"
+msgid "HTTP"
+msgstr ""
+
+msgctxt "#32105"
+msgid "HTTPS"
+msgstr ""
+
+msgctxt "#32106"
+msgid "Use proxy settings"
+msgstr ""
+
+msgctxt "#32107"
+msgid "Proxy from Elementum settings"
+msgstr ""
+
+msgctxt "#32108"
+msgid "Custom settings"
+msgstr ""
+
+msgctxt "#32109"
+msgid "Antizapret proxy"
+msgstr ""
+
+msgctxt "#32110"
+msgid "International"
+msgstr ""
+
+msgctxt "#32111"
+msgid "English"
+msgstr ""
+
+msgctxt "#32112"
+msgid "Italian"
+msgstr ""
+
+msgctxt "#32113"
+msgid "French"
+msgstr ""
+
+msgctxt "#32114"
+msgid "Russian"
+msgstr ""
+
+msgctxt "#32115"
+msgid "Ukrainian"
+msgstr ""
+
+msgctxt "#32116"
+msgid "Bulgarian"
+msgstr ""
+
+msgctxt "#32117"
+msgid "Romanian"
+msgstr ""
+
+msgctxt "#32118"
+msgid "Hungarian"
+msgstr ""
+
+msgctxt "#32119"
+msgid "Sort returned results by"
+msgstr ""
+
+msgctxt "#32120"
+msgid "Resolution"
+msgstr ""
+
+msgctxt "#32121"
+msgid "Seeds"
+msgstr ""
+
+msgctxt "#32122"
+msgid "Size"
+msgstr ""
+
+msgctxt "#32123"
+msgid "Balanced"
+msgstr ""
+
+msgctxt "#32124"
+msgid "Automatically adjust timeout according to Elementum settings"
+msgstr ""
+
+msgctxt "#32125"
+msgid "Proxy http requests with Elementum"
+msgstr ""
+
+msgctxt "#32126"
+msgid "Polish"
+msgstr ""
+
+msgctxt "#32127"
+msgid "Lithuanian"
+msgstr ""
+
+msgctxt "#32128"
+msgid "Public trackers [A .. M]"
+msgstr ""
+
+msgctxt "#32129"
+msgid "Public trackers [N .. ]"
+msgstr ""
+
+msgctxt "#32130"
+msgid "Private trackers [A .. M]"
+msgstr ""
+
+msgctxt "#32131"
+msgid "Private trackers [N .. ]"
+msgstr ""
+
+msgctxt "#32132"
+msgid "Remove quotes from search query"
+msgstr ""
+
+msgctxt "#32133"
+msgid "Resolution"
+msgstr ""
+
+msgctxt "#32134"
+msgid "Video quality"
+msgstr ""
+
+#~ msgctxt "#32071"
+#~ msgid "Timeout setting must be lower than Quasar's"
+#~ msgstr "Laiko nustatymas turi būti mažesnis nei Quasar"
+
+#~ msgctxt "#32040"
+#~ msgid "Maximum torrents"
+#~ msgstr "Maksimumas torrentų"

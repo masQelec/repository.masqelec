@@ -471,7 +471,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             sessions.popitem(last=False)
 
         # session.cookies.clear()
-        # session.headers.clear()
+        session.headers.clear()
 
         response = session.request(method=method, url=url, headers=headers, data=post_data, allow_redirects=False, stream=True)
         response.stream = ResponseStream(response, self._chunk_size)
@@ -493,7 +493,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             headers['location']  = PROXY_PATH + headers['location']
 
-        ## NEED TO FIX SET-COOKIE ##
+        ## IA COOKIES ARE BROKEN - SO USE OWN SESSION FOR COOKIES
+        ## FIX SET-COOKIE ##
+        # if 'set-cookie' in headers:
+        #     headers['set-cookie'] = headers['set-cookie'].split(';')[0]
 
         response.headers = headers
 

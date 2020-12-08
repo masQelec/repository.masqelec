@@ -2841,10 +2841,12 @@ v2.3.14 (2019-02-10)
     </extension>
 </addon>
 
-<addon id="script.elementum.burst" name="Elementum [COLOR FFFF6B00]Burst[/COLOR]" version="0.0.46" provider-name="elgatito">
+<addon id="script.elementum.burst" name="Elementum [COLOR FFFF6B00]Burst[/COLOR]" version="0.0.51" provider-name="elgatito">
     <requires>
-        <import addon="xbmc.python" version="2.1.0"/>
+        <import addon="xbmc.addon" version="16.0.0" />
         <import addon="plugin.video.elementum" optional="true"/>
+        <import addon="script.module.kodi-six" />
+        <import addon="script.module.future" version="0.16.0.4"/>
     </requires>
     <extension point="xbmc.python.script" library="burst.py">
         <provides>executable</provides>
@@ -3311,7 +3313,7 @@ FLAC stands out as the fastest and most widely supported lossless audio codec, a
   </extension>
 </addon>
 
-<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.4.8">
+<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.4.9">
   <requires>
     <import addon="script.module.slyguy"/>
   </requires>
@@ -14501,7 +14503,7 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.15.9">
+<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.16.2">
   <requires>
     <!-- <import addon="xbmc.python" version="2.1.0"/> -->
   </requires>

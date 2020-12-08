@@ -391,7 +391,7 @@ class API(object):
 
         scenario = self.get_config()['services']['media']['extras']['restrictedPlaybackScenario']
 
-        if xbmc.getCondVisibility('system.platform.android') and settings.getBool('wv_secure', False) and self.get_config()['services']['media']['extras']['isUhdAllowed']:
+        if settings.getBool('wv_secure', False):
             scenario = self.get_config()['services']['media']['extras']['playbackScenarioDefault']
             
             if settings.getBool('h265', False):
@@ -399,7 +399,7 @@ class API(object):
 
                 if settings.getBool('dolby_vision', False):
                     scenario += '-dovi'
-                elif settings.getBool('hdr10', False):
+                else:
                     scenario += '-hdr10'
 
                 if settings.getBool('dolby_atmos', False):

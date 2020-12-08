@@ -4,24 +4,32 @@
 Burst processing thread
 """
 
+from __future__ import unicode_literals
+from future.utils import PY3, iteritems
+
 import re
 import json
 import time
-import xbmc
-import xbmcaddon
-import xbmcgui
-from Queue import Queue
 from threading import Thread
-from urlparse import urlparse
-from urllib import unquote
 from elementum.provider import append_headers, get_setting, log
+if PY3:
+    from queue import Queue
+    from urllib.parse import urlparse
+    from urllib.parse import unquote
+    basestring = str
+    long = int
+else:
+    from Queue import Queue
+    from urlparse import urlparse
+    from urllib import unquote
+from .parser.ehp import Html
+from kodi_six import xbmc, xbmcgui, xbmcaddon, py2_encode
 
-from parser.ehp import Html
-from provider import process
-from providers.definitions import definitions, longest
-from filtering import apply_filters, Filtering
-from client import USER_AGENT, Client
-from utils import ADDON_ICON, notify, translation, sizeof, get_icon_path, get_enabled_providers, get_alias
+from .provider import process
+from .providers.definitions import definitions, longest
+from .filtering import apply_filters, Filtering
+from .client import USER_AGENT, Client
+from .utils import ADDON_ICON, notify, translation, sizeof, get_icon_path, get_enabled_providers, get_alias
 
 provider_names = []
 provider_results = []
@@ -30,16 +38,22 @@ request_time = time.time()
 auto_timeout = get_setting("auto_timeout", bool)
 timeout = get_setting("timeout", int)
 special_chars = "()\"':.[]<>/\\?"
+elementum_timeout = 0
 
+elementum_addon = xbmcaddon.Addon(id='plugin.video.elementum')
+if elementum_addon:
+    if elementum_addon.getSetting('custom_provider_timeout_enabled') == "true":
+        elementum_timeout = int(elementum_addon.getSetting('custom_provider_timeout'))
+    else:
+        elementum_timeout = 30
+    log.info("Using timeout from Elementum: %d seconds" % (elementum_timeout))
+
+# Make sure timeout is always less than the one from Elementum.
 if auto_timeout:
-    elementum_addon = xbmcaddon.Addon(id='plugin.video.elementum')
-    if elementum_addon:
-        if elementum_addon.getSetting('custom_provider_timeout_enabled') == "true":
-            timeout = int(elementum_addon.getSetting('custom_provider_timeout')) - 2
-        else:
-            timeout = 28
-        log.debug("Using timeout from Elementum: %d seconds" % (timeout))
-
+    timeout = elementum_timeout - 3
+elif elementum_timeout > 0 and timeout > elementum_timeout - 3:
+    log.info("Redefining timeout to be less than Elementum's: %d to %d seconds" % (timeout, elementum_timeout - 3))
+    timeout = elementum_timeout - 3
 
 def search(payload, method="general"):
     """ Main search entrypoint
@@ -67,7 +81,7 @@ def search(payload, method="general"):
                 },
             }
 
-    payload['titles'] = dict((k.lower(), v) for k, v in payload['titles'].iteritems())
+    payload['titles'] = dict((k.lower(), v) for k, v in iteritems(payload['titles']))
 
     # If titles[] exists in payload and there are special chars in titles[source]
     #   then we set a flag to possibly modify the search query
@@ -147,9 +161,9 @@ def search(payload, method="general"):
     del p_dialog
 
     if available_providers > 0:
-        message = u', '.join(provider_names)
+        message = ', '.join(provider_names)
         message = message + translation(32064)
-        log.warning(message.encode('utf-8'))
+        log.warning(message)
         if not payload['silent']:
             notify(message, ADDON_ICON)
 
@@ -268,7 +282,7 @@ def extract_torrents(provider, client):
                 headers['Referer'] = referer
 
             uri = torrent.split('|')  # Split cookies for private trackers
-            subclient.open(uri[0].encode('utf-8'), headers=headers)
+            subclient.open(py2_encode(uri[0]), headers=headers)
 
             if 'bittorrent' in subclient.headers.get('content-type', ''):
                 log.debug('[%s] bittorrent content-type for %s' % (provider, repr(torrent)))
@@ -284,6 +298,7 @@ def extract_torrents(provider, client):
                     log.error("[%s] Subpage extraction for %s failed with: %s" % (provider, repr(uri[0]), repr(e)))
                     map(log.debug, traceback.format_exc().split("\n"))
 
+            log.debug("[%s] Subpage torrent for %s: %s" % (provider, repr(uri[0]), torrent))
             ret = (name, info_hash, torrent, size, seeds, peers)
             q.put_nowait(ret)
 
@@ -373,7 +388,7 @@ def extract_torrents(provider, client):
 
             if name and torrent and needs_subpage and not torrent.startswith('magnet'):
                 if not torrent.startswith('http'):
-                    torrent = definition['root_url'] + torrent.encode('utf-8')
+                    torrent = definition['root_url'] + py2_encode(torrent)
                 t = Thread(target=extract_subpage, args=(q, name, torrent, size, seeds, peers, info_hash, referer))
                 threads.append(t)
             else:
@@ -417,15 +432,19 @@ def extract_from_api(provider, client):
     api_format = definition['api_format']
 
     results = []
-    result_keys = api_format['results'].split('.')
-    log.debug("[%s] result_keys: %s" % (provider, repr(result_keys)))
-    for key in result_keys:
-        if key in data:
-            data = data[key]
-        else:
-            data = []
-        # log.debug("[%s] nested results: %s" % (provider, repr(data)))
-    results = data
+    # If 'results' is empty - then we can try to take all the data as an array of results.
+    # Usable when api returns results without any other data.
+    if not api_format['results']:
+        results = data
+    else:
+        result_keys = api_format['results'].split('.')
+        log.debug("[%s] result_keys: %s" % (provider, repr(result_keys)))
+        for key in result_keys:
+            if key in data:
+                data = data[key]
+            else:
+                data = []
+        results = data
     log.debug("[%s] results: %s" % (provider, repr(results)))
 
     if 'subresults' in api_format:
@@ -475,17 +494,17 @@ def extract_from_api(provider, client):
             name = "%s - %s" % (name, result[api_format['quality']])
         if 'size' in api_format:
             size = result[api_format['size']]
-            if type(size) in (long, int):
+            if isinstance(size, (long, int)):
                 size = sizeof(size)
-            elif type(size) in (str, unicode) and size.isdigit():
+            elif isinstance(size, basestring) and size.isdigit():
                 size = sizeof(int(size))
         if 'seeds' in api_format:
             seeds = result[api_format['seeds']]
-            if type(seeds) in (str, unicode) and seeds.isdigit():
+            if isinstance(seeds, basestring) and seeds.isdigit():
                 seeds = int(seeds)
         if 'peers' in api_format:
             peers = result[api_format['peers']]
-            if type(peers) in (str, unicode) and peers.isdigit():
+            if isinstance(peers, basestring) and peers.isdigit():
                 peers = int(peers)
         yield (name, info_hash, torrent, size, seeds, peers)
 
@@ -539,6 +558,18 @@ def extract_from_page(provider, content):
         if matches:
             result = "magnet:?xt=urn:btih:" + matches[0]
             log.debug('[%s] Matched magnet info_hash search: %s' % (provider, repr(result)))
+            return result
+
+        matches = re.findall('/download.php\?id=([A-Za-z0-9]{40})\W', content)
+        if matches:
+            result = "magnet:?xt=urn:btih:" + matches[0]
+            log.debug('[%s] Matched download link: %s' % (provider, repr(result)))
+            return result
+
+        matches = re.findall('(/download.php\?id=[A-Za-z0-9]+[^\s\'"]*)', content)
+        if matches:
+            result = definition['root_url'] + matches[0]
+            log.debug('[%s] Matched download link: %s' % (provider, repr(result)))
             return result
     except:
         pass
