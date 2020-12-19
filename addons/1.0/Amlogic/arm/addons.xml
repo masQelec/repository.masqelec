@@ -11270,7 +11270,7 @@ v100
   </extension>
 </addon>
 
-<addon id="plugin.video.hbogoeu" name="hGO EU" provider-name="arvvoid" version="2.6.1">
+<addon id="plugin.video.hbogoeu" name="hGO EU" provider-name="arvvoid" version="2.6.2">
   <requires>
     <import addon="xbmc.python" version="2.26.0" />
     <import addon="script.module.kodi-six" version="0.1.0" />
@@ -11278,7 +11278,7 @@ v100
     <import addon="script.module.pyaes" version="1.6.1" />
     <import addon="script.module.defusedxml" version="0.6.0" />
     <import addon="script.module.dateutil" version="2.8.1" />
-    <import addon="script.module.inputstreamhelper" version="0.4.2" />
+    <import addon="script.module.inputstreamhelper" version="0.5.2" />
   </requires>
   <extension library="main.py" point="xbmc.python.pluginsource">
     <provides>video</provides>
@@ -11341,9 +11341,6 @@ Si hay una aplicación oficial disponible para su plataforma, úsela en lugar de
     <source>https://github.com/arvvoid/plugin.video.hbogoeu</source>
     <website>https://arvvoid.github.io/plugin.video.hbogoeu</website>
     <news>
-- Recent Kodi 19 API compatibility changes
-- Swedish translation by @Sopor
-- Minor changes
     </news>
     <assets>
      <icon>resources/icon.png</icon>
