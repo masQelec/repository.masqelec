@@ -2841,7 +2841,7 @@ v2.3.14 (2019-02-10)
     </extension>
 </addon>
 
-<addon id="script.elementum.burst" name="Elementum [COLOR FFFF6B00]Burst[/COLOR]" version="0.0.51" provider-name="elgatito">
+<addon id="script.elementum.burst" name="Elementum [COLOR FFFF6B00]Burst[/COLOR]" version="0.0.53" provider-name="elgatito">
     <requires>
         <import addon="xbmc.addon" version="16.0.0" />
         <import addon="plugin.video.elementum" optional="true"/>
@@ -3313,7 +3313,7 @@ FLAC stands out as the fastest and most widely supported lossless audio codec, a
   </extension>
 </addon>
 
-<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.4.9">
+<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.5.1">
   <requires>
     <import addon="script.module.slyguy"/>
   </requires>
@@ -3321,9 +3321,15 @@ FLAC stands out as the fastest and most widely supported lossless audio codec, a
     <provides>video</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <description lang="en">Disney+ is the exclusive home for your favorite movies and TV shows from Disney, Pixar, Marvel, Star Wars, and National Geographic.Subscription required.</description>
-    <description lang="es">Disney + es el hogar exclusivo para tus películas y programas de televisión favoritos de Disney, Pixar, Marvel, Star Wars y National Geographic.Se requiere suscripción.</description>
-    <description lang="it">Disney+ è la casa esclusiva per i tuoi film e programmi TV preferiti di Disney, Pixar, Marvel, Star Wars e National Geographic.Abbonamento richiesto.</description>
+    <description lang="en">Disney+ is the exclusive home for your favorite movies and TV shows from Disney, Pixar, Marvel, Star Wars, and National Geographic.
+
+Subscription required.</description>
+  <description lang="es">Disney + es el hogar exclusivo para tus películas y programas de televisión favoritos de Disney, Pixar, Marvel, Star Wars y National Geographic.
+
+Subscription required.</description>
+    <description lang="it">Disney+ è la casa esclusiva per i tuoi film e programmi TV preferiti di Disney, Pixar, Marvel, Star Wars e National Geographic.
+
+Abbonamento richiesto.</description>
     <reuselanguageinvoker>true</reuselanguageinvoker>
     <license></license>
     <language></language>
@@ -6425,7 +6431,7 @@ Supported files: .gb, .gbc, .sgb</description>
   </extension>
 </addon>
 
-<addon id="script.module.inputstreamhelper" name="InputStream Helper" version="0.5.1" provider-name="emilsvennesson, dagwieers, mediaminister, horstle">
+<addon id="script.module.inputstreamhelper" name="InputStream Helper" version="0.5.2" provider-name="emilsvennesson, dagwieers, mediaminister, horstle">
   <requires>
     <!--py3 compliant-->
     <import addon="xbmc.python" version="2.25.0"/>
@@ -6449,6 +6455,9 @@ Supported files: .gb, .gbc, .sgb</description>
     <description lang="fr_FR">Un simple module Kodi qui simplifie la vie des développeurs de modules complémentaires en s’appuyant sur des modules complémentaires basés sur InputStream et sur la lecture de DRM.</description>
     <description lang="es_ES">Un módulo Kodi simple que hace la vida más fácil para los desarrolladores de complementos que dependen de complementos basados en InputStream y reproducción de DRM.</description>
     <news>
+v0.5.2 (2020-12-13)
+- Update Chrome OS ARM hardware id's
+
 v0.5.1 (2020-10-02)
 - Fix incorrect ARM HWIDs: PHASER and PHASER360
 - Added Hebrew translations
@@ -14503,7 +14512,7 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.16.2">
+<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.17.7">
   <requires>
     <!-- <import addon="xbmc.python" version="2.1.0"/> -->
   </requires>
