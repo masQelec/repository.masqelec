@@ -18,6 +18,7 @@ class Language(BaseLanguage):
     DOLBY_VISION             = 30015
     DISNEY_SYNC              = 30016
 
+    HDR10                    = 30018
     H265                     = 30019
     SKIP_CREDITS             = 30020
     PLAY_NEXT_EPISODE        = 30021

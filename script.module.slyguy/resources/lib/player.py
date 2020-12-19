@@ -33,12 +33,12 @@ class Player(xbmc.Player):
 
             if self._callback and self._callback['type'] == 'interval' and (not last_callback or cur_time >= last_callback + self._callback['interval']):
                 callback = self._callback['callback'].replace('%24playback_time', str(int(play_time))).replace('$playback_time', str(int(play_time)))
-                xbmc.executebuiltin('XBMC.RunPlugin({})'.format(callback))
+                xbmc.executebuiltin('RunPlugin({})'.format(callback))
                 last_callback = cur_time
 
         if self._callback:
             callback = self._callback['callback'].replace('%24playback_time', str(int(play_time))).replace('$playback_time', str(int(play_time)))
-            xbmc.executebuiltin('XBMC.RunPlugin({})'.format(callback))
+            xbmc.executebuiltin('RunPlugin({})'.format(callback))
 
     def onAVStarted(self):
         self._up_next = None

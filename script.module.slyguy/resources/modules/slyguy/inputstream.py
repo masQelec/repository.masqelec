@@ -4,6 +4,7 @@ import re
 import shutil
 import time
 import struct
+import subprocess
 from distutils.version import LooseVersion
 
 from kodi_six import xbmc, xbmcaddon
@@ -279,6 +280,13 @@ def install_widevine(reinstall=False):
         url = widevine['base_url'] + selected['src']
         if not _download(url, wv_path, selected['md5']):
             return False
+
+    if system == 'Linux':
+        try:
+            subprocess.check_output('apt-get -y install libnss3 || sudo apt-get -y install libnss3', shell=True)
+            log.debug('libnss3 installed')
+        except Exception as e:
+            log.debug('libnss3 failed to install')
 
     if selected != latest:
         message = _.WV_NOT_LATEST

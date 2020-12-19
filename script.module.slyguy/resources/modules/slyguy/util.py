@@ -17,7 +17,7 @@ import requests
 from .language import _
 from .log import log
 from .exceptions import Error
-from .constants import WIDEVINE_UUID, WIDEVINE_PSSH, IS_ANDROID, DEFAULT_WORKERS
+from .constants import WIDEVINE_UUID, WIDEVINE_PSSH, DEFAULT_WORKERS
 
 def async_tasks(tasks, workers=DEFAULT_WORKERS, raise_on_error=True):
     def worker():
@@ -105,7 +105,7 @@ def user_country():
         return ''
 
 def FileIO(file_name, method):
-    if IS_ANDROID:
+    if xbmc.getCondVisibility('System.Platform.Android'):
         return io.FileIO(file_name, method)
     else:
         return open(file_name, method)
@@ -250,12 +250,12 @@ def process_brightcove(data):
         raise Error(_.NO_BRIGHTCOVE_SRC)
 
 def get_system_arch():
-    if xbmc.getCondVisibility('System.Platform.UWP') or '4n2hpmxwrvr6p' in xbmc.translatePath('special://xbmc/'):
+    if xbmc.getCondVisibility('System.Platform.Android'):
+        system = 'Android'
+    elif xbmc.getCondVisibility('System.Platform.UWP') or '4n2hpmxwrvr6p' in xbmc.translatePath('special://xbmc/'):
         system = 'UWP'
     elif xbmc.getCondVisibility('System.Platform.Windows'):
         system = 'Windows'
-    elif xbmc.getCondVisibility('System.Platform.Android'):
-        system = 'Android'
     elif xbmc.getCondVisibility('System.Platform.IOS'):
         system = 'IOS'
     elif xbmc.getCondVisibility('System.Platform.Darwin'):
@@ -285,6 +285,8 @@ def get_system_arch():
             
     elif arch == 'i686':
         arch = 'i386'
+
+    log.debug('System: {}, Arch: {}'.format(system, arch))
 
     return system, arch
 

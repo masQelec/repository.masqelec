@@ -13,12 +13,13 @@ from collections import defaultdict, OrderedDict
 
 from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from six.moves.socketserver import ThreadingMixIn
-from six.moves.urllib.parse import urlparse, urljoin, unquote, parse_qsl
+from six.moves.urllib.parse import urlparse, urljoin, unquote, parse_qsl, quote_plus
 from kodi_six import xbmc, xbmcvfs
 from requests import Session
 
 from slyguy.log import log
 from slyguy.constants import ADDON_DEV, ADDON_PROFILE
+from slyguy.util import hash_6
 from slyguy import settings
 
 from .constants import PROXY_CACHE, PROXY_CACHE_AHEAD, PROXY_CACHE_BEHIND
@@ -36,10 +37,10 @@ def devlog(msg):
         log.debug(msg)
 
 class ResponseStream(object):
-    def __init__(self, response, chunk_size=None):
+    def __init__(self, response=None, chunk_size=None):
         self._bytes = BytesIO()
         self._response = response
-        self._iterator = response.iter_content(chunk_size)
+        self._iterator = response.iter_content(chunk_size) if response else []
         self._chunk_size = chunk_size
 
     def _load_until(self, goal_position=None):
@@ -65,7 +66,7 @@ class ResponseStream(object):
         else:
             left_off_at = start_from or self._bytes.tell()
             goal_position = left_off_at + size
-        
+
         self._load_until(goal_position)
         self._bytes.seek(left_off_at)
 
@@ -83,7 +84,7 @@ class ResponseStream(object):
                 break
 
             yield chunk
-            
+
         for chunk in self._iterator:
             yield chunk
 
@@ -104,6 +105,30 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.request.settimeout(5)
 
     def _plugin_request(self, url):
+        if '$POST' in url or '%24POST' in url:
+            path = ''
+            length = int(self.headers.get('content-length', 0))
+            post_data = self.rfile.read(length) if length else None
+            if post_data:
+                path = xbmc.translatePath('special://temp/{}'.format(hash_6(url)))
+                with open(path, 'wb') as f:
+                    f.write(post_data)
+
+            param = quote_plus(path)
+            url = url.replace('$POST', param).replace('%24POST', param)
+
+        if '$HEADERS' in url or '%24HEADERS' in url:
+            headers = {}
+            for header in self.headers:
+                key = header.lower()
+                if not key.startswith('_proxy'):
+                    headers[key] = self.headers[header]
+            headers.pop('host', None)
+
+            param = quote_plus(json.dumps(headers))
+            url = url.replace('$HEADERS', param).replace('%24HEADERS', param)
+
+        devlog('PLUGIN REQUEST: {}'.format(url))
         dirs, files = xbmcvfs.listdir(url)
 
         path = unquote(files[0])
@@ -141,7 +166,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._parse_m3u8(response)
 
         self._output_response(response)
-                        
+
     def _parse_dash(self, response):
         data = response.stream.read().decode('utf8')
 
@@ -175,9 +200,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         ## FIXED in IA 2.4.6
         ## Commit: https://github.com/peak3d/inputstream.adaptive/commit/dc7b42783d18c65ebcf205a4979a1c9ea6b825e7
-        if self.headers.get('_proxy_addon_id') == 'plugin.video.skygo.nz' and 'availabilityStartTime' in mpd.attributes.keys():
+        if self.headers.get('_proxy_addon_id') in ('plugin.video.skygo.nz', 'plugin.video.optus.sport') and 'availabilityStartTime' in mpd.attributes.keys():
             mpd.removeAttribute('availabilityStartTime')
-            log.debug('Sky go fix: Remove availabilityStartTime')
+            log.debug('Removed availabilityStartTime')
 
         base_url_nodes = []
         for node in mpd.childNodes:
@@ -197,6 +222,18 @@ class RequestHandler(BaseHTTPRequestHandler):
             for e in base_url_nodes:
                 e.parentNode.removeChild(e)
         ####################
+
+        ## Live mpd needs non-last periods removed
+        ## https://github.com/peak3d/inputstream.adaptive/issues/574
+        if 'type' in mpd.attributes.keys() and mpd.getAttribute('type').lower() == 'dynamic':
+            periods = [elem for elem in root.getElementsByTagName('Period')]
+
+            # Keep last period
+            if len(periods) > 1:
+                periods.pop()
+                for e in periods:
+                    e.parentNode.removeChild(e)
+        #################################################
 
         ## SUPPORT NEW DOLBY FORMAT
         ## PR to fix in IA: https://github.com/peak3d/inputstream.adaptive/pull/466
@@ -218,24 +255,22 @@ class RequestHandler(BaseHTTPRequestHandler):
         lang_adap_sets = []
 
         default_language = self.headers.get('_proxy_default_language', '')
-        if default_language:
-            for elem in root.getElementsByTagName('Role'):
-                if elem.getAttribute('schemeIdUri') == 'urn:mpeg:dash:role:2011':
-                    elem.parentNode.removeChild(elem)
 
         for adap_set in root.getElementsByTagName('AdaptationSet'):
             highest_bandwidth = 0
             is_video = False
             is_trick = False
 
+            adapt_frame_rate = adap_set.getAttribute('frameRate')
+            if adapt_frame_rate and '/' not in adapt_frame_rate:
+                adapt_frame_rate = None
+
+            if adapt_frame_rate:
+                adap_set.removeAttribute('frameRate')
+                log.debug('fpsScale MPD fix')
+
             for stream in adap_set.getElementsByTagName("Representation"):
                 attrib = {}
-                multiply = 1
-
-                if adap_set.getAttribute('codecs') == 'ec-3':
-                    multiply = 1000000
-                    adap_set.setAttribute('codecs', 'ac-3')
-                    log.debug('ec-3 set to ac-3 and set to top')
 
                 for key in adap_set.attributes.keys():
                     attrib[key] = adap_set.getAttribute(key)
@@ -243,14 +278,17 @@ class RequestHandler(BaseHTTPRequestHandler):
                 for key in stream.attributes.keys():
                     attrib[key] = stream.getAttribute(key)
 
-                if default_language and 'audio' in attrib.get('mimeType', '') and attrib.get('lang') == default_language:
+                if adapt_frame_rate and not stream.getAttribute('frameRate'):
+                    stream.setAttribute('frameRate', adapt_frame_rate)
+
+                if default_language and 'audio' in attrib.get('mimeType', '') and attrib.get('lang') == default_language and adap_set not in lang_adap_sets:
                     lang_adap_sets.append(adap_set)
 
                 if 'bandwidth' in attrib:
-                    bandwidth = int(attrib['bandwidth'])*multiply
+                    bandwidth = int(attrib['bandwidth'])
                     if bandwidth > highest_bandwidth:
                         highest_bandwidth = bandwidth
-                
+
                 if 'video' in attrib.get('mimeType', ''):
                     is_video = True
 
@@ -363,10 +401,25 @@ class RequestHandler(BaseHTTPRequestHandler):
         subs_forced       = int(self.headers.get('_proxy_subs_forced', 1))
         subs_non_forced   = int(self.headers.get('_proxy_subs_non_forced', 1))
         audio_description = int(self.headers.get('_proxy_audio_description', 1))
-        default_language  = self.headers.get('_proxy_default_language', '')
+        original_language = self.headers.get('_proxy_original_language', '').lower().strip()
+        default_language  = self.headers.get('_proxy_default_language', '').lower().strip()
 
-        if default_language and audio_whitelist:
-            audio_whitelist.append(default_language.lower().strip())
+        if original_language and not default_language:
+            default_language = original_language
+
+        if audio_whitelist:
+            audio_whitelist.append(original_language)
+            audio_whitelist.append(default_language)
+
+        def _lang_allowed(lang, lang_list):
+            for _lang in lang_list:
+                if not _lang:
+                    continue
+
+                if lang.startswith(_lang):
+                    return True
+
+            return False
 
         default_groups = []
         groups = defaultdict(list)
@@ -378,19 +431,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             if not attribs:
                 continue
 
-            # FIX es-ES fr-FR languages #
-            language = attribs.get('LANGUAGE')
-            if language:
-                split = language.split('-')
-                if len(split) > 1 and split[1].lower() == split[0].lower():
-                    attribs['LANGUAGE'] = split[0]
-            #############################
-
-            if audio_whitelist and attribs.get('TYPE') == 'AUDIO' and 'LANGUAGE' in attribs and attribs['LANGUAGE'].lower() not in audio_whitelist:
+            if audio_whitelist and attribs.get('TYPE') == 'AUDIO' and 'LANGUAGE' in attribs and not _lang_allowed(attribs['LANGUAGE'].lower().strip(), audio_whitelist):
                 m3u8 = m3u8.replace(line, '')
                 continue
 
-            if subs_whitelist and attribs.get('TYPE') == 'SUBTITLES' and 'LANGUAGE' in attribs and attribs['LANGUAGE'].lower() not in subs_whitelist:
+            if subs_whitelist and attribs.get('TYPE') == 'SUBTITLES' and 'LANGUAGE' in attribs and not _lang_allowed(attribs['LANGUAGE'].lower().strip(), subs_whitelist):
                 m3u8 = m3u8.replace(line, '')
                 continue
 
@@ -418,14 +463,14 @@ class RequestHandler(BaseHTTPRequestHandler):
                 languages = []
                 for group in groups[group_id]:
                     attribs, line = group
-                    
+
                     attribs['AUTOSELECT'] = 'NO'
                     attribs['DEFAULT']    = 'NO'
 
                     if attribs['LANGUAGE'] not in languages or attribs.get('TYPE') == 'SUBTITLES':
                         attribs['AUTOSELECT'] = 'YES'
 
-                        if attribs['LANGUAGE'] == default_language:
+                        if attribs['LANGUAGE'].lower().strip().startswith(default_language):
                             attribs['DEFAULT'] = 'YES'
 
                         languages.append(attribs['LANGUAGE'])
@@ -433,6 +478,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         for group_id in groups:
             for group in groups[group_id]:
                 attribs, line = group
+
+                # FIX es-ES > es fr-FR > fr languages #
+                if 'LANGUAGE' in attribs:
+                    split = attribs['LANGUAGE'].split('-')
+                    if len(split) > 1 and split[1].lower() == split[0].lower():
+                        attribs['LANGUAGE'] = split[0]
+                #############################
 
                 new_line = '#EXT-X-MEDIA:' if attribs else ''
                 for key in attribs:
@@ -443,6 +495,21 @@ class RequestHandler(BaseHTTPRequestHandler):
         return m3u8
 
     def _proxy_request(self, method, url):
+        if not url.startswith('http'):
+            class Response(object):
+                pass
+
+            response = Response()
+            response.status_code = 200
+            response.headers = {}
+            response.stream = ResponseStream()
+
+            with open(url, 'rb') as f:
+                response.stream.set(f.read())
+
+            os.remove(url)
+            return response
+
         parsed = urlparse(url)
 
         headers = {}
@@ -460,9 +527,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         debug = self.headers.get('_proxy_debug_all') or self.headers.get('_proxy_debug_{}'.format(method.lower()))
         _time  = int(time.time())
         if post_data and debug:
-            data = {'time': time.time(), 'method': method, 'url': url, 'headers': headers, 'data': base64.b64encode(post_data)}
-            with open(os.path.join(ADDON_PROFILE, '{}-{}-send.txt'.format(method.lower(), _time)), 'wb') as f:
-                f.write(json.dumps(data, ensure_ascii=False))
+            with open(os.path.join(ADDON_PROFILE, '{}-{}-request.txt'.format(method.lower(), _time)), 'wb') as f:
+                f.write(post_data)
 
         session = sessions.get(headers['host'], Session())
         sessions[headers['host']] = session
@@ -483,9 +549,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             headers[header.lower()] = response.headers[header]
 
         if debug:
-            data = {'time': time.time(), 'status': response.status_code, 'headers': headers, 'data': base64.b64encode(response.stream.read())}
-            with open(os.path.join(ADDON_PROFILE, '{}-{}-receive.txt'.format(method.lower(), _time)), 'wb') as f:
-                f.write(json.dumps(data, ensure_ascii=False))
+            with open(os.path.join(ADDON_PROFILE, '{}-{}-response.txt'.format(method.lower(), _time)), 'wb') as f:
+                f.write(response.stream.read())
 
         if 'location' in headers:
             if not headers['location'].lower().startswith('http'):

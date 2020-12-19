@@ -14,7 +14,7 @@ path = os.path.dirname(DB_PATH)
 if not os.path.exists(path):
     os.makedirs(path)
 
-db = peewee.SqliteDatabase(DB_PATH, pragmas=DB_PRAGMAS)
+db = peewee.SqliteDatabase(DB_PATH, pragmas=DB_PRAGMAS, timeout=10)
 
 if ADDON_DEV and not int(os.environ.get('QUIET', 0)):
     import logging

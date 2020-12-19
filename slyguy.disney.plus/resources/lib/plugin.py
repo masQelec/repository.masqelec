@@ -630,6 +630,7 @@ def play(content_id=None, family_id=None, skip_intro=None, **kwargs):
     
     headers = api.session.headers
     headers['_proxy_default_language'] = original_language
+    headers['_proxy_original_language'] = original_language
     ia.properties['original_audio_language'] = original_language
 
     ## Allow fullres worldwide ##

@@ -36,16 +36,24 @@ class API(object):
         self._app_language = 'en'
         self._playback_language = 'en'
         self._subtitle_language = 'en'
+        self._kids_mode = False
+        self._maturity_rating = 9999
+        self._region = None
 
         if not self.logged_in:
             return
 
         data = jwt_data(userdata.get('access_token'))['context']
+
+        self._maturity_rating = data['preferred_maturity_rating']['implied_maturity_rating']
+        self._region = data['location']['country_code']
+
         for profile in data['profiles']:
             if profile['id'] == data['active_profile_id']:
                 self._app_language      = profile['language_preferences']['app_language']
                 self._playback_language = profile['language_preferences']['playback_language']
                 self._subtitle_language = profile['language_preferences']['subtitle_language']
+                self._kids_mode         = profile['kids_mode_enabled']
                 return
 
     @mem_cache.cached(60*60, key='transaction_id')
@@ -399,7 +407,7 @@ class API(object):
 
                 if settings.getBool('dolby_vision', False):
                     scenario += '-dovi'
-                else:
+                elif settings.getBool('hdr10', False):
                     scenario += '-hdr10'
 
                 if settings.getBool('dolby_atmos', False):

@@ -437,7 +437,9 @@ class TT:
                 't': 1.0/self.tickRate
             }.get(offset_match.group(2), 1.0)
         params = text.split(':')
-        if len(params) in (3, 4):
+        if len(params) == 1:
+            return float(text)
+        elif len(params) in (3, 4):
             if len(params) == 4:
                 frames = params[3].split('.', 2)
                 if len(frames) == 1:

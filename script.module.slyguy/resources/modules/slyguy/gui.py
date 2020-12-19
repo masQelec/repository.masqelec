@@ -56,12 +56,19 @@ def exception(heading=None):
 
     tb = []
 
-    include = [ADDON_ID, COMMON_ADDON_ID]
+    include = [ADDON_ID,  os.path.join(COMMON_ADDON_ID, 'resources', 'modules', 'slyguy'), os.path.join(COMMON_ADDON_ID, 'resources', 'lib')]
+    fline = True
     for trace in reversed(traceback.extract_tb(exc_traceback)):
         trace = list(trace)
+        if fline:
+            trace[0] = os.path.basename(trace[0])
+            tb.append(trace)
+            fline = False
+            continue
+
         for _id in include:
             if _id in trace[0]:
-                trace[0] = trace[0].split(_id)[1]
+                trace[0] = os.path.basename(trace[0])
                 tb.append(trace)
 
     error = '{}\n{}'.format(''.join(traceback.format_exception_only(exc_type, exc_value)), ''.join(traceback.format_list(tb)))

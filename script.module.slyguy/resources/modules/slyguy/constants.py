@@ -17,7 +17,6 @@ ADDON_DEV      = bool(int(os.environ.get('ADDON_DEV', '0')))
 
 COMMON_ADDON_ID = 'script.module.slyguy'
 COMMON_ADDON    = xbmcaddon.Addon(COMMON_ADDON_ID)
-IS_ANDROID      = xbmc.getCondVisibility('System.Platform.Android')
 
 try:
     KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split('.')[0])

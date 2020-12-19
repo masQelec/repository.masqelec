@@ -83,8 +83,8 @@ msgstr "El soporte completo en Kodi {kodi_ver} requiere al menos Inputstream Ada
 
 #: 
 msgctxt "#30015"
-msgid "Dolby Vision"
-msgstr "Dolby Vision"
+msgid "Dolby Vision / 4k"
+msgstr ""
 
 #: 
 msgctxt "#30016"
@@ -93,12 +93,12 @@ msgstr "Sincronizar con Disney +"
 
 #: 
 msgctxt "#30018"
-msgid "HDR10"
-msgstr "HDR10"
+msgid "HDR10 / 4K"
+msgstr ""
 
 #: 
 msgctxt "#30019"
-msgid "H.265 /4K"
+msgid "H.265 / 1080P"
 msgstr ""
 
 #: 
