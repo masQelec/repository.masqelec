@@ -376,14 +376,21 @@ class RequestHandler(BaseHTTPRequestHandler):
         m3u8 = m3u8.replace('KEYFORMAT="identity"', 'KEYFORMAT=""')
 
         if '#EXT-X-STREAM-INF' in m3u8:
+            file_name = 'proxy-master.m3u8'
             try:
                 m3u8 = self._parse_m3u8_master(m3u8)
             except Exception as e:
                 log.exception(e)
                 log.debug('failed to parse m3u8 master')
+        else:
+            file_name = 'proxy-sub.m3u8'
 
         m3u8 = re.sub(r'^/', r'{}'.format(urljoin(response.url, '/')), m3u8, flags=re.I|re.M)
         m3u8 = re.sub(r'(https?)://', r'{}\1://'.format(PROXY_PATH), m3u8, flags=re.I)
+
+        if ADDON_DEV:
+            with open(xbmc.translatePath('special://temp/'+file_name), 'wb') as f:
+                f.write(m3u8.encode('utf8'))
 
         response.stream.set(m3u8.encode('utf8'))
 

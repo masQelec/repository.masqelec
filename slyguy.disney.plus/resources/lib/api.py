@@ -45,8 +45,8 @@ class API(object):
 
         data = jwt_data(userdata.get('access_token'))['context']
 
-        self._maturity_rating = data['preferred_maturity_rating']['implied_maturity_rating']
-        self._region = data['location']['country_code']
+     #   self._maturity_rating = data['preferred_maturity_rating']['implied_maturity_rating']
+     #   self._region = data['location']['country_code']
 
         for profile in data['profiles']:
             if profile['id'] == data['active_profile_id']:
@@ -63,7 +63,7 @@ class API(object):
     @property
     def session(self):
         return self._session
-        
+
     def _set_authentication(self, access_token):
         if not access_token:
             return
@@ -131,7 +131,7 @@ class API(object):
             'deviceProfile': 'tv',
             'attributes': {},
         }
-    
+
         endpoint = self.get_config()['services']['device']['client']['endpoints']['createDeviceGrant']['href']
         device_data = self._session.post(endpoint, json=payload, headers=headers, timeout=20).json()
 
@@ -269,6 +269,18 @@ class API(object):
         endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/DmcVideoBundle')
         return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['DmcVideoBundle']
 
+    def extras(self, family_id):
+        variables = {
+            'preferredLanguage': [self._app_language],
+            'familyId': family_id,
+            'page': 1,
+            'pageSize': 999,
+            'contentTransactionId': self._transaction_id(),
+        }
+
+        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/DmcExtras')
+        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['DmcExtras']
+
     def continue_watching(self):
         set_id = CONTINUE_WATCHING_SET_ID
         set_type = CONTINUE_WATCHING_SET_TYPE
@@ -390,7 +402,7 @@ class API(object):
                 # "bitrate": 4206,
             },
         }]
-        
+
         endpoint = self.get_config()['services']['telemetry']['client']['endpoints']['postEvent']['href']
         return self._session.post(endpoint, json=payload).status_code
 
@@ -401,7 +413,7 @@ class API(object):
 
         if settings.getBool('wv_secure', False):
             scenario = self.get_config()['services']['media']['extras']['playbackScenarioDefault']
-            
+
             if settings.getBool('h265', False):
                 scenario += '-h265'
 

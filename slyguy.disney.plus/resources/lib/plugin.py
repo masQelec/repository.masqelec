@@ -43,7 +43,7 @@ def index(**kwargs):
             #folder.add_item(label=_.PROFILE_SETTINGS, path=plugin.url_for(profile_settings), art={'thumb': userdata.get('avatar')}, info={'plot': userdata.get('profile')}, _kiosk=False)
 
         folder.add_item(label=_.LOGOUT, path=plugin.url_for(logout), _kiosk=False)
-    
+
     folder.add_item(label=_.SETTINGS, path=plugin.url_for(plugin.ROUTE_SETTINGS), _kiosk=False)
 
     return folder
@@ -96,7 +96,7 @@ def edit_profile(key, value, **kwargs):
 def select_profile(**kwargs):
     if userdata.get('kid_lockdown', False):
         return
-        
+
     _select_profile()
     gui.refresh()
 
@@ -118,7 +118,7 @@ def _select_profile():
     values  = []
     can_delete = []
     default = -1
-    
+
     for index, profile in enumerate(profiles):
         values.append(profile)
         profile['_avatar'] = avatars.get(profile['attributes']['avatar']['id'])
@@ -225,10 +225,10 @@ def _add_profile(taken_names, taken_avatars):
 
         elif name in taken_names:
             gui.notification(_(_.PROFILE_NAME_TAKEN, name=name))
-            
+
         else:
             break
-    
+
     profile = api.add_profile(name, kids=kids, avatar=avatar)
     profile['_avatar'] = avatars[avatar]
 
@@ -240,7 +240,7 @@ def _add_profile(taken_names, taken_avatars):
 @plugin.route()
 def collection(slug, content_class, label=None, **kwargs):
     data = api.collection_by_slug(slug, content_class)
-    
+
     folder = plugin.Folder(label or _get_text(data['texts'], 'title', 'collection'), fanart=_image(data.get('images', []), 'fanart'))
     thumb  = _image(data.get('images', []), 'thumb')
 
@@ -350,7 +350,7 @@ def add_watchlist(content_id, title=None, icon=None, **kwargs):
 @plugin.route()
 def delete_watchlist(content_id, **kwargs):
     data = api.delete_watchlist(content_id)
-    
+
     if not data.get('watchlistItems'):
         gui.redirect(plugin.url_for(''))
     else:
@@ -363,7 +363,7 @@ def _parse_collection(row):
         art   = {'thumb': _image(row['images'], 'thumb'), 'fanart': _image(row['images'], 'fanart')},
         path  = plugin.url_for(collection, slug=row['collectionGroup']['slugs'][0]['value'], content_class=row['collectionGroup']['contentClass']),
     )
-            
+
 def _parse_series(row):
     return plugin.Item(
         label = _get_text(row['texts'], 'title', 'series'),
@@ -379,11 +379,11 @@ def _parse_series(row):
 
 def _parse_season(row, series):
     title = _(_.SEASON, season=row['seasonSequenceNumber'])
-    
+
     return plugin.Item(
         label = title,
         info  = {
-            'plot': _get_text(row['texts'], 'description', 'season'), 
+            'plot': _get_text(row['texts'], 'description', 'season'),
            # 'mediatype' : 'season'
         },
         art   = {'thumb': _image(row['images'] or series['images'], 'thumb')},
@@ -409,7 +409,7 @@ def _parse_video(row):
         label = _get_text(row['texts'], 'title', 'program'),
         info  = {
             'plot': _get_text(row['texts'], 'description', 'program'),
-            'duration': row['mediaMetadata']['runtimeMillis']/1000, 
+            'duration': row['mediaMetadata']['runtimeMillis']/1000,
             'year': row['releases'][0]['releaseYear'],
             'dateadded': row['releases'][0]['releaseDate'] or row['releases'][0]['releaseYear'],
             'mediatype': 'movie',
@@ -434,7 +434,7 @@ def _parse_video(row):
             'tvshowtitle': _get_text(row['texts'], 'title', 'series'),
         })
     else:
-        item.context.append((_.EXTRAS, "Container.Update({})".format(plugin.url_for(extras, family_id=row['encodedParentOf']))))
+        item.context.append((_.EXTRAS, "Container.Update({})".format(plugin.url_for(extras, family_id=row['encodedParentOf'], fanart=_image(row['images'], 'fanart')))))
         item.context.append((_.SUGGESTED, "Container.Update({})".format(plugin.url_for(suggested, family_id=row['encodedParentOf']))))
 
     available = arrow.get(row['currentAvailability']['appears'])
@@ -504,7 +504,7 @@ def series(series_id, **kwargs):
         folder.add_item(
             label = (_.EXTRAS),
             art   = {'thumb': _image(data['series']['images'], 'thumb')},
-            path  = plugin.url_for(extras, series_id=series_id),
+            path  = plugin.url_for(extras, family_id=data['series']['family']['encodedFamilyId'], fanart=_image(data['series']['images'], 'fanart')),
         )
 
     if data['related']['items']:
@@ -550,19 +550,11 @@ def suggested(family_id=None, series_id=None, **kwargs):
     return folder
 
 @plugin.route()
-def extras(family_id=None, series_id=None, **kwargs):
-    if family_id:
-        data = api.video_bundle(family_id)
-        fanart = _image(data['video']['images'], 'fanart')
-    elif series_id:
-        data = api.series_bundle(series_id, page_size=0)
-        fanart = _image(data['series']['images'], 'fanart')
-
+def extras(family_id, fanart=None, **kwargs):
     folder = plugin.Folder(_.EXTRAS, fanart=fanart)
-
-    items = _process_rows(data['extras']['videos'])
+    data = api.extras(family_id)
+    items = _process_rows(data['videos'])
     folder.add_items(items)
-
     return folder
 
 @plugin.route()
@@ -627,7 +619,7 @@ def play(content_id=None, family_id=None, skip_intro=None, **kwargs):
     playback_data     = api.playback_data(playback_url)
     media_stream      = playback_data['stream']['complete']
     original_language = video.get('originalLanguage') or 'en'
-    
+
     headers = api.session.headers
     headers['_proxy_default_language'] = original_language
     headers['_proxy_original_language'] = original_language
