@@ -2970,7 +2970,7 @@ Boblight(478) is an opensource AmbiLight implementation.
   </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="WebTV" version="1.5.0" provider-name="WebTV">
+<addon id="plugin.video.balandro" name="WebTV" version="1.5.1" provider-name="WebTV">
 
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
