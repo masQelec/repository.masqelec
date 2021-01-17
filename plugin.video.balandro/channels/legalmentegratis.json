@@ -1,0 +1,15 @@
+{
+  "id": "legalmentegratis",
+  "name": "LegalmenteGratis",
+  "thumbnail": "legalmentegratis.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "vose"],
+
+  "notes": "Películas por Géenros y categorias."
+}

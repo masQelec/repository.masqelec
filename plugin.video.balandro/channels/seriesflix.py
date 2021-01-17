@@ -101,10 +101,13 @@ def temporadas(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
+    # ~ logger.debug(data)
 
-    matches = scrapertools.find_multiple_matches(data, 'data-season="(\d+)".*?<a href="([^"]+)')
+    # ~ matches = scrapertools.find_multiple_matches(data, 'data-season="(\d+)".*?<a href="([^"]+)')
+    matches = scrapertools.find_multiple_matches(data, 'episodes-load">\s*<div class="Title"><a href="([^"]+)">Temporada <span>(\d+)</span>')
 
-    for numtempo, url in matches:
+    # ~ for numtempo, url in matches:
+    for url, numtempo in matches:
         numtempo = int(numtempo)
 
         itemlist.append(item.clone( action = 'episodios', title = 'Temporada ' + str(numtempo), url = url, 

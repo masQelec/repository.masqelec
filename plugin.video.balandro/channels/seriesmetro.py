@@ -197,14 +197,14 @@ def play(item):
     data = httptools.downloadpage(host + 'wp-admin/admin-ajax.php', post=post, raise_weberror=False).data
     # ~ logger.debug(data)
 
-    url = scrapertools.find_single_match(data, '<iframe[^>]* src="([^"]+)')
+    url = scrapertools.find_single_match(data, '(?i)<iframe[^>]* src="([^"]+)')
     if not url: return itemlist
     url = url.replace('&#038;', '&')
 
     data = httptools.downloadpage(url, headers={'Referer': item.url}, raise_weberror=False).data
     # ~ logger.debug(data)
 
-    url = scrapertools.find_single_match(data, '<iframe[^>]* src="([^"]+)')
+    url = scrapertools.find_single_match(data, '(?i)<iframe[^>]* src="([^"]+)')
     if not url: return itemlist
 
     if 'embed.cload' in url:

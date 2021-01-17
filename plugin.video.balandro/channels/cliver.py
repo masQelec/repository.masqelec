@@ -326,6 +326,7 @@ def play(item):
         url = item.url.split('?')[0]
         post = item.url.split('?')[1]
         data = httptools.downloadpage(url, post=post, headers={'Referer': host}).data.replace('\\/', '/')
+        # ~ data = do_downloadpage(url, post=post, headers={'Referer': host}).replace('\\/', '/')
         # ~ logger.debug(data)
         try:
             dom, vid = scrapertools.find_single_match(data, '(https://[^/]+)/player/([^&]+)')
@@ -341,6 +342,7 @@ def play(item):
                 url = dom + '/hls/' + vid + '/' + vid + '.playlist.m3u8'
                 
                 data = httptools.downloadpage(url).data
+                # ~ data = do_downloadpage(url)
                 # ~ logger.debug(data)
                 matches = scrapertools.find_multiple_matches(data, 'RESOLUTION=\d+x(\d+)\s*(.*?\.m3u8)')
                 if matches:

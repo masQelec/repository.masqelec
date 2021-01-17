@@ -51,7 +51,9 @@ def do_downloadpage(url, post=None, referer=None, check_domain=True):
     # ~ data = httptools.downloadpage_proxy('hdfull', url, post=post, headers=headers).data
     data = httptools.downloadpage(url, post=post, headers=headers).data
     
-    if check_domain and 'location.replace(' in data:
+    if check_domain and ('location.replace(' in data or not data):
+        if not data: data = httptools.downloadpage(host).data
+        
         dominio = scrapertools.find_single_match(data, 'location\.replace\("(https://[^/]+/)')
         if dominio:
             config.set_setting('dominio', dominio, 'hdfull')
@@ -203,7 +205,7 @@ def list_all(item):
     if buscar_next:
         next_page_link = scrapertools.find_single_match(data, '<a href="([^"]+)">&raquo;</a>')
         if next_page_link:
-            itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, page=0 ))
+            itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, page=0, action='list_all' ))
 
     return itemlist
 

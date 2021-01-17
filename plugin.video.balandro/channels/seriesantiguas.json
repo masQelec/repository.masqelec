@@ -1,0 +1,15 @@
+{
+  "id": "seriesantiguas",
+  "name": "SeriesAntiguas",
+  "thumbnail": "seriesantiguas.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["lat"],
+
+  "notes": "Series antiguas en idioma orignal de emisión."
+}

@@ -23,7 +23,7 @@
         
         <setting type="sep"/>
         <setting label="Opciones para servicios externos:" type="lsep"/>
-        <setting id="cliente_torrent" type="labelenum" values="Ninguno|Quasar|Elementum|Torrenter|Torrentin|Pulsar|Stream|Xbmctorrent" label="Cliente externo para Torrents" default="Ninguno"/>
+        <setting id="cliente_torrent" type="labelenum" values="Ninguno|Quasar|Elementum|Torrenter|Torrentin|Pulsar|Stream|Xbmctorrent|Torrest" label="Cliente externo para Torrents" default="Ninguno"/>
 
     </category>
 
@@ -164,6 +164,18 @@
                  default="[COLOR pink]pink[/COLOR]"/>
 
     </category>
+
+
+    <category label="Actualizaciones">
+        <setting label="Opciones para buscar nuevos episodios:" type="lsep"/>
+        <setting id="addon_tracking_atstart" type="bool" label="Activar servicio al iniciar Kodi (requiere reinicio si se cambia)" default="false"/>
+        <setting id="addon_tracking_interval" type="labelenum" values="6|8|12|24" label="Ejecutar el servicio cada n horas" default="12" visible="eq(-1,true)"/>
+        <setting id="addon_tracking_verbose" type="bool" label="Mostrar aviso del resultado final de la búsqueda" default="false" visible="eq(-2,true)"/>
+        <setting id="addon_tracking_doit" type="action" label="Pulse para 'Comprobar nuevos episodios' ahora" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=comprobar_nuevos_episodios)" />
+        <setting id="addon_tracking_lastscrap" label="Last scrap" type="text" default="" visible="false"/>
+
+    </category>
+
 
     <category label="Otros">
         <setting id="descartar_xxx" type="bool" label="Descartar listas y géneros con películas eróticas/xxx" default="false"/>

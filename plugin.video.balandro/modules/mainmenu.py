@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# WebTV - Menú principal
+# Balandro - Menú principal
 # ------------------------------------------------------------
 
 from platformcode import config, logger, platformtools

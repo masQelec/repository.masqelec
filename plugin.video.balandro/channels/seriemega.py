@@ -285,7 +285,7 @@ def findvideos(item):
 
 
 def play(item):
-    logger.info()
+    logger.info(item.url)
     itemlist = []
     item.url = item.url.replace('&#038;', '&')
 

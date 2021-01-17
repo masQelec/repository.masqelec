@@ -46,7 +46,7 @@ WebTV - DEVELOPER NOTES
 - Reducidos los parámetros de los json de canales y servidores.
   Añadidos searchable=True/False y searchable_types=[] con 'all','movie','tvshow' para indicar las búsquedas permitidas por el canal.
 
-- Conversión servers de pelisalacarta/alfa a webtv, casi iguales solamente hay que tener en cuenta:
+- Conversión servers de pelisalacarta/alfa a balandro, casi iguales solamente hay que tener en cuenta:
   Substituir config.get_localized_string(...) por su string correspondiente
   Lo que se importe de lib necesita from lib
   No se usan thumbnails de servidores
@@ -54,7 +54,7 @@ WebTV - DEVELOPER NOTES
   En algunos casos se ofusca la resolución del server para que tarde más en masificarse y dure más tiempo.
   No hay rutinas test_video_exists específicas pero desde get_video_url se puede devolver un string con el mensaje de error.
 
-- Conversión canales de pelisalacarta/alfa a webtv:
+- Conversión canales de pelisalacarta/alfa a balandro:
   Como hay que hacer algunos cambios, intentar dejarlos lo más simples y limpios posibles para facilitar hacer modificaciones.
   Tiene que haber mainlist_pelis y/o mainlist_series a parte del mainlist.
   Eliminadas referencias a autoplay, filtertools, thumbnails, newest, 

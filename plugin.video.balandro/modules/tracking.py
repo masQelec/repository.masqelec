@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# WebTV - Tracking (guardar enlaces para seguimiento de películas y series)
+# Balandro - Tracking (guardar enlaces para seguimiento de películas y series)
 # ------------------------------------------------------------
 
 import os, re, time

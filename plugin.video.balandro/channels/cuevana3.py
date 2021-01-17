@@ -13,21 +13,24 @@ host = 'https://cuevana3.io/'
 IDIOMAS = {'Latino':'Lat', 'Español':'Esp', 'Subtitulado':'VOSE'}
 
 
-# ~ def item_configurar_proxies(item):
-    # ~ plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    # ~ plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    # ~ return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
-# ~ def configurar_proxies(item):
-    # ~ from core import proxytools
-    # ~ return proxytools.configurar_proxies_canal(item.channel, host)
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
 
-def do_downloadpage(url, post=None):
+def do_downloadpage(url, post=None, headers=None, follow_redirects=True, onlydata=True):
     url = url.replace('http://www.cuevana3.co/', 'https://cuevana3.co/') # por si viene de enlaces guardados
     url = url.replace('https://cuevana3.co/', 'https://cuevana3.io/') # por si viene de enlaces guardados
-    data = httptools.downloadpage(url, post=post).data
-    # ~ data = httptools.downloadpage_proxy('cuevana3', url, post=post).data
-    return data
+
+    # ~ resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects)
+    resp = httptools.downloadpage_proxy('cuevana3', url, post=post, headers=headers, follow_redirects=follow_redirects)
+
+    if onlydata: return resp.data
+    return resp
 
 
 def mainlist(item):
@@ -39,7 +42,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 def mainlist_pelis(item):
@@ -59,7 +62,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 def mainlist_series(item):
@@ -73,7 +76,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -102,6 +105,7 @@ def list_all(item):
     if item.page: # paginaciones ajax para series
         post = {'page': item.page}
         if item.filtro == 'tabserie-1': post['action'] = 'cuevana_ajax_pagination'
+        elif item.filtro == 'tabserie-2': post['action'] = 'cuevana_ajax_pagination_estreno'
         elif item.filtro == 'tabserie-3': post['action'] = 'cuevana_ajax_pagination_rating'
         elif item.filtro == 'tabserie-4': post['action'] = 'cuevana_ajax_pagination_view'
         data = do_downloadpage(host+'wp-admin/admin-ajax.php', post=urllib.urlencode(post))
@@ -114,16 +118,17 @@ def list_all(item):
 
     matches = re.compile('<li\s*class="[^"]*TPostMv">(.*?)</li>', re.DOTALL).findall(data)
     for article in matches:
-        tipo = 'tvshow' if 'class=Qlty>SERIE' in article else 'movie'
+        tipo = 'tvshow' if 'class=Qlty>SERIE' in article or 'class="Qlty">SERIE' in article else 'movie'
         if item.search_type not in ['all', tipo]: continue
         sufijo = '' if item.search_type != 'all' else tipo
         
-        url = scrapertools.find_single_match(article, '\s*href=([^ >]+)')
+        url = scrapertools.find_single_match(article, '\s*href=(?:"|)([^ >"]+)')
         if '/pagina-ejemplo' in url: continue
         thumb = scrapertools.find_single_match(article, 'data-src=([^ >]+)')
+        if not thumb: thumb = scrapertools.find_single_match(article, ' src=(?:"|)([^ >"]+)')
         title = scrapertools.find_single_match(article, '<h2 class="Title">([^<]+)</h2>')
-        year = scrapertools.find_single_match(article, '<span\s*class=Year>(\d+)</span>')
-        qlty = scrapertools.find_single_match(article, '<span\s*class=Qlty>([^<]+)</span>')
+        year = scrapertools.find_single_match(article, '<span\s*class=(?:"|)Year(?:"|)>(\d+)</span>')
+        qlty = scrapertools.find_single_match(article, '<span\s*class=(?:"|)Qlty(?:"|)>([^<]+)</span>')
         
         if tipo == 'movie':
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, fmt_sufijo=sufijo, 
@@ -136,7 +141,7 @@ def list_all(item):
 
     next_page_link = scrapertools.find_single_match(data, ' rel="next" href="([^"]+)"')
     if next_page_link == '':
-        next_page_link = scrapertools.find_single_match(data, '\s*href=([^ >]+) class="next')
+        next_page_link = scrapertools.find_single_match(data, '\s*href=(?:"|)([^ >"]+) class="next')
     if next_page_link:
         if not item.filtro:
             itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, action='list_all' ))
@@ -276,14 +281,14 @@ def play(item):
         if 'file=' in item.url:
             fid = scrapertools.find_single_match(item.url, "file=([^&]+)")
             url = 'https://api.cuevana3.io/stream/plugins/gkpluginsphp.php'
-            data = httptools.downloadpage(url, post=urllib.urlencode({'link': fid})).data.replace('\\/', '/')
+            data = do_downloadpage(url, post=urllib.urlencode({'link': fid})).replace('\\/', '/')
             # ~ logger.debug(data)
 
             enlaces = scrapertools.find_multiple_matches(data, '"link":"([^"]+)"([^}]*)')
             for url, resto in enlaces:
                 if 'player.php?id=' in url:
                     url = url.replace('player.php?id=', 'index/').replace('&hlsfe=yes', '.m3u8')
-                    data = httptools.downloadpage(url).data
+                    data = do_downloadpage(url).data
                     matches = scrapertools.find_multiple_matches(data, 'RESOLUTION=\d+x(\d+)\s*(.*?\.m3u8)')
                     if matches:
                         # ~ for res, url in matches:
@@ -318,7 +323,7 @@ def play(item):
                 api_url = 'https://api.cuevana3.io/ir/rd.php'
                 api_post = 'url='+fid
             
-            resp = httptools.downloadpage(api_url, post=api_post, headers={'Referer': item.url}, follow_redirects=False)
+            resp = do_downloadpage(api_url, post=api_post, headers={'Referer': item.url}, follow_redirects=False, onlydata=False)
             # ~ logger.debug(resp.data)
             if 'location' in resp.headers:
                 url = resp.headers['location']
@@ -337,7 +342,7 @@ def play(item):
                             itemlist.append(['m3u8', url])
 
     elif 'openloadpremium.com/' in item.url and '/player.php?' in item.url:
-        data = httptools.downloadpage(item.url, headers={'Referer': item.referer}).data
+        data = do_downloadpage(item.url, headers={'Referer': item.referer})
         # ~ logger.debug(data)
         url = scrapertools.find_single_match(data, '"file": "([^"]+)')
         if url:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# WebTV - Buscador global
+# Balandro - Buscador global
 # ------------------------------------------------------------
 
 import os, time
@@ -16,16 +16,10 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    thumb_filmaffinity = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'filmaffinity.png')
-    thumb_tmdb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'tmdb.png')
+    thumb_filmaffinity = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'filmaffinity.jpg')
+    thumb_tmdb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'tmdb.jpg')
 
     item.category = 'Buscar'
-
-    itemlist.append(item.clone( channel='tmdblists', action='mainlist', title='Listas y búsquedas en TMDB', thumbnail=thumb_tmdb,
-                                plot = 'Buscar personas y ver listas de películas y series de la base de datos de The Movie Database' ))
-
-    itemlist.append(item.clone( channel='filmaffinitylists', action='mainlist', title='Listas en Filmaffinity', thumbnail=thumb_filmaffinity,
-                                plot = 'Ver listas de películas, series, documentales y otros de Filmaffinity' ))
 
     itemlist.append(item.clone( action='search', search_type='movie', title='Buscar Película ...', thumbnail=config.get_thumb('movie'),
                                 plot = 'Escribir el nombre de una película para buscarla en los canales de películas' ))
@@ -33,11 +27,17 @@ def mainlist(item):
     itemlist.append(item.clone( action='search', search_type='tvshow', title='Buscar Serie ...', thumbnail=config.get_thumb('tvshow'),
                                 plot = 'Escribir el nombre de una serie para buscarla en los canales de series' ))
 
+    itemlist.append(item.clone( action='search', search_type='all', title='Buscar Película y/o Serie ...',
+                                plot = 'Buscar indistintamente películas o series en todos los canales' ))
+
     itemlist.append(item.clone( action='search', search_type='documentary', title='Buscar Documental ...', thumbnail=config.get_thumb('documentary'),
                                 plot = 'Escribir el nombre de un documental para buscarlo en los canales de documentales' ))
 
-    itemlist.append(item.clone( action='search', search_type='all', title='Buscar Película y/o Serie ...',
-                                plot = 'Buscar indistintamente películas o series en todos los canales del addon' ))
+    itemlist.append(item.clone( channel='tmdblists', action='mainlist', title='Listas y búsquedas en TMDB', thumbnail=thumb_tmdb,
+                                plot = 'Buscar personas y ver listas de películas y series de la base de datos de The Movie Database' ))
+
+    itemlist.append(item.clone( channel='filmaffinitylists', action='mainlist', title='Listas en Filmaffinity', thumbnail=thumb_filmaffinity,
+                                plot = 'Ver listas de películas, series, documentales y otros de Filmaffinity' ))
 
     # ~ itemlist.append(item.clone( action='show_help', title='Información sobre búsquedas', folder=False, thumbnail=config.get_thumb('help') ))
 
