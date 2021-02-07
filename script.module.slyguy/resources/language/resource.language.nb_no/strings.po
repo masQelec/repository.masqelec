@@ -476,3 +476,21 @@ msgstr "{name} er allerede i bruk"
 msgctxt "#32104"
 msgid "Disable profile switching in Kids profile"
 msgstr "Deaktiver bytte av profil i barneprofil"
+
+msgctxt "#32105"
+msgid "Content requires a newer version of Inputstream Adaptive\n"
+"Minimum required version: [B]{required}[/B]\n"
+"Your current version: {current}"
+msgstr ""
+
+msgctxt "#32106"
+msgid "ARMv6 does not support Widevine playback"
+msgstr ""
+
+msgctxt "#32107"
+msgid "iOS does not support Widevine playback on Kodi"
+msgstr ""
+
+msgctxt "#32108"
+msgid "Next Page ({page})"
+msgstr "Neste side ({page})"

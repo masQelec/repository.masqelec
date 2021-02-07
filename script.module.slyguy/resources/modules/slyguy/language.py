@@ -17,7 +17,7 @@ def format_string(string, _bold=False, _label=False, _color=None, _strip=False, 
 
     if _color:
         string = u'[COLOR {}]{}[/COLOR]'.format(_color, string)
-        
+
     return string
 
 def addon_string(id):
@@ -25,7 +25,7 @@ def addon_string(id):
         string = COMMON_ADDON.getLocalizedString(id)
     else:
         string = ADDON.getLocalizedString(id)
-    
+
     if not string:
         log.warning("LANGUAGE: Addon didn't return a string for id: {}".format(id))
         string = str(id)
@@ -95,7 +95,7 @@ class BaseLanguage(object):
     MAX_BANDWIDTH               = 32059
     QUALITY_LOWEST              = 32060
     PLAYBACK_QUALITY            = 32061
-    LIVE_HLS_REQUIRED           = 32062              
+    LIVE_HLS_REQUIRED           = 32062
     PLAY_DEFAULT_ACTION         = 32063
     PLAY_FROM_START             = 32064
     PLAY_FROM_LIVE              = 32065
@@ -141,6 +141,16 @@ class BaseLanguage(object):
     IA_VERSION_REQUIRED         = 32105
     IA_ARMV6_ERROR              = 32106
     IA_IOS_ERROR                = 32107
+    NEXT_PAGE                   = 32108
+    JSON_ERROR                  = 32109
+    NO_RESPONSE_ERROR           = 32110
+    BOOKMARKS                   = 32111
+    ADD_BOOKMARK                = 32112
+    DELETE_BOOKMARK             = 32113
+    BOOKMARK_ADDED              = 32114
+    MOVE_UP                     = 32115
+    MOVE_DOWN                   = 32116
+    RENAME_BOOKMARK             = 32117
 
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)

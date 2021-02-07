@@ -19,7 +19,7 @@ from requests import Session
 
 from slyguy.log import log
 from slyguy.constants import ADDON_DEV, ADDON_PROFILE
-from slyguy.util import hash_6
+from slyguy.util import check_port, remove_file
 from slyguy import settings
 
 from .constants import PROXY_CACHE, PROXY_CACHE_AHEAD, PROXY_CACHE_BEHIND
@@ -30,6 +30,11 @@ REMOVE_OUT_HEADERS = ['connection', 'transfer-encoding', 'content-encoding', 'da
 
 HOST = settings.get('proxy_host')
 PORT = settings.getInt('proxy_port')
+
+if not check_port(PORT):
+    PORT = check_port(default=PORT)
+    settings.setInt('proxy_port', PORT)
+
 PROXY_PATH = 'http://{}:{}/'.format(HOST, PORT)
 
 def devlog(msg):
@@ -40,7 +45,7 @@ class ResponseStream(object):
     def __init__(self, response=None, chunk_size=None):
         self._bytes = BytesIO()
         self._response = response
-        self._iterator = response.iter_content(chunk_size) if response else []
+        self._iterator = response.iter_content(chunk_size) if response != None else iter([])
         self._chunk_size = chunk_size
 
     def _load_until(self, goal_position=None):
@@ -105,16 +110,17 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.request.settimeout(5)
 
     def _plugin_request(self, url):
+        data_path = None
         if '$POST' in url or '%24POST' in url:
             path = ''
             length = int(self.headers.get('content-length', 0))
             post_data = self.rfile.read(length) if length else None
             if post_data:
-                path = xbmc.translatePath('special://temp/{}'.format(hash_6(url)))
-                with open(path, 'wb') as f:
+                data_path = xbmc.translatePath('special://temp/proxy.post')
+                with open(data_path, 'wb') as f:
                     f.write(post_data)
 
-            param = quote_plus(path)
+            param = quote_plus(data_path)
             url = url.replace('$POST', param).replace('%24POST', param)
 
         if '$HEADERS' in url or '%24HEADERS' in url:
@@ -135,6 +141,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         split = path.split('|')
         url = split[0]
 
+        if data_path and os.path.realpath(path) != os.path.realpath(data_path):
+            remove_file(data_path)
+
         if len(split) > 1:
             self._override_headers = dict(parse_qsl(u'{}'.format(split[1]), keep_blank_values=True))
 
@@ -144,7 +153,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         url = self.path.lstrip('/').strip('\\')
 
         if url.lower().startswith('plugin'):
-            url = self._plugin_request(url)
+            try:
+                url = self._plugin_request(url)
+            except Exception as e:
+                log.debug('Plugin requsted failed')
+                log.exception(e)
 
         return url
 
@@ -385,7 +398,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         else:
             file_name = 'proxy-sub.m3u8'
 
-        m3u8 = re.sub(r'^/', r'{}'.format(urljoin(response.url, '/')), m3u8, flags=re.I|re.M)
+        base_url = urljoin(response.url, '/')
+
+        #URI="/.." fix (https://github.com/peak3d/inputstream.adaptive/issues/591)
+        m3u8 = re.sub(r'URI="/', r'URI="{}'.format(base_url), m3u8, flags=re.I|re.M)
+
+        m3u8 = re.sub(r'^/', r'{}'.format(base_url), m3u8, flags=re.I|re.M)
         m3u8 = re.sub(r'(https?)://', r'{}\1://'.format(PROXY_PATH), m3u8, flags=re.I)
 
         if ADDON_DEV:
@@ -514,7 +532,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             with open(url, 'rb') as f:
                 response.stream.set(f.read())
 
-            os.remove(url)
+            remove_file(url)
             return response
 
         parsed = urlparse(url)
@@ -532,9 +550,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(length) if length else None
 
         debug = self.headers.get('_proxy_debug_all') or self.headers.get('_proxy_debug_{}'.format(method.lower()))
-        _time  = int(time.time())
         if post_data and debug:
-            with open(os.path.join(ADDON_PROFILE, '{}-{}-request.txt'.format(method.lower(), _time)), 'wb') as f:
+            with open(os.path.join(ADDON_PROFILE, '{}-request.txt'.format(method.lower())), 'wb') as f:
                 f.write(post_data)
 
         session = sessions.get(headers['host'], Session())
@@ -556,7 +573,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             headers[header.lower()] = response.headers[header]
 
         if debug:
-            with open(os.path.join(ADDON_PROFILE, '{}-{}-response.txt'.format(method.lower(), _time)), 'wb') as f:
+            with open(os.path.join(ADDON_PROFILE, '{}-response.txt'.format(method.lower())), 'wb') as f:
                 f.write(response.stream.read())
 
         if 'location' in headers:
@@ -611,6 +628,7 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 
 class Proxy(object):
     def start(self):
+        log.debug("Starting Proxy {}:{}".format(HOST, PORT))
         self._server = ThreadedHTTPServer((HOST, PORT), RequestHandler)
         self._httpd_thread = threading.Thread(target=self._server.serve_forever)
         self._httpd_thread.start()

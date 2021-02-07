@@ -8,7 +8,7 @@ class Language(BaseLanguage):
     SERIES                   = 30005
     ORIGINALS                = 30006
     SEARCH                   = 30007
-    NEXT_PAGE                = 30008
+
     WV_SECURE                = 30009
     SUGGESTED                = 30010
     FEATURED                 = 30011

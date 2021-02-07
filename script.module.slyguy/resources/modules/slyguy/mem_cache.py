@@ -6,11 +6,11 @@ from six.moves import cPickle
 
 from .log import log
 from .util import hash_6, set_kodi_string, get_kodi_string
-from .constants import ADDON_ID, CACHE_EXPIRY, ROUTE_CLEAR_CACHE
+from .constants import ADDON_ID, CACHE_EXPIRY, ROUTE_CLEAR_CACHE, ADDON_VERSION
 from . import signals, gui, router
 from .settings import common_settings as settings
 
-cache_key = 'cache.'+ADDON_ID
+cache_key = 'cache.'+ADDON_ID+ADDON_VERSION
 
 class Cache(object):
     data = {}
@@ -41,7 +41,7 @@ def set(key, value, expires=CACHE_EXPIRY):
 
     log('Cache Set: {}'.format(key))
     cache.data[key] = [value, expires]
-    
+
 def get(key, default=None):
     try:
         row = cache.data[key]
@@ -52,6 +52,7 @@ def get(key, default=None):
         cache.data.pop(key, None)
         return default
     else:
+        log('Cache Hit: {}'.format(key))
         return row[0]
 
 def delete(key):
@@ -82,7 +83,7 @@ def _build_key(func_name, *args, **kwargs):
         except:
             #python3
             return type(item) in (int, str, dict, list, bool, float)
-    
+
     for k in args:
         if is_primitive(k):
             key += to_str(k)
@@ -104,7 +105,6 @@ def cached(*args, **kwargs):
             if not kwargs.pop('_skip_cache', False):
                 value = get(_key)
                 if value != None:
-                    log('Cache Hit: {}'.format(_key))
                     return value
 
             value = f(*args, **kwargs)

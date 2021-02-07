@@ -76,9 +76,11 @@ def exception(heading=None):
     text(error, heading=heading)
 
 class Progress(object):
-    def __init__(self, message, heading=None, percent=0, background=False):
+    def __init__(self, message='', heading=None, percent=0, background=False):
         heading = _make_heading(heading)
-        if background:
+        self._background = background
+
+        if self._background:
             self._dialog = xbmcgui.DialogProgressBG()
         else:
             self._dialog = xbmcgui.DialogProgress()
@@ -90,17 +92,20 @@ class Progress(object):
         self._dialog.update(int(percent), *self._get_args(message))
 
     def _get_args(self, message):
-        if message is not None and KODI_VERSION < 19:
+        if self._background or message is None or KODI_VERSION > 18:
+            args = [message]
+        else:
             args = message.split('\n')[:3]
             while len(args) < 3:
                 args.append(' ')
-        else:
-            args = [message]
 
         return args
 
     def iscanceled(self):
-        return self._dialog.iscanceled()
+        if self._background:
+            return self._dialog.isFinished()
+        else:
+            return self._dialog.iscanceled()
 
     def close(self):
         self._dialog.close()
@@ -115,10 +120,9 @@ def progressbg(message='', heading=None, percent=0):
     return dialog
 
 @contextmanager
-def progress(message='', heading=None, percent=0):
-    dialog = Progress(message, heading)
-    dialog.update(percent)
-    
+def progress(message='', heading=None, percent=0, background=False):
+    dialog = Progress(message=message, heading=heading, percent=percent, background=background)
+
     try:
         yield dialog
     finally:
@@ -127,7 +131,7 @@ def progress(message='', heading=None, percent=0):
 def input(message, default='', hide_input=False, **kwargs):
     if hide_input:
         kwargs['option'] = xbmcgui.ALPHANUM_HIDE_INPUT
-        
+
     return xbmcgui.Dialog().input(message, default, **kwargs)
 
 def numeric(message, default='', type=0, **kwargs):
@@ -146,7 +150,7 @@ def ok(message, heading=None):
 
 def text(message, heading=None, **kwargs):
     heading = _make_heading(heading)
-    
+
     return xbmcgui.Dialog().textviewer(heading, message)
 
 def yes_no(message, heading=None, autoclose=GUI_DEFAULT_AUTOCLOSE, **kwargs):
@@ -158,9 +162,9 @@ def yes_no(message, heading=None, autoclose=GUI_DEFAULT_AUTOCLOSE, **kwargs):
     return xbmcgui.Dialog().yesno(heading, message, **kwargs)
 
 class Item(object):
-    def __init__(self, id=None, label='', path=None, playable=False, info=None, context=None, 
+    def __init__(self, id=None, label='', path=None, playable=False, info=None, context=None,
             headers=None, cookies=None, properties=None, is_folder=None, art=None, inputstream=None,
-            video=None, audio=None, subtitles=None, use_proxy=False, specialsort=None):
+            video=None, audio=None, subtitles=None, use_proxy=False, specialsort=None, custom=None):
 
         self.id          = id
         self.label       = label
@@ -180,13 +184,14 @@ class Item(object):
         self._is_folder  = is_folder
         self.use_proxy   = use_proxy
         self.specialsort = specialsort #bottom, top
+        self.custom      = custom
 
     def update(self, **kwargs):
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
     @property
-    def is_folder(self): 
+    def is_folder(self):
         return not self.playable if self._is_folder == None else self._is_folder
 
     @is_folder.setter
@@ -203,7 +208,7 @@ class Item(object):
 
         if 'verifypeer' not in headers and not settings.getBool('verify_ssl', True):
             headers['verifypeer'] = 'false'
-        
+
         string = ''
         for key in self.headers:
             string += u'{0}={1}&'.format(key, quote(u'{}'.format(self.headers[key]).encode('utf8')))
@@ -225,7 +230,7 @@ class Item(object):
             li.setLabel(self.label)
             if not self.info.get('plot'):
                 self.info['plot'] = self.label
-                
+
             if not self.info.get('title'):
                 self.info['title'] = self.label
 
@@ -282,18 +287,18 @@ class Item(object):
 
         headers = self.get_url_headers()
         mimetype = self.mimetype
-        
+
         if self.inputstream and self.inputstream.check():
             if KODI_VERSION < 19:
                 li.setProperty('inputstreamaddon', self.inputstream.addon_id)
             else:
                 li.setProperty('inputstream', self.inputstream.addon_id)
-                
+
             li.setProperty('{}.manifest_type'.format(self.inputstream.addon_id), self.inputstream.manifest_type)
 
             if self.inputstream.license_type:
                 li.setProperty('{}.license_type'.format(self.inputstream.addon_id), self.inputstream.license_type)
-            
+
             if headers:
                 li.setProperty('{}.stream_headers'.format(self.inputstream.addon_id), headers)
 
@@ -303,7 +308,7 @@ class Item(object):
                     headers = headers,
                     content_type = self.inputstream.content_type,
                     challenge = self.inputstream.challenge,
-                    response = self.inputstream.response, 
+                    response = self.inputstream.response,
                 ))
             elif headers:
                 li.setProperty('{}.license_key'.format(self.inputstream.addon_id), u'|{}'.format(headers))

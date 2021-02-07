@@ -9,7 +9,7 @@ from functools import wraps
 from kodi_six import xbmc, xbmcplugin
 from six.moves.urllib.parse import quote
 
-from . import router, gui, settings, userdata, inputstream, signals, quality_player, migrate
+from . import router, gui, settings, userdata, inputstream, signals, quality_player, migrate, bookmarks
 from .constants import *
 from .log import log
 from .language import _
@@ -60,7 +60,7 @@ def route(url=None):
             elif isinstance(item, Redirect):
                 if _handle() > 0:
                     xbmcplugin.endOfDirectory(_handle(), succeeded=True, updateListing=True, cacheToDisc=True)
-                    
+
                 gui.redirect(item.location)
             else:
                 resolve()
@@ -92,7 +92,7 @@ def merge():
             )
 
             return folder
-                
+
         return decorated_function
     return lambda f: decorator(f)
 
@@ -131,6 +131,59 @@ def _exception(e):
 @route('')
 def _home(**kwargs):
     raise PluginError(_.PLUGIN_NO_DEFAULT_ROUTE)
+
+@route(ROUTE_ADD_BOOKMARK)
+def _add_bookmark(path, label=None, thumb=None, folder=1, playable=0, **kwargs):
+    bookmarks.add(path, label, thumb, int(folder), int(playable))
+    gui.notification(label, heading=_.BOOKMARK_ADDED, icon=thumb)
+
+@route(ROUTE_DEL_BOOKMARK)
+def _del_bookmark(index, **kwargs):
+    if bookmarks.delete(int(index)):
+        gui.refresh()
+    else:
+        gui.redirect(url_for(''))
+
+@route(ROUTE_RENAME_BOOKMARK)
+def _rename_bookmark(index, name, **kwargs):
+    new_name = gui.input(_.RENAME_BOOKMARK, default=name)
+    if not new_name or new_name == name:
+        return
+
+    bookmarks.rename(int(index), new_name)
+    gui.refresh()
+
+@route(ROUTE_MOVE_BOOKMARK)
+def _move_bookmark(index, shift, **kwargs):
+    bookmarks.move(int(index), int(shift))
+    gui.refresh()
+
+@route(ROUTE_BOOKMARKS)
+def _bookmarks(**kwargs):
+    folder = Folder(_.BOOKMARKS)
+    
+    _bookmarks = bookmarks.get()
+    for index, row in enumerate(_bookmarks):
+        item = Item(
+            label = row['label'],
+            path = row['path'],
+            art = {'thumb': row.get('thumb')},
+            is_folder = bool(row.get('folder', 1)),
+            playable = bool(row.get('playable', 0)),
+            bookmark = False,
+        )
+
+        if index > 0:
+            item.context.append((_.MOVE_UP, 'RunPlugin({})'.format(url_for(ROUTE_MOVE_BOOKMARK, index=index, shift=-1))))
+        if index < len(_bookmarks)-1:
+            item.context.append((_.MOVE_DOWN, 'RunPlugin({})'.format(url_for(ROUTE_MOVE_BOOKMARK, index=index, shift=1))))
+
+        item.context.append((_.RENAME_BOOKMARK, 'RunPlugin({})'.format(url_for(ROUTE_RENAME_BOOKMARK, index=index, name=row['label']))))
+        item.context.append((_.DELETE_BOOKMARK, 'RunPlugin({})'.format(url_for(ROUTE_DEL_BOOKMARK, index=index))))
+
+        folder.add_items(item)
+
+    return folder
 
 @route(ROUTE_IA_SETTINGS)
 def _ia_settings(**kwargs):
@@ -180,7 +233,7 @@ def _reset(**kwargs):
         shutil.rmtree(ADDON_PROFILE)
     except:
         pass
-        
+
     xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"{}","enabled":true}}}}'.format(ADDON_ID))
 
     gui.notification(_.PLUGIN_RESET_OK)
@@ -204,7 +257,7 @@ def service(interval=ROUTE_SERVICE_INTERVAL):
     last_run = 0
     while not monitor.abortRequested():
         if time.time() - last_run >= interval:
-            
+
             try:
                 signals.emit(signals.ON_SERVICE)
             except Exception as e:
@@ -212,7 +265,7 @@ def service(interval=ROUTE_SERVICE_INTERVAL):
                 log.exception(e)
 
             last_run = time.time()
-            
+
         monitor.waitForAbort(5)
 
 def _handle():
@@ -227,7 +280,7 @@ def _autoplay(folder, pattern):
     if '#' in pattern:
         pattern, choose = pattern.lower().split('#')
 
-        try: 
+        try:
             choose = int(choose)
         except:
             if choose != 'random':
@@ -243,7 +296,7 @@ def _autoplay(folder, pattern):
         if re.search(pattern, item.label, re.IGNORECASE):
             matches.append(item)
             log.debug('#{} Match: {}'.format(len(matches)-1, item.label))
-    
+
     if not matches:
         selected = None
 
@@ -285,17 +338,22 @@ default_fanart = ADDON_FANART
 
 #Plugin.Item()
 class Item(gui.Item):
-    def __init__(self, cache_key=None, play_next=None, callback=None, geolock=None, *args, **kwargs):
+    def __init__(self, cache_key=None, play_next=None, callback=None, geolock=None, bookmark=True, *args, **kwargs):
         super(Item, self).__init__(self, *args, **kwargs)
         self.cache_key = cache_key
         self.play_next = dict(play_next or {})
         self.callback  = dict(callback or {})
         self.geolock   = geolock
+        self.bookmark  = bookmark
 
     def get_li(self):
         # if settings.getBool('use_cache', True) and self.cache_key:
         #     url = url_for(ROUTE_CLEAR_CACHE, key=self.cache_key)
         #     self.context.append((_.PLUGIN_CONTEXT_CLEAR_CACHE, 'RunPlugin({})'.format(url)))
+        
+        if settings.getBool('bookmarks') and self.bookmark:
+            url = url_for(ROUTE_ADD_BOOKMARK, path=self.path, label=self.label, thumb=self.art.get('thumb'), folder=int(self.is_folder), playable=int(self.playable))
+            self.context.append((_.ADD_BOOKMARK, 'RunPlugin({})'.format(url)))
 
         if not self.playable:
             self.art['thumb']  = self.art.get('thumb') or default_thumb
@@ -347,7 +405,7 @@ class Folder(object):
         self.content = content
         self.updateListing = updateListing
         self.cacheToDisc = cacheToDisc
-        self.sort_methods = sort_methods or [xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL, xbmcplugin.SORT_METHOD_DATEADDED]
+        self.sort_methods = sort_methods or [xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL]
         self.thumb = thumb
         self.fanart = fanart
         self.no_items_label = no_items_label
@@ -359,13 +417,13 @@ class Folder(object):
 
         if not items and self.no_items_label:
             label = _(self.no_items_label, _label=True)
-            
+
             if self.no_items_method == 'dialog':
                 gui.ok(label, heading=self.title)
                 return resolve()
             else:
                 items.append(Item(
-                    label = label, 
+                    label = label,
                     is_folder = False,
                 ))
 
@@ -399,7 +457,7 @@ class Folder(object):
 
         if kiosk == False and settings.getBool('kiosk', False):
             return False
-        
+
         item = Item(*args, **kwargs)
 
         if position == None:

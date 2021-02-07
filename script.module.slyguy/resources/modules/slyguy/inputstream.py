@@ -81,7 +81,7 @@ class InputstreamItem(object):
     def check(self):
         if self.checked is None:
             self.checked = self.do_check()
-            
+
         return self.checked
 
 class HLS(InputstreamItem):
@@ -100,7 +100,7 @@ class HLS(InputstreamItem):
         hls_vod  = settings.getBool('use_ia_hls_vod', legacy)
 
         return (self.force or (self.live and hls_live) or (not self.live and hls_vod)) and require_version(self.minversion, required=self.force)
-        
+
 class MPD(InputstreamItem):
     manifest_type = 'mpd'
     mimetype      = 'application/dash+xml'
@@ -179,7 +179,7 @@ def open_settings():
         ia_addon.openSettings()
 
 def require_version(required_version, required=False):
-    ia_addon = get_ia_addon(required=required)    
+    ia_addon = get_ia_addon(required=required)
     if not ia_addon:
         return False
 
@@ -218,7 +218,7 @@ def install_widevine(reinstall=False):
 
     elif 'armv6' in arch:
         raise InputStreamError(_.IA_ARMV6_ERROR)
-    
+
     elif system not in DST_FILES:
         raise InputStreamError(_(_.IA_NOT_SUPPORTED, system=system, arch=arch, kodi_version=KODI_VERSION))
 
@@ -246,9 +246,6 @@ def install_widevine(reinstall=False):
     latest       = wv_versions[0]
     latest_known = userdata.get('_wv_latest_md5')
     userdata.set('_wv_latest_md5', latest['md5'])
-
-    if not wv_versions:
-        raise InputStreamError(_(_.IA_NOT_SUPPORTED, system=system, arch=arch, kodi_version=KODI_VERSION))
 
     if not reinstall and (installed == latest['md5'] or latest['md5'] == latest_known):
         return True
@@ -292,7 +289,7 @@ def install_widevine(reinstall=False):
         message = _.WV_NOT_LATEST
     else:
         message = _.IA_WV_INSTALL_OK
-    
+
     gui.ok(_(message, version=selected['ver']))
 
     return True
@@ -311,7 +308,7 @@ def _download(url, dst_path, md5=None):
             return True
         else:
             remove_file(dst_path)
-            
+
     with gui.progress(_(_.IA_DOWNLOADING_FILE, url=filename), heading=_.IA_WIDEVINE_DRM) as progress:
         resp = Session().get(url, stream=True)
         if resp.status_code != 200:
@@ -332,12 +329,12 @@ def _download(url, dst_path, md5=None):
                 progress.update(percent)
 
     if progress.iscanceled():
-        remove_file(dst_path)            
+        remove_file(dst_path)
         return False
 
     checksum = md5sum(dst_path)
     if checksum != md5:
         remove_file(dst_path)
         raise InputStreamError(_(_.MD5_MISMATCH, filename=filename, local_md5=checksum, remote_md5=md5))
-    
+
     return True

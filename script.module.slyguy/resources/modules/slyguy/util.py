@@ -5,19 +5,32 @@ import shutil
 import platform
 import base64
 import struct
+import codecs
 import json
 import io
 import gzip
 import threading
+import socket
+from contextlib import closing
 
 from kodi_six import xbmc, xbmcgui, xbmcaddon
 from six.moves import queue
+from six import PY2
 import requests
 
 from .language import _
 from .log import log
 from .exceptions import Error
 from .constants import WIDEVINE_UUID, WIDEVINE_PSSH, DEFAULT_WORKERS
+
+def check_port(port=0, default=False):
+    try:
+        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+            s.bind(('', port))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            return s.getsockname()[1]
+    except:
+        return default
 
 def async_tasks(tasks, workers=DEFAULT_WORKERS, raise_on_error=True):
     def worker():
@@ -37,7 +50,9 @@ def async_tasks(tasks, workers=DEFAULT_WORKERS, raise_on_error=True):
         task_queue.put([tasks[i], i])
 
     threads = []
-    for i in range(workers):
+    num_workers = min(workers, len(tasks))
+    log.debug('Starting {} workers'.format(num_workers))
+    for i in range(num_workers):
         thread = threading.Thread(target=worker)
         thread.daemon = True
         thread.start()
@@ -72,7 +87,7 @@ def get_addon(addon_id, required=False, install=True):
 
         if install:
             xbmc.executebuiltin('InstallAddon({})'.format(addon_id), True)
-            
+
         kodi_rpc('Addons.SetAddonEnabled', {'addonid': addon_id, 'enabled': True}, raise_on_error=True)
 
         return xbmcaddon.Addon(addon_id)
@@ -127,6 +142,40 @@ def gzip_extract(in_path, chunksize=4096):
         remove_file(in_path)
         shutil.move(out_path, in_path)
         return True
+
+def load_json(filepath, encoding='utf8', raise_error=True):
+    try:
+        with codecs.open(filepath, 'r', encoding='utf8') as f:
+            return json.load(f)
+    except:
+        if raise_error:
+            raise
+        else:
+            return False
+
+def save_json(filepath, data, raise_error=True, pretty=False, **kwargs):
+    _kwargs = {'ensure_ascii': False}
+
+    if pretty:
+        _kwargs['indent'] = 4
+        _kwargs['sort_keys'] = True
+        _kwargs['separators'] = (',', ': ')
+
+    if PY2:
+        _kwargs['encoding'] = 'utf8'
+
+    _kwargs.update(kwargs)
+
+    try:
+        with codecs.open(filepath, 'w', encoding='utf8') as f:
+            f.write(json.dumps(data, **_kwargs))
+
+        return True
+    except:
+        if raise_error:
+            raise
+        else:
+            return False
 
 def jwt_data(token):
     b64_string = token.split('.')[1]
@@ -264,7 +313,7 @@ def get_system_arch():
         system = 'Linux'
     else:
         system = platform.system()
-    
+
     if system == 'Windows':
         arch = platform.architecture()[0]
     else:
@@ -282,7 +331,7 @@ def get_system_arch():
             arch = 'armv6'
         else:
             arch = 'armv7'
-            
+
     elif arch == 'i686':
         arch = 'i386'
 
@@ -349,7 +398,7 @@ def cenc_init(data=None, uuid=None, kids=None):
     r_uint32 = struct.pack(">I", len(data))
     init_data[pos:pos+len(r_uint32)] = r_uint32
     pos += len(r_uint32)
-    
+
     # data (X bytes)
     init_data[pos:pos+len(data)] = data
     pos += len(data)
@@ -395,7 +444,7 @@ def parse_cenc_init(b64string):
     r_uint32 = init_data[pos:pos+4]
     data_length, = struct.unpack(">I", r_uint32)
     pos += 4
-    
+
     # data
     data = init_data[pos:pos+data_length]
     pos += data_length

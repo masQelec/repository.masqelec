@@ -9,6 +9,14 @@ from .constants import KODI_VERSION
 class ParserError(Exception):
     pass
 
+CODECS = {
+    'avc': 'H.264',
+    'hvc': 'H.265',
+    'mp4v': 'MPEG-4',
+    'mp4s': 'MPEG-4',
+    'dvh': 'H.265 DV',
+}
+
 class Parser(object):
     def __init__(self):
         self._streams = []
@@ -34,7 +42,13 @@ class Parser(object):
             except:
                 fps = ''
 
-            qualities.append([stream['bandwidth'], _(_.QUALITY_BITRATE, bandwidth=int((stream['bandwidth']/10000.0))/100.00, resolution=stream['resolution'], fps=fps)])
+            codec_string = ''
+            for codec in stream['codecs']:
+                for key in CODECS:
+                    if codec.lower().startswith(key.lower()):
+                        codec_string += ' ' + CODECS[key]
+
+            qualities.append([stream['bandwidth'], _(_.QUALITY_BITRATE, bandwidth=int((stream['bandwidth']/10000.0))/100.00, resolution=stream['resolution'], fps=fps, codecs=codec_string.strip()).replace('  ', ' ')])
 
         return qualities
 
@@ -92,18 +106,15 @@ class M3U8(Parser):
 
                     attributes[name] = value
 
-                num_codecs = 0
-                if 'codecs' in attributes:
-                    num_codecs = len(attributes['codecs'].split(','))
-
+                codecs     = [x for x in attributes.get('codecs', '').split(',') if x]
                 bandwidth  = attributes.get('bandwidth')
                 resolution = attributes.get('resolution', '')
                 frame_rate = attributes.get('frame_rate', '')
 
                 url = line.lower().strip()#.split('?')[0]
                 if url not in suburls:
-                    if bandwidth and (num_codecs != 1 or resolution or frame_rate):
-                        self._streams.append({'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'adaption_set': 0})
+                    if bandwidth and (len(codecs) != 1 or resolution or frame_rate):
+                        self._streams.append({'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'adaption_set': 0, 'codecs': codecs})
 
                     suburls.append(url)
 
@@ -152,7 +163,8 @@ class MPD(Parser):
                         except:
                             frame_rate = ''
 
-                    streams.append({'bandwidth': bandwidth, 'resolution': resolution, 'frame_rate': frame_rate})
+                    codecs = [x for x in attrib.get('codecs', '').split(',') if x]
+                    streams.append({'bandwidth': bandwidth, 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs})
 
             if streams:
                 video_sets.append(streams)

@@ -31,9 +31,6 @@ msgctxt "#30007"
 msgid "Search"
 msgstr "Søk"
 
-msgctxt "#30008"
-msgid "Next Page ({page})"
-msgstr "Neste side ({page})"
 
 msgctxt "#30009"
 msgid "Widevine L1 Secure Device"

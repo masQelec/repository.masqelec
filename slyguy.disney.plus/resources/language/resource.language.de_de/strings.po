@@ -30,9 +30,7 @@ msgctxt "#30007"
 msgid "Search"
 msgstr "Suchen"
 
-msgctxt "#30008"
-msgid "Next Page ({page})"
-msgstr "Nächste Seite ({page})"
+
 
 msgctxt "#30009"
 msgid "Widevine L1 Secure Device"
@@ -186,4 +184,3 @@ msgstr "Angepasst"
 msgctxt "#32073"
 msgid "Disabled"
 msgstr "Deaktiviert"
-

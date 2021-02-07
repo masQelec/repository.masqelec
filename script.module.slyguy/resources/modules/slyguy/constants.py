@@ -67,6 +67,11 @@ ROUTE_RESUME_TAG       = '_resume'
 FORCE_RUN_FLAG         = '_force_run'
 ROUTE_AUTOPLAY_TAG     = '_autoplay'
 ROUTE_MIGRATE_DONE     = '_migrated'
+ROUTE_ADD_BOOKMARK     = '_add_bookmark'
+ROUTE_DEL_BOOKMARK     = '_del_bookmark'
+ROUTE_BOOKMARKS        = '_bookmarks'
+ROUTE_MOVE_BOOKMARK    = '_move_bookmark'
+ROUTE_RENAME_BOOKMARK  = '_name_bookmark'
 #################
 
 #### INPUTSTREAM ADAPTIVE #####
@@ -115,3 +120,6 @@ WIDEVINE_PSSH = bytearray([112, 115, 115, 104])
 #DEFAULT_USERAGENT = xbmc.getUserAgent()
 DEFAULT_USERAGENT = 'okhttp/3.4.1'
 DEFAULT_WORKERS   = 5
+
+#### BOOKMARKS #####
+BOOKMARK_FILE = os.path.join(ADDON_PROFILE, 'bookmarks.json')

@@ -396,8 +396,8 @@ msgstr "¿Reproducción desde?"
 
 #: 
 msgctxt "#32068"
-msgid "{bandwidth:.2f} Mbit/s {resolution} {fps}"
-msgstr "{bandwidth:.2f} Mbit/s {resolution} {fps}"
+msgid "{bandwidth:.2f} Mbit/s {resolution} {fps} {codecs}"
+msgstr "{bandwidth:.2f} Mbit/s {resolution} {fps} {codecs}"
 
 #: 
 msgctxt "#32069"
@@ -609,4 +609,49 @@ msgstr "ARMv6 no admite la reproducción Widevine"
 msgctxt "#32107"
 msgid "iOS does not support Widevine playback on Kodi"
 msgstr "iOS no admite la reproducción de Widevine en Kodi"
+
+msgctxt "#32108"
+msgid "Next Page ({page})"
+msgstr "Pagina siguiente ({page})"
+
+msgctxt "#32109"
+msgid "Failed to fetch JSON data\n"
+"Make sure your IP address is allowed (not geo-blocked)\n"
+"Try accessing the content via other means (offical app / website) to test if it's a Kodi add-on issue"
+msgstr "No se pudieron recuperar los datos JSON \n"
+"Asegúrese de que su dirección IP esté permitida (no bloqueada geográficamente)\n"
+"Intente acceder al contenido a través de otros medios (aplicación oficial/sitio web) para probar si se trata de un problema de complemento de Kodi"
+
+msgctxt "#32110"
+msgid "URL returned no response\n"
+"Check your internet connection and make sure your IP address is allowed (not geo-blocked)"
+msgstr "Verifique su conexión a Internet y asegúrese de que su dirección IP esté permitida (no bloqueada geográficamente)"
+
+msgctxt "#32111"
+msgid "Bookmarks"
+msgstr "Marcadores"
+
+msgctxt "#32112"
+msgid "Add Bookmark"
+msgstr "Añadir marcador"
+
+msgctxt "#32113"
+msgid "Remove Bookmark"
+msgstr "Quitar marcador"
+
+msgctxt "#32114"
+msgid "Bookmark Added"
+msgstr "Marcador agregado"
+
+msgctxt "#32115"
+msgid "Move Up"
+msgstr "Subir"
+
+msgctxt "#32116"
+msgid "Move Down"
+msgstr "Bajar"
+
+msgctxt "#32117"
+msgid "Rename Bookmark"
+msgstr "Rename Bookmark"
 

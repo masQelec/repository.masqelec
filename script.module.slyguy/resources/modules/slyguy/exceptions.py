@@ -24,3 +24,6 @@ class GUIError(Error):
 
 class RouterError(Error):
     pass
+
+class SessionError(Error):
+    pass

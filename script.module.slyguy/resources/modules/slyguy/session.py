@@ -6,6 +6,8 @@ from six import BytesIO
 
 from . import userdata, settings
 from .log import log
+from .language import _
+from .exceptions import SessionError
 from .constants import DEFAULT_USERAGENT
 
 DEFAULT_HEADERS = {
@@ -14,6 +16,15 @@ DEFAULT_HEADERS = {
 
 # from .settings import common_settings
 # PROXY_PATH = 'http://{}:{}/'.format(common_settings.get('proxy_host'), common_settings.getInt('proxy_port'))
+
+def json_override(self, **kwargs):
+    try:
+        return old_json(self, **kwargs)
+    except Exception as e:
+        raise SessionError(_.JSON_ERROR)
+
+old_json = requests.models.Response.json
+requests.models.Response.json = json_override
 
 class Session(requests.Session):
     def __init__(self, headers=None, cookies_key=None, base_url='{}', timeout=None, attempts=None, verify=None):
@@ -32,7 +43,7 @@ class Session(requests.Session):
 
         if self._cookies_key:
             self.cookies.update(userdata.get(self._cookies_key, {}))
-    
+
     def gz_json(self, *args, **kwargs):
         resp = self.get(*args, **kwargs)
         json_text = GzipFile(fileobj=BytesIO(resp.content)).read()
@@ -68,7 +79,9 @@ class Session(requests.Session):
                 if i == attempts:
                     raise
 
-            if resp is not None and self.after_request:
+            if resp is None:
+                raise SessionError(_.NO_RESPONSE_ERROR)
+            elif self.after_request:
                 self.after_request(resp)
 
             return resp
