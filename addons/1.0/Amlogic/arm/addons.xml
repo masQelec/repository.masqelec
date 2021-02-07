@@ -3313,7 +3313,7 @@ FLAC stands out as the fastest and most widely supported lossless audio codec, a
   </extension>
 </addon>
 
-<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.5.7">
+<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.5.8">
   <requires>
     <import addon="script.module.slyguy"/>
   </requires>
@@ -14515,10 +14515,9 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.19.7">
+<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.19.8">
   <requires>
     <!-- <import addon="xbmc.python" version="2.1.0"/> -->
-    <import addon="repository.slyguy"/>
   </requires>
   <!-- <extension point="xbmc.python.script" library="default.py">
     <provides>executable</provides>
