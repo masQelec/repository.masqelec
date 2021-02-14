@@ -3,7 +3,7 @@
   "name": "DescargaCineClasico",
   "thumbnail": "descargacineclasico.png",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["movie"],

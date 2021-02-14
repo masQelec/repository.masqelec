@@ -17,7 +17,7 @@ CLONES = [
     # ~ ['tumejortorrent', 'https://tumejortorrent.org/', 'movie, tvshow', 'tumejortorrent.jpg'],
     # ~ ['torrentrapid', 'https://torrentrapid.org/', 'movie, tvshow', 'torrentrapid.png'],
     # ~ ['torrentlocura', 'http://torrentlocura.cc/', 'movie, tvshow', 'torrentlocura.png'],
-    ['pctreload', 'https://pctreload.com/', 'movie, tvshow', 'pctreload.png'] # new
+    ['pctreload', 'https://pctreload1.com/', 'movie, tvshow', 'pctreload.png'] # new
     # ~ ['planetatorrent', 'http://planetatorrent.com/', 'movie, tvshow', 'planetatorrent.png'],
     # ~ ['mispelisyseries', 'http://mispelisyseries.com/', 'movie', 'mispelisyseries.png'],
     # ~ ['tvsinpagar', 'http://www.tvsinpagar.com/', 'movie, tvshow', 'tvsinpagar.png']

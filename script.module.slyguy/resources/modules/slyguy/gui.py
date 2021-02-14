@@ -257,6 +257,10 @@ class Item(object):
                 if key not in self.art:
                     self.art[key] = self.art.get(defaults[key])
 
+            for key in self.art:
+                if self.art[key] and self.art[key].lower().startswith('http'):
+                    self.art[key] = self.art[key].replace(' ', '%20')
+
             li.setArt(self.art)
 
         if self.playable:

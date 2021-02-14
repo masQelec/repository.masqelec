@@ -9,6 +9,7 @@ import codecs
 import json
 import io
 import gzip
+import re
 import threading
 import socket
 from contextlib import closing
@@ -31,6 +32,24 @@ def check_port(port=0, default=False):
             return s.getsockname()[1]
     except:
         return default
+
+def kodi_db(name):
+    options = []
+    db_dir = xbmc.translatePath('special://database')
+
+    for file in os.listdir(db_dir):
+        db_path = os.path.join(db_dir, file)
+
+        result = re.match('{}([0-9]+)\.db'.format(name.lower()), file.lower())
+        if result:
+            options.append([db_path, int(result.group(1))])
+
+    options = sorted(options, key=lambda x: x[1], reverse=True)
+
+    if options:
+        return options[0][0]
+    else:
+        return None
 
 def async_tasks(tasks, workers=DEFAULT_WORKERS, raise_on_error=True):
     def worker():
@@ -133,6 +152,29 @@ def gzip_extract(in_path, chunksize=4096):
         with FileIO(out_path, 'wb') as f_out:
             with FileIO(in_path, 'rb') as in_obj:
                 with gzip.GzipFile(fileobj=in_obj) as f_in:
+                    shutil.copyfileobj(f_in, f_out, length=chunksize)
+    except Exception as e:
+        log.exception(e)
+        remove_file(out_path)
+        return False
+    else:
+        remove_file(in_path)
+        shutil.move(out_path, in_path)
+        return True
+
+def xz_extract(in_path, chunksize=4096):
+    if PY2:
+        raise Error(_.XZ_ERROR)
+
+    import lzma
+
+    log.debug('Gzip Extracting: {}'.format(in_path))
+    out_path = in_path + '_extract'
+
+    try:
+        with FileIO(out_path, 'wb') as f_out:
+            with FileIO(in_path, 'rb') as in_obj:
+                with lzma.LZMAFile(filename=in_obj) as f_in:
                     shutil.copyfileobj(f_in, f_out, length=chunksize)
     except Exception as e:
         log.exception(e)

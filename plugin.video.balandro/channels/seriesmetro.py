@@ -6,7 +6,8 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
-host = 'https://seriesmetro.com/'
+# ~ host = 'https://seriesmetro.com/'
+host = 'https://seriesmetro.net/'
 
 
 def mainlist(item):
@@ -138,7 +139,7 @@ def episodios(item):
     itemlist = []
 
     if not item.dobject or not item.dpost or not item.contentSeason: return itemlist
-
+    
     post = {'action': 'action_select_season', 'post': item.dpost, 'object': item.dobject, 'season': item.contentSeason}
     data = httptools.downloadpage(host + 'wp-admin/admin-ajax.php', post=post).data
     # ~ logger.debug(data)

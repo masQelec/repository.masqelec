@@ -15,7 +15,7 @@ from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from six.moves.socketserver import ThreadingMixIn
 from six.moves.urllib.parse import urlparse, urljoin, unquote, parse_qsl, quote_plus
 from kodi_six import xbmc, xbmcvfs
-from requests import Session
+import requests
 
 from slyguy.log import log
 from slyguy.constants import ADDON_DEV, ADDON_PROFILE
@@ -26,7 +26,7 @@ from .constants import PROXY_CACHE, PROXY_CACHE_AHEAD, PROXY_CACHE_BEHIND
 
 sessions = OrderedDict()
 
-REMOVE_OUT_HEADERS = ['connection', 'transfer-encoding', 'content-encoding', 'date', 'server', 'content-length', 'set-cookie']
+REMOVE_OUT_HEADERS = ['connection', 'transfer-encoding', 'content-encoding', 'date', 'server', 'content-length']
 
 HOST = settings.get('proxy_host')
 PORT = settings.getInt('proxy_port')
@@ -217,24 +217,24 @@ class RequestHandler(BaseHTTPRequestHandler):
             mpd.removeAttribute('availabilityStartTime')
             log.debug('Removed availabilityStartTime')
 
-        base_url_nodes = []
-        for node in mpd.childNodes:
-            if node.nodeType == node.ELEMENT_NODE:
-                if node.localName == 'BaseURL':
-                    url = node.firstChild.nodeValue
+        base_url_parents = []
+        for elem in root.getElementsByTagName('BaseURL'):
+            url = elem.firstChild.nodeValue
 
-                    if not url.startswith('http'):
-                        url = urljoin(response.url, url)
+            ## Only keep the first baseurl for each parent
+            if elem.parentNode in base_url_parents:
+                elem.parentNode.removeChild(elem)
+                continue
 
-                    node.firstChild.nodeValue = PROXY_PATH + url
-                    base_url_nodes.append(node)
+            if not url.endswith('/'):
+                log.debug('Appended / to BaseURL')
+                url += '/'
 
-        # Keep first base_url node
-        if base_url_nodes:
-            base_url_nodes.pop(0)
-            for e in base_url_nodes:
-                e.parentNode.removeChild(e)
-        ####################
+            if not url.startswith('http'):
+                url = urljoin(response.url, url)
+
+            elem.firstChild.nodeValue = PROXY_PATH + url
+            base_url_parents.append(elem.parentNode)
 
         ## Live mpd needs non-last periods removed
         ## https://github.com/peak3d/inputstream.adaptive/issues/574
@@ -288,13 +288,17 @@ class RequestHandler(BaseHTTPRequestHandler):
                 for key in adap_set.attributes.keys():
                     attrib[key] = adap_set.getAttribute(key)
 
+                    ## will be fixed with https://github.com/xbmc/inputstream.adaptive/pull/602
+                    if key == 'lang' and not (len(attrib[key]) == 2 or len(attrib[key]) == 3 or len(attrib[key]) > 3 and attrib[key][2] == '-'):
+                        adap_set.setAttribute('lang', u'en-{}'.format(attrib[key]))
+
                 for key in stream.attributes.keys():
                     attrib[key] = stream.getAttribute(key)
 
                 if adapt_frame_rate and not stream.getAttribute('frameRate'):
                     stream.setAttribute('frameRate', adapt_frame_rate)
 
-                if default_language and 'audio' in attrib.get('mimeType', '') and attrib.get('lang') == default_language and adap_set not in lang_adap_sets:
+                if default_language and 'audio' in attrib.get('mimeType', '') and attrib.get('lang').lower() == default_language.lower() and adap_set not in lang_adap_sets:
                     lang_adap_sets.append(adap_set)
 
                 if 'bandwidth' in attrib:
@@ -554,7 +558,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             with open(os.path.join(ADDON_PROFILE, '{}-request.txt'.format(method.lower())), 'wb') as f:
                 f.write(post_data)
 
-        session = sessions.get(headers['host'], Session())
+        session = sessions.get(headers['host'], requests.Session())
         sessions[headers['host']] = session
 
         if len(sessions) > 5:
@@ -563,7 +567,21 @@ class RequestHandler(BaseHTTPRequestHandler):
         # session.cookies.clear()
         session.headers.clear()
 
-        response = session.request(method=method, url=url, headers=headers, data=post_data, allow_redirects=False, stream=True)
+        retries = 3
+        # some reason we get connection errors every so often when using a session. something to do with the socket
+        for i in range(retries):
+            try:
+                response = session.request(method=method, url=url, headers=headers, data=post_data, allow_redirects=False, stream=True)
+            except requests.ConnectionError as e:
+                if i == retries-1:
+                    log.debug(e)
+                    raise
+            except Exception as e:
+                log.debug(e)
+                raise
+            else:
+                break
+
         response.stream = ResponseStream(response, self._chunk_size)
 
         devlog('{} OUT: {} ({})'.format(method.upper(), url, response.status_code))
@@ -586,6 +604,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         ## FIX SET-COOKIE ##
         # if 'set-cookie' in headers:
         #     headers['set-cookie'] = headers['set-cookie'].split(';')[0]
+        headers.pop('set-cookie', None)
 
         response.headers = headers
 

@@ -76,7 +76,7 @@ def reset_thread(_id):
     while not monitor.abortRequested():
         if not player.isPlaying():
             break
-        
+
         xbmc.sleep(sleep_time)
 
     reset_settings = common_data.get('reset_settings')
@@ -118,7 +118,7 @@ def set_settings(min_bandwidth, max_bandwidth, is_ia=False):
     _id = time.time()
     settings = common_data.get('reset_settings', [_id, is_ia, old_settings])
     common_data.set('reset_settings', settings)
-    
+
     thread = Thread(target=reset_thread, args=(_id,))
     thread.start()
 
@@ -127,7 +127,7 @@ def get_gui_settings(keys):
 
     for key in keys:
         settings[key] = get_kodi_setting(key)
-        
+
     return settings
 
 def set_gui_settings(settings):
@@ -156,7 +156,7 @@ def parse(item, quality=None, geolock=None):
 
     url   = item.path.split('|')[0]
     parse = urlparse(url.lower())
-    
+
     if 'http' not in parse.scheme:
         return
 
@@ -195,7 +195,7 @@ def parse(item, quality=None, geolock=None):
         return False
 
     try:
-        parser.parse(resp.text, proxy_enabled=item.use_proxy)
+        parser.parse(resp.content, proxy_enabled=item.use_proxy)
         qualities = parser.qualities()
     except Exception as e:
         log.exception(e)

@@ -12,6 +12,7 @@ class ParserError(Exception):
 CODECS = {
     'avc': 'H.264',
     'hvc': 'H.265',
+    'hev': 'H.265',
     'mp4v': 'MPEG-4',
     'mp4s': 'MPEG-4',
     'dvh': 'H.265 DV',
@@ -21,7 +22,7 @@ class Parser(object):
     def __init__(self):
         self._streams = []
 
-    def parse(self, text, proxy_enabled=False):
+    def parse(self, content, proxy_enabled=False):
         raise Exception('Not implemented')
 
     def streams(self):
@@ -78,7 +79,9 @@ class Parser(object):
         return qualities[index+1]+1, qualities[index-1]-1, stream
 
 class M3U8(Parser):
-    def parse(self, text, proxy_enabled=False):
+    def parse(self, content, proxy_enabled=False):
+        text = content.decode('utf8')
+
         if not text.upper().startswith('#EXTM3U'):
             raise ParserError(_.QUALITY_BAD_M3U8)
 
@@ -121,8 +124,8 @@ class M3U8(Parser):
                 line1 = None
 
 class MPD(Parser):
-    def parse(self, text, proxy_enabled=False):
-        root = parseString(text)
+    def parse(self, content, proxy_enabled=False):
+        root = parseString(content)
         mpd  = root.getElementsByTagName("MPD")[0]
 
         num_baseurls = 0

@@ -508,3 +508,7 @@ msgstr ""
 msgctxt "#32117"
 msgid "Rename Bookmark"
 msgstr ""
+
+msgctxt "#32118"
+msgid "XZ extracting requires Kodi 19 or above"
+msgstr ""

@@ -10,7 +10,8 @@ from core import httptools, scrapertools, servertools, jsontools, tmdb
 # ~ HOST = "http://www.seriespapaya.com"
 # ~ HOST = "https://www.seriespapaya.net"
 # ~ HOST = "https://www2.seriespapaya.nu/"
-HOST = "https://www.seriespapaya.se/"
+# ~ HOST = "https://www.seriespapaya.se/"
+HOST = "https://www.seriespapaya.io/"
 
 IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'in': 'Eng', 'ca': 'Cat', 'sub': 'VOSE', 
            'Español Latino':'Lat', 'Español Castellano':'Esp', 'Sub Español':'VOSE'}
@@ -27,15 +28,18 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, referer=None):
     # por si viene de enlaces guardados:
+    # por si viene de enlaces guardados:
     url = url.replace('http://', 'https://')
-    url = url.replace('seriespapaya.com', 'seriespapaya.net')
-    url = url.replace('seriespapaya.net', 'seriespapaya.nu')
-    url = url.replace('seriespapaya.nu', 'seriespapaya.se')
     url = url.replace('https://www2.', 'https://www.')
-    
+
+    url = url.replace('seriespapaya.com', 'seriespapaya.io')
+    url = url.replace('seriespapaya.net', 'seriespapaya.io')
+    url = url.replace('seriespapaya.nu', 'seriespapaya.io')
+    url = url.replace('seriespapaya.se', 'seriespapaya.io')
+
     headers = {'Referer': HOST}
     if referer: headers['Referer'] = referer
-    
+
     # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
     data = httptools.downloadpage_proxy('seriespapaya', url, post=post, headers=headers).data
     return data
@@ -78,10 +82,10 @@ def list_all(item):
 
         itemlist.append(item.clone( action='temporadas', url=urlparse.urljoin(HOST, url), title=name, 
                                     contentType = 'tvshow', contentSerieName = name,
-                                    thumbnail=urlparse.urljoin(HOST, img), infoLabels={'year':year, 'plot': plot} ))
+                                    thumbnail=httptools.get_url_headers(urlparse.urljoin(HOST, img)), infoLabels={'year':year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
-    
+
     if '/lista-series-estrenos/' in item.url:
         itemlist.append(item.clone( title="Mostrar otras 20 al azar", action="list_all" ))
 
@@ -109,12 +113,13 @@ def series_por_letra(item):
 def series_por_letra_y_grupo(item):
     logger.info("letra: %s - grupo: %s" % (item.letter, item.page))
     itemlist = []
-    
+
     url = urlparse.urljoin(HOST, "autoload_process.php")
     post_request = {
         "group_no": item.page,
         "letra": item.letter
     }
+
     data = do_downloadpage(url, post=urllib.urlencode(post_request))
     data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
     patron = '<div class=list_imagen><img src=(.*?) \/>.*?<div class=list_titulo><a href=(.*?) style=.*?inherit;>(.*?)'
@@ -124,7 +129,7 @@ def series_por_letra_y_grupo(item):
 
         new_item = item.clone( action='temporadas', url=urlparse.urljoin(HOST, url), title=name, 
                                contentType = 'tvshow', contentSerieName = name,
-                               thumbnail=urlparse.urljoin(HOST, img), infoLabels={'year':year, 'plot': plot} )
+                               thumbnail=httptools.get_url_headers(urlparse.urljoin(HOST, img)), infoLabels={'year':year, 'plot': plot} )
 
         itemlist.append(new_item)
 
@@ -139,7 +144,7 @@ def series_por_letra_y_grupo(item):
 def estrenos(item):
     logger.info()
     itemlist = []
-    
+
     language = 'Esp' if 'castellano' in item.url else 'Lat' if 'latino' in item.url else 'VOSE'
     if item.page == '': item.page = 0
     perpage = 10
@@ -174,7 +179,7 @@ def estrenos(item):
         context.append({ 'title': '[COLOR pink]Listar temporadas[/COLOR]',
                          'action': 'temporadas', 'url': url_serie, 'context': '', 'folder': True, 'link_mode': 'update' })
 
-        itemlist.append(item.clone( action='findvideos', title=titulo, url=url, thumbnail=urlparse.urljoin(HOST, img),
+        itemlist.append(item.clone( action='findvideos', title=titulo, url=url, thumbnail=httptools.get_url_headers(urlparse.urljoin(HOST, img)),
                                     contentType='episode', contentSerieName=show, contentSeason=season, contentEpisodeNumber=episode, 
                                     context=context ))
 
@@ -315,7 +320,7 @@ def search(item, texto):
         for show in tvshows:
             itemlist.append(item.clone( action='temporadas', url=urlparse.urljoin(HOST, show["urla"]),
                                         contentType='tvshow', contentSerieName=show["titulo"],
-                                        title=show["titulo"], thumbnail=urlparse.urljoin(HOST, show["img"])
+                                        title=show["titulo"], thumbnail=httptools.get_url_headers(urlparse.urljoin(HOST, show["img"]))
                            ))
 
         tmdb.set_infoLabels(itemlist)
@@ -342,7 +347,7 @@ def search_post(item, texto):
 
         itemlist.append(item.clone( action='temporadas', url=urlparse.urljoin(HOST, url), title=name, 
                                     contentType = 'tvshow', contentSerieName = name,
-                                    thumbnail=urlparse.urljoin(HOST, img) ))
+                                    thumbnail=httptools.get_url_headers(urlparse.urljoin(HOST, img)) ))
 
     tmdb.set_infoLabels(itemlist)
 

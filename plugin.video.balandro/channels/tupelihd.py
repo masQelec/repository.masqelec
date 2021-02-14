@@ -1,1 +1,333 @@
-import base64; exec(base64.b64decode('aW1wb3J0IG1hcnNoYWwKZXhlYyhtYXJzaGFsLmxvYWRzKGJhc2U2NC5iNjRkZWNvZGUoJ1l3QUFBQUFBQUFBQUhRQUFBRUFBQUFCemJ3RUFBR1FBQUdRQkFHd0FBRm9BQUdRQUFHUUNBR3dCQUcwQ0FGb0NBQUZrQUFCa0F3QnNBd0J0QkFCYUJBQUJaQUFBWkFRQWJBVUFiUVlBV2dZQWJRY0FXZ2NBYlFnQVdnZ0FiUWtBV2drQUFXUUZBRm9LQUdrREFHUUdBR1FIQURaa0NBQmtDUUEyWkFvQVpBc0FObG9MQUdRTUFJUUFBRm9NQUdRTkFJUUFBRm9OQUdRT0FJUUFBRm9PQUdRUEFJUUFBRm9QQUdRUUFJUUFBRm9RQUdRUkFJUUFBRm9SQUdRU0FJUUFBRm9TQUdRVEFJUUFBRm9UQUdRVUFJUUFBRm9VQUdRVkFJUUFBRm9WQUdRV0FJUUFBRm9XQUdRWEFJUUFBRm9YQUdRWUFJUUFBRm9ZQUdRWkFJUUFBRm9aQUdRYUFJUUFBRm9hQUdjQUFHUWJBR1FjQUdRZEFHUWVBR1FmQUdRZ0FHUWhBR1FpQUdRakFHUWtBR1FmQUdRbEFHUWZBR1FjQUdRbUFHUW5BR1FqQUdRb0FHUXBBR1FxQUdRckFHUWNBR1FzQUdRaUFHUWZBR1F0QUdRcEFHUW5BR2NjQUdjQ0FGb2JBR1VhQUlNQUFITnJBV1VjQUlNQUFJSUJBRzRBQUdRQkFGTW9MZ0FBQUduLy8vLy9UaWdCQUFBQWRBWUFBQUJzYjJkblpYSW9BUUFBQUhRRUFBQUFTWFJsYlNnRUFBQUFkQWtBQUFCb2RIUndkRzl2YkhOMERBQUFBSE5qY21Gd1pYSjBiMjlzYzNRRUFBQUFkRzFrWW5RTEFBQUFjMlZ5ZG1WeWRHOXZiSE56R1FBQUFHaDBkSEJ6T2k4dmQzZDNMblIxY0dWc2FXaGtMbU52YlM5MEF3QUFBRVZ6Y0hNSUFBQUFSWE53WWNPeGIyeDBBd0FBQUV4aGRIUUdBQUFBVEdGMGFXNXZkQVFBQUFCV1QxTkZkQXNBQUFCVGRXSjBhWFIxYkdGa2IyTUJBQUFBQWdBQUFBZ0FBQUJEQUFBQWMzY0FBQUIwQUFCcUFRQ0RBQUFCWndBQWZRRUFmQUVBYWdJQWZBQUFhZ01BWkFFQVpBSUFaQU1BWkFRQWd3QUNnd0VBQVh3QkFHb0NBSHdBQUdvREFHUUJBR1FGQUdRREFHUUdBSU1BQW9NQkFBRjhBUUJxQWdCOEFBQnFBd0JrQVFCa0J3QmtBd0JrQ0FCa0NRQmtDZ0NEQUFPREFRQUJmQUVBVXlnTEFBQUFUblFGQUFBQWRHbDBiR1Z6Q2dBQUFGQmxiTU90WTNWc1lYTjBCZ0FBQUdGamRHbHZiblFPQUFBQWJXRnBibXhwYzNSZmNHVnNhWE4wQmdBQUFGTmxjbWxsYzNRUEFBQUFiV0ZwYm14cGMzUmZjMlZ5YVdWemN3b0FBQUJDZFhOallYSWdMaTR1ZEFZQUFBQnpaV0Z5WTJoMEN3QUFBSE5sWVhKamFGOTBlWEJsZEFNQUFBQmhiR3dvQkFBQUFGSUFBQUFBZEFRQUFBQnBibVp2ZEFZQUFBQmhjSEJsYm1SMEJRQUFBR05zYjI1bEtBSUFBQUIwQkFBQUFHbDBaVzEwQ0FBQUFHbDBaVzFzYVhOMEtBQUFBQUFvQUFBQUFITUlBQUFBUEhOMGNtbHVaejUwQ0FBQUFHMWhhVzVzYVhOMERnQUFBSE1NQUFBQUFBRUtBUVlDSHdFZkFpVUNZd0VBQUFBQ0FBQUFDZ0FBQUVNQUFBQnp6QUVBQUhRQUFHb0JBSU1BQUFGbkFBQjlBUUI4QVFCcUFnQjhBQUJxQXdCa0FRQmtBZ0JrQXdCa0JBQmtCUUIwQkFCa0JnQVhaQWNBWkFnQWd3QUVnd0VBQVh3QkFHb0NBSHdBQUdvREFHUUJBR1FKQUdRREFHUUVBR1FGQUhRRUFHUUtBQmRrQndCa0NBQ0RBQVNEQVFBQmZBRUFhZ0lBZkFBQWFnTUFaQUVBWkFzQVpBTUFaQVFBWkFVQWRBUUFaQXdBRjJRSEFHUUlBSU1BQklNQkFBRjhBUUJxQWdCOEFBQnFBd0JrQVFCa0RRQmtBd0JrQkFCa0JRQjBCQUJrRGdBWFpBY0FaQWdBZ3dBRWd3RUFBWHdCQUdvQ0FId0FBR29EQUdRQkFHUVBBR1FEQUdRRUFHUUZBSFFFQUdRUUFCZGtCd0JrQ0FDREFBU0RBUUFCZkFFQWFnSUFmQUFBYWdNQVpBRUFaQkVBWkFNQVpBUUFaQVVBZEFRQVpCSUFGMlFIQUdRSUFJTUFCSU1CQUFGOEFRQnFBZ0I4QUFCcUF3QmtBUUJrRXdCa0F3QmtCQUJrQlFCMEJBQmtGQUFYWkFjQVpBZ0Fnd0FFZ3dFQUFYd0JBR29DQUh3QUFHb0RBR1FCQUdRVkFHUURBR1FXQUdRSEFHUUlBSU1BQTRNQkFBRjhBUUJxQWdCOEFBQnFBd0JrQVFCa0Z3QmtBd0JrR0FCa0J3QmtDQUNEQUFPREFRQUJmQUVBYWdJQWZBQUFhZ01BWkFFQVpCa0FaQU1BWkJvQVpBY0FaQWdBZ3dBRGd3RUFBWHdCQUZNb0d3QUFBRTVTQ3dBQUFITVRBQUFBdzVwc2RHbHRZWE1nY0dWc3c2MWpkV3hoYzFJTUFBQUFkQWdBQUFCc2FYTjBYMkZzYkhRREFBQUFkWEpzY3hNQUFBQjBiM0p5Wlc1MGN5MXdaV3hwWTNWc1lYTXZVaEVBQUFCMEJRQUFBRzF2ZG1sbGN3MEFBQUJGYzNSeVpXNXZjeUF5TURJd2N4Z0FBQUJ3Wld4cFkzVnNZWE12WlhOMGNtVnViM010TWpBeU1DOXpEUUFBQUVWemRISmxibTl6SURJd01UbHpHQUFBQUhCbGJHbGpkV3hoY3k5bGMzUnlaVzV2Y3kweU1ERTVMM01OQUFBQVJYTjBjbVZ1YjNNZ01qQXhPSE1ZQUFBQWNHVnNhV04xYkdGekwyVnpkSEpsYm05ekxUSXdNVGd2Y3d3QUFBQTBTeUJWU0VRZ1RXbGpjbTl6RmdBQUFIQmxiR2xqZFd4aGN5ODBheTExYUdSdGFXTnlieTl6Q2dBQUFEUkxJRlZJUkNCU2FYQnpGQUFBQUhCbGJHbGpkV3hoY3k4MGF5MTFhR1J5YVhBdmN3NEFBQUJDYkhWeVlYa2dUV2xqY205SVJITVpBQUFBY0dWc2FXTjFiR0Z6TDJKc2RYSmhlUzF0YVdOeWIyaGtMM01MQUFBQVVHOXlJR2ZEcVc1bGNtOTBCd0FBQUdkbGJtVnliM056Q1FBQUFGQnZjaUJodzdGdmMzUUZBQUFBWVc1NWIzTnpGQUFBQUVKMWMyTmhjaUJ3Wld6RHJXTjFiR0VnTGk0dVVoQUFBQUFvQlFBQUFGSUFBQUFBVWhNQUFBQlNGQUFBQUZJVkFBQUFkQVFBQUFCb2IzTjBLQUlBQUFCU0ZnQUFBRklYQUFBQUtBQUFBQUFvQUFBQUFITUlBQUFBUEhOMGNtbHVaejVTRFFBQUFCa0FBQUJ6R2dBQUFBQUJDZ0VHQWk4Q0x3RXZBUzhDTHdFdkFTOENKUUVsQWlVQ1l3RUFBQUFDQUFBQUNnQUFBRU1BQUFCempRQUFBSFFBQUdvQkFJTUFBQUZuQUFCOUFRQjhBUUJxQWdCOEFBQnFBd0JrQVFCa0FnQmtBd0JrQkFCa0JRQjBCQUJrQmdBWFpBY0FaQWdBZ3dBRWd3RUFBWHdCQUdvQ0FId0FBR29EQUdRQkFHUUpBR1FEQUdRS0FHUUhBR1FJQUlNQUE0TUJBQUY4QVFCcUFnQjhBQUJxQXdCa0FRQmtDd0JrQXdCa0RBQmtCd0JrQ0FDREFBT0RBUUFCZkFFQVV5Z05BQUFBVGxJTEFBQUFjdzhBQUFERG1teDBhVzFoY3lCelpYSnBaWE5TREFBQUFGSVpBQUFBVWhvQUFBQnpFQUFBQUhSdmNuSmxiblJ6TFhObGNtbGxjeTlTRVFBQUFIUUdBQUFBZEhaemFHOTNjd3NBQUFCUWIzSWdaOE9wYm1WeWIxSWNBQUFBY3hBQUFBQkNkWE5qWVhJZ2MyVnlhV1VnTGk0dVVoQUFBQUFvQlFBQUFGSUFBQUFBVWhNQUFBQlNGQUFBQUZJVkFBQUFVaDRBQUFBb0FnQUFBRklXQUFBQVVoY0FBQUFvQUFBQUFDZ0FBQUFBY3dnQUFBQThjM1J5YVc1blBsSVBBQUFBTGdBQUFITU1BQUFBQUFFS0FRWUNMd0lsQWlVQ1l3RUFBQUFIQUFBQUNRQUFBRU1BQUFCem1BQUFBSFFBQUdvQkFJTUFBQUZuQUFCOUFRQjBBZ0JxQXdCMEJBQ0RBUUJxQlFCOUFnQjBCZ0JxQndCOEFnQmtBUUNEQWdCOUF3QjBCZ0JxQ0FCOEF3QmtBZ0NEQWdCOUJBQjRTd0I4QkFCRVhVTUFYQUlBZlFVQWZRWUFaQU1BZkFVQWF3WUFjbXNBY1UwQWJnQUFmQUVBYWdrQWZBQUFhZ29BWkFRQVpBVUFaQVlBZkFZQVpBY0FmQVVBZ3dBRGd3RUFBWEZOQUZkOEFRQlRLQWdBQUFCT2N6UUFBQUJIWlc1bGNtOXpQQzl6Y0dGdVBqd3ZZVDVjY3lvOGRXd2dZMnhoYzNNOUluTjFZaTF0Wlc1MUlqNG9MaW8vS1R3dmRXdytjeXNBQUFBOFlTQm9jbVZtUFNJb1cxNGlYU3NwSWo0OGFWdGVQbDBxUGp3dmFUNDhjM0JoYmo0b1cxNDhYU3NwY3dvQUFBQXZaWE4wY21WdWIzTXZVZ3dBQUFCU0dRQUFBRklMQUFBQVVob0FBQUFvQ3dBQUFGSUFBQUFBVWhNQUFBQlNBZ0FBQUhRTUFBQUFaRzkzYm14dllXUndZV2RsVWg0QUFBQjBCQUFBQUdSaGRHRlNBd0FBQUhRUkFBQUFabWx1WkY5emFXNW5iR1ZmYldGMFkyaDBGUUFBQUdacGJtUmZiWFZzZEdsd2JHVmZiV0YwWTJobGMxSVVBQUFBVWhVQUFBQW9Cd0FBQUZJV0FBQUFVaGNBQUFCU0lRQUFBSFFHQUFBQVlteHZjWFZsZEFjQUFBQnRZWFJqYUdWelVob0FBQUJTQ3dBQUFDZ0FBQUFBS0FBQUFBQnpDQUFBQUR4emRISnBibWMrVWh3QUFBQTdBQUFBY3hRQUFBQUFBUW9CQmdJU0FoSUNFZ0VUQVF3QUJnSXBBbU1CQUFBQUJRQUFBQW9BQUFCREFBQUFjNDhBQUFCMEFBQnFBUUNEQUFBQlp3QUFmUUVBZEFJQWFnTUFkQVFBZ3dFQWFnVUFmUUlBZEFZQWFnY0FmQUlBWkFFQWd3SUFmUU1BZUQ4QWZBTUFSRjAzQUgwRUFId0JBR29JQUh3QUFHb0pBR1FDQUdRREFHUUVBSHdFQUdRRkFIUUVBR1FHQUJkOEJBQVhaQWNBRjRNQUE0TUJBQUZ4T3dCWGRBb0FmQUVBWkFnQVpBa0FoQUFBWkFvQWRBc0Fnd0VDVXlnTEFBQUFUbk1jQUFBQUwzSmxiR1ZoYzJVdkxpby9JajRvTGlvL0tUd3ZZVDQ4TDJ4cFBsSU1BQUFBVWhrQUFBQlNDd0FBQUZJYUFBQUFjd2dBQUFCeVpXeGxZWE5sTDNRQkFBQUFMM1FEQUFBQWEyVjVZd0VBQUFBQkFBQUFBUUFBQUZNQUFBQnpCd0FBQUh3QUFHb0FBRk1vQVFBQUFFNG9BUUFBQUZJTEFBQUFLQUVBQUFCMEFnQUFBR2wwS0FBQUFBQW9BQUFBQUhNSUFBQUFQSE4wY21sdVp6NTBDQUFBQUR4c1lXMWlaR0UrVlFBQUFIUUFBQUFBZEFjQUFBQnlaWFpsY25ObEtBd0FBQUJTQUFBQUFGSVRBQUFBVWdJQUFBQlNJQUFBQUZJZUFBQUFVaUVBQUFCU0F3QUFBRklqQUFBQVVoUUFBQUJTRlFBQUFIUUdBQUFBYzI5eWRHVmtkQVFBQUFCVWNuVmxLQVVBQUFCU0ZnQUFBRklYQUFBQVVpRUFBQUJTSlFBQUFIUUVBQUFBWVc1NWJ5Z0FBQUFBS0FBQUFBQnpDQUFBQUR4emRISnBibWMrVWgwQUFBQkxBQUFBY3c0QUFBQUFBUW9CQmdJU0FoSUJEUUUxQW1NQkFBQUFFQUFBQUJrQUFBQkRBQUFBYytvQ0FBQjBBQUJxQVFDREFBQUJad0FBZlFFQWRBSUFhZ01BZkFBQWFnUUFnd0VBYWdVQWZRSUFkQVlBYWdjQWZBSUFaQUVBZ3dJQWZRTUFkQWdBYWdrQVpBSUFkQWdBYWdvQWd3SUFhZ3NBZkFNQWd3RUFmUVFBZUFnQ2ZBUUFSRjBBQW4wRkFIUUdBR29IQUh3RkFHUURBSU1DQUgwR0FIUUdBR29IQUh3RkFHUUVBSU1DQUgwSEFId0dBQXh6WEFCOEJ3QU1jcG9BY1Z3QWJnQUFkQVlBYWdjQWZBVUFaQVVBZ3dJQWZRZ0FkQVlBYWdjQWZBVUFaQVlBZ3dJQWZRa0FmQWtBYzgwQVpBY0FmUWtBYmdBQVpBZ0FmQUFBYWdRQWF3WUFjdlFBZkFrQWZBQUFhZ1FBYXdjQWN2UUFjVndBY2ZRQWJnQUFaQWtBZkFVQWF3WUFjZ1lCWkFvQWJnTUFaQXNBZlFvQWZBQUFhZ3dBWkF3QWZBb0Fad0lBYXdjQWNpY0JjVndBYmdBQWZBQUFhZ3dBWkF3QWF3TUFjandCWkEwQWJnTUFmQW9BZlFzQWZBb0FaQXNBYXdJQWNoSUNkQVlBYWdjQWZBVUFaQTRBZ3dJQWZRd0FaQThBZkF3QWF3WUFjcUVCZkF3QWFnMEFaQThBZ3dFQVpCQUFHV29PQUlNQUFIME5BSHdNQUdvTkFHUVBBSU1CQUdRUkFCbHFEZ0NEQUFCOURnQnVEQUI4REFCOURRQmtEUUI5RGdCOEFRQnFEd0I4QUFCcUVBQmtFZ0JrRXdCa0ZBQjhCZ0JrRlFCOEJ3QmtGZ0I4Q0FCa0Z3QjhDd0JrR0FCOERRQmtHUUIwRVFCcUVnQjhEZ0I4RGdDREFnQmtHZ0JrQ3dCa0d3QjhCd0JrSEFCcEFRQjhDUUJrSFFBMmd3QUtnd0VBQVhGY0FId0JBR29QQUh3QUFHb1FBR1FTQUdRZUFHUVVBSHdHQUdRVkFId0hBR1FXQUh3SUFHUVhBSHdMQUdRYUFHUUtBR1FmQUh3SEFHUWNBR2tCQUh3SkFHUWRBRGFEQUFpREFRQUJjVndBVjNRVEFHb1VBSHdCQUlNQkFBRmtJQUI4QWdCckJnQnk1Z0owQmdCcUJ3QjhBZ0JrSVFDREFnQjlEd0I4RHdCenRRSmtJZ0I4QWdCckJnQnl0UUowQmdCcUJ3QjhBZ0JrSXdDREFnQjlEd0J4dFFKdUFBQjhEd0J5NWdKOEFRQnFEd0I4QUFCcUVBQmtGQUI4RHdCa0ZRQmtKQUJrRWdCa0pRQ0RBQU9EQVFBQmNlWUNiZ0FBZkFFQVV5Z21BQUFBVG5NUkFBQUFLQzRxUHlrK1RXRnpJSFpwYzNSaGN6eHpGd0FBQUR4aGNuUnBZMnhsS0M0cVB5azhMMkZ5ZEdsamJHVStjdzhBQUFBZ2FISmxaajBpS0Z0ZUlsMHJLU0p6SWdBQUFEeG9NaUJqYkdGemN6MGlaVzUwY25rdGRHbDBiR1VpUGlndUtqOHBQQzlvTWo1ekRnQUFBQ0J6Y21NOUlpaGJYaUpkS3lraWN4OEFBQUE4YzNCaGJpQmpiR0Z6Y3owaWVXVmhjaUkrS0Z4a0t5azhMM053WVc0K2RBRUFBQUF0Y3drQUFBQXZjbVZzWldGelpTOXpFUUFBQUQ1V1pYSWdVMlZ5YVdVOEwzTndZVzQrVWg4QUFBQlNHd0FBQUZJU0FBQUFVaW9BQUFCekdnQUFBRHh6Y0dGdUlHTnNZWE56UFNKUmJIUjVJajRvVzE0OFhTc3BkQUVBQUFCOGFRQUFBQUJwQVFBQUFGSU1BQUFBZEFvQUFBQm1hVzVrZG1sa1pXOXpVaG9BQUFCU0N3QUFBSFFKQUFBQWRHaDFiV0p1WVdsc2RBb0FBQUJtYlhSZmMzVm1hV3B2ZEFrQUFBQnhkV0ZzYVhScFpYTjBDUUFBQUd4aGJtZDFZV2RsYzNRTEFBQUFZMjl1ZEdWdWRGUjVjR1YwREFBQUFHTnZiblJsYm5SVWFYUnNaWFFLQUFBQWFXNW1iMHhoWW1Wc2MzUUVBQUFBZVdWaGNuUUtBQUFBZEdWdGNHOXlZV1JoYzNRUUFBQUFZMjl1ZEdWdWRGTmxjbWxsVG1GdFpYTUxBQUFBUGxOSlIxVkpSVTVVUlR4elFRQUFBRHhoSUdOc1lYTnpQU0p3WVdkbExXeHBibXNnWTNWeWNtVnVkQ0l1S2o5amJHRnpjejBpWlhoMFpXNWtJajR1S2o4OFlTQm9jbVZtUFNJb1cxNGlYU3NwY3dvQUFBQStRVTVVUlZKSlQxSThjMFVBQUFBOFlTQmpiR0Z6Y3owaWNHRm5aUzFzYVc1cklHTjFjbkpsYm5RaUlHTnNZWE56UFNKd1lXZGxMV3hwYm1zaUxpby9QQzloUGk0cVAyaHlaV1k5SWloYlhpSmRLeWx6RkFBQUFENCtJRkREb1dkcGJtRWdjMmxuZFdsbGJuUmxVaGtBQUFBb0ZRQUFBRklBQUFBQVVoTUFBQUJTQWdBQUFGSWdBQUFBVWhvQUFBQlNJUUFBQUZJREFBQUFVaUlBQUFCMEFnQUFBSEpsZEFjQUFBQmpiMjF3YVd4bGRBWUFBQUJFVDFSQlRFeDBCd0FBQUdacGJtUmhiR3hTRVFBQUFIUUZBQUFBYzNCc2FYUjBCUUFBQUhOMGNtbHdVaFFBQUFCU0ZRQUFBSFFIQUFBQVNVUkpUMDFCVTNRREFBQUFaMlYwVWdRQUFBQjBEZ0FBQUhObGRGOXBibVp2VEdGaVpXeHpLQkFBQUFCU0ZnQUFBRklYQUFBQVVpRUFBQUJTSkFBQUFGSWxBQUFBZEFjQUFBQmhjblJwWTJ4bFVob0FBQUJTQ3dBQUFIUUZBQUFBZEdoMWJXSlNPUUFBQUhRRUFBQUFkR2x3YjNRR0FBQUFjM1ZtYVdwdmRBa0FBQUJ4YkhSNVgyeGhibWQwQkFBQUFIRnNkSGwwQkFBQUFHeGhibWQwQ1FBQUFHNWxlSFJmY0dGblpTZ0FBQUFBS0FBQUFBQnpDQUFBQUR4emRISnBibWMrVWhrQUFBQllBQUFBYzFRQUFBQUFBUW9CQmdJVkFoSUNIZ0lOQVJJQkVnRU9BQVlDRWdFU0FRWUFDUUlQQVE4QUNRSVlBUlVBQmdJYkFnd0JFZ0VNQVJrQkhBSUdBUVlDTFFFWUFTQUNMUUVoQWcwQ0RBRVNBZ1lCREFFWUFnWUJLd0pqQVFBQUFBWUFBQUFOQUFBQVF3QUFBSE9nQUFBQWRBQUFhZ0VBZ3dBQUFXY0FBSDBCQUhRQ0FHb0RBSHdBQUdvRUFJTUJBR29GQUgwQ0FIUUdBR29IQUdRQkFIUUdBR29JQUlNQ0FHb0pBSHdDQUlNQkFIMERBSGhKQUh3REFFUmRRUUJjQWdCOUJBQjlCUUI4QVFCcUNnQjhBQUJxQ3dCa0FnQmtBd0JrQkFCa0JRQjhCUUFXWkFZQWZBUUFaQWNBWkFnQVpBa0FmQVVBZ3dBRmd3RUFBWEZLQUZkMERBQnFEUUI4QVFDREFRQUJmQUVBVXlnS0FBQUFUbk1xQUFBQVBHRWdaR0YwWVMxd2IzTjBQU0lvTGlvL0tTSXVLajlrWVhSaExYTmxZWE52YmowaUtGeGtLeWtpVWd3QUFBQjBDUUFBQUdWd2FYTnZaR2x2YzFJTEFBQUFjd3dBQUFCVVpXMXdiM0poWkdFZ0pYTjBDUUFBQUdSaGRHRmZjRzl6ZEZJMkFBQUFkQVlBQUFCelpXRnpiMjUwRFFBQUFHTnZiblJsYm5SVFpXRnpiMjRvRGdBQUFGSUFBQUFBVWhNQUFBQlNBZ0FBQUZJZ0FBQUFVaG9BQUFCU0lRQUFBRkk4QUFBQVVqMEFBQUJTUGdBQUFGSS9BQUFBVWhRQUFBQlNGUUFBQUZJRUFBQUFVa1FBQUFBb0JnQUFBRklXQUFBQVVoY0FBQUJTSVFBQUFGSWxBQUFBVWs0QUFBQjBDQUFBQUc1MWJYUmxiWEJ2S0FBQUFBQW9BQUFBQUhNSUFBQUFQSE4wY21sdVp6NVNPZ0FBQUpJQUFBQnpFQUFBQUFBQkNnRUdBaFVDSGdFVEFUa0NEUUpqQVFBQUFBRUFBQUFDQUFBQVF3QUFBSE1LQUFBQWRBQUFmQUFBZ3dFQVV5Z0JBQUFBVGlnQkFBQUFVazBBQUFBb0FRQUFBRklXQUFBQUtBQUFBQUFvQUFBQUFITUlBQUFBUEhOMGNtbHVaejUwRlFBQUFIUnlZV05yYVc1blgyRnNiRjlsY0dsemIyUmxjNklBQUFCekFnQUFBQUFCWXdFQUFBQUxBQUFBRVFBQUFFTUFBQUJ6ZGdFQUFIUUFBR29CQUlNQUFBRm5BQUI5QVFCMEFnQmtBUUFYZlFJQWFRTUFaQUlBWkFNQU5uUURBSHdBQUdvRUFJTUJBR1FFQURaOEFBQnFCUUJrQlFBMmZRTUFkQVlBYWdjQWZBSUFaQVVBZkFNQWd3RUJhZ2dBZlFRQWRBa0FhZ29BWkFZQWRBa0FhZ3NBZ3dJQWFnd0FmQVFBZ3dFQWZRVUFlT3NBZkFVQVJGM2pBSDBHQUhRTkFHb09BSHdHQUdRSEFJTUNBSDBDQUhRTkFHb09BSHdHQUdRSUFJTUNBSDBIQUh3Q0FBeHpmZ0I4QndBTWNyd0FjWDRBYmdBQWZBY0FhZzhBWkFrQWd3RUFaQW9BR1gwSUFId0hBR29QQUdRSkFJTUJBR1FMQUJsOUNRQjhDQUFNYzM0QWZBa0FESEwyQUhGK0FHNEFBSFFOQUdvT0FId0dBR1FNQUlNQ0FIMEtBSHdLQUdvUUFHUU5BSU1CQUhJa0FXUU9BSHdLQUJkOUNnQnVBQUI4QVFCcUVRQjhBQUJxRWdCa0F3QmtEd0JrRUFCOEFnQmtFUUI4QndCa0VnQjhDZ0JrRXdCa0ZBQmtGUUI4Q0FCa0ZnQjhDUUNEQUFlREFRQUJjWDRBVjNRVEFHb1VBSHdCQUlNQkFBRjhBUUJUS0JjQUFBQk9jeGNBQUFCM2NDMWhaRzFwYmk5aFpHMXBiaTFoYW1GNExuQm9jSFFVQUFBQVlXTjBhVzl1WDNObGJHVmpkRjl6WldGemIyNVNEQUFBQUZKUEFBQUFkQVFBQUFCd2IzTjBjeGNBQUFBOFlYSjBhV05zWlNndUtqOHBQQzloY25ScFkyeGxQbk1RQUFBQVBHRWdhSEpsWmowaUtGdGVJbDByS1hNaUFBQUFQSE53WVc0Z1kyeGhjM005SW01MWJTMWxjR2tpUGlndUtqOHBQQzl6Y0dGdVBuUUJBQUFBZUdrQUFBQUFhUUVBQUFCekRRQUFBQ0J6Y21NOUlpaGJYaUpkS3lsekFnQUFBQzh2Y3dZQUFBQm9kSFJ3Y3pwU01RQUFBRklhQUFBQVVnc0FBQUJTTWdBQUFGSTJBQUFBZEFjQUFBQmxjR2x6YjJSbFVsQUFBQUIwRkFBQUFHTnZiblJsYm5SRmNHbHpiMlJsVG5WdFltVnlLQlVBQUFCU0FBQUFBRklUQUFBQVVoNEFBQUIwQXdBQUFITjBjbEpRQUFBQVVrNEFBQUJTQWdBQUFGSWdBQUFBVWlFQUFBQlNQQUFBQUZJOUFBQUFVajRBQUFCU1B3QUFBRklEQUFBQVVpSUFBQUJTUUFBQUFIUUtBQUFBYzNSaGNuUnpkMmwwYUZJVUFBQUFVaFVBQUFCU0JBQUFBRkpFQUFBQUtBc0FBQUJTRmdBQUFGSVhBQUFBVWhvQUFBQlNWQUFBQUZJaEFBQUFVaVVBQUFCMENBQUFBR1JoZEdGZlpYQnBVZ3NBQUFCU1R3QUFBRkpXQUFBQVVrWUFBQUFvQUFBQUFDZ0FBQUFBY3dnQUFBQThjM1J5YVc1blBsSk5BQUFBcFFBQUFITXNBQUFBQUFFS0FRWUNDZ0VuQWhnQ0hnSU5BUklCRWdFT0FBWUNFd0VUQVE0QUJnSVNBUThBRFFJbkFSb0NEUUpqQVFBQUFBSUFBQUFQQUFBQVF3QUFBSE44QUFBQWZBQUFhZ0FBWkFFQVpBSUFnd0lBYWdBQVpBTUFaQUlBZ3dJQWFnRUFnd0FBZlFBQVpBUUFaQVVBWkFZQVpBY0FaQWdBWkFrQVpBb0FaQXNBWkF3QVpBMEFaQTRBWkE4QVpCQUFaQkVBWkJJQVp3OEFmUUVBZkFBQWZBRUFhd2NBY21jQVpCTUFVM3dCQUdvQ0FId0FBSU1CQUdRVUFCZFRaQUFBVXlnVkFBQUFUblFCQUFBQUlGSXFBQUFBVWk4QUFBQjBBd0FBQUdOaGJYUUZBQUFBYUdSallXMTBDd0FBQUhkbFluTmpjbVZsYm1WeWRBb0FBQUIwYzNOamNtVmxibVZ5ZEFvQUFBQmljbk5qY21WbGJtVnlkQVFBQUFCb1pIUjJkQWdBQUFCb1pIUjJOekl3Y0hRSEFBQUFiV2xqY205b1pIUUdBQUFBWkhaa2NtbHdkQTBBQUFCaWJIVnlZWGx0YVdOeWIyaGtkQWtBQUFCaWJIVnlZWGx5YVhCMEJRQUFBR2hrY21sd2RBVUFBQUJvWkRjeU1IUUdBQUFBYUdReE1EZ3dkQW9BQUFBMGEzVm9aRzFwWTNKdmFRQUFBQUJwQVFBQUFDZ0RBQUFBZEFjQUFBQnlaWEJzWVdObGRBVUFBQUJzYjNkbGNuUUZBQUFBYVc1a1pYZ29BZ0FBQUhRREFBQUFkSGgwZEFVQUFBQnZjbVJsYmlnQUFBQUFLQUFBQUFCekNBQUFBRHh6ZEhKcGJtYytkQThBQUFCd2RXNTBkV0Z5WDJOaGJHbGtZV1RGQUFBQWN3b0FBQUFBQVNRQk13RU1BQVFCWXdFQUFBQUJBQUFBQXdBQUFFTUFBQUJ6VmdBQUFIUUFBR29CQUh3QUFJTUJBSDBBQUh3QUFISkNBSHdBQUdvQ0FHUUJBR1FDQUlNQ0FHb0NBR1FEQUdRQ0FJTUNBR29DQUdRRUFHUUNBSU1DQUgwQUFHNEFBSHdBQUdRRkFHc0NBSEpTQUdRR0FGTjhBQUJUS0FjQUFBQk9jd1FBQUFBdVkyOXRVaW9BQUFCekJBQUFBQzV1WlhSekF3QUFBQzUwYjNRSUFBQUFkWEJzYjJGa1pXUjBDZ0FBQUhWd2JHOWhaR1ZrZEc4b0F3QUFBRklGQUFBQWRCRUFBQUJqYjNKeVpXZHBjbDl6WlhKMmFXUnZjbEpyQUFBQUtBRUFBQUIwQmdBQUFITmxjblpsY2lnQUFBQUFLQUFBQUFCekNBQUFBRHh6ZEhKcGJtYytkQkFBQUFCdWIzSnRZV3hwZW1WZmMyVnlkbVZ5eXdBQUFITU1BQUFBQUFFUEFRWUJMUUlNQUFRQll3RUFBQUFPQUFBQUZRQUFBRU1BQUFCejJRSUFBSFFBQUdvQkFJTUFBQUZuQUFCOUFRQjBBZ0JxQXdCOEFBQnFCQUNEQVFCcUJRQjlBZ0IwQmdCcUJ3QjhBZ0JrQVFDREFnQjlBd0IwQmdCcUNBQjhBd0JrQWdDREFnQjlCQUI0RGdGOEJBQkVYUVlCWEFJQWZRVUFmUVlBZEFZQWFnY0FmQVlBWkFNQWd3SUFmUWNBZkFjQWMzb0FjVkFBYmdBQWZBY0FaQVFBR1dvSkFJTUFBR29LQUlNQUFIMElBSHdJQUhPY0FIRlFBRzRTQUh3SUFHUUZBR3NDQUhLdUFIRlFBRzRBQUh3SEFHUUdBQmxxQ1FDREFBQjlDUUIwQmdCcUJ3QjhBd0JrQndCOEJRQVhaQWdBRjRNQ0FIMEtBSHdLQUhQN0FIUUdBR29IQUh3REFHUUhBSHdGQUJka0NRQVhnd0lBZlFvQWJnQUFmQW9BY3djQmNWQUFiZ0FBZkFFQWFnc0FkQXdBWkFvQWZBQUFhZzBBWkFzQVpBd0FaQTBBZEE0QWZBZ0Fnd0VBWkE0QVpBOEFaQkFBZkFvQVpCRUFkQThBYWhBQWZBa0FmQWtBZ3dJQVpCSUFaQk1BZ3dBSGd3RUFBWEZRQUZka0ZBQjhBZ0JyQmdCeTFRSjBCZ0JxQndCOEFnQmtGUUNEQWdCOUF3QjBFUUJxRWdCa0ZnQjBFUUJxRXdDREFnQnFGQUI4QXdDREFRQjlCQUI0UEFGOEJBQkVYVEVCZlFzQWRBWUFhZ2NBZkFzQVpCY0Fnd0lBZlFvQWZBb0FhaFVBWkJnQWd3RUFjdEVCWkJrQWZBb0FGMzBLQUc0QUFId0tBSFBkQVhHZEFXNEFBSFFHQUdvSEFId0xBR1FhQUlNQ0FHb0pBSU1BQUgwSUFId0lBSE1CQW5HZEFXNEFBSFFHQUdvSEFId0xBR1FiQUlNQ0FHb0pBSU1BQUgwSkFIUUdBR29IQUh3TEFHUWNBSU1DQUdvSkFJTUFBSDBNQUdRUEFIME5BSHdJQUdvS0FJTUFBR1FkQUdzREFISnRBbndJQUdvS0FJTUFBR1FlQUdzQ0FISnRBbVFmQUgwTkFHUVBBSDBJQUhGdEFtNEFBSHdCQUdvTEFIUU1BR1FLQUh3QUFHb05BR1FMQUdRTUFHUU5BSFFPQUh3SUFJTUJBR1FPQUdRUEFHUVFBSHdLQUdRUkFIUVBBR29RQUh3SkFId0pBSU1DQUdRZ0FId01BR1FoQUhRV0FId01BSU1CQUdRU0FId05BSU1BQ1lNQkFBRnhuUUZYYmdBQWZBRUFVeWdpQUFBQVRuTXRBQUFBUEhObFkzUnBiMjRnWTJ4aGMzTTlJbk5sWTNScGIyNGdjR3hoZVdWeUtDNHFQeWs4TDNObFkzUnBiMjQrY3pRQUFBQWdhSEpsWmowaUkyOXdkR2x2Ym5NdEtDNHFQeWtpTGlvL1kyeGhjM005SW5ObGNuWmxjaUkrS0M0cVB5azhMM053WVc0K2N3d0FBQUFvTGlvL0tTMG9MaW8vS1NScEFBQUFBSFFIQUFBQWVXOTFkSFZpWldrQkFBQUFjeEVBQUFBOFpHbDJJR2xrUFNKdmNIUnBiMjV6TFhNV0FBQUFMaW8vUEdsbWNtRnRaU0J6Y21NOUlpZ3VLajhwSW5NYkFBQUFMaW8vUEdsbWNtRnRaU0JrWVhSaExYTnlZejBpS0M0cVB5a2lkQWNBQUFCamFHRnVibVZzVWd3QUFBQjBCQUFBQUhCc1lYbFNkQUFBQUZJTEFBQUFVaW9BQUFCU0dnQUFBSFFJQUFBQWJHRnVaM1ZoWjJWMEJRQUFBRzkwYUdWeWRBRUFBQUJsY3hnQUFBQStSR1Z6WTJGeVoyRnlJRlJ2Y25KbGJuUThMMlJwZGo1ekZBQUFBRHgwWVdKc1pUNG9MaW8vS1R3dmRHRmliR1UrY3lZQUFBQThjM0JoYmlCamJHRnpjejBpYm5WdElqNGpLQzRxUHlrK1JHVnpZMkZ5WjJGeVBDOWhQbk1PQUFBQUlHaHlaV1k5SWloYlhpSmRLeWx6QWdBQUFDOHZjd1lBQUFCb2RIUndjenB6RVFBQUFEd3ZjM0JoYmo0b0xpby9LVHd2ZEdRK2N3NEFBQUE4ZEdRK0tDNHFQeWs4TDNSa1BuTWJBQUFBUEhSa1BqeHpjR0Z1UGlndUtqOHBQQzl6Y0dGdVBqd3ZkR1ErZEFjQUFBQjBiM0p5Wlc1MGRBZ0FBQUIwZFhCbGJHbG9aSFFCQUFBQWRIUUhBQUFBY1hWaGJHbDBlWFFMQUFBQWNYVmhiR2wwZVY5dWRXMG9Gd0FBQUZJQUFBQUFVaE1BQUFCU0FnQUFBRklnQUFBQVVob0FBQUJTSVFBQUFGSURBQUFBVWlJQUFBQlNJd0FBQUZKQkFBQUFVbXdBQUFCU0ZBQUFBRklCQUFBQVVuY0FBQUJTZFFBQUFGSkNBQUFBVWtNQUFBQlNQQUFBQUZJOUFBQUFVajRBQUFCU1B3QUFBRkpaQUFBQVVuQUFBQUFvRGdBQUFGSVdBQUFBVWhjQUFBQlNJUUFBQUZJa0FBQUFVaVVBQUFCMEF3QUFBRzl3ZEhRTkFBQUFjMlZ5ZG1WeVgybGthVzl0WVhRREFBQUFjMTlwZEFnQUFBQnpaWEoyYVdSdmNsSkxBQUFBVWhvQUFBQjBBd0FBQUd4cGJsSktBQUFBVW5vQUFBQW9BQUFBQUNnQUFBQUFjd2dBQUFBOGMzUnlhVzVuUGxJeEFBQUEwd0FBQUhOWUFBQUFBQUVLQVFZQ0ZRTVNBaElERXdFU0FRWUFCZ0lXQVFZQUJnRU1BQVlDRUFJYUFRWUFIUUVHQUFZQ013RWdBd3dCRWdFZUFnMERFZ0VQQUEwQkJnQUdBaGdCQmdBR0FoZ0JHQUlHQVJJQkVnRUdBUXdDTXdFMUFtTUJBQUFBQmdBQUFBWUFBQUJEQUFBQWM1OEJBQUIwQUFCcUFRQ0RBQUFCWndBQWZRRUFmQUFBYWdJQWFnTUFaQUVBWkFJQWd3SUFhZ01BWkFNQVpBUUFnd0lBZkFBQVh3SUFaQVFBZlFJQWZBQUFhZ1FBY21JQWZBQUFhZ0lBYWdVQWRBWUFnd0VBZEFjQWF3SUFjMklBZkFFQVUyNEFBSHdBQUdvSUFHUUZBR3NDQUhKOUFId0FBR29DQUgwQ0FHNk1BSHdBQUdvRUFHUUdBR3NDQUhMaUFIUUpBR29LQUh3QUFHb0NBR1FIQUhRSEFHUUlBSFFMQUlNQkFtb01BR29OQUdRSkFJTUJBSDBEQUh3REFISUpBWHdCQUdvT0FId0FBR29QQUdRS0FId0RBR1FMQUdRRkFJTUFBb01CQUFGOEFRQlRiaWNBZEFrQWFnb0FmQUFBYWdJQWd3RUFhaEFBZlFRQWRCRUFhaElBZkFRQVpBd0Fnd0lBZlFJQWZBSUFjcHNCZkFBQWFnZ0FaQVVBYXdJQWNrTUJmQUVBYWc0QWZBQUFhZzhBWkFvQWZBSUFaQXNBZkFBQWFnZ0Fnd0FDZ3dFQUFYR2JBWFFUQUdvVUFId0NBSU1CQUgwRkFId0ZBSEtiQVh3RkFHUU5BR3NEQUhLYkFYUVRBR29WQUh3RkFId0NBSU1DQUgwQ0FId0JBR29PQUh3QUFHb1BBR1FLQUh3Q0FHUUxBSHdGQUlNQUFvTUJBQUZ4bXdGdUFBQjhBUUJUS0E0QUFBQk9jd1lBQUFBbUl6QXpPRHQwQVFBQUFDWnpCd0FBQUNCamJHRnpjejFTS2dBQUFGSjhBQUFBVW40QUFBQjBEQUFBQUc5dWJIbGZhR1ZoWkdWeWMzUVFBQUFBWm05c2JHOTNYM0psWkdseVpXTjBjM1FJQUFBQWJHOWpZWFJwYjI1U0dnQUFBRkowQUFBQWN5RUFBQUE4WkdsMklHTnNZWE56UFNKV2FXUmxieUkrTGlvL2MzSmpQU0lvTGlvL0tTSjBCd0FBQUdScGNtVmpkRzhvRmdBQUFGSUFBQUFBVWhNQUFBQlNHZ0FBQUZKckFBQUFVbm9BQUFCU1dRQUFBRkllQUFBQVVpMEFBQUJTZEFBQUFGSUNBQUFBVWlBQUFBQjBCUUFBQUVaaGJITmxkQWNBQUFCb1pXRmtaWEp6VWtNQUFBQlNGQUFBQUZJVkFBQUFVaUVBQUFCU0F3QUFBRklpQUFBQVVnVUFBQUIwRXdBQUFHZGxkRjl6WlhKMlpYSmZabkp2YlY5MWNteDBEUUFBQUc1dmNtMWhiR2w2WlY5MWNtd29CZ0FBQUZJV0FBQUFVaGNBQUFCU0dnQUFBSFFGQUFBQWRYSnNYMlJTSVFBQUFGS0VBQUFBS0FBQUFBQW9BQUFBQUhNSUFBQUFQSE4wY21sdVp6NVNlQUFBQUE0QkFBQnpNQUFBQUFBQkNnRUdBaVFDQmdJSkFSZ0FCd0lQQUF3QkR3RXFBUVlCSHdFSEF4VUJFZ0lHQVE4QkpRSVBBUklCRWdFbEFtTUNBQUFBQkFBQUFBUUFBQUJEQUFBQWMzZ0FBQUIwQUFCcUFRQ0RBQUFCZVNzQWRBSUFaQUVBRjN3QkFHb0RBR1FDQUdRREFJTUNBQmQ4QUFCZkJBQjBCUUI4QUFDREFRQlRWMjQ4QUFFQkFXUUVBR1FBQUd3R0FIMENBSGdsQUh3Q0FHb0hBSU1BQUVSZEZ3QjlBd0IwQUFCcUNBQmtCUUI4QXdBV2d3RUFBWEZVQUZkbkFBQlRXR1FBQUZNb0JnQUFBRTV6QXdBQUFEOXpQVkpiQUFBQWRBRUFBQUFyYWYvLy8vOXpBZ0FBQUNWektBa0FBQUJTQUFBQUFGSVRBQUFBVWg0QUFBQlNhd0FBQUZJYUFBQUFVaGtBQUFCMEF3QUFBSE41YzNRSUFBQUFaWGhqWDJsdVptOTBCUUFBQUdWeWNtOXlLQVFBQUFCU0ZnQUFBSFFGQUFBQWRHVjRkRzlTa1FBQUFIUUVBQUFBYkdsdVpTZ0FBQUFBS0FBQUFBQnpDQUFBQUR4emRISnBibWMrVWhBQUFBQXdBUUFBY3hJQUFBQUFBUW9CQXdFZEFRNEJBd0VNQVJNQkZRRmpBQUFBQUFRQUFBQUlBQUFBUXdBQUFITnJBQUFBWkFFQVpBQUFiQUFBZlFBQWZBQUFhZ0VBWkFJQWd3RUFmUUVBZUVrQWRBSUFSRjFCQUgwQ0FId0JBSFFEQUdvRUFHUURBR29GQUdjQUFId0NBRVJkRWdCOUF3QjBCZ0I4QXdDREFRQmVBZ0J4UGdDREFRQ0RBUUJyQWdCeUlnQjBCd0JUY1NJQVYzUUlBRk1vQkFBQUFFNXAvLy8vLzNNVUFBQUFRMjl1ZEdGcGJtVnlMbEJzZFdkcGJrNWhiV1ZTS2dBQUFDZ0pBQUFBZEFRQUFBQjRZbTFqZEF3QUFBQm5aWFJKYm1adlRHRmlaV3gwQWdBQUFHd3hkQVlBQUFCaVlYTmxOalIwQ1FBQUFHSTJOR1JsWTI5a1pYUUVBQUFBYW05cGJuUURBQUFBWTJoeVVpMEFBQUJTaXdBQUFDZ0VBQUFBVXBZQUFBQjBBUUFBQUdGU1ZRQUFBSFFCQUFBQWVTZ0FBQUFBS0FBQUFBQnpDQUFBQUR4emRISnBibWMrZEFZQUFBQnNNV3d4Ykd3N0FRQUFjd3dBQUFBQUFnd0JEd0VOQVRjQUNBRnBZd0FBQUdsSEFBQUFhWGdBQUFCcE1RQUFBR2xhQUFBQWFUSUFBQUJwYkFBQUFHbDFBQUFBYVV3QUFBQnBiZ0FBQUdsd0FBQUFhVllBQUFCcGRnQUFBR2x0QUFBQWFVb0FBQUJwYUFBQUFHbGlBQUFBYVVZQUFBQnBTQUFBQUNnZEFBQUFVandBQUFCMERBQUFBSEJzWVhSbWIzSnRZMjlrWlZJQUFBQUFkQWtBQUFCamIzSmxMbWwwWlcxU0FRQUFBSFFFQUFBQVkyOXlaVklDQUFBQVVnTUFBQUJTQkFBQUFGSUZBQUFBVWg0QUFBQlNRZ0FBQUZJWUFBQUFVZzBBQUFCU0R3QUFBRkljQUFBQVVoMEFBQUJTR1FBQUFGSTZBQUFBVWxJQUFBQlNUUUFBQUZKd0FBQUFVblVBQUFCU01RQUFBRko0QUFBQVVoQUFBQUJTbndBQUFGS1lBQUFBZEJFQUFBQlhaV0pGY25KdmNrVjRZMlZ3ZEdsdmJpZ0FBQUFBS0FBQUFBQW9BQUFBQUhNSUFBQUFQSE4wY21sdVp6NTBDQUFBQUR4dGIyUjFiR1UrQXdBQUFITXVBQUFBREFJUUFSQUJJZ0lHQWhzRENRc0pGUWtOQ1JBSkRRazZDUkFKQXdrZ0NRWUpDQWs3Q1NJSkN3a0lZQUVKQUE9PScpKSk='))
+﻿# -*- coding: utf-8 -*-
+
+import re
+
+from platformcode import logger
+from core.item import Item
+from core import httptools, scrapertools, tmdb, servertools
+
+host = 'https://www.tupelihd.com/'
+
+IDIOMAS = {'Español':'Esp', 'Latino':'Lat', 'Subtitulado':'VOSE'}
+
+
+def mainlist(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone ( title = 'Películas', action = 'mainlist_pelis' ))
+    itemlist.append(item.clone ( title = 'Series', action = 'mainlist_series' ))
+
+    itemlist.append(item.clone ( title = 'Buscar ...', action = 'search', search_type = 'all' ))
+
+    return itemlist
+
+def mainlist_pelis(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone ( title = 'Últimas películas', action = 'list_all', url = host + 'torrents-peliculas/', search_type = 'movie' ))
+
+    itemlist.append(item.clone ( title = 'Estrenos 2020', action = 'list_all', url = host + 'peliculas/estrenos-2020/', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = 'Estrenos 2019', action = 'list_all', url = host + 'peliculas/estrenos-2019/', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = 'Estrenos 2018', action = 'list_all', url = host + 'peliculas/estrenos-2018/', search_type = 'movie' ))
+
+    itemlist.append(item.clone ( title = '4K UHD Micro', action = 'list_all', url = host + 'peliculas/4k-uhdmicro/', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = '4K UHD Rip', action = 'list_all', url = host + 'peliculas/4k-uhdrip/', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = 'Bluray MicroHD', action = 'list_all', url = host + 'peliculas/bluray-microhd/', search_type = 'movie' ))
+
+    itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = 'Por años', action = 'anyos', search_type = 'movie' ))
+
+    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
+
+    return itemlist
+
+def mainlist_series(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone ( title = 'Últimas series', action = 'list_all', url = host + 'torrents-series/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone ( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def generos(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(host).data
+
+    bloque = scrapertools.find_single_match(data, 'Generos</span></a>\s*<ul class="sub-menu">(.*?)</ul>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)"><i[^>]*></i><span>([^<]+)')
+    for url, title in matches:
+        if '/estrenos/' in url: continue
+
+        itemlist.append(item.clone( action='list_all', title=title, url=url ))
+
+    return itemlist
+
+def anyos(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(host).data
+
+    matches = scrapertools.find_multiple_matches(data, '/release/.*?">(.*?)</a></li>')
+    for anyo in matches:
+        itemlist.append(item.clone( action='list_all', title=anyo, url=host + 'release/' + anyo + '/' ))
+
+    return sorted(itemlist, key=lambda it: it.title, reverse=True)
+
+
+def list_all(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+
+    bloque = scrapertools.find_single_match(data, '(.*?)>Mas vistas<')
+
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
+
+    for article in matches:
+        url = scrapertools.find_single_match(article, ' href="([^"]+)"')
+        title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
+        if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
+        year = scrapertools.find_single_match(article, '<span class="year">(\d+)</span>')
+        if not year: year = '-'
+
+        if '/release/' in item.url:
+            if not year in item.url: continue
+
+        tipo = 'tvshow' if '>Ver Serie</span>' in article else 'movie'
+        if item.search_type not in ['all', tipo]: continue
+
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
+            qlty_lang = scrapertools.find_single_match(article, '<span class="Qlty">([^<]+)')
+            if '|' in qlty_lang:
+                qlty = qlty_lang.split('|')[0].strip()
+                lang = qlty_lang.split('|')[1].strip()
+            else:
+                qlty = qlty_lang
+                lang = ''
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, 
+                                        qualities=qlty, languages=IDIOMAS.get(lang, lang),
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        else:
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    if '>SIGUIENTE<' in data:
+        next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?class="extend">.*?<a href="([^"]+)')
+
+        if not next_page:
+            if '>ANTERIOR<' in data:
+                next_page = scrapertools.find_single_match(data, '<a class="page-link current" class="page-link".*?</a>.*?href="([^"]+)')
+
+        if next_page:
+           itemlist.append(item.clone (url = next_page, title = '>> Página siguiente', action = 'list_all'))
+
+    return itemlist
+
+
+def temporadas(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+
+    matches = re.compile('<a data-post="(.*?)".*?data-season="(\d+)"', re.DOTALL).findall(data)
+    for data_post, numtempo in matches:
+        itemlist.append(item.clone( action='episodios', title='Temporada %s' % numtempo, data_post = data_post, contentType='season', contentSeason=numtempo ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+# Si una misma url devuelve los episodios de todas las temporadas, definir rutina tracking_all_episodes para acelerar el scrap en trackingtools.
+def tracking_all_episodes(item):
+    return episodios(item)
+
+def episodios(item):
+    logger.info()
+    itemlist = []
+
+    url = host + 'wp-admin/admin-ajax.php'
+    post = {'action': 'action_select_season', 'season': str(item.contentSeason), 'post': item.data_post}
+
+    data = httptools.downloadpage(url, post = post).data
+
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
+
+    for data_epi in matches:
+        url = scrapertools.find_single_match(data_epi, '<a href="([^"]+)')
+        title = scrapertools.find_single_match(data_epi, '<span class="num-epi">(.*?)</span>')
+        if not url or not title: continue
+
+        season = title.split('x')[0]
+        episode = title.split('x')[1]
+        if not season or not episode: continue
+
+        thumb = scrapertools.find_single_match(data_epi, ' src="([^"]+)')
+        if thumb.startswith('//'): thumb = 'https:' + thumb
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, 
+                                    contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
+def puntuar_calidad(txt):
+    txt = txt.replace(' ', '').replace('-', '').lower()
+    orden = ['cam', 'hdcam', 'webscreener', 'tsscreener', 'brscreener', 'hdtv', 'hdtv720p', 'microhd', 'dvdrip', 'bluraymicrohd', 'blurayrip', 'hdrip', 'hd720', 'hd1080', '4kuhdmicro']
+    if txt not in orden: return 0
+    else: return orden.index(txt) + 1
+
+def normalize_server(server):
+    server = servertools.corregir_servidor(server)
+    if server:
+        server = server.replace('.com', '').replace('.net', '').replace('.to', '')
+
+    if server == 'uploaded': return 'uploadedto'
+    return server
+
+def findvideos(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+    # ~ logger.debug(data)
+
+    bloque = scrapertools.find_single_match(data, '<section class="section player(.*?)</section>')
+
+    matches = scrapertools.find_multiple_matches(bloque, ' href="#options-(.*?)".*?class="server">(.*?)</span>')
+
+    # Enlaces en opciones
+    for opt, server_idioma in matches:
+        s_i = scrapertools.find_single_match(server_idioma, '(.*?)-(.*?)$')
+        if not s_i: continue
+
+        servidor = s_i[0].strip().lower()
+        if not servidor: continue
+        elif servidor == 'youtube': continue
+
+        lang = s_i[1].strip()
+
+        url = scrapertools.find_single_match(bloque, '<div id="options-' + opt + '.*?<iframe src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(bloque, '<div id="options-' + opt + '.*?<iframe data-src="(.*?)"')
+        if not url: continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = normalize_server(servidor), title = '', url = url, 
+                              language = IDIOMAS.get(lang, lang), other = 'e' ))
+
+    # Enlaces en descargas
+    if '>Descargar enlaces</div>' in data:
+        bloque = scrapertools.find_single_match(data, '<table>(.*?)</table>')
+        matches = re.compile('<span class="num">#(.*?)>Descargar</a>', re.DOTALL).findall(bloque)
+
+        for lin in matches:
+            # ~ logger.debug(lin)
+
+            url = scrapertools.find_single_match(lin, ' href="([^"]+)')
+            if url.startswith('//'): url = 'https:' + url
+            if not url: continue
+
+            servidor = scrapertools.find_single_match(lin, '</span>(.*?)</td>').strip()
+            if not servidor: continue
+
+            lang = scrapertools.find_single_match(lin, '<td>(.*?)</td>').strip()
+            qlty = scrapertools.find_single_match(lin, '<td><span>(.*?)</span></td>').strip()
+
+            other = ''
+            if servidor.lower() != 'torrent':
+                if servidor.lower() == 'tupelihd':
+                    other = 'd'
+                    servidor = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = normalize_server(servidor), title = '', url = url,
+                                  language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty) , other = other ))
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    item.url = item.url.replace('&#038;', '&')
+
+    url = ''
+
+    if item.other:
+        if not item.url.startswith(host) == True: return itemlist
+
+    if item.server == 'torrent': url = item.url
+    elif item.other == 'd':
+        url_d = httptools.downloadpage(item.url, only_headers = True, follow_redirects = False).headers.get('location')
+
+        if url_d:
+            # ~ file = httptools.downloadpage(url_d, only_headers = True, follow_redirects = False).headers.get('content-disposition')
+            # ~ url = scrapertools.find_single_match(file, 'filename="(.*?)"')
+            # ~ if url:
+                # ~ if url.endswith('.torrent'): item.server = 'torrent'
+                
+            # Suposant que sigui un torrent:
+            
+            # Opció 1, provar si el gestor de torrents accepta una url que conté un format .torrent directament tot i que no consti el .torrent a la url
+            itemlist.append(item.clone( url = url_d, server = 'torrent' ))
+            return itemlist
+
+            # Opció 2, desar contingut del torrent en local i provar si el gestor de torrents accepta una url local
+            import os
+            from platformcode import config
+            
+            data = httptools.downloadpage(url_d).data
+            file_local = os.path.join(config.get_data_path(), "temp.torrent")
+            with open(file_local, 'wb') as f: f.write(data); f.close()
+            
+            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            return itemlist
+
+    else:
+        data = httptools.downloadpage(item.url).data
+        url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"')
+
+    if url:
+       if item.server == 'torrent':
+            itemlist.append(item.clone(url = url, server = item.server))
+       else:
+            servidor = servertools.get_server_from_url(url)
+            if servidor and servidor != 'directo':
+                url = servertools.normalize_url(servidor, url)
+                itemlist.append(item.clone( url = url, server = servidor ))
+
+    return itemlist
+
+
+def search(item, texto):
+    logger.info()
+    try:
+        item.url = host + '?s=' + texto.replace(" ", "+")
+        return list_all(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []
