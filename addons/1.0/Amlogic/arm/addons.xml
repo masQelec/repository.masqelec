@@ -2970,7 +2970,7 @@ Boblight(478) is an opensource AmbiLight implementation.
   </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="WebTV" version="1.5.1" provider-name="WebTV">
+<addon id="plugin.video.balandro" name="WebTV" version="1.5.2" provider-name="WebTV">
 
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -11274,7 +11274,7 @@ v100
   </extension>
 </addon>
 
-<addon id="plugin.video.hbogoeu" name="hGO EU" provider-name="arvvoid" version="2.6.2">
+<addon id="plugin.video.hbogoeu" name="hGO EU" provider-name="arvvoid" version="2.6.3">
   <requires>
     <import addon="xbmc.python" version="2.26.0" />
     <import addon="script.module.kodi-six" version="0.1.0" />
@@ -14515,7 +14515,7 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.19.8">
+<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.20.5">
   <requires>
     <!-- <import addon="xbmc.python" version="2.1.0"/> -->
   </requires>
