@@ -138,11 +138,15 @@ def user_country():
         log.debug('Unable to get users country')
         return ''
 
-def FileIO(file_name, method):
+def FileIO(file_name, method, chunksize=4096):
     if xbmc.getCondVisibility('System.Platform.Android'):
-        return io.FileIO(file_name, method)
+        file_obj = io.FileIO(file_name, method)
+        if method.startswith('r'):
+            return io.BufferedReader(file_obj, buffer_size=chunksize)
+        else:
+            return io.BufferedWriter(file_obj, buffer_size=chunksize)
     else:
-        return open(file_name, method)
+        return open(file_name, method, chunksize)
 
 def gzip_extract(in_path, chunksize=4096):
     log.debug('Gzip Extracting: {}'.format(in_path))

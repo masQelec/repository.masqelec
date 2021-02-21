@@ -7621,7 +7621,7 @@ Zároveň má nastavenia upravujúce výšku stĺpcov spektra, ich rýchlosť a 
   </extension>
 </addon>
 
-<addon id="script.cloud.masqelec" name="cloud.masQelec" version="0.0.1" provider-name="cloud.masQelec">
+<addon id="script.cloud.masqelec" name="Cloud masQelec" version="0.0.1" provider-name="Cloud masQelec">
     <extension point="xbmc.python.script" library="addon.py">
         <provides></provides>
     </extension>

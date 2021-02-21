@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.cloud.masqelec" name="cloud.masQelec" version="0.0.1" provider-name="cloud.masQelec">
+<addon id="script.cloud.masqelec" name="Cloud masQelec" version="0.0.1" provider-name="Cloud masQelec">
     <extension point="xbmc.python.script" library="addon.py">
         <provides></provides>
     </extension>

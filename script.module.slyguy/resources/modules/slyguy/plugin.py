@@ -5,11 +5,12 @@ import random
 import time
 import json
 from functools import wraps
+from six.moves.urllib_parse import urlparse
 
 from kodi_six import xbmc, xbmcplugin
 from six.moves.urllib.parse import quote
 
-from . import router, gui, settings, userdata, inputstream, signals, quality_player, migrate, bookmarks
+from . import router, gui, settings, userdata, inputstream, signals, migrate, bookmarks
 from .constants import *
 from .log import log
 from .language import _
@@ -161,7 +162,7 @@ def _move_bookmark(index, shift, **kwargs):
 @route(ROUTE_BOOKMARKS)
 def _bookmarks(**kwargs):
     folder = Folder(_.BOOKMARKS)
-    
+
     _bookmarks = bookmarks.get()
     for index, row in enumerate(_bookmarks):
         item = Item(
@@ -350,7 +351,7 @@ class Item(gui.Item):
         # if settings.getBool('use_cache', True) and self.cache_key:
         #     url = url_for(ROUTE_CLEAR_CACHE, key=self.cache_key)
         #     self.context.append((_.PLUGIN_CONTEXT_CLEAR_CACHE, 'RunPlugin({})'.format(url)))
-        
+
         if settings.getBool('bookmarks') and self.bookmark:
             url = url_for(ROUTE_ADD_BOOKMARK, path=self.path, label=self.label, thumb=self.art.get('thumb'), folder=int(self.is_folder), playable=int(self.playable))
             self.context.append((_.ADD_BOOKMARK, 'RunPlugin({})'.format(url)))
@@ -359,7 +360,10 @@ class Item(gui.Item):
             self.art['thumb']  = self.art.get('thumb') or default_thumb
             self.art['fanart'] = self.art.get('fanart') or default_fanart
 
-        quality_player.add_context(self)
+        quality = settings.getEnum('default_quality', QUALITY_TYPES, default=QUALITY_ASK)
+        if self.path and self.playable and quality not in (QUALITY_DISABLED, QUALITY_ASK):
+            url = router.add_url_args(self.path, **{QUALITY_TAG: QUALITY_ASK})
+            self.context.append((_.PLAYBACK_QUALITY, 'PlayMedia({},noresume)'.format(url)))
 
         return super(Item, self).get_li()
 
@@ -373,7 +377,30 @@ class Item(gui.Item):
         except:
             pass
 
-        quality_player.parse(self, quality=quality, geolock=self.geolock)
+        if quality is None:
+            quality = settings.getEnum('default_quality', QUALITY_TYPES, default=QUALITY_ASK)
+            if quality == QUALITY_CUSTOM:
+                quality = int(settings.getFloat('max_bandwidth')*1000000)
+        else:
+            quality = int(quality)
+
+        if quality not in (QUALITY_DISABLED, QUALITY_SKIP):
+            parse = urlparse(self.path.lower())
+
+            _type = None
+            if self.inputstream:
+                if self.inputstream.manifest_type == 'mpd':
+                    _type = 'mpd'
+                elif self.inputstream.manifest_type == 'hls':
+                    _type = 'm3u8'
+            else:
+                if parse.path.endswith('.m3u') or parse.path.endswith('.m3u8'):
+                    _type = 'm3u8'
+
+            if _type:
+                self.proxy_data['type'] = _type
+                self.proxy_data['quality'] = quality
+                self.use_proxy = True
 
         li     = self.get_li()
         handle = _handle()

@@ -1,9 +1,12 @@
 import sys
+import json
 import traceback
+import time
 from contextlib import contextmanager
 
 from six.moves.urllib_parse import quote, urlparse
 from kodi_six import xbmcgui, xbmc, xbmcgui
+from slyguy.util import set_kodi_string, hash_6
 
 from .constants import *
 from .exceptions import GUIError
@@ -164,7 +167,7 @@ def yes_no(message, heading=None, autoclose=GUI_DEFAULT_AUTOCLOSE, **kwargs):
 class Item(object):
     def __init__(self, id=None, label='', path=None, playable=False, info=None, context=None,
             headers=None, cookies=None, properties=None, is_folder=None, art=None, inputstream=None,
-            video=None, audio=None, subtitles=None, use_proxy=False, specialsort=None, custom=None):
+            video=None, audio=None, subtitles=None, use_proxy=False, specialsort=None, custom=None, proxy_data=None):
 
         self.id          = id
         self.label       = label
@@ -183,6 +186,7 @@ class Item(object):
         self.mimetype    = None
         self._is_folder  = is_folder
         self.use_proxy   = use_proxy
+        self.proxy_data  = proxy_data or {}
         self.specialsort = specialsort #bottom, top
         self.custom      = custom
 
@@ -277,17 +281,31 @@ class Item(object):
         for key in self.properties:
             li.setProperty(key, u'{}'.format(self.properties[key]))
 
-        if self.use_proxy:
-            self.headers.update({
-                '_proxy_audio_whitelist': settings.get('audio_whitelist', ''),
-                '_proxy_subs_whitelist':  settings.get('subs_whitelist', ''),
-                '_proxy_audio_description': str(int(settings.getBool('audio_description', True))),
-                '_proxy_subs_forced': str(int(settings.getBool('subs_forced', True))),
-                '_proxy_subs_non_forced': str(int(settings.getBool('subs_non_forced', True))),
-                '_proxy_addon_id': ADDON_ID,
-            })
+        use_proxy = False
+        if self.use_proxy and self.path and self.path.lower().startswith('http'):
+            session_id = hash_6(time.time())
 
+            proxy_data = {
+                'session_id': session_id,
+                'audio_whitelist': settings.get('audio_whitelist', ''),
+                'subs_whitelist':  settings.get('subs_whitelist', ''),
+                'audio_description': str(int(settings.getBool('audio_description', True))),
+                'subs_forced': str(int(settings.getBool('subs_forced', True))),
+                'subs_non_forced': str(int(settings.getBool('subs_non_forced', True))),
+                'addon_id': ADDON_ID,
+            }
+
+            ## LEGACY
+            for key in list(self.headers.keys()):
+                if key.startswith('_proxy_'):
+                    proxy_data[key[7:]] = self.headers.pop(key)
+            ######
+
+            proxy_data.update(self.proxy_data)
+            set_kodi_string('_slyguy_quality', json.dumps(proxy_data))
+            self.headers['x-uidh'] = session_id
             self.path = u'{}{}'.format(PROXY_PATH, self.path)
+            use_proxy = True
 
         headers = self.get_url_headers()
         mimetype = self.mimetype
@@ -308,7 +326,7 @@ class Item(object):
 
             if self.inputstream.license_key:
                 li.setProperty('{}.license_key'.format(self.inputstream.addon_id), u'{url}|Content-Type={content_type}&{headers}|{challenge}|{response}'.format(
-                    url = u'{}{}'.format(PROXY_PATH, self.inputstream.license_key) if self.use_proxy else self.inputstream.license_key,
+                    url = u'{}{}'.format(PROXY_PATH, self.inputstream.license_key) if use_proxy else self.inputstream.license_key,
                     headers = headers,
                     content_type = self.inputstream.content_type,
                     challenge = self.inputstream.challenge,

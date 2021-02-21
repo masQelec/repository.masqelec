@@ -6,9 +6,9 @@ from distutils.version import LooseVersion
 
 from kodi_six import xbmc
 
-from slyguy import userdata, gui, router, inputstream, settings
+from slyguy import userdata, gui, router, settings
 from slyguy.session import Session
-from slyguy.util import hash_6, kodi_rpc, set_kodi_setting, get_addon
+from slyguy.util import hash_6, kodi_rpc, get_addon
 from slyguy.log import log
 from slyguy.constants import ROUTE_SERVICE, ROUTE_SERVICE_INTERVAL, KODI_VERSION
 
@@ -114,19 +114,6 @@ def start():
     except Exception as e:
         log.error('Failed to start proxy server')
         log.exception(e)
-
-    ## If kodi crashed, we have not reverted the IA settings - so lets do that
-    reset_settings = userdata.get('reset_settings')
-
-    if reset_settings:
-        if reset_settings[1]:
-            inputstream.set_settings(reset_settings[2])
-        else:
-            for key in reset_settings[2]:
-                set_kodi_setting(key, reset_settings[2][key])
-
-        userdata.delete('reset_settings')
-        log.debug('Reset Settings after Crash: DONE')
 
     ## Inital wait on boot
     monitor.waitForAbort(5)

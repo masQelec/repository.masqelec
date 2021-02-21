@@ -10,6 +10,7 @@ import json
 from io import BytesIO, SEEK_END
 from xml.dom.minidom import parseString
 from collections import defaultdict, OrderedDict
+from functools import cmp_to_key
 
 from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from six.moves.socketserver import ThreadingMixIn
@@ -18,15 +19,17 @@ from kodi_six import xbmc, xbmcvfs
 import requests
 
 from slyguy.log import log
-from slyguy.constants import ADDON_DEV, ADDON_PROFILE
-from slyguy.util import check_port, remove_file
-from slyguy import settings
+from slyguy.constants import *
+from slyguy.util import check_port, remove_file, get_kodi_string, set_kodi_string
+from slyguy.exceptions import Exit
+from slyguy import settings, gui
+from slyguy.language import _
 
 from .constants import PROXY_CACHE, PROXY_CACHE_AHEAD, PROXY_CACHE_BEHIND
 
 sessions = OrderedDict()
 
-REMOVE_OUT_HEADERS = ['connection', 'transfer-encoding', 'content-encoding', 'date', 'server', 'content-length']
+REMOVE_OUT_HEADERS = ['connection', 'transfer-encoding', 'content-encoding', 'date', 'server', 'content-length', 'x-uidh']
 
 HOST = settings.get('proxy_host')
 PORT = settings.getInt('proxy_port')
@@ -93,10 +96,28 @@ class ResponseStream(object):
         for chunk in self._iterator:
             yield chunk
 
+CODECS = {
+    'avc': 'H.264',
+    'hvc': 'H.265',
+    'hev': 'H.265',
+    'mp4v': 'MPEG-4',
+    'mp4s': 'MPEG-4',
+    'dvh': 'H.265 DV',
+}
+
+CODEC_RANKING = ['MPEG-4', 'H.264', 'H.265', 'H.265 DV']
+
+PROXY_GLOBAL = {
+    'last_quality': QUALITY_BEST,
+    'debounce': None,
+    'session': {},
+}
+
 class RequestHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server):
         self._chunk_size = 4096
         self._override_headers = {}
+
         try:
             BaseHTTPRequestHandler.__init__(self, request, client_address, server)
         except (IOError, OSError) as e:
@@ -126,9 +147,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         if '$HEADERS' in url or '%24HEADERS' in url:
             headers = {}
             for header in self.headers:
-                key = header.lower()
-                if not key.startswith('_proxy'):
-                    headers[key] = self.headers[header]
+                headers[header.lower()] = self.headers[header]
             headers.pop('host', None)
 
             param = quote_plus(json.dumps(headers))
@@ -152,6 +171,23 @@ class RequestHandler(BaseHTTPRequestHandler):
     def _get_url(self):
         url = self.path.lstrip('/').strip('\\')
 
+        session_id = self.headers.get('x-uidh', None)
+        if session_id:
+            self._session = PROXY_GLOBAL['session']
+
+            if self._session.get('session_id') != session_id:
+                PROXY_GLOBAL['session'] = self._session = {}
+
+            try:
+                proxy_data = json.loads(get_kodi_string('_slyguy_quality'))
+                if proxy_data.get('session_id') == session_id:
+                    self._session.update(proxy_data)
+                    set_kodi_string('_slyguy_quality', '')
+            except:
+                pass
+        else:
+            self._session = {}
+
         if url.lower().startswith('plugin'):
             try:
                 url = self._plugin_request(url)
@@ -165,8 +201,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         url = self._get_url()
         devlog('GET IN: {}'.format(url))
 
+        debounce = PROXY_GLOBAL.pop('debounce', None)
+        if debounce and debounce[0] == url and time.time() < (debounce[2] + 10):
+            self._output_response(debounce[1])
+            return
+
         response = self._proxy_request('GET', url)
-        if not response.ok:
+        if not self._session:
             self._output_response(response)
             return
 
@@ -174,15 +215,147 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         if b'urn:mpeg:dash:schema' in first_chunk.lower():
             self._parse_dash(response)
+            PROXY_GLOBAL['debounce'] = [url, response, time.time()]
 
         elif b'#extm3u' in first_chunk.lower():
             self._parse_m3u8(response)
+            PROXY_GLOBAL['debounce'] = [url, response, time.time()]
+
+        # elif not self._session.get('redirecting', False) and self._session.get('quality', None) is not None and self._session.get('selected_quality', None) is None:
+        #     gui.error(_(_.QUALITY_PARSE_ERROR, error=_(_.QUALITY_HTTP_ERROR, code=response.status_code)))
 
         self._output_response(response)
 
-    def _parse_dash(self, response):
-        data = response.stream.read().decode('utf8')
+    def _quality_select(self, qualities):
+        def codec_rank(_codecs):
+            highest = -1
 
+            for codec in _codecs:
+                for key in CODECS:
+                    if codec.lower().startswith(key.lower()) and CODECS[key] in CODEC_RANKING:
+                        rank = CODEC_RANKING.index(CODECS[key])
+                        if not highest or rank > highest:
+                            highest = rank
+
+            return highest
+
+        def compare(a, b):
+            if a['resolution'] and b['resolution']:
+                if int(a['resolution'].split('x')[0]) > int(b['resolution'].split('x')[0]):
+                    return 1
+                elif int(a['resolution'].split('x')[0]) < int(b['resolution'].split('x')[0]):
+                    return -1
+
+            # Same resolution - compare codecs
+            a_rank = codec_rank(a['codecs'])
+            b_rank = codec_rank(b['codecs'])
+
+            if a_rank > b_rank:
+                return 1
+            elif a_rank < b_rank:
+                return -1
+
+            # Same codec rank - compare bandwidth
+            if a['bandwidth'] and b['bandwidth']:
+                if a['bandwidth'] > b['bandwidth']:
+                    return 1
+                elif a['bandwidth'] < b['bandwidth']:
+                    return -1
+
+            # Same bandwidth - they are equal (could compare framerate)
+            return 0
+
+        def _stream_label(stream):
+            try: fps = _(_.QUALITY_FPS, fps=float(stream['frame_rate']))
+            except: fps = ''
+
+            codec_string = ''
+            for codec in stream['codecs']:
+                for key in CODECS:
+                    if codec.lower().startswith(key.lower()):
+                        codec_string += ' ' + CODECS[key]
+
+            return _(_.QUALITY_BITRATE, bandwidth=int((stream['bandwidth']/10000.0))/100.00, resolution=stream['resolution'], fps=fps, codecs=codec_string.strip()).replace('  ', ' ')
+
+        if self._session.get('selected_quality') is not None:
+            if self._session['selected_quality'] in (QUALITY_DISABLED, QUALITY_SKIP):
+                return []
+            else:
+                qualities.pop(self._session['selected_quality'])
+                return qualities
+
+        quality_compare = cmp_to_key(compare)
+
+        quality = int(self._session.get('quality', QUALITY_DISABLED))
+        streams = sorted(qualities, key=quality_compare, reverse=True)
+
+        if not streams:
+            quality = QUALITY_DISABLED
+        elif len(streams) < 2:
+            quality = QUALITY_BEST
+
+        if quality == QUALITY_ASK:
+            options = []
+            options.append([QUALITY_BEST, _.QUALITY_BEST])
+
+            for x in streams:
+                options.append([x, _stream_label(x)])
+
+            options.append([QUALITY_LOWEST, _.QUALITY_LOWEST])
+            options.append([QUALITY_SKIP, _.QUALITY_SKIP])
+
+            values = [x[0] for x in options]
+            labels = [x[1] for x in options]
+
+            default = -1
+            if PROXY_GLOBAL['last_quality'] in values:
+                default = values.index(PROXY_GLOBAL['last_quality'])
+            else:
+                options = [streams[-1]]
+                for stream in streams:
+                    if PROXY_GLOBAL['last_quality'] >= stream['bandwidth']:
+                        options.append(stream)
+
+                default = values.index(sorted(options, key=quality_compare, reverse=True)[0])
+
+            index = gui.select(_.PLAYBACK_QUALITY, labels, preselect=default, autoclose=5000)
+            if index < 0:
+                raise Exit('Cancelled quality select')
+
+            quality = values[index]
+            if index != default:
+                PROXY_GLOBAL['last_quality'] = quality['bandwidth'] if quality in qualities else quality
+
+        if quality in (QUALITY_DISABLED, QUALITY_SKIP):
+            quality = quality
+        elif quality == QUALITY_BEST:
+            quality = streams[0]
+        elif quality == QUALITY_LOWEST:
+            quality = streams[-1]
+        elif quality not in streams:
+            options = [streams[-1]]
+            for stream in streams:
+                if quality >= stream['bandwidth']:
+                    options.append(stream)
+            quality = sorted(options, key=quality_compare, reverse=True)[0]
+
+        if quality in qualities:
+            self._session['selected_quality'] = qualities.index(quality)
+            qualities.pop(self._session['selected_quality'])
+            return qualities
+        else:
+            self._session['selected_quality'] = quality
+            return []
+
+    def _parse_dash(self, response):
+        if ADDON_DEV:
+            root = parseString(response.stream.read())
+            mpd = root.toprettyxml(encoding='utf-8')
+            mpd = b"\n".join([ll.rstrip() for ll in mpd.splitlines() if ll.strip()])
+            with open(xbmc.translatePath('special://temp/in.mpd'), 'wb') as f:
+                f.write(mpd)
+
+        data = response.stream.read().decode('utf8')
         data = data.replace('_xmlns:cenc', 'xmlns:cenc')
         data = data.replace('_:default_KID', 'cenc:default_KID')
         data = data.replace('<pssh', '<cenc:pssh')
@@ -213,7 +386,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         ## FIXED in IA 2.4.6
         ## Commit: https://github.com/peak3d/inputstream.adaptive/commit/dc7b42783d18c65ebcf205a4979a1c9ea6b825e7
-        if self.headers.get('_proxy_addon_id') in ('plugin.video.skygo.nz', 'plugin.video.optus.sport') and 'availabilityStartTime' in mpd.attributes.keys():
+        if 'availabilityStartTime' in mpd.attributes.keys() and self._session.get('remove_availability_startTime'):
             mpd.removeAttribute('availabilityStartTime')
             log.debug('Removed availabilityStartTime')
 
@@ -223,12 +396,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             ## Only keep the first baseurl for each parent
             if elem.parentNode in base_url_parents:
+                log.debug('Non-1st BaseURL removed: {}'.format(url))
                 elem.parentNode.removeChild(elem)
                 continue
-
-            if not url.endswith('/'):
-                log.debug('Appended / to BaseURL')
-                url += '/'
 
             if not url.startswith('http'):
                 url = urljoin(response.url, url)
@@ -266,9 +436,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         audio_sets = []
         trick_sets = []
         lang_adap_sets = []
+        streams = []
 
-        default_language = self.headers.get('_proxy_default_language', '')
+        def get_base_url(node):
+            if not node.parentNode:
+                return None
 
+            siblings = node.parentNode.getElementsByTagName('BaseURL')
+            if siblings:
+                return siblings[0]
+            else:
+                return get_base_url(node.parentNode)
+
+        default_language = self._session.get('default_language', '')
         for adap_set in root.getElementsByTagName('AdaptationSet'):
             highest_bandwidth = 0
             is_video = False
@@ -301,16 +481,35 @@ class RequestHandler(BaseHTTPRequestHandler):
                 if default_language and 'audio' in attrib.get('mimeType', '') and attrib.get('lang').lower() == default_language.lower() and adap_set not in lang_adap_sets:
                     lang_adap_sets.append(adap_set)
 
+                bandwidth = 0
                 if 'bandwidth' in attrib:
                     bandwidth = int(attrib['bandwidth'])
                     if bandwidth > highest_bandwidth:
                         highest_bandwidth = bandwidth
 
+                if 'maxPlayoutRate' in attrib:
+                    is_trick = True
+
                 if 'video' in attrib.get('mimeType', ''):
                     is_video = True
 
-                if 'maxPlayoutRate' in attrib:
-                    is_trick = True
+                    if not is_trick:
+                        resolution = ''
+                        if 'width' in attrib and 'height' in attrib:
+                            resolution = '{}x{}'.format(attrib['width'], attrib['height'])
+
+                        frame_rate = ''
+                        if 'frameRate'in attrib:
+                            frame_rate = attrib['frameRate']
+                            try:
+                                if '/' in str(frame_rate):
+                                    split = frame_rate.split('/')
+                                    frame_rate = float(split[0]) / float(split[1])
+                            except:
+                                frame_rate = ''
+
+                        codecs = [x for x in attrib.get('codecs', '').split(',') if x]
+                        streams.append({'bandwidth': bandwidth, 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'elem': stream})
 
             parent = adap_set.parentNode
             parent.removeChild(adap_set)
@@ -325,11 +524,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         video_sets.sort(key=lambda  x: x[0], reverse=True)
         audio_sets.sort(key=lambda  x: x[0], reverse=True)
         trick_sets.sort(key=lambda  x: x[0], reverse=True)
-
-        select_set = int(self.headers.get('_proxy_adaption_set', 0))
-        if select_set > 0 and len(video_sets) > select_set:
-            video_sets.insert(0, video_sets.pop(select_set))
-            log.debug('Proxy: AdaptationSet #{} moved to top'.format(select_set))
 
         for elem in video_sets:
             elem[2].appendChild(elem[1])
@@ -367,6 +561,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 if url.startswith('http'):
                     e.setAttribute(attrib, PROXY_PATH + url)
+                else:
+                    base_url = get_base_url(e)
+                    if base_url and not base_url.firstChild.nodeValue.endswith('/'):
+                        base_url.firstChild.nodeValue = base_url.firstChild.nodeValue + '/'
 
             process_attrib('initialization')
             process_attrib('media')
@@ -377,44 +575,68 @@ class RequestHandler(BaseHTTPRequestHandler):
                 e.removeAttribute('presentationTimeOffset')
             ###################
 
-        if ADDON_DEV:
-            text = root.toprettyxml(encoding='utf-8')
-            text = b"\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
-            with open(xbmc.translatePath('special://temp/proxy.mpd'), 'wb') as f:
-                f.write(text)
+        for stream in self._quality_select(streams):
+            stream['elem'].parentNode.removeChild(stream['elem'])
 
-        response.stream.set(root.toxml(encoding='utf-8'))
+        for adap_set in root.getElementsByTagName('AdaptationSet'):
+            if not adap_set.getElementsByTagName('Representation'):
+                adap_set.parentNode.removeChild(adap_set)
+
+        mpd = root.toprettyxml(encoding='utf-8')
+        mpd = b"\n".join([ll.rstrip() for ll in mpd.splitlines() if ll.strip()])
+
+        if ADDON_DEV:
+            with open(xbmc.translatePath('special://temp/out.mpd'), 'wb') as f:
+                f.write(mpd)
+
+        response.stream.set(mpd)
 
     def _parse_m3u8(self, response):
         m3u8 = response.stream.read().decode('utf8')
+
+        is_master = False
+        if '#EXT-X-STREAM-INF' in m3u8:
+            is_master = True
+            file_name = 'master'
+        else:
+            file_name = 'sub'
+
+        if ADDON_DEV:
+            _m3u8 = m3u8.encode('utf8')
+            _m3u8 = b"\n".join([ll.rstrip() for ll in _m3u8.splitlines() if ll.strip()])
+            with open(xbmc.translatePath('special://temp/'+file_name+'-in.m3u8'), 'wb') as f:
+                f.write(_m3u8)
+
+        if is_master:
+            try:
+                m3u8 = self._parse_m3u8_master(m3u8)
+            except Exit:
+                raise
+            except Exception as e:
+                log.exception(e)
+                log.debug('failed to parse m3u8 master')
+
+        base_url = urljoin(response.url, '/')
 
         ## FIX AES-128 streams with KEYFORMAT
         ## Fixed with this PR: https://github.com/peak3d/inputstream.adaptive/pull/461
         m3u8 = m3u8.replace('KEYFORMAT="identity"', 'KEYFORMAT=""')
 
-        if '#EXT-X-STREAM-INF' in m3u8:
-            file_name = 'proxy-master.m3u8'
-            try:
-                m3u8 = self._parse_m3u8_master(m3u8)
-            except Exception as e:
-                log.exception(e)
-                log.debug('failed to parse m3u8 master')
-        else:
-            file_name = 'proxy-sub.m3u8'
-
-        base_url = urljoin(response.url, '/')
-
-        #URI="/.." fix (https://github.com/peak3d/inputstream.adaptive/issues/591)
+        # URI="/.." fix (https://github.com/peak3d/inputstream.adaptive/issues/591)
         m3u8 = re.sub(r'URI="/', r'URI="{}'.format(base_url), m3u8, flags=re.I|re.M)
 
+        ## Convert to proxy paths
         m3u8 = re.sub(r'^/', r'{}'.format(base_url), m3u8, flags=re.I|re.M)
         m3u8 = re.sub(r'(https?)://', r'{}\1://'.format(PROXY_PATH), m3u8, flags=re.I)
 
-        if ADDON_DEV:
-            with open(xbmc.translatePath('special://temp/'+file_name), 'wb') as f:
-                f.write(m3u8.encode('utf8'))
+        m3u8 = m3u8.encode('utf8')
+        m3u8 = b"\n".join([ll.rstrip() for ll in m3u8.splitlines() if ll.strip()])
 
-        response.stream.set(m3u8.encode('utf8'))
+        if ADDON_DEV:
+            with open(xbmc.translatePath('special://temp/'+file_name+'-out.m3u8'), 'wb') as f:
+                f.write(m3u8)
+
+        response.stream.set(m3u8)
 
     def _parse_m3u8_master(self, m3u8):
         def _process_media(line):
@@ -425,13 +647,13 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             return attribs
 
-        audio_whitelist   = [x.strip().lower() for x in self.headers.get('_proxy_audio_whitelist', '').split(',') if x]
-        subs_whitelist    = [x.strip().lower() for x in self.headers.get('_proxy_subs_whitelist', '').split(',') if x]
-        subs_forced       = int(self.headers.get('_proxy_subs_forced', 1))
-        subs_non_forced   = int(self.headers.get('_proxy_subs_non_forced', 1))
-        audio_description = int(self.headers.get('_proxy_audio_description', 1))
-        original_language = self.headers.get('_proxy_original_language', '').lower().strip()
-        default_language  = self.headers.get('_proxy_default_language', '').lower().strip()
+        audio_whitelist   = [x.strip().lower() for x in self._session.get('audio_whitelist', '').split(',') if x]
+        subs_whitelist    = [x.strip().lower() for x in self._session.get('subs_whitelist', '').split(',') if x]
+        subs_forced       = int(self._session.get('subs_forced', 1))
+        subs_non_forced   = int(self._session.get('subs_non_forced', 1))
+        audio_description = int(self._session.get('audio_description', 1))
+        original_language = self._session.get('original_language', '').lower().strip()
+        default_language  = self._session.get('default_language', '').lower().strip()
 
         if original_language and not default_language:
             default_language = original_language
@@ -521,9 +743,37 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 m3u8 = m3u8.replace(line, new_line.rstrip(','))
 
-        return m3u8
+        lines = list(m3u8.splitlines())
+        line1 = None
+        streams = []
+        for index, line in enumerate(lines):
+            if not line.strip():
+                continue
+
+            if line.startswith('#EXT-X-STREAM-INF'):
+                line1 = index
+            elif line1 and not line.startswith('#'):
+                attribs = _process_media(lines[line1])
+
+                codecs     = [x for x in attribs.get('CODECS', '').split(',') if x]
+                bandwidth  = int(attribs.get('BANDWIDTH') or 0)
+                resolution = attribs.get('RESOLUTION', '')
+                frame_rate = attribs.get('FRAME_RATE', '')
+
+                streams.append({'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'lines': [line1, index]})
+                line1 = None
+
+        adjust = 0
+        for stream in self._quality_select(streams):
+            for index in stream['lines']:
+                lines.pop(index-adjust)
+                adjust += 1
+
+        return '\n'.join(lines)
 
     def _proxy_request(self, method, url):
+        self._session['redirecting'] = False
+
         if not url.startswith('http'):
             class Response(object):
                 pass
@@ -543,9 +793,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         headers = {}
         for header in self.headers:
-            key = header.lower()
-            if not key.startswith('_proxy'):
-                headers[key] = self.headers[header]
+            headers[header.lower()] = self.headers[header]
 
         headers['host'] = parsed.hostname
         headers.update(self._override_headers)
@@ -553,18 +801,20 @@ class RequestHandler(BaseHTTPRequestHandler):
         length    = int(headers.get('content-length', 0))
         post_data = self.rfile.read(length) if length else None
 
-        debug = self.headers.get('_proxy_debug_all') or self.headers.get('_proxy_debug_{}'.format(method.lower()))
+
+        debug = self._session.get('debug_all') or self._session.get('debug_{}'.format(method.lower()))
         if post_data and debug:
             with open(os.path.join(ADDON_PROFILE, '{}-request.txt'.format(method.lower())), 'wb') as f:
                 f.write(post_data)
 
         session = sessions.get(headers['host'], requests.Session())
+        sessions.keep_alive = False
         sessions[headers['host']] = session
 
         if len(sessions) > 5:
             sessions.popitem(last=False)
 
-        # session.cookies.clear()
+    #    session.cookies.clear()
         session.headers.clear()
 
         retries = 3
@@ -573,11 +823,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             try:
                 response = session.request(method=method, url=url, headers=headers, data=post_data, allow_redirects=False, stream=True)
             except requests.ConnectionError as e:
-                if i == retries-1:
-                    log.debug(e)
+                if 'Connection aborted' not in str(e) or i == retries-1:
+                    log.exception(e)
                     raise
             except Exception as e:
-                log.debug(e)
+                log.exception(e)
                 raise
             else:
                 break
@@ -595,10 +845,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                 f.write(response.stream.read())
 
         if 'location' in headers:
+            self._session['redirecting'] = True
             if not headers['location'].lower().startswith('http'):
                 headers['location'] = urljoin(url, headers['location'])
 
-            headers['location']  = PROXY_PATH + headers['location']
+            headers['location'] = PROXY_PATH + headers['location']
 
         ## IA COOKIES ARE BROKEN - SO USE OWN SESSION FOR COOKIES
         ## FIX SET-COOKIE ##
