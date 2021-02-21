@@ -14529,7 +14529,7 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.20.5">
+<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.21.2">
   <requires>
     <!-- <import addon="xbmc.python" version="2.1.0"/> -->
   </requires>
@@ -14544,7 +14544,7 @@ Mono is no longer maintained and has been removed.
     <license></license>
     <language></language>
     <website></website>
-    <news></news>
+    <news>Brand new Proxy Quality control method</news>
     <assets>
       <icon>icon.png</icon>
       <fanart>fanart.jpg</fanart>
@@ -14683,7 +14683,7 @@ tools for the btrfs filesystem
 
 <addon id="metadata.tvshows.themoviedb.org"
        name="The Movie Database"
-       version="3.5.12"
+       version="3.5.13"
        provider-name="Team Kodi">
   <requires>
     <import addon="xbmc.metadata" version="2.1.0"/>
@@ -14691,7 +14691,7 @@ tools for the btrfs filesystem
     <import addon="metadata.common.imdb.com" version="2.9.2"/>
   </requires>
   <extension point="xbmc.metadata.scraper.tvshows"
-             language="es"
+             language="en"
              library="tmdb.xml"
              cachepersistence="00:15"/>
   <extension point="xbmc.addon.metadata">
