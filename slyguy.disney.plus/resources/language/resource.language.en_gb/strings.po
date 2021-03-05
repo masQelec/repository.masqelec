@@ -30,7 +30,9 @@ msgctxt "#30007"
 msgid "Search"
 msgstr ""
 
-
+msgctxt "#30008"
+msgid "Hubs"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Widevine L1 Secure Device"
@@ -63,6 +65,10 @@ msgstr ""
 
 msgctxt "#30016"
 msgid "Sync with Disney+"
+msgstr ""
+
+msgctxt "#30017"
+msgid "{name} [PIN]"
 msgstr ""
 
 msgctxt "#30018"
@@ -113,7 +119,9 @@ msgctxt "#30029"
 msgid "Added to Watchlist"
 msgstr ""
 
-
+msgctxt "#30030"
+msgid "Enter your Profile PIN"
+msgstr ""
 
 msgctxt "#30041"
 msgid "Play with Intro"
@@ -144,7 +152,7 @@ msgid "{label} [B](Available {date})[/B]"
 msgstr ""
 
 msgctxt "#30050"
-msgid "D/MM/YYYY"
+msgid "DD/MM/YYYY"
 msgstr ""
 
 msgctxt "#30051"

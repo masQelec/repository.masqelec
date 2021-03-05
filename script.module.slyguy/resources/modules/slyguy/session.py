@@ -78,6 +78,8 @@ class Session(requests.Session):
                 resp = None
                 if i == attempts:
                     raise
+                else:
+                    continue
 
             if resp is None:
                 raise SessionError(_.NO_RESPONSE_ERROR)

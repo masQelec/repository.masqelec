@@ -9,7 +9,7 @@ import json
 
 from io import BytesIO, SEEK_END
 from xml.dom.minidom import parseString
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 from functools import cmp_to_key
 
 from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
@@ -27,9 +27,9 @@ from slyguy.language import _
 
 from .constants import PROXY_CACHE, PROXY_CACHE_AHEAD, PROXY_CACHE_BEHIND
 
-sessions = OrderedDict()
-
-REMOVE_OUT_HEADERS = ['connection', 'transfer-encoding', 'content-encoding', 'date', 'server', 'content-length', 'x-uidh']
+HOP_BY_HOP = ['connection', 'keep-alive', 'proxy-authenticate', 'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'upgrade', 'x-uidh', 'host']
+REMOVE_OUT_HEADERS = ['content-encoding', 'date', 'server', 'content-length']
+REMOVE_OUT_HEADERS.extend(HOP_BY_HOP)
 
 HOST = settings.get('proxy_host')
 PORT = settings.getInt('proxy_port')
@@ -109,7 +109,6 @@ CODEC_RANKING = ['MPEG-4', 'H.264', 'H.265', 'H.265 DV']
 
 PROXY_GLOBAL = {
     'last_quality': QUALITY_BEST,
-    'debounce': None,
     'session': {},
 }
 
@@ -201,11 +200,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         url = self._get_url()
         devlog('GET IN: {}'.format(url))
 
-        debounce = PROXY_GLOBAL.pop('debounce', None)
-        if debounce and debounce[0] == url and time.time() < (debounce[2] + 10):
-            self._output_response(debounce[1])
-            return
-
         response = self._proxy_request('GET', url)
         if not self._session:
             self._output_response(response)
@@ -215,11 +209,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         if b'urn:mpeg:dash:schema' in first_chunk.lower():
             self._parse_dash(response)
-            PROXY_GLOBAL['debounce'] = [url, response, time.time()]
 
         elif b'#extm3u' in first_chunk.lower():
             self._parse_m3u8(response)
-            PROXY_GLOBAL['debounce'] = [url, response, time.time()]
 
         # elif not self._session.get('redirecting', False) and self._session.get('quality', None) is not None and self._session.get('selected_quality', None) is None:
         #     gui.error(_(_.QUALITY_PARSE_ERROR, error=_(_.QUALITY_HTTP_ERROR, code=response.status_code)))
@@ -279,10 +271,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         if self._session.get('selected_quality') is not None:
             if self._session['selected_quality'] in (QUALITY_DISABLED, QUALITY_SKIP):
-                return []
+                return None
             else:
-                qualities.pop(self._session['selected_quality'])
-                return qualities
+                return qualities[self._session['selected_quality']]
 
         quality_compare = cmp_to_key(compare)
 
@@ -341,11 +332,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         if quality in qualities:
             self._session['selected_quality'] = qualities.index(quality)
-            qualities.pop(self._session['selected_quality'])
-            return qualities
+            return qualities[self._session['selected_quality']]
         else:
             self._session['selected_quality'] = quality
-            return []
+            return None
 
     def _parse_dash(self, response):
         if ADDON_DEV:
@@ -531,8 +521,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         for elem in audio_sets:
             elem[2].appendChild(elem[1])
 
-        for elem in trick_sets:
-            elem[2].appendChild(elem[1])
+        # for elem in trick_sets:
+        #     elem[2].appendChild(elem[1])
         ##################
 
         ## Set default languae
@@ -575,8 +565,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                 e.removeAttribute('presentationTimeOffset')
             ###################
 
-        for stream in self._quality_select(streams):
-            stream['elem'].parentNode.removeChild(stream['elem'])
+        selected = self._quality_select(streams)
+        if selected:
+            for stream in streams:
+                if stream['elem'] != selected['elem']:
+                    stream['elem'].parentNode.removeChild(stream['elem'])
 
         for adap_set in root.getElementsByTagName('AdaptationSet'):
             if not adap_set.getElementsByTagName('Representation'):
@@ -745,7 +738,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         lines = list(m3u8.splitlines())
         line1 = None
-        streams = []
+        streams, all_streams, urls = [], [], []
         for index, line in enumerate(lines):
             if not line.strip():
                 continue
@@ -760,14 +753,27 @@ class RequestHandler(BaseHTTPRequestHandler):
                 resolution = attribs.get('RESOLUTION', '')
                 frame_rate = attribs.get('FRAME_RATE', '')
 
-                streams.append({'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'lines': [line1, index]})
+                url = line
+                if '://' in url:
+                    url = '/'+'/'.join(url.lower().split('://')[1].split('/')[1:])
+
+                stream = {'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'url': url, 'lines': [line1, index]}
+                all_streams.append(stream)
+
+                if stream['url'] not in urls:
+                    streams.append(stream)
+                    urls.append(stream['url'])
+
                 line1 = None
 
-        adjust = 0
-        for stream in self._quality_select(streams):
-            for index in stream['lines']:
-                lines.pop(index-adjust)
-                adjust += 1
+        selected = self._quality_select(streams)
+        if selected:
+            adjust = 0
+            for stream in all_streams:
+                if stream['url'] != selected['url']:
+                    for index in stream['lines']:
+                        lines.pop(index-adjust)
+                        adjust += 1
 
         return '\n'.join(lines)
 
@@ -793,35 +799,30 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         headers = {}
         for header in self.headers:
-            headers[header.lower()] = self.headers[header]
+            if header.lower() not in HOP_BY_HOP:
+                headers[header.lower()] = self.headers[header]
 
-        headers['host'] = parsed.hostname
         headers.update(self._override_headers)
 
         length    = int(headers.get('content-length', 0))
         post_data = self.rfile.read(length) if length else None
-
 
         debug = self._session.get('debug_all') or self._session.get('debug_{}'.format(method.lower()))
         if post_data and debug:
             with open(os.path.join(ADDON_PROFILE, '{}-request.txt'.format(method.lower())), 'wb') as f:
                 f.write(post_data)
 
-        session = sessions.get(headers['host'], requests.Session())
-        sessions.keep_alive = False
-        sessions[headers['host']] = session
-
-        if len(sessions) > 5:
-            sessions.popitem(last=False)
-
-    #    session.cookies.clear()
-        session.headers.clear()
+        if not self._session.get('session'):
+            self._session['session'] = requests.Session()
+        else:
+            self._session['session'].headers.clear()
+        #    self._session['session'].cookies.clear()
 
         retries = 3
         # some reason we get connection errors every so often when using a session. something to do with the socket
         for i in range(retries):
             try:
-                response = session.request(method=method, url=url, headers=headers, data=post_data, allow_redirects=False, stream=True)
+                response = self._session['session'].request(method=method, url=url, headers=headers, data=post_data, allow_redirects=False, stream=True)
             except requests.ConnectionError as e:
                 if 'Connection aborted' not in str(e) or i == retries-1:
                     log.exception(e)
@@ -856,7 +857,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         # if 'set-cookie' in headers:
         #     headers['set-cookie'] = headers['set-cookie'].split(';')[0]
         headers.pop('set-cookie', None)
-
         response.headers = headers
 
         return response

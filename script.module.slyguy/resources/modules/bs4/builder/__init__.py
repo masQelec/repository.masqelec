@@ -311,15 +311,3 @@ class ParserRejectedMarkup(Exception):
 # want to use HTMLParser as a last result.
 from . import _htmlparser
 register_treebuilders_from(_htmlparser)
-try:
-    from . import _html5lib
-    register_treebuilders_from(_html5lib)
-except ImportError:
-    # They don't have html5lib installed.
-    pass
-try:
-    from . import _lxml
-    register_treebuilders_from(_lxml)
-except ImportError:
-    # They don't have lxml installed.
-    pass

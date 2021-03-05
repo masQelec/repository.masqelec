@@ -282,7 +282,7 @@ class Item(object):
             li.setProperty(key, u'{}'.format(self.properties[key]))
 
         use_proxy = False
-        if self.use_proxy and self.path and self.path.lower().startswith('http'):
+        if self.use_proxy and self.path and self.path.lower().startswith('http') and settings.common_settings.getBool('proxy_enabled', True):
             session_id = hash_6(time.time())
 
             proxy_data = {

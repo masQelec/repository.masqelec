@@ -220,11 +220,17 @@ class API(object):
         else:
             return False
 
-    def set_profile(self, profile):
+    def set_profile(self, profile, pin=None):
         self._refresh_token()
 
-        endpoint   = self.get_config()['services']['account']['client']['endpoints']['setActiveUserProfile']['href'].format(profileId=profile['profileId'])
-        grant_data = self._session.put(endpoint).json()
+        endpoint = self.get_config()['services']['account']['client']['endpoints']['setActiveUserProfile']['href'].format(profileId=profile['profileId'])
+
+        payload = {}
+        if pin:
+            payload['entryPin'] = str(pin)
+
+        grant_data = self._session.put(endpoint, json=payload).json()
+        self._check_errors(grant_data)
 
         payload = {
             'subject_token': grant_data['assertion'],

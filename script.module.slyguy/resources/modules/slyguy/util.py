@@ -283,6 +283,10 @@ def md5sum(filepath):
 
     return hashlib.md5(open(filepath,'rb').read()).hexdigest()
 
+## to find BCOV-POLICY. Open below url
+## https://players.brightcove.net/{account_id}/{player_id}_default/index.html?videoId={videoid}
+## then seach all files for policyKey
+
 def process_brightcove(data):
     if type(data) != dict:
         try:

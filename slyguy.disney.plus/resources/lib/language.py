@@ -8,7 +8,7 @@ class Language(BaseLanguage):
     SERIES                   = 30005
     ORIGINALS                = 30006
     SEARCH                   = 30007
-
+    HUBS                     = 30008
     WV_SECURE                = 30009
     SUGGESTED                = 30010
     FEATURED                 = 30011
@@ -17,7 +17,7 @@ class Language(BaseLanguage):
     IA_VER_ERROR             = 30014
     DOLBY_VISION             = 30015
     DISNEY_SYNC              = 30016
-
+    PROFILE_WITH_PIN         = 30017
     HDR10                    = 30018
     H265                     = 30019
     SKIP_CREDITS             = 30020
@@ -30,7 +30,7 @@ class Language(BaseLanguage):
     ADD_WATCHLIST            = 30027
     DELETE_WATCHLIST         = 30028
     ADDED_WATCHLIST          = 30029
-
+    ENTER_PIN                = 30030
     INCLUDE_INTRO            = 30041
     CONTINUE_WATCHING        = 30042
     NOT_ENTITLED             = 30043

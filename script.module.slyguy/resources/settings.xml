@@ -2,6 +2,7 @@
 <settings>
     <category label="$ADDON[script.module.slyguy 32034]">
         <setting label="Persist Cache" id="persist_cache" type="bool" default="true" visible="false"/>
+        <setting label="Proxy Enabled" id="proxy_enabled" type="bool" default="true" visible="false"/>
         <setting label="Proxy Host" id="proxy_host" type="ipaddress" default="127.0.0.1"/>
         <setting label="Proxy Port" id="proxy_port" type="number" default="49005"/>
     </category>
