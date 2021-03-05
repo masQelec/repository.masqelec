@@ -7,25 +7,34 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+# pylint: disable=wildcard-import
+from __future__ import absolute_import, division, unicode_literals
+
 import xbmc
 import xbmcgui
 
 from resources.lib.globals import G
 import resources.lib.common as common
 
+try:  # Python 2
+    unicode
+except NameError:  # Python 3
+    unicode = str  # pylint: disable=redefined-builtin
+
 
 def show_notification(msg, title='Netflix', time=3000):
     """Show a notification"""
-    xbmc.executebuiltin('Notification({}, {}, {}, {})'.format(title, msg, time, G.ICON))
+    xbmc.executebuiltin(G.py2_encode('Notification({}, {}, {}, {})'
+                                     .format(title, msg, time, G.ICON)))
 
 
 def ask_credentials():
     """
     Show some dialogs and ask the user for account credentials
     """
-    email = xbmcgui.Dialog().input(
+    email = G.py2_decode(xbmcgui.Dialog().input(
         heading=common.get_local_string(30005),
-        type=xbmcgui.INPUT_ALPHANUM) or None
+        type=xbmcgui.INPUT_ALPHANUM)) or None
     common.verify_credentials(email)
     password = ask_for_password()
     common.verify_credentials(password)
@@ -37,10 +46,10 @@ def ask_credentials():
 
 def ask_for_password():
     """Ask the user for the password"""
-    return xbmcgui.Dialog().input(
+    return G.py2_decode(xbmcgui.Dialog().input(
         heading=common.get_local_string(30004),
         type=xbmcgui.INPUT_ALPHANUM,
-        option=xbmcgui.ALPHANUM_HIDE_INPUT) or None
+        option=xbmcgui.ALPHANUM_HIDE_INPUT)) or None
 
 
 def ask_for_rating():
@@ -58,21 +67,22 @@ def show_dlg_input_numeric(message, mask_input=True):
     """Ask the user to enter numbers"""
     args = {'heading': message,
             'type': 0,
-            'defaultt': '',
-            'bHiddenInput': mask_input}
+            'defaultt': ''}
+    if not G.KODI_VERSION.is_major_ver('18'):  # Kodi => 19.x support mask input
+        args['bHiddenInput'] = mask_input
     return xbmcgui.Dialog().numeric(**args) or None
 
 
 def ask_for_search_term(default_text=None):
     """Ask the user for a search term"""
-    return ask_for_input(common.get_local_string(30402), default_text)
+    return _ask_for_input(common.get_local_string(30402), default_text)
 
 
-def ask_for_input(heading, default_text=None):
-    return xbmcgui.Dialog().input(
+def _ask_for_input(heading, default_text=None):
+    return G.py2_decode(xbmcgui.Dialog().input(
         defaultt=default_text,
         heading=heading,
-        type=xbmcgui.INPUT_ALPHANUM) or None
+        type=xbmcgui.INPUT_ALPHANUM)) or None
 
 
 def ask_for_confirmation(title, message):
@@ -85,7 +95,7 @@ def ask_for_resume(resume_position):
     return xbmcgui.Dialog().contextmenu(
         [
             common.get_local_string(12022).format(common.convert_seconds_to_hms_str(resume_position)),
-            common.get_local_string(12021)
+            common.get_local_string(12023 if G.KODI_VERSION.is_major_ver('18') else 12021)
         ])
 
 
@@ -115,7 +125,7 @@ def show_error_info(title, message, unknown_error=False, netflix_error=False):
 def show_addon_error_info(exc):
     """Show a dialog to notify of an addon internal error"""
     show_error_info(title=common.get_local_string(30105),
-                    message=': '.join((exc.__class__.__name__, str(exc))),
+                    message=': '.join((exc.__class__.__name__, unicode(exc))),
                     netflix_error=False)
 
 
@@ -136,8 +146,8 @@ def show_browse_dialog(title, browse_type=0, default_path=None, multi_selection=
     :param extensions: extensions allowed e.g. '.jpg|.png'
     :return: The selected path as string (or tuple of selected items) if user pressed 'Ok', else None
     """
-    ret = xbmcgui.Dialog().browse(browse_type, title, shares='local', useThumbs=False, treatAsFolder=False,
-                                  defaultt=default_path, enableMultiple=multi_selection, mask=extensions)
+    ret = G.py2_decode(xbmcgui.Dialog().browse(browse_type, title, shares='local', useThumbs=False, treatAsFolder=False,
+                                               defaultt=default_path, enableMultiple=multi_selection, mask=extensions))
     # Note: when defaultt is set and the user cancel the action (when enableMultiple is False),
     #       will be returned the defaultt value again, so we avoid this strange behavior...
     return None if not ret or ret == default_path else ret
@@ -156,7 +166,7 @@ class ProgressDialog(xbmcgui.DialogProgress):
     """Context manager to handle a progress dialog window"""
     # Keep the same arguments for all progress bar classes
     def __init__(self, is_enabled, title=None, initial_value=0, max_value=1):
-        super().__init__()
+        xbmcgui.DialogProgress.__init__(self)
         self.is_enabled = is_enabled
         self.max_value = max_value
         self.value = initial_value
@@ -194,7 +204,7 @@ class ProgressBarBG(xbmcgui.DialogProgressBG):
     """Context manager to handle a progress bar in background"""
     # Keep the same arguments for all progress bar classes
     def __init__(self, is_enabled, title, initial_value=None, max_value=None):
-        super().__init__()
+        xbmcgui.DialogProgressBG.__init__(self)
         self.is_enabled = is_enabled
         self.max_value = max_value
         self.value = 0 if max_value and initial_value is None else initial_value

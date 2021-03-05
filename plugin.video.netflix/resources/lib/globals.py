@@ -11,15 +11,35 @@
 # Using the Kodi reuseLanguageInvoker feature, only the code in the addon.py or service.py module
 # will be run every time the addon is called.
 # All other modules (imports) are initialized only on the first invocation of the add-on.
+from __future__ import absolute_import, division, unicode_literals
+
 import collections
 import os
-from urllib.parse import parse_qsl, unquote, urlparse
+import sys
+
+try:  # Python 3
+    from urllib.parse import parse_qsl, unquote, urlparse
+except ImportError:  # Python 2
+    from urllib2 import unquote
+    from urlparse import parse_qsl, urlparse
+
+from future.utils import iteritems
 
 import xbmcaddon
 from xbmcgui import Window
 
+try:  # Kodi >= 19
+    from xbmcvfs import translatePath  # pylint: disable=ungrouped-imports
+except ImportError:  # Kodi 18
+    from xbmc import translatePath  # pylint: disable=ungrouped-imports
 
-class GlobalVariables:
+try:  # Python 2
+    unicode
+except NameError:  # Python 3
+    unicode = str  # pylint: disable=redefined-builtin,invalid-name
+
+
+class GlobalVariables(object):
     """Encapsulation for global variables to work around quirks with
     Kodi's reuseLanguageInvoker behavior"""
     # pylint: disable=attribute-defined-outside-init
@@ -193,6 +213,7 @@ class GlobalVariables:
         # The class initialization (GlobalVariables) will only take place at the first initialization of this module
         # on subsequent add-on invocations (invoked by reuseLanguageInvoker) will have no effect.
         # Define here also any other variables necessary for the correct loading of the other project modules
+        self.PY_IS_VER2 = sys.version_info.major == 2
         self.WND_KODI_HOME = Window(10000)  # Kodi home window
         self.IS_ADDON_FIRSTRUN = None
         self.ADDON = None
@@ -204,7 +225,7 @@ class GlobalVariables:
         self.CACHE_MYLIST_TTL = None
         self.CACHE_METADATA_TTL = None
 
-    def init_globals(self, argv):
+    def init_globals(self, argv, reinitialize_database=False, reload_settings=False):
         """Initialized globally used module variables. Needs to be called at start of each plugin instance!"""
         # IS_ADDON_FIRSTRUN: specifies if the add-on has been initialized for the first time
         #                    (reuseLanguageInvoker not used yet)
@@ -213,7 +234,7 @@ class GlobalVariables:
         # xbmcaddon.Addon must be created at every instance otherwise it does not read any new changes to the settings
         self.ADDON = xbmcaddon.Addon()
         self.URL = urlparse(argv[0])
-        self.REQUEST_PATH = unquote(self.URL[2][1:])
+        self.REQUEST_PATH = G.py2_decode(unquote(self.URL[2][1:]))
         try:
             self.PARAM_STRING = argv[2][1:]
         except IndexError:
@@ -221,14 +242,14 @@ class GlobalVariables:
         self.REQUEST_PARAMS = dict(parse_qsl(self.PARAM_STRING))
         if self.IS_ADDON_FIRSTRUN:
             # Global variables that do not need to be generated at every instance
-            self.ADDON_ID = self.ADDON.getAddonInfo('id')
-            self.PLUGIN = self.ADDON.getAddonInfo('name')
-            self.VERSION_RAW = self.ADDON.getAddonInfo('version')
-            self.VERSION = remove_ver_suffix(self.VERSION_RAW)
-            self.ICON = self.ADDON.getAddonInfo('icon')
-            self.DEFAULT_FANART = self.ADDON.getAddonInfo('fanart')
-            self.ADDON_DATA_PATH = self.ADDON.getAddonInfo('path')  # Add-on folder
-            self.DATA_PATH = self.ADDON.getAddonInfo('profile')  # Add-on user data folder
+            self.ADDON_ID = self.py2_decode(self.ADDON.getAddonInfo('id'))
+            self.PLUGIN = self.py2_decode(self.ADDON.getAddonInfo('name'))
+            self.VERSION_RAW = self.py2_decode(self.ADDON.getAddonInfo('version'))
+            self.VERSION = self.remove_ver_suffix(self.VERSION_RAW)
+            self.ICON = self.py2_decode(self.ADDON.getAddonInfo('icon'))
+            self.DEFAULT_FANART = self.py2_decode(self.ADDON.getAddonInfo('fanart'))
+            self.ADDON_DATA_PATH = self.py2_decode(self.ADDON.getAddonInfo('path'))  # Add-on folder
+            self.DATA_PATH = self.py2_decode(self.ADDON.getAddonInfo('profile'))  # Add-on user data folder
             self.CACHE_PATH = os.path.join(self.DATA_PATH, 'cache')
             self.COOKIES_PATH = os.path.join(self.DATA_PATH, 'COOKIES')
             try:
@@ -243,61 +264,126 @@ class GlobalVariables:
                                                              netloc=self.ADDON_ID)
             from resources.lib.common.kodi_ops import GetKodiVersion
             self.KODI_VERSION = GetKodiVersion()
+        # Add absolute paths of embedded py packages (packages not supplied by Kodi)
+        packages_paths = [
+            os.path.join(self.ADDON_DATA_PATH, 'packages', 'mysql-connector-python')
+        ]
+        # On PY2 sys.path list can contains values as unicode type and string type at same time,
+        #   here we will add only unicode type so filter values by unicode.
+        #   This fixes comparison errors between str/unicode
+        sys_path_filtered = [value for value in sys.path if isinstance(value, unicode)]
+        for path in packages_paths:  # packages_paths has unicode type values
+            path = G.py2_decode(translatePath(path))
+            if path not in sys_path_filtered:
+                # Add embedded package path to python system directory
+                # The "path" will add an unicode type to avoids problems with OS using symbolic characters
+                sys.path.insert(0, path)
+
         # Initialize the log
         from resources.lib.utils.logging import LOG
         LOG.initialize(self.ADDON_ID, self.PLUGIN_HANDLE,
                        self.ADDON.getSettingString('debug_log_level'),
                        self.ADDON.getSettingBool('enable_timing'))
-        if self.IS_ADDON_FIRSTRUN:
-            self.init_database()
-            # Initialize the cache
+
+        self.IPC_OVER_HTTP = self.ADDON.getSettingBool('enable_ipc_over_http')
+        self._init_database(self.IS_ADDON_FIRSTRUN or reinitialize_database)
+
+        if self.IS_ADDON_FIRSTRUN or reload_settings:
+            # Put here all the global variables that need to be updated on service side
+            # when the user changes the add-on settings
             if self.IS_SERVICE:
-                from resources.lib.services.cache.cache_management import CacheManagement
-                self.CACHE_MANAGEMENT = CacheManagement()
-                from resources.lib.services.settings_monitor import SettingsMonitor
-                self.SETTINGS_MONITOR = SettingsMonitor()
+                # Initialize the cache
+                if reload_settings:
+                    self.CACHE_MANAGEMENT.load_ttl_values()
+                else:
+                    from resources.lib.services.cache.cache_management import CacheManagement
+                    self.CACHE_MANAGEMENT = CacheManagement()
+                    # Reset the "settings monitor" of the service in case of add-on crash
+                    self.settings_monitor_suspend(False)
             from resources.lib.common.cache import Cache
             self.CACHE = Cache()
-        self.IPC_OVER_HTTP = self.ADDON.getSettingBool('enable_ipc_over_http')
 
-    def init_database(self):
+    def _init_database(self, initialize):
         # Initialize local database
-        import resources.lib.database.db_local as db_local
-        self.LOCAL_DB = db_local.NFLocalDatabase()
+        if initialize:
+            import resources.lib.database.db_local as db_local
+            self.LOCAL_DB = db_local.NFLocalDatabase()
         # Initialize shared database
         use_mysql = G.ADDON.getSettingBool('use_mysql')
-        import resources.lib.database.db_shared as db_shared
-        from resources.lib.common.exceptions import DBMySQLConnectionError, DBMySQLError
-        try:
-            shared_db_class = db_shared.get_shareddb_class(use_mysql=use_mysql)
-            self.SHARED_DB = shared_db_class()
-        except (DBMySQLConnectionError, DBMySQLError) as exc:
-            import resources.lib.kodi.ui as ui
-            if isinstance(exc, DBMySQLError):
-                # There is a problem with the database
-                ui.show_addon_error_info(exc)
-            # The MySQL database cannot be reached, fallback to local SQLite database
-            # When this code is called from addon, is needed apply the change also in the
-            # service, so disabling it run the SettingsMonitor
-            self.ADDON.setSettingBool('use_mysql', False)
-            ui.show_notification(self.ADDON.getLocalizedString(30206), time=10000)
-            shared_db_class = db_shared.get_shareddb_class()
-            self.SHARED_DB = shared_db_class()
+        if initialize or use_mysql:
+            import resources.lib.database.db_shared as db_shared
+            from resources.lib.common.exceptions import DBMySQLConnectionError, DBMySQLError
+            try:
+                shared_db_class = db_shared.get_shareddb_class(use_mysql=use_mysql)
+                self.SHARED_DB = shared_db_class()
+            except (DBMySQLConnectionError, DBMySQLError) as exc:
+                import resources.lib.kodi.ui as ui
+                if isinstance(exc, DBMySQLError):
+                    # There is a problem with the database
+                    ui.show_addon_error_info(exc)
+                # The MySQL database cannot be reached, fallback to local SQLite database
+                # When this code is called from addon, is needed apply the change also in the
+                # service, so disabling it run the SettingsMonitor
+                self.ADDON.setSettingBool('use_mysql', False)
+                ui.show_notification(self.ADDON.getLocalizedString(30206), time=10000)
+                shared_db_class = db_shared.get_shareddb_class()
+                self.SHARED_DB = shared_db_class()
+
+    def settings_monitor_suspend(self, is_suspended=True, at_first_change=False):
+        """
+        Suspends for the necessary time the settings monitor of the service
+        that otherwise cause the reinitialization of global settings and possible consequent actions
+        to settings changes or unnecessary checks when a setting will be changed.
+        :param is_suspended: True/False - allows or denies the execution of the settings monitor
+        :param at_first_change:
+         True - monitor setting is automatically reactivated after the FIRST change to the settings
+         False - monitor setting MUST BE REACTIVATED MANUALLY
+        :return: None
+        """
+        if is_suspended and at_first_change:
+            new_value = 'First'
+        else:
+            new_value = str(is_suspended)
+        # Accepted values in string: First, True, False
+        current_value = G.LOCAL_DB.get_value('suspend_settings_monitor', 'False')
+        if new_value == current_value:
+            return
+        G.LOCAL_DB.set_value('suspend_settings_monitor', new_value)
+
+    def settings_monitor_suspend_status(self):
+        """
+        Returns the suspend status of settings monitor
+        """
+        return G.LOCAL_DB.get_value('suspend_settings_monitor', 'False')
 
     def is_known_menu_context(self, context):
         """Return true if context are one of the menu with loco_known=True"""
-        for _, data in self.MAIN_MENU_ITEMS.items():
+        for _, data in iteritems(self.MAIN_MENU_ITEMS):
             if data['loco_known']:
                 if data['loco_contexts'][0] == context:
                     return True
         return False
 
+    def py2_decode(self, value, encoding='utf-8'):
+        """Decode text only on python 2"""
+        # To remove when Kodi 18 support is over / Py2 dead
+        if self.PY_IS_VER2:
+            return value.decode(encoding)
+        return value
 
-def remove_ver_suffix(version):
-    """Remove the codename suffix from version value"""
-    import re
-    pattern = re.compile(r'\+\w+\.\d$')  # Example: +matrix.1
-    return re.sub(pattern, '', version)
+    def py2_encode(self, value, encoding='utf-8'):
+        """Encode text only on python 2"""
+        # To remove when Kodi 18 support is over / Py2 dead
+        if self.PY_IS_VER2:
+            return value.encode(encoding)
+        return value
+
+    @staticmethod
+    def remove_ver_suffix(version):
+        """Remove the codename suffix from version value"""
+        import re
+        pattern = re.compile(r'\+\w+\.\d$')  # Example: +matrix.1
+        return re.sub(pattern, '', version)
 
 
 # We initialize an instance importable of GlobalVariables from run_addon.py and run_service.py,

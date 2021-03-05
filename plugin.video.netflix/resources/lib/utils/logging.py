@@ -8,13 +8,26 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
+import sys
 import time
 from functools import wraps
+from future.utils import iteritems
 
 import xbmc
 
 
-class Logging:
+def perf_clock():
+    if hasattr(time, 'perf_counter'):
+        return time.perf_counter()  # pylint: disable=no-member
+    if hasattr(time, 'clock'):
+        # time.clock() was deprecated in Python 3.3 and removed in Python 3.8
+        return time.clock()  # pylint: disable=no-member
+    return time.time()
+
+
+class Logging(object):
     """A helper class for logging"""
     LEVEL_VERBOSE = 'Verbose'
     LEVEL_INFO = 'Info'
@@ -22,6 +35,7 @@ class Logging:
     LEVEL_NOTSET = None
 
     def __init__(self):
+        self.PY_IS_VER2 = sys.version_info.major == 2
         self.level = self.LEVEL_NOTSET
         self.__addon_id = None
         self.__plugin_handle = None
@@ -61,6 +75,8 @@ class Logging:
             identifier=self.__addon_id,
             handle=self.__plugin_handle,
             msg=msg)
+        if self.PY_IS_VER2:
+            message = message.encode('utf-8')
         xbmc.log(message, log_level)
 
     def _debug(self, msg, *args, **kwargs):
@@ -122,7 +138,7 @@ def logdetails_decorator(func):
         that = args[0]
         class_name = that.__class__.__name__
         arguments = [':{} = {}:'.format(key, value)
-                     for key, value in kwargs.items()
+                     for key, value in iteritems(kwargs)
                      if key not in ['account', 'credentials']]
         if arguments:
             LOG.debug('{cls}::{method} called with arguments {args}',
@@ -147,11 +163,11 @@ def measure_exec_time_decorator(is_immediate=False):
             if not LOG.is_time_trace_enabled:
                 return func(*args, **kwargs)
             LOG.add_time_trace_level()
-            start = time.perf_counter()
+            start = perf_clock()
             try:
                 return func(*args, **kwargs)
             finally:
-                execution_time = int((time.perf_counter() - start) * 1000)
+                execution_time = int((perf_clock() - start) * 1000)
                 if is_immediate:
                     LOG.debug('Call to {} took {}ms', func.__name__, execution_time)
                 else:

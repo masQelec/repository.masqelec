@@ -7,6 +7,8 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 import time
 
@@ -124,7 +126,7 @@ class ActionController(xbmc.Monitor):
                 self._on_playback_stopped()
         except Exception:  # pylint: disable=broad-except
             import traceback
-            LOG.error(traceback.format_exc())
+            LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
             self.tracking = False
             self.tracking_tick = False
             self.init_count = 0
@@ -237,7 +239,7 @@ def _notify_managers(manager, notification, data):
         manager.enabled = False
         msg = '{} disabled due to exception: {}'.format(manager.name, exc)
         import traceback
-        LOG.error(traceback.format_exc())
+        LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
         ui.show_notification(title=common.get_local_string(30105), msg=msg)
 
 

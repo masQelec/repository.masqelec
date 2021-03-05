@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.netflix" name="Netflix" version="1.13.0+matrix.1" provider-name="libdev + jojo + asciidisco + caphm + castagnait">
+<addon id="plugin.video.netflix" name="Netflix" version="1.12.3" provider-name="libdev + jojo + asciidisco + caphm + castagnait">
   <requires>
-    <import addon="xbmc.python" version="3.0.0"/>
-    <import addon="script.module.addon.signals" version="0.0.6"/>
-    <import addon="script.module.inputstreamhelper" version="0.4.4"/>
+    <import addon="xbmc.python" version="2.26.0"/>
+    <import addon="script.module.addon.signals" version="0.0.3"/>
+    <import addon="script.module.future" version="0.17.1"/>
+    <import addon="script.module.inputstreamhelper" version="0.3.3"/>
     <import addon="script.module.pycryptodome" version="3.4.3"/>
-    <import addon="script.module.requests" version="2.22.0"/>
-    <import addon="script.module.myconnpy" version="8.0.18"/> <!--MySQL Connector/Python-->
+    <import addon="script.module.requests" version="2.12.4"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
   <extension point="xbmc.service" library="service.py"/>
+  <extension point="xbmc.python.module" library="packages/mysql-connector-python"/>
   <extension point="xbmc.addon.metadata">
     <reuselanguageinvoker>true</reuselanguageinvoker>
     <summary lang="cs_CZ">Netflix</summary>
@@ -87,15 +88,9 @@
     <forum>https://forum.kodi.tv/showthread.php?tid=329767</forum>
     <source>https://github.com/CastagnaIT/plugin.video.netflix</source>
     <news>
-v1.13.0 (2021-01-02)
-- Add new ESN/Widevine setting dialog
-- MySQL Connector/Python library is now a Kodi dependency
-- Removed all Python 2 code / Kodi 18 compatibility
-- Fixed an issue that not allow to use same profile to play videos with UpNext
-- Disabled UpNext when play STRM of a shared path (Wiki: Share STRM library with multiple devices - OPTION 2)
-- Minor code fixes/improvements
-- Add Taiwan transation
-- Updated translations it, de, es, jp, kr, ro
+v1.12.3 (2021-02-21)
+- Fixed HTTP ReadTimeout/ConnectionError errors
+- Fixed incorrect handling of MSL errors
     </news>
   </extension>
 </addon>

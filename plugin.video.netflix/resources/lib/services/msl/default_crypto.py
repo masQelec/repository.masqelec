@@ -8,6 +8,8 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import base64
 import json
 
@@ -36,7 +38,7 @@ class DefaultMSLCrypto(MSLBaseCrypto):
     """Crypto Handler for non-Android platforms"""
 
     def __init__(self):
-        super().__init__()
+        super(DefaultMSLCrypto, self).__init__()
         self.rsa_key = None
         self.encryption_key = None
         self.sign_key = None

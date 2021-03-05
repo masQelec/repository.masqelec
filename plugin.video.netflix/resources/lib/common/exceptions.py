@@ -7,6 +7,7 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
 # Note: This module is also used to dynamically raise exceptions for IPC (see _raise_for_error in ipc.py)
 
 
@@ -18,10 +19,6 @@ class APIError(Exception):
 
 class HttpError401(Exception):
     """The request has returned http error 401 unauthorized for url ..."""
-
-
-class HttpErrorTimeout(Exception):
-    """The request has raised timeout"""
 
 
 class WebsiteParsingError(Exception):
@@ -63,7 +60,7 @@ class MSLError(Exception):
     def __init__(self, message, err_number=None):
         self.message = message
         self.err_number = err_number
-        super().__init__(self.message)
+        super(MSLError, self).__init__(self.message)
 
 
 class LicenseError(MSLError):

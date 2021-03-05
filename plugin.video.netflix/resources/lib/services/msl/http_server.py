@@ -7,15 +7,29 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
-import base64
-import json
-from http.server import BaseHTTPRequestHandler
-from socketserver import TCPServer
-from urllib.parse import parse_qs, urlparse
+from __future__ import absolute_import, division, unicode_literals
 
-from resources.lib import common
-from resources.lib.common.exceptions import MSLError
+import base64
+
+from resources.lib.globals import G
 from resources.lib.utils.logging import LOG
+from ...common.exceptions import MSLError
+
+try:  # Python 3
+    from urllib.parse import parse_qs, urlparse
+except ImportError:  # Python 2
+    from urlparse import urlparse, parse_qs
+
+try:  # Python 3
+    from http.server import BaseHTTPRequestHandler
+except ImportError:
+    from BaseHTTPServer import BaseHTTPRequestHandler
+
+try:  # Python 3
+    from socketserver import TCPServer
+except ImportError:
+    from SocketServer import TCPServer
+
 from .msl_handler import MSLHandler
 
 
@@ -31,36 +45,20 @@ class MSLHttpRequestHandler(BaseHTTPRequestHandler):
         try:
             url_parse = urlparse(self.path)
             LOG.debug('Handling HTTP POST IPC call to {}', url_parse.path)
-            if '/license' in url_parse:
-                length = int(self.headers.get('content-length', 0))
-                data = self.rfile.read(length).decode('utf-8').split('!')
-                b64license = self.server.msl_handler.get_license(
-                    challenge=data[0], sid=base64.standard_b64decode(data[1]).decode('utf-8'))
-                self.send_response(200)
+            if '/license' not in url_parse:
+                self.send_response(404)
                 self.end_headers()
-                self.wfile.write(base64.standard_b64decode(b64license))
-            else:
-                func_name = self.path[1:]
-                length = int(self.headers.get('content-length', 0))
-                data = json.loads(self.rfile.read(length)) or None
-                try:
-                    result = self.server.msl_handler.http_ipc_slots[func_name](data)
-                    if isinstance(result, dict) and common.IPC_EXCEPTION_PLACEHOLDER in result:
-                        self.send_response(500, json.dumps(result))
-                        self.end_headers()
-                        return
-                    self.send_response(200)
-                    self.end_headers()
-                    self.wfile.write(json.dumps(result).encode('utf-8'))
-                except KeyError:
-                    self.send_response(500, json.dumps(
-                        common.ipc_convert_exc_to_json(class_name='SlotNotImplemented',
-                                                       message='The specified slot {} does not exist'.format(func_name))
-                    ))
-                    self.end_headers()
+                return
+            length = int(self.headers.get('content-length', 0))
+            data = self.rfile.read(length).decode('utf-8').split('!')
+            b64license = self.server.msl_handler.get_license(
+                challenge=data[0], sid=base64.standard_b64decode(data[1]).decode('utf-8'))
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(base64.standard_b64decode(b64license))
         except Exception as exc:
             import traceback
-            LOG.error(traceback.format_exc())
+            LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
             self.send_response(500 if isinstance(exc, MSLError) else 400)
             self.end_headers()
 
@@ -81,7 +79,7 @@ class MSLHttpRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(data)
         except Exception as exc:
             import traceback
-            LOG.error(traceback.format_exc())
+            LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
             self.send_response(500 if isinstance(exc, MSLError) else 400)
             self.end_headers()
 
@@ -95,4 +93,4 @@ class MSLTCPServer(TCPServer):
         """Initialization of MSLTCPServer"""
         LOG.info('Constructing MSLTCPServer')
         self.msl_handler = MSLHandler()
-        super().__init__(server_address, MSLHttpRequestHandler)
+        TCPServer.__init__(self, server_address, MSLHttpRequestHandler)

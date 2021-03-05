@@ -7,8 +7,12 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 from re import search, compile as recompile, DOTALL, sub
+
+from future.utils import iteritems, raise_from
 
 import xbmc
 
@@ -19,9 +23,13 @@ from resources.lib.common.exceptions import (InvalidProfilesError, InvalidAuthUR
                                              WebsiteParsingError, LoginValidateError, MbrStatusAnonymousError,
                                              MbrStatusNeverMemberError, MbrStatusFormerMemberError, DBProfilesMissing)
 from .api_paths import jgraph_get, jgraph_get_list, jgraph_get_path
-from .esn import get_website_esn, set_website_esn
+from .esn import generate_android_esn
 from .logging import LOG, measure_exec_time_decorator
 
+try:  # Python 2
+    unicode
+except NameError:  # Python 3
+    unicode = str  # pylint: disable=redefined-builtin
 
 PAGE_ITEMS_INFO = [
     'models/userInfo/data/name',
@@ -89,8 +97,8 @@ def extract_session_data(content, validate=False, update_profiles=False):
 
     # Save only some info of the current profile from user data
     G.LOCAL_DB.set_value('build_identifier', user_data.get('BUILD_IDENTIFIER'), TABLE_SESSION)
-    if not get_website_esn():
-        set_website_esn(user_data['esn'])
+    if not G.LOCAL_DB.get_value('esn', table=TABLE_SESSION):
+        G.LOCAL_DB.set_value('esn', generate_android_esn() or user_data['esn'], TABLE_SESSION)
     G.LOCAL_DB.set_value('locale_id', user_data.get('preferredLocale').get('id', 'en-US'))
     # Extract the client version from assets core
     result = search(r'-([0-9\.]+)\.js$', api_data.pop('asset_core'))
@@ -133,7 +141,7 @@ def parse_profiles(data):
             raise InvalidProfilesError('It has not been possible to obtain the list of profiles.')
         sort_order = 0
         current_guids = []
-        for index, profile_data in profiles_list.items():  # pylint: disable=unused-variable
+        for index, profile_data in iteritems(profiles_list):  # pylint: disable=unused-variable
             summary = jgraph_get('summary', profile_data)
             guid = summary['guid']
             current_guids.append(guid)
@@ -143,9 +151,9 @@ def parse_profiles(data):
             G.LOCAL_DB.set_profile(guid, is_active, sort_order)
             G.SHARED_DB.set_profile(guid, sort_order)
             # Add profile language description translated from locale
-            summary['language_desc'] = xbmc.convertLanguage(summary['language'][:2], xbmc.ENGLISH_NAME)
+            summary['language_desc'] = G.py2_decode(xbmc.convertLanguage(summary['language'][:2], xbmc.ENGLISH_NAME))
             if LOG.level == LOG.LEVEL_VERBOSE:
-                for key, value in summary.items():
+                for key, value in iteritems(summary):
                     if key in PROFILE_DEBUG_INFO:
                         LOG.debug('Profile info {}', {key: value})
             # Translate the profile name, is coded as HTML
@@ -156,9 +164,9 @@ def parse_profiles(data):
         _delete_non_existing_profiles(current_guids)
     except Exception as exc:  # pylint: disable=broad-except
         import traceback
-        LOG.error(traceback.format_exc(), 'latin-1')
+        LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
         LOG.error('Profile list data: {}', profiles_list)
-        raise InvalidProfilesError from exc
+        raise_from(InvalidProfilesError, exc)
 
 
 def _delete_non_existing_profiles(current_guids):
@@ -173,6 +181,7 @@ def _delete_non_existing_profiles(current_guids):
         G.LOCAL_DB.get_active_profile_guid()
     except DBProfilesMissing:
         G.LOCAL_DB.switch_active_profile(G.LOCAL_DB.get_guid_owner_profile())
+    G.settings_monitor_suspend(True)
     # Verify if auto select profile exists
     autoselect_profile_guid = G.LOCAL_DB.get_value('autoselect_profile_guid', '')
     if autoselect_profile_guid and autoselect_profile_guid not in current_guids:
@@ -182,8 +191,7 @@ def _delete_non_existing_profiles(current_guids):
     sync_mylist_profile_guid = G.SHARED_DB.get_value('sync_mylist_profile_guid')
     if sync_mylist_profile_guid and sync_mylist_profile_guid not in current_guids:
         LOG.warn('Library auto-sync disabled, the GUID {} not more exists', sync_mylist_profile_guid)
-        with G.SETTINGS_MONITOR.ignore_events(1):
-            G.ADDON.setSettingBool('lib_sync_mylist', False)
+        G.ADDON.setSettingBool('lib_sync_mylist', False)
         G.SHARED_DB.delete_key('sync_mylist_profile_guid')
     # Verify if profile for library playback exists
     library_playback_profile_guid = G.LOCAL_DB.get_value('library_playback_profile_guid')
@@ -191,6 +199,7 @@ def _delete_non_existing_profiles(current_guids):
         LOG.warn('Profile set for playback from library cleared, the GUID {} not more exists',
                  library_playback_profile_guid)
         G.LOCAL_DB.set_value('library_playback_profile_guid', '')
+    G.settings_monitor_suspend(False)
 
 
 def _get_avatar(profile_data, data, guid):
@@ -262,12 +271,12 @@ def validate_login(react_context):
             raise LoginValidateError(common.remove_html_tags(error_description))
         except (AttributeError, KeyError) as exc:
             import traceback
-            LOG.error(traceback.format_exc())
+            LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
             error_msg = (
                 'Something is wrong in PAGE_ITEM_ERROR_CODE or PAGE_ITEM_ERROR_CODE_LIST paths.'
                 'react_context data may have changed.')
             LOG.error(error_msg)
-            raise WebsiteParsingError(error_msg) from exc
+            raise_from(WebsiteParsingError(error_msg), exc)
 
 
 @measure_exec_time_decorator(is_immediate=True)
@@ -291,8 +300,8 @@ def extract_json(content, name):
             # For testing purposes remember to add raw prefix to the string to test: json_str = r'string to test'
             LOG.error('JSON string trying to load: {}', json_str)
         import traceback
-        LOG.error(traceback.format_exc())
-        raise WebsiteParsingError('Unable to extract {}'.format(name)) from exc
+        LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
+        raise_from(WebsiteParsingError('Unable to extract {}'.format(name)), exc)
 
 
 def extract_parental_control_data(content, current_maturity):
@@ -324,14 +333,18 @@ def extract_parental_control_data(content, current_maturity):
             raise WebsiteParsingError('Unable to get maturity rating levels')
         return {'rating_levels': rating_levels, 'current_level_index': current_level_index}
     except KeyError as exc:
-        raise WebsiteParsingError('Unable to get path in to reactContext data') from exc
+        raise_from(WebsiteParsingError('Unable to get path in to reactContext data'), exc)
 
 
 def parse_html(html_value):
     """Parse HTML entities"""
-    try:  # Python >= 3.4
-        from html import unescape
-        return unescape(html_value)
-    except ImportError:  # Python <= 3.3
-        from html.parser import HTMLParser
-        return HTMLParser().unescape(html_value)  # pylint: disable=no-member
+    try:  # Python 2
+        from HTMLParser import HTMLParser
+        return HTMLParser().unescape(html_value)
+    except ImportError:
+        try:  # Python >= 3.4
+            from html import unescape
+            return unescape(html_value)
+        except ImportError:  # Python <= 3.3
+            from html.parser import HTMLParser
+            return HTMLParser().unescape(html_value)  # pylint: disable=no-member

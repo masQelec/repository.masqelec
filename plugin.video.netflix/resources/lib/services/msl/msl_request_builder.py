@@ -7,6 +7,8 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 import base64
 import random
@@ -17,7 +19,7 @@ import resources.lib.common as common
 from resources.lib.utils.logging import measure_exec_time_decorator
 
 
-class MSLRequestBuilder:
+class MSLRequestBuilder(object):
     """Provides mechanisms to create MSL requests"""
 
     def __init__(self):

@@ -7,7 +7,8 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
-import queue
+from __future__ import absolute_import, division, unicode_literals
+
 import random
 import threading
 import time
@@ -23,8 +24,13 @@ from resources.lib.services.msl.msl_utils import EVENT_START, EVENT_STOP, EVENT_
 from resources.lib.utils.esn import get_esn
 from resources.lib.utils.logging import LOG
 
+try:
+    import Queue as queue
+except ImportError:  # Python 3
+    import queue
 
-class Event:
+
+class Event(object):
     """Object representing an event request to be processed"""
 
     STATUS_REQUESTED = 'REQUESTED'
@@ -62,7 +68,7 @@ class EventsHandler(threading.Thread):
     """Handle and build Netflix event requests"""
 
     def __init__(self, chunked_request):
-        super().__init__()
+        super(EventsHandler, self).__init__()
         self.chunked_request = chunked_request
         # session_id, app_id are common to all events
         self.session_id = int(time.time()) * 10000 + random.randint(1, 10001)
@@ -92,7 +98,7 @@ class EventsHandler(threading.Thread):
             except Exception as exc:  # pylint: disable=broad-except
                 LOG.error('[Event queue monitor] An error has occurred: {}', exc)
                 import traceback
-                LOG.error(traceback.format_exc())
+                LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
                 self.clear_queue()
             monitor.waitForAbort(1)
 
@@ -105,7 +111,7 @@ class EventsHandler(threading.Thread):
                                                                'events/{}'.format(event))
         try:
             response = self.chunked_request(endpoint_url, event.request_data, get_esn(),
-                                            disable_msl_switch=False, retry_all_exceptions=True)
+                                            disable_msl_switch=False)
             # Malformed/wrong content in requests are ignored without returning error feedback in the response
             event.set_response(response)
         except Exception as exc:  # pylint: disable=broad-except
@@ -130,7 +136,7 @@ class EventsHandler(threading.Thread):
         except Exception as exc:  # pylint: disable=broad-except
             import traceback
             from resources.lib.kodi.ui import show_addon_error_info
-            LOG.error(traceback.format_exc())
+            LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
             show_addon_error_info(exc)
 
     def add_event_to_queue(self, event_type, event_data, player_state):

@@ -7,6 +7,10 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
+from future.utils import raise_from
+
 import inputstreamhelper
 from xbmc import getCondVisibility
 from xbmcaddon import Addon
@@ -26,6 +30,7 @@ def run_addon_configuration(show_end_msg=False):
     """
     system = get_system_platform()
     LOG.debug('Running add-on configuration wizard ({})', system)
+    G.settings_monitor_suspend(True, False)
     is_4k_capable = is_device_4k_capable()
 
     _set_profiles(system, is_4k_capable)
@@ -38,6 +43,8 @@ def run_addon_configuration(show_end_msg=False):
 
     # Enable UpNext if it is installed and enabled
     G.ADDON.setSettingBool('UpNextNotifier_enabled', getCondVisibility('System.AddonIsEnabled(service.upnext)'))
+
+    G.settings_monitor_suspend(False)
     if show_end_msg:
         show_ok_dialog(get_local_string(30154), get_local_string(30157))
 
@@ -52,8 +59,8 @@ def _set_isa_addon_settings(is_4k_capable, hdcp_override):
     except Exception as exc:  # pylint: disable=broad-except
         # Captures all types of ISH internal errors
         import traceback
-        LOG.error(traceback.format_exc())
-        raise InputStreamHelperError(str(exc)) from exc
+        LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
+        raise_from(InputStreamHelperError(str(exc)), exc)
 
     isa_addon = Addon('inputstream.adaptive')
     isa_addon.setSettingBool('HDCPOVERRIDE', hdcp_override)
@@ -76,7 +83,7 @@ def _set_profiles(system, is_4k_capable):
         # By default we do not enable VP9 because on some devices do not fully support it
         # By default we do not enable HEVC because not all device support it, then enable it only on 4K capable devices
         enable_hevc_profiles = is_4k_capable
-    elif system == 'linux':
+    elif system in ['linux', 'linux raspberrypi']:
         # Too many different linux systems, we can not predict all the behaviors
         # some linux distributions have encountered problems with VP9,
         # some OSMC users reported that HEVC does not work well

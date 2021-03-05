@@ -7,6 +7,8 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import resources.lib.common as common
 from resources.lib.common.cache_utils import CACHE_BOOKMARKS, CACHE_COMMON
 from resources.lib.common.exceptions import InvalidVideoListTypeError
@@ -22,7 +24,7 @@ class AMVideoEvents(ActionManager):
     SETTING_ID = 'ProgressManager_enabled'
 
     def __init__(self):
-        super().__init__()
+        super(AMVideoEvents, self).__init__()
         self.event_data = {}
         self.is_event_start_sent = False
         self.last_tick_count = 0

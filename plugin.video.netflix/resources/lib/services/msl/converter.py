@@ -7,18 +7,23 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import uuid
 import xml.etree.ElementTree as ET
 
 import resources.lib.common as common
 from resources.lib.database.db_utils import TABLE_SESSION
 from resources.lib.globals import G
-from resources.lib.utils.esn import WidevineForceSecLev
+from resources.lib.utils.esn import ForceWidevine
 from resources.lib.utils.logging import LOG
 
 
 def convert_to_dash(manifest):
     """Convert a Netflix style manifest to MPEG-DASH manifest"""
+    from xbmcaddon import Addon
+    isa_version = G.remove_ver_suffix(G.py2_decode(Addon('inputstream.adaptive').getAddonInfo('version')))
+
     # If a CDN server has stability problems it may cause errors with streaming,
     # we allow users to select a different CDN server
     # (should be managed by ISA but is currently is not implemented)
@@ -51,7 +56,7 @@ def convert_to_dash(manifest):
         if text_track['isNoneTrack']:
             continue
         is_default = _is_default_subtitle(manifest, text_track)
-        _convert_text_track(text_track, period, is_default, cdn_index)
+        _convert_text_track(text_track, period, is_default, cdn_index, isa_version)
 
     xml = ET.tostring(root, encoding='utf-8', method='xml')
     if LOG.level == LOG.LEVEL_VERBOSE:
@@ -106,11 +111,8 @@ def _add_protection_info(adaptation_set, pssh, keyid):
             'value': 'widevine'
         })
     # Add child tags to the DRM system configuration ('widevine:license' is an ISA custom tag)
-    wv_force_sec_lev = G.LOCAL_DB.get_value('widevine_force_seclev',
-                                            WidevineForceSecLev.DISABLED,
-                                            table=TABLE_SESSION)
     if (G.LOCAL_DB.get_value('drm_security_level', '', table=TABLE_SESSION) == 'L1'
-            and wv_force_sec_lev == WidevineForceSecLev.DISABLED):
+            and G.ADDON.getSettingString('force_widevine') == ForceWidevine.DISABLED):
         # The flag HW_SECURE_CODECS_REQUIRED is mandatory for L1 devices,
         # if it is set on L3 devices ISA already remove it automatically.
         # But some L1 devices with non regular Widevine library cause issues then need to be handled
@@ -245,16 +247,18 @@ def _convert_audio_downloadable(downloadable, adaptation_set, init_length, chann
     _add_segment_base(representation, init_length)
 
 
-def _convert_text_track(text_track, period, default, cdn_index):
+def _convert_text_track(text_track, period, default, cdn_index, isa_version):
     # Only one subtitle representation per adaptationset
     downloadable = text_track.get('ttDownloadables')
     if not text_track:
         return
+
     content_profile = list(downloadable)[0]
     is_ios8 = content_profile == 'webvtt-lssdh-ios8'
     impaired = 'true' if text_track['trackType'] == 'ASSISTIVE' else 'false'
     forced = 'true' if text_track['isForcedNarrative'] else 'false'
     default = 'true' if default else 'false'
+
     adaptation_set = ET.SubElement(
         period,  # Parent
         'AdaptationSet',  # Tag
@@ -266,10 +270,21 @@ def _convert_text_track(text_track, period, default, cdn_index):
         adaptation_set,  # Parent
         'Role',  # Tag
         schemeIdUri='urn:mpeg:dash:role:2011')
-    adaptation_set.set('impaired', impaired)
-    adaptation_set.set('forced', forced)
-    adaptation_set.set('default', default)
-    role.set('value', 'subtitle')
+    # In the future version of InputStream Adaptive, you can set the stream parameters
+    # in the same way as the video stream
+    if common.is_less_version(isa_version, '2.4.3'):
+        # To be removed when the new version is released
+        if forced == 'true':
+            role.set('value', 'forced')
+        else:
+            if default == 'true':
+                role.set('value', 'main')
+    else:
+        adaptation_set.set('impaired', impaired)
+        adaptation_set.set('forced', forced)
+        adaptation_set.set('default', default)
+        role.set('value', 'subtitle')
+
     representation = ET.SubElement(
         adaptation_set,  # Parent
         'Representation',  # Tag
@@ -291,7 +306,7 @@ def _get_id_default_audio_tracks(manifest):
         audio_language = profile_language_code[0:2]
     if not audio_language == 'original':
         # If set give priority to the same audio language with different country
-        if G.ADDON.getSettingBool('prefer_alternative_lang'):
+        if not G.KODI_VERSION.is_major_ver('18') and G.ADDON.getSettingBool('prefer_alternative_lang'):
             # Here we have only the language code without country code, we do not know the country code to be used,
             # usually there are only two tracks with the same language and different countries,
             # then we try to find the language with the country code

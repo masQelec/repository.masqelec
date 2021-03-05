@@ -7,8 +7,10 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
-import json
+from __future__ import absolute_import, division, unicode_literals
+
 from functools import wraps
+from future.utils import raise_from
 
 import AddonSignals
 
@@ -17,14 +19,20 @@ from resources.lib.globals import G
 from resources.lib.utils.logging import LOG, measure_exec_time_decorator
 from .misc_utils import run_threaded
 
+try:  # Python 2
+    unicode
+except NameError:  # Python 3
+    unicode = str  # pylint: disable=redefined-builtin
+
 IPC_TIMEOUT_SECS = 20
 IPC_EXCEPTION_PLACEHOLDER = 'IPC_EXCEPTION_PLACEHOLDER'
 
 
-class Signals:  # pylint: disable=no-init
+class Signals(object):  # pylint: disable=no-init
     """Signal names for use with AddonSignals"""
     # pylint: disable=too-few-public-methods
     PLAYBACK_INITIATED = 'playback_initiated'
+    ESN_CHANGED = 'esn_changed'
     RELEASE_LICENSE = 'release_license'
     REQUEST_KODI_LIBRARY_UPDATE = 'request_kodi_library_update'
     UPNEXT_ADDON_INIT = 'upnext_data'
@@ -73,21 +81,25 @@ def _send_signal(signal, data):
 
 
 @measure_exec_time_decorator()
-def make_call(callname, data=None, port_setting_name='ns_service_port'):
+def make_call(callname, data=None):
     # Note: IPC over HTTP handle FULL objects serialization, AddonSignals NOT HANDLE the serialization of objects
     if G.IPC_OVER_HTTP:
-        return make_http_call(callname, data, port_setting_name)
+        return make_http_call(callname, data)
     return make_addonsignals_call(callname, data)
 
 
-def make_http_call(callname, data, port_setting_name='ns_service_port'):
+def make_http_call(callname, data):
     """Make an IPC call via HTTP and wait for it to return.
     The contents of data will be expanded to kwargs and passed into the target function."""
     from collections import OrderedDict
-    from urllib.request import build_opener, install_opener, ProxyHandler, HTTPError, URLError, urlopen
+    try:  # Python 3
+        from urllib.request import build_opener, install_opener, ProxyHandler, HTTPError, URLError, urlopen
+    except ImportError:  # Python 2
+        from urllib2 import build_opener, install_opener, ProxyHandler, HTTPError, URLError, urlopen
+    import json
     LOG.debug('Handling HTTP IPC call to {}'.format(callname))
     # Note: On python 3, using 'localhost' slowdown the call (Windows OS is affected) not sure if it is an urllib issue
-    url = 'http://127.0.0.1:{}/{}'.format(G.LOCAL_DB.get_value(port_setting_name), callname)
+    url = 'http://127.0.0.1:{}/{}'.format(G.LOCAL_DB.get_value('ns_service_port', 8001), callname)
     install_opener(build_opener(ProxyHandler({})))  # don't use proxy for localhost
     try:
         result = json.loads(
@@ -96,11 +108,13 @@ def make_http_call(callname, data, port_setting_name='ns_service_port'):
     except HTTPError as exc:
         result = json.loads(exc.reason)
     except URLError as exc:
-        err_msg = str(exc)
+        # On PY2 the exception message have to be decoded with latin-1 for system with symbolic characters
+        err_msg = G.py2_decode(str(exc), 'latin-1')
         if '10049' in err_msg:
             err_msg += '\r\nPossible cause is wrong localhost settings in your operative system.'
         LOG.error(err_msg)
-        raise exceptions.BackendNotReady(err_msg) from exc
+        raise_from(exceptions.BackendNotReady(G.py2_encode(err_msg, encoding='latin-1')),
+                   exc)
     _raise_for_error(result)
     return result
 
@@ -108,7 +122,11 @@ def make_http_call(callname, data, port_setting_name='ns_service_port'):
 def make_http_call_cache(callname, params, data):
     """Make an IPC call via HTTP and wait for it to return.
     The contents of data will be expanded to kwargs and passed into the target function."""
-    from urllib.request import build_opener, install_opener, ProxyHandler, HTTPError, URLError, Request, urlopen
+    try:  # Python 3
+        from urllib.request import build_opener, install_opener, ProxyHandler, HTTPError, URLError, Request, urlopen
+    except ImportError:  # Python 2
+        from urllib2 import build_opener, install_opener, ProxyHandler, HTTPError, URLError, Request, urlopen
+    import json
     # debug('Handling HTTP IPC call to {}'.format(callname))
     # Note: On python 3, using 'localhost' slowdown the call (Windows OS is affected) not sure if it is an urllib issue
     url = 'http://127.0.0.1:{}/{}'.format(G.LOCAL_DB.get_value('cache_service_port', 8002), callname)
@@ -118,14 +136,15 @@ def make_http_call_cache(callname, params, data):
         result = urlopen(r, timeout=IPC_TIMEOUT_SECS).read()
     except HTTPError as exc:
         if exc.reason in exceptions.__dict__:
-            raise exceptions.__dict__[exc.reason] from exc
-        raise Exception('The service has returned: {}'.format(exc.reason)) from exc
+            raise_from(exceptions.__dict__[exc.reason], exc)
+        raise_from(Exception('The service has returned: {}'.format(exc.reason)), exc)
     except URLError as exc:
-        err_msg = str(exc)
+        # On PY2 the exception message have to be decoded with latin-1 for system with symbolic characters
+        err_msg = G.py2_decode(str(exc), 'latin-1')
         if '10049' in err_msg:
             err_msg += '\r\nPossible cause is wrong localhost settings in your operative system.'
         LOG.error(err_msg)
-        raise exceptions.BackendNotReady(err_msg) from exc
+        raise_from(exceptions.BackendNotReady(G.py2_encode(err_msg, encoding='latin-1')), exc)
     return result
 
 
@@ -165,7 +184,7 @@ def ipc_return_call(func):
     return make_return_call
 
 
-class EnvelopeIPCReturnCall:
+class EnvelopeIPCReturnCall(object):
     """Makes a function callable through IPC and handles catching, conversion and forwarding of exceptions"""
     # Defines a type of in-memory reference to avoids define functions in the source code just to handle IPC return call
     def __init__(self, func):
@@ -183,7 +202,7 @@ def _perform_ipc_return_call_instance(instance, func, data):
         if exc.__class__.__name__ not in ['CacheMiss', 'MetadataNotAvailable']:
             LOG.error('IPC callback raised exception: {exc}', exc=exc)
             import traceback
-            LOG.error(traceback.format_exc())
+            LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
         result = ipc_convert_exc_to_json(exc)
     return _execute_addonsignals_return_call(result, func.__name__)
 
@@ -195,7 +214,7 @@ def _perform_ipc_return_call(func, data, func_name=None):
         if exc.__class__.__name__ not in ['CacheMiss', 'MetadataNotAvailable']:
             LOG.error('IPC callback raised exception: {exc}', exc=exc)
             import traceback
-            LOG.error(traceback.format_exc())
+            LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
         result = ipc_convert_exc_to_json(exc)
     return _execute_addonsignals_return_call(result, func_name)
 
@@ -211,7 +230,7 @@ def ipc_convert_exc_to_json(exc=None, class_name=None, message=None):
     """
     return {IPC_EXCEPTION_PLACEHOLDER: {
         'class': class_name or exc.__class__.__name__,
-        'message': message or str(exc),
+        'message': message or unicode(exc),
     }}
 
 

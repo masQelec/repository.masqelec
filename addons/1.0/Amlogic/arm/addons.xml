@@ -14022,7 +14022,7 @@ Librespot (2020-06-22) lets you play Spotify through Kodi using a Spotify app as
   </extension>
 </addon>
 
-<addon id="plugin.video.netflix" name="Netflix" version="1.12.0" provider-name="libdev + jojo + asciidisco + caphm + castagnait">
+<addon id="plugin.video.netflix" name="Netflix" version="1.12.3" provider-name="libdev + jojo + asciidisco + caphm + castagnait">
   <requires>
     <import addon="xbmc.python" version="2.26.0"/>
     <import addon="script.module.addon.signals" version="0.0.3"/>
@@ -14091,9 +14091,12 @@ Librespot (2020-06-22) lets you play Spotify through Kodi using a Spotify app as
     <summary lang="he_IL">Netflix</summary>
     <description lang="he_IL">תוסף VOD לשירות של Netflix</description>
     <disclaimer lang="he_IL">השימוש בתוסף זה עלול להיות לא חוקי במדינת מגוריך - אנא בדוק את החוק ברשות המקומית לפני ההתקנה</disclaimer>
+    <summary lang="zh_TW">Netflix</summary>
+    <description lang="zh_TW">Netflix VOD服務套件</description>
+    <disclaimer lang="zh_TW">在您居住的國家使用此套件可能並不合法 - 請在安裝前與您當地的法律核對</disclaimer>
 	<assets>
       <icon>resources/media/icon.png</icon>
-      <fanart>resources/media/fanart.jpg</fanart>
+      <fanart>resources/media/fanart.png</fanart>
       <screenshot>resources/media/screenshot-01.jpg</screenshot>
       <screenshot>resources/media/screenshot-02.jpg</screenshot>
       <screenshot>resources/media/screenshot-03.jpg</screenshot>
@@ -14108,22 +14111,9 @@ Librespot (2020-06-22) lets you play Spotify through Kodi using a Spotify app as
     <forum>https://forum.kodi.tv/showthread.php?tid=329767</forum>
     <source>https://github.com/CastagnaIT/plugin.video.netflix</source>
     <news>
-v1.12.0 (2020-12-13)
-- >> END OF THE ADD-ON DEVELOPMENT ON KODI 18.x
-- >> ON KODI 18.x THE ADD-ON WILL RECEIVE ONLY BUG FIX OR MINOR CHANGES
-- Add more options to force Widevine L3 (android)
-- Improved errors messages to resolve:
-  - This title is not available to watch instantly
-  - Request failed validation during key exchange
-- Reverted "reworked Audio/Subtitles language features" on Kodi 18
-- Fix missing default audio track for impaired (Kodi 19)
-- Fixed "Prefer audio/subtitles language with country code" (Kodi 19)
-- Parental control moved to profiles list context menu
-- Fixed ESN generation with modelgroup
-- Fixed build_media_tag exception due to video pause
-- Blocked profile switching while playing, can cause issues
-- Managed wrong password case on login that caused http error 500
-- Updated translations it, de, gr, pt-br, hu, ro, es, jp, kr, fr
+v1.12.3 (2021-02-21)
+- Fixed HTTP ReadTimeout/ConnectionError errors
+- Fixed incorrect handling of MSL errors
     </news>
   </extension>
 </addon>

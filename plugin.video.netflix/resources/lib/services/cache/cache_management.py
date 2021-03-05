@@ -7,11 +7,14 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import sqlite3 as sql
 import threading
 from datetime import datetime, timedelta
 from functools import wraps
 from time import time
+from future.utils import raise_from
 
 from resources.lib.common import G
 from resources.lib.common.cache_utils import BUCKET_NAMES, BUCKETS
@@ -36,7 +39,7 @@ def handle_connection(func):
             return func(*args, **kwargs)
         except sql.Error as exc:
             LOG.error('SQLite error {}:', exc.args[0])
-            raise DBSQLiteConnectionError from exc
+            raise_from(DBSQLiteConnectionError, exc)
         finally:
             if conn:
                 args[0].is_connected = False
@@ -45,7 +48,7 @@ def handle_connection(func):
     return wrapper
 
 
-class CacheManagement:
+class CacheManagement(object):
     """Cache management"""
 
     def __init__(self):
@@ -141,10 +144,10 @@ class CacheManagement:
         except KeyError as exc:
             if bucket['is_persistent']:
                 return self._get_db(bucket['name'], identifier)
-            raise CacheMiss from exc
+            raise_from(CacheMiss, exc)
         except DBProfilesMissing as exc:
             # Raised by _add_prefix there is no active profile guid when add-on is installed from scratch
-            raise CacheMiss from exc
+            raise_from(CacheMiss, exc)
 
     @handle_connection
     def _get_db(self, bucket_name, identifier):
@@ -161,7 +164,7 @@ class CacheManagement:
             return result[0]
         except sql.Error as exc:
             LOG.error('SQLite error {}:', exc.args[0])
-            raise DBSQLiteError from exc
+            raise_from(DBSQLiteError, exc)
 
     def add(self, bucket, identifier, data, ttl=None, expires=None, delayed_db_op=False):
         """
@@ -206,7 +209,7 @@ class CacheManagement:
             cursor.execute(query, row_data)
         except sql.Error as exc:
             LOG.error('SQLite error {}:', exc.args[0])
-            raise DBSQLiteError from exc
+            raise_from(DBSQLiteError, exc)
 
     @handle_connection
     def execute_pending_db_ops(self):
@@ -266,7 +269,7 @@ class CacheManagement:
             cursor.execute(query, (bucket_name, identifier))
         except sql.Error as exc:
             LOG.error('SQLite error {}:', exc.args[0])
-            raise DBSQLiteError from exc
+            raise_from(DBSQLiteError, exc)
 
     def clear(self, buckets=None, clear_database=True):
         """
@@ -301,7 +304,7 @@ class CacheManagement:
                 cursor.execute(query, (bucket['name'], ))
         except sql.Error as exc:
             LOG.error('SQLite error {}:', exc.args[0])
-            raise DBSQLiteError from exc
+            raise_from(DBSQLiteError, exc)
 
     def delete_expired(self):
         bucket_names_db = []
@@ -330,7 +333,7 @@ class CacheManagement:
             cursor.execute(query, bucket_names)
         except sql.Error as exc:
             LOG.error('SQLite error {}:', exc.args[0])
-            raise DBSQLiteError from exc
+            raise_from(DBSQLiteError, exc)
 
 
 def _compute_next_schedule():

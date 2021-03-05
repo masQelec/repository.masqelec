@@ -7,7 +7,11 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import json
+
+from future.utils import raise_from
 
 import xbmcgui
 import xbmcplugin
@@ -120,8 +124,12 @@ def _play(videoid, is_played_from_strm=False):
             event_data['videoid'] = videoid.to_dict()
             event_data['is_played_by_library'] = is_played_from_strm
 
+    if 'raspberrypi' in common.get_system_platform():
+        _raspberry_disable_omxplayer()
+
     # Start and initialize the action controller (see action_controller.py)
     LOG.debug('Sending initialization signal')
+    # Do not use send_signal as threaded slow devices are not powerful to send in faster way and arrive late to service
     common.send_signal(common.Signals.PLAYBACK_INITIATED, {
         'videoid': videoid.to_dict(),
         'videoid_next_episode': videoid_next_episode.to_dict() if videoid_next_episode else None,
@@ -129,7 +137,7 @@ def _play(videoid, is_played_from_strm=False):
         'info_data': info_data,
         'is_played_from_strm': is_played_from_strm,
         'resume_position': resume_position,
-        'event_data': event_data}, non_blocking=True)
+        'event_data': event_data})
     xbmcplugin.setResolvedUrl(handle=G.PLUGIN_HANDLE, succeeded=True, listitem=list_item)
 
 
@@ -166,14 +174,14 @@ def get_inputstream_listitem(videoid):
             key=is_helper.inputstream_addon + '.server_certificate',
             value=INPUTSTREAM_SERVER_CERTIFICATE)
         list_item.setProperty(
-            key='inputstream',
+            key='inputstreamaddon' if G.KODI_VERSION.is_major_ver('18') else 'inputstream',
             value=is_helper.inputstream_addon)
         return list_item
     except Exception as exc:  # pylint: disable=broad-except
         # Captures all types of ISH internal errors
         import traceback
-        LOG.error(traceback.format_exc())
-        raise InputStreamHelperError(str(exc)) from exc
+        LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
+        raise_from(InputStreamHelperError(str(exc)), exc)
 
 
 def _profile_switch():
@@ -267,7 +275,7 @@ def _upnext_get_next_episode_videoid(videoid, metadata):
         return videoid_next_episode
     except (TypeError, KeyError):
         # import traceback
-        # LOG.debug(traceback.format_exc())
+        # LOG.debug(G.py2_decode(traceback.format_exc(), 'latin-1'))
         LOG.debug('There is no next episode, not setting up Up Next')
         return None
 
@@ -288,3 +296,13 @@ def _find_next_episode(videoid, metadata):
         return common.VideoId(tvshowid=videoid.tvshowid,
                               seasonid=next_season['id'],
                               episodeid=episode['id'])
+
+
+def _raspberry_disable_omxplayer():
+    """Check and disable OMXPlayer (not compatible with Netflix video streams)"""
+    # Only Kodi 18 has this property, from Kodi 19 OMXPlayer has been removed
+    if not G.KODI_VERSION.is_major_ver('18'):
+        return
+    value = common.json_rpc('Settings.GetSettingValue', {'setting': 'videoplayer.useomxplayer'})
+    if value.get('value'):
+        common.json_rpc('Settings.SetSettingValue', {'setting': 'videoplayer.useomxplayer', 'value': False})

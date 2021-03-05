@@ -7,17 +7,29 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
+from resources.lib.globals import G
 from resources.lib.utils.logging import LOG
 from .device_utils import get_system_platform
+
+try:  # Python 2
+    unicode
+except NameError:  # Python 3
+    unicode = str  # pylint: disable=redefined-builtin
+
+__CRYPT_KEY__ = None
 
 
 def get_crypt_key():
     """
     Lazily generate the crypt key and return it
     """
-    if not hasattr(get_crypt_key, 'cached'):
-        get_crypt_key.cached = _get_system_uuid()
-    return get_crypt_key.cached
+    # pylint: disable=global-statement
+    global __CRYPT_KEY__
+    if not __CRYPT_KEY__:
+        __CRYPT_KEY__ = _get_system_uuid()
+    return __CRYPT_KEY__
 
 
 def get_random_uuid():
@@ -26,7 +38,7 @@ def get_random_uuid():
     :return: a string of a random uuid
     """
     import uuid
-    return str(uuid.uuid4())
+    return unicode(uuid.uuid4())
 
 
 def get_namespace_uuid(name):
@@ -49,7 +61,7 @@ def _get_system_uuid():
         uuid_value = _get_windows_uuid()
     elif system == 'android':
         uuid_value = _get_android_uuid()
-    elif system == 'linux':
+    elif system in ['linux', 'linux raspberrypi']:
         uuid_value = _get_linux_uuid()
     elif system == 'osx':
         # Due to OS restrictions on 'ios' and 'tvos' is not possible to use _get_macos_uuid()
@@ -57,16 +69,19 @@ def _get_system_uuid():
         uuid_value = _get_macos_uuid()
     if not uuid_value:
         LOG.debug('It is not possible to get a system UUID creating a new UUID')
-        uuid_value = _get_fake_uuid(system not in ['android', 'linux'])
+        uuid_value = _get_fake_uuid(system not in ['android', 'linux', 'linux raspberrypi'])
     return get_namespace_uuid(str(uuid_value)).bytes
 
 
 def _get_windows_uuid():
     # pylint: disable=broad-except
-    # pylint: disable=import-error  # Under linux pylint rightly complains
+    # pylint: disable=no-member
     uuid_value = None
     try:
-        import winreg
+        try:  # Python 2
+            import _winreg as winreg
+        except ImportError:  # Python 3
+            import winreg
         registry = winreg.HKEY_LOCAL_MACHINE
         address = 'SOFTWARE\\Microsoft\\Cryptography'
         keyargs = winreg.KEY_READ | winreg.KEY_WOW64_64KEY
@@ -96,7 +111,7 @@ def _get_linux_uuid():
     except Exception as exc:
         import traceback
         LOG.error('_get_linux_uuid first attempt returned: {}', exc)
-        LOG.error(traceback.format_exc())
+        LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
     if not uuid_value:
         try:
             # Fedora linux
@@ -154,7 +169,12 @@ def _parse_osx_xml_plist_data(data):
     import plistlib
     import re
     dict_values = {}
-    xml_data = plistlib.loads(data)
+    try:  # Python 2
+        xml_data = plistlib.readPlistFromString(data)
+    except AttributeError:  # Python => 3.4
+        # pylint: disable=no-member
+        xml_data = plistlib.loads(data)
+
     items_dict = xml_data[0]['_items'][0]
     r = re.compile(r'.*UUID.*')  # Find to example "platform_UUID" key
     uuid_keys = list(filter(r.match, list(items_dict.keys())))

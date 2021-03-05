@@ -11,7 +11,7 @@
     <setting id="select_first_unwatched" type="bool" label="30243" default="false" visible="eq(-2,true)" subsetting="true"/>
     <setting id="mylist_titles_color" type="enum" label="30215" lvalues="13106|762|13343|13341|761|760|731|767" default="1"/>
     <setting id="supplemental_info_color" type="enum" label="30239" lvalues="13106|762|13343|13341|761|760|731|767" default="3"/>
-    <setting id="disable_startup_notification" type="bool" label="30141" default="true"/>
+    <setting id="disable_startup_notification" type="bool" label="30141" default="false"/>
   </category>
   <category label="30025"><!--Library-->
     <setting label="30065" type="lsep"/><!--Auto-Update-->
@@ -112,9 +112,10 @@
     <setting label="30049" type="lsep"/><!--Library-->
     <setting id="ResumeManager_enabled" type="bool" label="30176" default="true"/>
     <setting id="ResumeManager_dialog" type="bool" label="30177" default="true" visible="eq(-1,true)" subsetting="true"/>
-    <setting id="upnext_install" type="action" label="30234" action="InstallAddon(service.upnext)" visible="false" option="close"/>
-    <setting id="UpNextNotifier_enabled" type="bool" label="30129" default="false" visible="false"/>
-    <setting id="upnext_settings" type="action" label="30178" action="Addon.OpenSettings(service.upnext)" visible="false" option="close"/>
+    <setting label="30238" type="lsep"/><!--Up Next-->
+    <setting id="upnext_install" type="action" label="30234" action="InstallAddon(service.upnext)" visible="!System.HasAddon(service.upnext)" option="close"/>
+    <setting id="UpNextNotifier_enabled" type="bool" label="30129" default="false" visible="System.HasAddon(service.upnext)"/>
+    <setting id="upnext_settings" type="action" label="30178" action="Addon.OpenSettings(service.upnext)" visible="System.HasAddon(service.upnext)" option="close"/>
   </category>
   <category label="30023"><!--Expert-->
     <setting id="configuration_wizard" type="action" label="30158" action="RunPlugin(plugin://$ID/action/configuration_wizard/)" option="close"/>
@@ -130,7 +131,6 @@
     <setting id="disable_webvtt_subtitle" type="bool" label="30144" default="false"/>
     <setting id="enable_force_hdcp" type="bool" label="30081" default="false"/>
     <setting label="30116" type="lsep"/><!--Advanced Addon Configuration-->
-    <setting id="show_esn_widevine_options" type="action" label="30600" action="RunPlugin(plugin://$ID/action/show_esn_widevine_options/)" option="close"/>
     <setting id="debug_log_level" type="labelenum" label="30066" values="Disabled|Info|Verbose" default="Disabled"/>
     <setting id="enable_timing" type="bool" label="30134" default="false" visible="eq(-1,2)" subsetting="true"/>
     <setting id="show_codec_info" type="bool" label="30073" default="false" visible="eq(-2,2)" subsetting="true"/>
@@ -138,9 +138,12 @@
     <setting id="cdn_server" type="labelenum" label="30241" values="Server 1|Server 2|Server 3" default="Server 1" />
     <setting id="enable_ipc_over_http" type="bool" label="30139" default="false"/>
     <setting id="ssl_verification" type="bool" label="30024" default="true" visible="false"/> <!-- just for developers -->
+    <setting id="force_widevine" type="labelenum" label="30244" values="Disabled|Widevine L3|Widevine L3 (ID-4445)" default="Disabled" visible="System.Platform.Android"/>
     <setting id="page_results" type="slider" option="int" range="45,45,180" label="30247" default="90"/>
-    <setting id="esn" type="text" label="30601" value="" default="" visible="false" enable="false"/> <!-- not more used, kept only for upgrade purpose -->
-    <setting id="force_widevine" type="labelenum" label="30604" values="Disabled|Widevine L3|Widevine L3 (ID-4445)" default="Disabled" visible="false" enable="false"/> <!-- not more used, kept only for upgrade purpose -->
+    <setting label="30016" type="lsep"/><!--ESN-->
+    <setting id="view_esn" type="action" label="30216" action="RunPlugin(plugin://$ID/action/view_esn/)"/>
+    <setting id="esn" type="text" label="30034" value="" default=""/>
+    <setting id="reset_esn" type="action" label="30217" action="RunPlugin(plugin://$ID/action/reset_esn/)" option="close"/>
     <setting label="30117" type="lsep"/><!--Cache-->
     <setting id="cache_ttl" type="slider" option="int" range="5,5,2880" label="30084" default="180"/>
     <setting id="cache_mylist_ttl" type="slider" option="int" range="10,10,1440" label="30086" default="60"/>

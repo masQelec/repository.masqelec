@@ -7,7 +7,11 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import copy
+
+from future.utils import iteritems, itervalues
 
 import resources.lib.utils.api_paths as paths
 import resources.lib.utils.api_requests as api
@@ -17,6 +21,10 @@ from resources.lib.common.cache_utils import CACHE_BOOKMARKS, CACHE_INFOLABELS, 
 from resources.lib.globals import G
 from resources.lib.utils.logging import LOG
 
+try:  # Python 2
+    unicode
+except NameError:  # Python 3
+    unicode = str  # pylint: disable=redefined-builtin
 
 # For each videos Netflix provides multiple codecs and the resolutions depends on type of device/SO/DRM used
 # it is not possible to provide specific info, then we set info according to the video properties of the video list data
@@ -179,15 +187,15 @@ def _parse_referenced_infos(item, raw_data):
     return {target: [person['name']
                      for _, person
                      in paths.resolve_refs(item.get(source, {}), raw_data)]
-            for target, source in paths.REFERENCE_MAPPINGS.items()}
+            for target, source in iteritems(paths.REFERENCE_MAPPINGS)}
 
 
 def _parse_tags(item):
     """Parse the tags"""
     return {'tag': [tagdef['name']
                     for tagdef
-                    in item.get('tags', {}).values()
-                    if isinstance(tagdef.get('name', {}), str)]}
+                    in itervalues(item.get('tags', {}))
+                    if isinstance(tagdef.get('name', {}), unicode)]}
 
 
 def get_quality_infos(item):

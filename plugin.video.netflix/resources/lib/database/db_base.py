@@ -7,9 +7,10 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
 
 
-class BaseDatabase:
+class BaseDatabase(object):
     """
     Base class to handle various types of databases
     """

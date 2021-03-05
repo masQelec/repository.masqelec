@@ -7,6 +7,8 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import resources.lib.common as common
 from resources.lib.globals import G
 from resources.lib.services.nfsession.directorybuilder.dir_builder import DirectoryBuilder
@@ -14,7 +16,7 @@ from resources.lib.services.nfsession.nfsession_ops import NFSessionOperations
 from resources.lib.utils.logging import LOG
 
 
-class NetflixSession:
+class NetflixSession(object):
     """Stateful netflix session management"""
 
     http_ipc_slots = {}

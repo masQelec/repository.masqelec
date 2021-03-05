@@ -8,20 +8,25 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
-import json
-import time
+from __future__ import absolute_import, division, unicode_literals
 
-import resources.lib.common as common
+import json
+
+import requests.exceptions as req_exceptions
+
+from future.utils import raise_from
+
 import resources.lib.utils.website as website
+import resources.lib.common as common
 from resources.lib.common.exceptions import (APIError, WebsiteParsingError, MbrStatusError, MbrStatusAnonymousError,
-                                             HttpError401, NotLoggedInError, HttpErrorTimeout)
+                                             HttpError401, NotLoggedInError)
+from resources.lib.kodi import ui
+from resources.lib.utils import cookies
 from resources.lib.database.db_utils import TABLE_SESSION
 from resources.lib.globals import G
-from resources.lib.kodi import ui
 from resources.lib.services.nfsession.session.base import SessionBase
 from resources.lib.services.nfsession.session.endpoints import ENDPOINTS, BASE_URL
-from resources.lib.utils import cookies
-from resources.lib.utils.logging import LOG, measure_exec_time_decorator
+from resources.lib.utils.logging import LOG, measure_exec_time_decorator, perf_clock
 
 
 class SessionHTTPRequests(SessionBase):
@@ -46,28 +51,33 @@ class SessionHTTPRequests(SessionBase):
         return self._request(method, endpoint, None, **kwargs)
 
     def _request(self, method, endpoint, session_refreshed, **kwargs):
-        from requests import exceptions
         endpoint_conf = ENDPOINTS[endpoint]
         url = (_api_url(endpoint_conf['address'])
                if endpoint_conf['is_api_call']
                else _document_url(endpoint_conf['address'], kwargs))
-        LOG.debug('Executing {verb} request to {url}',
-                  verb='GET' if method == self.session.get else 'POST', url=url)
         data, headers, params = self._prepare_request_properties(endpoint_conf, kwargs)
-        start = time.perf_counter()
-        try:
-            response = method(
-                url=url,
-                verify=self.verify_ssl,
-                headers=headers,
-                params=params,
-                data=data,
-                timeout=8)
-        except exceptions.ReadTimeout as exc:
-            LOG.error('HTTP Request ReadTimeout error: {}', exc)
-            raise HttpErrorTimeout from exc
-        LOG.debug('Request took {}s', time.perf_counter() - start)
-        LOG.debug('Request returned status code {}', response.status_code)
+        retry = 1
+        while True:
+            try:
+                LOG.debug('Executing {verb} request to {url}',
+                          verb='GET' if method == self.session.get else 'POST', url=url)
+                start = perf_clock()
+                response = method(
+                    url=url,
+                    verify=self.verify_ssl,
+                    headers=headers,
+                    params=params,
+                    data=data,
+                    timeout=8)
+                LOG.debug('Request took {}s', perf_clock() - start)
+                LOG.debug('Request returned status code {}', response.status_code)
+                break
+            except req_exceptions.ConnectionError as exc:
+                LOG.error('HTTP request error: {}', exc)
+                if retry == 3:
+                    raise
+                retry += 1
+                LOG.warn('Another attempt will be performed ({})', retry)
         # for redirect in response.history:
         #     LOG.warn('Redirected to: [{}] {}', redirect.status_code, redirect.url)
         if not session_refreshed:
@@ -89,7 +99,6 @@ class SessionHTTPRequests(SessionBase):
 
     def try_refresh_session_data(self, raise_exception=False):
         """Refresh session data from the Netflix website"""
-        from requests import exceptions
         try:
             self.auth_url = website.extract_session_data(self.get('browse'))['auth_url']
             cookies.save(self.session.cookies)
@@ -101,7 +110,7 @@ class SessionHTTPRequests(SessionBase):
             import traceback
             LOG.warn('Failed to refresh session data, login can be expired or the password has been changed ({})',
                      type(exc).__name__)
-            LOG.debug(traceback.format_exc())
+            LOG.debug(G.py2_decode(traceback.format_exc(), 'latin-1'))
             self.session.cookies.clear()
             if isinstance(exc, MbrStatusAnonymousError):
                 # This prevent the MSL error: No entity association record found for the user
@@ -109,17 +118,17 @@ class SessionHTTPRequests(SessionBase):
             # Needed to do a new login
             common.purge_credentials()
             ui.show_notification(common.get_local_string(30008))
-            raise NotLoggedInError from exc
-        except exceptions.RequestException:
+            raise_from(NotLoggedInError, exc)
+        except req_exceptions.RequestException:
             import traceback
             LOG.warn('Failed to refresh session data, request error (RequestException)')
-            LOG.warn(traceback.format_exc())
+            LOG.warn(G.py2_decode(traceback.format_exc(), 'latin-1'))
             if raise_exception:
                 raise
         except Exception:  # pylint: disable=broad-except
             import traceback
             LOG.warn('Failed to refresh session data, login expired (Exception)')
-            LOG.debug(traceback.format_exc())
+            LOG.debug(G.py2_decode(traceback.format_exc(), 'latin-1'))
             self.session.cookies.clear()
             if raise_exception:
                 raise

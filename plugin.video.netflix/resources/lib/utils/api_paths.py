@@ -7,6 +7,9 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+from future.utils import iteritems
+
 import resources.lib.common as common
 
 from resources.lib.globals import G
@@ -97,7 +100,7 @@ SUPPLEMENTAL_TYPE_TRAILERS = 'trailers'
 INFO_MAPPINGS = [
     ('Title', 'title'),  # Title is needed only for UpNext metadata on play method
     ('Year', 'releaseYear'),
-    ('Plot', 'regularSynopsis'),  # Complete plot
+    ('Plot', 'regularSynopsis'),  # Complete plot (Kodi 18 original skins do not use plotoutline)
     ('PlotOutline', 'synopsis'),  # Small plot
     ('Season', 'seasonCount'),  # Path used with videolist data for 'tvshow' ListItems (get total seasons)
     ('Season', ['summary', 'shortName']),  # Path used with season list data for 'season' ListItems (get current season)
@@ -141,7 +144,7 @@ def _convert_season(value):
     if isinstance(value, int):
         return str(value)
     # isdigit is needed to filter out non numeric characters from 'shortName' key
-    return ''.join([n for n in value if n.isdigit()])
+    return ''.join([n for n in G.py2_encode(value) if n.isdigit()])
 
 
 def build_paths(base_path, partial_paths):
@@ -164,7 +167,7 @@ def iterate_references(source):
     list.
     Items with a key that do not represent an integer are ignored."""
     for index, ref in sorted({int(k): v
-                              for k, v in source.items()
+                              for k, v in iteritems(source)
                               if common.is_numeric(k)}.items()):
         path = reference_path(ref)
         if path is None:
@@ -178,7 +181,7 @@ def iterate_references(source):
 def count_references(source):
     counter = 0
     for index, ref in sorted({int(k): v  # pylint: disable=unused-variable
-                              for k, v in source.items()
+                              for k, v in iteritems(source)
                               if common.is_numeric(k)}.items()):
         path = reference_path(ref)
 

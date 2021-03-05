@@ -8,19 +8,30 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 import re
+
+from future.utils import raise_from
 
 import resources.lib.utils.website as website
 import resources.lib.common as common
 import resources.lib.utils.cookies as cookies
 import resources.lib.kodi.ui as ui
+from resources.lib.utils.esn import get_esn
 from resources.lib.common.exceptions import (LoginValidateError, NotConnected, NotLoggedInError,
                                              MbrStatusNeverMemberError, MbrStatusFormerMemberError, LoginError,
                                              MissingCredentialsError, MbrStatusAnonymousError, WebsiteParsingError)
+from resources.lib.database.db_utils import TABLE_SESSION
 from resources.lib.globals import G
 from resources.lib.services.nfsession.session.cookie import SessionCookie
 from resources.lib.services.nfsession.session.http_requests import SessionHTTPRequests
 from resources.lib.utils.logging import LOG, measure_exec_time_decorator
+
+try:  # Python 2
+    unicode
+except NameError:  # Python 3
+    unicode = str  # pylint: disable=redefined-builtin
 
 
 class SessionAccess(SessionCookie, SessionHTTPRequests):
@@ -42,7 +53,7 @@ class SessionAccess(SessionCookie, SessionHTTPRequests):
             # It was not possible to connect to the web service, no connection, network problem, etc
             import traceback
             LOG.error('Login prefetch: request exception {}', exc)
-            LOG.debug(traceback.format_exc())
+            LOG.debug(G.py2_decode(traceback.format_exc(), 'latin-1'))
         except Exception as exc:  # pylint: disable=broad-except
             LOG.warn('Login prefetch: failed {}', exc)
         return False
@@ -56,7 +67,12 @@ class SessionAccess(SessionCookie, SessionHTTPRequests):
 
     def is_logged_in(self):
         """Check if there are valid login data"""
-        return self._load_cookies() and self._verify_session_cookies()
+        valid_login = self._load_cookies() and self._verify_session_cookies() and self._verify_esn_existence()
+        return valid_login
+
+    @staticmethod
+    def _verify_esn_existence():
+        return bool(get_esn())
 
     def get_safe(self, endpoint, **kwargs):
         """
@@ -108,7 +124,7 @@ class SessionAccess(SessionCookie, SessionHTTPRequests):
         except exceptions.HTTPError as exc:
             if exc.response.status_code == 500:
                 # This endpoint raise HTTP error 500 when the password is wrong
-                raise LoginError(common.get_local_string(12344)) from exc
+                raise_from(LoginError(common.get_local_string(12344)), exc)
             raise
         common.set_credentials({'email': email, 'password': password})
         LOG.info('Login successful')
@@ -141,15 +157,15 @@ class SessionAccess(SessionCookie, SessionHTTPRequests):
         except LoginValidateError as exc:
             self.session.cookies.clear()
             common.purge_credentials()
-            raise LoginError(str(exc)) from exc
+            raise_from(LoginError(unicode(exc)), exc)
         except (MbrStatusNeverMemberError, MbrStatusFormerMemberError) as exc:
             self.session.cookies.clear()
             LOG.warn('Membership status {} not valid for login', exc)
-            raise LoginError(common.get_local_string(30180)) from exc
+            raise_from(LoginError(common.get_local_string(30180)), exc)
         except Exception:  # pylint: disable=broad-except
             self.session.cookies.clear()
             import traceback
-            LOG.error(traceback.format_exc())
+            LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
             raise
 
     @measure_exec_time_decorator(is_immediate=True)
@@ -160,10 +176,11 @@ class SessionAccess(SessionCookie, SessionHTTPRequests):
         # Perform the website logout
         self.get('logout')
 
-        with G.SETTINGS_MONITOR.ignore_events(2):
-            # Disable and reset auto-update / auto-sync features
-            G.ADDON.setSettingInt('lib_auto_upd_mode', 1)
-            G.ADDON.setSettingBool('lib_sync_mylist', False)
+        G.settings_monitor_suspend(True)
+
+        # Disable and reset auto-update / auto-sync features
+        G.ADDON.setSettingInt('lib_auto_upd_mode', 1)
+        G.ADDON.setSettingBool('lib_sync_mylist', False)
         G.SHARED_DB.delete_key('sync_mylist_profile_guid')
 
         # Disable and reset the profile guid of profile auto-selection
@@ -172,10 +189,15 @@ class SessionAccess(SessionCookie, SessionHTTPRequests):
         # Disable and reset the selected profile guid for library playback
         G.LOCAL_DB.set_value('library_playback_profile_guid', '')
 
+        G.settings_monitor_suspend(False)
+
         # Delete cookie and credentials
         self.session.cookies.clear()
         cookies.delete()
         common.purge_credentials()
+
+        # Reset the ESN obtained from website/generated
+        G.LOCAL_DB.set_value('esn', '', TABLE_SESSION)
 
         # Reinitialize the MSL handler (delete msl data file, then reset everything)
         common.send_signal(signal=common.Signals.REINITIALIZE_MSL_HANDLER, data=True)

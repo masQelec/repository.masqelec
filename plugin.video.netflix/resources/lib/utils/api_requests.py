@@ -7,7 +7,11 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 from functools import wraps
+
+from future.utils import itervalues
 
 import resources.lib.common as common
 import resources.lib.kodi.ui as ui
@@ -16,6 +20,11 @@ from resources.lib.globals import G
 from resources.lib.common.exceptions import APIError, LoginError, MissingCredentialsError, CacheMiss, HttpError401
 from .api_paths import EPISODES_PARTIAL_PATHS, ART_PARTIAL_PATHS, build_paths
 from .logging import LOG, measure_exec_time_decorator
+
+try:  # Python 2
+    unicode
+except NameError:  # Python 3
+    unicode = str  # pylint: disable=redefined-builtin
 
 
 def catch_api_errors_decorator(func):
@@ -65,7 +74,7 @@ def login(ask_credentials=True):
         raise
     except LoginError as exc:
         # Login not valid
-        ui.show_ok_dialog(common.get_local_string(30008), str(exc))
+        ui.show_ok_dialog(common.get_local_string(30008), unicode(exc))
     return False
 
 
@@ -224,7 +233,7 @@ def get_available_audio_languages():
     }
     response = common.make_call('path_request', call_args)
     lang_list = {}
-    for lang_dict in response.get('spokenAudioLanguages', {}).values():
+    for lang_dict in itervalues(response.get('spokenAudioLanguages', {})):
         lang_list[lang_dict['id']] = lang_dict['name']
     return lang_list
 
@@ -236,7 +245,7 @@ def get_available_subtitles_languages():
     }
     response = common.make_call('path_request', call_args)
     lang_list = {}
-    for lang_dict in response.get('subtitleLanguages', {}).values():
+    for lang_dict in itervalues(response.get('subtitleLanguages', {})):
         lang_list[lang_dict['id']] = lang_dict['name']
     return lang_list
 

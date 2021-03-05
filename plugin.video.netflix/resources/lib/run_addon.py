@@ -6,13 +6,16 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 from functools import wraps
+from future.utils import raise_from
 
 from xbmc import getCondVisibility, Monitor, getInfoLabel
 
 from resources.lib.common.exceptions import (HttpError401, InputStreamHelperError, MbrStatusNeverMemberError,
                                              MbrStatusFormerMemberError, MissingCredentialsError, LoginError,
-                                             NotLoggedInError, InvalidPathError, BackendNotReady, HttpErrorTimeout)
+                                             NotLoggedInError, InvalidPathError, BackendNotReady)
 from resources.lib.common import check_credentials, get_local_string, WndHomeProps
 from resources.lib.globals import G
 from resources.lib.upgrade_controller import check_addon_upgrade
@@ -30,19 +33,18 @@ def catch_exceptions_decorator(func):
             success = True
         except BackendNotReady as exc_bnr:
             from resources.lib.kodi.ui import show_backend_not_ready
-            show_backend_not_ready(str(exc_bnr))
+            show_backend_not_ready(G.py2_decode(str(exc_bnr), 'latin-1'))
         except InputStreamHelperError as exc:
             from resources.lib.kodi.ui import show_ok_dialog
             show_ok_dialog('InputStream Helper Add-on error',
                            ('The operation has been cancelled.[CR]'
                             'InputStream Helper has generated an internal error:[CR]{}[CR][CR]'
                             'Please report it to InputStream Helper github.'.format(exc)))
-        except (HttpError401, HttpErrorTimeout) as exc:
-            # HttpError401: This is a generic error, can happen when the http request for some reason has failed.
+        except HttpError401 as exc:
+            # This is a generic error, can happen when the http request for some reason has failed.
             # Known causes:
             # - Possible change of data format or wrong data in the http request (also in headers/params)
             # - Some current nf session data are not more valid (authURL/cookies/...)
-            # HttpErrorTimeout: This error is raised by Requests ReadTimeout error, unknown causes
             from resources.lib.kodi.ui import show_ok_dialog
             show_ok_dialog(get_local_string(30105),
                            ('There was a communication problem with Netflix.[CR]'
@@ -54,7 +56,7 @@ def catch_exceptions_decorator(func):
         except Exception as exc:
             import traceback
             from resources.lib.kodi.ui import show_addon_error_info
-            LOG.error(traceback.format_exc())
+            LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
             show_addon_error_info(exc)
         finally:
             if not success:
@@ -151,15 +153,14 @@ def _execute(executor_type, pathitems, params, root_handler):
     """Execute an action as specified by the path"""
     try:
         executor = executor_type(params).__getattribute__(pathitems[0] if pathitems else 'root')
+        LOG.debug('Invoking action: {}', executor.__name__)
+        executor(pathitems=pathitems)
+        if root_handler == G.MODE_DIRECTORY and not G.IS_ADDON_EXTERNAL_CALL:
+            # Save the method name of current loaded directory
+            WndHomeProps[WndHomeProps.CURRENT_DIRECTORY] = executor.__name__
+            WndHomeProps[WndHomeProps.IS_CONTAINER_REFRESHED] = None
     except AttributeError as exc:
-        raise InvalidPathError('Unknown action {}'.format('/'.join(pathitems))) from exc
-    LOG.debug('Invoking action: {}', executor.__name__)
-    executor(pathitems=pathitems)
-    if root_handler == G.MODE_DIRECTORY and not G.IS_ADDON_EXTERNAL_CALL:
-        # Save the method name of current loaded directory and his menu item id
-        WndHomeProps[WndHomeProps.CURRENT_DIRECTORY] = executor.__name__
-        WndHomeProps[WndHomeProps.CURRENT_DIRECTORY_MENU_ID] = pathitems[1] if len(pathitems) > 1 else ''
-        WndHomeProps[WndHomeProps.IS_CONTAINER_REFRESHED] = None
+        raise_from(InvalidPathError('Unknown action {}'.format('/'.join(pathitems))), exc)
 
 
 def _get_service_status():

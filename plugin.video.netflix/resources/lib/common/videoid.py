@@ -7,12 +7,20 @@
     SPDX-License-Identifier: MIT
     See LICENSES/MIT.md for more information.
 """
+from __future__ import absolute_import, division, unicode_literals
+
 from functools import wraps
+from future.utils import raise_from
 
 from .exceptions import InvalidVideoId
 
+try:  # Python 2
+    unicode
+except NameError:  # Python 3
+    unicode = str  # pylint: disable=redefined-builtin
 
-class VideoId:
+
+class VideoId(object):
     """Universal representation of a video id. Video IDs can be of multiple types:
     - supplemental: a single identifier only for supplementalid, all other values must be None
     - movie: a single identifier only for movieid, all other values must be None
@@ -52,7 +60,7 @@ class VideoId:
         try:
             self._mediatype = VideoId.VALIDATION_MASKS[validation_mask]
         except KeyError as exc:
-            raise InvalidVideoId from exc
+            raise_from(InvalidVideoId, exc)
 
     @classmethod
     def from_path(cls, pathitems):
@@ -213,7 +221,7 @@ class VideoId:
         represent a show."""
         if self.mediatype != VideoId.SHOW:
             raise InvalidVideoId('Cannot derive season VideoId from {}'.format(self))
-        return type(self)(tvshowid=self.tvshowid, seasonid=str(seasonid))
+        return type(self)(tvshowid=self.tvshowid, seasonid=unicode(seasonid))
 
     def derive_episode(self, episodeid):
         """Return a new VideoId instance that represents the given episode
@@ -222,7 +230,7 @@ class VideoId:
         if self.mediatype != VideoId.SEASON:
             raise InvalidVideoId('Cannot derive episode VideoId from {}'.format(self))
         return type(self)(tvshowid=self.tvshowid, seasonid=self.seasonid,
-                          episodeid=str(episodeid))
+                          episodeid=unicode(episodeid))
 
     def derive_parent(self, videoid_type):
         """
@@ -269,7 +277,7 @@ class VideoId:
 
 def _get_unicode_kwargs(kwargs):
     # Example of return value: (None, None, '70084801', None, None, None) this is a movieid
-    return tuple((str(kwargs[idpart])
+    return tuple((unicode(kwargs[idpart])
                   if kwargs.get(idpart)
                   else None)
                  for idpart
@@ -300,7 +308,8 @@ def inject_video_id(path_offset, pathitems_arg='pathitems',
                 _path_to_videoid(kwargs, pathitems_arg, path_offset,
                                  inject_remaining_pathitems, inject_full_pathitems)
             except KeyError as exc:
-                raise Exception('Pathitems must be passed as kwarg {}'.format(pathitems_arg)) from exc
+                raise_from(Exception('Pathitems must be passed as kwarg {}'.format(pathitems_arg)),
+                           exc)
             return func(*args, **kwargs)
         return wrapper
     return injecting_decorator
@@ -322,7 +331,7 @@ def _path_to_videoid(kwargs, pathitems_arg, path_offset,
         del kwargs[pathitems_arg]
 
 
-class MenuIdParameters:
+class MenuIdParameters(object):
     """Parse the information grouped in a id value of a menu"""
     # Example:
     # 8f0bcda8-a281-4ca3-9f56-f64ee1d76219_68180357X28X1430972X1551542684270
