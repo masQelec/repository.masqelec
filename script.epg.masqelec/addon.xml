@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.epg.masqelec" name="Epg masQelec" version="0.0.1" provider-name="masQelec">
-    <extension point="xbmc.python.script" library="addon.py">
-        <provides></provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary>Epg masQelec</summary>
-	    <description>Cloud masQelec mantiene actualizado tus canales</description>
-        <platform>all</platform>
-	    <assets>
-		    <icon>icon.png</icon>
-	    </assets>
-    </extension>
+	<requires>
+		<import addon="xbmc.python" version="2.25.0"/>
+	</requires>
+	<extension point="xbmc.service" library="autoexec.py">
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="es_ES">Cloud masQelec mantiene actualizado tus canales.</summary>
+		<description lang="es_ES">Cloud masQelec mantiene actualizado tus canales.</description>
+		<platform>all</platform>
+		<license>GNU GENERAL PUBLIC LICENSE Version 2</license>
+	</extension>
 </addon>
