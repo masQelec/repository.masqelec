@@ -3762,6 +3762,20 @@ Archivos soportados: .ngp, .ngc, .ngpc, .npc</description>
   </extension>
 </addon>
 
+<addon id="script.epg.masqelec" name="Epg masQelec" version="0.0.1" provider-name="masQelec">
+    <extension point="xbmc.python.script" library="addon.py">
+        <provides></provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Epg masQelec</summary>
+	    <description>Cloud masQelec mantiene actualizado tus canales</description>
+        <platform>all</platform>
+	    <assets>
+		    <icon>icon.png</icon>
+	    </assets>
+    </extension>
+</addon>
+
 <addon id="metadata.common.themoviedb.org"
        name="The Movie Database Scraper Library"
        version="3.2.13"
