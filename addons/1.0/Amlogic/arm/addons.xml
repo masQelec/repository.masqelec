@@ -3762,20 +3762,6 @@ Archivos soportados: .ngp, .ngc, .ngpc, .npc</description>
   </extension>
 </addon>
 
-<addon id="script.epg.masqelec" name="Epg masQelec" version="0.0.1" provider-name="masQelec">
-	<requires>
-		<import addon="xbmc.python" version="2.25.0"/>
-	</requires>
-	<extension point="xbmc.service" library="autoexec.py">
-	</extension>
-	<extension point="xbmc.addon.metadata">
-		<summary lang="es_ES">Cloud masQelec mantiene actualizado tus canales.</summary>
-		<description lang="es_ES">Cloud masQelec mantiene actualizado tus canales.</description>
-		<platform>all</platform>
-		<license>GNU GENERAL PUBLIC LICENSE Version 2</license>
-	</extension>
-</addon>
-
 <addon id="metadata.common.themoviedb.org"
        name="The Movie Database Scraper Library"
        version="3.2.13"
@@ -6227,6 +6213,20 @@ v0.0.3
   </extension>
 </addon>
 
+<addon id="service.epg.masqelec" name="Epg masQelec" version="0.0.1" provider-name="masQelec">
+	<requires>
+		<import addon="xbmc.python" version="2.25.0"/>
+	</requires>
+	<extension point="xbmc.service" library="autoexec.py">
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="es_ES">Cloud masQelec mantiene actualizado tus canales.</summary>
+		<description lang="es_ES">Cloud masQelec mantiene actualizado tus canales.</description>
+		<platform>all</platform>
+		<license>GNU GENERAL PUBLIC LICENSE Version 2</license>
+	</extension>
+</addon>
+
 <addon id="plugin.onedrive" name="OneDrive" version="2.1.6" provider-name="Carlos Guzman (cguZZman)">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
@@ -6529,6 +6529,20 @@ v0.5.0 (2020-06-25)
 		<website>https://sourceforge.net/projects/xbmc-dropbox/</website>
 		<source>https://sourceforge.net/p/xbmc-dropbox/code/ci/master/tree/</source>
 		<email />
+	</extension>
+</addon>
+
+<addon id="service.cloud.masqelec" name="Cloud masQelec" version="0.0.1" provider-name="Cloud masQelec">
+	<requires>
+		<import addon="xbmc.python" version="2.25.0"/>
+	</requires>
+	<extension point="xbmc.service" library="autoexec.py">
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="es_ES">Cloud masQelec mantiene actualizada tu biblioteca.</summary>
+		<description lang="es_ES">Cloud masQelec mantiene actualizada tu biblioteca.</description>
+		<platform>all</platform>
+		<license>GNU GENERAL PUBLIC LICENSE Version 2</license>
 	</extension>
 </addon>
 
@@ -7630,20 +7644,6 @@ Zároveň má nastavenia upravujúce výšku stĺpcov spektra, ich rýchlosť a 
       <icon>icon.png</icon>
     </assets>
   </extension>
-</addon>
-
-<addon id="script.cloud.masqelec" name="Cloud masQelec" version="0.0.1" provider-name="Cloud masQelec">
-	<requires>
-		<import addon="xbmc.python" version="2.25.0"/>
-	</requires>
-	<extension point="xbmc.service" library="autoexec.py">
-	</extension>
-	<extension point="xbmc.addon.metadata">
-		<summary lang="es_ES">Cloud masQelec mantiene actualizada tu biblioteca.</summary>
-		<description lang="es_ES">Cloud masQelec mantiene actualizada tu biblioteca.</description>
-		<platform>all</platform>
-		<license>GNU GENERAL PUBLIC LICENSE Version 2</license>
-	</extension>
 </addon>
 
 <addon id="pvr.hts" version="4.4.21.1" name="Tvheadend HTSP Client" provider-name="Adam Sutton, Sam Stenvall, Lars Op den Kamp, Kai Sommerfeld">
