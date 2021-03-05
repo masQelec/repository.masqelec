@@ -22,8 +22,6 @@ def launch():
     try:        
         subprocess.call(["systemctl", "daemon-reload"]) # make sure it's executable
         subprocess.call(["systemctl", "stop", "service.tvheadend43"]) # make sure it's executable
-        
-        shutil.rmtree('/storage/.kodi/userdata/Thumbnails', ignore_errors=True)
          
         shutil.rmtree('/storage/.kodi/userdata/addon_data/service.tvheadend43/bouquet', ignore_errors=True)
         shutil.rmtree('/storage/.kodi/userdata/addon_data/service.tvheadend43/channel', ignore_errors=True)
@@ -47,10 +45,7 @@ def launch():
         
         shutil.rmtree('/storage/tmp', ignore_errors=True)
         os.remove("/storage/epg.tar.gz")
-        
-        xbmc.executebuiltin('Notification(%s, %s, %d, %s)'%(__addonname__,"Canales Actualizados, se va a reiniciar kodi", 5000, __icon__))
-        
-        subprocess.call(["reboot"])
+
     except:
         xbmcgui.Dialog().ok("Failed to launch", "Failed to launch script %s" % cmd)
 
