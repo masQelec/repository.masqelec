@@ -213,7 +213,12 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
                 sleep(wait)
             return getURL(url, useCookie, silent, headers, rjson, attempt, check, postdata, binary)
         return retval
-    res = json.loads(response) if rjson else response
+    res = response
+    if rjson:
+        try:
+            res = json.loads(response)
+        except ValueError:
+            res = retval
     duration = timer()
     duration -= starttime
     addNetTime(duration)
@@ -428,6 +433,18 @@ def LogIn():
                     form.set_radio({choices[sel][1]: choices[sel][2]})
             else:
                 return None
+        elif 'auth-select-device-form' in uni_soup:
+            sd_form = soup.find('form', attrs={'id': 'auth-select-device-form'})
+            sd_hint = sd_form.parent.p.get_text(strip=True)
+            choices = []
+            for c in sd_form.findAll('label'):
+                choices.append((c.span.get_text(strip=True), c.input['name'], c.input['value']))
+            sel = g.dialog.select(sd_hint, [k[0] for k in choices])
+
+            if sel > -1:
+                form.set_radio({choices[sel][1]: choices[sel][2]})
+            else:
+                return None
         elif 'fwcim-form' in uni_soup:
             msg = soup.find('div', attrs={'class': 'a-row a-spacing-micro cvf-widget-input-code-label'})
             if msg:
@@ -490,7 +507,6 @@ def LogIn():
                     form_id = form_poll
                     WriteLog(response.replace(py2_decode(email), '**@**'), 'login-pollingform')
                     stat = soup.find('input', attrs={'name': 'transactionApprovalStatus'})['value']
-                    Log(stat)
                     if stat in ['TransactionCompleted', 'TransactionCompletionTimeout']:
                         parsed_url = urlparse(url)
                         query = parse_qs(parsed_url.query)
@@ -505,8 +521,9 @@ def LogIn():
             pd.close()
         return br
 
-    def _setLoginPW():
+    def _setLoginPW(visible):
         keyboard = xbmc.Keyboard('', getString(30003))
+        keyboard.setHiddenInput(visible is False)
         keyboard.doModal(60000)
         if keyboard.isConfirmed() and keyboard.getText():
             password = keyboard.getText()
@@ -549,7 +566,7 @@ def LogIn():
         keyboard.doModal()
         if keyboard.isConfirmed() and keyboard.getText():
             email = keyboard.getText()
-            password = _setLoginPW()
+            password = _setLoginPW(s.show_pass)
 
         if password:
             cj = requests.cookies.RequestsCookieJar()
@@ -586,19 +603,17 @@ def LogIn():
                                        'Content-Type': 'application/x-www-form-urlencoded',
                                        'Origin': '/'.join(br.get_url().split('/')[0:3]),
                                        'Upgrade-Insecure-Requests': '1'})
-
             br.submit_selected()
             response, soup = _parseHTML(br)
             WriteLog(response.replace(py2_decode(email), '**@**'), 'login')
 
             while any(sp in response for sp in
                       ['auth-mfa-form', 'ap_dcq_form', 'ap_captcha_img_label', 'claimspicker', 'fwcim-form', 'auth-captcha-image-container', 'validateCaptcha',
-                       'pollingForm']):
+                       'pollingForm', 'auth-select-device-form']):
                 br = _MFACheck(br, email, soup)
                 if br is None:
                     return False
                 if not br.get_current_form() is None:
-                    useMFA = True if br.get_current_form().form.find('input', {'name': 'otpCode'}) else False
                     br.submit_selected()
                 response, soup = _parseHTML(br)
                 WriteLog(response.replace(py2_decode(email), '**@**'), 'login-mfa')
@@ -685,6 +700,13 @@ def FQify(URL):
 
 def GrabJSON(url, postData=None):
     """ Extract JSON objects from HTMLs while keeping the API ones intact """
+    try:
+        from htmlentitydefs import name2codepoint
+        from urlparse import urlparse, parse_qs
+        from urllib import urlencode
+    except:
+        from urllib.parse import urlparse, parse_qs, urlencode
+        from html.entities import name2codepoint
 
     s = Settings()
 
@@ -784,13 +806,6 @@ def GrabJSON(url, postData=None):
 
     def do(url, postData):
         """ Wrapper to facilitate logging """
-        try:
-            from htmlentitydefs import name2codepoint
-            from urlparse import urlparse, parse_qs
-            from urllib import urlencode
-        except:
-            from urllib.parse import urlparse, parse_qs, urlencode
-            from html.entities import name2codepoint
 
         if url.startswith('/search/'):
             np = urlparse(url)
@@ -801,7 +816,7 @@ def GrabJSON(url, postData=None):
             np = np._replace(path='/gp/video/api' + np.path, query=urlencode([(k, v) for k, l in qs.items() for v in l]))
             url = np.geturl()
 
-        r = getURL(FQify(url), silent=True, useCookie=True, rjson=False, postdata=postData)
+        r = getURL(FQify(url), silent=True, useCookie=True, rjson=False, postdata=postData, binary=(not g.UsePrimeVideo))
         if not r:
             return None
         try:
@@ -813,7 +828,7 @@ def GrabJSON(url, postData=None):
                 return o
         except:
             pass
-        matches = re.findall(r'\s*(?:<script[^>]+type="(?:text/template|application/json)"[^>]*>|state:)\s*({[^\n]+})\s*(?:,|</script>)\s*', r)
+        matches = [r] if r.startswith('{') else re.findall(r'\s*(?:<script[^>]+type="(?:text/template|application/json)"[^>]*>|state:)\s*({[^\n]+})\s*(?:,|</script>)\s*', r)
         if not matches:
             Log('No JSON objects found in the page', Log.ERROR)
             return None

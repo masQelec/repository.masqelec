@@ -1,9 +1,9 @@
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
+# Use of this source code is governed by the MIT license.
+__license__ = "MIT"
 
 __all__ = [
     'HTML5TreeBuilder',
-    ]
+]
 
 import warnings
 import re
@@ -12,38 +12,54 @@ from bs4.builder import (
     HTML,
     HTML_5,
     HTMLTreeBuilder,
-    )
+)
 from bs4.element import (
     NamespacedAttribute,
-    whitespace_re,
+    nonwhitespace_re,
 )
 import html5lib
 from html5lib.constants import (
     namespaces,
     prefixes,
-    )
+)
 from bs4.element import (
     Comment,
     Doctype,
     NavigableString,
     Tag,
-    )
+)
 
 try:
     # Pre-0.99999999
     from html5lib.treebuilders import _base as treebuilder_base
     new_html5lib = False
-except ImportError as e:
+except ImportError:
     # 0.99999999 and up
     from html5lib.treebuilders import base as treebuilder_base
     new_html5lib = True
 
+
 class HTML5TreeBuilder(HTMLTreeBuilder):
-    """Use html5lib to build a tree."""
+    """Use html5lib to build a tree.
+
+    Note that this TreeBuilder does not support some features common
+    to HTML TreeBuilders. Some of these features could theoretically
+    be implemented, but at the very least it's quite difficult,
+    because html5lib moves the parse tree around as it's being built.
+
+    * This TreeBuilder doesn't use different subclasses of NavigableString
+      based on the name of the tag in which the string was found.
+
+    * You can't use a SoupStrainer to parse only part of a document.
+    """
 
     NAME = "html5lib"
 
     features = [NAME, PERMISSIVE, HTML_5, HTML]
+
+    # html5lib can tell us which line number and position in the
+    # original file is the source of an element.
+    TRACKS_LINE_NUMBERS = True
 
     def prepare_markup(self, markup, user_specified_encoding,
                        document_declared_encoding=None, exclude_encodings=None):
@@ -62,7 +78,7 @@ class HTML5TreeBuilder(HTMLTreeBuilder):
         if self.soup.parse_only is not None:
             warnings.warn("You provided a value for parse_only, but the html5lib tree builder doesn't support parse_only. The entire document will be parsed.")
         parser = html5lib.HTMLParser(tree=self.create_treebuilder)
-
+        self.underlying_builder.parser = parser
         extra_kwargs = dict()
         if not isinstance(markup, unicode):
             if new_html5lib:
@@ -84,10 +100,13 @@ class HTML5TreeBuilder(HTMLTreeBuilder):
                 # with other tree builders.
                 original_encoding = original_encoding.name
             doc.original_encoding = original_encoding
+        self.underlying_builder.parser = None
 
     def create_treebuilder(self, namespaceHTMLElements):
         self.underlying_builder = TreeBuilderForHtml5lib(
-            namespaceHTMLElements, self.soup)
+            namespaceHTMLElements, self.soup,
+            store_line_numbers=self.store_line_numbers
+        )
         return self.underlying_builder
 
     def test_fragment_to_document(self, fragment):
@@ -97,13 +116,27 @@ class HTML5TreeBuilder(HTMLTreeBuilder):
 
 class TreeBuilderForHtml5lib(treebuilder_base.TreeBuilder):
 
-    def __init__(self, namespaceHTMLElements, soup=None):
+    def __init__(self, namespaceHTMLElements, soup=None,
+                 store_line_numbers=True, **kwargs):
         if soup:
             self.soup = soup
         else:
             from bs4 import BeautifulSoup
-            self.soup = BeautifulSoup("", "html.parser")
+            # TODO: Why is the parser 'html.parser' here? To avoid an
+            # infinite loop?
+            self.soup = BeautifulSoup(
+                "", "html.parser", store_line_numbers=store_line_numbers,
+                **kwargs
+            )
+        # TODO: What are **kwargs exactly? Should they be passed in
+        # here in addition to/instead of being passed to the BeautifulSoup
+        # constructor?
         super(TreeBuilderForHtml5lib, self).__init__(namespaceHTMLElements)
+
+        # This will be set later to an html5lib.html5parser.HTMLParser
+        # object, which we can use to track the current line number.
+        self.parser = None
+        self.store_line_numbers = store_line_numbers
 
     def documentClass(self):
         self.soup.reset()
@@ -118,7 +151,16 @@ class TreeBuilderForHtml5lib(treebuilder_base.TreeBuilder):
         self.soup.object_was_parsed(doctype)
 
     def elementClass(self, name, namespace):
-        tag = self.soup.new_tag(name, namespace)
+        kwargs = {}
+        if self.parser and self.store_line_numbers:
+            # This represents the point immediately after the end of the
+            # tag. We don't know when the tag started, but we do know
+            # where it ended -- the character just before this one.
+            sourceline, sourcepos = self.parser.tokenizer.stream.position()
+            kwargs['sourceline'] = sourceline
+            kwargs['sourcepos'] = sourcepos - 1
+        tag = self.soup.new_tag(name, namespace, **kwargs)
+
         return Element(tag, self.soup, namespace)
 
     def commentClass(self, data):
@@ -126,6 +168,8 @@ class TreeBuilderForHtml5lib(treebuilder_base.TreeBuilder):
 
     def fragmentClass(self):
         from bs4 import BeautifulSoup
+        # TODO: Why is the parser 'html.parser' here? To avoid an
+        # infinite loop?
         self.soup = BeautifulSoup("", "html.parser")
         self.soup.name = "[document_fragment]"
         return Element(self.soup, self.soup, None)
@@ -190,32 +234,41 @@ class TreeBuilderForHtml5lib(treebuilder_base.TreeBuilder):
 
         return "\n".join(rv)
 
+
 class AttrList(object):
+
     def __init__(self, element):
         self.element = element
         self.attrs = dict(self.element.attrs)
+
     def __iter__(self):
         return list(self.attrs.items()).__iter__()
+
     def __setitem__(self, name, value):
         # If this attribute is a multi-valued attribute for this element,
         # turn its value into a list.
-        list_attr = HTML5TreeBuilder.cdata_list_attributes
+        list_attr = self.element.cdata_list_attributes
         if (name in list_attr['*']
             or (self.element.name in list_attr
                 and name in list_attr[self.element.name])):
             # A node that is being cloned may have already undergone
             # this procedure.
             if not isinstance(value, list):
-                value = whitespace_re.split(value)
+                value = nonwhitespace_re.findall(value)
         self.element[name] = value
+
     def items(self):
         return list(self.attrs.items())
+
     def keys(self):
         return list(self.attrs.keys())
+
     def __len__(self):
         return len(self.attrs)
+
     def __getitem__(self, name):
         return self.attrs[name]
+
     def __contains__(self, name):
         return name in list(self.attrs.keys())
 
@@ -249,8 +302,8 @@ class Element(treebuilder_base.Node):
         if not isinstance(child, basestring) and child.parent is not None:
             node.element.extract()
 
-        if (string_child and self.element.contents
-            and self.element.contents[-1].__class__ == NavigableString):
+        if (string_child is not None and self.element.contents
+                and self.element.contents[-1].__class__ == NavigableString):
             # We are appending a string onto another string.
             # TODO This has O(n^2) performance, for input like
             # "a</a>a</a>a</a>..."
@@ -287,9 +340,7 @@ class Element(treebuilder_base.Node):
         return AttrList(self.element)
 
     def setAttributes(self, attributes):
-
         if attributes is not None and len(attributes) > 0:
-
             converted_attributes = []
             for name, value in list(attributes.items()):
                 if isinstance(name, tuple):
@@ -320,9 +371,9 @@ class Element(treebuilder_base.Node):
     def insertBefore(self, node, refNode):
         index = self.element.index(refNode.element)
         if (node.element.__class__ == NavigableString and self.element.contents
-            and self.element.contents[index-1].__class__ == NavigableString):
+                and self.element.contents[index - 1].__class__ == NavigableString):
             # (See comments in appendChild)
-            old_node = self.element.contents[index-1]
+            old_node = self.element.contents[index - 1]
             new_str = self.soup.new_string(old_node + node.element)
             old_node.replace_with(new_str)
         else:
@@ -334,9 +385,9 @@ class Element(treebuilder_base.Node):
 
     def reparentChildren(self, new_parent):
         """Move all of this tag's children into another tag."""
-        # print "MOVE", self.element.contents
-        # print "FROM", self.element
-        # print "TO", new_parent.element
+        # print("MOVE", self.element.contents)
+        # print("FROM", self.element)
+        # print("TO", new_parent.element)
 
         element = self.element
         new_parent_element = new_parent.element
@@ -360,16 +411,16 @@ class Element(treebuilder_base.Node):
             # Set the first child's previous_element and previous_sibling
             # to elements within the new parent
             first_child = to_append[0]
-            if new_parents_last_descendant:
+            if new_parents_last_descendant is not None:
                 first_child.previous_element = new_parents_last_descendant
             else:
                 first_child.previous_element = new_parent_element
             first_child.previous_sibling = new_parents_last_child
-            if new_parents_last_descendant:
+            if new_parents_last_descendant is not None:
                 new_parents_last_descendant.next_element = first_child
             else:
                 new_parent_element.next_element = first_child
-            if new_parents_last_child:
+            if new_parents_last_child is not None:
                 new_parents_last_child.next_sibling = first_child
 
             # Find the very last element being moved. It is now the
@@ -379,7 +430,7 @@ class Element(treebuilder_base.Node):
             last_childs_last_descendant = to_append[-1]._last_descendant(False, True)
 
             last_childs_last_descendant.next_element = new_parents_last_descendant_next_element
-            if new_parents_last_descendant_next_element:
+            if new_parents_last_descendant_next_element is not None:
                 # TODO: This code has no test coverage and I'm not sure
                 # how to get html5lib to go through this path, but it's
                 # just the other side of the previous line.
@@ -394,14 +445,14 @@ class Element(treebuilder_base.Node):
         element.contents = []
         element.next_element = final_next_element
 
-        # print "DONE WITH MOVE"
-        # print "FROM", self.element
-        # print "TO", new_parent_element
+        # print("DONE WITH MOVE")
+        # print("FROM", self.element)
+        # print("TO", new_parent_element)
 
     def cloneNode(self):
         tag = self.soup.new_tag(self.element.name, self.namespace)
         node = Element(tag, self.soup, self.namespace)
-        for key,value in self.attributes:
+        for key, value in self.attributes:
             node.attributes[key] = value
         return node
 
@@ -409,12 +460,13 @@ class Element(treebuilder_base.Node):
         return self.element.contents
 
     def getNameTuple(self):
-        if self.namespace == None:
+        if self.namespace is None:
             return namespaces["html"], self.name
         else:
             return self.namespace, self.name
 
     nameTuple = property(getNameTuple)
+
 
 class TextNode(Element):
     def __init__(self, element, soup):

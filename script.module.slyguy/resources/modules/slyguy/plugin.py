@@ -426,15 +426,15 @@ class Item(gui.Item):
 
 #Plugin.Folder()
 class Folder(object):
-    def __init__(self, title=None, items=None, content='videos', updateListing=False, cacheToDisc=True, sort_methods=None, thumb=default_thumb, fanart=default_fanart, no_items_label=_.NO_ITEMS, no_items_method='dialog'):
+    def __init__(self, title=None, items=None, content='videos', updateListing=False, cacheToDisc=True, sort_methods=None, thumb=None, fanart=None, no_items_label=_.NO_ITEMS, no_items_method='dialog'):
         self.title = title
         self.items = items or []
         self.content = content
         self.updateListing = updateListing
         self.cacheToDisc = cacheToDisc
         self.sort_methods = sort_methods or [xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL]
-        self.thumb = thumb
-        self.fanart = fanart
+        self.thumb = thumb or default_thumb
+        self.fanart = fanart or default_fanart
         self.no_items_label = no_items_label
         self.no_items_method = no_items_method
 

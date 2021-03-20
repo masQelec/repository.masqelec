@@ -194,7 +194,10 @@ class AmazonTLD(Singleton):
         all_rec = {}
         if xbmcvfs.exists(self.recentsdb):
             with open(self.recentsdb, 'rb') as fp:
-                all_rec = pickle.load(fp)
+                try:
+                    all_rec = pickle.load(fp)
+                except:
+                    pass
 
         cur_user = loadUser('name') + getConfig('profileID')
         user_rec = all_rec.get(cur_user, [])
@@ -1173,8 +1176,10 @@ class AmazonTLD(Singleton):
                     addDir(il['DisplayTitle'], 'text', infoLabels=il)
 
         more = props.get('pagination', props.get('seeMoreLink'))
-        if more and remref(more['url']) not in urls:
-            addDir('-= %s =-' % more['label'], 'Channel', more['url'], thumb=self._s.NextIcon)
+        if more:
+            nextpage = more.get('apiUrl', more['url'])
+            if remref(nextpage) not in urls:
+                addDir('-= %s =-' % more['label'], 'Channel', nextpage, thumb=self._s.NextIcon)
 
         Log('Parsing Channels Page: %ss' % (time.time()-s), Log.DEBUG)
         '''
@@ -1194,10 +1199,11 @@ class AmazonTLD(Singleton):
         for item in j['profiles']:
             url = self._g.BaseUrl + item['switchLink']['partialURL']
             q = urlencode(item['switchLink']['query'])
-            profiles.append((item['name'], '{}?{}'.format(url, q), item['avatarUrl']))
+            n = item.get('name', 'Default').encode('utf-8')
+            profiles.append((n, '{}?{}'.format(url, q), item['avatarUrl']))
             if item.get('isSelected', False):
                 active = len(profiles) - 1
-                writeConfig('profileID', '' if item.get('isDefault', False) else item['name'])
+                writeConfig('profileID', '' if item.get('isDefault', False) else n)
         return active, profiles
 
     def switchProfile(self):

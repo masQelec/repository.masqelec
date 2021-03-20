@@ -20,7 +20,7 @@ import requests
 
 from slyguy.log import log
 from slyguy.constants import *
-from slyguy.util import check_port, remove_file, get_kodi_string, set_kodi_string
+from slyguy.util import check_port, remove_file, get_kodi_string, set_kodi_string, cenc_version1to0
 from slyguy.exceptions import Exit
 from slyguy import settings, gui
 from slyguy.language import _
@@ -40,6 +40,7 @@ if not check_port(PORT):
 
 PROXY_PATH = 'http://{}:{}/'.format(HOST, PORT)
 
+#ADDON_DEV = True
 def devlog(msg):
     if ADDON_DEV:
         log.debug(msg)
@@ -404,8 +405,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             # Keep last period
             if len(periods) > 1:
                 periods.pop()
-                for e in periods:
-                    e.parentNode.removeChild(e)
+                for elem in periods:
+                    elem.parentNode.removeChild(elem)
         #################################################
 
         ## SUPPORT NEW DOLBY FORMAT
@@ -414,6 +415,17 @@ class RequestHandler(BaseHTTPRequestHandler):
             if elem.getAttribute('schemeIdUri') == 'tag:dolby.com,2014:dash:audio_channel_configuration:2011':
                 elem.setAttribute('schemeIdUri', 'urn:dolby:dash:audio_channel_configuration:2011')
         ###########################
+
+        # for elem in root.getElementsByTagName('ContentProtection'):
+        #     if elem.getAttribute('schemeIdUri') not in ('urn:uuid:EDEF8BA9-79D6-4ACE-A3C8-27DCD51D21ED', 'urn:mpeg:dash:mp4protection:2011'):
+        #         elem.parentNode.removeChild(elem)
+
+        # for elem in root.getElementsByTagName('cenc:pssh'):
+        #     old = elem.firstChild.nodeValue
+        #     new = cenc_version1to0(old)
+        #     if old != new:
+        #         log.debug('cenc coverted from 1 to 0')
+        #         elem.firstChild.nodeValue = new
 
         ## Make sure Representation are last in adaptionset
         for elem in root.getElementsByTagName('Representation'):
@@ -426,7 +438,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         audio_sets = []
         trick_sets = []
         lang_adap_sets = []
-        streams = []
+        streams, all_streams, ids = [], [], []
 
         def get_base_url(node):
             if not node.parentNode:
@@ -499,7 +511,12 @@ class RequestHandler(BaseHTTPRequestHandler):
                                 frame_rate = ''
 
                         codecs = [x for x in attrib.get('codecs', '').split(',') if x]
-                        streams.append({'bandwidth': bandwidth, 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'elem': stream})
+                        stream  = {'bandwidth': bandwidth, 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'id': attrib['id'], 'elem': stream}
+                        all_streams.append(stream)
+
+                        if stream['id'] not in ids:
+                            streams.append(stream)
+                            ids.append(stream['id'])
 
             parent = adap_set.parentNode
             parent.removeChild(adap_set)
@@ -567,8 +584,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         selected = self._quality_select(streams)
         if selected:
-            for stream in streams:
-                if stream['elem'] != selected['elem']:
+            for stream in all_streams:
+                if stream['id'] != selected['id']:
                     stream['elem'].parentNode.removeChild(stream['elem'])
 
         for adap_set in root.getElementsByTagName('AdaptationSet'):
@@ -809,7 +826,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         debug = self._session.get('debug_all') or self._session.get('debug_{}'.format(method.lower()))
         if post_data and debug:
-            with open(os.path.join(ADDON_PROFILE, '{}-request.txt'.format(method.lower())), 'wb') as f:
+            with open(xbmc.translatePath('special://temp/{}-request.txt').format(method.lower()), 'wb') as f:
                 f.write(post_data)
 
         if not self._session.get('session'):
@@ -842,7 +859,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             headers[header.lower()] = response.headers[header]
 
         if debug:
-            with open(os.path.join(ADDON_PROFILE, '{}-response.txt'.format(method.lower())), 'wb') as f:
+            with open(xbmc.translatePath('special://temp/{}-response.txt').format(method.lower()), 'wb') as f:
                 f.write(response.stream.read())
 
         if 'location' in headers:

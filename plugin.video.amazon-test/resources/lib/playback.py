@@ -656,6 +656,11 @@ class _AmazonPlayer(xbmc.Player):
     def onPlayBackStopped(self):
         self.finished()
 
+    def onPlayBackSeek(self, time, seekOffset):
+        cur_sub = jsonRPC('Player.GetProperties', 'currentsubtitle', param={'playerid': 1})
+        Log('Seeking / Current Subtitle: {}'.format(cur_sub), Log.DEBUG)
+        jsonRPC('Player.SetSubtitle', param={'playerid': 1, 'subtitle': cur_sub['index']})
+
     def updateStream(self, event):
         if not self.asin:
             return
@@ -738,22 +743,9 @@ class _SkipButton(xbmcgui.WindowDialog):
             self.skipScene()
 
     def skipScene(self, wait=0):
-        # Workaround for bug in Kodi/ISA:
-        #   Jumping to a specfic/absolute time results in asynchronus subtitles timings. Seeking forward/backwards didn't have this issue.
-        #   But just seeking forwards isn't possible, values lower 60 will be threated as absolut values.
-        #   Avoid this by jumping additionally to start with values lower 60.
-        tc = int(self.seek_time - self.player.getTime())
-        Log('Seeking to (+4): {}sec / seek incr {}sec / cur pos {}sec'.format(self.seek_time, tc, self.player.getTime()), Log.DEBUG)
-        seek_back = True if 60 - tc > 0 and self.has_seek_bug() else False  # seeking forward fixed since JSON-RPC v11.7.0
-        if seek_back:
-            tc = self.seek_time
-            self.player.pause()
-            jsonRPC('Player.Seek', param={'playerid': 1, 'value': 0})
-            sleep(0.75)
-        jsonRPC('Player.Seek', param={'playerid': 1, 'value': {'seconds': tc}})
+        Log('Seeking to: {}sec / cur pos {}sec'.format(self.seek_time, self.player.getTime()), Log.DEBUG)
+        self.player.seekTime(self.seek_time)
         sleep(0.75)
-        if seek_back:
-            self.player.pause()
         Log('Position: {}'.format(self.player.getTime()), Log.DEBUG)
         xbmc.sleep(wait)
         self.hide()

@@ -500,3 +500,11 @@ def parse_cenc_init(b64string):
     pos += data_length
 
     return uuid, version, data, kids
+
+def cenc_version1to0(cenc):
+    uuid, version, data, kids = parse_cenc_init(cenc)
+
+    if version != 1 or not data or uuid != WIDEVINE_UUID:
+        return cenc
+
+    return cenc_init(data)

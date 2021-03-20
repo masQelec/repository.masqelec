@@ -152,6 +152,7 @@ class BaseLanguage(object):
     MOVE_DOWN                   = 32116
     RENAME_BOOKMARK             = 32117
     XZ_ERROR                    = 32118
+    INSTALLING_APT_IA           = 32119
 
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)

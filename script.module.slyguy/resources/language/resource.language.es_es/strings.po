@@ -659,3 +659,7 @@ msgctxt "#32118"
 msgid "XZ extracting requires Kodi 19 or above"
 msgstr "La extracción XZ requiere Kodi 19 o superior"
 
+msgctxt "#32119"
+msgid "Attempting to install Inputstream Adaptive from apt..."
+msgstr "Intentando instalar Inputstream Adaptive desde apt..."
+

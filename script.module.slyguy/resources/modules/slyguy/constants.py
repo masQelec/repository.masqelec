@@ -75,15 +75,16 @@ ROUTE_RENAME_BOOKMARK  = '_name_bookmark'
 #################
 
 #### INPUTSTREAM ADAPTIVE #####
-IA_ADDON_ID     = 'inputstream.adaptive'
-IA_TESTING_ID   = 'inputstream.adaptive.testing'
-IA_VERSION_KEY  = '_version'
-IA_HLS_MIN_VER  = '2.0.0'
-IA_PR_MIN_VER   = '2.2.19'
-IA_MPD_MIN_VER  = '2.2.19'
-IA_WV_MIN_VER   = '2.2.27'
-IA_MODULES_URL  = 'https://k.slyguy.xyz/.decryptmodules/modules.json.gz'
-IA_CHECK_EVERY  = 86400 #24 hours
+IA_ADDON_ID      = 'inputstream.adaptive'
+IA_TESTING_ID    = 'inputstream.adaptive.testing'
+IA_VERSION_KEY   = '_version'
+IA_HLS_MIN_VER   = '2.0.0'
+IA_PR_MIN_VER    = '2.2.19'
+IA_MPD_MIN_VER   = '2.2.19'
+IA_WV_MIN_VER    = '2.2.27'
+IA_MODULES_URL   = 'https://k.slyguy.xyz/.decryptmodules/modules.json.gz'
+IA_CHECK_EVERY   = 86400 #24 hours
+IA_LINUX_PACKAGE = 'kodi-inputstream-adaptive'
 ###################
 
 #### MISC #####

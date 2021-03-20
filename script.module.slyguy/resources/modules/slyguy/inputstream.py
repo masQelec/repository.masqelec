@@ -21,7 +21,7 @@ from .exceptions import InputStreamError
 ADDON_ID = IA_ADDON_ID
 
 def get_id():
-    if KODI_VERSION < 18:
+    if KODI_VERSION != 18:
         return IA_ADDON_ID
 
     return ADDON_ID
@@ -32,7 +32,31 @@ def get_ia_addon(required=False, install=True):
     if addon_id == IA_TESTING_ID:
         install_iat_repo()
 
-    return get_addon(addon_id, required=required, install=install)
+    addon = get_addon(addon_id, required=False, install=install)
+
+    if not addon and addon_id == IA_ADDON_ID and install and get_system_arch()[0] == 'Linux':
+        with gui.progress(_.INSTALLING_APT_IA, heading=_.IA_WIDEVINE_DRM, percent=20) as progress:
+            try:
+                subprocess.check_output('apt-get -y install {0} || sudo apt-get -y install {0}'.format(IA_LINUX_PACKAGE), shell=True)
+                log.debug('kodi-inputstream-adaptive installed')
+                progress.update(70)
+                xbmc.executebuiltin('UpdateLocalAddons()')
+
+                max_wait = 5
+                for i in range(max_wait):
+                    xbmc.sleep(1000)
+                    progress.update(70+(i*(30/max_wait)))
+                    addon = get_addon(addon_id, required=False, install=False)
+                    if addon:
+                        break
+            except Exception as e:
+                log.exception(e)
+                log.debug('kodi-inputstream-adaptive failed to install')
+
+    if not addon and required:
+        raise InputStreamError(_(_.ADDON_REQUIRED, addon_id=addon_id))
+
+    return addon
 
 def install_iat_repo():
     addon = get_addon(IA_TESTING_ID, install=False)

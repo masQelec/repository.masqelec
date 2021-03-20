@@ -876,6 +876,11 @@ class PrimeVideo(Singleton):
                 details = state['detail']
                 if 'detail' in details:
                     details = details['detail']
+                if 'headerDetail' in state['detail']:
+                    details.update(state['detail']['headerDetail'])
+                    del state['detail']['headerDetail']
+                if 'btfMoreDetails' in state['detail']:
+                    del state['detail']['btfMoreDetails']
 
                 # Add video streams in order
                 for vid, i in sorted(details.items(), key=lambda t: 9999 if t[0] not in items else items[t[0]]):
@@ -959,11 +964,17 @@ class PrimeVideo(Singleton):
                 self._videodata['urn2gti'][urn] = state['pageTitleId']
 
             # Both of these versions have been spotted in the wild
-            # { "detail": { … } }
-            # { "detail": { "detail": {…}, "headerDetail": {…} } }
+            # { "detail": { "headerDetail": {…}, "amzn1.dv.gti.[…]": {…} }
+            # { "detail": { "detail": { "amzn1.dv.gti.[…]": {…} }, "headerDetail": {…} } }
             details = state['detail']
             if 'detail' in details:
                 details = details['detail']
+            # headerDetail contains sometimes gtis/asins, which are not included in details
+            if 'headerDetail' in state['detail']:
+                details.update(state['detail']['headerDetail'])
+                del state['detail']['headerDetail']
+            if 'btfMoreDetails' in state['detail']:
+                del state['detail']['btfMoreDetails']
 
             # Get details, seasons first
             # WARNING: seasons may not have proper initialization at this stage
@@ -1152,7 +1163,7 @@ class PrimeVideo(Singleton):
             except:
                 bCouldNotParse = True
             if bCouldNotParse or (not cnt):
-                self._g.dialog.notification(getString(30251), requestURL, xbmcgui.NOTIFICATION_ERROR)
+                self._g.dialog.notification(getString(30251), requestURL[:48], xbmcgui.NOTIFICATION_ERROR)
                 Log('Unable to fetch the url: {}'.format(requestURL), Log.ERROR)
                 continue
 
@@ -1226,7 +1237,6 @@ class PrimeVideo(Singleton):
                 if 'state' in cnt:
                     bSinglePage = True
                     bUpdatedVideoData |= ParseSinglePage(breadcrumb[-1], o, bCacheRefresh, data=cnt, url=requestURL)
-
                 # Pagination
                 if ('pagination' in cnt) or (key_exists(cnt, 'viewOutput', 'features', 'legacy-watchlist', 'content', 'seeMoreHref')):
                     nextPage = None
