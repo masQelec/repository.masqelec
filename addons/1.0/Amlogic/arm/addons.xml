@@ -6208,7 +6208,7 @@ v0.0.3
   </extension>
 </addon>
 
-<addon id="service.epg.masqelec" name="Epg masQelec" version="0.0.1" provider-name="masQelec">
+<addon id="service.epg.masqelec" name="Epg masQelec" version="0.0.2" provider-name="masQelec">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0"/>
 	</requires>
