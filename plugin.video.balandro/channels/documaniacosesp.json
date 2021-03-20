@@ -3,7 +3,7 @@
   "name": "DocumaniacosEsp",
   "thumbnail": "documaniacosesp.png",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["documentary"],
@@ -11,5 +11,5 @@
   "categories": ["documentary"],
   "language": ["cast"],
 
-  "notes": "Documentales en castellano, aunque hay bastantes enlaces que han sido retirados."
+  "notes": "Web Cerrada Diciembre/2020. Documentales en castellano, aunque hay bastantes enlaces que han sido retirados."
 }

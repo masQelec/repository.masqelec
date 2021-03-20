@@ -11,5 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast"],
 
+  "clusters": ["classic", "lists"],
+
   "notes": "Series clásicas de TV."
 }

@@ -12,16 +12,16 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Últimos documentales', action = 'list_all', url = host ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
-    itemlist.append(item.clone( title = 'Por categorías', action = 'generos' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
     itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary' ))
 
     return itemlist
 
 
-def generos(item):
+def categorias(item):
     logger.info()
     itemlist = []
 
@@ -54,11 +54,12 @@ def list_all(item):
         if title == 'La guía definitiva para crear un negocio exitoso en Internet': continue # entradas que no contienen vídeos
         if title == 'Ventajas y desventajas de las criptomonedas que necesitas conocer': continue # entradas que no contienen vídeos
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, plot=plot, contentType='movie', contentTitle=title, contentExtra='documentary' ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, plot=plot, 
+                                    contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
     next_page_link = scrapertools.find_single_match(data, '<a href="([^"]+)">Pr&oacute;xima')
     if next_page_link:
-        itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_all', url = next_page_link ))
+        itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_all', url = next_page_link, text_color='coral' ))
 
     return itemlist
 

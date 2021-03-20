@@ -11,5 +11,7 @@
   "categories": ["tvshow"],
   "language": ["lat"],
 
-  "notes": "Series retro, por género e idioma orignal de emisión."
+  "clusters": ["classic", "lasts"],
+
+  "notes": "Series retro, por género en idioma orignal de emisión."
 }

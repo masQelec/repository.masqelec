@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 
 # ~ host = 'https://xdede.co/'
-host = 'https://movidy.co/'
+host = 'https://movidy.tv/'
 
 
 def do_downloadpage(url, post=None, headers=None):

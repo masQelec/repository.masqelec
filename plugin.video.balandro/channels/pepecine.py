@@ -7,8 +7,8 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, jsontools, tmdb
 
 
-host = 'https://verencasa.com/'
-# ~ host = 'https://pepecinehd.com/'
+# ~ host = 'https://verencasa.com/'
+host = 'https://pepecinehd.top/'
 
 ruta_pelis  = 'browse?type=movie'
 ruta_series = 'browse?type=series'

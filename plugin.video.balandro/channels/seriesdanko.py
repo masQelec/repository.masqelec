@@ -4,11 +4,9 @@ import re
 
 from platformcode import config, logger
 from core.item import Item
-from core import httptools, scrapertools, servertools, tmdb
-
-
-# ~ HOST = 'http://seriesdanko.to/'
-HOST = 'https://seriesdanko.net/'
+from core import httptools, scrapertools, servertools, 
+HOST = 'http://seriescube.pw/'
+# ~ HOST = 'https://seriesdanko.net/'
 IDIOMAS = {'es': 'Esp', 'la': 'Lat', 'sub': 'VOSE'}
 
 
@@ -22,7 +20,7 @@ IDIOMAS = {'es': 'Esp', 'la': 'Lat', 'sub': 'VOSE'}
     # ~ return proxytools.configurar_proxies_canal(item.channel, HOST)
 
 def do_downloadpage(url, post=None):
-    url = url.replace('seriesdanko.to', 'seriesdanko.net').replace('http://', 'https://') # por si viene de enlaces guardados
+    url = url.replace('seriesdanko.to', 'seriescube.pw').replace('http://', 'https://') # por si viene de enlaces guardados
     data = httptools.downloadpage(url, post=post).data
     # ~ data = httptools.downloadpage_proxy('seriesdanko', url, post=post).data
     return data

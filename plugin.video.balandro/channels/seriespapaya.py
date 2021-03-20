@@ -11,7 +11,7 @@ from core import httptools, scrapertools, servertools, jsontools, tmdb
 # ~ HOST = "https://www.seriespapaya.net"
 # ~ HOST = "https://www2.seriespapaya.nu/"
 # ~ HOST = "https://www.seriespapaya.se/"
-HOST = "https://www.seriespapaya.io/"
+HOST = "https://www.seriespapaya.xyz/"
 
 IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'in': 'Eng', 'ca': 'Cat', 'sub': 'VOSE', 
            'Español Latino':'Lat', 'Español Castellano':'Esp', 'Sub Español':'VOSE'}
@@ -32,10 +32,10 @@ def do_downloadpage(url, post=None, referer=None):
     url = url.replace('http://', 'https://')
     url = url.replace('https://www2.', 'https://www.')
 
-    url = url.replace('seriespapaya.com', 'seriespapaya.io')
-    url = url.replace('seriespapaya.net', 'seriespapaya.io')
-    url = url.replace('seriespapaya.nu', 'seriespapaya.io')
-    url = url.replace('seriespapaya.se', 'seriespapaya.io')
+    url = url.replace('seriespapaya.com', 'seriespapaya.xyz')
+    url = url.replace('seriespapaya.net', 'seriespapaya.xyz')
+    url = url.replace('seriespapaya.nu', 'seriespapaya.xyz')
+    url = url.replace('seriespapaya.se', 'seriespapaya.xyz')
 
     headers = {'Referer': HOST}
     if referer: headers['Referer'] = referer
