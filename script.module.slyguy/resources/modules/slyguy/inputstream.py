@@ -237,10 +237,10 @@ def install_widevine(reinstall=False):
     elif system == 'IOS':
         raise InputStreamError(_.IA_IOS_ERROR)
 
-    elif 'aarch64' in arch or 'arm64' in arch:
+    elif system == 'Linux' and arch == 'arm64':
         raise InputStreamError(_.IA_AARCH64_ERROR)
 
-    elif 'armv6' in arch:
+    elif arch == 'armv6':
         raise InputStreamError(_.IA_ARMV6_ERROR)
 
     elif system not in DST_FILES:

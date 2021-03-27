@@ -372,9 +372,12 @@ def get_system_arch():
         except:
             arch = ''
 
-    #64bit kernel with 32bit userland
-    if ('aarch64' in arch or 'arm64' in arch) and (struct.calcsize("P") * 8) == 32:
-        arch = 'armv7'
+    if 'aarch64' in arch or 'arm64' in arch:
+        #64bit kernel with 32bit userland
+        if (struct.calcsize("P") * 8) == 32:
+            arch = 'armv7'
+        else:
+            arch = 'arm64'
 
     elif 'arm' in arch:
         if 'v6' in arch:

@@ -167,7 +167,7 @@ def yes_no(message, heading=None, autoclose=GUI_DEFAULT_AUTOCLOSE, **kwargs):
 class Item(object):
     def __init__(self, id=None, label='', path=None, playable=False, info=None, context=None,
             headers=None, cookies=None, properties=None, is_folder=None, art=None, inputstream=None,
-            video=None, audio=None, subtitles=None, use_proxy=False, specialsort=None, custom=None, proxy_data=None):
+            video=None, audio=None, subtitles=None, use_proxy=None, specialsort=None, custom=None, proxy_data=None):
 
         self.id          = id
         self.label       = label
@@ -185,10 +185,10 @@ class Item(object):
         self.inputstream = inputstream
         self.mimetype    = None
         self._is_folder  = is_folder
-        self.use_proxy   = use_proxy
         self.proxy_data  = proxy_data or {}
         self.specialsort = specialsort #bottom, top
         self.custom      = custom
+        self.use_proxy   = use_proxy if use_proxy is not None else bool(proxy_data)
 
     def update(self, **kwargs):
         for key in kwargs:

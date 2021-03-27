@@ -168,6 +168,32 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return url
 
+    def _manifest_middleware(self, data):
+        url = self._session.get('manifest_middleware')
+        if not url:
+            return data
+
+        data_path = xbmc.translatePath('special://temp/proxy.manifest')
+        with open(data_path, 'wb') as f:
+            f.write(data.encode('utf8'))
+
+        param = quote_plus(data_path)
+        url = url.replace('$DATA', param).replace('%24DATA', param)
+
+        devlog('PLUGIN MANIFEST MIDDLEWARE REQUEST: {}'.format(url))
+        dirs, files = xbmcvfs.listdir(url)
+
+        path = unquote(files[0])
+        split = path.split('|')
+        data_path = split[0]
+
+        with open(data_path, 'rb') as f:
+            data = f.read().decode('utf8')
+
+        remove_file(data_path)
+
+        return data
+
     def _get_url(self):
         url = self.path.lstrip('/').strip('\\')
 
@@ -347,10 +373,12 @@ class RequestHandler(BaseHTTPRequestHandler):
                 f.write(mpd)
 
         data = response.stream.read().decode('utf8')
-        data = data.replace('_xmlns:cenc', 'xmlns:cenc')
-        data = data.replace('_:default_KID', 'cenc:default_KID')
-        data = data.replace('<pssh', '<cenc:pssh')
-        data = data.replace('</pssh>', '</cenc:pssh>')
+        data = self._manifest_middleware(data)
+
+        ## SUPPORT NEW DOLBY FORMAT https://github.com/xbmc/inputstream.adaptive/pull/466
+        data = data.replace('tag:dolby.com,2014:dash:audio_channel_configuration:2011', 'urn:dolby:dash:audio_channel_configuration:2011')
+        ## SUPPORT EC-3 CHANNEL COUNT https://github.com/xbmc/inputstream.adaptive/pull/618
+        data = data.replace('urn:mpeg:mpegB:cicp:ChannelConfiguration', 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011')
 
         try:
             root = parseString(data.encode('utf8'))
@@ -398,7 +426,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             base_url_parents.append(elem.parentNode)
 
         ## Live mpd needs non-last periods removed
-        ## https://github.com/peak3d/inputstream.adaptive/issues/574
+        ## https://github.com/xbmc/inputstream.adaptive/issues/574
         if 'type' in mpd.attributes.keys() and mpd.getAttribute('type').lower() == 'dynamic':
             periods = [elem for elem in root.getElementsByTagName('Period')]
 
@@ -408,24 +436,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                 for elem in periods:
                     elem.parentNode.removeChild(elem)
         #################################################
-
-        ## SUPPORT NEW DOLBY FORMAT
-        ## PR to fix in IA: https://github.com/peak3d/inputstream.adaptive/pull/466
-        for elem in root.getElementsByTagName('AudioChannelConfiguration'):
-            if elem.getAttribute('schemeIdUri') == 'tag:dolby.com,2014:dash:audio_channel_configuration:2011':
-                elem.setAttribute('schemeIdUri', 'urn:dolby:dash:audio_channel_configuration:2011')
-        ###########################
-
-        # for elem in root.getElementsByTagName('ContentProtection'):
-        #     if elem.getAttribute('schemeIdUri') not in ('urn:uuid:EDEF8BA9-79D6-4ACE-A3C8-27DCD51D21ED', 'urn:mpeg:dash:mp4protection:2011'):
-        #         elem.parentNode.removeChild(elem)
-
-        # for elem in root.getElementsByTagName('cenc:pssh'):
-        #     old = elem.firstChild.nodeValue
-        #     new = cenc_version1to0(old)
-        #     if old != new:
-        #         log.debug('cenc coverted from 1 to 0')
-        #         elem.firstChild.nodeValue = new
 
         ## Make sure Representation are last in adaptionset
         for elem in root.getElementsByTagName('Representation'):
@@ -618,6 +628,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 f.write(_m3u8)
 
         if is_master:
+            m3u8 = self._manifest_middleware(m3u8)
             try:
                 m3u8 = self._parse_m3u8_master(m3u8)
             except Exit:

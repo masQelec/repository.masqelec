@@ -17,14 +17,11 @@ DEFAULT_HEADERS = {
 # from .settings import common_settings
 # PROXY_PATH = 'http://{}:{}/'.format(common_settings.get('proxy_host'), common_settings.getInt('proxy_port'))
 
-def json_override(self, **kwargs):
+def json_override(func, error_msg):
     try:
-        return old_json(self, **kwargs)
+        return func()
     except Exception as e:
-        raise SessionError(_.JSON_ERROR)
-
-old_json = requests.models.Response.json
-requests.models.Response.json = json_override
+        raise SessionError(error_msg or _.JSON_ERROR)
 
 class Session(requests.Session):
     def __init__(self, headers=None, cookies_key=None, base_url='{}', timeout=None, attempts=None, verify=None):
@@ -49,7 +46,7 @@ class Session(requests.Session):
         json_text = GzipFile(fileobj=BytesIO(resp.content)).read()
         return json.loads(json_text)
 
-    def request(self, method, url, timeout=None, attempts=None, verify=None, **kwargs):
+    def request(self, method, url, timeout=None, attempts=None, verify=None, error_msg=None, **kwargs):
         method = method.upper()
 
         if not url.startswith('http'):
@@ -82,8 +79,11 @@ class Session(requests.Session):
                     continue
 
             if resp is None:
-                raise SessionError(_.NO_RESPONSE_ERROR)
-            elif self.after_request:
+                raise SessionError(error_msg or _.NO_RESPONSE_ERROR)
+
+            resp.json = lambda func=resp.json, error_msg=error_msg: json_override(func, error_msg)
+
+            if self.after_request:
                 self.after_request(resp)
 
             return resp

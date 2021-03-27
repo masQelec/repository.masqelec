@@ -14525,7 +14525,7 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.22.8">
+<addon id="script.module.slyguy" name="SlyGuy Shared" provider-name="SlyGuy" version="0.23.1">
   <requires>
     <!-- <import addon="xbmc.python" version="2.1.0"/> -->
   </requires>
