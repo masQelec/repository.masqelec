@@ -9156,23 +9156,23 @@ Dual Screen Sound Format is an audio format based on PSF. It stores audio ripped
 
 <addon id="script.module.six"
        name="six"
-       version="1.13.0"
+       version="1.15.0"
        provider-name="gutworth">
   <requires>
     <import addon="xbmc.python"
     		version="2.14.0"/>
   </requires>
-  <extension point="xbmc.python.module"
-             library="lib" />
+  <extension point="xbmc.python.module" library="lib" />
   <extension point="xbmc.addon.metadata">
-    <summary lang="en">Python 2 and 3 compatibility utilities.</summary>
-    <description lang="en">Six is a Python 2 and 3 compatibility library. It provides utility functions for smoothing over the differences between the Python versions with the goal of writing Python code that is compatible on both Python versions. See the documentation for more information on what is provided.</description>
-	<summary lang="es">Python 2 y 3 utilidades de compatibilidad.</summary>
-    <description lang="es">Six es una biblioteca de compatibilidad Python 2 y 3. Proporciona funciones de utilidad para suavizar las diferencias entre las versiones de Python con el objetivo de escribir código de Python que sea compatible en ambas versiones de Python. Consulte la documentación para obtener más información sobre lo que se proporciona.</description>
+    <summary lang="en_GB">Python 2 and 3 compatibility utilities.</summary>
+    <description lang="en_GB">Six is a Python 2 and 3 compatibility library. It provides utility functions for smoothing over the differences between the Python versions with the goal of writing Python code that is compatible on both Python versions. See the documentation for more information on what is provided.</description>
     <platform>all</platform>
     <license>MIT</license>
-    <source>https://pypi.org/project/six/</source>
+    <source>https://github.com/benjaminp/six</source>
     <website>https://pypi.org/project/six/</website>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
   </extension>
 </addon>
 
