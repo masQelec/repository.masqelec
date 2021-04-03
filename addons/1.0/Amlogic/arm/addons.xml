@@ -6208,15 +6208,15 @@ v0.0.3
   </extension>
 </addon>
 
-<addon id="service.epg.masqelec" name="Epg masQelec" version="0.0.2" provider-name="masQelec">
+<addon id="service.epg.masqelec" name="Epg masQelec" version="0.0.3" provider-name="masQelec">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0"/>
 	</requires>
 	<extension point="xbmc.service" library="autoexec.py">
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary lang="es_ES">Cloud masQelec mantiene actualizado tus canales.</summary>
-		<description lang="es_ES">Cloud masQelec mantiene actualizado tus canales.</description>
+		<summary lang="es_ES">EPG masQelec mantiene actualizado tus canales.</summary>
+		<description lang="es_ES">EPG masQelec mantiene actualizado tus canales.</description>
 		<platform>all</platform>
 		<license>GNU GENERAL PUBLIC LICENSE Version 2</license>
 	</extension>
