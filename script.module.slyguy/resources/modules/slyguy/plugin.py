@@ -15,7 +15,7 @@ from .constants import *
 from .log import log
 from .language import _
 from .exceptions import Error, PluginError, FailedPlayback
-from .util import set_kodi_string, get_addon
+from .util import set_kodi_string, get_addon, get_kodi_string
 
 ## SHORTCUTS
 url_for         = router.url_for
@@ -385,22 +385,30 @@ class Item(gui.Item):
             quality = int(quality)
 
         if quality not in (QUALITY_DISABLED, QUALITY_SKIP):
-            parse = urlparse(self.path.lower())
-
             _type = None
             if self.inputstream:
                 if self.inputstream.manifest_type == 'mpd':
                     _type = 'mpd'
                 elif self.inputstream.manifest_type == 'hls':
                     _type = 'm3u8'
-            else:
+
+            if not _type:
+                parse = urlparse(self.path.lower())
                 if parse.path.endswith('.m3u') or parse.path.endswith('.m3u8'):
                     _type = 'm3u8'
 
             if _type:
+                last_quality = get_kodi_string('_slyguy_last_quality')
+                addon        = get_kodi_string('_slyguy_last_addon')
+                playlist_pos = xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition()
+
+                if quality == QUALITY_ASK and last_quality and addon == ADDON_ID and (playlist_pos > 0 or (xbmc.Player().isPlaying() and playlist_pos == -1)):
+                    quality = int(last_quality)
+
                 self.proxy_data['type'] = _type
                 self.proxy_data['quality'] = quality
                 self.use_proxy = True
+                set_kodi_string('_slyguy_last_addon', ADDON_ID)
 
         li     = self.get_li()
         handle = _handle()

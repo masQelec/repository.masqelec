@@ -13,6 +13,7 @@ from .exceptions import GUIError
 from .router import add_url_args
 from .language import _
 from . import settings
+from .util import url_sub
 
 PROXY_PATH = 'http://{}:{}/'.format(settings.common_settings.get('proxy_host'), settings.common_settings.getInt('proxy_port'))
 
@@ -164,6 +165,10 @@ def yes_no(message, heading=None, autoclose=GUI_DEFAULT_AUTOCLOSE, **kwargs):
 
     return xbmcgui.Dialog().yesno(heading, message, **kwargs)
 
+def info(item):
+    dialog = xbmcgui.Dialog()
+    dialog.info(item.get_li())
+
 class Item(object):
     def __init__(self, id=None, label='', path=None, playable=False, info=None, context=None,
             headers=None, cookies=None, properties=None, is_folder=None, art=None, inputstream=None,
@@ -304,7 +309,6 @@ class Item(object):
             proxy_data.update(self.proxy_data)
             set_kodi_string('_slyguy_quality', json.dumps(proxy_data))
             self.headers['x-uidh'] = session_id
-            self.path = u'{}{}'.format(PROXY_PATH, self.path)
             use_proxy = True
 
         headers = self.get_url_headers()
@@ -353,6 +357,11 @@ class Item(object):
                     mimetype = 'application/dash+xml'
                 elif parse.path.endswith('.ism'):
                     mimetype = 'application/vnd.ms-sstr+xml'
+
+            self.path = url_sub(self.path)
+
+            if use_proxy:
+                self.path = u'{}{}'.format(PROXY_PATH, self.path)
 
             if headers and '|' not in self.path:
                 self.path = u'{}|{}'.format(self.path, headers)

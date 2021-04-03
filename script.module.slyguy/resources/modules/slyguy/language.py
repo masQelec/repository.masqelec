@@ -1,3 +1,5 @@
+from kodi_six import xbmc
+
 from .log import log
 from .constants import ADDON, COMMON_ADDON
 
@@ -23,8 +25,10 @@ def format_string(string, _bold=False, _label=False, _color=None, _strip=False, 
 def addon_string(id):
     if id >= 32000:
         string = COMMON_ADDON.getLocalizedString(id)
-    else:
+    elif id >= 30000:
         string = ADDON.getLocalizedString(id)
+    else:
+        string = xbmc.getLocalizedString(id)
 
     if not string:
         log.warning("LANGUAGE: Addon didn't return a string for id: {}".format(id))

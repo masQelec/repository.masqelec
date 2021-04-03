@@ -22,7 +22,39 @@ import requests
 from .language import _
 from .log import log
 from .exceptions import Error
-from .constants import WIDEVINE_UUID, WIDEVINE_PSSH, DEFAULT_WORKERS
+from .constants import WIDEVINE_UUID, WIDEVINE_PSSH, DEFAULT_WORKERS, ADDON_PROFILE
+
+def url_sub(url):
+    file_path = os.path.join(ADDON_PROFILE, 'url_subs.txt')
+    if not os.path.exists(file_path):
+        return url
+
+    try:
+        with open(file_path, 'r') as f:
+            while True:
+                pattern = f.readline()
+                if not pattern: # end of file
+                    break
+
+                pattern = pattern.rstrip()
+                if not pattern: # blank line
+                    continue
+
+                replace = f.readline().rstrip()
+                if not replace: # no replace after pattern
+                    continue
+
+                _url = re.sub(pattern, replace, url)
+                if _url != url:
+                    log.debug('URL sub match: {} > {}'.format(url, _url))
+                    url = _url
+                    break
+
+    except Exception as e:
+        log.debug('failed to parse urls.txt')
+        log.exception(e)
+
+    return url
 
 def check_port(port=0, default=False):
     try:
@@ -284,6 +316,7 @@ def md5sum(filepath):
     return hashlib.md5(open(filepath,'rb').read()).hexdigest()
 
 ## to find BCOV-POLICY. Open below url
+## account_id / player_id / videoid can be found by right clicking player and selecting Player Information
 ## https://players.brightcove.net/{account_id}/{player_id}_default/index.html?videoId={videoid}
 ## then seach all files for policyKey
 

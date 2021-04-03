@@ -20,7 +20,7 @@ import requests
 
 from slyguy.log import log
 from slyguy.constants import *
-from slyguy.util import check_port, remove_file, get_kodi_string, set_kodi_string, cenc_version1to0
+from slyguy.util import check_port, remove_file, get_kodi_string, set_kodi_string
 from slyguy.exceptions import Exit
 from slyguy import settings, gui
 from slyguy.language import _
@@ -343,6 +343,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             quality = values[index]
             if index != default:
                 PROXY_GLOBAL['last_quality'] = quality['bandwidth'] if quality in qualities else quality
+                set_kodi_string('_slyguy_last_quality', PROXY_GLOBAL['last_quality'])
 
         if quality in (QUALITY_DISABLED, QUALITY_SKIP):
             quality = quality
@@ -389,25 +390,15 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         mpd = root.getElementsByTagName("MPD")[0]
 
-        ## Set publishtime to utctime
-        utc_time = mpd.getElementsByTagName("UTCTiming")
-        if utc_time:
-            value = utc_time[0].getAttribute('value')
-            mpd.setAttribute('publishTime', value)
-            log.debug('publishTime updated to UTCTiming ({})'.format(value))
-
-        for elem in mpd.getElementsByTagName("SupplementalProperty"):
-            if elem.getAttribute('schemeIdUri') == 'urn:scte:dash:utc-time':
-                value = elem.getAttribute('value')
-                mpd.setAttribute('publishTime', value)
-                log.debug('publishTime updated to urn:scte:dash:utc-time ({})'.format(value))
-                break
+        ## Remove publishTime PR: https://github.com/xbmc/inputstream.adaptive/pull/564
+        if 'publishTime' in mpd.attributes.keys():
+            mpd.removeAttribute('publishTime')
 
         ## FIXED in IA 2.4.6
         ## Commit: https://github.com/peak3d/inputstream.adaptive/commit/dc7b42783d18c65ebcf205a4979a1c9ea6b825e7
-        if 'availabilityStartTime' in mpd.attributes.keys() and self._session.get('remove_availability_startTime'):
-            mpd.removeAttribute('availabilityStartTime')
-            log.debug('Removed availabilityStartTime')
+        # if 'availabilityStartTime' in mpd.attributes.keys() and self._session.get('remove_availability_startTime'):
+        #     mpd.removeAttribute('availabilityStartTime')
+        #     log.debug('Removed availabilityStartTime')
 
         base_url_parents = []
         for elem in root.getElementsByTagName('BaseURL'):
@@ -466,6 +457,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             is_video = False
             is_trick = False
 
+            # Fixed with: https://github.com/xbmc/inputstream.adaptive/pull/575
             adapt_frame_rate = adap_set.getAttribute('frameRate')
             if adapt_frame_rate and '/' not in adapt_frame_rate:
                 adapt_frame_rate = None
@@ -480,7 +472,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 for key in adap_set.attributes.keys():
                     attrib[key] = adap_set.getAttribute(key)
 
-                    ## will be fixed with https://github.com/xbmc/inputstream.adaptive/pull/602
+                    ## fixed with https://github.com/xbmc/inputstream.adaptive/pull/602
                     if key == 'lang' and not (len(attrib[key]) == 2 or len(attrib[key]) == 3 or len(attrib[key]) > 3 and attrib[key][2] == '-'):
                         adap_set.setAttribute('lang', u'en-{}'.format(attrib[key]))
 
@@ -580,14 +572,15 @@ class RequestHandler(BaseHTTPRequestHandler):
                     e.setAttribute(attrib, PROXY_PATH + url)
                 else:
                     base_url = get_base_url(e)
+
+                    ## Fixed with https://github.com/xbmc/inputstream.adaptive/pull/606
                     if base_url and not base_url.firstChild.nodeValue.endswith('/'):
                         base_url.firstChild.nodeValue = base_url.firstChild.nodeValue + '/'
 
             process_attrib('initialization')
             process_attrib('media')
 
-            ## FIX FOR BEIN MENA TO GET CORRECT SEGMENT
-            ## PR TO FIX: https://github.com/peak3d/inputstream.adaptive/pull/564
+            ## Remove presentationTimeOffset PR: https://github.com/xbmc/inputstream.adaptive/pull/564/
             if 'presentationTimeOffset' in e.attributes.keys():
                 e.removeAttribute('presentationTimeOffset')
             ###################
@@ -766,7 +759,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         lines = list(m3u8.splitlines())
         line1 = None
-        streams, all_streams, urls = [], [], []
+        streams, all_streams, urls, metas = [], [], [], []
         for index, line in enumerate(lines):
             if not line.strip():
                 continue
@@ -788,9 +781,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                 stream = {'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'url': url, 'lines': [line1, index]}
                 all_streams.append(stream)
 
-                if stream['url'] not in urls:
+                if stream['url'] not in urls and lines[line1] not in metas:
                     streams.append(stream)
                     urls.append(stream['url'])
+                    metas.append(lines[line1])
 
                 line1 = None
 

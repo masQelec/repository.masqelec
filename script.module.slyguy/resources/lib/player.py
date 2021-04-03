@@ -43,8 +43,12 @@ class Player(xbmc.Player):
     def onAVStarted(self):
         self._up_next = None
         self._callback = None
-        self._thread = Thread(target=self.playback, args=(self.getPlayingFile(),))
-        self._thread.start()
+        self._playlist = None
+
+        if self.isPlayingVideo():
+            self._playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+        else:
+            self._playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
 
         up_next = get_kodi_string('_slyguy_play_next')
         if up_next:
@@ -52,13 +56,8 @@ class Player(xbmc.Player):
             up_next = json.loads(up_next)
             if up_next['playing_file'] == self.getPlayingFile():
                 if up_next['next_file']:
-                    if self.isPlayingVideo():
-                        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-                    else:
-                        playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
-                    
-                    playlist.remove(up_next['next_file'])
-                    playlist.add(up_next['next_file'], index=playlist.getposition()+1)
+                    self._playlist.remove(up_next['next_file'])
+                    self._playlist.add(up_next['next_file'], index=self._playlist.getposition()+1)
 
                 if up_next['time']:
                     self._up_next = up_next
@@ -69,6 +68,10 @@ class Player(xbmc.Player):
             callback = json.loads(callback)
             if callback['playing_file'] == self.getPlayingFile() and callback['callback']:
                 self._callback = callback
+
+        if self._up_next or self._callback:
+            self._thread = Thread(target=self.playback, args=(self.getPlayingFile(),))
+            self._thread.start()
 
     # def onPlayBackEnded(self):
     #     vid_playlist   = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -86,7 +89,7 @@ class Player(xbmc.Player):
 
     # def onPlayBackPaused(self):
     #     print("AV PAUSED")
-            
+
     # def onPlayBackResumed(self):
     #     print("AV RESUME")
 
