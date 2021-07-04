@@ -431,7 +431,7 @@ def play(item):
         if config.get_setting('proxies', item.channel, default=''):
             data = do_downloadpage(item, item.url)
             file_local = os.path.join(config.get_data_path(), "temp.torrent")
-            with open(file_local, 'wb') as f: f.write(data); f.close()
+            with open(file_local, 'w') as f: f.write(data); f.close()
 
             itemlist.append(item.clone( url = file_local, server = 'torrent' ))
         else:

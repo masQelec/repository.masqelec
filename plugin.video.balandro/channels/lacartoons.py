@@ -105,10 +105,6 @@ def alfabetico(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def temporadas(item):
     logger.info()
     itemlist = []

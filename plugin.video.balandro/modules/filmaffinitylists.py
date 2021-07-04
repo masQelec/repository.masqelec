@@ -259,12 +259,10 @@ def list_temas(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-
-    matches = scrapertools.find_multiple_matches(data, '<div class="movie-card movie-card-0" data-movie-id=".*?src="(.*?)".*?title="(.*?)">.*?</a>(.*?)<img')
+    patron = '<div class="movie-card.*?movie-card-0" data-movie-id=".*?src="(.*?)".*?title="(.*?)">.*?</a>[^\d+]+(\d+)[^<]+'
+    matches = scrapertools.find_multiple_matches(data, patron)
 
     for thumb, title, year in matches:
-        year = year.replace('(', '').replace(')', '').strip()
-
         if year:
             if year > str(current_year): continue
 
@@ -436,14 +434,14 @@ def list_sagas(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="movie-card movie-card-0" data-movie-id=".*?src="(.*?)".*?title="(.*?)".*?</a>(.*?)<img')
+    patron = '<div class="movie-card.*?movie-card-0" data-movie-id=".*?src="(.*?)".*?title="(.*?)">.*?</a>[^\d+]+(\d+)[^<]+'
+    matches = scrapertools.find_multiple_matches(data, patron)
 
     num_matches = len(matches)
     desde = item.page * perpage
     hasta = desde + perpage
 
     for thumb, title, year in matches[desde:hasta]:
-        year = year.replace('(', '').replace(')', '').strip()
 
         if year:
             if year > str(current_year):
@@ -559,9 +557,9 @@ def oscars_2021_categories(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
     bloque_patron = '(<div class="full-content"><div class="header" id="%s">.*?</div></div></li></ul></div></div>)' % (item.oscars_id)
     bloque = scrapertools.find_single_match(data, bloque_patron)
-    patron = '<li class="fa-shadow">(.*?)</li>'
+    patron = '<li class="(fa-shadow.*?)">(.*?)</li>'
     matches = scrapertools.find_multiple_matches(bloque, patron)
-    for match in matches:
+    for info, match in matches:
         titulo = ''
         title = scrapertools.find_single_match(match, '<a class="movie-title-link" href="[^"]+" title="([^"]+)\W+"')
         titulo += title
@@ -574,6 +572,8 @@ def oscars_2021_categories(item):
             titulo += ' - ' + nominations
         else:
             nominations = '1 nominación'
+        if 'win' in info:
+            titulo = ''.join(("[COLOR gold]", titulo, "[/COLOR]"))
         itemlist.append(item.clone( action = 'find_search', title = titulo, search_type = 'movie',
                                         name = title, contentTitle = title, infoLabels={'year': '-'} ))
         

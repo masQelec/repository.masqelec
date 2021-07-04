@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://dontorrent.one/'
+host = 'https://dontorrents.one/'
 
 
 def item_configurar_proxies(item):
@@ -19,13 +19,14 @@ def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
 
-def do_downloadpage(url, post=None):
+def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/dontorrents.org/', '/dontorrent.one/')
-    url = url.replace('/dontorrents.net/', '/dontorrent.one/')
+    url = url.replace('/dontorrents.org/', '/dontorrents.one/')
+    url = url.replace('/dontorrents.net/', '/dontorrents.one/')
+    url = url.replace('/dontorrent.one/', '/dontorrents.one/')
 
     # ~ data = httptools.downloadpage(url, post=post).data
-    data = httptools.downloadpage_proxy('dontorrents', url, post=post).data
+    data = httptools.downloadpage_proxy('dontorrents', url, post=post, headers=headers).data
     return data
 
 
@@ -334,9 +335,13 @@ def list_search(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(item.url)
+    headers = {'Referer': host}
 
-    patron = """<a href='([^']+)' class="text-decoration-none">(?:<span class="text-secondary">|)([^<]+)"""
+    data = do_downloadpage(item.url, headers=headers)
+
+    patron = "<a href='(.*?)'.*?"
+    patron += 'class="text-decoration-none">(.*?)</a>'
+
     matches = re.compile(patron).findall(data)
 
     for url, title in matches:

@@ -6,12 +6,16 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 
-host = "https://hdfull.se"
+
+host = "https://hdfull.so"
 
 perpage = 20
 
 
 def do_downloadpage(url, post = None, referer = None):
+    # ~ por si viene de enlaces guardados
+    url = url.replace('/hdfull.se', '/hdfull.so')
+
     if not referer: referer = host
     headers = {'Referer': referer}
 
@@ -33,6 +37,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = ' Buscar intérprete ...', action = 'search', group = 'star', search_type = 'person', 
                        plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
+
     itemlist.append(item.clone( title = ' Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
                        plot = 'Debe indicarse el nombre y apellido/s del director.'))
 
@@ -124,6 +129,7 @@ def list_all(item):
     if item.search_post != '' and item.search_type != 'all':
         matches = filter(lambda x: ('/movie/' in x[0] and item.search_type == 'movie') or \
                                    ('/show/' in x[0] and item.search_type == 'tvshow'), matches)
+
     num_matches = len(matches)
 
     for url, thumb, langs, title in matches[item.page * perpage:]:
@@ -335,12 +341,12 @@ def findvideos(item):
         except: 
             try:
                 calidad = str(calidad, 'utf8').upper()
-            except: calidad  = calidad.upper()                
+            except: calidad  = calidad.upper()
+
         idioma = idioma.capitalize() if idioma != 'ESPSUB' else 'Vose'
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, 
-                              language = idioma, quality = calidad, quality_num = puntuar_calidad(calidad)
-                       ))
+                              language = idioma, quality = calidad, quality_num = puntuar_calidad(calidad) ))
 
     itemlist = servertools.get_servers_itemlist(itemlist)
 

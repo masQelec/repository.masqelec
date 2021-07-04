@@ -68,7 +68,7 @@
 
         <setting type="sep"/>
         <setting id="proxies_auto" type="bool" label="Buscar proxies automáticamente (solo con el proveedor 'Todos' seleccionado)" default="true"/>
-        <setting id="proxies_provider" type="enum" values="spys.one|hidemy.name|httptunnel.ge|proxynova.com|free-proxy-list|spys.me|proxyscrape.com|proxyservers.pro|us-proxy.org|proxy-list.download|Todos|proxysource.org" label="Proveedor habitual de proxies" default="10"/>
+        <setting id="proxies_provider" type="enum" values="spys.one|hidemy.name|httptunnel.ge|proxynova.com|free-proxy-list|spys.me|proxyscrape.com|proxyservers.pro|us-proxy.org|proxy-list.download|Todos|proxysource.org|silverproxy.xyz" label="Proveedor habitual de proxies" default="10"/>
         <setting id="proxies_validos" type="bool" label="Limitar la cantidad de proxies válidos a memorizar" default="true"/>
         <setting id="proxies_limit" type="bool" label="Si se encontraron suficientes válidos dejar de buscar más proxies" default="true"/>
 
@@ -104,14 +104,17 @@
 
         <setting type="sep"/>
         <setting id="search_channels_prefered" type="action" label="Qué canales tiene marcados como preferidos" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_prefered)"/>
-        <setting id="search_only_prefered" type="bool" label="Efectuar las búsquedas solo en los canales preferidos" default="false"/>
+        <setting id="search_only_prefered" type="bool" label="Efectuar búsquedas solo en los canales preferidos" default="false"/>
 
         <setting type="sep"/>
-        <setting id="search_no_inestables" type="bool" label="Descartar en las búsquedas los canales inestables" default="false"/>
+        <setting id="search_no_torrents" type="bool" label="Descartar búsquedas en los canales que pueden contener archivos torrent" default="false"/>
+
+        <setting type="sep"/>
+        <setting id="search_no_inestables" type="bool" label="Descartar búsquedas en los canales inestables" default="false"/>
 
         <setting type="sep"/>
         <setting id="search_no_channels_with_proxies" type="action" label="Qué canales pueden usar proxies" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
-        <setting id="search_no_proxies" type="bool" label="Descartar en las búsquedas los canales con proxies informados" default="false"/>
+        <setting id="search_no_proxies" type="bool" label="Descartar búsquedas en los canales con proxies informados" default="false"/>
 
         <setting type="sep"/>
         <setting label="Opciones para el proceso de las búsquedas:" type="lsep"/>

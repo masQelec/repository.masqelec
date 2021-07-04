@@ -1,9 +1,9 @@
 {
   "id": "allpeliculas",
   "name": "AllPeliculas",
-  "thumbnail": "allpeliculas.png",
+  "thumbnail": "allpeliculas.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],

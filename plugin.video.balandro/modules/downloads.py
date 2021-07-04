@@ -336,8 +336,9 @@ def download_video(item, parent_item):
 def do_download(mediaurl, file_name, parent_item, server_item):
     from core import downloadtools
 
+    download_path = config.get_setting('downloadpath', default='')
+
     if config.get_setting('conf_ubicacion', default=True):
-        download_path = config.get_setting('downloadpath', default='')
         if download_path == '':
             download_path = filetools.join(config.get_data_path(), 'downloads')
 

@@ -377,7 +377,13 @@ def channels(item):
 
         if 'inestable' in ch['clusters']:
             titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
-
+        elif 'register' in ch['clusters']:
+            cfg_login_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_login'
+            if not config.get_setting(cfg_login_channel, default=False):
+               titulo += '[I][COLOR teal] (cuenta)[/COLOR][/I]'
+            else:
+               titulo += '[COLOR teal] (sesion)[/COLOR]'
+			
         itemlist.append(Item( channel=ch['id'], action=accion, title=titulo, context=context, text_color=color, plot = plot,
                               thumbnail=ch['thumbnail'], category=ch['name'] ))
 

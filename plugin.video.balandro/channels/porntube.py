@@ -37,10 +37,9 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por canal', action = 'canales',
                                 url = host + 'api/channel/list?filter=%7B%7D&order=rating&ssr=false&orientation=straigh' ))
 
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'api/tag/list?orientation=straight&hl=es&ssr=false' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
-    itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars',
-                                url = host + 'api/pornstar/list?filter=%7B%7D&ssr=false&orientation=straight' ))
+    itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'api/pornstar/list?filter=%7B%7D&ssr=false&orientation=straight' ))
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie' ))
 
@@ -110,8 +109,10 @@ def categorias(item):
     logger.info()
     itemlist = []
 
+    url = host + 'api/tag/list?orientation=straight&hl=es&ssr=false'
+
     headers = {'referer': host + 'tags?hl=es'}
-    data = httptools.downloadpage(item.url, headers = headers).data
+    data = httptools.downloadpage(url, headers = headers).data
 
     data = jsontools.load(data).get('tags', {}).get('_embedded', {}).get('items', [])
 

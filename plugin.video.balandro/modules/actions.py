@@ -222,12 +222,21 @@ def manto_proxies(item):
 def manto_params(item):
     logger.info()
 
-    if platformtools.dialog_yesno(config.__addon_name, "Se Eliminarán: Los 'Dominios' seleccionados en los canales, Los 'Canales Excluidos' en búsquedas, Los 'Canales Excluidos' de buscar proxies global, y se Inicializarán otros 'Parámetros' a su valor por defecto.", '[COLOR yellow]¿ Confirma Restablecer a sus valores por defecto los Parámetros Internos del addon ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, "Se quitarán: 'Logins' en canales, 'Dominios' seleccionados en los canales, 'Canales Excluidos' en búsquedas, 'Canales Excluidos' en buscar proxies global, y se Inicializarán otros 'Parámetros'.", '[COLOR yellow]¿ Confirma Restablecer a sus valores por defecto los Parámetros Internos del addon ?[/COLOR]'):
         config.set_setting('adults_password', '')
 
         config.set_setting('channel_cinecalidad_dominio', '')
+
         config.set_setting('channel_documaniatv_rua', '')
+
         config.set_setting('channel_hdfull_dominio', '')
+        config.set_setting('channel_hdfull_hdfull_login', False)
+        config.set_setting('channel_hdfull_hdfull_password', '')
+        config.set_setting('channel_hdfull_hdfull_username', '')
+
+        config.set_setting('channel_playdede_playdede_login', False)
+        config.set_setting('channel_playdede_playdede_password', '')
+        config.set_setting('channel_playdede_playdede_username', '')
 
         config.set_setting('search_excludes_movies', '')
         config.set_setting('search_excludes_tvshows', '')

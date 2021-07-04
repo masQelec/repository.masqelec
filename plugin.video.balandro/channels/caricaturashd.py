@@ -172,11 +172,6 @@ def temporadas(item):
     return sorted(itemlist, key=lambda i: i.contentSeason)
 
 
-# Si una misma url devuelve los episodios de todas las temporadas, definir rutina tracking_all_episodes para acelerar el scrap en trackingtools.
-# ~ def tracking_all_episodes(item):
-    # ~ return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -234,7 +229,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'sub': 'Vose', 'Latino': 'Lat', 'Castellano': 'Esp', 'Subtitulado': 'Vose'}
+    IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'sub': 'Vose', 'Latino': 'Lat', 'Castellano': 'Esp', 'Español': 'Esp', 'Subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
 

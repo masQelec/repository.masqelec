@@ -6,12 +6,15 @@ from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
-host = 'https://seriesflix.to/'
+host = 'https://seriesflix.nu/'
 
 perpage = 24
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    url = url.replace('/seriesflix.to/', '/seriesflix.nu/')
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data:

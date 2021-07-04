@@ -171,10 +171,6 @@ def temporadas(item):
     return itemlist
 
 
-# Si una misma url devuelve los episodios de todas las temporadas, definir rutina tracking_all_episodes para acelerar el scrap en trackingtools.
-def tracking_all_episodes(item):
-    return episodios(item)
-
 def episodios(item):
     logger.info()
     itemlist = []

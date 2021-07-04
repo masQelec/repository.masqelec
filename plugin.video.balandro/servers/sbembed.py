@@ -8,7 +8,10 @@ from lib import jsunpack
 def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
-    page_url = page_url.replace('/e/', '/v/')
+
+    page_url = page_url.replace('/e/', '/play/').replace('/d/', '/play/')
+    page_url = page_url.replace('embed-', '')
+
     data = httptools.downloadpage(page_url).data
 
     if "was not found on this server" in data:
@@ -20,4 +23,5 @@ def get_video_url(page_url, url_referer=''):
 
     for video_url in matches:
         video_urls.append(['m3u8', video_url])
+
     return video_urls

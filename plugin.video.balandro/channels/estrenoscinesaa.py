@@ -9,8 +9,7 @@ host = 'https://www.estrenoscinesaa.com/'
 
 
 def do_downloadpage(url):
-    timeout = 30 # timeout ampliado pq el primer acceso puede tardar en responder
-    data = httptools.downloadpage(url, timeout=timeout).data
+    data = httptools.downloadpage(url).data
     return data
 
 

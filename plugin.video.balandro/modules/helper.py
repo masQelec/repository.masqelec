@@ -118,8 +118,8 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='', title= 'Media Center:', text_color='pink', folder=False ))
     itemlist.append(item.clone( action='show_log', title= ' - Visualizar el fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('computer') ))
-    itemlist.append(item.clone( action='copy_log', title= ' - Obtener una copia del fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('computer') ))
-    #itemlist.append(item.clone( action='upload_pastebin', title= ' - Subir log al servidor Pastebin', folder=False, thumbnail=config.get_thumb('computer') ))
+    itemlist.append(item.clone( action='copy_log', title= ' - Obtener una copia del fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('folder') ))
+    #itemlist.append(item.clone( action='upload_pastebin', title= ' - Subir a Pastebin el fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('cloud') ))
     itemlist.append(item.clone( action='show_advs', title= ' - Visualizar el fichero advancedsettings de su Media Center', folder=False, thumbnail=config.get_thumb('keyboard') ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría sistema)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
@@ -677,6 +677,7 @@ def show_test(item):
     your_ip = ''
 
     try:
+       import re
        data = httptools.downloadpage('http://httpbin.org/ip').data
        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
        your_ip = scrapertools.find_single_match(str(data), '.*?"origin".*?"(.*?)"')

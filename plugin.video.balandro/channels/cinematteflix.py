@@ -108,6 +108,8 @@ def list_all(item):
 
         title = re.sub(r" \(.*?\)", "", title)
 
+        title = title.replace('Ver gratis', '').replace('Ver y descargar', '')
+
         title = title.lower().strip()
 
         title = title.capitalize()
@@ -202,13 +204,21 @@ def findvideos(item):
     itemlist = []
 
     if item.grupo == 'colec':
-        url = item.url
-    else:
-        data = do_downloadpage(item.url)
+        url = item.url.replace('?feature=oembed', '')
 
-        url = scrapertools.find_single_match(data, '<div class="jetpack-video-wrapper">.*?src="(.*?)"')
+        servidor = servertools.get_server_from_url(url)
 
-    if url:
+        if servidor and servidor != 'directo':
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, title = '', language = item.languages)) 
+
+        return itemlist
+
+    data = do_downloadpage(item.url)
+
+    links = scrapertools.find_multiple_matches(data, '<div class="jetpack-video-wrapper">.*?src="(.*?)"')
+    if not links: links = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
+
+    for url in links:  
         url = url.replace('?feature=oembed', '')
 
         servidor = servertools.get_server_from_url(url)

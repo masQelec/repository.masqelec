@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, re, base64
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -10,8 +10,6 @@ from core import httptools, scrapertools, servertools, tmdb, jsontools
 host = 'https://serieskao.tv/'
 
 perpage = 30
-
-IDIOMAS = {'0': 'Lat', '1': 'Esp', '2': 'Vose'}
 
 
 def mainlist(item):
@@ -69,6 +67,7 @@ def list_all(item):
 
     patron = '<article id="post-\d+" class="item ([^"]+)".*?><a href="([^"]+)"'
     patron += '.*?data-srcset="([^"]+)" class="lazyload" alt="([^"]+)".*?<p>(\d+)'
+
     matches = re.compile(patron).findall(data)
 
     num_matches = len(matches)
@@ -107,25 +106,9 @@ def list_all(item):
 
     if buscar_next:
         if itemlist:
-            patron = '<div class="pagMovidy">\s*<a href="([^"]+)'
-            next_url = scrapertools.find_single_match(data, patron)
+            next_url = scrapertools.find_single_match(data, '<div class="pagMovidy">\s*<a href="([^"]+)')
             if next_url:
-                    itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
-
-    return itemlist
-
-
-def listas(item):
-    logger.info()
-    itemlist = []
-
-    data = httptools.downloadpage(item.url).data
-    patron = '<article>.*?<a href="([^"]+)"[^<]+<h2>([^<]+)</h2><p>(.*?)</p>'
-    matches = re.compile(patron).findall(data)
-
-    for url, title, info in matches:
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, search_type = 'all', infoLabels={'plot': info} ))
-
+                itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
 
     return itemlist
 
@@ -140,8 +123,8 @@ def generos(item):
         url_generos = host + 'series/'
 
     data = httptools.downloadpage(url_generos).data
-    patron = '<li class="cfilter" data-type="genre" data-value="([^"]+)">.*?<b>([^<]+)'
-    matches = re.compile(patron).findall(data)
+
+    matches = re.compile('<li class="cfilter" data-type="genre" data-value="([^"]+)">.*?<b>([^<]+)').findall(data)
 
     url_generos = url_generos  + "/filtro/?genre="
 
@@ -180,11 +163,8 @@ def temporadas(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    # ~ if developer == True: logger.debug(data)
 
-    patron = '<div class="clickSeason[^"]+" data-season="(\d+)"'
-
-    temporadas = re.compile(patron, re.DOTALL).findall(data)
+    temporadas = re.compile('<div class="clickSeason[^"]+" data-season="(\d+)"', re.DOTALL).findall(data)
 
     for tempo in temporadas:
         title = 'Temporada ' + tempo
@@ -212,13 +192,14 @@ def episodios(item):
     perpage = 50
 
     data = httptools.downloadpage(item.url).data
-    # ~ if developer == True: logger.debug(data)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = scrapertools.find_single_match(data, "<div class='se-c' data-season='%d'(.*?)<\/div><\/div>" % (item.contentSeason))
+
     patron = "<a href='([^']+)'><div class='imagen'>"
     patron += "<img src='([^']+)'><\/div>.*?<div class='epst'>([^<]+)"
     patron += "<\/div><div class='numerando'>([^<]+)"
+
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, thumb, titulo, name in matches[item.page * perpage:]:
@@ -239,7 +220,7 @@ def episodios(item):
     if len(matches) > ((item.page + 1) * perpage):
         itemlist.append(item.clone( title=">> Página siguiente", action="episodios", page=item.page + 1, text_color='coral' ))
 
-    return sorted(itemlist, key=lambda x: x.contentEpisodeNumber)
+    return itemlist
 
 
 def last_episodes(item):
@@ -250,11 +231,11 @@ def last_episodes(item):
     perpage = 50
 
     data = httptools.downloadpage(item.url).data
-    # ~ if developer == True: logger.debug(data)
 
     patron = '<article class="item se episodes" id="post-\d+" data-id="\d+">'
     patron += '<a href="([^"]+)"><div class="poster"><img src="[^"]+" data-srcset="([^"]+)" class="lazyload" alt="([^"]+)"'
     patron += '><div class="data"><h3><span>(\d+)\s*-\s*(\d+)</span>\s*([^<]+)'
+
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     num_matches = len(matches)
@@ -278,10 +259,9 @@ def last_episodes(item):
 
     if buscar_next:
         if itemlist:
-            patron = '<div class="pagMovidy">\s*<a href="([^"]+)'
-            next_url = scrapertools.find_single_match(data, patron)
+            next_url = scrapertools.find_single_match(data, '<div class="pagMovidy">\s*<a href="([^"]+)')
             if next_url:
-                    itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, action = 'last_episodes', page = 0, text_color = 'coral' ))
+                itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, action = 'last_episodes', page = 0, text_color = 'coral' ))
 
     return itemlist
 
@@ -290,54 +270,119 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    IDIOMAS = {'0': 'Lat', '1': 'Esp', '2': 'Vose'}
+
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-    # ~ if developer == True: logger.debug(data)
 
     items_patron = "<li class=\"dooplay_player_option\" data-type='([^']+)' data-post='(\d+)' data-nume='(\d+)'"
     items_matches = re.compile(items_patron, re.DOTALL).findall(data)
+
     for datatype, datapost, datanume in items_matches:
         if not datatype or not datapost or not datanume: continue
 
         post = {'action': 'doo_player_ajax', 'post': datapost, 'nume': datanume, 'type': datatype}
         data = httptools.downloadpage("%swp-admin/admin-ajax.php" % host, post = post, headers = {'Referer': item.url}).data
+
         url = scrapertools.find_single_match(data, "src='([^']+)")
+        if not url: url = scrapertools.find_single_match(data, 'src="(.*?)"')
         if not url: continue
 
         serversdata = httptools.downloadpage(url, headers = {"referer": item.url}).data
         if not serversdata: continue
 
-        patron = r'data-lang="(\d+)"\s*data-r="([^"]+)"'
-        matches = re.compile(patron).findall(serversdata)
+        matches = re.compile(r'data-lang="(\d+)"\s*data-r="([^"]+)"').findall(serversdata)
+
+        if not matches:
+            if '/hqq.' in url or '/waaw.' in url: url = ''
+
+            if url:
+                other = ''
+                if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaodrive/embed.php' in url: other = 'amazon'
+                elif 'hydrax.com' in url: other = 'hydrax'
+                elif '.xyz/v/' in url: other = 'fembed'
+
+                if other == '':
+                    other = servertools.get_server_from_url(url)
+                    other = servertools.corregir_servidor(other)
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = url, other = other.capitalize() ))
+                return itemlist
 
         for lang, b64url in matches:
             url = base64.b64decode(b64url)
             if isinstance(url, bytes):
                 url = url.decode('utf-8')
 
-            if 'kplayer.animekao.club/embed' in url:
-                from lib import jsunpack
-                sdata = httptools.downloadpage(url).data
-                d = scrapertools.find_single_match(sdata, '(?s)<script type="text\/javascript">(eval.*?)<\/script>')
-                pack = jsunpack.unpack(d)
+            if '/hqq.' in url or '/waaw.' in url: url = ''
 
-                file = scrapertools.find_single_match(pack, '"file":"([^"]+)"')
-                urlserver = 'https://kplayer.animekao.club/' + file
+            if url:
+                other = ''
+                if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaodrive/embed.php' in url: other = 'amazon'
+                elif 'hydrax.com' in url: other = 'hydrax'
+                elif '.xyz/v/' in url: other = 'fembed'
 
-                url = file
+                if other == '':
+                    other = servertools.get_server_from_url(url)
+                    other = servertools.corregir_servidor(other)
 
-                if not 'https://' in file:
-                    try:
-                       url = httptools.downloadpage(urlserver, follow_redirects=False).headers['location']
-                    except:
-                       pass
+                itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = url,
+                                      language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
 
-            if '/hqq.' in url or '/waaw.' in url: continue
+    return itemlist
 
-            servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if '.animekao.club/embed' in url:
+        from lib import jsunpack
+        sdata = httptools.downloadpage(url).data
+
+        d = scrapertools.find_single_match(sdata, '(?s)<script type="text\/javascript">(eval.*?)<\/script>')
+        pack = jsunpack.unpack(d)
+
+        file = scrapertools.find_single_match(pack, '"file":"([^"]+)"')
+        urlserver = 'https://kplayer.animekao.club/' + file
+
+        url = file
+
+        if not 'https://' in file:
+            try:
+               url = httptools.downloadpage(urlserver, follow_redirects=False).headers['location']
+            except:
+               pass
+
+    elif 'kaodrive/embed.php' in url:
+         data = httptools.downloadpage(url).data
+         shareId = scrapertools.find_single_match(data, 'var shareId = "([^"]+)')
+         url = 'https://www.amazon.com/drive/v1/shares/%s?resourceVersion=V2&ContentType=JSON&asset=ALL' %(shareId)
+
+    elif 'hydrax.com' in url:
+         slug = url.split('v=')[1]
+         post = "slug=%s&dataType=mp4" % slug
+         try:
+            data = httptools.downloadpage("https://ping.iamcdn.net/", post=post).data
+         except:
+            url = ''
+
+    elif '.xyz/v/' in url:
+         url = url.replace('serieskao.xyz/v/', 'femax20.com/v/').replace('animekao.xyz/v/', 'femax20.com/v/').replace('sypl.xyz/v/', 'femax20.com/v/')
+         if '#' in url:
+             url = url.split('#')[0]
+
+    if '/hqq.' in url or '/waaw.' in url: url = ''
+
+    if url:
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+        itemlist.append(item.clone(url = url, server = servidor))
+
     return itemlist
 
 

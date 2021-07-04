@@ -148,7 +148,7 @@ def list_all(item):
             if len(itemlist) >= perpage: break          
 
     else:
- 
+
         data = do_downloadpage(host + "controllers/load-more.php", post="i=%s&c=%s&u=%s" % (item.page, perpage, '/' + item.url.replace(host, '')))
         data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
         matches = re.compile('<img src="([^"]+)" alt="([^"]+)".*?a href="([^"]+)"').findall(data)
@@ -225,7 +225,7 @@ def list_last(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > perpage: # subpaginación interna dentro de la página si hay demasiados items
+    if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
             itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='list_last', text_color='coral' ))
@@ -233,17 +233,24 @@ def list_last(item):
     return itemlist
 
 
-def temporadas (item):
+def temporadas(item):
     logger.info()
     itemlist = []
 
     if not item.url.startswith("http"): item.url = host[:-1] + item.url
+
     data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, r"onClick='modCap\((\d+)\)'>\s*([^<]+)")
 
+    i = 0
+
     for id, title in matches:
-        itemlist.append(item.clone( action='findvideos', title=title, contentType='episode', episodeId=id ))
+        i += 1
+
+        itemlist.append(item.clone( action='findvideos', title=title, episodeId=id,
+                                    contentType='episode', contentSeason = 1, contentEpisodeNumber = i ))
+
     return itemlist    
 
 

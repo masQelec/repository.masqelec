@@ -1,9 +1,9 @@
 {
   "id": "seriesflv",
   "name": "SeriesFlv",
-  "thumbnail": "seriesflv.png",
+  "thumbnail": "seriesflv.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],

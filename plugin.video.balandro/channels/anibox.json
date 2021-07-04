@@ -1,7 +1,7 @@
 {
   "id": "anibox",
   "name": "AniBox",
-  "thumbnail": "anibox.png",
+  "thumbnail": "anibox.jpg",
 
   "active": true,
 
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["lat", "cast", "vose"],
 
-  "clusters": ["news", "rankings", "years", "lists", "kids", "docs", "vos", "anime"],
+  "clusters": ["news", "rankings", "years", "kids", "vos", "anime"],
 
   "notes": "Web dedicada exclusivamente al anime"
 }

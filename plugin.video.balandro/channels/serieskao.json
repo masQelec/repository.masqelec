@@ -1,7 +1,7 @@
 {
   "id": "serieskao",
   "name": "SeriesKao",
-  "thumbnail": "serieskao.png",
+  "thumbnail": "serieskao.jpg",
 
   "active": true,
 
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["lat", "cast", "vose"],
 
-  "clusters": ["news", "rankings", "years", "lists", "kids", "docs", "vos", "anime"],
+  "clusters": ["news", "rankings", "years", "kids", "docs", "vos", "anime"],
 
   "notes": "Películas y series, por género, últimos etc."
 }

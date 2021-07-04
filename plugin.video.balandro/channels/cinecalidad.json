@@ -3,7 +3,7 @@
   "name": "CineCalidad",
   "thumbnail": "cinecalidad.png",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],

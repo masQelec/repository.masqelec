@@ -127,6 +127,7 @@ def do_search(item, tecleado):
     num_canales = float(len(ch_list)) # float para calcular porcentaje
 
     only_prefered = config.get_setting('search_only_prefered', default=False)
+    no_torrents = config.get_setting('search_no_torrents', default=False)
     no_inestables = config.get_setting('search_no_inestables', default=False)
     no_proxies = config.get_setting('search_no_proxies', default=False)
 
@@ -152,6 +153,10 @@ def do_search(item, tecleado):
         progreso.update(perc, 'Analizar %s  en el canal %s ' % (tecleado, ch['name']))
 
         c_item = Item( channel=ch['id'], action='search', search_type=item.search_type, title='Buscar en '+ch['name'], thumbnail=ch['thumbnail'] )
+
+        if no_torrents:
+            if 'torrents' in ch['clusters']:
+                continue
 
         if no_inestables:
             if 'inestable' in ch['clusters']:
@@ -261,9 +266,13 @@ def do_search(item, tecleado):
 
                     titulo = '%s [COLOR plum]No se ha buscado' % ch['name']
 
+                    if no_torrents:
+                        if 'torrents' in ch['clusters']:
+                            continue
+
                     if no_inestables:
-                     if 'inestable' in ch['clusters']:
-                         continue
+                        if 'inestable' in ch['clusters']:
+                            continue
 
                     if no_proxies:
                         if 'proxies' in ch['notes'].lower():

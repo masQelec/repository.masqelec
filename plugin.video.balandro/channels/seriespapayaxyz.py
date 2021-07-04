@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+if sys.version_info[0] < 3:
+    PY3 = False
+else:
+    PY3 = True
+
+	
 import re
 
 from platformcode import config, logger, platformtools
@@ -8,6 +16,11 @@ from core import httptools, scrapertools, servertools, tmdb
 
 
 host = "https://seriespapaya.xyz/"
+
+
+notification_d_ok = config.get_setting('notification_d_ok', default=True)
+
+color_alert = config.get_setting('notification_alert_color', default='red')
 
 
 # ~ def item_configurar_proxies(item):
@@ -22,7 +35,6 @@ host = "https://seriespapaya.xyz/"
 
 def do_downloadpage(url, post=None, headers=None):
     headers = {'Referer': host}
-
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
     # ~ data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers, follow_redirects=follow_redirects).data
@@ -269,6 +281,13 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
+    if not PY3:
+        if not data:
+            if notification_d_ok:
+                platformtools.dialog_ok(config.__addon_name, '[COLOR yellow]Probable incompatibilidad con la versión de su Media Center.[/COLOR]', 'El canal no da respuesta a las temporadas en esta serie.')
+            else:
+                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Media Center Incompatible[/COLOR][/B]' % color_alert)
+
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, '<div class="Title AA-Season.*?data-tab="(.*?)">(.*?)<i class(.*?)</tbody>')
@@ -297,11 +316,6 @@ def temporadas(item):
     return itemlist
 
 
-# Si una misma url devuelve los episodios de todas las temporadas, definir rutina tracking_all_episodes para acelerar el scrap en trackingtools.
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -314,9 +328,18 @@ def episodios(item):
     item.url = item.url.replace('&#038;', '&')
 
     if not item.page: item.page = 0
+
     perpage = 50
 
     data = do_downloadpage(item.url)
+
+    if not PY3:
+        if not data:
+            if notification_d_ok:
+                platformtools.dialog_ok(config.__addon_name, '[COLOR yellow]Probable incompatibilidad con la versión de su Media Center.[/COLOR]', 'El canal no da respuesta a los episodios de la temporada dn esta serie.')
+            else:
+                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Media Center Incompatible[/COLOR][/B]' % color_alert)
+
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<div class="Title AA-Season.*?data-tab="%s">.*?<tbody>(.*?)</tbody>' % str(item.contentSeason))
@@ -361,6 +384,13 @@ def findvideos(item):
     item.url = item.url.replace('&#038;', '&')
 
     data = do_downloadpage(item.url)
+
+    if not PY3:
+        if not data:
+            if notification_d_ok:
+                platformtools.dialog_ok(config.__addon_name, '[COLOR yellow]Probable incompatibilidad con la versión de su Media Center.[/COLOR]', 'El canal no da respuesta a los enlaces de reproducción.')
+            else:
+                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Media Center Incompatible[/COLOR][/B]' % color_alert)
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 

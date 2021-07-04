@@ -36,7 +36,7 @@ def extract_sources(data):
     video_urls = []
 
     bloque = scrapertools.find_single_match(data, 'sources: \[(.*?\})\]')
-    
+
     matches = scrapertools.find_multiple_matches(bloque, '\{(.*?)\}')
     for vid in matches:
         url = scrapertools.find_single_match(vid, 'src:\s*"([^"]+)')
@@ -47,7 +47,10 @@ def extract_sources(data):
         if url.endswith('.m3u8'):
             aux = httptools.downloadpage(url).data
             # ~ logger.debug(aux)
-            
+
+            if len(aux) == 0:
+                return video_urls
+
             matches2 = scrapertools.find_multiple_matches(aux, 'RESOLUTION=\d+x(\d+).*?(http.*?\.m3u8)')
             if matches2:
                 for res2, url2 in sorted(matches2, key=lambda x: int(x[0])):

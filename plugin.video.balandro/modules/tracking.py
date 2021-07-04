@@ -15,7 +15,6 @@ color_adver = config.get_setting('notification_adver_color', default='violet')
 color_avis  = config.get_setting('notification_avis_color', default='yellow')
 color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
-
 # Helpers
 
 def valor_infolabel(valor, infoLabels):
@@ -47,22 +46,29 @@ def addFavourite(item):
     # Si no está definido tmdb_id seleccionar
     if item.contentType in ['movie', 'tvshow'] and not item.infoLabels['tmdb_id']:
         tipo = 'película' if item.contentType == 'movie' else 'serie'
-        platformtools.dialog_ok(config.__addon_name, 'La %s no está identificada en TMDB.' % tipo, 'Si hay varias opciones posibles escoge una de ellas y sino cambia el texto de búsqueda.')
+        platformtools.dialog_ok(config.__addon_name, 'La %s no está identificada en TMDB.' % tipo, '[COLOR yellow]Si hay varias opciones posibles escoge una de ellas y sino cambia el texto de búsqueda.[/COLOR]')
         from core import tmdb
         ret = tmdb.dialog_find_and_set_infoLabels(item)
-        if not ret: return False # Se ha cancelado
+        if not ret:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Proceso cancelado[/COLOR][/B]' % color_adver)
+            return False
 
     # Si está activada la confirmación de tmdb_id
     elif config.get_setting('tracking_confirm_tmdbid', default=False):
         if item.contentType in ['movie', 'tvshow']:
             from core import tmdb
             ret = tmdb.dialog_find_and_set_infoLabels(item)
-            if not ret: return False # Se ha cancelado
+            if not ret:
+                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Proceso cancelado[/COLOR][/B]' % color_adver)
+                return False
         else: # para temporadas/episodios no perder season/episode
             it_ant = item.clone()
             from core import tmdb
             ret = tmdb.dialog_find_and_set_infoLabels(item)
-            if not ret: return False # Se ha cancelado
+            if not ret:
+                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Proceso cancelado[/COLOR][/B]' % color_adver)
+                return False
+
             item.contentType = it_ant.contentType
             item.contentSeason = it_ant.contentSeason
             if it_ant.contentEpisodeNumber: item.contentEpisodeNumber = it_ant.contentEpisodeNumber
@@ -370,7 +376,7 @@ def findvideos(item):
         ret = 0
 
     else:
-        # TODO? canal preferente preseleccionado u ordenar por updated o último usado ?
+        # canal preferente preseleccionado u ordenar por updated o último usado ?
         ret = platformtools.dialog_select('¿ De qué canal quieres los enlaces ?', opciones, useDetails=True)
         if ret == -1: 
             return None # pedido cancel
@@ -502,7 +508,7 @@ def acciones_peli(item):
 
         if len(opciones) == 0:
             db.close()
-            platformtools.dialog_ok(config.__addon_name, 'No hay otras listas dónde mover el enlace.', 'Puedes crearlas desde el menú Gestionar listas.')
+            platformtools.dialog_ok(config.__addon_name, 'No hay otras listas dónde mover el enlace.', '[COLOR yellow]Puedes crearlas desde el menú Gestionar listas.[/COLOR]')
             return False
 
         ret2 = platformtools.dialog_select('Seleccionar lista destino', opciones)
@@ -551,7 +557,7 @@ def acciones_serie(item):
     acciones.append('Buscar ahora nuevos episodios')
     acciones.append('Actualizar datos desde TMDB (themoviedb.org)')
     acciones.append('Actualizar datos desde TVDB (thetvdb.com)')
-    # TODO? 'Vista/No vista' => bucle para todas las temporadas/episodios y marcarlos en bd_kodi_files !? De momento por temporada.
+    # 'Vista/No vista' => bucle para todas las temporadas/episodios y marcarlos en bd_kodi_files !? De momento por temporada.
 
     # Diferentes canales con enlaces ya sea en serie, temporadas o episodios
     sql = 'SELECT DISTINCT channel FROM ('
@@ -715,7 +721,7 @@ def acciones_serie(item):
 
         if len(opciones) == 0:
             db.close()
-            platformtools.dialog_ok(config.__addon_name, 'No hay otras listas dónde mover el enlace.', 'Puedes crearlas desde el menú Gestionar listas.')
+            platformtools.dialog_ok(config.__addon_name, 'No hay otras listas dónde mover el enlace.', '[COLOR yellow]Puedes crearlas desde el menú Gestionar listas.[/COLOR]')
             return False
 
         ret2 = platformtools.dialog_select('Seleccionar lista destino', opciones)
@@ -902,7 +908,7 @@ def copiar_lista(item):
         platformtools.dialog_ok(config.__addon_name, 'Ya existe una lista con este nombre, se le añade un sufijo para diferenciarla.', lista_origen)
 
     if not filetools.copy(origen, destino, silent=False):
-        platformtools.dialog_ok(config.__addon_name, 'Error, no se ha podido copiar la lista!', origen, destino)
+        platformtools.dialog_ok(config.__addon_name, 'Error, no se ha podido copiar la lista', origen, destino)
         return False
 
     platformtools.itemlist_refresh()
@@ -992,7 +998,7 @@ def renombrar_lista(item):
 
     # Rename del fichero
     if not filetools.rename(fullfilename_current, filename):
-        platformtools.dialog_ok(config.__addon_name, 'Error, no se ha podido renombrar la lista!', filename)
+        platformtools.dialog_ok(config.__addon_name, 'Error, no se pudo renombrar la lista!', filename)
         return False
 
     # Update settings si es la lista activa
@@ -1008,11 +1014,11 @@ def eliminar_lista(item):
 
     fullfilename = filetools.join(trackingtools.get_tracking_path(), item.lista)
     if not filetools.exists(fullfilename):
-        platformtools.dialog_ok(config.__addon_name, 'Error, no se encuentra la lista!', item.lista)
+        platformtools.dialog_ok(config.__addon_name, 'Error, no se encuentra la lista', item.lista)
         return False
 
     if item.lista.replace('.sqlite', '') == trackingtools.get_current_dbname():
-        platformtools.dialog_ok(config.__addon_name, 'La lista activa no se puede eliminar!', item.lista)
+        platformtools.dialog_ok(config.__addon_name, 'La lista activa no se puede eliminar', item.lista)
         return False
 
     if not platformtools.dialog_yesno('Eliminar lista', '¿Estás seguro de querer borrar la lista %s ?' % item.lista): return False
@@ -1027,7 +1033,7 @@ def informacion_lista(item):
 
     fullfilename = filetools.join(trackingtools.get_tracking_path(), item.lista)
     if not filetools.exists(fullfilename):
-        platformtools.dialog_ok(config.__addon_name, 'Error, no se encuentra la lista!', item.lista)
+        platformtools.dialog_ok(config.__addon_name, 'Error, no se encuentra la lista', item.lista)
         return False
 
     db = trackingtools.TrackingData(item.lista)

@@ -1,7 +1,7 @@
 {
   "id": "animefenix",
   "name": "AnimeFenix",
-  "thumbnail": "animefenix.png",
+  "thumbnail": "animefenix.jpg",
 
   "active": true,
 
@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["anime", "categories"],
+  "clusters": ["anime", "lasts", "years", "categories", "vos"],
 
   "notes": "Web dedicada exclusivamente al anime"
 }

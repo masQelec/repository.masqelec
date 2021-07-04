@@ -353,6 +353,8 @@ def episodios(item):
 
     matches = scrapertools.find_multiple_matches(bloque, "<a href='([^']+)'>(.*?)<")
 
+    i = 0
+
     for url, title in matches:
         if not url.startswith('/'): url = '/' + url
         url = url.replace('&amp;', '&')
@@ -360,7 +362,10 @@ def episodios(item):
 
         if item.grupo == 'selecc': title = title + '  ' + item.title
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title ))
+        i += 1
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = title,
+                                    contentType='episode', contentSeason = 1, contentEpisodeNumber = i ))
 
     return itemlist
 

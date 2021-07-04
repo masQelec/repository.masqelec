@@ -145,7 +145,7 @@ class TrackingData:
             title = infolabels['title']
         aired = date_for_db(infolabels['release_date'])
         self.cur.execute('INSERT OR REPLACE INTO movies (tmdb_id, infolabels, updated, title, aired) VALUES (?, ?, ?, ?, ?)',
-                                  (tmdb_id, base64.b64encode(jsontools.dump(infolabels).encode("utf-8")), datetime.now(), title, aired ))
+                                  (tmdb_id, base64.b64encode(jsontools.dump(infolabels).encode('utf-8')) if PY3 else base64.b64encode(jsontools.dump(infolabels)), datetime.now(), title, aired ))
         if commit: self.conn.commit()
 
     def delete_movie(self, tmdb_id='', commit=False):
@@ -213,7 +213,7 @@ class TrackingData:
             title = infolabels['title']
         aired = date_for_db(infolabels['aired'])
         self.cur.execute('INSERT OR REPLACE INTO shows (tmdb_id, infolabels, updated, title, aired) VALUES (?, ?, ?, ?, ?)',
-                                  (tmdb_id, base64.b64encode(jsontools.dump(infolabels).encode("utf-8")), datetime.now(), title, aired ))
+                                  (tmdb_id, base64.b64encode(jsontools.dump(infolabels).encode('utf-8')) if PY3 else base64.b64encode(jsontools.dump(infolabels)), datetime.now(), title, aired ))
         if commit: self.conn.commit()
 
     def delete_show(self, tmdb_id='', commit=False):
@@ -283,7 +283,7 @@ class TrackingData:
 
     def save_season(self, tmdb_id='', season=0, infolabels='', commit=False):
         self.cur.execute('INSERT OR REPLACE INTO seasons (tmdb_id, season, infolabels, updated) VALUES (?, ?, ?, ?)',
-                                  (tmdb_id, int(season), base64.b64encode(jsontools.dump(infolabels).encode('utf-8')), datetime.now() ))
+                                  (tmdb_id, int(season), base64.b64encode(jsontools.dump(infolabels).encode('utf-8')) if PY3 else base64.b64encode(jsontools.dump(infolabels)), datetime.now() ))
         if commit: self.conn.commit()
 
     def delete_season(self, tmdb_id='', season=0, commit=False):
@@ -346,7 +346,7 @@ class TrackingData:
     def save_episode(self, tmdb_id='', season=0, episode=0, infolabels='', commit=False):
         aired = date_for_db(infolabels['aired'])
         self.cur.execute('INSERT OR REPLACE INTO episodes (tmdb_id, season, episode, infolabels, updated, aired) VALUES (?, ?, ?, ?, ?, ?)',
-                                  (tmdb_id, int(season), int(episode), base64.b64encode(jsontools.dump(infolabels).encode("utf-8")), datetime.now(), aired ))
+                                  (tmdb_id, int(season), int(episode), base64.b64encode(jsontools.dump(infolabels).encode('utf-8')) if PY3 else base64.b64encode(jsontools.dump(infolabels)), datetime.now(), aired ))
         if commit: self.conn.commit()
 
     def delete_episode(self, tmdb_id='', season=0, episode=0, commit=False):
