@@ -83,7 +83,7 @@ class BaseLanguage(object):
     QUALITY_BEST                = 32043
     HTTP_TIMEOUT                = 32044
     HTTP_RETRIES                = 32045
-    CHUNKSIZE                   = 32046
+    CHUNK_SIZE                  = 32046
     WV_LATEST                   = 32047
     QUALITY_SKIP                = 32048
     NO_AUTOPLAY_FOUND           = 32049
@@ -157,6 +157,12 @@ class BaseLanguage(object):
     RENAME_BOOKMARK             = 32117
     XZ_ERROR                    = 32118
     INSTALLING_APT_IA           = 32119
+    FOLDERS_FOR_SHOW_SERIES     = 32120
+    IA_TESTING_NOT_AVAILABLE    = 32121
+    WV_REVOKED                  = 32122
+    WV_REVOKED_CONFIRM          = 32123
+    WV_FAILED                   = 32124
+    IA_TVOS_ERROR               = 32125
 
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)

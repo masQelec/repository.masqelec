@@ -15,11 +15,20 @@ from threading import Thread
 from core import httptools, scrapertools
 from platformcode import config, logger, platformtools
 
+
+color_alert = config.get_setting('notification_alert_color', default='red')
+color_infor = config.get_setting('notification_infor_color', default='pink')
+color_adver = config.get_setting('notification_adver_color', default='violet')
+color_avis  = config.get_setting('notification_avis_color', default='yellow')
+color_exec  = config.get_setting('notification_exec_color', default='cyan')
+
+
 default_provider = 'proxyscrape.com'
 all_providers = 'All-providers'
 private_list = 'lista_proxies.txt'
 
-opciones_provider = ['spys.me',
+opciones_provider = [
+        'spys.me',
         'hidemy.name',
         'httptunnel.ge',
         'proxynova.com',
@@ -27,13 +36,15 @@ opciones_provider = ['spys.me',
         'spys.one',
         default_provider,
         'proxyservers.pro',
-        'proxy-list.download',
         'us-proxy.org',
+        'proxy-list.download',
         all_providers,
-        private_list]
+        'proxysource.org',
+        private_list
+        ]
 
 opciones_tipo = ['Cualquier tipo', 'Elite', 'Anonymous', 'Transparent']
-opciones_pais = ['Cualquier país', 'ES', 'US', 'FR', 'DE', 'CZ', 'IT', 'CH', 'NL', 'MX', 'RU', 'HK', 'SG'] #TODO completar
+opciones_pais = ['Cualquier país', 'ES', 'US', 'FR', 'DE', 'CZ', 'IT', 'CH', 'NL', 'MX', 'RU', 'HK', 'SG']
 
 proxies_auto = config.get_setting('proxies_auto', default=True)
 proxies_limit = config.get_setting('proxies_limit', default=True)
@@ -56,11 +67,9 @@ if not proxies_list:
 
 # Parámetros proxytools_ específicos del canal
 def get_settings_proxytools(canal):
+    logger.info()
+
     provider = config.get_setting('proxytools_provider', canal, default=default_provider)
-    if proxies_auto:
-        if not proxies_todos:
-            provider_fijo = opciones_provider[proxies_provider]
-            provider = provider_fijo
 
     tipo_proxy = config.get_setting('proxytools_tipo', canal, default='')
     pais_proxy = config.get_setting('proxytools_pais', canal, default='')
@@ -78,39 +87,66 @@ def get_settings_proxytools(canal):
 def configurar_proxies_canal(canal, url):
     logger.info()
 
+    procesar = False
+
+    proxies_iniciales = config.get_setting('proxies', canal, default='').strip()
+
     if proxies_auto:
         proxies_actuales = config.get_setting('proxies', canal, default='').strip()
 
+        procesar = True
+
         if proxies_todos:
-            provider_auto = all_providers
-            proxies_nuevos = ''
+            if proxies_actuales:
+                if not platformtools.dialog_yesno(config.__addon_name, 'Actualmente existen proxies memorizados en el canal [COLOR yellow]' + canal.capitalize() + '[/COLOR]', '¿ Desea iniciar una nueva búsqueda de proxies en todos los proveedores ?'):
+                    procesar = False
 
-            _buscar_proxies(canal, url, provider_auto)
-            config.set_setting('proxytools_provider', provider_auto, canal)
+            if procesar:
+                provider_auto = all_providers
+                proxies_nuevos = ''
 
-            proxies_encontrados = config.get_setting('proxies', canal, default='').strip()
+                _buscar_proxies(canal, url, provider_auto, procesar)
+                config.set_setting('proxytools_provider', provider_auto, canal)
 
-            if proxies_nuevos: proxies_nuevos = proxies_nuevos + ', '
-            proxies_nuevos = proxies_nuevos + proxies_encontrados
+                proxies_encontrados = config.get_setting('proxies', canal, default='').strip()
 
-            if proxies_nuevos:
-                cuantos_proxies(canal, provider_auto, proxies_nuevos)
-            else:
-                sin_news_proxies(provider_auto, proxies_actuales)
+                if proxies_nuevos: proxies_nuevos = proxies_nuevos + ', '
+                proxies_nuevos = proxies_nuevos + proxies_encontrados
+
+                if proxies_nuevos:
+                    cuantos_proxies(canal, provider_auto, proxies_nuevos, procesar)
+                else:
+                    sin_news_proxies(provider_auto, proxies_actuales, procesar)
 
         else:
             provider_fijo = opciones_provider[proxies_provider]
+            if not proxies_list:
+                if provider_fijo > 0 and provider_fijo < 12:
+                     provider_fijo = opciones_provider[proxies_provider - 1]
 
-            if _buscar_proxies(canal, url, provider_fijo):
-                config.set_setting('proxytools_provider', provider_fijo, canal)
+            if proxies_actuales:
+                if not platformtools.dialog_yesno(config.__addon_name, 'Actualmente existen proxies memorizados en el canal [COLOR yellow]' + canal.capitalize() + '[/COLOR]', '¿ Desea iniciar una nueva búsqueda de proxies con el proveedor configurado en los Ajustes categoria proxies ? ' + '[COLOR red][B] ' + provider_fijo.capitalize() + '[/COLOR][/B]' ):
+                    procesar = False
 
-                proxies_nuevos = config.get_setting('proxies', canal, default='').strip()
+            if procesar:
+                 if _buscar_proxies(canal, url, provider_fijo, procesar):
+                     config.set_setting('proxytools_provider', provider_fijo, canal)
 
-                cuantos_proxies(canal, provider_fijo, proxies_nuevos)
-            else:
-                sin_news_proxies(provider_fijo, proxies_actuales)
+                     proxies_nuevos = config.get_setting('proxies', canal, default='').strip()
 
-    # Aunque venga por automático y haya localizado nuevos proxies, hay que entrar por si se modifican o se quitan, o pq no van bien
+                     if proxies_nuevos:
+                         cuantos_proxies(canal, provider_fijo, proxies_nuevos, procesar)
+                     else:
+                         sin_news_proxies(provider_fijo, proxies_actuales, procesar)
+
+    # Aunque venga por automático y haya localizado nuevos proxies, hay que entrar por si se modifican o se quitan,
+    # o pq no van bien  excepto que inicialmente el canal no tuviera proxies memorizados
+
+    if not proxies_iniciales:
+        proxies = config.get_setting('proxies', canal, default='').strip()
+        if proxies: return True
+
+
     while True:
         proxies = config.get_setting('proxies', canal, default='').strip()
 
@@ -126,20 +162,20 @@ def configurar_proxies_canal(canal, url):
         acciones = []
 
         lbl = proxies if proxies else '(sin proxies)'
-        if lbl == '(sin proxies)': texto = 'Informar proxies manualmente'
-        else: texto = 'Modificar proxies manualmente'
+        if lbl == '(sin proxies)': texto = '[COLOR plum]Informar proxies manualmente[/COLOR]'
+        else: texto = '[COLOR plum]Modificar proxies manualmente[/COLOR]'
 
         acciones.append(platformtools.listitem_to_select(texto, lbl, ''))
-        acciones.append(platformtools.listitem_to_select('[COLOR moccasin]Buscar nuevos proxies[/COLOR]', 'Buscar con parámetros actuales (Guardará los mejores)'))
+        acciones.append(platformtools.listitem_to_select('[COLOR yellow]Buscar nuevos proxies[/COLOR]', 'Buscar con parámetros actuales (Guardará los mejores)'))
         acciones.append(platformtools.listitem_to_select('[COLOR cyan]Parámetros búsquedas[/COLOR] proveedor, tipo, país, ...', '%s, %s, %s, %d' % (provider, tipo_proxy, pais_proxy, max_proxies), ''))
 
         if proxies:
             acciones.append(platformtools.listitem_to_select('[COLOR red]Quitar proxies[/COLOR]', 'Suprimir proxies actuales para probar el canal sin ellos'))
 
-        acciones.append(platformtools.listitem_to_select('[COLOR blue]Configuración[/COLOR]', '[COLOR mediumaquamarine]Si la modifica debe abandonar por cancelar[/COLOR]'))
+        acciones.append(platformtools.listitem_to_select('[COLOR yellowgreen]Ajustes categoría proxies[/COLOR]', '[COLOR mediumaquamarine]Si la modifica debe abandonar por cancelar[/COLOR]'))
 
         if proxies_help:
-            acciones.append(platformtools.listitem_to_select('Ayuda', 'Informacion sobre la gestión de proxies'))
+            acciones.append(platformtools.listitem_to_select('[COLOR green]Ayuda[/COLOR]', 'Informacion sobre la gestión de proxies'))
 
         ret = platformtools.dialog_select('Configuración proxies para %s' % canal.capitalize(), acciones, useDetails=True)
 
@@ -164,11 +200,19 @@ def configurar_proxies_canal(canal, url):
             elif provider == all_providers: search_provider = False
 
             if not search_provider:
-                if platformtools.dialog_yesno(config.__addon_name, '¿ Desea iniciar la búsqueda de proxies en todos los proveedores ?'):
+                if not procesar:
+                    provider, tipo_proxy, pais_proxy, max_proxies = get_settings_proxytools(canal)
+
+                    if not provider == all_providers:
+                        search_provider = True
+
+            if not search_provider:
+                if platformtools.dialog_yesno(config.__addon_name, '¿ Desea iniciar la búsqueda de proxies en todos los proveedores ?', 'en el Canal [COLOR yellow]' + canal.capitalize() + '[/COLOR]'):
                     search_provider = True
 
             if search_provider:
-                if _buscar_proxies(canal, url, provider): break # si no se encuentran proxies válidos seguir para poder cambiar parámetros o entrar manualmente
+                if _buscar_proxies(canal, url, provider, procesar):
+                    break # si no se encuentran proxies válidos seguir para poder cambiar parámetros o entrar manualmente
 
         elif ret == 2:
             _settings_proxies_canal(canal, opciones_provider)
@@ -193,7 +237,16 @@ def configurar_proxies_canal(canal, url):
 
 # Diálogos para guardar las diferentes opciones de búsqueda
 def _settings_proxies_canal(canal, opciones_provider):
+    logger.info()
+
     provider, tipo_proxy, pais_proxy, max_proxies = get_settings_proxytools(canal)
+
+    if proxies_auto:
+        if not proxies_todos:
+            if not provider == default_provider:
+                if not platformtools.dialog_yesno(config.__addon_name, 'Tiene seleccionado un proveedor que no es el asociado en su configuración de proxies [COLOR cyan]' + provider.capitalize() + '[/COLOR]', '¿ Desea asignar este proveedor para este canal [COLOR yellow]' + canal.capitalize() + '[/COLOR] ?'):
+                    provider = default_provider
+                    config.set_setting('proxytools_provider', provider, canal)
 
     preselect = 0 if provider not in opciones_provider else opciones_provider.index(provider)
     ret = platformtools.dialog_select('Proveedores de proxies', opciones_provider, preselect=preselect)
@@ -251,10 +304,12 @@ def _settings_proxies_canal(canal, opciones_provider):
     return True
 
 
-def _buscar_proxies(canal, url, provider):
+def _buscar_proxies(canal, url, provider, procesar):
+    logger.info()
+
     proxies_actuales = config.get_setting('proxies', canal, default='').strip()
 
-    if url == '': url = 'http://httpbin.org/ip'
+    if url == '': url = 'https://www.youtube.com/'
 
     provider_canal, tipo_proxy, pais_proxy, max_proxies = get_settings_proxytools(canal)
 
@@ -266,59 +321,98 @@ def _buscar_proxies(canal, url, provider):
         if proxies_todos: search_provider = True
     elif provider == all_providers: search_provider = True
 
-    if search_provider:
-        platformtools.dialog_notification('Buscar proxies', '[COLOR blue]Obteniendo proxies espere ...[/COLOR]')
+    if not procesar:
+        if not provider == all_providers:
+            search_provider = False
 
     if search_provider or provider == 'spys.one':
+        if search_provider:
+            platformtools.dialog_notification('Buscar en Spys.one', '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
         proxies = _spys_one(url, tipo_proxy, pais_proxy, max_proxies)
         if proxies:
             all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     if search_provider or provider == 'hidemy.name':
+        if search_provider:
+            platformtools.dialog_notification('Buscar en Hidemy.name', '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
         proxies = _hidemy_name(url, tipo_proxy, pais_proxy, max_proxies)
         if proxies:
             all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     if search_provider or provider == 'httptunnel.ge':
+        if search_provider:
+            platformtools.dialog_notification('Buscar en Httptunnel.ge', '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
         proxies = _httptunnel_ge(url, tipo_proxy, pais_proxy, max_proxies)
         if proxies:
             all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     if search_provider or provider == 'proxynova.com':
+        if search_provider:
+            platformtools.dialog_notification('Buscar en Proxynova.com', '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
         proxies = _proxynova_com(url, tipo_proxy, pais_proxy, max_proxies)
         if proxies:
             all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     if search_provider or provider == 'free-proxy-list':
+        if search_provider:
+            platformtools.dialog_notification('Buscar en Free-proxy-list', '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
         proxies = _free_proxy_list(url, tipo_proxy, pais_proxy, max_proxies)
         if proxies:
             all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     if search_provider or provider == 'spys.me':
+        if search_provider:
+            platformtools.dialog_notification('Buscar en Spys.me', '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
         proxies = _spys_me(url, tipo_proxy, pais_proxy, max_proxies)
         if proxies:
             all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     if search_provider or provider == default_provider:
+        if search_provider:
+            platformtools.dialog_notification('Buscar en ' + default_provider.capitalize(), '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
         proxies = _proxyscrape_com(url, tipo_proxy, pais_proxy, max_proxies)
         if proxies:
             all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     if search_provider or provider == 'proxyservers.pro':
+        if search_provider:
+            platformtools.dialog_notification('Buscar en Proxyservers.pro', '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
         proxies = _proxyservers_pro(url, tipo_proxy, pais_proxy, max_proxies)
         if proxies:
             all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
-    if search_provider or provider == 'proxy-list.download':
-        proxies = _proxy_list_download(url, tipo_proxy, pais_proxy, max_proxies)
-        if proxies:
-            all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
-
     if search_provider or provider == 'us-proxy.org':
+        if search_provider:
+            platformtools.dialog_notification('Buscar en Us-proxy.org', '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
         proxies = _us_proxy_org(url, tipo_proxy, pais_proxy, max_proxies)
         if proxies:
             all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
+    if search_provider or provider == 'proxy-list.download':
+        if search_provider:
+            platformtools.dialog_notification('Buscar en Proxy-list.download', '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
+        proxies = _proxy_list_download(url, tipo_proxy, pais_proxy, max_proxies)
+
+        if proxies:
+            all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
+    if search_provider or provider == 'proxysource.org':
+        if search_provider:
+            platformtools.dialog_notification('Buscar en Proxysource.org', '[B][COLOR %s]Obteniendo proxies espere ...[/COLOR][/B]' % color_infor)
+
+        proxies = _proxysource_org(url, tipo_proxy, pais_proxy, max_proxies)
+        if proxies:
+            all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     # fichero personal de proxies en userdata (separados por comas o saltos de línea)
     if provider == private_list:
@@ -326,12 +420,12 @@ def _buscar_proxies(canal, url, provider):
     else:
         if not provider:
             if not search_provider:
-                platformtools.dialog_notification('Buscar proxies', '[COLOR red]Parámetros desconocidos[/COLOR]')
+                platformtools.dialog_notification('Buscar proxies', '[B][COLOR %s]Parámetros desconocidos[/COLOR][/B]' % color_alert)
                 return False
 
     if not all_providers_proxies:
         if not proxies:
-            platformtools.dialog_notification('Buscar proxies ' + provider.capitalize(), '[COLOR coral]Sin proxies según parámetros[/COLOR]')
+            platformtools.dialog_notification('Buscar proxies ' + provider.capitalize(), '[B][COLOR %s]Sin proxies según parámetros[/COLOR][/B]' % color_adver)
             return False
 
     # Limitar proxies y validar formato
@@ -348,7 +442,7 @@ def _buscar_proxies(canal, url, provider):
         proxies = all_providers_proxies
 
         if len(proxies) > 50:
-            platformtools.dialog_notification('Buscar proxies', '[COLOR blue]Cargando proxies espere ...[/COLOR]')
+            platformtools.dialog_notification('Buscar proxies', '[B][COLOR %s]Cargando proxies espere ...[/COLOR][/B]' % color_adver)
 
         tot_proxies = len(proxies)
         if tot_proxies >= 500: tot_proxies = 500
@@ -384,7 +478,10 @@ def _buscar_proxies(canal, url, provider):
     if len(selected) > 0:
         config.set_setting('proxies', ', '.join(selected), canal)
         logger.info('Proxies actualizados %s : %s' % (canal, ', '.join(selected)))
-        platformtools.dialog_notification('Buscar proxies', '[COLOR blue]%s[/COLOR][COLOR gold] proxies actualizados[/COLOR]' % canal.capitalize())
+        el_canal = '[B][COLOR %s]' % color_exec
+        el_canal += canal.capitalize()
+        el_canal += '[COLOR %s] proxies actualizados[/COLOR][/B]' % color_avis
+        platformtools.dialog_notification('Buscar proxies', el_canal)
     else:
         if not proxies_actuales:
             avisar = True
@@ -393,10 +490,10 @@ def _buscar_proxies(canal, url, provider):
             elif provider == all_providers: avisar = False
 
             if avisar:
-                 platformtools.dialog_notification('Buscar proxies', '[COLOR red]Sin localizar proxies válidos[/COLOR]')
+                 platformtools.dialog_notification('Buscar proxies', '[B][COLOR %s]Sin localizar proxies válidos[/COLOR][/B]' % color_alert)
         else:
             if provider == private_list:
-                platformtools.dialog_notification('Buscar proxies', 'Sin proxies válidos [COLOR red]en su lista[/COLOR]')
+                platformtools.dialog_notification('Buscar proxies', 'Sin proxies válidos [B][COLOR %s]en su lista[/COLOR][/B]' % color_alert)
 
     # Apuntar resultados en proxies.log
     if config.get_setting('developer_mode', default=False):
@@ -412,52 +509,73 @@ def _buscar_proxies(canal, url, provider):
 
         txt_log += 'Búsqueda finalizada. Proxies válidos: %d' % (num_ok) + os.linesep
 
-        with open(proxies_log, 'a') as f: f.write(txt_log); f.close()
+        with open(proxies_log, 'wb') as f: f.write(txt_log if not PY3 else txt_log.encode('utf-8')); f.close()
 
     if not provider == private_list:
         if len(selected) == 0:
-            sin_news_proxies(nom_provider, proxies_actuales)
+            sin_news_proxies(nom_provider, proxies_actuales, procesar)
         elif len(selected) >= 10:
-            valor = str(len(selected))
-            top_news_proxies(nom_provider, proxies_actuales, valor)
+            valor = len(selected)
+            top_news_proxies(nom_provider, proxies_actuales, valor, procesar)
 
     return True if len(selected) > 0 else False
 
 
-def cuantos_proxies(canal, provider, proxies_actuales):
+def cuantos_proxies(canal, provider, proxies_actuales, procesar):
+    logger.info()
+
     cuantos = config.get_setting('proxies', canal, default='').strip()
     cuantos = cuantos.split(',')
 
     if cuantos:
-        valor = str(len(cuantos))
-        top_news_proxies(provider, proxies_actuales, valor)
+        valor = len(cuantos)
+        top_news_proxies(provider, proxies_actuales, valor, procesar)
 
-def sin_news_proxies(provider, proxies_actuales):
+def sin_news_proxies(provider, proxies_actuales, procesar):
+    logger.info()
+
     avisar = True
+
     if proxies_auto:
         if proxies_todos: avisar = False
     else:
         if provider == all_providers: avisar = True
+
+    if not procesar:
+        if not provider == all_providers:
+            search_provider = False
 
     if avisar:
         texto_mensaje = ''
         if proxies_actuales: texto_mensaje = '[COLOR yellow]Se conservan los proxies almacenados actualmente.[/COLOR]'
         platformtools.dialog_ok('Búsqueda proxies en [COLOR blue]' + provider.capitalize() + '[/COLOR]', 'No se ha obtenido ningún proxy válido con este proveedor.', texto_mensaje, '[COLOR coral]Puede intentar obtener nuevos proxies, cambiando de proveedor, en los parámetros para buscar proxies.[/COLOR]')
 
-def top_news_proxies(provider, proxies_actuales, valor):
+def top_news_proxies(provider, proxies_actuales, valor, procesar):
+    logger.info()
+
+    if not valor: return
+    else:
+       if valor < 10: return
+
     avisar = True
     if proxies_auto:
         if proxies_todos: avisar = False
     else:
         if provider == all_providers: avisar = True
 
+    if not procesar:
+        if not provider == all_providers:
+            search_provider = False
+
     if avisar:
         texto_mensaje = ''
         if proxies_actuales: texto_mensaje = '[COLOR yellow][B]El tiempo de espera acceso al canal podría ser muy elevado.[/B][/COLOR]'
-        platformtools.dialog_ok('Búsqueda proxies en [COLOR blue]' + provider.capitalize() + '[/COLOR]', 'Se han obtenido ' + valor + ' proxies válidos con este proveedor.', texto_mensaje, '[COLOR coral]Puede intentar obtener menos proxies, cambiando de proveedor, en los parámetros para buscar proxies.[/COLOR]')
+        platformtools.dialog_ok('Búsqueda proxies en [COLOR blue]' + provider.capitalize() + '[/COLOR]', 'Se han obtenido ' + str(valor) + ' proxies válidos con este proveedor.', texto_mensaje, '[COLOR coral]Puede intentar obtener menos proxies, cambiando de proveedor, en los parámetros para buscar proxies.[/COLOR]')
 
 
 def _spys_one(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
     url_provider = 'https://spys.one/en/free-proxy-list/'
     url_post = 'xpp=0'
     if tipo_proxy == 'anonymous': url_post += 'xf1=3'
@@ -485,6 +603,8 @@ def _spys_one(url, tipo_proxy, pais_proxy, max_proxies):
     return proxies
 
 def _hidemy_name(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
     url_provider = 'https://hidemy.name/es/proxy-list/?'
     url_provider += 'type=' + ('s' if url.startswith('https') else 'h')
     if pais_proxy != '': url_provider += '&country=' + pais_proxy
@@ -503,6 +623,8 @@ def _hidemy_name(url, tipo_proxy, pais_proxy, max_proxies):
     return proxies
 
 def _httptunnel_ge(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
     url_provider = 'https://www.httptunnel.ge/ProxyListForFree.aspx'
     resp = httptools.downloadpage(url_provider, raise_weberror=False)
 
@@ -522,6 +644,8 @@ def _httptunnel_ge(url, tipo_proxy, pais_proxy, max_proxies):
     return proxies
 
 def _proxynova_com(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
     url_provider = 'https://www.proxynova.com/proxy-server-list/'
     resp = httptools.downloadpage(url_provider, raise_weberror=False)
 
@@ -535,6 +659,8 @@ def _proxynova_com(url, tipo_proxy, pais_proxy, max_proxies):
     return proxies
 
 def _free_proxy_list(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
     url_provider = 'https://free-proxy-list.net'
     resp = httptools.downloadpage(url_provider, raise_weberror=False)
 
@@ -551,6 +677,8 @@ def _free_proxy_list(url, tipo_proxy, pais_proxy, max_proxies):
     return proxies
 
 def _spys_me(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
     url_provider = 'https://spys.me/proxy.txt'
     resp = httptools.downloadpage(url_provider, raise_weberror=False)
 
@@ -572,6 +700,8 @@ def _spys_me(url, tipo_proxy, pais_proxy, max_proxies):
     return proxies
 
 def _proxyscrape_com(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
     # API: https://proxyscrape.com/api-documentation
     url_provider = 'https://api.proxyscrape.com/?request=displayproxies'
     url_provider += '&proxytype=' + ('https' if url.startswith('https') else 'http')  # http, socks4, socks5
@@ -586,6 +716,8 @@ def _proxyscrape_com(url, tipo_proxy, pais_proxy, max_proxies):
     return proxies
 
 def _proxyservers_pro(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
     url_provider = 'https://es.proxyservers.pro/proxy/list?__path2query_param__='
     url_provider += '/protocol/' + ('https' if url.startswith('https') else 'http')
     if tipo_proxy != '': url_provider += '/anonymity/' + tipo_proxy
@@ -611,33 +743,9 @@ def _proxyservers_pro(url, tipo_proxy, pais_proxy, max_proxies):
 
     return proxies
 
-def _proxy_list_download(url, tipo_proxy, pais_proxy, max_proxies):
-    # API: https://www.proxy-list.download/api/v1
-    url_provider = 'https://www.proxy-list.download/api/v1/get'
-    url_provider += '?type=' + ('https' if url.startswith('https') else 'http') # http, https, socks4, socks5
-    if tipo_proxy != '': url_provider += '&anon=' + tipo_proxy
-    if pais_proxy != '': url_provider += '&country=' + pais_proxy
-
-    resp = httptools.downloadpage(url_provider, raise_weberror=False)
-
-    if len(resp.data) > 0: proxies = resp.data.split()
-    else:
-       url_provider = 'https://www.proxy-list.download/'
-       url_provider += ('HTTPS' if url.startswith('https') else 'HTTP')
-       resp = httptools.downloadpage(url_provider, raise_weberror=False)
-
-       proxies = []
-
-       block = scrapertools.find_single_match(resp.data, '<tbody id="tabli"(.*?)</tbody>')
-
-       enlaces = scrapertools.find_multiple_matches(block, '<tr>.*?<td>(.*?)</td>.*?<td>(.*?)</td>')
-
-       for prox, puerto in enlaces:
-           proxies.append(prox + ':' + puerto)
-       
-    return proxies
-
 def _us_proxy_org(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
     url_provider = 'https://www.us-proxy.org/#list'
     resp = httptools.downloadpage(url_provider, raise_weberror=False)
 
@@ -653,8 +761,68 @@ def _us_proxy_org(url, tipo_proxy, pais_proxy, max_proxies):
 
     return proxies
 
+def _proxy_list_download(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    # API: https://www.proxy-list.download/api/v1
+    url_provider = 'https://www.proxy-list.download/api/v1/get'
+    url_provider += '?type=' + ('https' if url.startswith('https') else 'http') # http, https, socks4, socks5
+    if tipo_proxy != '': url_provider += '&anon=' + tipo_proxy
+    if pais_proxy != '': url_provider += '&country=' + pais_proxy
+
+    resp = httptools.downloadpage(url_provider, raise_weberror=False)
+
+    if len(resp.data) > 0: proxies = resp.data.split()
+    else:
+       proxies = []
+
+       url_provider = 'https://www.proxy-list.download/'
+       url_provider += ('HTTPS' if url.startswith('https') else 'HTTP')
+       resp = httptools.downloadpage(url_provider, raise_weberror=False)
+
+       block = scrapertools.find_single_match(resp.data, '<tbody id="tabli"(.*?)</tbody>')
+
+       enlaces = scrapertools.find_multiple_matches(block, '<tr>.*?<td>(.*?)</td>.*?<td>(.*?)</td>')
+
+       for prox, puerto in enlaces:
+           proxies.append(prox + ':' + puerto)
+
+    return proxies
+
+def _proxysource_org(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    proxies = []
+
+    url_provider = 'https://proxysource.org/en/freeproxies'
+
+    resp = httptools.downloadpage(url_provider, raise_weberror=False)
+    # ~ logger.debug(resp.data)
+
+    url_provider_day = scrapertools.find_single_match(resp.data, '</p><a href="(.*?)"')
+
+    if not url_provider_day:
+        return proxies
+
+    if url_provider_day.startswith('/'):
+        url_provider_day = 'https://proxysource.org' + url_provider_day
+
+    resp = httptools.downloadpage(url_provider_day, raise_weberror=False)
+    # ~ logger.debug(resp.data)
+
+    block = scrapertools.find_single_match(resp.data, 'class="ant-input">(.*?)</textarea>')
+
+    enlaces = scrapertools.find_multiple_matches(block, '(.*?)\n')
+    for prox in enlaces:
+        if prox == '': continue
+        elif  '-' in prox: continue
+        proxies.append(prox)
+
+    return proxies
 
 def acumulaciones(provider, proxies, all_providers_proxies, max_proxies):
+    logger.info()
+
     acumular = False
     if proxies_auto:
         if proxies_todos: acumular = True
@@ -671,7 +839,11 @@ def acumulaciones(provider, proxies, all_providers_proxies, max_proxies):
 
 # Testear una lista de proxies para una url determinada
 def do_test_proxy(url, proxy, info):
-    resp = httptools.downloadpage(url, use_proxy = {'http': proxy, 'https': proxy}, timeout=15, raise_weberror=False)
+    logger.info()
+
+    try:
+        resp = httptools.downloadpage(url, use_proxy = {'http': proxy, 'https': proxy}, timeout=15, raise_weberror=False)
+    except: return
 
     info['ok'] = (type(resp.code) == int and resp.code >= 200 and resp.code < 400)
     if 'ERROR 404 - File not found' in resp.data \
@@ -686,8 +858,12 @@ def do_test_proxy(url, proxy, info):
 
 
 def testear_lista_proxies(provider, url, proxies=[]):
+    logger.info()
+
     threads = []
     proxies_info = {} # resultados de los tests
+
+    proceso_test = True
 
     num_proxies = float(len(proxies)) # float para calcular porcentaje
 
@@ -703,25 +879,33 @@ def testear_lista_proxies(provider, url, proxies=[]):
            t.start()
            threads.append(t)
         except:
+           proceso_test = False
            logger.info("proxytools-check: Error Thread.start")
            break
 
-        if progreso.iscanceled(): break
+        if progreso.iscanceled():
+            progreso.close()
+            return [] #break
 
-    pendent = [a for a in threads if a.isAlive()]
-    while len(pendent) > 0:
-        hechos = num_proxies - len(pendent)
-        perc = int(hechos / num_proxies * 100)
-        validos = sum([1 for proxy in proxies if proxies_info[proxy]['ok']])
-
-        progreso.update(perc, 'Comprobando %d de %d proxies. Válidos %d. Cancelar si tarda demasiado o si ya hay más de uno válido.' % (hechos, num_proxies, validos))
-
-        if progreso.iscanceled(): break
-
-        time.sleep(0.5)
+    if proceso_test:
         pendent = [a for a in threads if a.isAlive()]
+        while len(pendent) > 0:
+            hechos = num_proxies - len(pendent)
+            perc = int(hechos / num_proxies * 100)
+            validos = sum([1 for proxy in proxies if proxies_info[proxy]['ok']])
+
+            progreso.update(perc, 'Comprobando %d de %d proxies. Válidos %d. Cancelar si tarda demasiado o si ya hay más de uno válido.' % (hechos, num_proxies, validos))
+
+            if progreso.iscanceled(): break
+
+            time.sleep(0.5)
+            pendent = [a for a in threads if a.isAlive()]
 
     progreso.close()
+
+    if not proceso_test:
+        if platformtools.dialog_yesno('ERROR Test proxies en ' + provider.capitalize(), '[COLOR red][B]Sin disponibilidad de suficiente Memoria para este proceso.[/B][/COLOR]', '[COLOR yellow]¿ Desea anular el test automatico en TODOS los proveedores para intentar evitar este inconveniente ?[/COLOR]'):
+            config.set_setting('proxies_auto', False)
 
     # Ordenar según proxy válido y tiempo de respuesta
     return sorted(proxies_info.items(), key=lambda x: (-x[1]['ok'], x[1]['time']))
@@ -738,10 +922,15 @@ def show_help_proxies():
 
 
 def configuracion_general():
+    logger.info()
+
     config.__settings__.openSettings()
 
+    platformtools.itemlist_refresh()
 
 def obtener_private_list():
+    logger.info()
+
     from core import filetools
 
     proxies = []
@@ -759,7 +948,7 @@ def obtener_private_list():
         existe = filetools.exists(proxies_file)
 
         if not existe:
-            platformtools.dialog_notification('Buscar proxies', '[COLOR red]No se encuentra el fichero[/COLOR]')
+            platformtools.dialog_notification('Buscar proxies', '[B][COLOR %s]No se encuentra el fichero[/COLOR][/B]' % color_alert)
             time.sleep(1.0)
             return proxies
 

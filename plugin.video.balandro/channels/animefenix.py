@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import os, re
+import re
 
-from platformcode import config, logger, platformtools
+from platformcode import config, logger
 from core.item import Item
-from core import httptools, scrapertools, servertools, tmdb, jsontools
+from core import httptools, scrapertools, servertools, tmdb
 
 
 host = 'https://www.animefenix.com/'
@@ -27,12 +27,13 @@ def mainlist_anime(item):
         from modules import actions
         if actions.adults_password(item) == False:
             return itemlist
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes?page=1', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animes?estado[]=1', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por categorízación', action = 'categories', url = host + 'animes', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', url = host + 'animes', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por año', action = 'anios', url = host + 'animes', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow' ))
 
@@ -77,14 +78,17 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    url_genre = host + 'animes'
+
+    data = httptools.downloadpage(url_genre).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
     data = scrapertools.find_single_match(data, r'<select name="[^"]+" id="genre_select" multiple="multiple">(.*?)<\/select>')
     patron = r'<option value="([^"]+)"\s*>([^<]+)'
     matches = re.compile(patron).findall(data)
 
     for genre_id, title in matches:
-        url = "%s?genero[]=%s&order=default&page=1" % (item.url, genre_id)
+        url = "%s?genero[]=%s&order=default&page=1" % (url_genre, genre_id)
         itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
 
     return sorted(itemlist,key=lambda x: x.title)
@@ -94,17 +98,20 @@ def anios(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    url_anio = host + 'animes'
+
+    data = httptools.downloadpage(url_anio).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
     data = scrapertools.find_single_match(data, r'<select name="[^"]+" id="year_select" multiple="multiple">(.*?)<\/select>')
     patron = r'<option value="([^"]+)"\s*>([^<]+)'
     matches = re.compile(patron).findall(data)
 
     for anio, title in matches:
-        url = "%s?year[]=%s&order=default&page=1" % (item.url, anio)
+        url = "%s?year[]=%s&order=default&page=1" % (url_anio, anio)
         itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
 
-    return sorted(itemlist,key=lambda x: x.title)
+    return itemlist
 
 
 def categories(item):
@@ -160,10 +167,8 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-    # ~ if developer == True: logger.debug(data)
 
     patron = r"tabsArray\['\d+'\] = \".*?src='(?:\.\.|)([^']+)"
     matches = re.compile(patron, re.DOTALL).findall(data)
@@ -177,24 +182,34 @@ def findvideos(item):
 
     return itemlist
 
+
 def play(item):
     logger.info()
     itemlist = []
 
-    if "stream/amz.php" in item.url:
+    if item.url.startswith('//'): item.url = 'https:' + item.url
+
+    item.url = item.url.replace('&amp;', '&')
+
+    if '/videa.hu/' in item.url:
+        data = httptools.downloadpage(item.url).data
+        if '/recaptcha/api.js?render=explicit&hl=hu' in data:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+    elif '/stream/amz.php' in item.url:
         if not item.url.startswith("http"):
             item.url = host + item.url[1:]
+
         data = httptools.downloadpage(item.url).data
-        url_play = scrapertools.find_single_match(data, '"file":"([^"]+)').replace("\\/", "/")
+        url_play = scrapertools.find_single_match(data, '"file":"([^"]+)"').replace("\\/", "/")
     else:
         url_play = item.url
-
-    #logger.debug(url_play)    
 
     if url_play:
         itemlist.append(item.clone(url = url_play.replace("\\/", "/")))
 
     return itemlist
+
 
 def search(item, texto):
     logger.info()

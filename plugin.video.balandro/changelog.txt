@@ -1,19 +1,80 @@
-WebTV changelog
-==================
+[COLOR coral]Balandro[/COLOR]
+
+[COLOR yellow]2021[/COLOR]
+
+2.0.1:
+    Incorporada opcion Premios Oscars
+    Correcciones bugs de la version anterior
+    Configuracion Visual Habilitar colores personalizados notificaciones
+    Habilitar menus contextuales adicionales en los menus
+    Buscar y Ayuda:
+       Configurar proxies a usar global (en los canales que los necesiten)
+    Canales modificados:
+       AllPeliculas, Beeg, CineCalidad, CineMatteFlix, Dilo,
+       DocumentalesOnline, DonTorrents, EstrenosCineCasaa, GDrive, HDFull,
+       JKAnime, LaCartoons, TuPeliHd, MejorTorrents, NewPct1, PctFenix,
+       PeliculasFlix, PelisHouse, PlayDede, SeriesAntiguas, SeriesManta,
+       SeriespapayaTo, SigloXX, Subtorrents, TvSeries
+    Nuevos canales:
+       AniBox, AnimeFlv, CaricaturasHd, Cuevana2Esp, PeliculasFlv,
+       Pelis24, PornHub, PornTube, SeriesKao, SeriesPapayaXyz, XVideos
+    Canales inestables:
+       SeriesBlanco
+    Canales desactivados:
+       CinemaClasic, Cliver, DaftSex, DosPelis, RePelis, Seriemega, Yape
+    Servidores modificados:
+       Aparat, Clipwatching, Evoload, Fembed, Mixdrop, Mp4Upload, Streamsb,
+       Uptobox, Uptostream, Zplayer
+    Servidores nuevos:
+       Amazon, Fastream, Highstream, Sbembed, Wolfstream
+
+2.0.0:
+    Compatible con Python3
+    Nuevo Menu
+    Nueva gestion de Proxies, Torrents y Busquedas
+    Nuevas opciones Grupos y Ayuda
+    Nueva Configuracion
+    Nuevos canales:
+       AnimeFenix, CineDeAntes, CinematteFlix, ClasicoTv, CliverSite, ClubCine,
+       Cuevana3Video, DocumaniaTv, DonTorrents, EntrePeliculasySeries,
+       HdfullSe, HomeCine, JKAnime, LegalmenteGratis, MegadedeLa,
+       MejorTorrents, MovidyMobi, PctFenix, Playdede, PelisHouse,
+       PelisRetro, PornHd, SeriesAntiguas, SeriesFlixIo, SeriesManta,
+       SeriesPapayaTo, SeriesRetro, SigloXX, SubTorrents, Tekilaz,
+       TupeliculaTv, TvSeries, VerPeliculasGratis
+    Canales reactivados:
+       CiberDocumentales, MiraDoumentales, TorrentDivx
+    Canales inactivos:
+       DesTotal, SeriesDanko
+    Canales anulados:
+       CienciaTv, DocumaniacosEsp, GDrive, MasPeliculas, Movidy, PepeCine,
+       SeriesPapaya, TeleDocumentales
+    Nuevos servidores:
+       Letsupload, Movcloud, Racaty, Streamsb, Zplayer
+
+[COLOR cyan]Versiones no compatibles con python3[/COLOR]
+
+1.5.2:
+    Canales modificados: Cinecalidad, Hdfull, Seriesmetro, SeriesFlix, Pelispedia, Repelis,
+    Seriesblanco, Newpct1, Seriemega, Seriez, Cliver, Seriespapaya, Seriesdanko, Pepecine.
+    Servidores modificados: Filesim, Gamovideo, Clipwatching, Vidtodo, Easyload.
+    Incorporado nuevo proveedor de proxies.
 
 1.5.1:
     Canales modificados: Cuevana3, Playview, Inkapelis, Cinecalidad, Hdfull, Movidy, 
     Seriesmetro, Serieflix, Newpct1, Grantorrent, Descargacineclasico, Pelisplay.
     Servidores modificados: Doodstream, Vidia, Gounlimited, Youtube, Videossh, 
     Streamtape, Gamovideo, Yourupload.
-    Añadido cliente Torrest para torrents.
+    Incorporado cliente Torrest para torrents.
+
+[COLOR yellow]2020[/COLOR]
 
 1.5.0:
     Canales modificados: Hdfull, Seriesdanko, Seriespapaya, Estrenoscinesaa, Allpeliculas,
     Playview, Dospelis, Inkapelis, Cinecalidad.
     Servidores modificados: Youtube, Gamovideo, Streamtape.
     Corrección bug por cambios de tmdb.
-    Opción en Settings para forzar actualizaciones de fixs.
+    Opcion en Settings para forzar actualizaciones de fixs.
 
 1.4.23:
     Canales modificados: Hdfull, Pepecine, Seriespapaya, Dilo, Dospelis, Movidy.

@@ -1,110 +1,163 @@
-[COLOR coral]Balandro[/COLOR]  [COLOR yellow]Marzo/2021[/COLOR]
+[COLOR coral]Balandro[/COLOR]  [COLOR yellow]Abril/2021[/COLOR]
 
-2.0.0:
-   Compatible con Python3
+Version 2.0.1
 
-   Novedades:
-      Nuevo Menu:
-         Nueva opcion Canales
-         Nueva opcion Grupos
-         Nueva opcion Animes
-         Nueva opcion Adultos
-         Nueva opcion Ayuda
+   [COLOR yellow]INCIDENCIAS:[/COLOR]
+      Bugs - en ciertas opciones de la configuracion
+      Bug - en las opciones de Grupos
+      Bug - acceso series a Tmdb bucle infinito
+      Bug - en Guardar peliculas y series en preferidos
+      Bug - en Guardar peliculas y series en favoritos
+      Bug - en Descargas (a veces se paralizaban)
+      Bug - en Cofigurar proxies a usar (control memoria disponible)
+      Bug - en ficheros Torrent (intercomunicacion con los motores)
+      Otros Bugs menores de la version anterior
 
-      Nueva gestion de Proxies
-      Nueva gestion de Torrents
-      Nueva gestion de Busquedas
+   [COLOR yellow]DESACTIVACIONES:[/COLOR]
+      Canales:
+         CinemaClasic, Cliver, DaftSex, DosPelis, RePelis, Seriemega, Yape
 
-      Nueva Configuracion:
-         Re-distribucion informacion por agrupaciones
-         Control Parental
-         Mas opciones personalizables
+   [COLOR yellow]MODIFICACIONES:[/COLOR]
+      Canales:
+         AllPeliculas - activada opcion Netflix
+         Beeg - ciertos videos no reproducian (sin enlaces disponibles)
+         CineCalidad - anulado configurar dominio y proxies a usar
+         CineMatteFlix - cambio de dominio y estructura
+         Dilo - habilitar configurar proxies, ultimos episodios
+         DocumentalesOnline - cambio de estructura
+         DonTorrents - habilitar configurar proxies
+         EstrenosCineCasaa - cambio de estructura
+         GDrive (canal privado) - operativo con python3 
+         HDFull - habilitar dominios a usar
+         JkAnime - paginacion en episodios
+         LaCartoons - cambio de estructura
+         MejorTorrents - habilitar configurar proxies
+         NewPct1 - habilitar configurar proxies, cambios de dominios en clones
+         PctFenix - habilitar configurar proxies
+         PeliculasFlix - servidores directos
+         PelisHouse - cambio de estructura
+         PlayDede - canal nuevamente operativo
+         TuPeliHd - cambio de dominio y estructura
+         SeriesAntiguas - solo presentaba hasta 20 episodios por temporada
+         SeriesManta - scraper adicional obtencion servidores y generos
+         SeriespapayaTo - cambio de estructura
+         SigloXX - incorporada opcion sagas
+         Subtorrents - cambio de dominio
+         TvSeries - incorporadas nuevas secciones
+
+      Servidores:
+         Aparat, Clipwatching, Evoload, Fembed, Mixdrop, Mp4Upload, Streamsb,
+         Uptobox, Uptostream, Zplayer
+
+      Varias:
+         Configurar proxies a usar - optimizacion y notificaciones varias
+         Canales - algunos canales pueden ahora prescindir de proxies
+         Generos - re-configurados e integracion de los nuevos canales
+         Servidores - notificacion si solo hay enlaces a servidores no soportados
+         Notificaciones - mayor claridad en el texto de la notificacion
+         Calificacion nuevas calidades - en algunos canales
+
+   [COLOR yellow]NOVEDADES:[/COLOR]
+      Configuracion Canales:
+         Opcion para eliminar el Pin parental
+
+      Configuracion Proxies:
+         Incorporado nuevo proveedor
+
+      Configuracion Buscar:
+         Descartar en las busquedas los canales inestables
+
+      Configuracion Descargas:
+         Opcion para preguntar la ubicacion de destino de las descargas
+
+      Configuracion Visual:
+         Personalizar - color nombre canal (preferidos, desactivados, con proxies, inestable)
+         Personalizar - color en las notificaciones
+
+      Configuracion Sistema:
+         Test - comprobacion disponiblidad de internet
+
+      Menu Principal:
+         Premios Oscars - nueva opcion por un periodo determinado
+
+         Habilitar menus contextuales:
+            Buscar, Canales, Peliculas y Series, Animes, Adultos,
+            Preferidos, Descargas, Ayuda
+
+      Menus Canales, Peliculas, Series, Documentales y Grupos:
+         Buscar - color especifico y sub-opciones inteligentes
+         Menus contextuales - opciones inteligentes con nuevas funciones
+         Nombre del canal - color especifico si tiene proxies memorizados
+
+      Descargas:
+         Opcion de preguntar y asignar la ubicacion de la descarga (segun configuracion)
+
+      Buscar y Ayuda:
+         Configurar proxies a usar - global (en los canales que los necesiten)
+         Excluir canales configurar proxies a usar - global
+
+      [COLOR gold]Nuevos Canales Convencionales:[/COLOR]
+         CaricaturasHd
+         Cuevana2Esp
+         PeliulasFlv
+         Pelis24
+         SeriesKao
+         SeriesPapayaXyz
+
+      [COLOR gold]Nuevos Canales Anime:[/COLOR]
+         AniBox
+         AnimeFlv
+
+      [COLOR gold]Nuevos Canales Adultos:[/COLOR]
+         PornHub
+         PornTube
+         XVideos
+
+      Grupos:
+         Peliculas y/o series - canales con tematica Infantil
+         Documentales - canales con tematica de Documentales
+
+      Ayuda:
+         Sistema - visualizar ajustes configuracion personalizada
+		 Sistema - comprobar estado de internet
+         Media center - visualizar fichero advancedsettings
+
+      [COLOR gold]Nuevos Servidores:[/COLOR]
+         Amazon, Fastream, Highstream, Sbembed, Wolfstream
+
+   [COLOR yellow]SITUACION CANALES:[/COLOR]
+      Canales Inestables (siguen Activados):
+         SeriesBlanco
 
       Numero de Canales:
-         74 Canales
-         50 de Peliculas
-         40 de Series
-         29 de Peliculas y Series
+         79 Canales
+         52 de Peliculas
+         42 de Series
+         32 de Peliculas y Series
            6 de Documentales
-           2 de Animes
-           2 de Adultos
+           4 de Animes
+           5 de Adultos
+           1 Privado
 
-   Nuevos Canales:
-      AnimeFenix
-      CineDeAntes
-      CinematteFlix
-      ClasicoTv
-      CliverSite
-      ClubCine
-      Cuevana3Video
-      DocumaniaTv
-      DonTorrents
-      EntrePeliculasySeries
-      HdfullSe
-      HomeCine
-      JKAnime
-      LegalmenteGratis
-      MegadedeLa
-      MejorTorrents
-      MovidyMobi
-      PctFenix
-      PelisHouse
-      PelisRetro
-      Playdede
-      PornHd
-      SeriesAntiguas
-      SeriesFlixIo
-      SeriesManta
-      SeriesPapayaTo
-      SeriesRetro
-      SigloXX
-      SubTorrents
-      Tekilaz
-      TupeliculaTv
-      TvSeries
-      VerPeliculasGratis
+      Numero de Servidores:
+         79 Servidores
 
-   Canales Reactivados:
-      CiberDocumentales
-      MiraDoumentales
-      TorrentDivx
-
-   Canales Desactivados:
-      DesTotal
-      SeriesDanko
-
-   Canales Anulados:
-      CienciaTv
-      DocumaniacosEsp
-      GDrive
-      MasPeliculas
-      Movidy
-      PepeCine
-      SeriesPapaya
-      TeleDocumentales
-
-   Canales que pueden usar proxies (Bloqueo Operadoras):
-      CineCalidad
-      CineTux
-      Cliver
-      CliverSite
-      Cuevana3
-      DocumaniaTv
-      DonTorrents
-      Gnula
-      GranTorrent
-      HdFull
-      PelisPlay
-      PelisVips
-      PlayView
-      RePelis
-      SerieMega
-      SubTorrents
-      TorrenDivx
-
-  Nuevos Servidores:
-      Letsupload
-      Movcloud
-      Racaty
-      Streamsb
-      Zplayer
+      Canales que pueden usar proxies (Bloqueo operadoras):
+         CineTux
+         CliverSite
+         Cuevana3
+         Cuevana3Video
+         Dilo
+         DocumaniaTv
+         DonTorrents
+         Gnula
+         GranTorrent
+         HdFull
+         MejorTorrents
+         Newpct1
+         PctFenix
+         PelisPlay
+         PelisVips
+         PlayView
+         SubTorrents
+         TorrentDivx

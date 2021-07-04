@@ -262,7 +262,25 @@ def episodios(item):
 
 def puntuar_calidad(txt):
     txt = txt.replace(' ', '').replace('-', '').lower()
-    orden = ['cam', 'ts', 'webdl', 'webrip', 'bdscr', 'hdtv', 'hc720p', 'bdrip', 'dvdrip', 'hdrip', '720p', '1080p', '4k']
+
+    orden = ['cam',
+          'ts',
+          'webdl',
+          'webrip',
+          'bdscr',
+          'hdtv',
+          'hc720p',
+          'bdrip',
+          'dvdrip',
+          'hdrip',
+          '720p',
+          'hd720p',
+          '1080p',
+          'hd1080p',
+          'hd2160p',
+          '2160p',
+          '4k']
+
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
@@ -313,6 +331,20 @@ def play(item):
         # ~ logger.debug(data)
 
         url = scrapertools.find_single_match(data, '<a id="link" rel="nofollow" href="([^"]+)')
+
+        if url.startswith('https://www.pastexts.com/'): url = '' # ~  reCAPTCHA
+
+        if url.endswith('.torrent'):
+            import os
+            from platformcode import config
+            
+            data = do_downloadpage(url)
+            file_local = os.path.join(config.get_data_path(), "temp.torrent")
+            with open(file_local, 'wb') as f: f.write(data); f.close()
+            
+            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            return itemlist
+
         if url:
             itemlist.append(item.clone(url = url))
 

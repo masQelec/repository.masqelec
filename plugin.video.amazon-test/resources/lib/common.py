@@ -5,7 +5,7 @@
 '''
 from __future__ import unicode_literals
 from locale import getdefaultlocale
-from kodi_six import xbmc, xbmcaddon, xbmcgui
+from kodi_six import xbmcaddon, xbmcgui
 from kodi_six.utils import py2_decode
 from sys import argv
 import hashlib
@@ -15,6 +15,11 @@ import json
 from .singleton import Singleton
 from .l10n import *
 from .configs import *
+
+try:
+    from xbmcvfs import translatePath
+except ImportError:
+    from xbmc import translatePath
 
 # Usage:
 #   gs = Globals()/Settings()
@@ -44,7 +49,7 @@ class Globals(Singleton):
     tmdb = 'b34490c056f0dd9e3ec9af2167a731f4'  # b64decode('YjM0NDkwYzA1NmYwZGQ5ZTNlYzlhZjIxNjdhNzMxZjQ=')
     tvdb = '1D62F2F90030C444'  # b64decode('MUQ2MkYyRjkwMDMwQzQ0NA==')
     langID = {'movie': 30165, 'series': 30166, 'season': 30167, 'episode': 30173}
-    KodiK = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0]) < 18
+    KodiVersion = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
 
     """ Allow the usage of dot notation for data inside the _globals dictionary, without explicit function call """
     def __getattr__(self, name): return self._globals[name]
@@ -68,9 +73,9 @@ class Globals(Singleton):
         # self._globals['dialogprogress'] = xbmcgui.DialogProgress()
         self._globals['hasExtRC'] = xbmc.getCondVisibility('System.HasAddon(script.chromium_remotecontrol)')
 
-        self._globals['DATA_PATH'] = py2_decode(xbmc.translatePath(self.addon.getAddonInfo('profile')))
+        self._globals['DATA_PATH'] = py2_decode(translatePath(self.addon.getAddonInfo('profile')))
         self._globals['CONFIG_PATH'] = OSPJoin(self._globals['DATA_PATH'], 'config')
-        self._globals['HOME_PATH'] = py2_decode(xbmc.translatePath('special://home'))
+        self._globals['HOME_PATH'] = py2_decode(translatePath('special://home'))
         self._globals['PLUGIN_PATH'] = py2_decode(self._globals['addon'].getAddonInfo('path'))
 
         # With main PATHs configured, we initialise the get/write path attributes
@@ -150,7 +155,7 @@ class Settings(Singleton):
         if name in ['MOVIE_PATH', 'TV_SHOWS_PATH']:
             export = self._g.DATA_PATH
             if self._gs('enablelibraryfolder') == 'true':
-                export = py2_decode(xbmc.translatePath(self._gs('customlibraryfolder')))
+                export = py2_decode(translatePath(self._gs('customlibraryfolder')))
             export = OSPJoin(export, 'Movies' if 'MOVIE_PATH' == name else 'TV')
             return export + '\\' if '\\' in export else export + '/'
         elif 'Language' == name:
@@ -206,6 +211,7 @@ class Settings(Singleton):
             return [3600, 21600, 43200, 86400, 259200, 604800, 1296000, 2592000][int(self._gs('catalog_cache_expiry'))]
         elif 'profiles' == name: return self._gs('profiles') == 'true'
         elif 'show_pass' == name: return self._gs('show_pass') == 'true'
+        elif 'use_h265' == name: return self._gs('use_h265') == 'true'
 
 
 def jsonRPC(method, props='', param=None):

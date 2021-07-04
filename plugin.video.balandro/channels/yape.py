@@ -129,6 +129,23 @@ web_paises = [
    ]
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False, raise_weberror=True):
+    # ~ resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
+    resp = httptools.downloadpage_proxy('yape', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
+
+    if only_headers: return resp.headers
+    return resp.data
+
+
 def mainlist(item):
     return mainlist_pelis(item)
 
@@ -171,6 +188,8 @@ def mainlist_pelis(item):
         itemlist.append(item.clone( title = 'Configurar filtros a usar ...', action = 'modificar_filtro', folder=False, text_color='plum' ))
 
     # ~ itemlist.append(item.clone( title = 'Test configuración filtros', action = 'extraer_datos_web', folder=False, text_color = 'yellow' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -231,7 +250,7 @@ def paises(item):
 def extraer_datos_web(item):
     logger.info()
 
-    data = httptools.downloadpage(host_catalogue).data
+    data = do_downloadpage(host_catalogue)
     # ~ logger.debug(data)
 
     # Obtener distintos géneros, idiomas, calidades, órdenes
@@ -349,7 +368,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     # ~ logger.debug(data)
 
     matches = re.compile('<div class="col-lg-2 col-md-3 col-6 mb-3"><a(.*?)</a></div>', re.DOTALL).findall(data)
@@ -385,7 +404,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     # ~ logger.debug(data)
 
     # ~ patron = '<a href="#" class="[^"]*" data-link="([^"]+)".*?/languajes/([^.]+).png.*?<span class="[^"]*">([^<]+)'
@@ -412,7 +431,7 @@ def play(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url, raise_weberror=False).data
+    data = do_downloadpage(item.url, raise_weberror=False)
     # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, 'iframe class="" src="([^"]+)')
@@ -423,7 +442,7 @@ def play(item):
         if action and token: url = host + action + '?token=' + token
 
     if host in url:
-        url = httptools.downloadpage(url, follow_redirects=False, only_headers=True).headers.get('location', '')
+        url = do_downloadpage(url, follow_redirects=False, only_headers=True).headers.get('location', '')
 
     if url != '': 
         itemlist.append(item.clone(url = url))

@@ -38,7 +38,7 @@ def get_ia_addon(required=False, install=True):
         with gui.progress(_.INSTALLING_APT_IA, heading=_.IA_WIDEVINE_DRM, percent=20) as progress:
             try:
                 subprocess.check_output('apt-get -y install {0} || sudo apt-get -y install {0}'.format(IA_LINUX_PACKAGE), shell=True)
-                log.debug('kodi-inputstream-adaptive installed')
+                log.debug('{} installed'.format(IA_LINUX_PACKAGE))
                 progress.update(70)
                 xbmc.executebuiltin('UpdateLocalAddons()')
 
@@ -51,7 +51,7 @@ def get_ia_addon(required=False, install=True):
                         break
             except Exception as e:
                 log.exception(e)
-                log.debug('kodi-inputstream-adaptive failed to install')
+                log.debug('{} failed to install'.format(IA_LINUX_PACKAGE))
 
     if not addon and required:
         raise InputStreamError(_(_.ADDON_REQUIRED, addon_id=addon_id))
@@ -72,6 +72,8 @@ def install_iat_repo():
             repo_id = 'repository.inputstream.adaptive.testing.aarch64'
         else:
             repo_id = 'repository.inputstream.adaptive.testing.x86_64'
+    elif system in ('UWP', 'IOS', 'TVOS'):
+        raise InputStreamError(_.IA_TESTING_NOT_AVAILABLE)
     else:
         repo_id = 'repository.inputstream.adaptive.testing'
 
@@ -89,11 +91,13 @@ class InputstreamItem(object):
     response      = None
     properties    = None
     minversion    = None
+    x_discontinuity = False
 
-    def __init__(self, minversion=None, properties=None):
+    def __init__(self, minversion=None, properties=None, x_discontinuity=False):
         if minversion:
             self.minversion = minversion
         self.properties = properties or {}
+        self.x_discontinuity = x_discontinuity
 
     @property
     def addon_id(self):
@@ -123,6 +127,10 @@ class HLS(InputstreamItem):
         hls_live = settings.getBool('use_ia_hls_live', legacy)
         hls_vod  = settings.getBool('use_ia_hls_vod', legacy)
 
+        if self.x_discontinuity and KODI_VERSION == 18:
+            global ADDON_ID
+            ADDON_ID = IA_TESTING_ID
+
         return (self.force or (self.live and hls_live) or (not self.live and hls_vod)) and require_version(self.minversion, required=self.force)
 
 class MPD(InputstreamItem):
@@ -144,7 +152,6 @@ class Playready(InputstreamItem):
 
 class Widevine(InputstreamItem):
     license_type  = 'com.widevine.alpha'
-    minversion    = IA_WV_MIN_VER
 
     def __init__(self, license_key=None, content_type='application/octet-stream', challenge='R{SSM}', response='', manifest_type='mpd', mimetype='application/dash+xml', license_data=None, **kwargs):
         super(Widevine, self).__init__(**kwargs)
@@ -157,7 +164,7 @@ class Widevine(InputstreamItem):
         self.license_data  = license_data
 
     def do_check(self):
-        return require_version(self.minversion, required=True) and install_widevine()
+        return install_widevine()
 
 def set_bandwidth_bin(bps):
     addon = get_ia_addon(install=False)
@@ -212,38 +219,28 @@ def require_version(required_version, required=False):
     if required and not result:
         raise InputStreamError(_(_.IA_VERSION_REQUIRED, required=required_version, current=current_version))
 
-    return result
+    return ia_addon if result else False
 
 def install_widevine(reinstall=False):
-    system, arch = get_system_arch()
+    DST_FILES = {
+        'Linux': 'libwidevinecdm.so',
+        'Darwin': 'libwidevinecdm.dylib',
+        'IOS': 'libwidevinecdm.dylib',
+        'TVOS': 'libwidevinecdm.dylib',
+        'Windows': 'widevinecdm.dll',
+        'UWP': 'widevinecdm.dll',
+    }
 
     if KODI_VERSION < 18:
-        raise InputStreamError(_(_.IA_KODI18_REQUIRED, system=system))
+        raise InputStreamError(_.IA_KODI18_REQUIRED)
 
-    ia_addon = get_ia_addon(required=True)
-
-    DST_FILES = {
-        'Linux':   'libwidevinecdm.so',
-        'Darwin':  'libwidevinecdm.dylib',
-        'Windows': 'widevinecdm.dll',
-    }
+    ia_addon = require_version(IA_WV_MIN_VER, required=True)
+    system, arch = get_system_arch()
 
     if system == 'Android':
         return True
 
-    elif system == 'UWP':
-        raise InputStreamError(_.IA_UWP_ERROR)
-
-    elif system == 'IOS':
-        raise InputStreamError(_.IA_IOS_ERROR)
-
-    elif system == 'Linux' and arch == 'arm64':
-        raise InputStreamError(_.IA_AARCH64_ERROR)
-
-    elif arch == 'armv6':
-        raise InputStreamError(_.IA_ARMV6_ERROR)
-
-    elif system not in DST_FILES:
+    if system not in DST_FILES:
         raise InputStreamError(_(_.IA_NOT_SUPPORTED, system=system, arch=arch, kodi_version=KODI_VERSION))
 
     userdata     = Userdata(COMMON_ADDON)
@@ -253,7 +250,23 @@ def install_widevine(reinstall=False):
     last_check   = int(userdata.get('_wv_last_check', 0))
 
     if not installed:
-        reinstall = True
+        if system == 'UWP':
+            raise InputStreamError(_.IA_UWP_ERROR)
+
+        elif system == 'IOS':
+            raise InputStreamError(_.IA_IOS_ERROR)
+
+        elif system == 'TVOS':
+            raise InputStreamError(_.IA_TVOS_ERROR)
+
+        elif system == 'Linux' and arch == 'arm64':
+            raise InputStreamError(_.IA_AARCH64_ERROR)
+
+        elif arch == 'armv6':
+            raise InputStreamError(_.IA_ARMV6_ERROR)
+
+        else:
+            reinstall = True
 
     if not reinstall and time.time() - last_check < IA_CHECK_EVERY:
         return True
@@ -261,13 +274,13 @@ def install_widevine(reinstall=False):
     ## DO INSTALL ##
     userdata.set('_wv_last_check', int(time.time()))
 
-    widevine     = Session().gz_json(IA_MODULES_URL)['widevine']
-    wv_versions  = widevine['platforms'].get(system + arch, [])
+    widevine = Session().gz_json(IA_MODULES_URL)['widevine']
+    wv_versions = widevine['platforms'].get(system + arch, [])
 
     if not wv_versions:
         raise InputStreamError(_(_.IA_NOT_SUPPORTED, system=system, arch=arch, kodi_version=KODI_VERSION))
 
-    latest       = wv_versions[0]
+    latest = wv_versions[0]
     latest_known = userdata.get('_wv_latest_md5')
     userdata.set('_wv_latest_md5', latest['md5'])
 
@@ -276,11 +289,14 @@ def install_widevine(reinstall=False):
 
     current = None
     for wv in wv_versions:
+        wv['label'] = _(_.WV_LATEST, label=wv['ver']) if wv == latest and not wv.get('revoked') else wv['ver']
+
+        if wv.get('revoked'):
+            wv['label'] = _(_.WV_REVOKED, label=wv['label'])
+
         if wv['md5'] == installed:
             current = wv
-            wv['label'] = _(_.WV_INSTALLED, version=wv['ver'])
-        else:
-            wv['label'] = wv['ver']
+            wv['label'] = _(_.WV_INSTALLED, label=wv['label'])
 
     if installed and not current:
         wv_versions.append({
@@ -288,19 +304,25 @@ def install_widevine(reinstall=False):
             'label': _(_.WV_UNKNOWN, version=installed[:6]),
         })
 
-    latest['label'] = _(_.WV_LATEST, label=latest['label'])
-    labels = [x['label'] for x in wv_versions]
-
-    index = gui.select(_.SELECT_WV_VERSION, options=labels)
-    if index < 0:
-        return False
-
-    selected = wv_versions[index]
-
-    if 'src' in selected:
-        url = widevine['base_url'] + selected['src']
-        if not _download(url, wv_path, selected['md5']):
+    while True:
+        index = gui.select(_.SELECT_WV_VERSION, options=[x['label'] for x in wv_versions])
+        if index < 0:
             return False
+
+        selected = wv_versions[index]
+
+        if selected.get('revoked') and not gui.yes_no(_.WV_REVOKED_CONFIRM):
+            continue
+
+        if 'confirm' in selected and not gui.yes_no(selected['confirm']):
+            continue
+
+        if 'src' in selected:
+            url = widevine['base_url'] + selected['src']
+            if not _download(url, wv_path, selected['md5']):
+                continue
+
+        break
 
     if system == 'Linux':
         try:
@@ -341,7 +363,7 @@ def _download(url, dst_path, md5=None):
         total_length = float(resp.headers.get('content-length', 1))
 
         with open(dst_path, 'wb') as f:
-            for chunk in resp.iter_content(chunk_size=settings.getInt('chunksize', 4096)):
+            for chunk in resp.iter_content(chunk_size=CHUNK_SIZE):
                 f.write(chunk)
                 downloaded += len(chunk)
                 percent = int(downloaded*100/total_length)

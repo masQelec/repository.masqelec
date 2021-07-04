@@ -15,6 +15,9 @@ def get_video_url(page_url, url_referer=''):
         return 'El fichero no existe o ha sido borrado'
 
     packed = scrapertools.find_single_match(data, r"'text/javascript'>(eval.*?)\n")
+    if not packed:
+        data = httptools.downloadpage(page_url.replace('/e/', '/play/')).data
+        packed = scrapertools.find_single_match(data, r"'text/javascript'>(eval.*?)\n")
     unpacked = jsunpack.unpack(packed)
 
     video_srcs = scrapertools.find_single_match(unpacked, "sources:\[[^\]]+\]")

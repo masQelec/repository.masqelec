@@ -139,7 +139,6 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
     g = Globals()
     s = Settings()
     if (not silent) or s.verbLog:
-        dispurl = url
         dispurl = re.sub('(?i)%s|%s|&token=\\w+|&customerId=\\w+' % (g.tvdb, g.tmdb), '', url).strip()
         Log('%sURL: %s' % ('check' if check else 'post' if postdata is not None else 'get', dispurl))
 
@@ -150,6 +149,9 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
         headers['Host'] = host
     if 'Accept-Language' not in headers:
         headers['Accept-Language'] = g.userAcceptLanguages
+    if '/api/' in url:
+        headers['X-Requested-With'] = 'XMLHttpRequest'
+        binary = True
 
     if 'amazonvideo.com' in host:
         session.mount('https://', MyTLS1Adapter())
@@ -252,6 +254,7 @@ def getURLData(mode, asin, retformat='json', devicetypeid='AOAGZA014O5RE', versi
         url += '&resourceUsage=ImmediateConsumption&consumptionType=Streaming&deviceDrmOverride=CENC' \
                '&deviceStreamingTechnologyOverride=DASH&deviceProtocolOverride=Https' \
                '&deviceBitrateAdaptationsOverride=CVBR%2CCBR&audioTrackId=all'
+        url += '&deviceVideoCodecOverride=H265' if s.use_h265 else ''
         url += '&languageFeature=MLFv2'  # Audio Description tracks
         url += '&videoMaterialType=' + vMT
         url += '&desiredResources=' + dRes
@@ -966,6 +969,7 @@ class _Challenge(pyxbmct.AddonDialogWindow):
         self.btn_submit = pyxbmct.Button('OK')
         self.btn_cancel = pyxbmct.Button(getString(30123))
         self.set_controls()
+        self.set_navigation()
 
     def set_controls(self):
         self.placeControl(self.tb_hint, 0, 0, 2, 2)
@@ -980,6 +984,18 @@ class _Challenge(pyxbmct.AddonDialogWindow):
         self.tb_hint.setText(self.hint)
         self.fl_task.addLabel(self.task)
         self.setFocus(self.ed_cap)
+
+    def set_navigation(self):
+        self.ed_cap.controlUp(self.btn_submit)
+        self.ed_cap.controlDown(self.btn_submit)
+        self.btn_submit.controlUp(self.ed_cap)
+        self.btn_submit.controlDown(self.ed_cap)
+        self.btn_cancel.controlUp(self.ed_cap)
+        self.btn_cancel.controlDown(self.ed_cap)
+        self.btn_submit.controlRight(self.btn_cancel)
+        self.btn_submit.controlLeft(self.btn_cancel)
+        self.btn_cancel.controlRight(self.btn_submit)
+        self.btn_cancel.controlLeft(self.btn_submit)
 
     def submit(self):
         self.cap = self.ed_cap.getText()

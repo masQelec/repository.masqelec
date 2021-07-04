@@ -126,7 +126,7 @@ def list_all(item):
         title_alt = title.split('(')[0].strip() if ' (' in title else '' # para mejorar detección en tmdb
 
         tipo = 'tvshow' if '/serie/' in url else 'movie'
-        if tipo != item.search_type: continue
+        sufijo = '' if item.search_type != 'all' else tipo
 
         year = scrapertools.find_single_match(article, '<span class="year">(\d+)</span>')
         if not year: year = scrapertools.find_single_match(article, '<span>(\d{4})</span>')
@@ -139,13 +139,14 @@ def list_all(item):
             if '<div class="latino">' in article: langs.append('Lat')
             if '<div class="subtitulado">' in article: langs.append('Vose')
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages = ', '.join(langs), 
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages = ', '.join(langs), fmt_sufijo = sufijo, 
                                         contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot}, contentTitleAlt = title_alt ))
+
         else:
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo = sufijo,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot}, contentTitleAlt = title_alt ))
 
-            
+
     tmdb.set_infoLabels(itemlist)
 
     next_page_link = scrapertools.find_single_match(data, ' href="([^"]+)"*><span class="icon-chevron-right">')
@@ -205,8 +206,8 @@ def episodios(item):
         except:
             continue
 
-        if not item.contentSeason: continue
-        elif not str(item.contentSeason) == season: continue
+        if item.contentSeason:
+           if not str(item.contentSeason) == str(season): continue
 
         thumb = scrapertools.find_single_match(datos, " src='([^']+)")
         titulo = '%sx%s %s' % (season, episode, title)
@@ -356,7 +357,7 @@ def findvideos(item):
                 vurl = vurl.replace('https://go.megaplay.cc/index.php?h=', '/playerdir/')
                 if '/playerdir/' in vurl: vurl = '/playdir/' + scrapertools.find_single_match(vurl, "/playerdir/([^&]+)")
                 if vurl.startswith('/'): vurl = dom + vurl
-                    
+
                 servidor = scrapertools.find_single_match(lnk, 'player/server/([^."]+)').lower()
                 if not servidor: servidor = scrapertools.find_single_match(lnk, '<span class="serverx">([^<]+)').lower()
                 if servidor == 'descargar': continue # 1fichier?

@@ -1,13 +1,9 @@
 import threading
 import os
-import shutil
 import re
-import uuid
 import time
-import base64
 import json
 
-from io import BytesIO, SEEK_END
 from xml.dom.minidom import parseString
 from collections import defaultdict
 from functools import cmp_to_key
@@ -16,97 +12,45 @@ from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from six.moves.socketserver import ThreadingMixIn
 from six.moves.urllib.parse import urlparse, urljoin, unquote, parse_qsl, quote_plus
 from kodi_six import xbmc, xbmcvfs
-import requests
+from requests import ConnectionError
 
+from slyguy import settings, gui, inputstream
 from slyguy.log import log
 from slyguy.constants import *
-from slyguy.util import check_port, remove_file, get_kodi_string, set_kodi_string
+from slyguy.util import check_port, remove_file, get_kodi_string, set_kodi_string, fix_url
+from slyguy.plugin import failed_playback
 from slyguy.exceptions import Exit
-from slyguy import settings, gui
+from slyguy.session import RawSession
 from slyguy.language import _
+from slyguy.router import add_url_args
 
-from .constants import PROXY_CACHE, PROXY_CACHE_AHEAD, PROXY_CACHE_BEHIND
-
-HOP_BY_HOP = ['connection', 'keep-alive', 'proxy-authenticate', 'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'upgrade', 'x-uidh', 'host']
-REMOVE_OUT_HEADERS = ['content-encoding', 'date', 'server', 'content-length']
-REMOVE_OUT_HEADERS.extend(HOP_BY_HOP)
-
-HOST = settings.get('proxy_host')
-PORT = settings.getInt('proxy_port')
-
-if not check_port(PORT):
-    PORT = check_port(default=PORT)
-    settings.setInt('proxy_port', PORT)
-
-PROXY_PATH = 'http://{}:{}/'.format(HOST, PORT)
+from .constants import *
 
 #ADDON_DEV = True
-def devlog(msg):
-    if ADDON_DEV:
-        log.debug(msg)
 
-class ResponseStream(object):
-    def __init__(self, response=None, chunk_size=None):
-        self._bytes = BytesIO()
-        self._response = response
-        self._iterator = response.iter_content(chunk_size) if response != None else iter([])
-        self._chunk_size = chunk_size
+REMOVE_IN_HEADERS = ['upgrade', 'host']
+REMOVE_OUT_HEADERS = ['date', 'server', 'transfer-encoding', 'keep-alive', 'connection']
 
-    def _load_until(self, goal_position=None):
-        current_position = self._bytes.seek(0, SEEK_END)
+DEFAULT_PORT = 52103
+HOST = '127.0.0.1'
 
-        while goal_position is None or current_position < goal_position:
-            try:
-                current_position = self._bytes.write(next(self._iterator))
-            except StopIteration:
-                break
+PORT = check_port(DEFAULT_PORT)
+if not PORT:
+    PORT = check_port()
 
-    @property
-    def size(self):
-        return self._size
+PROXY_PATH = 'http://{}:{}/'.format(HOST, PORT)
+settings.set('_proxy_path', PROXY_PATH)
 
-    def tell(self):
-        return self._bytes.tell()
+CODECS = [
+    ['avc', 'H.264'],
+    ['hvc', 'H.265'],
+    ['hev', 'H.265'],
+    ['mp4v', 'MPEG-4'],
+    ['mp4s', 'MPEG-4'],
+    ['dvh', 'H.265 Dolby Vision'],
+]
 
-    def read(self, size=None, start_from=None):
-        if size is None:
-            left_off_at = start_from or 0
-            goal_position = None
-        else:
-            left_off_at = start_from or self._bytes.tell()
-            goal_position = left_off_at + size
-
-        self._load_until(goal_position)
-        self._bytes.seek(left_off_at)
-
-        return self._bytes.read(size)
-
-    def set(self, _bytes):
-        self._bytes = BytesIO(_bytes)
-
-    def iter_content(self):
-        self._bytes.seek(0)
-
-        while True:
-            chunk = self._bytes.read(self._chunk_size)
-            if not chunk:
-                break
-
-            yield chunk
-
-        for chunk in self._iterator:
-            yield chunk
-
-CODECS = {
-    'avc': 'H.264',
-    'hvc': 'H.265',
-    'hev': 'H.265',
-    'mp4v': 'MPEG-4',
-    'mp4s': 'MPEG-4',
-    'dvh': 'H.265 DV',
-}
-
-CODEC_RANKING = ['MPEG-4', 'H.264', 'H.265', 'H.265 DV']
+CODEC_RANKING = ['MPEG-4', 'H.264', 'H.265', 'HDR', 'H.265 Dolby Vision']
 
 PROXY_GLOBAL = {
     'last_quality': QUALITY_BEST,
@@ -115,9 +59,6 @@ PROXY_GLOBAL = {
 
 class RequestHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server):
-        self._chunk_size = 4096
-        self._override_headers = {}
-
         try:
             BaseHTTPRequestHandler.__init__(self, request, client_address, server)
         except (IOError, OSError) as e:
@@ -130,41 +71,65 @@ class RequestHandler(BaseHTTPRequestHandler):
         BaseHTTPRequestHandler.setup(self)
         self.request.settimeout(5)
 
+    def _get_url(self):
+        url = self.path.lstrip('/').strip('\\')
+
+        self._headers = {}
+        self._plugin_headers = {}
+        for header in self.headers:
+            if header.lower() not in REMOVE_IN_HEADERS:
+                self._headers[header.lower()] = self.headers[header]
+
+        self._headers['accept-encoding'] = 'gzip, deflate, br'
+
+        length = int(self._headers.get('content-length', 0))
+        self._post_data = self.rfile.read(length) if length else None
+
+        self._session = PROXY_GLOBAL['session']
+
+        try:
+            proxy_data = json.loads(get_kodi_string('_slyguy_quality'))
+            if self._session.get('session_id') != proxy_data['session_id']:
+                self._session = {}
+
+            self._session.update(proxy_data)
+            set_kodi_string('_slyguy_quality', '')
+        except:
+            pass
+
+        PROXY_GLOBAL['session'] = self._session
+
+        url = self._session.get('path_subs', {}).get(url) or url
+
+        if url.lower().startswith('plugin'):
+            new_url = self._plugin_request(url)
+
+            if url == self._session.get('license_url'):
+                self._session['license_url'] = new_url
+
+            url = new_url
+
+        return url
+
     def _plugin_request(self, url):
-        data_path = None
-        if '$POST' in url or '%24POST' in url:
-            path = ''
-            length = int(self.headers.get('content-length', 0))
-            post_data = self.rfile.read(length) if length else None
-            if post_data:
-                data_path = xbmc.translatePath('special://temp/proxy.post')
-                with open(data_path, 'wb') as f:
-                    f.write(post_data)
+        data_path = xbmc.translatePath('special://temp/proxy.post')
+        with open(data_path, 'wb') as f:
+            f.write(self._post_data or b'')
 
-            param = quote_plus(data_path)
-            url = url.replace('$POST', param).replace('%24POST', param)
+        url = add_url_args(url, _data_path=data_path, _headers=json.dumps(self._headers))
 
-        if '$HEADERS' in url or '%24HEADERS' in url:
-            headers = {}
-            for header in self.headers:
-                headers[header.lower()] = self.headers[header]
-            headers.pop('host', None)
-
-            param = quote_plus(json.dumps(headers))
-            url = url.replace('$HEADERS', param).replace('%24HEADERS', param)
-
-        devlog('PLUGIN REQUEST: {}'.format(url))
+        log.debug('PLUGIN REQUEST: {}'.format(url))
         dirs, files = xbmcvfs.listdir(url)
+
+        if not files:
+            raise Exception('No data returned from plugin')
 
         path = unquote(files[0])
         split = path.split('|')
         url = split[0]
 
-        if data_path and os.path.realpath(path) != os.path.realpath(data_path):
-            remove_file(data_path)
-
         if len(split) > 1:
-            self._override_headers = dict(parse_qsl(u'{}'.format(split[1]), keep_blank_values=True))
+            self._plugin_headers = dict(parse_qsl(u'{}'.format(split[1]), keep_blank_values=True))
 
         return url
 
@@ -177,71 +142,54 @@ class RequestHandler(BaseHTTPRequestHandler):
         with open(data_path, 'wb') as f:
             f.write(data.encode('utf8'))
 
-        param = quote_plus(data_path)
-        url = url.replace('$DATA', param).replace('%24DATA', param)
+        url = add_url_args(url, _data_path=data_path, _headers=json.dumps(self._headers))
 
-        devlog('PLUGIN MANIFEST MIDDLEWARE REQUEST: {}'.format(url))
+        log.debug('PLUGIN MANIFEST MIDDLEWARE REQUEST: {}'.format(url))
         dirs, files = xbmcvfs.listdir(url)
 
         path = unquote(files[0])
         split = path.split('|')
         data_path = split[0]
 
+        if len(split) > 1:
+            self._plugin_headers = dict(parse_qsl(u'{}'.format(split[1]), keep_blank_values=True))
+
         with open(data_path, 'rb') as f:
             data = f.read().decode('utf8')
 
-        remove_file(data_path)
+        if not ADDON_DEV:
+            remove_file(data_path)
 
         return data
 
-    def _get_url(self):
-        url = self.path.lstrip('/').strip('\\')
-
-        session_id = self.headers.get('x-uidh', None)
-        if session_id:
-            self._session = PROXY_GLOBAL['session']
-
-            if self._session.get('session_id') != session_id:
-                PROXY_GLOBAL['session'] = self._session = {}
-
-            try:
-                proxy_data = json.loads(get_kodi_string('_slyguy_quality'))
-                if proxy_data.get('session_id') == session_id:
-                    self._session.update(proxy_data)
-                    set_kodi_string('_slyguy_quality', '')
-            except:
-                pass
-        else:
-            self._session = {}
-
-        if url.lower().startswith('plugin'):
-            try:
-                url = self._plugin_request(url)
-            except Exception as e:
-                log.debug('Plugin requsted failed')
-                log.exception(e)
-
-        return url
-
     def do_GET(self):
         url = self._get_url()
-        devlog('GET IN: {}'.format(url))
 
+        log.debug('GET IN: {}'.format(url))
         response = self._proxy_request('GET', url)
-        if not self._session:
+
+        if self._session.get('redirecting') or not self._session.get('type') or not self._session.get('manifest') or int(response.headers.get('content-length', 0)) > 1000000:
             self._output_response(response)
             return
 
-        first_chunk = response.stream.read(self._chunk_size, start_from=0)
+        parse = urlparse(self.path.lower())
 
-        if b'urn:mpeg:dash:schema' in first_chunk.lower():
-            self._parse_dash(response)
+        try:
+            if self._session.get('type') == 'm3u8' and (url == self._session['manifest'] or parse.path.endswith('.m3u') or parse.path.endswith('.m3u8')):
+                self._parse_m3u8(response)
 
-        elif b'#extm3u' in first_chunk.lower():
-            self._parse_m3u8(response)
+            elif self._session.get('type') == 'mpd' and url == self._session['manifest']:
+                self._parse_dash(response)
+                self._session['manifest'] = None  # unset manifest url so isn't parsed again
+        except Exception as e:
+            log.exception(e)
 
-        # elif not self._session.get('redirecting', False) and self._session.get('quality', None) is not None and self._session.get('selected_quality', None) is None:
-        #     gui.error(_(_.QUALITY_PARSE_ERROR, error=_(_.QUALITY_HTTP_ERROR, code=response.status_code)))
+            if type(e) != Exit and url == self._session['manifest']:
+                gui.error(_.QUALITY_PARSE_ERROR)
+
+            response.status_code = 500
+            response.stream.content = str(e).encode('utf-8')
+            failed_playback()
 
         self._output_response(response)
 
@@ -250,9 +198,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             highest = -1
 
             for codec in _codecs:
-                for key in CODECS:
-                    if codec.lower().startswith(key.lower()) and CODECS[key] in CODEC_RANKING:
-                        rank = CODEC_RANKING.index(CODECS[key])
+                for _codec in CODECS:
+                    if codec.lower().startswith(_codec[0].lower()) and _codec[1] in CODEC_RANKING:
+                        rank = CODEC_RANKING.index(_codec[1])
                         if not highest or rank > highest:
                             highest = rank
 
@@ -290,9 +238,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             codec_string = ''
             for codec in stream['codecs']:
-                for key in CODECS:
-                    if codec.lower().startswith(key.lower()):
-                        codec_string += ' ' + CODECS[key]
+                for _codec in CODECS:
+                    if codec.lower().startswith(_codec[0].lower()):
+                        codec_string += ' ' + _codec[1]
 
             return _(_.QUALITY_BITRATE, bandwidth=int((stream['bandwidth']/10000.0))/100.00, resolution=stream['resolution'], fps=fps, codecs=codec_string.strip()).replace('  ', ' ')
 
@@ -304,7 +252,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         quality_compare = cmp_to_key(compare)
 
-        quality = int(self._session.get('quality', QUALITY_DISABLED))
+        quality = int(self._session.get('quality', QUALITY_ASK))
         streams = sorted(qualities, key=quality_compare, reverse=True)
 
         if not streams:
@@ -367,13 +315,15 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def _parse_dash(self, response):
         if ADDON_DEV:
-            root = parseString(response.stream.read())
+            root = parseString(response.stream.content)
             mpd = root.toprettyxml(encoding='utf-8')
             mpd = b"\n".join([ll.rstrip() for ll in mpd.splitlines() if ll.strip()])
             with open(xbmc.translatePath('special://temp/in.mpd'), 'wb') as f:
                 f.write(mpd)
 
-        data = response.stream.read().decode('utf8')
+            start = time.time()
+
+        data = response.stream.content.decode('utf8')
         data = self._manifest_middleware(data)
 
         ## SUPPORT NEW DOLBY FORMAT https://github.com/xbmc/inputstream.adaptive/pull/466
@@ -381,130 +331,68 @@ class RequestHandler(BaseHTTPRequestHandler):
         ## SUPPORT EC-3 CHANNEL COUNT https://github.com/xbmc/inputstream.adaptive/pull/618
         data = data.replace('urn:mpeg:mpegB:cicp:ChannelConfiguration', 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011')
 
-        try:
-            root = parseString(data.encode('utf8'))
-        except Exception as e:
-            log.debug("Proxy: Failed to parse MPD")
-            log.exception(e)
-            return self._output_response(response)
-
+        root = parseString(data.encode('utf8'))
         mpd = root.getElementsByTagName("MPD")[0]
 
         ## Remove publishTime PR: https://github.com/xbmc/inputstream.adaptive/pull/564
         if 'publishTime' in mpd.attributes.keys():
             mpd.removeAttribute('publishTime')
-
-        ## FIXED in IA 2.4.6
-        ## Commit: https://github.com/peak3d/inputstream.adaptive/commit/dc7b42783d18c65ebcf205a4979a1c9ea6b825e7
-        # if 'availabilityStartTime' in mpd.attributes.keys() and self._session.get('remove_availability_startTime'):
-        #     mpd.removeAttribute('availabilityStartTime')
-        #     log.debug('Removed availabilityStartTime')
-
-        base_url_parents = []
-        for elem in root.getElementsByTagName('BaseURL'):
-            url = elem.firstChild.nodeValue
-
-            ## Only keep the first baseurl for each parent
-            if elem.parentNode in base_url_parents:
-                log.debug('Non-1st BaseURL removed: {}'.format(url))
-                elem.parentNode.removeChild(elem)
-                continue
-
-            if not url.startswith('http'):
-                url = urljoin(response.url, url)
-
-            elem.firstChild.nodeValue = PROXY_PATH + url
-            base_url_parents.append(elem.parentNode)
-
-        ## Live mpd needs non-last periods removed
-        ## https://github.com/xbmc/inputstream.adaptive/issues/574
-        if 'type' in mpd.attributes.keys() and mpd.getAttribute('type').lower() == 'dynamic':
-            periods = [elem for elem in root.getElementsByTagName('Period')]
-
-            # Keep last period
-            if len(periods) > 1:
-                periods.pop()
-                for elem in periods:
-                    elem.parentNode.removeChild(elem)
-        #################################################
-
-        ## Make sure Representation are last in adaptionset
-        for elem in root.getElementsByTagName('Representation'):
-            parent = elem.parentNode
-            parent.removeChild(elem)
-            parent.appendChild(elem)
+            log.debug('Dash Fix: publishTime removed')
 
         ## SORT ADAPTION SETS BY BITRATE ##
         video_sets = []
         audio_sets = []
-        trick_sets = []
         lang_adap_sets = []
-        streams, all_streams, ids = [], [], []
-
-        def get_base_url(node):
-            if not node.parentNode:
-                return None
-
-            siblings = node.parentNode.getElementsByTagName('BaseURL')
-            if siblings:
-                return siblings[0]
-            else:
-                return get_base_url(node.parentNode)
+        streams, all_streams = [], []
+        adap_parent = None
 
         default_language = self._session.get('default_language', '')
-        for adap_set in root.getElementsByTagName('AdaptationSet'):
-            highest_bandwidth = 0
-            is_video = False
-            is_trick = False
 
-            # Fixed with: https://github.com/xbmc/inputstream.adaptive/pull/575
-            adapt_frame_rate = adap_set.getAttribute('frameRate')
-            if adapt_frame_rate and '/' not in adapt_frame_rate:
-                adapt_frame_rate = None
+        for period_index, period in enumerate(root.getElementsByTagName('Period')):
+            rep_index = 0
+            for adap_set in period.getElementsByTagName('AdaptationSet'):
+                adap_parent = adap_set.parentNode
 
-            if adapt_frame_rate:
-                adap_set.removeAttribute('frameRate')
-                log.debug('fpsScale MPD fix')
+                highest_bandwidth = 0
+                is_video = False
+                is_trick = False
 
-            for stream in adap_set.getElementsByTagName("Representation"):
-                attrib = {}
+                for stream in adap_set.getElementsByTagName("Representation"):
+                    attribs = {}
 
-                for key in adap_set.attributes.keys():
-                    attrib[key] = adap_set.getAttribute(key)
+                    ## Make sure Representation are last in adaptionset
+                    adap_set.removeChild(stream)
+                    adap_set.appendChild(stream)
+                    #######
 
-                    ## fixed with https://github.com/xbmc/inputstream.adaptive/pull/602
-                    if key == 'lang' and not (len(attrib[key]) == 2 or len(attrib[key]) == 3 or len(attrib[key]) > 3 and attrib[key][2] == '-'):
-                        adap_set.setAttribute('lang', u'en-{}'.format(attrib[key]))
+                    for key in adap_set.attributes.keys():
+                        attribs[key] = adap_set.getAttribute(key)
 
-                for key in stream.attributes.keys():
-                    attrib[key] = stream.getAttribute(key)
+                    for key in stream.attributes.keys():
+                        attribs[key] = stream.getAttribute(key)
 
-                if adapt_frame_rate and not stream.getAttribute('frameRate'):
-                    stream.setAttribute('frameRate', adapt_frame_rate)
+                    if default_language and 'audio' in attribs.get('mimeType', '') and attribs.get('lang').lower() == default_language.lower() and adap_set not in lang_adap_sets:
+                        lang_adap_sets.append(adap_set)
 
-                if default_language and 'audio' in attrib.get('mimeType', '') and attrib.get('lang').lower() == default_language.lower() and adap_set not in lang_adap_sets:
-                    lang_adap_sets.append(adap_set)
+                    bandwidth = 0
+                    if 'bandwidth' in attribs:
+                        bandwidth = int(attribs['bandwidth'])
+                        if bandwidth > highest_bandwidth:
+                            highest_bandwidth = bandwidth
 
-                bandwidth = 0
-                if 'bandwidth' in attrib:
-                    bandwidth = int(attrib['bandwidth'])
-                    if bandwidth > highest_bandwidth:
-                        highest_bandwidth = bandwidth
+                    if 'maxPlayoutRate' in attribs:
+                        is_trick = True
 
-                if 'maxPlayoutRate' in attrib:
-                    is_trick = True
+                    if 'video' in attribs.get('mimeType', '') and not is_trick:
+                        is_video = True
 
-                if 'video' in attrib.get('mimeType', ''):
-                    is_video = True
-
-                    if not is_trick:
                         resolution = ''
-                        if 'width' in attrib and 'height' in attrib:
-                            resolution = '{}x{}'.format(attrib['width'], attrib['height'])
+                        if 'width' in attribs and 'height' in attribs:
+                            resolution = '{}x{}'.format(attribs['width'], attribs['height'])
 
                         frame_rate = ''
-                        if 'frameRate'in attrib:
-                            frame_rate = attrib['frameRate']
+                        if 'frameRate'in attribs:
+                            frame_rate = attribs['frameRate']
                             try:
                                 if '/' in str(frame_rate):
                                     split = frame_rate.split('/')
@@ -512,37 +400,32 @@ class RequestHandler(BaseHTTPRequestHandler):
                             except:
                                 frame_rate = ''
 
-                        codecs = [x for x in attrib.get('codecs', '').split(',') if x]
-                        stream  = {'bandwidth': bandwidth, 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'id': attrib['id'], 'elem': stream}
+                        codecs = [x for x in attribs.get('codecs', '').split(',') if x]
+                        stream = {'bandwidth': bandwidth, 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'rep_index': rep_index, 'elem': stream}
                         all_streams.append(stream)
+                        rep_index += 1
 
-                        if stream['id'] not in ids:
+                        if period_index == 0:
                             streams.append(stream)
-                            ids.append(stream['id'])
 
-            parent = adap_set.parentNode
-            parent.removeChild(adap_set)
+                adap_parent.removeChild(adap_set)
 
-            if is_trick:
-                trick_sets.append([highest_bandwidth, adap_set, parent])
-            elif is_video:
-                video_sets.append([highest_bandwidth, adap_set, parent])
-            else:
-                audio_sets.append([highest_bandwidth, adap_set, parent])
+                if is_trick:
+                    continue
+
+                if is_video:
+                    video_sets.append([highest_bandwidth, adap_set, adap_parent])
+                else:
+                    audio_sets.append([highest_bandwidth, adap_set, adap_parent])
 
         video_sets.sort(key=lambda  x: x[0], reverse=True)
         audio_sets.sort(key=lambda  x: x[0], reverse=True)
-        trick_sets.sort(key=lambda  x: x[0], reverse=True)
 
         for elem in video_sets:
             elem[2].appendChild(elem[1])
 
         for elem in audio_sets:
             elem[2].appendChild(elem[1])
-
-        # for elem in trick_sets:
-        #     elem[2].appendChild(elem[1])
-        ##################
 
         ## Set default languae
         if lang_adap_sets:
@@ -556,10 +439,64 @@ class RequestHandler(BaseHTTPRequestHandler):
                 elem.setAttribute('value', 'main')
                 adap_set.appendChild(elem)
                 log.debug('default language set to: {}'.format(default_language))
-        ####
+        #############
 
+        ## Insert subtitles
+        if adap_parent:
+            for idx, subtitle in enumerate(self._session.get('subtitles') or []):
+                elem = root.createElement('AdaptationSet')
+                elem.setAttribute('mimeType', subtitle[0])
+                elem.setAttribute('lang', subtitle[1])
+                elem.setAttribute('id', 'caption_{}'.format(idx))
+
+                elem2 = root.createElement('Representation')
+                elem2.setAttribute('id', 'caption_rep_{}'.format(idx))
+
+                if 'ttml' in subtitle[0]:
+                    elem2.setAttribute('codecs', 'ttml')
+
+                elem3 = root.createElement('BaseURL')
+                elem4 = root.createTextNode(subtitle[2])
+
+                elem3.appendChild(elem4)
+                elem2.appendChild(elem3)
+                elem.appendChild(elem2)
+
+                adap_parent.appendChild(elem)
+        ##################
+
+        ## Convert BaseURLS
+        base_url_parents = []
+        for elem in root.getElementsByTagName('BaseURL'):
+            url = elem.firstChild.nodeValue
+
+            if elem.parentNode in base_url_parents:
+                log.debug('Non-1st BaseURL removed: {}'.format(url))
+                elem.parentNode.removeChild(elem)
+                continue
+
+            if url.startswith('/'):
+                url = urljoin(response.url, url)
+
+            if '://' in url:
+                elem.firstChild.nodeValue = PROXY_PATH + url
+
+            base_url_parents.append(elem.parentNode)
+        ################
+
+        ## Convert to proxy paths
         elems = root.getElementsByTagName('SegmentTemplate')
         elems.extend(root.getElementsByTagName('SegmentURL'))
+
+        def get_parent_node(node, tag_name, levels=99):
+            if not node.parentNode or levels == 0:
+                return None
+
+            siblings = [x for x in node.parentNode.childNodes if x != node and x.nodeType == x.ELEMENT_NODE and x.tagName == tag_name]
+            if siblings:
+                return siblings[0]
+            else:
+                return get_parent_node(node.parentNode, tag_name, levels-1)
 
         for e in elems:
             def process_attrib(attrib):
@@ -567,15 +504,24 @@ class RequestHandler(BaseHTTPRequestHandler):
                     return
 
                 url = e.getAttribute(attrib)
-
-                if url.startswith('http'):
+                if '://' in url:
                     e.setAttribute(attrib, PROXY_PATH + url)
                 else:
-                    base_url = get_base_url(e)
-
                     ## Fixed with https://github.com/xbmc/inputstream.adaptive/pull/606
+                    base_url = get_parent_node(e, 'BaseURL')
                     if base_url and not base_url.firstChild.nodeValue.endswith('/'):
                         base_url.firstChild.nodeValue = base_url.firstChild.nodeValue + '/'
+                        log.debug('Dash Fix: base_url / fixed')
+
+                    # Fixed with https://github.com/xbmc/inputstream.adaptive/pull/668
+                    parent_template = get_parent_node(e, 'SegmentTemplate', levels=2)
+                    if parent_template:
+                        for key in parent_template.attributes.keys():
+                            if key not in e.attributes.keys():
+                                e.setAttribute(key, parent_template.getAttribute(key))
+
+                        parent_template.parentNode.removeChild(parent_template)
+                        log.debug('Dash Fix: Double SegmentTemplate removed')
 
             process_attrib('initialization')
             process_attrib('media')
@@ -583,76 +529,36 @@ class RequestHandler(BaseHTTPRequestHandler):
             ## Remove presentationTimeOffset PR: https://github.com/xbmc/inputstream.adaptive/pull/564/
             if 'presentationTimeOffset' in e.attributes.keys():
                 e.removeAttribute('presentationTimeOffset')
-            ###################
+                log.debug('Dash Fix: presentationTimeOffset removed')
+        ###############
 
+        ## Get selected quality
         selected = self._quality_select(streams)
         if selected:
             for stream in all_streams:
-                if stream['id'] != selected['id']:
+                if stream['rep_index'] != selected['rep_index']:
                     stream['elem'].parentNode.removeChild(stream['elem'])
+        #################
 
+        ## Remove empty adaption sets
         for adap_set in root.getElementsByTagName('AdaptationSet'):
             if not adap_set.getElementsByTagName('Representation'):
                 adap_set.parentNode.removeChild(adap_set)
-
-        mpd = root.toprettyxml(encoding='utf-8')
-        mpd = b"\n".join([ll.rstrip() for ll in mpd.splitlines() if ll.strip()])
+        #################
 
         if ADDON_DEV:
+            mpd = root.toprettyxml(encoding='utf-8')
+            mpd = b"\n".join([ll.rstrip() for ll in mpd.splitlines() if ll.strip()])
+
+            log.debug('Time taken: {}'.format(time.time() - start))
             with open(xbmc.translatePath('special://temp/out.mpd'), 'wb') as f:
                 f.write(mpd)
-
-        response.stream.set(mpd)
-
-    def _parse_m3u8(self, response):
-        m3u8 = response.stream.read().decode('utf8')
-
-        is_master = False
-        if '#EXT-X-STREAM-INF' in m3u8:
-            is_master = True
-            file_name = 'master'
         else:
-            file_name = 'sub'
+            mpd = root.toxml(encoding='utf-8')
 
-        if ADDON_DEV:
-            _m3u8 = m3u8.encode('utf8')
-            _m3u8 = b"\n".join([ll.rstrip() for ll in _m3u8.splitlines() if ll.strip()])
-            with open(xbmc.translatePath('special://temp/'+file_name+'-in.m3u8'), 'wb') as f:
-                f.write(_m3u8)
+        response.stream.content = mpd
 
-        if is_master:
-            m3u8 = self._manifest_middleware(m3u8)
-            try:
-                m3u8 = self._parse_m3u8_master(m3u8)
-            except Exit:
-                raise
-            except Exception as e:
-                log.exception(e)
-                log.debug('failed to parse m3u8 master')
-
-        base_url = urljoin(response.url, '/')
-
-        ## FIX AES-128 streams with KEYFORMAT
-        ## Fixed with this PR: https://github.com/peak3d/inputstream.adaptive/pull/461
-        m3u8 = m3u8.replace('KEYFORMAT="identity"', 'KEYFORMAT=""')
-
-        # URI="/.." fix (https://github.com/peak3d/inputstream.adaptive/issues/591)
-        m3u8 = re.sub(r'URI="/', r'URI="{}'.format(base_url), m3u8, flags=re.I|re.M)
-
-        ## Convert to proxy paths
-        m3u8 = re.sub(r'^/', r'{}'.format(base_url), m3u8, flags=re.I|re.M)
-        m3u8 = re.sub(r'(https?)://', r'{}\1://'.format(PROXY_PATH), m3u8, flags=re.I)
-
-        m3u8 = m3u8.encode('utf8')
-        m3u8 = b"\n".join([ll.rstrip() for ll in m3u8.splitlines() if ll.strip()])
-
-        if ADDON_DEV:
-            with open(xbmc.translatePath('special://temp/'+file_name+'-out.m3u8'), 'wb') as f:
-                f.write(m3u8)
-
-        response.stream.set(m3u8)
-
-    def _parse_m3u8_master(self, m3u8):
+    def _parse_m3u8_master(self, m3u8, master_url):
         def _process_media(line):
             attribs = {}
 
@@ -663,9 +569,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         audio_whitelist   = [x.strip().lower() for x in self._session.get('audio_whitelist', '').split(',') if x]
         subs_whitelist    = [x.strip().lower() for x in self._session.get('subs_whitelist', '').split(',') if x]
-        subs_forced       = int(self._session.get('subs_forced', 1))
-        subs_non_forced   = int(self._session.get('subs_non_forced', 1))
-        audio_description = int(self._session.get('audio_description', 1))
+        subs_forced       = self._session.get('subs_forced', True)
+        subs_non_forced   = self._session.get('subs_non_forced', True)
+        audio_description = self._session.get('audio_description', True)
         original_language = self._session.get('original_language', '').lower().strip()
         default_language  = self._session.get('default_language', '').lower().strip()
 
@@ -744,7 +650,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             for group in groups[group_id]:
                 attribs, line = group
 
-                # FIX es-ES > es fr-FR > fr languages #
+                # FIX es-ES > es / fr-FR > fr languages #
                 if 'LANGUAGE' in attribs:
                     split = attribs['LANGUAGE'].split('-')
                     if len(split) > 1 and split[1].lower() == split[0].lower():
@@ -799,53 +705,90 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return '\n'.join(lines)
 
+    def _parse_m3u8(self, response):
+        m3u8 = response.stream.content.decode('utf8')
+
+        is_master = False
+        if '#EXTM3U' not in m3u8:
+            raise Exception('Invalid m3u8')
+
+        if '#EXT-X-STREAM-INF' in m3u8:
+            is_master = True
+            file_name = 'master'
+        else:
+            file_name = 'sub'
+
+        if ADDON_DEV:
+            start = time.time()
+            _m3u8 = m3u8.encode('utf8')
+            _m3u8 = b"\n".join([ll.rstrip() for ll in _m3u8.splitlines() if ll.strip()])
+            with open(xbmc.translatePath('special://temp/'+file_name+'-in.m3u8'), 'wb') as f:
+                f.write(_m3u8)
+
+        if is_master:
+            m3u8 = self._manifest_middleware(m3u8)
+            m3u8 = self._parse_m3u8_master(m3u8, response.url)
+
+        base_url = urljoin(response.url, '/')
+
+        m3u8 = re.sub(r'^/', r'{}'.format(base_url), m3u8, flags=re.I|re.M)
+        m3u8 = re.sub(r'URI="/', r'URI="{}'.format(base_url), m3u8, flags=re.I|re.M)
+
+        ## Convert to proxy paths
+        m3u8 = re.sub(r'(https?)://', r'{}\1://'.format(PROXY_PATH), m3u8, flags=re.I)
+
+        m3u8 = m3u8.encode('utf8')
+
+        if ADDON_DEV:
+            m3u8 = b"\n".join([ll.rstrip() for ll in m3u8.splitlines() if ll.strip()])
+            log.debug('Time taken: {}'.format(time.time() - start))
+            with open(xbmc.translatePath('special://temp/'+file_name+'-out.m3u8'), 'wb') as f:
+                f.write(m3u8)
+
+        response.stream.content = m3u8
+
     def _proxy_request(self, method, url):
         self._session['redirecting'] = False
 
-        if not url.startswith('http'):
-            class Response(object):
-                pass
-
+        if not url.lower().startswith('http://') and not url.lower().startswith('https://'):
             response = Response()
-            response.status_code = 200
             response.headers = {}
-            response.stream = ResponseStream()
+            response.stream = ResponseStream(response)
 
-            with open(url, 'rb') as f:
-                response.stream.set(f.read())
+            if os.path.exists(url):
+                response.ok = True
+                response.status_code = 200
+                with open(url, 'rb') as f:
+                    response.stream.content = f.read()
+                if not ADDON_DEV: remove_file(url)
+            else:
+                response.ok = False
+                response.status_code = 500
+                response.stream.content = "File not found: {}".format(url).encode('utf-8')
 
-            remove_file(url)
             return response
 
-        parsed = urlparse(url)
-
-        headers = {}
-        for header in self.headers:
-            if header.lower() not in HOP_BY_HOP:
-                headers[header.lower()] = self.headers[header]
-
-        headers.update(self._override_headers)
-
-        length    = int(headers.get('content-length', 0))
-        post_data = self.rfile.read(length) if length else None
-
         debug = self._session.get('debug_all') or self._session.get('debug_{}'.format(method.lower()))
-        if post_data and debug:
+        if self._post_data and debug:
             with open(xbmc.translatePath('special://temp/{}-request.txt').format(method.lower()), 'wb') as f:
-                f.write(post_data)
+                f.write(self._post_data)
 
         if not self._session.get('session'):
-            self._session['session'] = requests.Session()
+            self._session['session'] = RawSession()
+            self._session['session'].set_dns_rewrites(self._session.get('dns_rewrites', []))
         else:
             self._session['session'].headers.clear()
-        #    self._session['session'].cookies.clear()
+            #self._session['session'].cookies.clear() #lets handle cookies in session
+
+        ## Fix any double // in url
+        url = fix_url(url)
 
         retries = 3
         # some reason we get connection errors every so often when using a session. something to do with the socket
         for i in range(retries):
             try:
-                response = self._session['session'].request(method=method, url=url, headers=headers, data=post_data, allow_redirects=False, stream=True)
-            except requests.ConnectionError as e:
+                response = self._session['session'].request(method=method, url=url, headers=self._headers, data=self._post_data, allow_redirects=False, verify=self._session.get('verify_ssl', True), stream=True)
+            except ConnectionError as e:
                 if 'Connection aborted' not in str(e) or i == retries-1:
                     log.exception(e)
                     raise
@@ -855,40 +798,47 @@ class RequestHandler(BaseHTTPRequestHandler):
             else:
                 break
 
-        response.stream = ResponseStream(response, self._chunk_size)
+        response.stream = ResponseStream(response)
 
-        devlog('{} OUT: {} ({})'.format(method.upper(), url, response.status_code))
+        log.debug('{} OUT: {} ({})'.format(method.upper(), url, response.status_code))
 
         headers = {}
         for header in response.headers:
-            headers[header.lower()] = response.headers[header]
+            if header.lower() not in REMOVE_OUT_HEADERS:
+                headers[header.lower()] = response.headers[header]
+
+        response.headers = headers
 
         if debug:
             with open(xbmc.translatePath('special://temp/{}-response.txt').format(method.lower()), 'wb') as f:
-                f.write(response.stream.read())
+                f.write(response.stream.content)
 
-        if 'location' in headers:
+        if 'location' in response.headers:
+            if '://' not in response.headers['location']:
+                response.headers['location'] = urljoin(url, response.headers['location'])
+
             self._session['redirecting'] = True
-            if not headers['location'].lower().startswith('http'):
-                headers['location'] = urljoin(url, headers['location'])
+            if url == self._session.get('manifest'):
+                self._session['manifest'] = response.headers['location']
+            if url == self._session.get('license_url'):
+                self._session['license_url'] = response.headers['location']
 
-            headers['location'] = PROXY_PATH + headers['location']
+            response.headers['location'] = PROXY_PATH + response.headers['location']
+            response.stream.content = b''
 
-        ## IA COOKIES ARE BROKEN - SO USE OWN SESSION FOR COOKIES
-        ## FIX SET-COOKIE ##
-        # if 'set-cookie' in headers:
-        #     headers['set-cookie'] = headers['set-cookie'].split(';')[0]
-        headers.pop('set-cookie', None)
-        response.headers = headers
+        if 'set-cookie' in response.headers:
+            log.debug('set-cookie: {}'.format(response.headers['set-cookie']))
+            response.headers.pop('set-cookie') #lets handle cookies in session
+            # base_url = urljoin(url, '/')
+            # response.headers['set-cookie'] = re.sub(r'domain=([^ ;]*)', r'domain={}'.format(HOST), response.headers['set-cookie'], flags=re.I)
+            # response.headers['set-cookie'] = re.sub(r'path=(/[^ ;]*)', r'path=/{}\1'.format(base_url), response.headers['set-cookie'], flags=re.I)
 
         return response
 
     def _output_headers(self, response):
         self.send_response(response.status_code)
 
-        for header in REMOVE_OUT_HEADERS:
-            response.headers.pop(header, None)
-
+        response.headers.update(self._plugin_headers)
         for d in list(response.headers.items()):
             self.send_header(d[0], d[1])
 
@@ -905,30 +855,83 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def do_HEAD(self):
         url = self._get_url()
-        devlog('HEAD IN: {}'.format(url))
+        log.debug('HEAD IN: {}'.format(url))
         response = self._proxy_request('HEAD', url)
         self._output_response(response)
 
     def do_POST(self):
         url = self._get_url()
-        devlog('POST IN: {}'.format(url))
+        log.debug('POST IN: {}'.format(url))
         response = self._proxy_request('POST', url)
         self._output_response(response)
+
+        if not response.ok and url == self._session.get('license_url') and gui.yes_no(_.WV_FAILED, heading=_.IA_WIDEVINE_DRM):
+            inputstream.install_widevine(reinstall=True)
+
+class Response(object):
+    pass
+
+class ResponseStream(object):
+    def __init__(self, response):
+        self._response = response
+        self._bytes = None
+
+    @property
+    def content(self):
+        if not self._bytes:
+            self.content = self._response.content
+
+        return self._bytes
+
+    @content.setter
+    def content(self, _bytes):
+        if not type(_bytes) is bytes:
+            raise Exception('Only bytes allowed when setting content')
+
+        self._bytes = _bytes
+        self._response.headers['content-length'] = str(len(_bytes))
+        self._response.headers.pop('content-range', None)
+        self._response.headers.pop('content-encoding', None)
+
+    def iter_content(self):
+        if self._bytes is not None:
+            yield self._bytes
+        else:
+            while True:
+                try:
+                    chunk = self._response.raw.read(CHUNK_SIZE)
+                except:
+                    chunk = None
+
+                if not chunk:
+                    break
+
+                yield chunk
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     daemon_threads = True
 
 class Proxy(object):
+    started = False
+
     def start(self):
-        log.debug("Starting Proxy {}:{}".format(HOST, PORT))
+        if self.started:
+            return
+
         self._server = ThreadedHTTPServer((HOST, PORT), RequestHandler)
+        self._server.allow_reuse_address = True
         self._httpd_thread = threading.Thread(target=self._server.serve_forever)
         self._httpd_thread.start()
-        log.info("Proxy bound to {}:{}".format(HOST, PORT))
+        self.started = True
+        log.info("Proxy Started: {}:{}".format(HOST, PORT))
 
     def stop(self):
+        if not self.started:
+            return
+
         self._server.shutdown()
         self._server.server_close()
         self._server.socket.close()
         self._httpd_thread.join()
-        log.debug("Proxy Server: Stopped")
+        self.started = False
+        log.debug("Proxy: Stopped")

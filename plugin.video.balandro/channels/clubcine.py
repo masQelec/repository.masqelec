@@ -139,8 +139,8 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    thumb_filmaffinity = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'filmaffinity.png')
-    thumb_imdb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'imdb.png')
+    thumb_filmaffinity = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'filmaffinity.jpg')
+    thumb_imdb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'imdb.jpg')
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 

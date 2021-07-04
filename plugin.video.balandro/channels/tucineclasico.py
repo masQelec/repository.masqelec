@@ -32,31 +32,13 @@ def mainlist_pelis(item):
     return itemlist
 
 
-def generos_ant(item):
-    logger.info()
-    itemlist = []
-
-    data = httptools.downloadpage(host).data
-
-    bloque = scrapertools.find_single_match(data, '<nav class="genres">(.*?)</ul>')
-
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)"[^>]*>([^<]+)</a>\s*<i>([^<]+)</i>')
-    for url, title, num in matches:
-        if num == '0': continue
-        if 'genero/version-original-subtitulada' in url: continue
-
-        itemlist.append(item.clone( action='list_all', title=title + ' ('+num+')', url=url ))
-
-    return sorted(itemlist, key = lambda it: it.title)
-
-
 def generos(item):
     logger.info()
     itemlist = []
 
     data = httptools.downloadpage(host).data
 
-    bloque = scrapertools.find_single_match(data, '<ul id="menu-generos" class="menu">(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '<nav class="genres">(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)"[^>]*>([^<]+)')
     for url, title in matches:
@@ -82,7 +64,7 @@ def anios(item):
     for ano in range(1948, 1921, -1):
         itemlist.append(item.clone( action = 'list_all', title = str(ano), url = host + 'lanzamiento/' + str(ano) + '/' ))
 
-    return sorted(itemlist, key = lambda it: it.title)
+    return sorted(itemlist, key = lambda it: it.title, reverse=True)
 
 
 def list_all(item): 

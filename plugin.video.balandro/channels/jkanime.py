@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import os, re
+import re
 
-from platformcode import config, logger, platformtools
+from platformcode import config, logger
 from core.item import Item
-from core import httptools, scrapertools, servertools, tmdb, jsontools
+from core import httptools, scrapertools, servertools, jsontools, tmdb
 
 
 host = 'https://jkanime.net/'
@@ -27,6 +27,7 @@ def mainlist_anime(item):
         from modules import actions
         if actions.adults_password(item) == False:
             return itemlist
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host, search_type = 'tvshow' ))
 
@@ -81,12 +82,12 @@ def list_all(item):
     data = httptools.downloadpage(item.url).data
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-    patron = '<h2 class="portada-title"><a title="([^"]+)" href="([^"]+)".*?<img src="([^"]+)"'
+    patron = '<h5.*?href="([^"]+)">([^<]+)<\/a></h5></div>.*?div class="[^"]+"><.*?set[^"]+"[^"]+"([^"]+)"'
 
     matches = re.compile(patron).findall(data)
     num_matches = len(matches)
 
-    for title, url, thumb in matches[item.page * perpage:]:
+    for url, title, thumb in matches[item.page * perpage:]:
         if not url or not title: continue
 
         if item.search_type == "tvshow":

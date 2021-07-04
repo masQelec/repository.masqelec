@@ -36,7 +36,7 @@ class AmazonTLD(Singleton):
         if self._s.profiles:
             act, profiles = self.getProfiles()
             if act is not False:
-                addDir(profiles[act][0], 'switchProfile', '', thumb=profiles[act][2])
+                addDir(profiles[act][0], 'switchProfile', '', thumb=profiles[act][3])
         addDir('Watchlist', 'getListMenu', self._g.watchlist, cm=cm_wl)
         self.listCategories(0)
         addDir('Channels', 'Channel', '/gp/video/storefront/ref=nav_shopall_nav_sa_aos?filterId=OFFER_FILTER%3DSUBSCRIPTIONS', opt='root')
@@ -142,7 +142,8 @@ class AmazonTLD(Singleton):
     def SetupAmazonLibrary(self):
         import xml.etree.ElementTree as et
         from contextlib import closing
-        source_path = py2_decode(xbmc.translatePath('special://profile/sources.xml'))
+        from .common import translatePath
+        source_path = py2_decode(translatePath('special://profile/sources.xml'))
         source_added = False
         source_dict = {self._s.ms_mov: self._s.MOVIE_PATH, self._s.ms_tv: self._s.TV_SHOWS_PATH}
 
@@ -568,6 +569,8 @@ class AmazonTLD(Singleton):
                 elif self._s.wl_export:
                     self.listContent('GetASINDetails', 'asinList%3D' + asin, 1, '_show' if self._s.dispShowOnly else '', 1)
                     xbmc.executebuiltin('UpdateLibrary(video)')
+            else:
+                Log('Error while {}ing {}'.format(action.lower(), asin), Log.ERROR)
 
     def getArtWork(self, infoLabels, contentType):
         if contentType == 'movie' and self._s.tmdb_art == '0':
@@ -774,12 +777,14 @@ class AmazonTLD(Singleton):
 
     def getListMenu(self, listing, export):
         if export:
-            self.listContent(listing, 'movie', 1, listing, export)
-            self.listContent(listing, 'tv', 1, listing, export)
-            if export == 2: xbmc.executebuiltin('UpdateLibrary(video)')
+            self.listContent(listing, 'MOVIE', 1, listing, export)
+            self.listContent(listing, 'TV', 1, listing, export)
+            if export == 2:
+                writeConfig('last_wl_export', time.time())
+                xbmc.executebuiltin('UpdateLibrary(video)')
         else:
-            addDir(getString(30104), 'listContent', 'movie', catalog=listing, export=export)
-            addDir(getString(30107), 'listContent', 'tv', catalog=listing, export=export)
+            addDir(getString(30104), 'listContent', 'MOVIE', catalog=listing, export=export)
+            addDir(getString(30107), 'listContent', 'TV', catalog=listing, export=export)
             xbmcplugin.endOfDirectory(self._g.pluginhandle, updateListing=False)
 
     def findKey(self, key, obj):
@@ -800,7 +805,7 @@ class AmazonTLD(Singleton):
     def _scrapeAsins(self, aurl, cj):
         asins = []
         url = self._g.BaseUrl + aurl
-        json = GrabJSON(url)
+        json = getURL(url, useCookie=cj)
         if not json:
             return False, False
         WriteLog(str(json), 'watchlist')
@@ -818,7 +823,14 @@ class AmazonTLD(Singleton):
             cj = MechanizeLogin()
             if not cj:
                 return [], ''
-            url = '/gp/video/mystuff/{}/{}/?page={}&sort={}'.format(listing, cont, page, self._s.wl_order)
+            args = {listing: {'sort': self._s.wl_order,
+                              'libraryType': 'Items',
+                              'primeOnly': False,
+                              'startIndex': (page - 1) * 60,
+                              'contentType': cont},
+                    'shared': {'isPurchaseRow': 0}}
+
+            url = '/gp/video/api/myStuff{}?viewType={}&args={}'.format(listing.capitalize(), listing, json.dumps(args, separators=(',', ':')))
             info, asins = self._scrapeAsins(url, cj)
             if info is False:
                 Log('Cookie invalid', Log.ERROR)
@@ -1189,9 +1201,8 @@ class AmazonTLD(Singleton):
         active = 0
         for item in j['profiles']:
             url = self._g.BaseUrl + item['switchLink']['partialURL']
-            q = urlencode(item['switchLink']['query'])
             n = item.get('name', 'Default').encode('utf-8')
-            profiles.append((n, '{}?{}'.format(url, q), item['avatarUrl']))
+            profiles.append((n, url, item['switchLink']['query'], item['avatarUrl']))
             if item.get('isSelected', False):
                 active = len(profiles) - 1
                 writeConfig('profileID', '' if item.get('isDefault', False) else n)
@@ -1202,5 +1213,5 @@ class AmazonTLD(Singleton):
         if active is not False:
             ret = self._g.dialog.select('Amazon', [i[0] for i in profiles])
             if ret >= 0 and ret != active:
-                getURL(profiles[ret][1], useCookie=True, rjson=False, silent=True, check=True)
+                getURL(profiles[ret][1], postdata=profiles[ret][2], useCookie=True, rjson=False, check=True)
         exit()

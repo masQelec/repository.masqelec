@@ -150,9 +150,9 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    seasons = scrapertools.find_multiple_matches(data, 'data-season="(.*?)".*?<a href="(.*?)"')
+    seasons = scrapertools.find_multiple_matches(data, '<section class="Season.*?<a href="(.*?)".*?<span>(.*?)</span>')
 
-    for tempo, url in seasons:
+    for url, tempo in seasons:
         title = 'Temporada ' + tempo
 
         if len(seasons) == 1:
@@ -184,7 +184,7 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
-    patron = '<td><span class="Num">(.*?)</span>.*?<a href="(.*?)".*?data-src="(.*?)".*?<td class="MvTbTtl"><a href=.*?>(.*?)</a>'
+    patron = '<td><span class="Num">(.*?)</span>.*?<a href="(.*?)".*?src="(.*?)".*?<td class="MvTbTtl"><a href=.*?>(.*?)</a>'
 
     episodes = scrapertools.find_multiple_matches(data, patron)
 

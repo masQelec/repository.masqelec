@@ -172,8 +172,8 @@ def episodios(item):
     matches1 = re.compile(patron, re.DOTALL).findall(data)
 
     for url, season, episode, thumb, title in matches1[item.page * perpage:]:
-        if not item.contentSeason: continue
-        elif not str(item.contentSeason) == season: continue
+        if item.contentSeason:
+            if not str(item.contentSeason) == str(season): continue
 
         titulo = '%sx%s %s' % (season, episode, title)
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 

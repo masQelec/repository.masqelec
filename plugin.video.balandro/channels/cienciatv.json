@@ -3,7 +3,7 @@
   "name": "CienciaTv",
   "thumbnail": "cienciatv.png",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["documentary"],

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import os, re, time, base64, sqlite3
+import sys, os, re, time, base64, sqlite3
 from datetime import datetime
 
 from core import filetools, jsontools
 from core.item import Item
 from platformcode import config, logger, platformtools
 
-
+PY3 = sys.version_info[0] >= 3
 # Funciones auxiliares
 
 # Devuelve el nombre de la base de datos de tracking activa (sin el sufijo .sqlite)
@@ -58,16 +58,16 @@ class TrackingData:
                 self.create_tables()
                 self.cur.execute('PRAGMA user_version=1')
                 db_user_version = 1
-                logger.info('Base de datos %s actualizada a versión %d' % (self.filename, db_user_version))
+                logger.info('Base de datos %s actualizada a versión %d' % (self.filename, int(db_user_version)))
 
             if db_user_version == 1:
                 self.cur.execute('ALTER TABLE seasons ADD reverseorder INTEGER')
                 self.cur.execute('PRAGMA user_version=2')
                 db_user_version = 2
-                logger.info('Base de datos %s actualizada a versión %d' % (self.filename, db_user_version))
+                logger.info('Base de datos %s actualizada a versión %d' % (self.filename, int(db_user_version)))
 
             if db_user_version == 2:
-                logger.debug('Base de datos %s ok con última versión (%d)' % (self.filename, db_user_version))
+                logger.debug('Base de datos %s ok con última versión (%d)' % (self.filename, int(db_user_version)))
         except:
             logger.debug('Fallo en PRAGMA... %s' % self.filename)
             pass
@@ -154,7 +154,7 @@ class TrackingData:
         if commit: self.conn.commit()
 
     def get_movies(self, orden='updated DESC', desde=0, numero=10):
-        self.cur.execute('SELECT tmdb_id, infolabels FROM movies ORDER BY %s LIMIT %d, %d' % (orden, desde, numero))
+        self.cur.execute('SELECT tmdb_id, infolabels FROM movies ORDER BY %s LIMIT %d, %d' % (orden, int(desde), int(numero)))
         rows = self.cur.fetchall()
         return [ [row[0], jsontools.load(base64.b64decode(row[1]))] for row in rows]
 
@@ -227,7 +227,7 @@ class TrackingData:
         if commit: self.conn.commit()
 
     def get_shows(self, orden='updated DESC', desde=0, numero=10):
-        self.cur.execute('SELECT tmdb_id, infolabels FROM shows ORDER BY %s LIMIT %d, %d' % (orden, desde, numero))
+        self.cur.execute('SELECT tmdb_id, infolabels FROM shows ORDER BY %s LIMIT %d, %d' % (orden, int(desde), int(numero)))
         rows = self.cur.fetchall()
         return [ [row[0], jsontools.load(base64.b64decode(row[1]))] for row in rows]
 
@@ -368,7 +368,7 @@ class TrackingData:
         return self.cur.fetchone()[0]
 
     def get_all_episodes(self, orden='updated DESC', desde=0, numero=10):
-        self.cur.execute('SELECT tmdb_id, season, episode, infolabels FROM episodes ORDER BY %s LIMIT %d, %d' % (orden, desde, numero))
+        self.cur.execute('SELECT tmdb_id, season, episode, infolabels FROM episodes ORDER BY %s LIMIT %d, %d' % (orden, int(desde), int(numero)))
         rows = self.cur.fetchall()
         return [ [row[0], row[1], row[2], jsontools.load(base64.b64decode(row[3]))] for row in rows]
 
@@ -785,7 +785,7 @@ def check_and_scrap_new_episodes(notification=True):
             dt_diff = dt_hoy - dt_scrap
             horas_dif = (dt_diff.days * 24) + (dt_diff.seconds / 3600)
             tratar = int(horas_dif) >= int(periodicity)
-            logger.info('tmdb_id: %s se actualizó hace %d horas. Tratar ahora: %s. Periodicidad serie: %d' % (tmdb_id.encode('utf-8'), int(horas_dif), tratar, int(periodicity)))
+            logger.info('tmdb_id: %s se actualizó hace %d horas. Tratar ahora: %s. Periodicidad serie: %d' % (tmdb_id.encode('utf-8') if not PY3 else tmdb_id, int(horas_dif), tratar, int(periodicity)))
 
         if tratar:
             n_series += 1

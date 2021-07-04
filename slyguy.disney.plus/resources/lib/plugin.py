@@ -403,7 +403,7 @@ def _parse_series(row):
         info = {
             'plot': _get_text(row['texts'], 'description', 'series'),
             'year': row['releases'][0]['releaseYear'],
-      #      'mediatype': 'tvshow',
+            'mediatype': 'tvshow',
             'genre': row['genres'],
         },
         path = plugin.url_for(series, series_id=row['encodedSeriesId']),
@@ -418,7 +418,7 @@ def _parse_season(row, series):
             'plot': _get_text(row['texts'], 'description', 'season'),
             'year': row['releases'][0]['releaseYear'],
             'season': row['seasonSequenceNumber'],
-           # 'mediatype' : 'season'
+            'mediatype' : 'season',
         },
         art   = {'thumb': _image(row['images'] or series['images'], 'thumb')},
         path  = plugin.url_for(season, season_id=row['seasonId'], title=title),
@@ -474,7 +474,10 @@ def _parse_video(row):
     if row['currentAvailability']['appears']:
         available = arrow.get(row['currentAvailability']['appears'])
         if available > arrow.now():
-            item.label = _(_.AVAILABLE, label=item.label, date=available.to('local').format(_.AVAILABLE_FORMAT))
+            if available > arrow.now().shift(years=1):
+                item.label = _(_.COMING_SOON, label=item.label)
+            else:
+                item.label = _(_.AVAILABLE, label=item.label, date=available.to('local').format(_.AVAILABLE_FORMAT))
 
     return item
 
@@ -656,8 +659,6 @@ def play(content_id=None, family_id=None, skip_intro=None, **kwargs):
     original_language = video.get('originalLanguage') or 'en'
 
     headers = api.session.headers
-    headers['_proxy_default_language'] = original_language
-    headers['_proxy_original_language'] = original_language
     ia.properties['original_audio_language'] = original_language
 
     ## Allow fullres worldwide ##
@@ -669,22 +670,16 @@ def play(content_id=None, family_id=None, skip_intro=None, **kwargs):
         path = media_stream,
         inputstream = ia,
         headers = headers,
-        use_proxy = True,
+        proxy_data = {'default_language': original_language, 'original_language': original_language},
     )
 
-    resume_from = None
-    if kwargs[ROUTE_RESUME_TAG]:
-        if settings.getBool('disney_sync', False):
-            continue_watching = api.continue_watching()
-            resume_from = continue_watching.get(video['contentId'], 0)
-            item.properties['ForceResume'] = True
+    if kwargs[ROUTE_RESUME_TAG] and settings.getBool('disney_sync', False):
+        continue_watching = api.continue_watching()
+        item.resume_from = continue_watching.get(video['contentId'], 0)
+        item.force_resume = True
 
     elif (int(skip_intro) if skip_intro is not None else settings.getBool('skip_intros', False)):
-        resume_from = _get_milestone(video.get('milestones'), 'intro_end', default=0) / 1000
-
-    if resume_from is not None:
-        item.properties['ResumeTime'] = resume_from
-        item.properties['TotalTime']  = resume_from
+        item.resume_from = _get_milestone(video.get('milestones'), 'intro_end', default=0) / 1000
 
     item.play_next = {}
 
@@ -714,14 +709,15 @@ def play(content_id=None, family_id=None, skip_intro=None, **kwargs):
         item.callback = {
             'type':'interval',
             'interval': 20,
-            'callback': plugin.url_for(callback, media_id=telemetry['mediaId'], fguid=telemetry['fguid'], playback_time='$playback_time'),
+            'callback': plugin.url_for(callback, media_id=telemetry['mediaId'], fguid=telemetry['fguid']),
         }
 
     return item
 
 @plugin.route()
-def callback(media_id, fguid, playback_time, **kwargs):
-    api.update_resume(media_id, fguid, int(playback_time))
+@plugin.no_error_gui()
+def callback(media_id, fguid, _time, **kwargs):
+    api.update_resume(media_id, fguid, int(_time))
 
 def _get_milestone(milestones, key, default=None):
     if not milestones:

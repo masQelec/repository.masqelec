@@ -244,6 +244,8 @@ class API(object):
         userdata.set('profile_language', profile['attributes']['languagePreferences']['appLanguage'])
 
     def search(self, query, page=1, page_size=PAGE_SIZE):
+        self._refresh_token()
+
         variables = {
             'preferredLanguage': [self._app_language],
             'index': 'disney_global',
@@ -254,7 +256,11 @@ class API(object):
         }
 
         endpoint = self.get_config()['services']['content']['client']['endpoints']['searchPersisted']['href'].format(queryId='core/disneysearch')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['disneysearch']
+
+        data = self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()
+        self._check_errors(data)
+
+        return data['data']['disneysearch']
 
     def avatar_by_id(self, ids):
         variables = {
@@ -415,10 +421,11 @@ class API(object):
     def playback_data(self, playback_url):
         self._refresh_token(force=True)
 
-        scenario = self.get_config()['services']['media']['extras']['restrictedPlaybackScenario']
+        config = self.get_config()
+        scenario = config['services']['media']['extras']['restrictedPlaybackScenario']
 
         if settings.getBool('wv_secure', False):
-            scenario = self.get_config()['services']['media']['extras']['playbackScenarioDefault']
+            scenario = config['services']['media']['extras']['playbackScenarioDefault']
 
             if settings.getBool('h265', False):
                 scenario += '-h265'

@@ -91,6 +91,8 @@ def temporadas(item):
     for url, numtempo in matches:
         title = 'Temporada ' + numtempo
 
+        url = url + '?max-results=100'
+
         if tot_temp == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.url = url

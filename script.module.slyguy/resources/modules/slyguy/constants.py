@@ -1,4 +1,3 @@
-
 import os
 
 from kodi_six import xbmc, xbmcaddon
@@ -72,6 +71,7 @@ ROUTE_DEL_BOOKMARK     = '_del_bookmark'
 ROUTE_BOOKMARKS        = '_bookmarks'
 ROUTE_MOVE_BOOKMARK    = '_move_bookmark'
 ROUTE_RENAME_BOOKMARK  = '_name_bookmark'
+ROUTE_WEBVTT           = '_webvtt'
 #################
 
 #### INPUTSTREAM ADAPTIVE #####
@@ -95,9 +95,6 @@ NOARG = object()
 LOG_ID     = ADDON_ID
 LOG_FORMAT = u'%(name)s - %(message)s'
 #################
-
-#### GUI ####
-GUI_DEFAULT_AUTOCLOSE = 10000 #10 seconds
 
 ## QUALITY ##
 QUALITY_ASK      = -1
@@ -124,3 +121,6 @@ DEFAULT_WORKERS   = 5
 
 #### BOOKMARKS #####
 BOOKMARK_FILE = os.path.join(ADDON_PROFILE, 'bookmarks.json')
+
+CHUNK_SIZE = 64 * 1024
+LIVE_HEAD = 12*60*60

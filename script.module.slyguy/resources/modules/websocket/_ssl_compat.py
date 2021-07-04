@@ -33,7 +33,7 @@ try:
         if hasattr(ssl, "match_hostname"):
             from ssl import match_hostname
         else:
-            from backports.ssl_match_hostname import match_hostname
+            from _backports.ssl_match_hostname import match_hostname
         __all__.append("match_hostname")
     __all__.append("HAVE_CONTEXT_CHECK_HOSTNAME")
 

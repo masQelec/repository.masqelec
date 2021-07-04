@@ -1,5 +1,4 @@
 import os
-import time
 import hashlib
 import shutil
 import platform
@@ -16,13 +15,61 @@ from contextlib import closing
 
 from kodi_six import xbmc, xbmcgui, xbmcaddon
 from six.moves import queue
+from six.moves.urllib.parse import urlparse, urlunparse
 from six import PY2
 import requests
 
 from .language import _
 from .log import log
 from .exceptions import Error
-from .constants import WIDEVINE_UUID, WIDEVINE_PSSH, DEFAULT_WORKERS, ADDON_PROFILE
+from .constants import WIDEVINE_UUID, WIDEVINE_PSSH, DEFAULT_WORKERS, ADDON_PROFILE, CHUNK_SIZE, ADDON_ID, COMMON_ADDON
+
+def fix_url(url):
+    parse = urlparse(url)
+    parse = parse._replace(path=re.sub('/{2,}','/',parse.path))
+    return urlunparse(parse)
+
+def get_dns_rewrites():
+    rewrites = _load_rewrites(ADDON_PROFILE)
+
+    if COMMON_ADDON.getAddonInfo('id') != ADDON_ID:
+        rewrites.extend(_load_rewrites(COMMON_ADDON.getAddonInfo('profile')))
+
+    if rewrites:
+        log.debug('Rewrites Loaded: {}'.format(len(rewrites)))
+
+    return rewrites
+
+def _load_rewrites(directory):
+    rewrites = []
+
+    file_path = os.path.join(xbmc.translatePath(directory), 'dns_rewrites.txt')
+    if not os.path.exists(file_path):
+        return rewrites
+
+    try:
+        with open(file_path, 'r') as f:
+            while True:
+                entry = f.readline()
+                if not entry: # end of file
+                    break
+
+                try:
+                    ip, pattern = entry.split(None, 1)
+                except:
+                    continue
+
+                pattern = pattern.strip()
+                ip = ip.strip()
+                if not pattern or not ip:
+                    continue
+
+                rewrites.append((pattern, ip))
+    except Exception as e:
+        log.debug('DNS Rewrites Failed: {}'.format(file_path))
+        log.exception(e)
+
+    return rewrites
 
 def url_sub(url):
     file_path = os.path.join(ADDON_PROFILE, 'url_subs.txt')
@@ -59,7 +106,7 @@ def url_sub(url):
 def check_port(port=0, default=False):
     try:
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
-            s.bind(('', port))
+            s.bind(('127.0.0.1', port))
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             return s.getsockname()[1]
     except:
@@ -165,12 +212,60 @@ def require_country(required=None, _raise=False):
 
 def user_country():
     try:
-        return requests.get('http://ip-api.com/json/?fields=countryCode').json()['countryCode'].upper()
+        country = requests.get('http://ip-api.com/json/?fields=countryCode').json()['countryCode'].upper()
+        log.debug('fetched user country: {}'.format(country))
+        return country
     except:
         log.debug('Unable to get users country')
         return ''
 
-def FileIO(file_name, method, chunksize=4096):
+def gdrivedl(url, dst_path):
+    if 'drive.google.com' not in url.lower():
+        raise Error('Not a gdrive url')
+
+    ID_PATTERNS = [
+        re.compile('/file/d/([0-9A-Za-z_-]{10,})(?:/|$)', re.IGNORECASE),
+        re.compile('id=([0-9A-Za-z_-]{10,})(?:&|$)', re.IGNORECASE),
+        re.compile('([0-9A-Za-z_-]{10,})', re.IGNORECASE)
+    ]
+    FILE_URL = 'https://docs.google.com/uc?export=download&id={id}&confirm={confirm}'
+    CONFIRM_PATTERN = re.compile("download_warning[0-9A-Za-z_-]+=([0-9A-Za-z_-]+);", re.IGNORECASE)
+    FILENAME_PATTERN = re.compile('attachment;filename="(.*?)"', re.IGNORECASE)
+
+    id = None
+    for pattern in ID_PATTERNS:
+        match = pattern.search(url)
+        if match:
+            id = match.group(1)
+            break
+
+    if not id:
+        raise Error('No file ID find in gdrive url')
+
+    session = requests.session()
+    resp = session.get(FILE_URL.format(id=id, confirm=''), stream=True)
+    if not resp.ok:
+        raise Error('Gdrive url no longer exists')
+
+    if 'ServiceLogin' in resp.url:
+        raise Error('Gdrive url does not have link sharing enabled')
+
+    cookies = resp.headers.get('Set-Cookie') or ''
+    if 'download_warning' in cookies:
+        confirm = CONFIRM_PATTERN.search(cookies)
+        resp = session.get(FILE_URL.format(id=id, confirm=confirm.group(1)), stream=True)
+
+    filename = FILENAME_PATTERN.search(resp.headers.get('content-disposition')).group(1)
+    dst_path = dst_path if os.path.isabs(dst_path) else os.path.join(dst_path, filename)
+
+    resp.raise_for_status()
+    with open(dst_path, 'wb') as f:
+        for chunk in resp.iter_content(CHUNK_SIZE):
+            f.write(chunk)
+
+    return filename
+
+def FileIO(file_name, method, chunksize=CHUNK_SIZE):
     if xbmc.getCondVisibility('System.Platform.Android'):
         file_obj = io.FileIO(file_name, method)
         if method.startswith('r'):
@@ -180,7 +275,7 @@ def FileIO(file_name, method, chunksize=4096):
     else:
         return open(file_name, method, chunksize)
 
-def gzip_extract(in_path, chunksize=4096):
+def gzip_extract(in_path, chunksize=CHUNK_SIZE, raise_error=True):
     log.debug('Gzip Extracting: {}'.format(in_path))
     out_path = in_path + '_extract'
 
@@ -190,15 +285,17 @@ def gzip_extract(in_path, chunksize=4096):
                 with gzip.GzipFile(fileobj=in_obj) as f_in:
                     shutil.copyfileobj(f_in, f_out, length=chunksize)
     except Exception as e:
-        log.exception(e)
         remove_file(out_path)
+        if raise_error:
+            raise
+        log.exception(e)
         return False
     else:
         remove_file(in_path)
         shutil.move(out_path, in_path)
         return True
 
-def xz_extract(in_path, chunksize=4096):
+def xz_extract(in_path, chunksize=CHUNK_SIZE, raise_error=True):
     if PY2:
         raise Error(_.XZ_ERROR)
 
@@ -213,8 +310,10 @@ def xz_extract(in_path, chunksize=4096):
                 with lzma.LZMAFile(filename=in_obj) as f_in:
                     shutil.copyfileobj(f_in, f_out, length=chunksize)
     except Exception as e:
-        log.exception(e)
         remove_file(out_path)
+        if raise_error:
+            raise
+        log.exception(e)
         return False
     else:
         remove_file(in_path)
@@ -287,7 +386,6 @@ def kodi_rpc(method, params=None, raise_on_error=False):
 
         return data['result']
     except Exception as e:
-        log.exception(e)
         if raise_on_error:
             raise
         else:
@@ -390,6 +488,8 @@ def get_system_arch():
         system = 'Windows'
     elif xbmc.getCondVisibility('System.Platform.IOS'):
         system = 'IOS'
+    elif xbmc.getCondVisibility('System.Platform.TVOS'):
+        system = 'TVOS'
     elif xbmc.getCondVisibility('System.Platform.Darwin'):
         system = 'Darwin'
     elif xbmc.getCondVisibility('System.Platform.Linux') or xbmc.getCondVisibility('System.Platform.Linux.RaspberryPi'):
@@ -398,10 +498,10 @@ def get_system_arch():
         system = platform.system()
 
     if system == 'Windows':
-        arch = platform.architecture()[0]
+        arch = platform.architecture()[0].lower()
     else:
         try:
-            arch = platform.machine()
+            arch = platform.machine().lower()
         except:
             arch = ''
 
@@ -420,6 +520,9 @@ def get_system_arch():
 
     elif arch == 'i686':
         arch = 'i386'
+
+    if 'appletv' in arch:
+        arch = 'arm64'
 
     log.debug('System: {}, Arch: {}'.format(system, arch))
 
@@ -544,3 +647,18 @@ def cenc_version1to0(cenc):
         return cenc
 
     return cenc_init(data)
+
+def pthms_to_seconds(duration):
+    if not duration:
+        return None
+
+    keys = [['H', 3600], ['M', 60], ['S', 1]]
+
+    seconds = 0
+    duration = duration.lstrip('PT')
+    for key in keys:
+        if key[0] in duration:
+            count, duration = duration.split(key[0])
+            seconds += float(count) * key[1]
+
+    return int(seconds)

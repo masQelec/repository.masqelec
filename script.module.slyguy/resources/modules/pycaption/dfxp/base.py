@@ -1,4 +1,5 @@
 import re
+import six
 from copy import deepcopy
 from xml.sax.saxutils import escape
 from bs4 import BeautifulSoup, NavigableString
@@ -59,7 +60,7 @@ class DFXPReader(BaseReader):
             return False
 
     def read(self, content):
-        if type(content) != str:
+        if type(content) != six.text_type:
             raise InvalidInputError('The content is not a unicode string.')
 
         dfxp_document = self._get_dfxp_parser_class()(
@@ -127,19 +128,30 @@ class DFXPReader(BaseReader):
         return start, end
 
     def _translate_time(self, stamp):
+        coefs = [3600000000, 60000000, 1000000]
+        framerate = 24.0
+        frameRateMultiplier = 1.0
+        subFrameRate = 1.0
+
         if stamp[-1].isdigit():
-            timesplit = stamp.split(':')
-            if '.' not in timesplit[2]:
-                timesplit[2] += '.000'
-            secsplit = timesplit[2].split('.')
-            if len(timesplit) > 3:
-                secsplit.append((int(timesplit[3]) / 30) * 100)
-            while len(secsplit[1]) < 3:
-                secsplit[1] += '0'
-            microseconds = (int(timesplit[0]) * 3600000000 +
-                            int(timesplit[1]) * 60000000 +
-                            int(secsplit[0]) * 1000000 +
-                            int(secsplit[1]) * 1000)
+            microseconds = 0
+
+            params = stamp.split(':')
+            if len(params) in (3, 4):
+                if len(params) == 4:
+                    frames = params[3].split('.', 2)
+                    if len(frames) == 1:
+                        params[2] = float(params[2]) + float(params[3]) / (framerate * frameRateMultiplier)
+                    else:
+                        params[2] = float(params[2]) + (
+                            float(frames[0]) / frameRate +
+                            float(frames[1]) / (frameRate * subFrameRate)
+                        ) * frameRateMultiplier
+                    del params[3]
+
+                for c, v in zip(coefs, params):
+                    microseconds += int(c*float(v))
+
             return microseconds
         else:
             # Must be offset-time

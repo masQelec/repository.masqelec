@@ -353,6 +353,9 @@ def episodios(item):
         except:
             continue
 
+        if item.contentSeason:
+           if not str(item.contentSeason) == str(season): continue
+
         titulo = '%sx%s %s' % (season, episode, title)
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
 

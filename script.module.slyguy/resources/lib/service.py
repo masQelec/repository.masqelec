@@ -6,9 +6,9 @@ from distutils.version import LooseVersion
 
 from kodi_six import xbmc
 
-from slyguy import userdata, gui, router, settings
+from slyguy import gui, router, settings
 from slyguy.session import Session
-from slyguy.util import hash_6, kodi_rpc, get_addon
+from slyguy.util import hash_6, kodi_rpc, get_addon, user_country
 from slyguy.log import log
 from slyguy.constants import ROUTE_SERVICE, ROUTE_SERVICE_INTERVAL, KODI_VERSION
 
@@ -26,16 +26,16 @@ def _check_updates():
         return
 
     _time = int(time())
-    if _time < userdata.get('last_updates_check', 0) + UPDATES_CHECK_TIME:
+    if _time < settings.getInt('_last_updates_check', 0) + UPDATES_CHECK_TIME:
         return
 
-    userdata.set('last_updates_check', _time)
+    settings.setInt('_last_updates_check', _time)
 
     new_md5 = session.get(ADDONS_MD5).text.split(' ')[0]
-    if new_md5 == userdata.get('addon_md5'):
+    if new_md5 == settings.get('addon_md5'):
         return
 
-    userdata.set('addon_md5', new_md5)
+    settings.set('_addon_md5', new_md5)
 
     updates = []
     slyguy_addons = session.gz_json(ADDONS_URL)
@@ -60,32 +60,57 @@ def _check_updates():
 
 def _check_news():
     _time = int(time())
-    if _time < userdata.get('last_news_check', 0) + NEWS_CHECK_TIME:
+    if _time < settings.getInt('_last_news_check', 0) + NEWS_CHECK_TIME:
         return
 
-    userdata.set('last_news_check', _time)
+    settings.setInt('_last_news_check', _time)
 
     news = session.gz_json(NEWS_URL)
     if not news:
         return
 
-    if 'id' not in news or news['id'] == userdata.get('last_news_id'):
+    if 'id' not in news or news['id'] == settings.get('_last_news_id'):
         return
 
-    userdata.set('last_news_id', news['id'])
+    settings.set('_last_news_id', news['id'])
 
     if _time > news.get('timestamp', _time) + NEWS_MAX_TIME:
-        log.debug("news is too old to show")
+        log.debug('news is too old')
+        return
+
+    if news.get('country'):
+        valid = False
+        cur_country = user_country().lower()
+
+        for rule in [x.lower().strip() for x in news['country'].split(',')]:
+            if not rule:
+                continue
+            elif not rule.startswith('!') and cur_country == rule:
+                valid = True
+                break
+            else:
+                valid = cur_country != rule[1:] if rule.startswith('!') else cur_country == rule
+
+        if not valid:
+            log.debug('news is only for country: {}'.format(news['country']))
+            return
+
+    if news.get('requires') and not get_addon(news['requires'], install=False):
+        log.debug('news is only for users with addon {} installed'.format(news['requires']))
         return
 
     if news['type'] == 'next_plugin_msg':
-        userdata.set('_next_plugin_msg', news['message'])
+        settings.set('_next_plugin_msg', news['message'])
+
+    elif news['type'] == 'message':
+        def _interact_thread():
+            gui.ok(news['message'], news.get('heading', _.NEWS_HEADING))
+
+        thread = Thread(target=_interact_thread)
+        thread.daemon = True
+        thread.start()
 
     elif news['type'] == 'addon_release':
-        if news.get('requires') and not get_addon(news['requires'], install=False):
-            log.debug('addon_release {} requires addon {} which is not installed'.format(news['addon_id'], news['requires']))
-            return
-
         if get_addon(news['addon_id'], install=False):
             log.debug('addon_release {} already installed'.format(news['addon_id']))
             return

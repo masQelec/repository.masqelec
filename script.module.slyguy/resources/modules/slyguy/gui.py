@@ -5,17 +5,15 @@ import time
 from contextlib import contextmanager
 
 from six.moves.urllib_parse import quote, urlparse
-from kodi_six import xbmcgui, xbmc, xbmcgui
-from slyguy.util import set_kodi_string, hash_6
+from kodi_six import xbmcgui, xbmc
+from slyguy.util import set_kodi_string, hash_6, get_dns_rewrites
 
 from .constants import *
 from .exceptions import GUIError
-from .router import add_url_args
+from .router import add_url_args, url_for
 from .language import _
 from . import settings
-from .util import url_sub
-
-PROXY_PATH = 'http://{}:{}/'.format(settings.common_settings.get('proxy_host'), settings.common_settings.getInt('proxy_port'))
+from .util import url_sub, fix_url
 
 def _make_heading(heading=None):
     return heading if heading else ADDON_NAME
@@ -29,13 +27,14 @@ def notification(message, heading=None, icon=None, time=3000, sound=False):
 def refresh():
     xbmc.executebuiltin('Container.Refresh')
 
-def select(heading=None, options=None, autoclose=None, **kwargs):
+def select(heading=None, options=None, autoclose=None, multi=False, **kwargs):
     heading = _make_heading(heading)
     options = options or []
 
-    if KODI_VERSION < 17:
-        kwargs.pop('preselect', None)
-        kwargs.pop('useDetails', None)
+    if KODI_VERSION < 18:
+        kwargs.pop('preselect', None) # preselect breaks cancel in 17
+        if KODI_VERSION < 17:
+            kwargs.pop('useDetails', None) # useDetails added in 17
 
     if autoclose:
         kwargs['autoclose'] = autoclose
@@ -47,7 +46,10 @@ def select(heading=None, options=None, autoclose=None, **kwargs):
 
         _options.append(option)
 
-    return xbmcgui.Dialog().select(heading, _options, **kwargs)
+    if multi:
+        return xbmcgui.Dialog().multiselect(heading, _options, **kwargs)
+    else:
+        return xbmcgui.Dialog().select(heading, _options, **kwargs)
 
 def redirect(location):
     xbmc.executebuiltin('Container.Update({},replace)'.format(location))
@@ -157,7 +159,7 @@ def text(message, heading=None, **kwargs):
 
     return xbmcgui.Dialog().textviewer(heading, message)
 
-def yes_no(message, heading=None, autoclose=GUI_DEFAULT_AUTOCLOSE, **kwargs):
+def yes_no(message, heading=None, autoclose=None, **kwargs):
     heading = _make_heading(heading)
 
     if autoclose:
@@ -172,7 +174,8 @@ def info(item):
 class Item(object):
     def __init__(self, id=None, label='', path=None, playable=False, info=None, context=None,
             headers=None, cookies=None, properties=None, is_folder=None, art=None, inputstream=None,
-            video=None, audio=None, subtitles=None, use_proxy=None, specialsort=None, custom=None, proxy_data=None):
+            video=None, audio=None, subtitles=None, use_proxy=True, specialsort=None, custom=None, proxy_data=None,
+            resume_from=None, force_resume=False):
 
         self.id          = id
         self.label       = label
@@ -185,15 +188,17 @@ class Item(object):
         self.video       = dict(video or {})
         self.audio       = dict(audio or {})
         self.context     = list(context or [])
-        self.subtitles   = list(subtitles or [])
+        self.subtitles   = subtitles or []
         self.playable    = playable
         self.inputstream = inputstream
+        self.proxy_data  = proxy_data or {}
         self.mimetype    = None
         self._is_folder  = is_folder
-        self.proxy_data  = proxy_data or {}
         self.specialsort = specialsort #bottom, top
         self.custom      = custom
-        self.use_proxy   = use_proxy if use_proxy is not None else bool(proxy_data)
+        self.use_proxy   = use_proxy
+        self.resume_from = resume_from
+        self.force_resume = force_resume
 
     def update(self, **kwargs):
         for key in kwargs:
@@ -244,6 +249,9 @@ class Item(object):
                 self.info['title'] = self.label
 
         if self.info:
+            if self.info.get('mediatype') in ('tvshow','season') and settings.getBool('show_series_folders', True):
+                self.info.pop('mediatype')
+
             li.setInfo('video', self.info)
 
         if self.specialsort:
@@ -280,40 +288,31 @@ class Item(object):
         if self.context:
             li.addContextMenuItems(self.context)
 
-        if self.subtitles:
-            li.setSubtitles(self.subtitles)
+        if self.resume_from:
+            self.properties['ResumeTime'] = self.resume_from
+            self.properties['TotalTime'] = 1
+
+        if not self.force_resume and len(sys.argv) > 3 and sys.argv[3].lower() == 'resume:true':
+            self.properties.pop('ResumeTime', None)
+            self.properties.pop('TotalTime', None)
 
         for key in self.properties:
             li.setProperty(key, u'{}'.format(self.properties[key]))
 
-        use_proxy = False
-        if self.use_proxy and self.path and self.path.lower().startswith('http') and settings.common_settings.getBool('proxy_enabled', True):
-            session_id = hash_6(time.time())
-
-            proxy_data = {
-                'session_id': session_id,
-                'audio_whitelist': settings.get('audio_whitelist', ''),
-                'subs_whitelist':  settings.get('subs_whitelist', ''),
-                'audio_description': str(int(settings.getBool('audio_description', True))),
-                'subs_forced': str(int(settings.getBool('subs_forced', True))),
-                'subs_non_forced': str(int(settings.getBool('subs_non_forced', True))),
-                'addon_id': ADDON_ID,
-            }
-
-            ## LEGACY
-            for key in list(self.headers.keys()):
-                if key.startswith('_proxy_'):
-                    proxy_data[key[7:]] = self.headers.pop(key)
-            ######
-
-            proxy_data.update(self.proxy_data)
-            set_kodi_string('_slyguy_quality', json.dumps(proxy_data))
-            self.headers['x-uidh'] = session_id
-            use_proxy = True
-
         headers = self.get_url_headers()
         mimetype = self.mimetype
 
+        proxy_path = settings.common_settings.get('_proxy_path')
+
+        def get_url(url):
+            _url = url.lower()
+
+            if _url.startswith('plugin://') or (_url.startswith('http') and self.use_proxy and not _url.startswith(proxy_path)):
+                url = u'{}{}'.format(proxy_path, url)
+
+            return url
+
+        license_url = None
         if self.inputstream and self.inputstream.check():
             if KODI_VERSION < 19:
                 li.setProperty('inputstreamaddon', self.inputstream.addon_id)
@@ -329,8 +328,9 @@ class Item(object):
                 li.setProperty('{}.stream_headers'.format(self.inputstream.addon_id), headers)
 
             if self.inputstream.license_key:
+                license_url = self.inputstream.license_key
                 li.setProperty('{}.license_key'.format(self.inputstream.addon_id), u'{url}|Content-Type={content_type}&{headers}|{challenge}|{response}'.format(
-                    url = u'{}{}'.format(PROXY_PATH, self.inputstream.license_key) if use_proxy else self.inputstream.license_key,
+                    url = get_url(self.inputstream.license_key),
                     headers = headers,
                     content_type = self.inputstream.content_type,
                     challenge = self.inputstream.challenge,
@@ -347,8 +347,34 @@ class Item(object):
 
             for key in self.inputstream.properties:
                 li.setProperty(self.inputstream.addon_id+'.'+key, self.inputstream.properties[key])
+        else:
+            self.inputstream = None
 
-        if self.path and self.path.lower().startswith('http'):
+        def make_sub(url, language='unk', mimetype=''):
+            if not url.lower().startswith('http') and not url.lower().startswith('plugin://'):
+                return url
+
+            ## using dash, we can embed subs
+            if self.inputstream and self.inputstream.manifest_type == 'mpd':
+                if mimetype not in ('application/ttml+xml', 'text/vtt') and not url.lower().startswith('plugin://'):
+                    ## can't play directly - covert to webvtt
+                    url = url_for(ROUTE_WEBVTT, url=url)
+                    mimetype = 'text/vtt'
+
+                proxy_data['subtitles'].append([mimetype, language, url])
+                return None
+
+            ## only srt or webvtt (text/) supported
+            if not mimetype.startswith('text/') and not url.lower().startswith('plugin://'):
+                url = url_for(ROUTE_WEBVTT, url=url)
+                mimetype = 'text/vtt'
+
+            proxy_url = '{}.srt'.format(language)
+            proxy_data['path_subs'][proxy_url] = url
+
+            return u'{}{}'.format(proxy_path, proxy_url)
+
+        if self.path and (self.path.lower().startswith('http://') or self.path.lower().startswith('https://')):
             if not mimetype:
                 parse = urlparse(self.path.lower())
                 if parse.path.endswith('.m3u') or parse.path.endswith('.m3u8'):
@@ -359,10 +385,46 @@ class Item(object):
                     mimetype = 'application/vnd.ms-sstr+xml'
 
             self.path = url_sub(self.path)
+            self.path = fix_url(self.path)
 
-            if use_proxy:
-                self.path = u'{}{}'.format(PROXY_PATH, self.path)
+            proxy_data = {
+                'manifest': self.path,
+                'license_url': license_url,
+                'session_id': hash_6(time.time()),
+                'audio_whitelist': settings.get('audio_whitelist', ''),
+                'subs_whitelist':  settings.get('subs_whitelist', ''),
+                'audio_description': settings.getBool('audio_description', True),
+                'subs_forced': settings.getBool('subs_forced', True),
+                'subs_non_forced': settings.getBool('subs_non_forced', True),
+                'verify_ssl': settings.getBool('verify_ssl', True),
+                'subtitles': [],
+                'path_subs': {},
+                'addon_id': ADDON_ID,
+                'quality': QUALITY_DISABLED,
+                'manifest_middleware': None,
+                'type': None,
+                'dns_rewrites': get_dns_rewrites(),
+            }
 
+            if mimetype == 'application/vnd.apple.mpegurl':
+                proxy_data['type'] = 'm3u8'
+            elif mimetype == 'application/dash+xml':
+                proxy_data['type'] = 'mpd'
+
+            proxy_data.update(self.proxy_data)
+
+            if self.subtitles:
+                subs = []
+                for sub in self.subtitles:
+                    sub = make_sub(*sub)
+                    if sub:
+                        subs.append(sub)
+
+                li.setSubtitles(list(subs))
+
+            set_kodi_string('_slyguy_quality', json.dumps(proxy_data))
+
+            self.path = get_url(self.path)
             if headers and '|' not in self.path:
                 self.path = u'{}|{}'.format(self.path, headers)
 

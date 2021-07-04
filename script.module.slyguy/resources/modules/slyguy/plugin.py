@@ -5,8 +5,9 @@ import random
 import time
 import json
 from functools import wraps
-from six.moves.urllib_parse import urlparse
+from six.moves.urllib_parse import quote_plus
 
+from pycaption import detect_format, WebVTTWriter
 from kodi_six import xbmc, xbmcplugin
 from six.moves.urllib.parse import quote
 
@@ -14,8 +15,9 @@ from . import router, gui, settings, userdata, inputstream, signals, migrate, bo
 from .constants import *
 from .log import log
 from .language import _
+from .session import Session
 from .exceptions import Error, PluginError, FailedPlayback
-from .util import set_kodi_string, get_addon, get_kodi_string
+from .util import set_kodi_string, get_addon, remove_file
 
 ## SHORTCUTS
 url_for         = router.url_for
@@ -30,6 +32,18 @@ logged_in = False
 class Redirect(object):
     def __init__(self, location):
         self.location = location
+
+# @plugin.no_error_gui()
+def no_error_gui():
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            try:
+                return f(*args, **kwargs)
+            except Exception as e:
+                log.exception(e)
+        return decorated_function
+    return lambda f: decorator(f)
 
 # @plugin.login_required()
 def login_required():
@@ -57,7 +71,7 @@ def route(url=None):
             elif isinstance(item, Folder):
                 item.display()
             elif isinstance(item, Item):
-                item.play(quality=kwargs.get(QUALITY_TAG))
+                item.play(**kwargs)
             elif isinstance(item, Redirect):
                 if _handle() > 0:
                     xbmcplugin.endOfDirectory(_handle(), succeeded=True, updateListing=True, cacheToDisc=True)
@@ -70,6 +84,32 @@ def route(url=None):
         return decorated_function
     return lambda f: decorator(f, url)
 
+# @plugin.plugin_callback()
+def plugin_callback():
+    def decorator(func):
+        @wraps(func)
+        def decorated_function(*args, **kwargs):
+            with open(kwargs['_data_path'], 'rb') as f:
+                kwargs['_data'] = f.read()
+
+            remove_file(kwargs['_data_path'])
+            kwargs['_headers'] = json.loads(kwargs['_headers'])
+
+            try:
+                path = func(*args, **kwargs)
+            except Exception as e:
+                log.exception(e)
+                path = None
+
+            folder = Folder()
+            folder.add_item(
+                path = quote_plus(path or ''),
+            )
+
+            return folder
+        return decorated_function
+    return lambda func: decorator(func)
+
 # @plugin.merge()
 def merge():
     def decorator(f):
@@ -77,8 +117,9 @@ def merge():
         def decorated_function(*args, **kwargs):
             folder = Folder()
 
+            result = False
             try:
-                f(*args, **kwargs)
+                message = f(*args, **kwargs) or ''
             except Error as e:
                 log.debug(e, exc_info=True)
                 message = e.message
@@ -86,10 +127,10 @@ def merge():
                 log.exception(e)
                 message = str(e)
             else:
-                message = 'ok'
+                result = True
 
             folder.add_item(
-                path = quote(message),
+                path = quote_plus(u'{}{}'.format(int(result), message)),
             )
 
             return folder
@@ -101,7 +142,7 @@ def resolve(error=False):
     handle = _handle()
     if handle > 0:
         if error and '_play=1' in sys.argv[2]:
-            _failed_playback()
+            failed_playback()
         else:
             xbmcplugin.endOfDirectory(handle, succeeded=False, updateListing=False, cacheToDisc=False)
 
@@ -122,7 +163,7 @@ def _exception(e):
     _close()
 
     if type(e) == FailedPlayback:
-        _failed_playback()
+        failed_playback()
         return
 
     log.exception(e)
@@ -222,6 +263,20 @@ def _settings(**kwargs):
     settings.open()
     gui.refresh()
 
+@route(ROUTE_WEBVTT)
+@plugin_callback()
+def _webvtt(url, _data_path, _headers, **kwargs):
+    r = Session().get(url, headers=_headers)
+
+    data = r.content.decode('utf8')
+    reader = detect_format(data)
+
+    data = WebVTTWriter().write(reader().read(data))
+    with open(_data_path, 'wb') as f:
+        f.write(data.encode('utf8'))
+
+    return _data_path + '|content-type=text/vtt'
+
 @route(ROUTE_RESET)
 def _reset(**kwargs):
     if not gui.yes_no(_.PLUGIN_RESET_YES_NO):
@@ -275,6 +330,14 @@ def _handle():
     except:
         return -1
 
+def failed_playback():
+    handle = _handle()
+    xbmcplugin.setResolvedUrl(handle, False, Item(path='http').get_li())
+    xbmcplugin.endOfDirectory(handle, succeeded=True, updateListing=False, cacheToDisc=False)
+    if KODI_VERSION < 18:
+        xbmc.PlayList(xbmc.PLAYLIST_MUSIC).clear()
+        xbmc.PlayList(xbmc.PLAYLIST_VIDEO).clear()
+
 def _autoplay(folder, pattern):
     choose = 'pick'
 
@@ -327,25 +390,19 @@ def _autoplay(folder, pattern):
 
     return router.redirect(selected.path)
 
-def _failed_playback():
-    handle = _handle()
-    xbmcplugin.setResolvedUrl(handle, False, Item(path='http://').get_li())
-    xbmcplugin.endOfDirectory(handle, succeeded=True, updateListing=False, cacheToDisc=False)
-    # xbmc.PlayList(xbmc.PLAYLIST_MUSIC).clear()
-    # xbmc.PlayList(xbmc.PLAYLIST_VIDEO).clear()
-
 default_thumb  = ADDON_ICON
 default_fanart = ADDON_FANART
 
 #Plugin.Item()
 class Item(gui.Item):
-    def __init__(self, cache_key=None, play_next=None, callback=None, geolock=None, bookmark=True, *args, **kwargs):
+    def __init__(self, cache_key=None, play_next=None, callback=None, geolock=None, bookmark=True, quality=None, *args, **kwargs):
         super(Item, self).__init__(self, *args, **kwargs)
         self.cache_key = cache_key
         self.play_next = dict(play_next or {})
         self.callback  = dict(callback or {})
         self.geolock   = geolock
         self.bookmark  = bookmark
+        self.quality   = quality
 
     def get_li(self):
         # if settings.getBool('use_cache', True) and self.cache_key:
@@ -367,15 +424,21 @@ class Item(gui.Item):
 
         return super(Item, self).get_li()
 
-    def play(self, quality=None):
+    def play(self, **kwargs):
         self.playable = True
 
-        try:
-            if not self.properties.get('ForceResume', False) and sys.argv[3] == 'resume:true':
-                self.properties.pop('ResumeTime', None)
-                self.properties.pop('TotalTime', None)
-        except:
-            pass
+        quality = kwargs.get(QUALITY_TAG, self.quality)
+        is_live = ROUTE_LIVE_TAG in kwargs
+
+        ##LEGACY##
+        if self.resume_from is None and 'ResumeTime' in self.properties:
+            self.resume_from = int(self.properties.pop('ResumeTime'))
+        #######
+
+        # if is_live and self.resume_from is None:
+        #     # Make sure always play from live head across chapters
+        #     # Requires https://github.com/xbmc/inputstream.adaptive/pull/685 for some streams
+        #     self.resume_from = 12*60*60
 
         if quality is None:
             quality = settings.getEnum('default_quality', QUALITY_TYPES, default=QUALITY_ASK)
@@ -384,31 +447,7 @@ class Item(gui.Item):
         else:
             quality = int(quality)
 
-        if quality not in (QUALITY_DISABLED, QUALITY_SKIP):
-            _type = None
-            if self.inputstream:
-                if self.inputstream.manifest_type == 'mpd':
-                    _type = 'mpd'
-                elif self.inputstream.manifest_type == 'hls':
-                    _type = 'm3u8'
-
-            if not _type:
-                parse = urlparse(self.path.lower())
-                if parse.path.endswith('.m3u') or parse.path.endswith('.m3u8'):
-                    _type = 'm3u8'
-
-            if _type:
-                last_quality = get_kodi_string('_slyguy_last_quality')
-                addon        = get_kodi_string('_slyguy_last_addon')
-                playlist_pos = xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition()
-
-                if quality == QUALITY_ASK and last_quality and addon == ADDON_ID and (playlist_pos > 0 or (xbmc.Player().isPlaying() and playlist_pos == -1)):
-                    quality = int(last_quality)
-
-                self.proxy_data['type'] = _type
-                self.proxy_data['quality'] = quality
-                self.use_proxy = True
-                set_kodi_string('_slyguy_last_addon', ADDON_ID)
+        self.proxy_data['quality'] = quality
 
         li     = self.get_li()
         handle = _handle()
@@ -440,7 +479,7 @@ class Folder(object):
         self.content = content
         self.updateListing = updateListing
         self.cacheToDisc = cacheToDisc
-        self.sort_methods = sort_methods or [xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL]
+        self.sort_methods = sort_methods
         self.thumb = thumb or default_thumb
         self.fanart = fanart or default_fanart
         self.no_items_label = no_items_label
@@ -449,6 +488,9 @@ class Folder(object):
     def display(self):
         handle = _handle()
         items  = [i for i in self.items if i]
+
+        ep_sort = True
+        last_show_name = ''
 
         if not items and self.no_items_label:
             label = _(self.no_items_label, _label=True)
@@ -469,21 +511,33 @@ class Folder(object):
             if self.fanart and not item.art.get('fanart'):
                 item.art['fanart'] = self.fanart
 
+            episode = item.info.get('episode')
+            show_name = item.info.get('tvshowtitle')
+            if not episode or not show_name or (last_show_name and show_name != last_show_name):
+                ep_sort = False
+
+            if not last_show_name:
+                last_show_name = show_name
+
             li = item.get_li()
             xbmcplugin.addDirectoryItem(handle, item.path, li, item.is_folder)
 
         if self.content: xbmcplugin.setContent(handle, self.content)
         if self.title: xbmcplugin.setPluginCategory(handle, self.title)
 
+        if not self.sort_methods:
+            self.sort_methods = [xbmcplugin.SORT_METHOD_EPISODE, xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL]
+            if not ep_sort:
+                self.sort_methods.pop(0)
+
         for sort_method in self.sort_methods:
             xbmcplugin.addSortMethod(handle, sort_method)
 
         xbmcplugin.endOfDirectory(handle, succeeded=True, updateListing=self.updateListing, cacheToDisc=self.cacheToDisc)
 
-        common_data = userdata.Userdata(COMMON_ADDON)
-        plugin_msg  = common_data.get('_next_plugin_msg')
+        plugin_msg = settings.common_settings.get('_next_plugin_msg')
         if plugin_msg:
-            common_data.delete('_next_plugin_msg')
+            settings.common_settings.set('_next_plugin_msg', '')
             gui.ok(plugin_msg)
 
     def add_item(self, *args, **kwargs):

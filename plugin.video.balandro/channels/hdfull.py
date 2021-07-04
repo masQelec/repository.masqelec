@@ -16,21 +16,27 @@ from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 from lib import balandroresolver
 
+
 host = "https://hdfull.me/"
+
+dominios = ['https://hdfullcdn.cc/', 'https://hdfull.sh/', 'https://hdfull.ch/', 'https://hdfull.org/']
+
 
 perpage = 20
 
 
-# /peliculas-actualizadas y /peliculas-estreno solo muestran una página con 40 elementos sin paginación
-# /peliculas/abc muestra páginas con 40 elementos paginables pero no permite escoger letra
-# /peliculas/date (= /peliculas) y /peliculas/imdb_rating muestran páginas con 40 elementos paginables
+def item_configurar_dominio(item):
+    plot = 'Este canal tiene varios posibles dominios. Si uno no te funciona puedes probar con los otros antes de intentarlo con proxies.'
+    return item.clone( title = 'Configurar dominio a usar ...', action = 'configurar_dominio', folder=False, plot=plot, text_color='yellowgreen' )
 
-# /series/date (= /series) y /series/imdb_rating solo muestran una página con 40 elementos sin paginación
-# /series/abc/X muestra todas las series que empiezan por la letra (pueden ser cientos)
-# /series/list es un listado de texto sin thumbnails de todas las series [no usado]
-# /tags-tv/xxx (por género) muestra páginas con 40 elementos paginables
 
-# /buscar muestra todas las pelis y series que coincidan (pueden ser bastantes)
+def configurar_dominio(item):
+    dominio = config.get_setting('dominio', 'hdfull', default=dominios[0])
+    num_dominio = dominios.index(dominio) if dominio in dominios else 0
+    ret = platformtools.dialog_select('Dominio a usar HdFull', dominios, preselect=num_dominio)
+    if ret == -1: return False
+    config.set_setting('dominio', dominios[ret], 'hdfull')
+    return True
 
 
 def item_configurar_proxies(item):
@@ -44,21 +50,27 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, referer=None, check_domain=True):
-    dominio = config.get_setting('dominio', 'hdfull', default=host)
-    url = re.sub('^https://[^/]+/', dominio, url)
+    dominio = config.get_setting('dominio', 'hdfull', default=dominios[0])
+    if dominio:
+        if not dominio in dominios: dominio = dominios[0]
+    else:
+        dominio = dominios[0]
 
-    if not referer: referer = dominio #host
+    # ~ por si viene de enlaces guardados de la v. 2.0.0
+    if url.startswith('/'):
+        url = dominios[0] + url
+
+    if dominio == host:
+        url = re.sub('^https://[^/]+/', dominio, url)
+
+    url = url.replace(host, dominio)
+
+    if not referer: referer = dominio
     elif host in referer: referer = referer.replace(host, dominio)
 
-    if dominio:
-        if not dominio in url:
-            if host in url:
-                url = url.replace(host, dominio)
-
-            if url.startswith('/'): url = dominio + url[1:]
+    headers = {}
 
     # ~ headers = {'Referer': referer}
-    headers = {}
 
     if post: headers = {'Referer': referer}
     # ~ headers = balandroresolver.get_headers(headers)
@@ -66,16 +78,20 @@ def do_downloadpage(url, post=None, referer=None, check_domain=True):
     resp = httptools.downloadpage_proxy('hdfull', url, post=post, headers=headers, raise_weberror=False)
     # ~ resp = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False)
 
-    if check_domain and ('location.replace(' in resp.data or not resp.data or resp.code >= 400):
-        if not resp.data or resp.code >= 400:
-            resp = httptools.downloadpage_proxy('hdfull', host)
-            # ~ resp = httptools.downloadpage(host)
+    if check_domain:
+        if host in url:
+            if ('location.replace(' in resp.data or not resp.data or resp.code >= 400):
+                if not resp.data or resp.code >= 400:
+                    resp = httptools.downloadpage_proxy('hdfull', host)
+                    # ~ resp = httptools.downloadpage(host)
 
-        dominio = scrapertools.find_single_match(resp.data, 'location\.replace\("(https://[^/]+/)')
-        if dominio:
-            config.set_setting('dominio', dominio, 'hdfull')
-            if not dominio in url:
+            dominio = scrapertools.find_single_match(resp.data, 'location\.replace\("(https://[^/]+/)')
+            if dominio:
+                config.set_setting('dominio', dominio, 'hdfull')
                 url = url.replace(host, dominio)
+            else:
+               config.set_setting('dominio', dominios[0], 'hdfull')
+               url = url.replace(host, dominios[0])
 
             return do_downloadpage(url, post=post, referer=referer, check_domain=False)
 
@@ -91,11 +107,14 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
 
-    itemlist.append(item.clone( title = 'Buscar intérprete ...', action = 'search', group = 'actor', search_type = 'person',
+    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='plum' ))
+
+    itemlist.append(item.clone( title = ' Buscar intérprete ...', action = 'search', group = 'actor', search_type = 'person',
                        plot = 'Debe indicarse el nombre y apellido/s del intérprete (lo más exacto posible).'))
-    itemlist.append(item.clone( title = 'Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
+    itemlist.append(item.clone( title = ' Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
                        plot = 'Debe indicarse el nombre y apellido/s del director (lo más exacto posible).'))
 
+    itemlist.append(item_configurar_dominio(item))
     itemlist.append(item_configurar_proxies(item))
     return itemlist
 
@@ -116,6 +135,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
+    itemlist.append(item_configurar_dominio(item))
     itemlist.append(item_configurar_proxies(item))
     return itemlist
 
@@ -138,6 +158,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
+    itemlist.append(item_configurar_dominio(item))
     itemlist.append(item_configurar_proxies(item))
     return itemlist
 
@@ -154,6 +175,9 @@ def generos(item):
 
     matches = re.compile('<li><a href="([^"]+)">([^<]+)', re.DOTALL).findall(bloque)
     for url, title in matches:
+        if url.startswith('/'):
+            url = host + url[1:]
+
         itemlist.append(item.clone( title=title, url=url, action='list_all' ))
 
     return sorted(itemlist, key=lambda it: it.title)
@@ -205,6 +229,9 @@ def list_all(item):
         languages = detectar_idiomas(langs)
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
+
+        if url.startswith('/'):
+            url = host + url[1:]
 
         if tipo == 'movie':
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=', '.join(languages), fmt_sufijo=sufijo,
@@ -333,7 +360,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data_js = do_downloadpage(host+'templates/hdfull/js/jquery.hdfull.view.min.js')
+    data_js = do_downloadpage(host + 'templates/hdfull/js/jquery.hdfull.view.min.js')
     # ~ logger.debug(data_js)
     key = scrapertools.find_single_match(data_js, 'JSON.parse\(atob.*?substrings\((.*?)\)')
     if not key: 
@@ -341,25 +368,30 @@ def findvideos(item):
         if key: key = int(key, 16)
         else: key = scrapertools.find_single_match(data_js, 'JSON.*?\]\(([0-9]+)\)\);')
 
-    data_js = do_downloadpage(host+'js/providers.js')
+    data_js = do_downloadpage(host + 'js/providers.js')
 
     provs = balandroresolver.hdfull_providers(data_js)
 
-
     data = do_downloadpage(item.url)
     # ~ logger.debug(data)
+
     data_obf = scrapertools.find_single_match(data, "var ad\s*=\s*'([^']+)")
-    data_decrypt = jsontools.load(balandroresolver.obfs(base64.b64decode(data_obf), 126 - int(key)))
+
+    # ~ por si viene de enlaces guardados de la v. 2.0.0
+    try:
+       data_decrypt = jsontools.load(balandroresolver.obfs(base64.b64decode(data_obf), 126 - int(key)))
+    except:
+       data_decrypt = ''
 
     matches = []
     for match in data_decrypt:
         if match['provider'] in provs:
             try:
-                embed = provs[match['provider']][0]
-                url = eval(provs[match['provider']][1].replace('_code_', "match['code']"))
-                matches.append([match['lang'], match['quality'], url, embed])
+               embed = provs[match['provider']][0]
+               url = eval(provs[match['provider']][1].replace('_code_', "match['code']"))
+               matches.append([match['lang'], match['quality'], url, embed])
             except:
-                pass
+               pass
 
     for idioma, calidad, url, embed in matches:
         # ~ logger.info('%s %s' % (embed, url))
@@ -384,7 +416,6 @@ def search(item, texto):
     try:
         if item.group:
             item.url = host + 'buscar' + '/' + item.group + '/' + texto
-            item.search_type = ''
         else:
             data = do_downloadpage(host)
             # ~ logger.debug(data)
@@ -392,7 +423,6 @@ def search(item, texto):
             item.search_post = '__csrf_magic=%s&menu=search&query=%s' % (magic, texto.replace(' ','+'))
             item.url = host + 'buscar'
 
-        if item.search_type == '': item.search_type = 'all'
         return list_all(item)
     except:
         import sys

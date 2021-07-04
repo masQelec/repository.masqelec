@@ -3,7 +3,7 @@
   "name": "Beeg",
   "thumbnail": "beeg.png",
 
-  "active": false,
+  "active": true,
 
   "searchable": false,
   "search_types": ["movie"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "adults"],
   "language": ["vo"],
 
-  "clusters": ["adults", "vos"],
+  "clusters": ["adults", "categories", "stars", "vos"],
 
   "notes": "Videos en Version Original para Adultos +18"
 }

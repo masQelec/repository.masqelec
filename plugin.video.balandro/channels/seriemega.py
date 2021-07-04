@@ -212,8 +212,8 @@ def episodios(item):
 
         if not url or not season or not episode: continue
 
-        if not item.contentSeason: continue
-        elif not str(item.contentSeason) == season: continue
+        if item.contentSeason:
+           if not str(item.contentSeason) == str(season): continue
 
         thumb = scrapertools.find_single_match(data_epi.replace('&quot;','"'), ' src="([^"]+)')
         titulo = '%sx%s %s' % (season, episode, title)
