@@ -3759,7 +3759,7 @@ Archivos soportados: .ngp, .ngc, .ngpc, .npc</description>
 
 <addon id="metadata.common.themoviedb.org"
        name="The Movie Database Scraper Library"
-       version="3.2.14"
+       version="3.2.17"
        provider-name="Team Kodi">
   <requires>
     <import addon="xbmc.metadata" version="2.1.0"/>
@@ -9210,7 +9210,7 @@ Dual Screen Sound Format is an audio format based on PSF. It stores audio ripped
     </extension>
 </addon>
 
-<addon id="slyguy.samsung.tv.plus" name="Samsung TV Plus" provider-name="SlyGuy" version="0.0.9">
+<addon id="slyguy.samsung.tv.plus" name="Samsung TV Plus" provider-name="SlyGuy" version="0.1.1">
   <requires>
     <import addon="script.module.slyguy"/>
   </requires>
@@ -14564,7 +14564,9 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Common" provider-name="SlyGuy" version="0.34.1">
+<addon id="script.module.slyguy" name="SlyGuy Common" provider-name="SlyGuy" version="0.34.8">
+  <requires>
+  </requires>
   <extension point="xbmc.service" library="service.py" start="login" />
   <extension point="xbmc.python.pluginsource" library="default.py" />
   <extension point="xbmc.python.module" library="resources/modules" />
