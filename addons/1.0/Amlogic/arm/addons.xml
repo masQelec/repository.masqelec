@@ -3004,6 +3004,27 @@ Boblight(478) is an opensource AmbiLight implementation.
 
 </addon>
 
+<addon id="script.module.simpleplugin3"
+   name="SimplePlugin 3"
+   version="3.0.5"
+   provider-name="Roman V.M.">
+  <requires>
+    <import addon="xbmc.python" version="2.25.0"/>
+    <import addon="script.module.future" version="0.16.0.4"/>
+  </requires>
+  <extension point="xbmc.python.module" library="libs" />
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <summary lang="en_GB">SimplePlugin micro-framework</summary>
+    <description lang="en_GB">SimplePlugin micro-framework that simplifies Kodi content plugin programming.</description>
+    <license>GPL-3.0-only</license>
+    <forum></forum>
+    <website>http://romanvm.github.io/script.module.simpleplugin</website>
+    <email>roman1972@gmail.com</email>
+    <source>https://github.com/romanvm/script.module.simpleplugin</source>
+  </extension>
+</addon>
+
 <addon id="game.controller.genesis.6button"
         name="Sega Genesis Controller"
         version="1.0.8"
@@ -3308,7 +3329,7 @@ FLAC stands out as the fastest and most widely supported lossless audio codec, a
   </extension>
 </addon>
 
-<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.6.9">
+<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.7.0">
   <requires>
     <import addon="script.module.slyguy"/>
   </requires>
@@ -14070,7 +14091,7 @@ Librespot (2020-06-22) lets you play Spotify through Kodi using a Spotify app as
   </extension>
 </addon>
 
-<addon id="plugin.video.netflix" name="Netflix" version="1.12.5" provider-name="libdev + jojo + asciidisco + caphm + castagnait">
+<addon id="plugin.video.netflix" name="Netflix" version="1.12.6" provider-name="libdev + jojo + asciidisco + caphm + castagnait">
   <requires>
     <import addon="xbmc.python" version="2.26.0"/>
     <import addon="script.module.addon.signals" version="0.0.3"/>
@@ -14159,9 +14180,8 @@ Librespot (2020-06-22) lets you play Spotify through Kodi using a Spotify app as
     <forum>https://forum.kodi.tv/showthread.php?tid=329767</forum>
     <source>https://github.com/CastagnaIT/plugin.video.netflix</source>
     <news>
-v1.12.5 (2021-06-20)
-- Updated video profiles for HEVC/HEVC HDR
-- Fixed missing items in episodes lists and others submenus
+v1.12.6 (2021-07-16)
+- Fixed empty lists on menu/submenus due to website changes
     </news>
   </extension>
 </addon>
@@ -14564,14 +14584,14 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Common" provider-name="SlyGuy" version="0.34.8">
+<addon id="script.module.slyguy" name="SlyGuy Common" provider-name="SlyGuy" version="0.35.8">
   <requires>
   </requires>
   <extension point="xbmc.service" library="service.py" start="login" />
   <extension point="xbmc.python.pluginsource" library="default.py" />
   <extension point="xbmc.python.module" library="resources/modules" />
   <extension point="xbmc.addon.metadata">
-    <description lang="en">Common code used by all Slyguy add-ons</description>
+    <description lang="en">Common code required by all Slyguy add-ons</description>
     <reuselanguageinvoker>true</reuselanguageinvoker>
     <license></license>
     <language></language>
