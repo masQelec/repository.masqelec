@@ -1968,7 +1968,7 @@ Supported files: .bin, .vec</description>
     </extension>
 </addon>
 
-<addon id="script.common.plugin.cache" name="Common plugin cache" provider-name="anxdpanic, TheCollective" version="2.6.1">
+<addon id="script.common.plugin.cache" name="Common plugin cache" provider-name="anxdpanic, TheCollective" version="2.6.3">
     <requires>
         <import addon="xbmc.python" version="2.24.0"/>
     </requires>
@@ -3329,7 +3329,7 @@ FLAC stands out as the fastest and most widely supported lossless audio codec, a
   </extension>
 </addon>
 
-<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.7.0">
+<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.7.7">
   <requires>
     <import addon="script.module.slyguy"/>
   </requires>
@@ -3340,9 +3340,6 @@ FLAC stands out as the fastest and most widely supported lossless audio codec, a
     <description lang="en">Disney+ is the exclusive home for your favorite movies and TV shows from Disney, Pixar, Marvel, Star Wars, and National Geographic.
 
 Subscription required.</description>
-  <description lang="es">Disney + es el hogar exclusivo para tus películas y programas de televisión favoritos de Disney, Pixar, Marvel, Star Wars y National Geographic.
-
-Subscription required.</description>
     <description lang="it">Disney+ è la casa esclusiva per i tuoi film e programmi TV preferiti di Disney, Pixar, Marvel, Star Wars e National Geographic.
 
 Abbonamento richiesto.</description>
@@ -3350,7 +3347,7 @@ Abbonamento richiesto.</description>
     <license></license>
     <language></language>
     <website></website>
-    <news>Fix search</news>
+    <news>Migrate to latest Disney API</news>
     <assets>
       <icon>icon.png</icon>
       <fanart>fanart.jpg</fanart>
@@ -14584,7 +14581,7 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Common" provider-name="SlyGuy" version="0.35.8">
+<addon id="script.module.slyguy" name="SlyGuy Common" provider-name="SlyGuy" version="0.36.7">
   <requires>
   </requires>
   <extension point="xbmc.service" library="service.py" start="login" />
