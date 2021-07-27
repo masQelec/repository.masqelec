@@ -10,6 +10,7 @@ from slyguy.log import log
 
 from kodi_six import xbmc
 
+from . import queries
 from .constants import *
 from .language import _
 
@@ -19,46 +20,35 @@ class APIError(Error):
 ERROR_MAP = {
     'not-entitled': _.NOT_ENTITLED,
     'idp.error.identity.bad-credentials': _.BAD_CREDENTIALS,
+    'account.profile.pin.invalid': _.BAD_PIN,
 }
 
 class API(object):
     def new_session(self):
         self.logged_in = False
-        self._session  = Session(HEADERS, timeout=30)
+        self._session = Session(HEADERS, timeout=30)
         self._set_authentication(userdata.get('access_token'))
-        self._set_languages()
 
     @mem_cache.cached(60*60, key='config')
     def get_config(self):
         return self._session.get(CONFIG_URL).json()
 
-    def _set_languages(self):
-        self._app_language = 'en'
-        self._playback_language = 'en'
-        self._subtitle_language = 'en'
-        self._kids_mode = False
-        self._maturity_rating = 9999
-        self._region = None
-
-        if not self.logged_in:
-            return
-
-        data = jwt_data(userdata.get('access_token'))['context']
-
-     #   self._maturity_rating = data['preferred_maturity_rating']['implied_maturity_rating']
-     #   self._region = data['location']['country_code']
-
-        for profile in data['profiles']:
-            if profile['id'] == data['active_profile_id']:
-                self._app_language      = profile['language_preferences']['app_language']
-                self._playback_language = profile['language_preferences']['playback_language']
-                self._subtitle_language = profile['language_preferences']['subtitle_language']
-                self._kids_mode         = profile['kids_mode_enabled']
-                return
-
     @mem_cache.cached(60*60, key='transaction_id')
     def _transaction_id(self):
         return str(uuid.uuid4())
+
+    @mem_cache.cached(60*60, key='profile')
+    def _get_profile(self):
+        data = self.account()
+
+        profile = None
+        if data['account']['activeProfile']:
+            for row in data['account']['profiles']:
+                if row['id'] == data['account']['activeProfile']['id']:
+                    profile = row
+                    break
+
+        return data['activeSession'], profile
 
     @property
     def session(self):
@@ -77,341 +67,222 @@ class API(object):
             return
 
         payload = {
-            'refresh_token': userdata.get('refresh_token'),
             'grant_type': 'refresh_token',
-            'platform': 'browser',
-        }
-
-        self._oauth_token(payload)
-
-    def _oauth_token(self, payload):
-        headers = {
-            'Authorization': 'Bearer {}'.format(API_KEY),
+            'refresh_token': userdata.get('refresh_token'),
+            'platform': 'android-tv',
         }
 
         endpoint = self.get_config()['services']['token']['client']['endpoints']['exchange']['href']
-        token_data = self._session.post(endpoint, data=payload, headers=headers).json()
+        data = self._session.post(endpoint, data=payload, headers={'authorization': 'Bearer {}'.format(API_KEY)}).json()
+        self._check_errors(data)
+        self._set_auth(data)
 
-        self._check_errors(token_data)
+    def _set_auth(self, data):
+        token = data.get('accessToken') or data['access_token']
+        expires = data.get('expiresIn') or data['expires_in']
+        refresh_token = data.get('refreshToken') or data['refresh_token']
 
-        self._set_authentication(token_data['access_token'])
-
-        userdata.set('access_token', token_data['access_token'])
-        userdata.set('expires', int(time() + token_data['expires_in'] - 15))
-
-        if 'refresh_token' in token_data:
-            userdata.set('refresh_token', token_data['refresh_token'])
+        self._set_authentication(token)
+        userdata.set('access_token', token)
+        userdata.set('expires', int(time() + expires - 15))
+        userdata.set('refresh_token', refresh_token)
 
     def login(self, username, password):
         self.logout()
 
-        try:
-            self._do_login(username, password)
-        except:
-            self.logout()
-            raise
+        payload = {
+            'variables': {
+                'registerDevice': {
+                    'applicationRuntime': 'android',
+                    'attributes': {
+                        'operatingSystem': 'Android',
+                        'operatingSystemVersion': '8.1.0',
+                    },
+                    'deviceFamily': 'android',
+                    'deviceLanguage': 'en',
+                    'deviceProfile': 'tv',
+                }
+            },
+            'query': queries.REGISTER_DEVICE,
+        }
+
+        endpoint = self.get_config()['services']['orchestration']['client']['endpoints']['registerDevice']['href']
+        data = self._session.post(endpoint, json=payload, headers={'authorization': API_KEY}).json()
+        self._check_errors(data)
+        token = data['extensions']['sdk']['token']['accessToken']
+
+        payload = {
+            'operationName': 'loginTv',
+            'variables': {
+                'input': {
+                    'email': username,
+                    'password': password,
+                },
+            },
+            'query': queries.LOGIN,
+        }
+
+        endpoint = self.get_config()['services']['orchestration']['client']['endpoints']['query']['href']
+        data = self._session.post(endpoint, json=payload, headers={'authorization': token}).json()
+        self._check_errors(data)
+        self._set_auth(data['extensions']['sdk']['token'])
 
     def _check_errors(self, data, error=_.API_ERROR):
+        if not type(data) is dict:
+            return
+
         if data.get('errors'):
-            error_msg = ERROR_MAP.get(data['errors'][0].get('code')) or data['errors'][0].get('description') or data['errors'][0].get('code')
+            if 'extensions' in data['errors'][0]:
+                code = data['errors'][0]['extensions'].get('code')
+            else:
+                code = data['errors'][0].get('code')
+
+            error_msg = ERROR_MAP.get(code) or data['errors'][0].get('message') or data['errors'][0].get('description') or code
             raise APIError(_(error, msg=error_msg))
 
         elif data.get('error'):
             error_msg = ERROR_MAP.get(data.get('error_code')) or data.get('error_description') or data.get('error_code')
             raise APIError(_(error, msg=error_msg))
 
-    def _do_login(self, username, password):
-        headers = {
-            'Authorization': 'Bearer {}'.format(API_KEY),
-        }
+        elif data.get('status') == 400:
+            raise APIError(_(error, msg=data.get('message')))
 
-        payload = {
-            'deviceFamily': 'android',
-            'applicationRuntime': 'android',
-            'deviceProfile': 'tv',
-            'attributes': {},
-        }
-
-        endpoint = self.get_config()['services']['device']['client']['endpoints']['createDeviceGrant']['href']
-        device_data = self._session.post(endpoint, json=payload, headers=headers, timeout=20).json()
-
-        self._check_errors(device_data)
-
-        payload = {
-            'subject_token': device_data['assertion'],
-            'subject_token_type': 'urn:bamtech:params:oauth:token-type:device',
-            'platform': 'android',
-            'grant_type': 'urn:ietf:params:oauth:grant-type:token-exchange',
-        }
-
-        self._oauth_token(payload)
-
-        payload = {
-            'email':    username,
-            'password': password,
-        }
-
-        endpoint = self.get_config()['services']['bamIdentity']['client']['endpoints']['identityLogin']['href']
-        login_data = self._session.post(endpoint, json=payload).json()
-
-        self._check_errors(login_data)
-
-        endpoint = self.get_config()['services']['account']['client']['endpoints']['createAccountGrant']['href']
-        grant_data = self._session.post(endpoint, json={'id_token': login_data['id_token']}).json()
-
-        payload = {
-            'subject_token': grant_data['assertion'],
-            'subject_token_type': 'urn:bamtech:params:oauth:token-type:account',
-            'platform': 'android',
-            'grant_type': 'urn:ietf:params:oauth:grant-type:token-exchange',
-        }
-
-        self._oauth_token(payload)
-
-    def profiles(self):
+    def _json_call(self, endpoint):
         self._refresh_token()
-
-        endpoint = self.get_config()['services']['account']['client']['endpoints']['getUserProfiles']['href']
-        return self._session.get(endpoint).json()
-
-    def add_profile(self, name, kids=False, avatar=None):
-        payload = {
-            'attributes': {
-                'kidsModeEnabled': bool(kids),
-                'languagePreferences': {
-                    'appLanguage': self._app_language,
-                    'playbackLanguage': self._playback_language,
-                    'subtitleLanguage': self._subtitle_language,
-                },
-                'playbackSettings': {
-                    'autoplay': True,
-                },
-            },
-            'metadata': None,
-            'profileName': name,
-        }
-
-        if avatar:
-            payload['attributes']['avatar'] = {
-                'id': avatar,
-                'userSelected': False,
-            }
-
-        endpoint = self.get_config()['services']['account']['client']['endpoints']['createUserProfile']['href']
-        return self._session.post(endpoint, json=payload).json()
-
-    def delete_profile(self, profile):
-        endpoint = self.get_config()['services']['account']['client']['endpoints']['deleteUserProfile']['href'].format(profileId=profile['profileId'])
-        return self._session.delete(endpoint)
-
-    def active_profile(self):
-        self._refresh_token()
-
-        endpoint = self.get_config()['services']['account']['client']['endpoints']['getActiveUserProfile']['href']
-        return self._session.get(endpoint).json()
-
-    def update_profile(self, profile):
-        self._refresh_token()
-
-        endpoint = self.get_config()['services']['account']['client']['endpoints']['updateUserProfile']['href'].format(profileId=profile['profileId'])
-        if self._session.patch(endpoint, json=profile).ok:
-            self._refresh_token(force=True)
-            return True
-        else:
-            return False
-
-    def set_profile(self, profile, pin=None):
-        self._refresh_token()
-
-        endpoint = self.get_config()['services']['account']['client']['endpoints']['setActiveUserProfile']['href'].format(profileId=profile['profileId'])
-
-        payload = {}
-        if pin:
-            payload['entryPin'] = str(pin)
-
-        grant_data = self._session.put(endpoint, json=payload).json()
-        self._check_errors(grant_data)
-
-        payload = {
-            'subject_token': grant_data['assertion'],
-            'subject_token_type': 'urn:bamtech:params:oauth:token-type:account',
-            'platform': 'android',
-            'grant_type': 'urn:ietf:params:oauth:grant-type:token-exchange',
-        }
-
-        self._oauth_token(payload)
-
-        userdata.set('profile_language', profile['attributes']['languagePreferences']['appLanguage'])
-
-    def search(self, query, page=1, page_size=PAGE_SIZE):
-        self._refresh_token()
-
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'index': 'disney_global',
-            'q': query,
-            'page': page,
-            'pageSize': page_size,
-            'contentTransactionId': self._transaction_id(),
-        }
-
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['searchPersisted']['href'].format(queryId='core/disneysearch')
-
-        data = self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()
+        data = self._session.get(endpoint).json()
         self._check_errors(data)
-
-        return data['data']['disneysearch']
-
-    def avatar_by_id(self, ids):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'avatarId': ids,
-        }
-
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['searchPersisted']['href'].format(queryId='core/AvatarByAvatarId')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['AvatarByAvatarId']
-
-    def video_bundle(self, family_id):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'familyId': family_id,
-            'contentTransactionId': self._transaction_id(),
-        }
-
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/DmcVideoBundle')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['DmcVideoBundle']
-
-    def extras(self, family_id):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'familyId': family_id,
-            'page': 1,
-            'pageSize': 999,
-            'contentTransactionId': self._transaction_id(),
-        }
-
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/DmcExtras')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['DmcExtras']
-
-    def continue_watching(self):
-        set_id = CONTINUE_WATCHING_SET_ID
-        set_type = CONTINUE_WATCHING_SET_TYPE
-        data = self.set_by_id(set_id, set_type, page_size=999)
-
-        continue_watching = {}
-        for row in data['items']:
-            if row['meta']['bookmarkData']:
-                play_from = row['meta']['bookmarkData']['playhead']
-            else:
-                play_from = 0
-
-            continue_watching[row['contentId']] = play_from
-
-        return continue_watching
-
-    def series_bundle(self, series_id, page=1, page_size=PAGE_SIZE):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'seriesId': series_id,
-            'episodePage': page,
-            'episodePageSize': page_size,
-            'contentTransactionId': self._transaction_id(),
-        }
-
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/DmcSeriesBundle')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['DmcSeriesBundle']
-
-    def episodes(self, season_ids, page=1, page_size=PAGE_SIZE_EPISODES):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'seasonId': season_ids,
-            'episodePage': page,
-            'episodePageSize': page_size,
-            'contentTransactionId': self._transaction_id(),
-        }
-
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/DmcEpisodes')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['DmcEpisodes']
-
-    def collection_by_slug(self, slug, content_class):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'contentClass': content_class,
-            'slug': slug,
-            'contentTransactionId': self._transaction_id(),
-        }
-
-        #endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='disney/CollectionBySlug')
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/CompleteCollectionBySlug')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['CompleteCollectionBySlug']
-
-    def set_by_id(self, set_id, set_type, page=1, page_size=PAGE_SIZE):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'setId': set_id,
-            'setType': set_type,
-            'page': page,
-            'pageSize': page_size,
-            'contentTransactionId': self._transaction_id(),
-        }
-
-        #endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='disney/SetBySetId')
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/SetBySetId')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['SetBySetId']
-
-    def add_watchlist(self, content_id):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'contentIds': content_id,
-        }
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/AddToWatchlist')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['AddToWatchlist']
-
-    def delete_watchlist(self, content_id):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'contentIds': content_id,
-        }
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/DeleteFromWatchlist')
-        data = self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['DeleteFromWatchlist']
-        xbmc.sleep(500)
         return data
 
+    def account(self):
+        self._refresh_token()
+
+        endpoint = self.get_config()['services']['orchestration']['client']['endpoints']['query']['href']
+
+        payload = {
+            'operationName': 'EntitledGraphMeQuery',
+            'variables': {},
+            'query': queries.ENTITLEMENTS,
+        }
+
+        data = self._session.post(endpoint, json=payload).json()
+        self._check_errors(data)
+        return data['data']['me']
+
+    def switch_profile(self, profile_id, pin=None):
+        self._refresh_token()
+
+        payload = {
+            'operationName': 'switchProfile',
+            'variables': {
+                'input': {
+                    'profileId': profile_id,
+                },
+            },
+            'query': queries.SWITCH_PROFILE,
+        }
+
+        if pin:
+            payload['variables']['input']['entryPin'] = str(pin)
+
+        endpoint = self.get_config()['services']['orchestration']['client']['endpoints']['query']['href']
+        data = self._session.post(endpoint, json=payload).json()
+        self._check_errors(data)
+        self._set_auth(data['extensions']['sdk']['token'])
+        mem_cache.delete('profile')
+
+    def _endpoint(self, href, **kwargs):
+        session, profile = self._get_profile()
+
+        region = session['location']['countryCode']
+        maturity = session['preferredMaturityRating']['impliedMaturityRating'] if session['preferredMaturityRating'] else 1850
+        kids_mode = profile['attributes']['kidsModeEnabled'] if profile else False
+        appLanguage = profile['attributes']['languagePreferences']['appLanguage'] if profile else 'en-US'
+
+        _args = {
+            'apiVersion': API_VERSION,
+            'region': region,
+            'impliedMaturityRating': maturity,
+            'kidsModeEnabled': 'true' if kids_mode else 'false',
+            'appLanguage': appLanguage,
+        }
+        _args.update(**kwargs)
+
+        return href.format(**_args)
+
+    def search(self, query):
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['getSiteSearch']['href'], query=query)
+        return self._json_call(endpoint)['data']['disneysearch']
+
+    def avatar_by_id(self, ids):
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['getAvatars']['href'], avatarIds=','.join(ids))
+        return self._json_call(endpoint)['data']['Avatars']
+
+    def video_bundle(self, family_id):
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['getDmcVideoBundle']['href'], encodedFamilyId=family_id)
+        return self._json_call(endpoint)['data']['DmcVideoBundle']
+
     def up_next(self, content_id):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'contentId': content_id,
-            'contentTransactionId': self._transaction_id(),
-        }
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['getUpNext']['href'], contentId=content_id)
+        return self._json_call(endpoint)['data']['UpNext']
 
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/UpNext')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['UpNext']
+    def continue_watching(self):
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['getCWSet']['href'], setId=CONTINUE_WATCHING_SET_ID)
+        return self._json_call(endpoint)['data']['ContinueWatchingSet']
 
-    def videos(self, content_id):
-        variables = {
-            'preferredLanguage': [self._app_language],
-            'contentId': content_id,
-            'contentTransactionId': self._transaction_id(),
-        }
+    def add_watchlist(self, content_id):
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['addToWatchlist']['href'], contentId=content_id)
+        return self._json_call(endpoint)['data']['AddToWatchlist']
 
-        endpoint = self.get_config()['services']['content']['client']['endpoints']['dmcVideos']['href'].format(queryId='core/DmcVideos')
-        return self._session.get(endpoint, params={'variables': json.dumps(variables)}).json()['data']['DmcVideos']
+    def delete_watchlist(self, content_id):
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['deleteFromWatchlist']['href'], contentId=content_id)
+        return self._json_call(endpoint)['data']['DeleteFromWatchlist']
+
+    def collection_by_slug(self, slug, content_class):
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['getCompleteStandardCollection']['href'], contentClass=content_class, slug=slug)
+        return self._json_call(endpoint)['data']['CompleteStandardCollection']
+
+    def set_by_id(self, set_id, set_type, page=1, page_size=15):
+        if set_type == 'ContinueWatchingSet':
+            endpoint = 'getCWSet'
+        elif set_type == 'CuratedSet':
+            endpoint = 'getCuratedSet'
+        else:
+            endpoint = 'getSet'
+
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints'][endpoint]['href'], setType=set_type, setId=set_id, pageSize=page_size, page=page)
+        return self._json_call(endpoint)['data'][set_type]
+
+    def video(self, content_id):
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['getDmcVideo']['href'], contentId=content_id)
+        return self._json_call(endpoint)['data']['DmcVideo']
+
+    def series_bundle(self, series_id):
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['getDmcSeriesBundle']['href'], encodedSeriesId=series_id)
+        return self._json_call(endpoint)['data']['DmcSeriesBundle']
+
+    def episodes(self, season_id, page=1, page_size=PAGE_SIZE_EPISODES):
+        endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['getDmcEpisodes']['href'], seasonId=season_id, pageSize=page_size, page=page)
+        return self._json_call(endpoint)['data']['DmcEpisodes']
 
     def update_resume(self, media_id, fguid, playback_time):
         self._refresh_token()
 
         payload = [{
-            "server": {
-                "fguid": fguid,
-                "mediaId": media_id,
+            'server': {
+                'fguid': fguid,
+                'mediaId': media_id,
+                # 'origin': '',
+                # 'host': '',
+                # 'cdn': '',
+                # 'cdnPolicyId': '',
             },
-            "client": {
-                "event": "urn:dss:telemetry-service:event:stream-sample",
-                "timestamp": str(int(time()*1000)),
-                "play_head": playback_time,
-                # "playback_session_id": str(uuid.uuid4()),
-                # "interaction_id": str(uuid.uuid4()),
-                # "bitrate": 4206,
+            'client': {
+                'event': 'urn:bamtech:api:stream-sample',
+                'timestamp': str(int(time()*1000)),
+                'play_head': playback_time,
+                # 'playback_session_id': str(uuid.uuid4()),
+                # 'interaction_id': str(uuid.uuid4()),
+                # 'bitrate': 4206,
             },
         }]
 
@@ -419,13 +290,14 @@ class API(object):
         return self._session.post(endpoint, json=payload).status_code
 
     def playback_data(self, playback_url):
-        self._refresh_token(force=True)
+        self._refresh_token()
 
         config = self.get_config()
         scenario = config['services']['media']['extras']['restrictedPlaybackScenario']
 
         if settings.getBool('wv_secure', False):
-            scenario = config['services']['media']['extras']['playbackScenarioDefault']
+            #scenario = config['services']['media']['extras']['playbackScenarioDefault']
+            scenario = 'tv-drm-ctr'
 
             if settings.getBool('h265', False):
                 scenario += '-h265'
@@ -438,7 +310,7 @@ class API(object):
                 if settings.getBool('dolby_atmos', False):
                     scenario += '-atmos'
 
-        headers = {'accept': 'application/vnd.media-service+json; version=4', 'authorization': userdata.get('access_token')}
+        headers = {'accept': 'application/vnd.media-service+json; version=5', 'authorization': userdata.get('access_token'), 'x-dss-feature-filtering': 'true'}
 
         endpoint = playback_url.format(scenario=scenario)
         playback_data = self._session.get(endpoint, headers=headers).json()
@@ -453,5 +325,6 @@ class API(object):
 
         mem_cache.delete('transaction_id')
         mem_cache.delete('config')
+        mem_cache.delete('profile')
 
         self.new_session()
