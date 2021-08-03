@@ -27,7 +27,7 @@ msgid "Originals"
 msgstr ""
 
 msgctxt "#30007"
-msgid "Information"
+msgid "Full Details"
 msgstr ""
 
 msgctxt "#30008"
@@ -91,10 +91,6 @@ msgctxt "#30022"
 msgid "Play Next Recommended Movie"
 msgstr ""
 
-msgctxt "#30023"
-msgid "Play without Intro"
-msgstr ""
-
 msgctxt "#30024"
 msgid "Skip Intros"
 msgstr ""
@@ -123,9 +119,6 @@ msgctxt "#30030"
 msgid "Enter your Profile PIN"
 msgstr ""
 
-msgctxt "#30041"
-msgid "Play with Intro"
-msgstr ""
 
 msgctxt "#30042"
 msgid "Continue Watching"
@@ -149,6 +142,9 @@ msgctxt "#30046"
 msgid "Incorrect Pin"
 msgstr ""
 
+msgctxt "#30047"
+msgid "Disney+ Watchlist"
+msgstr ""
 
 msgctxt "#30048"
 msgid "From {time:0>8}"

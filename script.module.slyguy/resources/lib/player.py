@@ -7,8 +7,7 @@ from threading import Thread
 from slyguy.util import get_kodi_string, set_kodi_string
 from slyguy.log import log
 from slyguy.router import add_url_args
-
-from .monitor import monitor
+from slyguy.monitor import monitor
 
 class Player(xbmc.Player):
     # def __init__(self, *args, **kwargs):
@@ -26,9 +25,19 @@ class Player(xbmc.Player):
             cur_time  = time.time()
             play_time = self.getTime()
 
+            if self._play_skips:
+                play_skips = []
+                for row in self._play_skips:
+                    if play_time >= row['from']:
+                        self.seekTime(row['to'])
+                    else:
+                        play_skips.append(row)
+                self._play_skips = play_skips
+
             if self._up_next and play_time >= self._up_next['time']:
                 play_time = self.getTotalTime()
                 self.seekTime(play_time)
+                self._up_next = None
                 last_callback = None
 
             if self._callback and self._callback['type'] == 'interval' and (not last_callback or cur_time >= last_callback + self._callback['interval']):
@@ -44,6 +53,7 @@ class Player(xbmc.Player):
         self._up_next = None
         self._callback = None
         self._playlist = None
+        self._play_skips = None
 
         if self.isPlayingVideo():
             self._playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -62,6 +72,13 @@ class Player(xbmc.Player):
                 if up_next['time']:
                     self._up_next = up_next
 
+        play_skips = get_kodi_string('_slyguy_play_skips')
+        if play_skips:
+            set_kodi_string('_slyguy_play_skips')
+            play_skips = json.loads(play_skips)
+            if play_skips['playing_file'] == self.getPlayingFile():
+                self._play_skips = play_skips['skips']
+
         callback = get_kodi_string('_slyguy_play_callback')
         if callback:
             set_kodi_string('_slyguy_play_callback')
@@ -69,7 +86,7 @@ class Player(xbmc.Player):
             if callback['playing_file'] == self.getPlayingFile() and callback['callback']:
                 self._callback = callback
 
-        if self._up_next or self._callback:
+        if self._up_next or self._callback or self._play_skips:
             self._thread = Thread(target=self.playback, args=(self.getPlayingFile(),))
             self._thread.start()
 

@@ -25,11 +25,7 @@ from slyguy.session import RawSession
 from slyguy.language import _
 from slyguy.router import add_url_args
 
-from .constants import *
-
-#ADDON_DEV = True
-
-REMOVE_IN_HEADERS = ['upgrade', 'host']
+REMOVE_IN_HEADERS = ['upgrade', 'host', 'accept-encoding']
 REMOVE_OUT_HEADERS = ['date', 'server', 'transfer-encoding', 'keep-alive', 'connection']
 
 DEFAULT_PORT = 52103
@@ -90,8 +86,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         for header in self.headers:
             if header.lower() not in REMOVE_IN_HEADERS:
                 self._headers[header.lower()] = self.headers[header]
-
-        self._headers['accept-encoding'] = 'gzip, deflate, br'
 
         length = int(self._headers.get('content-length', 0))
         self._post_data = self.rfile.read(length) if length else None
@@ -353,15 +347,20 @@ class RequestHandler(BaseHTTPRequestHandler):
             mpd.removeAttribute('publishTime')
             log.debug('Dash Fix: publishTime removed')
 
-        ## Fix mpd overalseconds bug
-        if mpd.getAttribute('type') == 'dynamic' and 'timeShiftBufferDepth' not in mpd_attribs and 'mediaPresentationDuration' not in mpd_attribs:
+        ## Remove mediaPresentationDuration from live PR: https://github.com/xbmc/inputstream.adaptive/pull/762
+        if (mpd.getAttribute('type') == 'dynamic' or 'timeShiftBufferDepth' in mpd_attribs) and 'mediaPresentationDuration' in mpd_attribs:
+            mpd.removeAttribute('mediaPresentationDuration')
+            log.debug('Dash Fix: mediaPresentationDuration removed from live')
+
+        ## Fix mpd overalseconds bug issue: https://github.com/xbmc/inputstream.adaptive/issues/731
+        if mpd.getAttribute('type') == 'dynamic' and 'timeShiftBufferDepth' not in mpd_attribs:
             if 'availabilityStartTime' in mpd_attribs:
                 buffer_seconds = (arrow.now() - arrow.get(mpd.getAttribute('availabilityStartTime'))).total_seconds()
-                mpd.setAttribute('timeShiftBufferDepth', 'PT{}S'.format(buffer_seconds))
-                log.debug('Dash Fix: {}S timeShiftBufferDepth added'.format(buffer_seconds))
             else:
-                mpd.setAttribute('mediaPresentationDuration', 'PT60S')
-                log.debug('Dash Fix: 60S mediaPresentationDuration added')
+                buffer_seconds = 60
+
+            mpd.setAttribute('timeShiftBufferDepth', 'PT{}S'.format(buffer_seconds))
+            log.debug('Dash Fix: {}S timeShiftBufferDepth added'.format(buffer_seconds))
 
         ## SORT ADAPTION SETS BY BITRATE ##
         video_sets = []
@@ -875,10 +874,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         if 'set-cookie' in response.headers:
             log.debug('set-cookie: {}'.format(response.headers['set-cookie']))
-            response.headers.pop('set-cookie') #lets handle cookies in session
-            # base_url = urljoin(url, '/')
-            # response.headers['set-cookie'] = re.sub(r'domain=([^ ;]*)', r'domain={}'.format(HOST), response.headers['set-cookie'], flags=re.I)
-            # response.headers['set-cookie'] = re.sub(r'path=(/[^ ;]*)', r'path=/{}\1'.format(base_url), response.headers['set-cookie'], flags=re.I)
+            ## we handle cookies in the requests session
+            response.headers.pop('set-cookie')
 
         return response
 
@@ -911,9 +908,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         log.debug('POST IN: {}'.format(url))
         response = self._proxy_request('POST', url)
         self._output_response(response)
-
-        # if not response.ok and url == self._session.get('license_url') and gui.yes_no(_.WV_FAILED, heading=_.IA_WIDEVINE_DRM):
-        #     inputstream.install_widevine(reinstall=True)
 
 class Response(object):
     pass

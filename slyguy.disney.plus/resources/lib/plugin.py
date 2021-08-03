@@ -28,8 +28,10 @@ def index(**kwargs):
         folder.add_item(label=_(_.ORIGINALS, _bold=True), path=plugin.url_for(collection, slug='originals', content_class='originals'))
         folder.add_item(label=_(_.SEARCH, _bold=True), path=plugin.url_for(search))
 
-        if settings.getBool('disney_sync', False):
+        if settings.getBool('disney_watchlist', False):
             folder.add_item(label=_(_.WATCHLIST, _bold=True), path=plugin.url_for(collection, slug='watchlist', content_class='watchlist'))
+
+        if settings.getBool('disney_sync', False):
             folder.add_item(label=_(_.CONTINUE_WATCHING, _bold=True), path=plugin.url_for(sets, set_id=CONTINUE_WATCHING_SET_ID, set_type=CONTINUE_WATCHING_SET_TYPE))
 
         if settings.getBool('bookmarks', True):
@@ -250,10 +252,11 @@ def _process_rows(rows, content_class=None):
         if not item:
             continue
 
-        if content_class == 'WatchlistSet':
-            item.context.insert(0, (_.DELETE_WATCHLIST, 'RunPlugin({})'.format(plugin.url_for(delete_watchlist, content_id=row['contentId']))))
-        elif settings.getBool('disney_sync', False) and (content_type == 'DmcSeries' or (content_type == 'DmcVideo' and program_type != 'episode')):
-            item.context.insert(0, (_.ADD_WATCHLIST, 'RunPlugin({})'.format(plugin.url_for(add_watchlist, content_id=row['contentId'], title=item.label, icon=item.art.get('thumb')))))
+        if settings.getBool('disney_watchlist', False):
+            if content_class == 'WatchlistSet':
+                item.context.insert(0, (_.DELETE_WATCHLIST, 'RunPlugin({})'.format(plugin.url_for(delete_watchlist, content_id=row['contentId']))))
+            elif (content_type == 'DmcSeries' or (content_type == 'DmcVideo' and program_type != 'episode')):
+                item.context.insert(0, (_.ADD_WATCHLIST, 'RunPlugin({})'.format(plugin.url_for(add_watchlist, content_id=row['contentId'], title=item.label, icon=item.art.get('thumb')))))
 
         items.append(item)
 
@@ -277,17 +280,17 @@ def _parse_collection(row):
         path  = plugin.url_for(collection, slug=row['collectionGroup']['slugs'][0]['value'], content_class=row['collectionGroup']['contentClass']),
     )
 
-def _get_play_path(content_id, skip_intro=None):
+def _get_play_path(content_id):
     kwargs = {
         'content_id': content_id,
-        'profile_id': userdata.get('profile_id', ''),
     }
+
+    profile_id = userdata.get('profile_id')
+    if profile_id:
+        kwargs['profile_id'] = profile_id
 
     if settings.getBool('disney_sync', False):
         kwargs['sync'] = 1
-
-    if skip_intro != None:
-        kwargs['skip_intro'] = skip_intro
 
     return plugin.url_for(play, **kwargs)
 
@@ -300,7 +303,7 @@ def _parse_series(row):
             'year': row['releases'][0]['releaseYear'],
             'mediatype': 'tvshow',
         },
-        context = ((_.INFORMATION, 'RunPlugin({})'.format(plugin.url_for(information, series_id=row['encodedSeriesId']))),),
+        context = ((_.FULL_DETAILS, 'RunPlugin({})'.format(plugin.url_for(full_details, series_id=row['encodedSeriesId']))),),
         path = plugin.url_for(series, series_id=row['encodedSeriesId']),
     )
 
@@ -329,17 +332,10 @@ def _parse_video(row):
             'aired': row['releases'][0]['releaseDate'] or row['releases'][0]['releaseYear'],
             'mediatype': 'movie',
         },
-        context = ((_.INFORMATION, 'RunPlugin({})'.format(plugin.url_for(information, family_id=row['family']['encodedFamilyId']))),),
         art  = {'thumb': _image(row['image'], 'thumb'), 'fanart': _image(row['image'], 'fanart')},
         path = _get_play_path(row['contentId']),
         playable = True,
     )
-
-    if _get_milestone(row.get('milestones'), 'intro_end'):
-        if settings.getBool('skip_intros', False):
-            item.context.append((_.INCLUDE_INTRO, 'PlayMedia({},noresume)'.format(_get_play_path(row['contentId'], skip_intro=0))))
-        else:
-            item.context.append((_.SKIP_INTRO, 'PlayMedia({},noresume)'.format(_get_play_path(row['contentId'], skip_intro=1))))
 
     if row['programType'] == 'episode':
         item.info.update({
@@ -349,6 +345,7 @@ def _parse_video(row):
             'tvshowtitle': _get_text(row['text'], 'title', 'series'),
         })
     else:
+        item.context.append((_.FULL_DETAILS, 'RunPlugin({})'.format(plugin.url_for(full_details, family_id=row['family']['encodedFamilyId']))))
         item.context.append((_.EXTRAS, "Container.Update({})".format(plugin.url_for(extras, family_id=row['family']['encodedFamilyId']))))
         item.context.append((_.SUGGESTED, "Container.Update({})".format(plugin.url_for(suggested, family_id=row['family']['encodedFamilyId']))))
 
@@ -475,7 +472,7 @@ def extras(family_id=None, series_id=None, **kwargs):
     return folder
 
 @plugin.route()
-def information(family_id=None, series_id=None, **kwargs):
+def full_details(family_id=None, series_id=None, **kwargs):
     if series_id:
         data = api.series_bundle(series_id)
         item = _parse_series(data['series'])
@@ -495,7 +492,7 @@ def search(query, page, **kwargs):
 
 @plugin.route()
 @plugin.login_required()
-def play(content_id=None, family_id=None, skip_intro=None, **kwargs):
+def play(content_id=None, family_id=None, **kwargs):
     if KODI_VERSION > 18:
         ver_required = '2.6.0'
     else:
@@ -536,19 +533,26 @@ def play(content_id=None, family_id=None, skip_intro=None, **kwargs):
         proxy_data = {'default_language': original_language, 'original_language': original_language},
     )
 
+    milestones = video.get('milestone', [])
+    item.play_next = {}
+    item.play_skips = []
+
     if kwargs[ROUTE_RESUME_TAG] and settings.getBool('disney_sync', False):
         continue_watching = _continue_watching()
         item.resume_from = continue_watching.get(video['contentId'], 0)
         item.force_resume = True
 
-    elif (int(skip_intro) if skip_intro is not None else settings.getBool('skip_intros', False)):
-        # TO DO: Intro doesnt always start at start - there may be recap
-        item.resume_from = _get_milestone(video.get('milestones'), 'intro_end', default=0) / 1000
+    elif milestones and settings.getBool('skip_intros', False):
+        intro_start = _get_milestone(milestones, 'intro_start')
+        intro_end = _get_milestone(milestones, 'intro_end')
 
-    item.play_next = {}
+        if intro_start <= 10 and intro_end > intro_start:
+            item.resume_from = intro_end
+        elif intro_start > 0 and intro_end > intro_start:
+            item.play_skips.append({'from': intro_start, 'to': intro_end})
 
-    if settings.getBool('skip_credits', False):
-        next_start = _get_milestone(video.get('milestones'), 'up_next', default=0) / 1000
+    if milestones and settings.getBool('skip_credits', False):
+        next_start = _get_milestone(milestones, 'up_next')
         item.play_next['time'] = next_start
 
     if video['programType'] == 'episode' and settings.getBool('play_next_episode', True):
@@ -583,13 +587,13 @@ def play(content_id=None, family_id=None, skip_intro=None, **kwargs):
 def callback(media_id, fguid, _time, **kwargs):
     api.update_resume(media_id, fguid, int(_time))
 
-def _get_milestone(milestones, key, default=None):
+def _get_milestone(milestones, name, default=0):
     if not milestones:
         return default
 
-    for milestone in milestones:
-        if milestone['milestoneType'] == key:
-            return milestone['milestoneTime'][0]['startMillis']
+    for key in milestones:
+        if key == name:
+            return int(milestones[key][0]['milestoneTime'][0]['startMillis'] / 1000)
 
     return default
 
