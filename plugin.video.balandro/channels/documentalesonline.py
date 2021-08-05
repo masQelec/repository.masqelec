@@ -7,6 +7,8 @@ from core import httptools, scrapertools, servertools
 
 host = "https://www.documentales-online.com"
 
+perpage = 25
+
 
 def mainlist(item):
     logger.info()
@@ -14,7 +16,12 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_top', url = host + '/populares/', grupo = 'Populares' ))
+    itemlist.append(item.clone( title = 'Top 100', action = 'list_top', url = host +'/top/', grupo = 'Top 100' ))
+
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
+
+    itemlist.append(item.clone( title = 'Por tema', action = 'series', url = host + '/series-temas/' ))
 
     itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary' ))
 
@@ -36,6 +43,40 @@ def categorias(item):
         if url.startswith('/'): url = host + url
 
         itemlist.append(item.clone( action='list_all', title=title, url=url ))
+
+    return itemlist
+
+
+def series(item):
+    logger.info()
+    itemlist = []
+
+    perpage = 100
+
+    if not item.page: item.page = 0
+
+    data = httptools.downloadpage(item.url).data
+
+    bloque = scrapertools.find_single_match(data, 'Populares</a>.*?Series / Temas(.*?)</article>')
+
+    patron  = '<a href="(.*?)".*?>(.*?)</a>'
+
+    matches = scrapertools.find_multiple_matches(bloque, patron)
+
+    num_matches = len(matches)
+
+    for url, title in matches[item.page * perpage:]:
+        url = host + url
+        title = title.split("<")[0].capitalize()
+
+        itemlist.append(item.clone( action='list_videos', url=url, title=title ))
+
+        if len(itemlist) >= perpage: break
+
+    if num_matches > perpage:
+        hasta = (item.page * perpage) + perpage
+        if hasta < num_matches:
+            itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='series', text_color='coral' ))
 
     return itemlist
 
@@ -65,21 +106,84 @@ def list_all(item):
     return itemlist
 
 
+def list_top(item):
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+
+    data = httptools.downloadpage(item.url).data
+
+    bloque = scrapertools.find_single_match(data, 'Populares</a>.*?%s(.*?)>Última revisión' % item.grupo)
+
+    patron  = '<a href="(.*?)".*?>(.*?)</a>'
+    matches = scrapertools.find_multiple_matches(bloque, patron)
+
+    num_matches = len(matches)
+
+    for url, title in matches[item.page * perpage:]:
+        title = title.split("<")[0]
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, contentType='movie', contentTitle=title, contentExtra='documentary' ))
+
+        if len(itemlist) >= perpage: break
+
+    if num_matches > perpage:
+        hasta = (item.page * perpage) + perpage
+        if hasta < num_matches:
+            itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='list_top', text_color='coral' ))
+
+    return itemlist
+
+
+def list_videos(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+
+    patron = 'Populares</a>(.*?)</div></article></div></div>'
+    data = scrapertools.find_single_match(data, patron)
+
+    patron = 'href="([^"]+).*?src="([^"]+).*?bookmark">([^<]+)'
+    matches = scrapertools.find_multiple_matches(data, patron)
+
+    for url, thumb, title in matches:
+        title = title.replace("&#8211;","-").strip()
+        if not title: continue
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                    contentType='movie', contentTitle=title, contentExtra='documentary' ))
+
+    return itemlist
+
+
 def findvideos(item):
     logger.info()
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(http[^"]+)')
 
+    i = 0
+
+    num_matches = len(matches)
+
     for url in matches:
-        if 'amazon-adsystem.com' in url: continue
+        if 'amazon-adsystem.com' in url:
+            num_matches = num_matches - 1
+            continue
+
+        other = ''
+        if num_matches > 1:
+            i += 1
+            other = str(i)
 
         servidor = servertools.get_server_from_url(url)
+
         if servidor and servidor != 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = servidor.capitalize(), url = url, language = 'Esp' ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url = url, language = 'Esp', other = other ))
 
     return itemlist
 

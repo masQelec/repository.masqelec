@@ -15,10 +15,23 @@ perpage = 18
 IDIOMAS = {'latino': 'Lat', 'espanol': 'Esp', 'castellano': 'Esp', 'subtitulado': 'Vose', 'subtitulo': 'Vose'}
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None):
     raise_weberror = False if '/ano/' in url else True
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('pelisgratis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
     return data
 
 
@@ -39,6 +52,8 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -176,7 +191,6 @@ def findvideos(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     matches = scrapertools.find_multiple_matches(data, 'aria-labelledby="([^"]+)">(.*?)</li>')
 
@@ -190,7 +204,7 @@ def findvideos(item):
             _url += '=='
             _url_links = base64.urlsafe_b64decode(_url).decode('utf-8')
 
-            datos = httptools.downloadpage(_url_links, headers={"referer": item.url}).data
+            datos = do_downloadpage(_url_links, headers={"referer": item.url})
 
             datos = re.compile('data-embed="([^"]+)"', re.DOTALL).findall(datos)
 
@@ -198,8 +212,7 @@ def findvideos(item):
                 url += '=='
                 url = base64.urlsafe_b64decode(url).decode('utf-8')
 
-                if '/hqq.' in url: url = ''
-                elif '/waaw.' in url: url = ''
+                if '/hqq.' in url or '/waaw.' in url or '/netu' in url: url = ''
                 elif '/ninjastream.to/' in url: url = ''
 
                 if url:

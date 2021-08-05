@@ -41,8 +41,8 @@ def mainlist(item):
             itemlist.append(Item( channel='developer', action='mainlist', title='Gestión opción géneros', thumbnail=config.get_thumb('genres'), text_color='yellow' ))
         if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'test.py')):
             itemlist.append(Item( channel='test', action='mainlist', title='Tests canales y servidores', thumbnail=config.get_thumb('tools'), text_color='moccasin' ))
-    
-    itemlist.append(Item( channel='filmaffinitylists', action='oscars', title='[COLOR gold]Premios Oscars[/COLOR]', thumbnail=config.get_thumb('oscars'), plot = 'Especial con las películas nominadas a los premios [COLOR gold]Oscars[/COLOR]' ))
+
+    # ~ itemlist.append(Item( channel='filmaffinitylists', action='oscars', title='[COLOR gold]Premios Oscars[/COLOR]', thumbnail=config.get_thumb('oscars'), plot = 'Especial con las películas nominadas a los premios [COLOR gold]Oscars[/COLOR]' ))
 
     context = []
     tit = '[COLOR %s]Global configurar proxies a usar[/COLOR]' % color_list_proxies
@@ -79,6 +79,9 @@ def mainlist(item):
     itemlist.append(Item( channel='generos', action='mainlist', title='Géneros', thumbnail=config.get_thumb('genres') ))
 
     itemlist.append(item.clone( action='channels', extra='documentaries', title='Documentales', thumbnail=config.get_thumb('documentary') ))
+
+    if not config.get_setting('search_no_torrents'):
+        itemlist.append(item.clone( action='channels', extra='torrents', title='Torrents', thumbnail=config.get_thumb('torrents') ))
 
     context = []
     if config.get_setting('adults_password'):
@@ -244,6 +247,21 @@ def channels(item):
         accion = 'mainlist'
         filtros = {}
 
+    elif item.extra == 'torrents':
+        itemlist.append(item.clone( channel='filters', action = 'channels_excluded', title = 'Excluir canales en las búsquedas para Películas y/o Series',
+                                    extra = 'mixed', thumbnail=config.get_thumb('stack'), folder = False, text_color='cyan' ))
+
+        if channels_search_excluded_mixed:
+            itemlist.append(item.clone( channel='filters', action = 'channels_excluded_del', title = 'Anular los canales excluidos en las búsquedas para Películas y/o Series',
+                                        extra = 'mixed', folder = False, text_color='coral' ))
+
+        itemlist.append(Item( channel='search', action='search', search_type='all', extra = 'only_torrents', title='Buscar Película y/o Serie ...', context=context,
+                              thumbnail=config.get_thumb('search'), text_color='yellowgreen' ))
+
+        item.category = 'Canales con archivos Torrents'
+        accion = 'mainlist'
+        filtros = {'categories': 'torrent'}
+
     else:
         if item.extra == 'adults': pass
         elif item.extra == 'anime': pass
@@ -314,6 +332,10 @@ def channels(item):
 
             if not 'movie' in tipos: continue
             if not 'tvshow' in tipos: continue
+
+        elif item.extra == 'torrents':
+            tipos = ch['search_types']
+            if 'documentary' in tipos: continue
 
         context = []
 
@@ -419,3 +441,4 @@ def _proxies(item):
     from modules import submnuctext
     submnuctext._proxies(item)
     return True
+

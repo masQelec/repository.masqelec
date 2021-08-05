@@ -13,18 +13,8 @@ ruta_pelis  = 'browse?type=movie'
 ruta_series = 'browse?type=series'
 
 
-# ~ def item_configurar_proxies(item):
-    # ~ plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    # ~ plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    # ~ return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-# ~ def configurar_proxies(item):
-    # ~ from core import proxytools
-    # ~ return proxytools.configurar_proxies_canal(item.channel, host)
-
 def do_downloadpage(url, post=None, headers=None):
-    # ~ data = httptools.downloadpage_proxy('verpeliculasgratis', url, post=post, headers=headers).data
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage(url, post=post, headers=headers, timeout = 20).data
 
     return data
 
@@ -38,7 +28,6 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -61,7 +50,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -84,7 +72,6 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -441,62 +428,6 @@ def edades(item):
     return itemlist
 
 
-def search(item, texto):
-    logger.info()
-    try:
-        if item.search_type not in ['movie', 'tvshow', 'all']: item.search_type = 'all'
-        item.url = host + 'secure/search/' + texto.replace(" ", "+")
-        return sub_search(item)
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
-
-
-def sub_search(item):
-    logger.info()
-    itemlist = []
-
-    url = item.url + '?type=&limit=30'
-
-    data = do_downloadpage(url)
-
-    dict_data = jsontools.load(data)
-
-    if 'results' not in dict_data: return itemlist
-
-    for element in dict_data['results']:
-        # ~ logger.debug(element)
-        if 'is_series' not in element or 'name' not in element: continue
-
-        if element['is_series'] and item.search_type == 'movie': continue
-        if not element['is_series'] and item.search_type == 'tvshow': continue
-
-        thumb = element['poster'] if element['poster'] else item.thumbnail
-        new_item = item.clone( title = element['name'], thumbnail = thumb, infoLabels = {'year':element['year'], 'plot': element['description']})
-
-        # ~ new_item.url = host + 'titles/' + str(element['id'])
-        new_item.url = host + 'secure/titles/' + str(element['id']) + '?titleId=' + str(element['id'])
-
-        if not element['is_series']:
-            new_item.action = 'findvideos'
-            new_item.contentType = 'movie'
-            new_item.contentTitle = element['name']
-        else:
-            new_item.action = 'temporadas'
-            new_item.contentType = 'tvshow'
-            new_item.contentSerieName = element['name']
-
-        new_item.fmt_sufijo = '' if item.search_type != 'all' else new_item.contentType
-
-        itemlist.append(new_item)
-
-    tmdb.set_infoLabels(itemlist)
-
-    return itemlist
-
-
 def list_all(item):
     logger.info()
     itemlist=[]
@@ -511,7 +442,6 @@ def list_all(item):
     if item.calificacion: url += '&certification=' + item.calificacion
 
     data = do_downloadpage(url)
-    # ~ logger.debug(data)
 
     dict_data = jsontools.load(data)
 
@@ -521,7 +451,6 @@ def list_all(item):
         thumb = element['poster'] if element['poster'] else item.thumbnail
         new_item = item.clone( title = element['name'], thumbnail = thumb, infoLabels = {'year':element['year'], 'plot': element['description']})
 
-        # ~ new_item.url = host + 'titles/' + str(element['id'])
         new_item.url = host + 'secure/titles/' + str(element['id']) + '?titleId=' + str(element['id'])
 
         if not element['is_series']:
@@ -623,6 +552,7 @@ def puntuar_calidad(txt):
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
+
 def _extraer_idioma(lang):
     lang = lang.lower()
     if 'es' in lang: return 'Esp'
@@ -631,12 +561,12 @@ def _extraer_idioma(lang):
     if 'en' in lang: return 'Vose'
     return 'VO'
 
+
 def findvideos(item):
     logger.info()
     itemlist=[]
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     dict_data = jsontools.load(data)
 
@@ -655,22 +585,73 @@ def findvideos(item):
 
     for element in elementos:
         if '/z' in element['name'] and 'clicknupload' not in element['url']: continue # descartar descargas directas (menos clicknupload)
-        if 'youtube.com/' in element['url']: continue # descartar tráilers
-        # ~ logger.debug(element)
+        if 'youtube.com/' in element['url']: continue
 
         url = element['url']
-        if url.startswith('https://goo.gl/'): # acortador de google
+        if url.startswith('https://goo.gl/'):
             url = httptools.downloadpage(url, follow_redirects=False, only_headers=True).headers.get('location', '')
             if not url: continue
-        elif 'streamcrypt.net/' in url: # acortador
+        elif 'streamcrypt.net/' in url:
             url = scrapertools.decode_streamcrypt(url)
             if not url: continue
 
         itemlist.append(Item(channel = item.channel, action = 'play', title = item.title, url = url, language = _extraer_idioma(element['language']), 
-                             quality = element['quality'], quality_num = puntuar_calidad(element['quality']) ))  #, other = url
+                             quality = element['quality'], quality_num = puntuar_calidad(element['quality']) ))
 
     itemlist = servertools.get_servers_itemlist(itemlist)
 
     return itemlist
 
+def search(item, texto):
+    logger.info()
+    try:
+        if item.search_type not in ['movie', 'tvshow', 'all']: item.search_type = 'all'
+        item.url = host + 'secure/search/' + texto.replace(" ", "+")
+        return sub_search(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []
+
+
+def sub_search(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url + '?type=&limit=30'
+
+    data = do_downloadpage(url)
+
+    dict_data = jsontools.load(data)
+
+    if 'results' not in dict_data: return itemlist
+
+    for element in dict_data['results']:
+        if 'is_series' not in element or 'name' not in element: continue
+
+        if element['is_series'] and item.search_type == 'movie': continue
+        if not element['is_series'] and item.search_type == 'tvshow': continue
+
+        thumb = element['poster'] if element['poster'] else item.thumbnail
+        new_item = item.clone( title = element['name'], thumbnail = thumb, infoLabels = {'year':element['year'], 'plot': element['description']})
+
+        new_item.url = host + 'secure/titles/' + str(element['id']) + '?titleId=' + str(element['id'])
+
+        if not element['is_series']:
+            new_item.action = 'findvideos'
+            new_item.contentType = 'movie'
+            new_item.contentTitle = element['name']
+        else:
+            new_item.action = 'temporadas'
+            new_item.contentType = 'tvshow'
+            new_item.contentSerieName = element['name']
+
+        new_item.fmt_sufijo = '' if item.search_type != 'all' else new_item.contentType
+
+        itemlist.append(new_item)
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
 

@@ -58,7 +58,9 @@ def generos(item):
     matches = re.compile(r'<li><a href="([^"]+)".*?">([^<]+)').findall(data)
 
     for url, title in matches:
-        if title == "Peliculas": continue
+        if title == "Latino": continue
+        elif title == "Ovas": continue
+        elif title == "Peliculas": continue
 
         itemlist.append(item.clone( action = "list_all", title = title, url = host[:-1] + url))
 
@@ -110,10 +112,18 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
+    buscar_next = True
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
             itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
+            buscar_next = False
+
+    if buscar_next:
+        if itemlist:
+            next_url = scrapertools.find_single_match(data, '<a class="text nav-next".*?href="(.*?)".*?">Resultados')
+            if next_url:
+                itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
 
     return itemlist
 
@@ -274,6 +284,7 @@ def play(item):
 
     elif "/jk.php" in item.url:
         data = httptools.downloadpage(item.url).data
+
         url_play = scrapertools.find_single_match(data, '<source src="(.*?)"')
         if host in url_play:
             url_play = httptools.downloadpage(url_play, follow_redirects=False, only_headers=True).headers.get("location", "")
@@ -291,7 +302,6 @@ def play(item):
            servidor = servertools.get_server_from_url(url_play)
            url_play = servertools.normalize_url(servidor, url_play)
 
-    #logger.debug(url_play)    
     if url_play:
         if not url_play.startswith("http"):
             url_play = "https:" + url_play

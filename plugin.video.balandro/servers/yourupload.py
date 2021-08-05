@@ -17,6 +17,7 @@ def get_video_url(page_url, url_referer=''):
 
     url1 = httptools.downloadpage(page_url, follow_redirects=False, only_headers=True).headers.get("location", "")
     referer = {'Referer': page_url}
+
     url = scrapertools.find_single_match(data, '<meta property="og:video" content="([^"]+)"')
 
     if not url:
@@ -29,7 +30,7 @@ def get_video_url(page_url, url_referer=''):
         if "vidcache" not in url:
             url = "https://www.yourupload.com%s" % url
             location = httptools.downloadpage(url, headers=referer, follow_redirects=False, only_headers=True)
-            media_url = location.headers["location"].replace("?start=0", "").replace("https", "http")
+            media_url = location.headers["location"].replace("?start=0", "")
             ext = media_url[-4:]
             media_url += "|Referer=%s" % url
         else:

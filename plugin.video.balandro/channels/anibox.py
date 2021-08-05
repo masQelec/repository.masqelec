@@ -4,7 +4,7 @@ import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
-from core import httptools, scrapertools, servertools, tmdb, jsontools
+from core import httptools, scrapertools, servertools, tmdb
 
 
 host = 'https://anibox.tv/'
@@ -98,9 +98,8 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    # Subpaginación interna y/o paginación de la web
     buscar_next = True
-    if num_matches > perpage: # subpaginación interna dentro de la página si hay demasiados items
+    if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
             itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
@@ -264,9 +263,8 @@ def last_episodes(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    # Subpaginación interna y/o paginación de la web
     buscar_next = True
-    if num_matches > perpage: # subpaginación interna dentro de la página si hay demasiados items
+    if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
             itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
@@ -391,7 +389,8 @@ def play(item):
          if '#' in url:
              url = url.split('#')[0]
 
-    if '/hqq.' in url or '/waaw.' in url: url = ''
+    if '/hqq.' in url or '/waaw.' in url:
+        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     if url:
         servidor = servertools.get_server_from_url(url)

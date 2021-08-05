@@ -105,15 +105,14 @@ def do_search_channel(item, tecleado, ch):
 
 def do_search(item, tecleado):
     itemlist = []
-    # De item se usa .search_type y .from_channel
 
     multithread = config.get_setting('search_multithread', default=True)
     threads = []
+
     search_limit_by_channel = config.get_setting('search_limit_by_channel', default=2)
 
     progreso = platformtools.dialog_progress('Buscando '+tecleado, '...')
 
-    # Seleccionar los canales dónde se puede buscar
     filtros = { 'searchable': True, 'status': 0 } # status para descartar desactivados por el usuario, solamente se busca en activos y preferidos
     if item.search_type != 'all': filtros['search_types'] = item.search_type
 
@@ -124,7 +123,10 @@ def do_search(item, tecleado):
         if item.only_channels_group and (item.group == 'docs' or item.group == '3d'): pass
         else: ch_list = [ch for ch in ch_list if 'documentary' not in ch['categories']]
 
-    num_canales = float(len(ch_list)) # float para calcular porcentaje
+    num_canales = float(len(ch_list))
+
+    only_torrents = ''
+    if item.extra == 'only_torrents': only_torrents = item.extra
 
     only_prefered = config.get_setting('search_only_prefered', default=False)
     no_torrents = config.get_setting('search_no_torrents', default=False)
@@ -146,7 +148,6 @@ def do_search(item, tecleado):
         channels_search_excluded = config.get_setting('search_excludes_mixed', default='')
         channels_search_excluded = channels_search_excluded + config.get_setting('search_excludes_all', default='')
 
-    # Hacer la búsqueda en cada canal
     for i, ch in enumerate(ch_list):
         perc = int(i / num_canales * 100)
 
@@ -185,6 +186,10 @@ def do_search(item, tecleado):
                 if not config.get_setting(cfg_status_channel, default=''):
                     continue
 
+            elif only_torrents:
+                if not 'torrents' in ch['clusters']:
+                   continue
+
         if multithread:
             t = Thread(target=do_search_channel, args=[c_item, tecleado, ch], name=ch['name'])
             t.setDaemon(True)
@@ -195,7 +200,7 @@ def do_search(item, tecleado):
 
         if progreso.iscanceled(): break
 
-    if multithread: # bucle de espera hasta que acabe o se cancele
+    if multithread:
         pendent = [a for a in threads if a.isAlive()]
         while len(pendent) > 0:
             hechos = num_canales - len(pendent)
@@ -209,15 +214,13 @@ def do_search(item, tecleado):
             time.sleep(0.5)
             pendent = [a for a in threads if a.isAlive()]
 
-
-    # Mostrar resultados de las búsquedas
     if item.from_channel != '': 
         # Búsqueda exacta en otros/todos canales de una peli/serie : mostrar sólo las coincidencias exactas
         tecleado_lower = tecleado.lower()
         for ch in ch_list:
             if 'itemlist_search' in ch and len(ch['itemlist_search']) > 0:
                 for it in ch['itemlist_search']:
-                    if it.contentType not in ['movie','tvshow','season']: continue # paginaciones
+                    if it.contentType not in ['movie','tvshow','season']: continue
                     if it.infoLabels['tmdb_id'] and item.infoLabels['tmdb_id']:
                         if it.infoLabels['tmdb_id'] != item.infoLabels['tmdb_id']: continue
                     else:
@@ -228,9 +231,6 @@ def do_search(item, tecleado):
 
     else:
         # Búsqueda parecida en todos los canales : link para acceder a todas las coincidencias y previsualización de n enlaces por canal
-        # Mover al final los canales que no tienen resultados
-        # ~ for ch in ch_list:
-
         no_results = config.get_setting('search_no_results', default=False)
 
         color = 'chartreuse'
@@ -282,6 +282,7 @@ def do_search(item, tecleado):
                             continue
                     else:
                        if only_prefered: continue
+                       elif only_torrents: continue
 
                        titulo = titulo + ' [COLOR red]comprobar si necesita proxies'
 
@@ -294,7 +295,7 @@ def do_search(item, tecleado):
 
             if 'itemlist_search' in ch:
                 for j, it in enumerate(ch['itemlist_search']):
-                    if it.contentType not in ['movie', 'tvshow', 'season']: continue # paginaciones
+                    if it.contentType not in ['movie', 'tvshow', 'season']: continue
                     if j < search_limit_by_channel:
                         itemlist.append(it)
                     else:

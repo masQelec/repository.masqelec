@@ -2,9 +2,9 @@
 
 import re, os
 
-from platformcode import logger
+from platformcode import logger, platformtools
 from core.item import Item
-from core import httptools, scrapertools, tmdb
+from core import httptools, scrapertools, servertools, tmdb
 
 
 host = 'https://pctfenix.com/'
@@ -21,9 +21,9 @@ def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
 
-def do_downloadpage(url, post=None):
-    # ~ data = httptools.downloadpage(url, post=post).data
-    data = httptools.downloadpage_proxy('pctfenix', url, post=post).data
+def do_downloadpage(url, post=None, headers=None):
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage_proxy('pctfenix', url, post=post, headers=headers).data
     return data
 
 
@@ -44,22 +44,24 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Catálogo castellano', action = 'list_all', url = host + 'descargar-peliculas/', search_type = 'movie', page=0))
-    itemlist.append(item.clone( title = 'Catálogo latino', action = 'list_all', url = host + 'descargar-peliculas/latino', search_type = 'movie', page=0 ))
+    itemlist.append(item.clone( title = 'Catálogo castellano', action = 'list_all', url = host + 'descargar-peliculas/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo latino', action = 'list_all', url = host + 'descargar-peliculas/latino', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'descargar-peliculas/estrenos-de-cine/', search_type = 'movie', page=0 ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'descargar-peliculas/estrenos-de-cine/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'descargar-lo-ultimo/', search_type = 'movie', page=0 ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'descargar-lo-ultimo/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'mas-valorados/', search_type = 'movie', page=0 ))
-    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'mas-visitados/', search_type = 'movie', page=0 ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'mas-valorados/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'mas-visitados/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'descargar-peliculas/hd/', search_type = 'movie', page=0 ))
-    itemlist.append(item.clone( title = 'En x264 MKV', action ='list_all', url = host + 'descargar-peliculas/x264-mkv/', search_type = 'movie', page=0 ))
-    itemlist.append(item.clone( title = 'En 3D', action ='list_all', search_type = 'movie', url = host + 'descargar-peliculas/3d/', page=0 ))
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'descargar-peliculas/hd/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En x264 MKV', action ='list_all', url = host + 'descargar-peliculas/x264-mkv/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En 3D', action ='list_all', url = host + 'descargar-peliculas/3d/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por calidad en castellano', action = 'calidades', url = host + '/torrents-de-peliculas.html', calidad_type = 'cast' ))
-    itemlist.append(item.clone( title = 'Por calidad en latino', action = 'calidades', url = host + '/secciones.php?sec=ultimos_torrents', calidad_type = 'latino' ))
+    itemlist.append(item.clone( title = 'Por calidad en castellano', action = 'calidades', url = host + '/torrents-de-peliculas.html',
+                                search_type = 'movie', calidad_type = 'cast' ))
+    itemlist.append(item.clone( title = 'Por calidad en latino', action = 'calidades', url = host + '/secciones.php?sec=ultimos_torrents',
+                                search_type = 'movie', calidad_type = 'latino' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
@@ -71,13 +73,13 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'descargar-lo-ultimo/', search_type = 'tvshow', page=0 ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'descargar-lo-ultimo/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Series TV', action = 'list_all', url = host + 'descargar-series/', search_type = 'tvshow', page=0 ))
-    itemlist.append(item.clone( title = 'Series HD', action = 'list_all', url = host + 'descargar-series/hd/', search_type = 'tvshow', page=0 ))
+    itemlist.append(item.clone( title = 'Series TV', action = 'list_all', url = host + 'descargar-series/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Series HD', action = 'list_all', url = host + 'descargar-series/hd/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'mas-valorados/', search_type = 'tvshow', page=0 ))
-    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'mas-visitados/', search_type = 'tvshow', page=0 ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'mas-valorados/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'mas-visitados/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
@@ -111,10 +113,13 @@ def list_all(item):
     logger.info()
     itemlist = []
 
+    cargar_mas = False
+
     if not item.page: item.page = 0
 
     if item.page == 0:
         data = do_downloadpage(item.url)
+
         data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
         matches = re.compile('<img src="([^"]+)" alt="([^"]+)".*?a href="([^"]+)".*?<strong>([^<]+)').findall(data)
@@ -147,10 +152,21 @@ def list_all(item):
 
             if len(itemlist) >= perpage: break          
 
-    else:
+        # ~ 2021/27/07
+        if not matches:
+            if '>Cargar Mas</button>' in data: cargar_mas = True
+
+    # ~ else:
+
+    # ~ 2021/27/07
+    if not item.page == 0 or cargar_mas == True:
+        if cargar_mas == True:
+            if item.page == 0: item.page = 1
 
         data = do_downloadpage(host + "controllers/load-more.php", post="i=%s&c=%s&u=%s" % (item.page, perpage, '/' + item.url.replace(host, '')))
+
         data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
         matches = re.compile('<img src="([^"]+)" alt="([^"]+)".*?a href="([^"]+)"').findall(data)
         num_matches = len(matches)
 
@@ -239,9 +255,14 @@ def temporadas(item):
 
     if not item.url.startswith("http"): item.url = host[:-1] + item.url
 
+    item.url = item.url.replace(host, host + 'descargar-gratis/')
+
     data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, r"onClick='modCap\((\d+)\)'>\s*([^<]+)")
+
+    if len(matches) >= 50:
+        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), '[COLOR blue]Cargando vídeos [/COLOR]')
 
     i = 0
 
@@ -259,12 +280,16 @@ def findvideos(item):
     itemlist = []
 
     if not item.url.startswith("http"): item.url = host[:-1] + item.url
+
     if item.contentType == "movie":
+        item.url = item.url.replace(host, host + 'descargar-gratis/')
         data = do_downloadpage(item.url)
     else:
-        data = do_downloadpage(host + "controllers/show.chapters.php", post="id=%s" %(item.episodeId))
+        headers = {'Referer': item.url}
 
-    url_torrent = scrapertools.find_single_match(data, '<div class="ctn-download-torrent"><a href="javascript:[^"]+" id="[^"]+" data-ut\s*=\s*"([^"]+)"')
+        data = do_downloadpage(host + "controllers/show.chapters.php", post='id=' + str(item.episodeId), headers=headers)
+
+    url_torrent = scrapertools.find_single_match(data, '<div class="ctn-download-torrent".*?<a href="javascript:[^"]+".*?id="[^"]+".*?data-ut\s*=\s*"([^"]+)"')
 
     if '[castellano]' in data: 
         lang = 'Esp'
@@ -272,13 +297,27 @@ def findvideos(item):
         lang = 'Lat'
 
     if url_torrent:
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, url = url_torrent if url_torrent.startswith("http") else "https:" + url_torrent, server = 'torrent'))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang,
+                                                      url = url_torrent if url_torrent.startswith("http") else "https:" + url_torrent, server = 'torrent'))
 
     if '<div class="box-content-links">' in data:
         block = scrapertools.find_single_match(data, '<div class="box-content-links">(.*?)</div')
         matches = scrapertools.find_multiple_matches(block, '<a href="([^"]+)".*?">(.*?)</a>')
 
         for url, servidor in matches:
+            url = url.strip()
+            servidor = servertools.corregir_servidor(servidor)
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, url = url, server = servidor))
+
+    elif '>Links de Descarga<' in data:
+        block = scrapertools.find_single_match(data, '>Links de Descarga<(.*?)</div')
+        matches = scrapertools.find_multiple_matches(block, '<a href="([^"]+)".*?">(.*?)</a>')
+
+        for url, servidor in matches:
+            url = url.strip()
+            servidor = servertools.corregir_servidor(servidor)
+
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, url = url, server = servidor))
 
     return itemlist
@@ -319,7 +358,7 @@ def list_search(item):
     itemlist = []
 
     data = do_downloadpage(item.url, post = item.post)
-	
+
     patron = '<a href="([^"]+)"><img src="([^"]+)" alt="([^"]+)"'
     matches = re.compile(patron, re.DOTALL).findall(data)
 

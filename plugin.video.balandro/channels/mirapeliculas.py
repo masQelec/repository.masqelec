@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re, base64
+import re
 
 from platformcode import logger
 from core.item import Item
@@ -67,7 +67,6 @@ def idiomas(item):
     return itemlist
 
 
-
 def list_all(item): 
     logger.info()
     itemlist = []
@@ -118,7 +117,6 @@ def findvideos(item):
     IDIOMAS = {'Español': 'Esp', 'Latino': 'Lat', 'Subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     patron = 'Reproducir</a></td>\n.*?<td>([^<]+)</td>\n.*?<td>([^<]+)</td>\n.*?<td><img src="([^"]+)"'
 
@@ -130,7 +128,8 @@ def findvideos(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        if '/hqq.' in url or '/waaw.' in url: servidor = ''
+        if '/hqq.' in url or '/waaw.' in url or '/netu' in url:
+            continue
 
         if servidor:
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 

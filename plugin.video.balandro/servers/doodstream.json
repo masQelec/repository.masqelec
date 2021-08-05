@@ -8,8 +8,8 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "http(?:s|)://(?:doodstream.com|dood.watch|dood.to|dood.so)/(d|e)/(?:embed-|)([A-z0-9]+)",
-        "url": "https://doodstream.com/\\1/\\2"
+        "pattern": "http(?:s|)://(?:doodstream.com|dood.watch|dood.to|dood.so|dood.cx|dood.la)/(d|e)/(?:embed-|)([A-z0-9]+)",
+        "url": "https://dood.to/\\1/\\2"
       }
     ]
   }

@@ -31,11 +31,9 @@ def do_downloadpage(url, post=None, headers=None):
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
-                # ~ logger.debug('Cookies: %s %s' % (ck_name, ck_value))
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
                 # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
                 data = httptools.downloadpage_proxy('cliversite', url, post=post, headers=headers).data
-                # ~ logger.debug(data)
         except:
             pass
 
@@ -53,6 +51,7 @@ def mainlist(item):
 
     itemlist.append(item_configurar_proxies(item))
     return itemlist
+
 
 def mainlist_pelis(item):
     logger.info()
@@ -120,6 +119,9 @@ def generos(item):
 
         itemlist.append(item.clone( action="list_all", title=title, url=url, pagina = 1 ))
 
+    if item.search_type == 'movie':
+        itemlist.append(item.clone( action="list_all", title='Guerra', url=host + '/peliculas/genero/guerra', pagina = 1 ))
+
     return sorted(itemlist, key=lambda it: it.title)
 
 
@@ -166,8 +168,6 @@ def list_all(item):
 
     data = do_downloadpage(url_acceso)
 
-    # ~ logger.debug(data)
-
     if item.tipo == 'index':
        data = scrapertools.find_single_match(data, 'AGREGADAS(.*?)</section>')
     elif '/series/tendencias' in item.url:
@@ -205,9 +205,8 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    # Subpaginación interna y/o paginación de la web
     buscar_next = True
-    if num_matches > perpage: # subpaginación interna dentro de la página si hay demasiados items
+    if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
             itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, pagina = item.pagina, action='list_all', text_color='coral' ))
@@ -266,11 +265,10 @@ def temporadas(item):
 
     return sorted(itemlist, key=lambda it: it.title)
 
-    #return itemlist
 
-# Si una misma url devuelve los episodios de todas las temporadas, definir rutina tracking_all_episodes para acelerar el scrap en trackingtools.
 def tracking_all_episodes(item):
     return episodios(item)
+
 
 def episodios(item):
     logger.info()
@@ -280,7 +278,6 @@ def episodios(item):
     perpage = 50
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     matches = re.compile('<div class="mic">(.*?)<i class="fa fa-play">', re.DOTALL).findall(data)
 
@@ -328,7 +325,7 @@ def findvideos(item):
     matches_idiomas = scrapertools.find_multiple_matches(data, '<img src="/static/img/bg/icon_(.*?)_.*?data-id="(.*?)"')
 
     for lang, data_id in matches_idiomas:
-        bloque_enlaces_idioma = scrapertools.find_single_match(data, 'server-item-(.*?)</div></div>')
+        bloque_enlaces_idioma = scrapertools.find_single_match(data, 'server-item-' + data_id + '(.*?)</div></div>')
         if not bloque_enlaces_idioma.startswith('</div>'):
             bloque_enlaces_idioma = bloque_enlaces_idioma + '</div>'
 
@@ -351,8 +348,9 @@ def findvideos(item):
     return itemlist
 
 
-# Descartat hydrax pq de moment no es poden resoldre
 def normalize_other(srv):
+    # Descartat hydrax pq de moment no es poden resoldre
+
     srv = srv.replace('.to', '').lower()
 
     if srv == 'peliscloud': link_other = 'cloud'
@@ -379,7 +377,6 @@ def play(item):
 
             url = dom + '/playlist/' + vid + '/' + str(int(time.time() * 1000))
             data = httptools.downloadpage(url).data
-            # ~ logger.debug(data)
 
             matches = scrapertools.find_multiple_matches(data, 'RESOLUTION=\d+x(\d+)\s*(.*?\.m3u8)')
             if matches:
@@ -387,7 +384,7 @@ def play(item):
                     itemlist.append(item.clone(url = dom + url, server = 'm3u8hls'))
                     break
 
-            return itemlist
+                return itemlist
 
         elif item.other == 'dame':
             url = item.url.replace('https://damedamehoy.xyz/embed.html#', 'https://damedamehoy.xyz/details.php?v=')
@@ -395,13 +392,24 @@ def play(item):
             url = scrapertools.find_single_match(data, '"file":"(.*?)"')
             url = url.replace('\\/', '/')
 
-            itemlist.append(item.clone(url=url , server=servidor))
-            return itemlist
+            if url:
+                itemlist.append(item.clone(url=url , server=servidor))
+                return itemlist
 
         elif item.other == 'super':
             data = do_downloadpage(item.url)
 
             matches = scrapertools.find_multiple_matches(data, 'data-video="(.*?)"')
+
+            if str(matches) == "['']":
+                url = scrapertools.find_single_match(data, "sources.*?'(.*?)'")
+
+                if url:
+                    servidor = servertools.get_server_from_url(url)
+                    url = servertools.normalize_url(servidor, url)
+
+                    itemlist.append(item.clone(url=url , server=servidor))
+                    return itemlist
 
             for url in matches:
                 if 'https://damedamehoy.xyz/embed.html#' in url:
@@ -421,10 +429,6 @@ def play(item):
                     itemlist.append(item.clone(url=url , server=servidor))
                     return itemlist
 
-            return itemlist
-
-        else:
-            return itemlist
     else:
         url = item.url
 

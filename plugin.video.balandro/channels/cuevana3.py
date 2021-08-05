@@ -113,7 +113,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    if item.page: # paginaciones ajax para series
+    if item.page:
         post = {'page': item.page}
         if item.filtro == 'tabserie-1': post['action'] = 'cuevana_ajax_pagination'
         elif item.filtro == 'tabserie-2': post['action'] = 'cuevana_ajax_pagination_estreno'
@@ -122,10 +122,8 @@ def list_all(item):
         data = do_downloadpage(host+'wp-admin/admin-ajax.php', post=post)
     else:
         data = do_downloadpage(item.url)
-        if item.filtro: # Para series limitar según últimas, estrenos, ranking, mas vistas
+        if item.filtro:
             data = scrapertools.find_single_match(data, '<div\s*id=%s(.*?)</nav>\s*</div>' % item.filtro)
-
-    # ~ logger.debug(data)
 
     matches = re.compile('<li\s*class="[^"]*TPostMv">(.*?)</li>', re.DOTALL).findall(data)
 
@@ -162,7 +160,7 @@ def list_all(item):
         else:
             pagina = 2 if not item.page else item.page + 1
             itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, action='list_all', page=pagina ))
-    
+
     return itemlist
 
 
@@ -251,8 +249,6 @@ def findvideos(item):
     for option, url_data, language, quality in matches:
         url = scrapertools.find_single_match(data, 'id=Opt%s><iframe.*? data-src=(?:"|)([^ >"]+)' % option)
         if url.startswith('/'): url = 'https:' + url
-        # ~ if '/fembed/?' in url:
-            # ~ url = scrapertools.find_single_match(url_data, 'domain=([^"]+)"')
 
         if url and 'youtube' not in url:
             url = url.replace('#Synchronization+Service', '')
@@ -270,7 +266,7 @@ def findvideos(item):
 
     itemlist = servertools.get_servers_itemlist(itemlist)
 
-    # Dejar desconocidos como directos para resolverse en el play
+    # Dejar desconocidos como directos
     for it in itemlist:
         if it.server == 'desconocido' and ('//api.cuevana3' in it.url or '//damedamehoy.' in it.url):
             it.server = 'fembed' if '/fembed/?' in it.url else 'directo' if '//damedamehoy.' in it.url else ''
@@ -345,6 +341,9 @@ def play(item):
                 api_post = 'url='+fid
 
             url = do_downloadpage(api_url, post=api_post, headers={'Referer': item.url}, follow_redirects=False, only_headers=True).get('location', '')
+
+            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or 'gounlimited' in url:
+                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
             if '//damedamehoy.' in url:
                 url = resuelve_damedamehoy(url)

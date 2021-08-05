@@ -39,18 +39,22 @@ def mainlist(item):
 
     item.category = 'Agrupaciones de Canales'
 
-    itemlist.append(item.clone( title = 'Novedades:', action = '', text_color='yellow' ))
-    itemlist.append(item.clone( title = ' Canales de Películas con Estrenos y/ó Novedades', action = 'ch_groups', group = 'news' ))
-    itemlist.append(item.clone( title = ' Canales de Series con Episodios Nuevos y/ó Últimos', action = 'ch_groups', group = 'lasts' ))
+    itemlist.append(item.clone( title = 'Novedades:', thumbnail=config.get_thumb('heart'), action = '', text_color='yellow' ))
+    itemlist.append(item.clone( title = ' Canales de Películas con Estrenos y/ó Novedades', thumbnail=config.get_thumb('movie'), action = 'ch_groups', group = 'news' ))
 
-    itemlist.append(item.clone( title = 'Películas y/ó Series:', action = '', text_color='springgreen' ))
+    itemlist.append(item.clone( title = ' Canales de Series con Episodios Nuevos y/ó Últimos', thumbnail=config.get_thumb('tvshow'), action = 'ch_groups', group = 'lasts' ))
+
+    itemlist.append(item.clone( title = 'Películas y/ó Series:', action = '', thumbnail=config.get_thumb('booklet'), text_color='springgreen' ))
     itemlist.append(item.clone( title = ' Canales con temática Clásica', action = 'ch_groups', group = 'classic' ))
     itemlist.append(item.clone( title = ' Canales con temática Infantil', action = 'ch_groups', group = 'kids' ))
-    itemlist.append(item.clone( title = ' Canales que pueden contener enlaces Torrents', action = 'ch_groups', group = 'torrents' ))
+
+    if not config.get_setting('search_no_torrents'):
+        itemlist.append(item.clone( title = ' Canales que pueden contener enlaces Torrents', thumbnail=config.get_thumb('torrents'), action = 'ch_groups', group = 'torrents' ))
+
     itemlist.append(item.clone( title = ' Canales con Rankings (Más vistas, Más valoradas, etc.)', action = 'ch_groups', group = 'rankings' ))
     itemlist.append(item.clone( title = ' Canales con Vídeos en Versión Original y/ó Subtitulada', action = 'ch_groups', group = 'vos' ))
 
-    itemlist.append(item.clone( title = 'Películas:', action = '', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Películas:', action = '', thumbnail=config.get_thumb('movie'), text_color='cyan' ))
     itemlist.append(item.clone( title = ' Canales por Idiomas', action = 'ch_groups', group = 'languages' ))
     itemlist.append(item.clone( title = ' Canales por Años', action = 'ch_groups', group = 'years' ))
     itemlist.append(item.clone( title = ' Canales con Épocas', action = 'ch_groups', group = 'epochs' ))
@@ -81,15 +85,15 @@ def mainlist(item):
         itemlist.append(item.clone( title = 'Adultos (+18):', action = '', thumbnail=config.get_thumb('adults'), text_color='red' ))
         itemlist.append(item.clone( title = ' Canales que pueden contener temática para Adultos', action = 'ch_groups', group = 'adults', context=context ))
 
-    itemlist.append(item.clone( title = 'Documentales:', action = '', text_color='limegreen' ))
+    itemlist.append(item.clone( title = 'Documentales:', action = '', thumbnail=config.get_thumb('documentary'), text_color='limegreen' ))
     itemlist.append(item.clone( title = ' Canales con temática de Documentales', action = 'ch_groups', group = 'docs' ))
 
-    itemlist.append(item.clone( title = 'Especiales:', action = '', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Especiales:', action = '', thumbnail=config.get_thumb('genres'), text_color='moccasin' ))
     itemlist.append(item.clone( title = ' Canales con Categorias', action = 'ch_groups', group = 'categories' ))
     itemlist.append(item.clone( title = ' Canales con Intérpretes', action = 'ch_groups', group = 'stars' ))
     itemlist.append(item.clone( title = ' Canales con Directores/as', action = 'ch_groups', group = 'directors' ))
 
-    itemlist.append(item.clone( title = 'Diversos:', action = '', text_color='fuchsia' ))
+    itemlist.append(item.clone( title = 'Diversos:', action = '', thumbnail=config.get_thumb('crossroads'), text_color='fuchsia' ))
     itemlist.append(item.clone( title = ' Canales con Productoras, Plataformas, y/ó Estudios', action = 'ch_groups', group = 'producers' ))
     itemlist.append(item.clone( title = ' Canales con Listas, Sagas, Colecciones, y/ó Otros', action = 'ch_groups', group = 'lists' ))
     itemlist.append(item.clone( title = ' Canales con Vídeos en 3D', action = 'ch_groups', group = '3d' ))

@@ -16,7 +16,7 @@ def get_video_url(page_url, url_referer=''):
 
     packed = scrapertools.find_single_match(data, r"'text/javascript'>(eval.*?)\n")
     if not packed:
-        page_url = page_url.replace('/e/', '/play/').replace('/d/', '/play/')
+        page_url = page_url.replace('/e/', '/play/').replace('/d/', '/play/').replace('/embed-', '/play/').replace('.html', '')
         data = httptools.downloadpage(page_url).data
         packed = scrapertools.find_single_match(data, r"'text/javascript'>(eval.*?)\n")
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from platformcode import config, logger, platformtools
+from platformcode import config, logger, platformtools, recaptcha
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 

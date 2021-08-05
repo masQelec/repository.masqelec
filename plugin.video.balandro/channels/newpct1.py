@@ -95,9 +95,8 @@ def mainlist_pelis(item):
 
             color = 'white'
 
-            if not 'descargas2020.net' in url: 
-                if config.get_setting('proxies', item.channel, default=''):
-                    color = color_list_proxies
+            if config.get_setting('proxies', item.channel, default=''):
+                color = color_list_proxies
 
             itemlist.append(item.clone( title = clone[0].capitalize(), action = 'mainlist_pelis_clon', url = url, thumbnail = thumb, text_color=color ))
 
@@ -114,9 +113,9 @@ def mainlist_pelis_clon(item):
 
     clon_host = item.url
 
-    if not host.startswith('https://descargas2020.net/'):
-        itemlist.append(item_configurar_proxies(item, clon_host))
+    itemlist.append(item_configurar_proxies(item, clon_host))
 
+    if not 'descargas2020' in clon_host:
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', url = item.url, search_type = 'movie', text_color='yellowgreen' ))
 
     enlaces = [
@@ -138,7 +137,7 @@ def mainlist_pelis_clon(item):
         ['En 3D', 'peliculas-3d/']
         ]
 
-    if 'descargas2020.net' in item.url: 
+    if 'descargas2020' in item.url: 
         item.url += 'categoria/'
         enlaces = [
             ['Estrenos', 'estrenos-de-cine/'],
@@ -167,9 +166,8 @@ def mainlist_series(item):
 
             color = 'white'
 
-            if not 'descargas2020.net' in url: 
-                if config.get_setting('proxies', item.channel, default=''):
-                    color = color_list_proxies
+            if config.get_setting('proxies', item.channel, default=''):
+                color = color_list_proxies
 
             itemlist.append(item.clone( title = clone[0].capitalize(), action = 'mainlist_series_clon', url = url, thumbnail = thumb, text_color=color ))
 
@@ -196,7 +194,7 @@ def mainlist_series_clon(item):
         ['Subtituladas', 'series-vo/']
     ]
 
-    if 'descargas2020.net' in item.url: 
+    if 'descargas2020' in item.url: 
         del enlaces[1:]
 
     for enlace in enlaces:
@@ -206,7 +204,7 @@ def mainlist_series_clon(item):
 
 
 def limpiar_titulo(title, quitar_sufijo=''):
-    prefijos = ['Ver en linea ', 'Ver online ', 'Descarga Gratis ', 'Descarga Serie HD ',  
+    prefijos = ['Ver en linea ', 'Ver online ', 'Descarga Gratis ', 'Descarga Serie HD ',
                 'Descargar Estreno ', 'Descargar Pelicula ', 'Descargar torrent ']
 
     for prefijo in prefijos:
@@ -242,7 +240,6 @@ def list_all(item):
     if '-3d/' in item.url: quitar_sufijo = ' 3D'
 
     data = do_downloadpage(item, item.url)
-    # ~ logger.debug(data)
 
     patron = '<li>\s*<a href="([^"]+)" title="([^"]+)">\s*<img src="([^"]+)"[^>]+>'
     patron += '\s*<h2[^>]*>[^<]+</h2>\s*<span>([^<]+)</span>'
@@ -251,7 +248,6 @@ def list_all(item):
     num_matches = len(matches)
 
     for url, title, thumb, quality in matches[item.page * perpage:]:
-        # ~ logger.debug('%s %s %s %s' % (url, title, thumb, quality))
         if '/varios/' in item.url and quality in ['ISO','DVD-Screener']: continue # descartar descargas de pc, revistas pdf
 
         year = scrapertools.find_single_match(title, '\((\d{4})\)')
@@ -264,7 +260,7 @@ def list_all(item):
             m = re.match(r"^(.*?) - (Temporada \d+) Capitulo \d*", title)
             if not m:
                 m = re.match(r"^(.*?) - (Temporada \d+)", title)
-            if m: 
+            if m:
                 title = m.group(1)
                 titulo = '%s [%s]' % (title, m.group(2))
 
@@ -280,7 +276,6 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    # Subpaginación interna y/o paginación de la web
     buscar_next = True
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
@@ -305,25 +300,25 @@ def tracking_all_episodes(item):
 
 
 def extrae_show_s_e(title):
-    show = ''; season = ''; episode = ''
+    show = ''
+    season = ''
+    episode = ''
 
-    # ~ Blue Bloods  Temporada 9 Capitulo 9
     datos = scrapertools.find_single_match(title, '(.*?) (?:Temporada|Temp\.) (\d+) (?:Capitulo|Cap\.) (\d+)')
-    if datos: 
+    if not datos: datos = scrapertools.find_single_match(title, '(.*?) (?:Temporada|Temp\.) (\d+) (?:Capitulos|Cap\.) (\d+)')
+
+    if datos:
         show, season, episode = datos
     else:
-        # ~ Vikings - Temporada 4 [HDTV 720p][Cap.410][V.O. Subt. Castellano]
         datos = scrapertools.find_single_match(title, '(.*?) - (?:Temporada|Temp\.) (\d+).*?\[Cap\.(\d+)\]')
         if datos:
             show, season, episode = datos
             if episode.startswith(season): episode = episode[len(season):]
         else:
-            # ~ This Is Us  Temporada[ 3 ]Capitulo[ 8 ]
             datos = scrapertools.find_single_match(title, '(.*?) Temporada[^0-9]*(\d+)[^C]*Capitulo[^0-9]*(\d+)')
             if datos:
                 show, season, episode = datos
 
-    # ~ Serie Benidorm Temp. 1 Capitulo 3 - Español Calidad [ HDTV ]
     if show.startswith('Serie '): show = show.replace('Serie ', '')
 
     return show.strip(), season, episode
@@ -334,25 +329,21 @@ def episodios(item):
     itemlist = []
 
     data = do_downloadpage(item, item.url)
-    # ~ logger.debug(data)
 
     ul = scrapertools.find_single_match(data, '<ul class="buscar-list">(.*?)</ul>')
     matches = re.compile('<li[^>]*>(.*?)</li>', re.DOTALL).findall(ul)
     for article in matches:
-
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         title = scrapertools.find_single_match(article, '<strong[^>]*>(.*?)</strong>')
         if title == '':
             title = scrapertools.find_single_match(article, '<h2[^>]*>(.*?)</h2>')
         title = scrapertools.htmlclean(title)
-        # ~ spans = scrapertools.find_multiple_matches(article, '<span[^>]*>([^<]+)</span>')
-        # ~ logger.debug(spans) #0:idioma, 1:calidad, 2:fecha, 3:tamaño
 
         show, season, episode = extrae_show_s_e(title)
         if show == '' or season == '' or episode == '': 
-            if title != '': logger.debug('Serie/Temporada/Episodio no detectados! %s' % title)
-            # ~ else: logger.debug(article)
+            if title != '':
+                logger.debug('Serie/Temporada/Episodio no detectados! %s' % title)
             continue
 
         titulo = '%sx%s %s' % (season, episode, show)
@@ -370,10 +361,12 @@ def episodios(item):
 
 
 def extrae_idioma(txt):
-    if 'Latino' in txt: return 'Lat'
-    elif 'Castellano' in txt or txt.startswith('Espa'): return 'Esp'
-    elif 'Subtitulado Espa' in txt: return 'Vose'
-    elif 'Subtitulado' in txt: return 'Vose'
+    txt = txt.lower()
+    if 'latino' in txt: return 'Lat'
+    elif 'castellano' in txt: return 'Esp'
+    elif 'español' in txt: return 'Esp'
+    elif 'subtitulado espa' in txt: return 'Vose'
+    elif 'subtitulado' in txt: return 'Vose'
     else: return 'VO'
 
 
@@ -381,44 +374,85 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not 'descargas2020' in item.url:
+        item.url = item.url.replace('/descargar/', '/descargar/torrent/')
+
     data = do_downloadpage(item, item.url)
 
-    # ~ logger.debug(data)
-
     # Enlace torrent
-    calidad = ''; idioma = ''
+    calidad = ''
+    idioma = ''
+
     h1 = scrapertools.find_single_match(data, '<h1[^>]*>(.*?)</h1>')
     h1 = scrapertools.htmlclean(h1.replace('\n', ''))
+
     datos = scrapertools.find_multiple_matches(h1, '\[([^\]]+)\]')
     if datos:
         calidad = datos[0]
-        if len(datos) > 1: idioma = extrae_idioma(datos[1])
+
+        if len(datos) > 1: idioma = datos[1]
+        if idioma:
+            idioma = extrae_idioma(idioma)
+
         if idioma == 'VO' and len(datos) > 2: idioma = extrae_idioma(datos[2]) # a veces no es el segundo []
         if idioma == 'VO' and len(datos) > 3: idioma = extrae_idioma(datos[3]) # a veces no es el tercero []
+
+    if not idioma:
+        if '/peliculas-castellano/' in item.url: idioma = extrae_idioma('Castellano')
+        elif '/peliculas-latino/' in item.url: idioma = extrae_idioma('Latino')
+        elif '/peliculas-subtitulado/' in item.url: idioma = extrae_idioma('Subtitulado')
 
     tamano = scrapertools.find_single_match(data, '<strong>Size:</strong>([^<]+)</span>').strip()
     url = scrapertools.find_single_match(data, 'window.location.href\s*=\s*"([^"]+)')
 
-    if url.startswith('//'): url = 'https:' + url
-    if not url.endswith('.torrent'): url = url + '.torrent'
+    if url:
+        if url.startswith('//'): url = 'https:' + url
 
-    itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
-                         language = idioma, quality = calidad, other = tamano ))
+        if url.startswith('/'): url = ''
 
-    # Enlaces streaming
+        if url:
+            if not url.endswith('.torrent'): url = url + '.torrent'
+
+            itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
+                                                         language = idioma, quality = calidad, other = tamano ))
+
+    # Enlaces streaming con idioma y calidad
     patron = '<div class="box2">([^<]+)</div>\s*<div class="box3">([^<]+)</div>\s*<div class="box4">([^<]+)</div>'
     patron += '\s*<div class="box5"><a href=\'([^\']+)[^>]+>([^<]+)'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
     for servidor, idioma, calidad, url, tipo in matches:
         if url.startswith('javascript:'): continue
-        # ~ logger.debug('%s %s %s %s %s' % (tipo, servidor, url, idioma, calidad))
-        if 'descargar' in tipo.lower() and servidor != 'uptobox': continue  # Descartar descargas directas (menos uptobox)
 
-        itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url,
-                             language = extrae_idioma(idioma), quality = calidad ))
+        servidor = servidor.replace('.com', '').strip()
+        servidor = servertools.corregir_servidor(servidor)
 
-    itemlist = servertools.get_servers_itemlist(itemlist)
+        if not idioma:
+            if '/peliculas-castellano/' in item.url: idioma = 'Castellano'
+            elif '/peliculas-latino/' in item.url: idioma = 'Latino'
+            elif '/peliculas-subtitulado/' in item.url: idioma = 'Subtitulado'
+
+        itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = servidor,
+                                                     language = extrae_idioma(idioma), quality = calidad ))
+
+    # Otros Enlaces
+    if not matches:
+        patron = '<div class="box2">(.*?)</div>.*?<div class="box3">(.*?)</div>.*?<div class="box4">(.*?)</div>.*?<div class="box5">.*?'
+        patron += "<a href='(.*?)'"
+
+        matches = re.compile(patron, re.DOTALL).findall(data)
+        for servidor, idioma, calidad, url in matches:
+            if url.startswith('javascript:'): continue
+
+            servidor = servidor.replace('.com', '').strip()
+            servidor = servertools.corregir_servidor(servidor)
+
+            if not idioma:
+                if '/peliculas-castellano/' in item.url: idioma = 'Castellano'
+                elif '/peliculas-latino/' in item.url: idioma = 'Latino'
+                elif '/peliculas-subtitulado/' in item.url: idioma = 'Subtitulado'
+
+            itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = extrae_idioma(idioma) ))
 
     return itemlist
 
@@ -430,9 +464,9 @@ def play(item):
     if item.url.endswith('.torrent'):
         if config.get_setting('proxies', item.channel, default=''):
             data = do_downloadpage(item, item.url)
-            file_local = os.path.join(config.get_data_path(), "temp.torrent")
-            with open(file_local, 'w') as f: f.write(data); f.close()
 
+            file_local = os.path.join(config.get_data_path(), "temp.torrent")
+            with open(file_local, 'wb') as f: f.write(data); f.close()
             itemlist.append(item.clone( url = file_local, server = 'torrent' ))
         else:
             itemlist.append(item.clone( url = item.url, server = 'torrent' ))
@@ -449,11 +483,8 @@ def busqueda(item):
 
     post = 'categoryIDR=&categoryID=&idioma=&calidad=&ordenar=Fecha&inon=Descendente&s=%s&pg=%d' % (item.busca_texto, item.busca_pagina)
     data = do_downloadpage(item, item.url, post=post)
-    # ~ logger.debug(data)
 
     data = data.replace('\\/', '/')
-
-    logger.info("check-00-quehay: %s" % data)
 
     dominio = item.url.replace('get/result/', '')
 

@@ -1,0 +1,17 @@
+{
+  "id": "seriesyonkis",
+  "name": "SeriesYonkis",
+  "thumbnail": "seriesyonkis.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["producers", "rankings", "kids", "docs", "vos"],
+
+  "notes": "Películas y Series en castellano, latino y subtitulado."
+}

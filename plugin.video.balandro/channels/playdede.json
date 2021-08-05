@@ -3,7 +3,7 @@
   "name": "PlayDede",
   "thumbnail": "playdede.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],

@@ -280,7 +280,8 @@ def play(item):
             servidor = servertools.get_server_from_url(url)
             url = servertools.normalize_url(servidor, url)
 
-    if '/hqq.' in url or '/waaw.' in url: url = ''
+    if '/hqq.' in url or '/waaw.' in url:
+        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     if url:
         if not url.startswith("http"):

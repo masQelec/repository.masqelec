@@ -211,7 +211,7 @@ def findvideos(item):
             if not url:
                 url = scrapertools.find_single_match(url_data,'window.location.href = "([^"]+)";')
 
-        if '/hqq.' in url or '/waaw.' in url: url = ''
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: url = ''
         elif '/badshare.io/' in url: url = ''
 
         if url:

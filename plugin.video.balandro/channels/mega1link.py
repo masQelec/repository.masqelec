@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re, base64
+import re
 
 from platformcode import logger
 from core.item import Item
@@ -20,12 +20,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title='Catálogo', action='list_all', url=host + 'peliculas/' ))
 
-    itemlist.append(item.clone( title='Castellano', action='list_all', url=host + 'tag/espanol-castellano/' ))
-    itemlist.append(item.clone( title='Latino', action='list_all', url=host + 'tag/espanol-latino/' ))
-    itemlist.append(item.clone( title='Subtitulado', action='list_all', url=host + 'tag/subtitulada/' ))
-
-    itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
-    itemlist.append(item.clone ( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
@@ -41,14 +38,27 @@ def generos(item):
     bloque = scrapertools.find_single_match(data, 'Genero</a>\s*<ul class="sub-menu">(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)">([^<]+)')
+
     for url, title in matches:
         if '/genero/' not in url: continue
+
         itemlist.append(item.clone( action='list_all', title=title, url=url ))
 
     itemlist.append(item.clone ( action = 'list_all', title = 'Bélica', url=host + 'genero/belica/' ))
     itemlist.append(item.clone ( action = 'list_all', title = 'Western', url=host + 'genero/western/' ))
 
     return sorted(itemlist, key=lambda it: it.title)
+
+
+def idiomas(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title='Castellano', action='list_all', url=host + 'tag/espanol-castellano/' ))
+    itemlist.append(item.clone( title='Latino', action='list_all', url=host + 'tag/espanol-latino/' ))
+    itemlist.append(item.clone( title='Subtitulado', action='list_all', url=host + 'tag/subtitulada/' ))
+
+    return itemlist
 
 
 def calidades(item):
@@ -60,6 +70,7 @@ def calidades(item):
     bloque = scrapertools.find_single_match(data, 'Calidad</a>\s*<ul class="sub-menu">(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)">([^<]+)')
+
     for url, title in matches:
         itemlist.append(item.clone( action='list_all', title='En ' + title, url=url ))
 
@@ -83,6 +94,7 @@ def list_all(item):
         url = scrapertools.find_single_match(article, ' href="([^"]+)')
         title = scrapertools.find_single_match(article, ' alt="([^"]+)')
         if not url or not title: continue
+
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         year = scrapertools.find_single_match(article, '<span>(\d{4})</span>')
         if year:
@@ -90,6 +102,7 @@ def list_all(item):
             title = re.sub(' \(%s\)$' % year, '', title)
         else:
             year = '-'
+
         title_alt = title.split(' / ')[0].strip() if ' / ' in title else '' # para mejorar detección en tmdb
         if not title_alt and ' – ' in title: title_alt = title.split(' – ')[0].strip()
 
@@ -104,7 +117,6 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    # Subpaginación interna y/o paginación de la web
     buscar_next = True
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
@@ -120,7 +132,6 @@ def list_all(item):
     return itemlist
 
 
-# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
 def puntuar_calidad(txt):
     txt = txt.replace(' ', '').replace('-', '').lower()
     orden = ['tscam', 'brscreener', 'dvdrip', 'hd720p', 'hd1080p']
@@ -134,13 +145,13 @@ def findvideos(item):
     IDIOMAS = {'Español Castellano': 'Esp', 'Español Latino': 'Lat', 'Subtitulada': 'Vose'}
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     # Enlaces en descargas
     bloque = scrapertools.find_single_match(data, "<div id='download'(.*?)</table>")
+
     matches = re.compile('<tr(.*?)</tr>', re.DOTALL).findall(bloque)
+
     for lin in matches:
-        # ~ logger.debug(lin)
         if '<th' in lin: continue
 
         url = scrapertools.find_single_match(lin, " href='([^']+)")
@@ -163,7 +174,7 @@ def play(item):
 
     if item.url.startswith(host):
         data = httptools.downloadpage(item.url).data
-        # ~ logger.debug(data)
+
         url = scrapertools.find_single_match(data, '<a id="link"[^>]*href="([^"]+)')
         if url:
             servidor = servertools.get_server_from_url(url)
@@ -183,6 +194,7 @@ def list_search(item):
     data = httptools.downloadpage(item.url).data
 
     matches = re.compile('<div class="result-item">(.*?)</article>', re.DOTALL).findall(data)
+
     for article in matches:
         article = scrapertools.decodeHtmlentities(article)
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
@@ -200,6 +212,7 @@ def list_search(item):
             title = re.sub(' \(%s\)$' % year, '', title)
         else:
             year = '-'
+
         title_alt = title.split(' / ')[0].strip() if ' / ' in title else '' # para mejorar detección en tmdb
         if not title_alt and ' – ' in title: title_alt = title.split(' – ')[0].strip()
 

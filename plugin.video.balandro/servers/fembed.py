@@ -8,16 +8,21 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
+    page_url = page_url.replace('/myurlshort.live/', '/www.fembed.com/').replace('/divload.com/', '/www.fembed.com/').replace('/jplayer.club/', '/www.fembed.com/').replace('/pelispng.online/', '/www.fembed.com/')
+
     # ~ dom = 'https://feurl.com'
     # ~ dom = 'https://www.fembed.com'
     dom = scrapertools.find_single_match(page_url, "(https://[^/]+)")
+
+    logger.info("check-00-dom: %s" % dom)
+
     vid = scrapertools.find_single_match(page_url, "/(?:v|f)/([A-z0-9_-]+)")
     if not vid or not dom: return video_urls
 
     post = {'r':'', 'd': dom.replace('https://', '')}
 
     data = httptools.downloadpage(dom + '/api/source/' + vid, post=post).data
-    
+
     try:
         data = jsontools.load(data)
         # ~ logger.debug(data)

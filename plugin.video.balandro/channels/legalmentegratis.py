@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import config, logger
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -58,15 +58,34 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(host).data
+    descartar_xxx = config.get_setting('descartar_xxx', default=False)
 
-    bloque = scrapertools.find_single_match(data, '<ul class="sub-menu">(.*?)</ul>')
-
-    patron = 'class="menu-item menu-item-type-taxonomy menu-item-object-category.*?href="(.*?)">(.*?)</a>'
-    matches = scrapertools.find_multiple_matches(bloque, patron)
+    matches = [
+        ['cienciaficcion/', 'Ciencia Ficción'],
+        ['comedia/', 'Comedia'],
+        ['documental/', 'Documental'],
+        ['drama/', 'Drama'],
+        ['ecologia/', 'Ecología'],
+        ['erotismo/', 'Erotismo'],
+        ['gore/', 'Gore'],
+        ['policial/', 'Policial'],
+        ['romantica/', 'Romántica'],
+        ['surrealismo/', 'Surrealismo'],
+        ['suspenso/', 'Suspenso'],
+        ['terror/', 'Terror'],
+        ['thriller/', 'Thriller'],
+        ['vampiros/', 'Vampiros'],
+        ['/western/', 'Western'],
+        ['zombies/', 'Zombies']
+        ]
 
     for url, title in matches:
-        itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
+        if descartar_xxx:
+            if title == 'Erotismo': continue
+
+        url = host + 'category/' + url
+
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
 
     return itemlist
 

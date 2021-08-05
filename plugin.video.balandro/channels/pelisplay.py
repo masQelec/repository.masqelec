@@ -16,6 +16,7 @@ from core import httptools, scrapertools, tmdb, servertools
 
 host = 'https://www.pelisplay.co/'
 
+
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
@@ -106,7 +107,6 @@ def generos(item):
         else:
             itemlist.append(item.clone( action="list_series", title='%s (%s)' % (title, cantidad), url=url ))
 
-    # ~ return itemlist # orden por cantidad
     return sorted(itemlist, key=lambda it: it.title) # orden alfabético
 
 
@@ -118,7 +118,6 @@ def list_pelis(item):
 
     matches = re.compile('<figure>(.*?)</figure>', re.DOTALL).findall(data)
     for article in matches:
-
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         if thumb.startswith('/'): thumb = host[:-1] + thumb
         title = scrapertools.find_single_match(article, '<div class="Title">(.*?)</div>').strip()
@@ -150,8 +149,8 @@ def list_series(item):
     data = do_downloadpage(item.url)
 
     matches = re.compile('<figure>(.*?)</figure>', re.DOTALL).findall(data)
-    for article in matches:
 
+    for article in matches:
         thumb = scrapertools.find_single_match(article, 'img src="([^"]+)"')
         if thumb.startswith('/'): thumb = host[:-1] + thumb
         title = scrapertools.find_single_match(article, '<h2>(.*?)</h2>').strip()
@@ -275,6 +274,7 @@ def findvideos(item):
         url = 'https://www.pelisplay.tv/entradas/procesar_player?' + urllib.urlencode(post)
 
         servidor = scrapertools.find_single_match(tds[0], '>([^<]+)</div>').lower().replace(' ', '')
+
         if servidor in ['tazmania', 'zeus', 'tiburon', 'mega', 'turbo']:
             agregado += ', ' + servidor.capitalize()
             servidor = 'm3u8hls' if servidor == 'turbo' else 'directo'
@@ -292,7 +292,6 @@ def play(item):
     url = item.url.split('?')[0]
     post = item.url.split('?')[1]
     data = do_downloadpage(url, post=post, raise_weberror=False).replace('\\/', '/')
-    # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, '"data":"([^"]+)')
 
@@ -302,14 +301,12 @@ def play(item):
             url = host + 'private/plugins/gkpluginsphp.php'
             post = {'link': scrapertools.find_single_match(data, 'link:"([^"]+)')}.replace('\\/', '/')
             data = do_downloadpage(url, post=post, raise_weberror=False)
-            # ~ logger.debug(data)
             url = scrapertools.find_single_match(data, '"link":"([^"]+)')
             if url:
                 itemlist.append(['mp4', url])
 
         elif 'start_jwplayer(JSON.parse(' in data:
             data = data.replace('\\/', '/')
-            # ~ logger.debug(data)
 
             matches = scrapertools.find_multiple_matches(data, '"file"\s*:\s*"([^"]+)"\s*,\s*"label"\s*:\s*"([^"]*)"\s*,\s*"type"\s*:\s*"([^"]*)"')
             if matches:

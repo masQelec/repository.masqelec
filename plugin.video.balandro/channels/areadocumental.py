@@ -71,14 +71,15 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(data, patron)
 
     for url, thumb, title, year, plot in matches:
+        thumb = host + thumb
+        plot = scrapertools.htmlclean(plot).strip()
+
         if 'player.php' not in url:
             titulo = '%s [COLOR gray](%s)[/COLOR]' % (title, year)
-            itemlist.append(item.clone( action='list_all', url=url, title=titulo, thumbnail=host+thumb,
-                                        plot=scrapertools.htmlclean(plot).strip() ))
+            itemlist.append(item.clone( action='list_all', url=url, title=titulo, thumbnail=thumb, plot=plot ))
         else:
-            itemlist.append(item.clone( action='findvideos', url=host+url, title=title, thumbnail=host+thumb,
-                                        infoLabels={"year": year, "plot": scrapertools.htmlclean(plot).strip()},
-                                        contentType='movie', contentTitle=title, contentExtra='documentary' ))
+            itemlist.append(item.clone( action='findvideos', url=host+url, title=title, thumbnail=thumb,
+                                        infoLabels={"year": year, "plot": plot}, contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
     next_page_link = scrapertools.find_single_match(data, '<li><a class="last">\d+</a></li>\s*<li>\s*<a href="([^"]+)')
     if next_page_link != '':
@@ -105,16 +106,19 @@ def findvideos(item):
         sub_url = host + sub_url
         sub_url += '|Referer=' + item.url
     except:
-        sub_url = ''; sub_lang = ''
+        sub_url = ''
+        sub_lang = ''
 
     matches = scrapertools.find_multiple_matches(data, 'file:\s*"([^"]+)",.*?label: "([^"]*)"')
-    # ~ logger.debug(matches)
+
     for url, lbl in matches:
         if '.mp4' not in url and url != 'video.php' and url != 'video3Dfull.php': continue
+
         if url in ['video.php', 'video3Dfull.php']: 
             url = host + url + '|Referer=' + item.url 
             url += '&Cookie=' + httptools.get_cookies('area-documental.com')
-        lang = 'Vose' if 'Espa' in sub_lang else 'Esp' # !?
+
+        lang = 'Vose'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', url = url, 
                               language = lang, quality = lbl, subtitle = sub_url ))

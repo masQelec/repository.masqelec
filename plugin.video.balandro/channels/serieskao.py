@@ -294,7 +294,7 @@ def findvideos(item):
         matches = re.compile(r'data-lang="(\d+)"\s*data-r="([^"]+)"').findall(serversdata)
 
         if not matches:
-            if '/hqq.' in url or '/waaw.' in url: url = ''
+            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: url = ''
 
             if url:
                 other = ''
@@ -315,7 +315,7 @@ def findvideos(item):
             if isinstance(url, bytes):
                 url = url.decode('utf-8')
 
-            if '/hqq.' in url or '/waaw.' in url: url = ''
+            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: url = ''
 
             if url:
                 other = ''
@@ -376,7 +376,8 @@ def play(item):
          if '#' in url:
              url = url.split('#')[0]
 
-    if '/hqq.' in url or '/waaw.' in url: url = ''
+    if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     if url:
         servidor = servertools.get_server_from_url(url)

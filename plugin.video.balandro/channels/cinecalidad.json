@@ -3,15 +3,15 @@
   "name": "CineCalidad",
   "thumbnail": "cinecalidad.png",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["movie", "torrent"],
+  "categories": ["movie", "tvshow", "torrent"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["torrents", "rankings", "years", "kids", "vos"],
+  "clusters": ["torrents", "rankings", "years", "kids", "docs", "vos"],
 
-  "notes": "Acceso por separado a Castellano y Latino. Películas, destacadas, por género, por año."
+  "notes": "Acceso por separado a Castellano y Latino. Películas, destacadas, por género y por año."
 }

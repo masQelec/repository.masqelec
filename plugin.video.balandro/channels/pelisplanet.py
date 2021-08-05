@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://www.pelisplanet.com/'
+host = 'https://www.pelisplanet.to/'
 
 
 def item_configurar_proxies(item):
@@ -21,6 +21,9 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    url = url.replace('/www.pelisplanet.com/', '/www.pelisplanet.to/')
+
     data = httptools.downloadpage_proxy('pelisplanet', url, post=post, headers=headers).data
     return data
 
@@ -168,7 +171,8 @@ def findvideos(item):
         if servidor == 'streamvips': continue
         elif servidor == 'ultrastream': continue
 
-        if '/hqq.' in url or '/waaw.' in url: continue
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
+        elif '.mystream' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

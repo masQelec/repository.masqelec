@@ -80,7 +80,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_series', url = host + 'series-2/', search_type = 'tvshow', page = 0 ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_series', url = host + 'series-2/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title='Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
@@ -176,7 +176,7 @@ def list_series(item):
             if next_page:
                 itemlist.append(item.clone( title = '>> Página siguiente', url = next_page, action='list_series', page = 0, text_color = 'coral' ))
     else:
-       if num_matches > perpage: # subpaginación interna dentro de la página si hay demasiados items
+       if num_matches > perpage:
            hasta = (item.page * perpage) + perpage
            if hasta < num_matches:
                itemlist.append(item.clone( title = '>> Página siguiente', url = item.url, action='list_series', page = item.page + 1, text_color = 'coral' ))
@@ -193,7 +193,7 @@ def alfabetico(item):
     else:
        url_letra = host + 'series-2/?s=letra-'
 
-    for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#':
+    for letra in '#ABCDEFGHIJKLMNOPQRSTUVWXYZ':
         title = letra
         if letra == '#': letra = '0'
 
@@ -202,7 +202,7 @@ def alfabetico(item):
         if item.search_type == 'movie':
             itemlist.append(item.clone( action = "list_all", title = title, url = url))
         else:
-            itemlist.append(item.clone( action = "list_series", title = title, url = url, page = 0))
+            itemlist.append(item.clone( action = "list_series", title = title, url = url))
 
     return itemlist
 
@@ -261,11 +261,18 @@ def findvideos(item):
     if item.contentType == "movie":
         data = do_downloadpage(item.url)
 
-        url_torrent = re.compile('<a href="([^"]+)" title=".*?" class="fichabtndes linktorrent"').findall(data)[0]
+        url_torrent = ''
+
+        try:
+            url_torrent = re.compile('<a href="([^"]+)" title=".*?" class="fichabtndes linktorrent"').findall(data)[0]
+        except:
+            url_torrent = scrapertools.find_single_match(data, '<div class="fichadescargat".*?<a href="(.*?)"')
     else:
         url_torrent = item.url
 
-    itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url_torrent, server = 'torrent', quality= item.qualityes, language=item.languages))
+    if url_torrent:
+         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url_torrent, server = 'torrent',
+                                                       quality= item.qualityes, language=item.languages))
 
     return itemlist
 
@@ -279,7 +286,7 @@ def play(item):
 
         if config.get_setting('proxies', item.channel, default=''):
             import os
-            
+
             data = do_downloadpage(item.url)
             file_local = os.path.join(config.get_data_path(), "temp.torrent")
             with open(file_local, 'wb') as f: f.write(data); f.close()

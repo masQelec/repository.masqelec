@@ -22,10 +22,8 @@ def do_downloadpage(url, post=None, headers=None):
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
-                # ~ logger.debug('Cookies: %s %s' % (ck_name, ck_value))
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
                 data = httptools.downloadpage(url, post=post, headers=headers).data
-                # ~ logger.debug(data)
         except:
             pass
 
@@ -142,8 +140,9 @@ def list_all(item):
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(article, ' data-src="([^"]+)')
-        year = scrapertools.find_single_match(article, '<span class="Date">(\d{4})</span>')
+        year = scrapertools.find_single_match(article, '<span class="Qlty Yr">(.*?)</span>')
         if not year: year = '-'
+
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<div class="Description">\s*<p>(.*?)</p>'))
 
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
@@ -154,7 +153,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     buscar_next = True
-    if num_matches > perpage: # subpaginación interna dentro de la página si hay demasiados items
+    if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
             itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='list_all', text_color='coral' ))
@@ -201,10 +200,8 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    # ~ matches = scrapertools.find_multiple_matches(data, 'data-season="(\d+)".*?<a href="([^"]+)')
     matches = scrapertools.find_multiple_matches(data, 'episodes-load">\s*<div class="Title"><a href="([^"]+)">Temporada <span>(\d+)</span>')
 
-    # ~ for numtempo, url in matches:
     for url, numtempo in matches:
         numtempo = int(numtempo)
 
@@ -226,10 +223,6 @@ def temporadas(item):
     return itemlist
 
 
-# Si una misma url devuelve los episodios de todas las temporadas, definir rutina tracking_all_episodes para acelerar el scrap en trackingtools.
-# ~ def tracking_all_episodes(item):
-    # ~ return episodios(item)
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -237,7 +230,6 @@ def episodios(item):
     if not item.page: item.page = 0
     perpage = 50
 
-    # ~ data = do_downloadpage(item.url, headers={'Referer':item.referer})
     data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, '<tr class="Viewed">(.*?)</tr>')
@@ -266,12 +258,12 @@ def episodios(item):
     return itemlist
 
 
-# Si hay excepciones concretas de este canal, añadir aquí, si son genéricas añadir en servertools.corregir_servidor
 def corregir_servidor(servidor):
     servidor = servertools.corregir_servidor(servidor)
     if servidor == 'embed': return 'mystream'
     if servidor == 'flixplayer': return 'directo'
     return servidor
+
 
 def findvideos(item):
     logger.info()
@@ -279,9 +271,7 @@ def findvideos(item):
 
     IDIOMAS = {'castellano': 'Esp', 'latino': 'Lat', 'subtitulado': 'Vose'}
 
-    # ~ data = do_downloadpage(item.url, headers={'Referer': item.referer})
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     matches = scrapertools.find_multiple_matches(data, '<li data-typ(?:e|)="episode"(.*?)</li>')
 
@@ -309,26 +299,24 @@ def play(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, 'src="([^"]+)"')
     if url.startswith('/'): url = host + url[1:]
 
     if '/flixplayer.' in url:
-        data = httptools.downloadpage(url).data
-        # ~ logger.debug(data)
+        data = do_downloadpage(url)
         url = scrapertools.find_single_match(data, 'link":"([^"]+)"')
 
-    elif host in url and '?h=' in url:
+    elif host in url or '.seriesflix.' in url and '?h=' in url:
         fid = scrapertools.find_single_match(url, "h=([^&]+)")
         url2 = url.replace('index.php', '').split('?h=')[0] + 'r.php'
-        resp = httptools.downloadpage(url2, post='h='+fid, headers={'Referer': url}, follow_redirects=False)
+
+        resp = httptools.downloadpage(url2, post='h=' + fid, headers={'Referer': url}, follow_redirects=False)
         if 'location' in resp.headers: url = resp.headers['location']
         else: url = None
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        # ~ if servidor and servidor != 'directo': # descartado pq puede ser 'directo' si viene de flixplayer
         url = servertools.normalize_url(servidor, url)
         itemlist.append(item.clone( url = url, server = servidor ))
 

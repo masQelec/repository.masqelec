@@ -210,7 +210,6 @@ def episodios(item):
     return itemlist
 
 
-# Si hay excepciones concretas de este canal, añadir aquí, si son genéricas añadir en servertools.corregir_servidor
 def corregir_servidor(servidor):
     servidor = servertools.corregir_servidor(servidor)
     if servidor == 'embed': return 'mystream'
@@ -224,7 +223,6 @@ def findvideos(item):
     IDIOMAS = {'castellano': 'Esp', 'latino': 'Lat', 'subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     matches = scrapertools.find_multiple_matches(data, 'href="#options-(.*?)">(.*?)</li>')
 
@@ -250,26 +248,24 @@ def play(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, 'src="([^"]+)"')
     if url.startswith('/'): url = host + url[1:]
 
     if '/flixplayer.' in url:
         data = httptools.downloadpage(url).data
-        # ~ logger.debug(data)
         url = scrapertools.find_single_match(data, 'link":"([^"]+)"')
 
-    elif host in url and '?h=' in url:
+    elif host in url or '.seriesflix.io' in url and '?h=' in url:
         fid = scrapertools.find_single_match(url, "h=([^&]+)")
         url2 = url.replace('index.php', '').split('?h=')[0] + 'r.php'
+
         resp = httptools.downloadpage(url2, post='h='+fid, headers={'Referer': url}, follow_redirects=False)
         if 'location' in resp.headers: url = resp.headers['location']
         else: url = None
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        # ~ if servidor and servidor != 'directo': # descartado pq puede ser 'directo' si viene de flixplayer
         url = servertools.normalize_url(servidor, url)
         itemlist.append(item.clone( url = url, server = servidor ))
 

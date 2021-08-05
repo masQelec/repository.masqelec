@@ -8,7 +8,7 @@
     "ignore_urls": [ "http://www.yourupload.com/embed/embed" ],
     "patterns": [
       {
-        "pattern": "yourupload.com/(?:embed|watch)/([A-z0-9]+)",
+        "pattern": "yourupload.(?:com|co)/(?:embed|watch)/([A-z0-9]+)",
         "url": "https://www.yourupload.com/embed/\\1"
       },
       {

@@ -99,18 +99,17 @@ def list_all(item):
         elif 'Versión ' in info: langs = 'Vo'
         else: langs = 'Esp'
 
-        try:
-           title = info.split("|")[1]
-           if 'Ver y descargar' in info: title = info.split("|")[0]
-           elif not 'VIDEOCLUB' in info: title = info.split("|")[0]
-        except:
-           title = info
+        title = info.lower()
 
-        title = re.sub(r" \(.*?\)", "", title)
-
-        title = title.replace('Ver gratis', '').replace('Ver y descargar', '')
+        title = re.sub("(?:videoclub \| )?(?:ver )?(?:y descargar )?(?:pel.*?cula\S? de)?(?:pel.*?cula\S?)?(?:gratis)?(?:en tu videoclub )?(?:serie)?(?:online)?", "", info)
 
         title = title.lower().strip()
+
+        title = title.replace('ver ', '').replace('videoclub gratuito', '').replace('videoclub ', '').strip()
+
+        if title.startswith('|'):
+            title = title.split("|")[1]
+            title = title.strip()
 
         title = title.capitalize()
 
@@ -189,8 +188,6 @@ def list_col(item):
 
         title = title.replace('Á', 'á').replace('É', 'é').replace('Í', 'í').replace('Ó', 'ó').replace('Ú', 'ú').replace('Ñ', 'ñ').replace('Ü', 'ú')
 
-        title = title.strip()
-
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = langs, grupo = item.grupo,
                                     contentType = 'movie', contentTitle = item.title, infoLabels={'year': year} ))
 
@@ -218,7 +215,7 @@ def findvideos(item):
     links = scrapertools.find_multiple_matches(data, '<div class="jetpack-video-wrapper">.*?src="(.*?)"')
     if not links: links = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
-    for url in links:  
+    for url in links:
         url = url.replace('?feature=oembed', '')
 
         servidor = servertools.get_server_from_url(url)

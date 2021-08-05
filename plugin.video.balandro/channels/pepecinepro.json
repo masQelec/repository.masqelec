@@ -1,0 +1,17 @@
+{
+  "id": "pepecinepro",
+  "name": "PepecinePro",
+  "thumbnail": "pepecinepro.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["years", "kids", "docs", "vos"],
+
+  "notes": "Películas en castellano, latino y subtitulado."
+}

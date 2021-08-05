@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-# --------------------------------------------------------------------------------
-# Server management
-# --------------------------------------------------------------------------------
 
 import datetime
 import os
 import re
 import time
 import sys
+
 PY2 = False
 PY3 = False
 if sys.version_info[0] >= 3:
@@ -68,8 +66,6 @@ def normalize_url(serverid, url):
     server_parameters = get_server_parameters(serverid)
     # Recorre los patrones
     for pattern in server_parameters.get("find_videos", {}).get("patterns", []):
-        # ~ logger.info(pattern["pattern"])
-
         # Recorre los resultados
         found = False
         if not isinstance(url, str):
@@ -88,10 +84,9 @@ def normalize_url(serverid, url):
             else:
                 new_url = url
             break
-        
+
         if found: break
 
-    # ~ logger.info("Server: %s, Url: %s => %s" % (serverid, url, new_url))
     return new_url
 
 
@@ -107,8 +102,6 @@ def get_servers_itemlist(itemlist):
 
         # Recorre los patrones
         for pattern in server_parameters.get("find_videos", {}).get("patterns", []):
-            # ~ logger.info(pattern["pattern"])
-
             # Recorre los resultados
             for match in re.compile(pattern["pattern"], re.DOTALL).finditer("\n".join([item.url.split('|')[0] for item in itemlist if not item.server])):
                 url = pattern["url"]
@@ -117,7 +110,6 @@ def get_servers_itemlist(itemlist):
 
                 for item in itemlist:
                     if match.group() in item.url:
-                        # ~ logger.info('Found pattern ' + pattern["pattern"])
                         item.server = serverid
                         if '|' in item.url:
                             item.url = url + '|' + item.url.split('|')[1]
@@ -206,7 +198,6 @@ def get_server_from_url(url, disabled_servers=False):
             return None
 
 
-
 # Para un servidor y una url, devuelve video_urls ([]), puede (True/False), motivo_no_puede
 def resolve_video_urls_for_playing(server, url, url_referer=''):
     logger.info("Server: %s, Url: %s" % (server, url))
@@ -259,7 +250,7 @@ def resolve_video_urls_for_playing(server, url, url_referer=''):
             return [], False, errmsg
 
         if len(video_urls) == 0:
-            return [], False, 'No se encuentra el vídeo en %s' % server_name
+            return [], False, ' No se encuentra el vídeo en %s' % server_name
 
     return video_urls, True, ''
 
@@ -299,7 +290,6 @@ def is_server_enabled(server):
     @rtype: bool
     """
     server_parameters = get_server_parameters(server)
-    # ~ logger.debug(server_parameters)
     if 'active' not in server_parameters or server_parameters['active'] == False:
         return False
     return config.get_setting('status', server=server, default=0) >= 0
@@ -357,8 +347,6 @@ def get_server_parameters(server):
             return {}
 
     return dict_servers_parameters[server]
-
-
 
 
 def get_server_setting(name, server, default=None):
@@ -422,16 +410,12 @@ def corregir_servidor(servidor):
     else: return servidor
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 # Reordenación/Filtrado de enlaces
-# --------------------------------
 
 def filter_and_sort_by_quality(itemlist):
     servers_sort_quality = config.get_setting('servers_sort_quality', default=0) # 0: orden web, 1: calidad desc, 2: calidad asc
 
     # Ordenar por preferencia de calidades
-    # ------------------------------------
     logger.info('Preferencias de orden para calidades: %s' % servers_sort_quality)
     
     if servers_sort_quality == 1:
@@ -446,7 +430,6 @@ def filter_and_sort_by_server(itemlist):
     # not it.server para casos en que no está definido y se resuelve en el play del canal
 
     # Quitar enlaces de servidores descartados por el usuario
-    # -------------------------------------------------------
     servers_discarded = config.get_setting('servers_discarded', default='')
     if servers_discarded != '':
         servers_discarded_list = servers_discarded.lower().replace(' ', '').split(',')
@@ -455,7 +438,6 @@ def filter_and_sort_by_server(itemlist):
         itemlist = filter(lambda it: (not it.server and 'indeterminado' not in servers_discarded_list) or (it.server and it.server.lower() not in servers_discarded_list), itemlist)
 
     # Ordenar enlaces de servidores preferidos del usuario
-    # ----------------------------------------------------
     servers_preferred = config.get_setting('servers_preferred', default='')
     servers_unfavored = config.get_setting('servers_unfavored', default='')
     if servers_preferred != '' or servers_unfavored != '':
@@ -476,7 +458,6 @@ def filter_and_sort_by_server(itemlist):
         itemlist = sorted(itemlist, key=lambda it: numera_server(it.server.lower()))
 
     # Quitar enlaces de servidores inactivos
-    # --------------------------------------
     return filter(lambda it: not it.server or is_server_enabled(get_server_id(it.server)), itemlist)
 
 
@@ -489,7 +470,6 @@ def filter_and_sort_by_language(itemlist):
     # prefs = {'Esp': pref_esp, 'Lat': pref_lat, 'VO': pref_vos} dónde pref_xxx "0:Descartar|1:Primero|2:Segundo|3:Tercero"
 
     # Quitar enlaces de idiomas descartados y ordenar por preferencia de idioma
-    # -------------------------------------------------------------------------
     prefs = config.get_lang_preferences()
     logger.info('Preferencias de idioma para servidores: %s' % str(prefs))
     prefs['?'] = 4 # Cuando no hay idioma mostrar al final

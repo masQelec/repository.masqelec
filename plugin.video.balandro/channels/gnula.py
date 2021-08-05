@@ -43,17 +43,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Recomendadas', action = 'list_all', url = url_recomendadas ))
 
-    # Enlaces por idioma según las preferencias del usuario en servidores
-    idio = {'Esp': ['Castellano', 'VC'], 'Lat': ['Latino', 'VL'], 'VO': ['Subtitulado', 'VS']}
-    prefs = config.get_lang_preferences()
-    prefs = sorted(prefs.items(), key=lambda p: p[1])
-
-    for lg, num in prefs:
-        if num == 0: continue
-        itemlist.append(item.clone( title = '%s estrenos' % idio[lg][0], action = 'list_all', url = url_estrenos, filtro_lang = idio[lg][1] ))
-        itemlist.append(item.clone( title = '%s recomendadas' % idio[lg][0], action = 'list_all', url = url_recomendadas, filtro_lang = idio[lg][1] ))
-
-    itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
@@ -66,20 +57,35 @@ def generos(item):
     itemlist = []
 
     data = do_downloadpage(host + 'generos/lista-de-generos/')
-    # ~ logger.debug(data)
 
-    patron = '<td>\s*<strong>([^<]+)</strong>\s*\[<a href="([^"]+)" title="([^"]+)"'
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('<td>\s*<strong>([^<]+)</strong>\s*\[<a href="([^"]+)" title="([^"]+)"', re.DOTALL).findall(data)
     for title, url, plot in matches:
         itemlist.append(item.clone( title=title, url=url, action='list_all', plot=plot ))
 
-    patron = '<td>\s*<strong>([^<]+)</strong>\s*\[<a href="([^"]+)"'
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('<td>\s*<strong>([^<]+)</strong>\s*\[<a href="([^"]+)"', re.DOTALL).findall(data)
     for title, url in matches:
         if url in [it.url for it in itemlist]: continue # descartar repetidos
+
         itemlist.append(item.clone( title=title, url=url, action='list_all' ))
 
     return sorted(itemlist, key=lambda it: it.title)
+
+
+def idiomas(item):
+    logger.info()
+    itemlist = []
+
+    # Enlaces por idioma según las preferencias del usuario en servidores
+    idio = {'Esp': ['Castellano', 'VC'], 'Lat': ['Latino', 'VL'], 'VO': ['Subtitulado', 'VS']}
+    prefs = config.get_lang_preferences()
+    prefs = sorted(prefs.items(), key=lambda p: p[1])
+
+    for lg, num in prefs:
+        if num == 0: continue
+        itemlist.append(item.clone( title = '%s estrenos' % idio[lg][0], action = 'list_all', url = url_estrenos, filtro_lang = idio[lg][1] ))
+        itemlist.append(item.clone( title = '%s recomendadas' % idio[lg][0], action = 'list_all', url = url_recomendadas, filtro_lang = idio[lg][1] ))
+
+    return itemlist
 
 
 def list_all(item):
@@ -89,7 +95,6 @@ def list_all(item):
     if item.page == '': item.page = 0
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     patron  = '<a class="Ntooltip" href="([^"]+)">([^<]+)<span><br[^<]+'
     patron += '<img src="([^"]+)"></span></a>(.*?)<br'
@@ -105,13 +110,15 @@ def list_all(item):
         else:
             palabras = filter(lambda p: len(p) > 3, buscado.split(' ')) # descartar palabras demasiado cortas (la, de, los, etc)
             if len(palabras) == 0: return [] # No hay palabras a buscar
+
             def contiene(texto, palabras):
                 found = False
                 for palabra in palabras:
                     if palabra in texto: found = True; break
                 return found
+
             matches = filter(lambda m: contiene(m[1].lower(), palabras), matches)
-    # ~ logger.info('Número total de películas: %d' % len(matches))
+
     for url, title, thumb, resto in list(matches)[item.page * perpage:]:
         year = scrapertools.find_single_match(url, '-(\d+)-online/$')
         spans = scrapertools.find_multiple_matches(resto, '<span style="[^"]+">([^<]+)</span>')
@@ -137,21 +144,19 @@ def list_all(item):
     return itemlist
 
 
-# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
 def puntuar_calidad(txt):
     orden = ['CAM', 'TS', 'TS-HQ', 'WEB-S', 'HD-S', 'DVD-S', 'BR-S', 'HD-TC', 'HD-TV', 'DVD-R', 'HD-R', 'BR-R']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
+
 
 def findvideos(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
-    patron = '<em>([^<]+)</em></p>(.*?)<table[^>]*>(.*?)</table>'
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('<em>([^<]+)</em></p>(.*?)<table[^>]*>(.*?)</table>', re.DOTALL).findall(data)
     if len(matches) == 0:
         patron = '<strong>Ver película online</strong> \[<span style="[^"]*">([^<]+)</span>\](.*?)<table[^>]*>(.*?)</table>'
         matches = re.compile(patron, re.DOTALL).findall(data)
@@ -182,7 +187,6 @@ def findvideos(item):
 
 
 # No hay buscador propio en la web, usan el buscador genérico de google en su site.
-# En el addon se busca dentro del listado de estrenos (+/- 800 películas) y de recomendadas (+/- 1600)
 def search(item, texto):
     logger.info()
     try:

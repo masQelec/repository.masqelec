@@ -1,87 +1,94 @@
 [COLOR coral]Balandro[/COLOR]
 
-Version 2.0.2  [COLOR darkorange]Mayo 2021[/COLOR]
+Version 2.0.3  [COLOR darkorange]Agosto 2021[/COLOR]
 
-   [COLOR yellow]INCIDENCIAS:[/COLOR]
-      Bug - en Descargas si la carpeta de descargas distinta a la de por defecto
-      Otros Bugs menores de la version anterior
+   [COLOR yellow]INCIDENCIAS CORREGIDAS:[/COLOR]
+      Bugs de la version anterior
+      Trailers
 
    [COLOR yellow]MODIFICACIONES:[/COLOR]
-      Canales:
-         AniBox, AnimeFenix, AnimeFlv, Beeg, CiberDocumentales, CineMatteFlix,
-         Cliver, ClasicoTv, Cuevana3, DocumaniaTv, DonTorrents, Estrenoscinesaa,
-         HdFull, HdFullSe, InkaPelis, JKanime, LaCartoons, MegadedeLa,
-         MejorTorrents, PctFenix, Pelis24, PelisVips, PornHub, PornTube,
-         SeriesAntiguas, SeriesFlix, SeriesKao, SeriesLan, SeriesPapayaTo,
-         SeriesPapayaXyz, SeriesRetro, SerieZ, Tekilaz, TorrentDivx, TuCineClasico,
-         TupeliculaTv, TuPeliHd, VerPeliculasGratis, XVideos
+      Canales inactivos:
+         DescargaCineClasico, MegadedeLa, PelisHouse, PelisVips
 
-      Servidores:
-         Aparat, Clipwatching, fembed, Gamovideo, Highstream, Mega, PlayTube,
-         Sbembed, Streamsb, Uptobox, YourUpload
+      Canales modificados:
+         AniBox, AnimeFenix, AnimeFlv, AreaDocumental, CaricaturasHd,
+         CiberDocumentales, CineCalidad, CineMatteFlix, CliverSite,
+         Cuevana3, Cuevana3Video, Daftsex, Dilo, DocumaniaTv,
+         DocumentalesOnline, DonTorrents, EntrePeliculasySeries,
+         Gnula, GranTorrent, HdFull, HentaiSd, JKAnime,
+         LegalmenteGratis, Mega1Link, MejorTorrents, MiraDeTodo,
+         MiraPeliculas, MonosChinos, NewPct1, PctFenix, Pelis24,
+         PelisGratis, PelisPlanet, PelisPlay, PlayDede, PornHd,
+         SeriesAntiguas, SeriesAnimadas, SeriesFlix, SeriesFlixIo,
+         SeriesKao, SeriesPapayaXyz, SigloXX, SubTorrents, Tekilaz,
+         TorrentDivx, TuCneClasico, TuPeliHd
 
-      Varias:
-         Calificacion nuevas calidades - en algunos canales
-         Generos - reconfigurados
+      Generos: Re-configurados
+
+      Servidores inactivos:
+        Mystream
+
+      Servidores modificados:
+         ClicknUpload, DoodStream, Fembed, Gamovideo, Playtube,
+         Sbembed, Streamsb, Streamz, YourUpload,, YouTube, Zplayer
 
    [COLOR yellow]NOVEDADES:[/COLOR]
-      Configuracion Buscar:
-         Descartar búsquedas en los canales que pueden contener archivos torrent
+      Menu principal: nueva opcion Torrents
 
-      Buscar:
-         filmaffinitylists - cambio de estructura
-         Busquedas - Descartar canales que pueden contener archivos torrent
+      Canales nuevos:
+        AresHd, CineLibreOnline, Cuevana3Mobi, DixmaxLive,
+        HdFullCom, Megadede2, MegaSerie, MundoKaos, PelisForte,
+        PepecinePro, Pelismart, Ppeliculas, SeriesYonkis
 
-      Proxies:
-         Nuevo proveedor SilverProxies
+      Servidores nuevos:
+        Anonfiles, Bayfiles, Streams3
 
-      Nuevos Canales:
-         CumLouder, Hentaisd, MiraDeTodo, MiraPeliculas, MonosChinos,
-         PelisGratis, PelisMaraton, PelisPlanet, PelisXd, SeriesAnimadas,
-         TioAnime, Tubehentai
-
-      Nuevos Servidores:
-         ShareVid
-
-   [COLOR yellow]SITUACION CANALES:[/COLOR]
+   [COLOR yellow]SITUACION:[/COLOR]
       Canales Inestables (siguen Activados):
-         Dilo
-
-      Canales Desactivados:
-         AllPeliculas, CineCalidad, PlayDede, RePelis, SeriesBlanco,
-         SeriesFlv
-
-      Numero de Canales:
-         87 Canales
-         56 de Peliculas
-         41 de Series
-         33 de Peliculas y Series
-           6 de Documentales
-           7 de Animes
-           8 de Adultos
-           1 Privados
-
-      Numero de Servidores:
-         79 Servidores
+         Dilo, PctFenix
 
       Canales que pueden usar proxies (Bloqueo operadoras):
          CineTux
          Cliver
          CliverSite
          Cuevana3
-         Cuevana3Video
          Dilo
+         DixmaxLive
          DocumaniaTv
          DonTorrents
          Gnula
          GranTorrent
          HdFull
+         HdFullCom
+         Megadede2
          MejorTorrents
          Newpct1
          PctFenix
+         PelisGratis
          PelisPlanet
          PelisPlay
-         PelisVips
          PlayView
          SubTorrents
          TorrentDivx
+
+   [COLOR yellow]RESUMENES:[/COLOR]
+      Numero de Canales:
+       121 Canales
+         22 Inactivos
+         99 Disponibles
+
+      Distribucion Canales:
+         67 de Peliculas
+         48 de Series
+         41 de Peliculas y Series
+           6 de Documentales
+         10 de Torrents 
+           7 de Animes
+           9 de Adultos
+           1 Privados
+
+      Numero de Servidores:
+       135 Servidores
+         53 Inactivos
+         18 Sin Soporte
+         82 Disponibles

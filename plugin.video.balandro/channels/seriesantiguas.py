@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import re
-
 from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.seriesantiguas.net/'
+host = 'https://www.seriesantiguas.com/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('www.seriesantiguas.com', 'www.seriesantiguas.net')
+    url = url.replace('www.seriesantiguas.net', 'www.seriesantiguas.com')
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
     return data
@@ -169,7 +167,6 @@ def findvideos(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     bloque = scrapertools.find_single_match(data, "<div class='post-body entry-content'>(.*?)<div class='post-footer'>")
 

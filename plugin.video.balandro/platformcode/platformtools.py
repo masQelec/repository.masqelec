@@ -26,17 +26,13 @@ color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
 # Diálogos de Kodi
 
-def compat(line1, line2="", line3=""):
-    message = line1
-    if line2:
-        message += '\n' + line2
-    if line3:
-        message += '\n' + line3
+def compat(**kwargs):
+    message = '\n'.join([line for line in kwargs.values()])
     return message
 
 
 def dialog_ok(heading, line1, line2="", line3=""):
-    return xbmcgui.Dialog().ok(heading, compat(line1, line2, line3))
+    return xbmcgui.Dialog().ok(heading, compat(line1=line1, line2=line2, line3=line3))
 
 
 def dialog_notification(heading, message, icon=0, time=5000, sound=None):
@@ -54,17 +50,17 @@ def dialog_yesno(heading, line1, line2="", line3="", nolabel="No", yeslabel="Sí
     dialog = xbmcgui.Dialog()
     if PY3:
         if autoclose > 0:
-            return dialog.yesno(heading, compat(line1, line2, line3), nolabel=nolabel, 
+            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, 
                             yeslabel=yeslabel, customlabel=customlabel, autoclose=autoclose)
         else:
-            return dialog.yesno(heading, compat(line1, line2, line3), nolabel=nolabel, 
+            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, 
                             yeslabel=yeslabel)
     else:
         if autoclose > 0:
-            return dialog.yesno(heading, compat(line1, line2, line3), nolabel=nolabel, 
+            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, 
                             yeslabel=yeslabel, autoclose=autoclose)
         else:
-            return dialog.yesno(heading, compat(line1, line2, line3), nolabel=nolabel, 
+            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, 
                             yeslabel=yeslabel)
 
 
@@ -78,14 +74,7 @@ def dialog_multiselect(heading, _list, autoclose=0, preselect=[], useDetails=Fal
 
 def dialog_progress(heading, line1, line2=" ", line3=" "):
     dialog = xbmcgui.DialogProgress()
-    def compat(line1, line2, line3):
-        message = line1
-        if line2:
-            message += '\n' + line2
-        if line3:
-            message += '\n' + line3
-        return message
-    dialog.create(heading, compat(line1, line2, line3))
+    dialog.create(heading, compat(line1=line1, line2=line2, line3=line3))
     return dialog
 
 
@@ -565,11 +554,13 @@ def developer_mode_check_findvideos(itemlist, parent_item):
     # Guardar en ficheros de log
     if txt_log_servers != '':
         dev_log = os.path.join(config.get_data_path(), 'servers_todo.log')
-        with open(dev_log, 'a') as f: f.write(txt_log_servers); f.close()
+        if PY3 and not isinstance(txt_log_servers, bytes): txt_log_servers = txt_log_servers.encode('utf-8')
+        with open(dev_log, 'wb') as f: f.write(txt_log_servers); f.close()
 
     if txt_log_qualities != '':
         dev_log = os.path.join(config.get_data_path(), 'qualities_todo.log')
-        with open(dev_log, 'a') as f: f.write(txt_log_qualities); f.close()
+        if PY3 and not isinstance(txt_log_qualities, bytes): txt_log_qualities = txt_log_qualities.encode('utf-8')
+        with open(dev_log, 'wb') as f: f.write(txt_log_qualities); f.close()
 
     if os.path.isfile(os.path.join(config.get_runtime_path(), 'core', 'developertools.py')):
         try:

@@ -14,11 +14,14 @@ else:
     import urllib.parse as urlparse
 
 
-import re, base64
+import xbmc, re
 
+from platformcode import config, logger, platformtools
 from core import httptools, scrapertools, servertools
 from core import jsontools as json
-from platformcode import logger, platformtools
+
+
+web_yt = 'https://www.youtube.com'
 
 # ~ https://tyrrrz.me/blog/reverse-engineering-youtube
 
@@ -26,17 +29,18 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
 
     if not page_url.startswith("http"):
-        page_url = "https://www.youtube.com/watch?v=%s" % page_url
+        page_url = web_yt + '/watch?v=%s' % page_url
         logger.info(" page_url->'%s'" % page_url)
 
     page_url = servertools.normalize_url('youtube', page_url)
 
     data = httptools.downloadpage(page_url).data
 
-    if "File was deleted" in data:
+    if "File was deleted" in data or 'El vídeo no está disponible' in data:
         return 'El archivo no existe o ha sido borrado'
 
-    video_id = scrapertools.find_single_match(page_url, 'v=([A-z0-9_-]{11})')
+    video_id = scrapertools.find_single_match(page_url, '(?:v=|embed/)([A-z0-9_-]{11})')
+
     video_urls = extract_videos(video_id)
 
     return video_urls
@@ -53,6 +57,7 @@ def normalize_url(url):
         url = "https:" + url
     return url
 
+
 def extract_flashvars(data):
     assets = 0
     flashvars = {}
@@ -61,18 +66,16 @@ def extract_flashvars(data):
     if 'ytInitialPlayerResponse' in data:
         aux = scrapertools.find_single_match(data, 'var ytInitialPlayerResponse = (\{.*?\});')
         if aux: flashvars['player_response'] = aux
-        # ~ else: logger.debug(data)
-
     else:
         for line in data.split("\n"):
             if line.strip().find(";ytplayer.config = ") > 0:
                 found = True
                 p1 = line.find(";ytplayer.config = ") + len(";ytplayer.config = ") - 1
                 p2 = line.rfind(";")
-                if p1 <= 0 or p2 <= 0:
-                    continue
+                if p1 <= 0 or p2 <= 0: continue
                 data = line[p1 + 1:p2]
                 break
+
         data = remove_additional_ending_delimiter(data)
 
         if found:
@@ -90,7 +93,7 @@ def extract_flashvars(data):
 
 
 def label_from_itag(itag):
-    fmt_value = { # Youtube itags
+    fmt_value = {
         5: "240p h263 flv",
         6: "240p h263 flv",
         18: "360p h264 mp4",
@@ -116,6 +119,7 @@ def label_from_itag(itag):
         101: "480p vp8 3D",
         102: "720p vp8 3D"
     }
+
     if not itag or itag not in fmt_value: return None
     return fmt_value[itag]
 
@@ -125,51 +129,54 @@ js_signature_checked = False
 
 def obtener_js_signature(youtube_page_data):
     global js_signature, js_signature_checked
-    # ~ logger.debug(youtube_page_data)
 
     js_signature_checked = True
     urljs = scrapertools.find_single_match(youtube_page_data, '"assets":.*?"js":\s*"([^"]+)"').replace("\\", "")
     if not urljs: urljs = scrapertools.find_single_match(youtube_page_data, '"([^"]+base\.js)"').replace("\\", "")
     if urljs:
-        if not re.search(r'https?://', urljs): urljs = urlparse.urljoin("https://www.youtube.com", urljs)
+        if not re.search(r'https?://', urljs): urljs = urlparse.urljoin(web_yt, urljs)
         data_js = httptools.downloadpage(urljs).data
-        # ~ logger.debug(data_js)
+
         funcname = scrapertools.find_single_match(data_js, '\.sig\|\|([A-z0-9$]+)\(')
         if not funcname:
             funcname = scrapertools.find_single_match(data_js, '["\']signature["\']\s*,\s*([A-z0-9$]+)\(')
         if not funcname:
             funcname = scrapertools.find_single_match(data_js, '([A-z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\);\w+\.')
         if not funcname:
-            logger.debug('Youtube signature not found!')
-            return #'No se puede decodificar este vídeo'
+            # No se puede decodificar este vídeo
+            logger.info("check-youtube: %s" % 'Youtube signature not found')
+            return
 
-        # ~ logger.debug(funcname)
         from lib.jsinterpreter import JSInterpreter
         jsi = JSInterpreter(data_js)
         js_signature = jsi.extract_function(funcname)
     else:
-        logger.info('No detectada js_signature')
+        logger.info('Youtube no detectada js_signature')
 
 
 def extract_from_player_response(params, youtube_page_data=''):
     video_urls = []
+
     try:
         pr = json.load(params['player_response'])
-        # ~ logger.debug(pr)
+
         if not 'streamingData' in pr: raise()
         if not 'formats' in pr['streamingData']: raise()
-        # ~ logger.debug(pr['streamingData']['formats'])
+
         for vid in sorted(pr['streamingData']['formats'], key=lambda x: (x['height'], x['mimeType'])):
-            # ~ logger.debug(vid)
             if not 'url' in vid and not 'cipher' in vid and not 'signatureCipher' in vid: continue
+
             if not 'url' in vid:
                 if not youtube_page_data: continue
+
                 aux = vid['cipher'] if 'cipher' in vid else vid['signatureCipher']
                 v_url = urllib.unquote(scrapertools.find_single_match(aux, 'url=([^&]+)'))
                 v_sig = urllib.unquote(scrapertools.find_single_match(aux, 's=([^&]+)'))
                 if not js_signature and not js_signature_checked:
                     obtener_js_signature(youtube_page_data)
+
                 if not js_signature: continue
+
                 vid['url'] = v_url + '&sig=' + urllib.quote(js_signature([v_sig]), safe='')
 
             lbl = ''
@@ -179,20 +186,73 @@ def extract_from_player_response(params, youtube_page_data=''):
             video_urls.append([lbl, vid['url']])
     except:
         pass
+
     return video_urls
 
 
+def import_libs(module):
+        import os, xbmcaddon
+        from core import filetools
+
+        path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
+        addon_xml = filetools.read(filetools.join(path, "addon.xml"))
+        if addon_xml:
+            require_addons = scrapertools.find_multiple_matches(addon_xml, '(<import addon="[^"]+"[^\/]+\/>)')
+            require_addons = list(filter(lambda x: not 'xbmc.python' in x and 'optional="true"' not in x, require_addons))
+
+            for addon in require_addons:
+                addon = scrapertools.find_single_match(addon, 'import addon="([^"]+)"')
+                if xbmc.getCondVisibility('System.HasAddon("%s")' % (addon)):
+                    import_libs(addon)
+                else:
+                    xbmc.executebuiltin('InstallAddon(%s)' % (addon))
+                    import_libs(addon)
+
+            lib_path = scrapertools.find_multiple_matches(addon_xml, 'library="([^"]+)"')
+            for lib in list(filter(lambda x: not '.py' in x, lib_path)):
+                sys.path.append(os.path.join(path, lib))
+
+
 def extract_videos(video_id):
-    url = 'https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&ssl_stream=1' % (video_id, video_id)
+    youtube_page_data = ''
+
+    url =  web_yt + '/get_video_info?c=TVHTML5&cver=7.20201028&html5=1&video_id=%s&eurl=https://youtube.googleapis.com/v/%s&ssl_stream=1' % (video_id, video_id)
+
     data = httptools.downloadpage(url).data
-    # ~ logger.debug(data)
+
+    video_urls = []
+
+    if not data or "<h1>We're sorry" in data:
+        if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+            try:
+                import_libs('plugin.video.youtube')
+                import youtube_resolver
+                items = youtube_resolver.resolve(video_id)
+
+                for item in list(filter(lambda x: not 'opus' in x.get('title') and not 'webm' in x.get('title'), items)):
+                    if '/manifest.googlevideo.com/' in item['url']: continue
+                    elif "'dash/audio': True" in str(item): continue
+
+                    video_urls.append([item['title'],  item['url']])
+
+            except:
+                # YouTubeExceptions: Sign in to confirm your age or private video
+                import traceback
+                logger.error(traceback.format_exc())
+
+        else:
+            color_exec = config.get_setting('notification_exec_color', default='cyan')
+            el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
+            el_srv += ('YouTube[/B][/COLOR]')
+            platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
+        return video_urls
+
 
     if PY3 and isinstance(data, bytes):
         data = data.decode('utf-8')
 
-    video_urls = []
     params = dict(urlparse.parse_qsl(data))
-    # ~ logger.debug(params)
 
     if params.get('hlsvp'):
         video_urls.append(["LIVE .m3u8", params['hlsvp']])
@@ -207,10 +267,9 @@ def extract_videos(video_id):
             video_urls.append(['mpd HD', params['dashmpd'], 0, '', True])
 
 
-    youtube_page_data = httptools.downloadpage("https://www.youtube.com/watch?v=%s" % video_id).data
-    # ~ logger.debug(youtube_page_data)
+    youtube_page_data = httptools.downloadpage(web_yt + '/watch?v=%s' % video_id).data
+
     params = extract_flashvars(youtube_page_data)
-    # ~ logger.debug(params)
 
     if params.get('player_response'):
         video_urls = extract_from_player_response(params, youtube_page_data)
@@ -218,13 +277,12 @@ def extract_videos(video_id):
 
     if not params.get('url_encoded_fmt_stream_map'):
         params = dict(urlparse.parse_qsl(data))
-    # ~ logger.debug(params)
 
     if params.get('url_encoded_fmt_stream_map'):
         data_flashvars = params["url_encoded_fmt_stream_map"].split(",")
         for url_desc in data_flashvars:
             url_desc_map = dict(urlparse.parse_qsl(url_desc))
-            # ~ logger.debug(url_desc_map)
+
             if not url_desc_map.get("url") and not url_desc_map.get("stream"): continue
             try:
                 lbl = label_from_itag(int(url_desc_map["itag"]))
@@ -244,7 +302,7 @@ def extract_videos(video_id):
                     url += "&signature=" + url_desc_map["sig"]
                 elif url_desc_map.get("s"):
                     sig = url_desc_map["s"]
-                    # ~ logger.debug(sig)
+
                     if not js_signature and not js_signature_checked:
                         obtener_js_signature(youtube_page_data)
                     if not js_signature: continue
@@ -255,6 +313,7 @@ def extract_videos(video_id):
             except:
                 import traceback
                 logger.info(traceback.format_exc())
+
         video_urls.reverse()
 
     return video_urls

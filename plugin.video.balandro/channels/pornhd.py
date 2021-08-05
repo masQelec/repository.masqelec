@@ -38,7 +38,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host + '/?order=longest&page=1' ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host + '/channel/' ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + '/category/' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + '/pornstars/' ))
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie' ))
@@ -62,10 +62,12 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Novedades en categorías', action = 'list_categorias', url = item.url + '?order=newest' ))
-    itemlist.append(item.clone( title = 'Categorías más populares', action = 'list_categorias', url = item.url + '?order=most-popular' ))
-    itemlist.append(item.clone( title = 'Categorías con más vídeos', action = 'list_categorias', url = item.url + '?order=video-count' ))
-    itemlist.append(item.clone( title = 'Categorías por alfabético', action = 'list_categorias', url = item.url + '?order=alphabetical' ))
+    url_cat = host + '/category/'
+   
+    itemlist.append(item.clone( title = 'Novedades en categorías', action = 'list_categorias', url = url_cat + '?order=newest' ))
+    itemlist.append(item.clone( title = 'Categorías más populares', action = 'list_categorias', url = url_cat + '?order=most-popular' ))
+    itemlist.append(item.clone( title = 'Categorías con más vídeos', action = 'list_categorias', url = url_cat + '?order=video-count' ))
+    itemlist.append(item.clone( title = 'Categorías por alfabético', action = 'list_categorias', url = url_cat + '?order=alphabetical' ))
 
     return itemlist
 

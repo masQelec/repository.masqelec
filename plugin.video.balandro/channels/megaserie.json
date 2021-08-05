@@ -1,0 +1,17 @@
+{
+  "id": "megaserie",
+  "name": "MegaSerie",
+  "thumbnail": "megaserie.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["years", "kids", "docs", "vos"],
+
+  "notes": "Películas y Series en castellano, latino y subtitulado."
+}

@@ -13,6 +13,6 @@
 
   "clusters": ["news", "languages", "rankings", "years", "producers", "kids", "docs", "vos"],
 
-  "notes": "Peliculas y Series en Español, Latino, Subtitulado, por géneros y años."
+  "notes": "Peliculas en Español, Latino, Subtitulado, por géneros y años."
 
 }

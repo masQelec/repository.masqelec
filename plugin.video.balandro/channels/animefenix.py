@@ -276,26 +276,60 @@ def play(item):
     url = item.url
 
     if '/videa.hu/' in url:
+        if url.startswith('//'): url = 'https:' + url
         data = httptools.downloadpage(url).data
+
         if '/recaptcha/api.js?render=explicit&hl=hu' in data:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     elif '/stream/amz.php' in url:
-        if not url.startswith("http"):
-            url = host + url[1:]
+        if not url.startswith("http"): url = host + url[1:]
 
         data = httptools.downloadpage(url).data
         url = scrapertools.find_single_match(data, '"file":"([^"]+)"')
         servidor = servertools.get_server_from_url(url)
         url = servertools.normalize_url(servidor, url)
 
-    if '/hqq.' in url or '/waaw.' in url: url = ''
+    elif '/redirect.php?' in url:
+        data = httptools.downloadpage(url).data
+        url = scrapertools.find_single_match(data, 'playerContainer.*?src="([^"]+)"')
+
+        if '/videa.hu/' in url:
+            if url.startswith('//'): url = 'https:' + url
+            data = httptools.downloadpage(url).data
+
+            if '/recaptcha/api.js?render=explicit&hl=hu' in data:
+                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+        elif '/stream/amz.php' in url:
+            if not url.startswith("http"): url = host + url[1:]
+
+            data = httptools.downloadpage(url).data
+            url = scrapertools.find_single_match(data, '"file":"([^"]+)"')
+
+        elif 'burstcloud' in url:
+            data = httptools.downloadpage(url).data
+
+            file = scrapertools.find_single_match(data, 'data-file-id="([^"]+)"')
+            if file:
+                post = {"fileId": file}
+
+                data = httptools.downloadpage('https://www.burstcloud.co/file/play-request/', post=post, headers={'referer': url}).data
+
+                url = scrapertools.find_single_match(data, '"cdnUrl".*?"([^"]+)"')
+
+                if url:
+                    url = url + '|referer=https://www.burstcloud.co/'
+
+        servidor = servertools.get_server_from_url(url)
+        url = servertools.normalize_url(servidor, url)
+
+    if '/hqq.' in url or '/waaw.' in url:
+        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     if url:
-        if not url.startswith("http"):
-            url = "https:" + url
-
-        url = url.replace("\\/", "/")
+        if not url.startswith("http"): url = "https:" + url
+        url = url.replace('&amp;', '&').replace("\\/", "/")
 
         itemlist.append(item.clone(url = url, server = servidor))
 

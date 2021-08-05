@@ -50,11 +50,6 @@ def _proxies(item):
         item.channel = 'cuevana3'
         cuevana3.configurar_proxies(item)
 
-    elif item.from_channel == 'cuevana3video':
-        from channels import cuevana3video
-        item.channel = 'cuevana3video'
-        cuevana3video.configurar_proxies(item)
-
     elif item.from_channel == 'dilo':
         from channels import dilo
         item.channel = 'dilo'
@@ -98,25 +93,25 @@ def _proxies(item):
         item.channel = 'pctfenix'
         pctfenix.configurar_proxies(item)
 
+    elif item.from_channel == 'pelisgratis':
+        from channels import peligratis
+        item.channel = 'pelisgratis'
+        pelisplay.configurar_proxies(item)
+
+    elif item.from_channel == 'pelisplanet':
+        from channels import pelisplanet
+        item.channel = 'pelisplanet'
+        pelisplay.configurar_proxies(item)
+
     elif item.from_channel == 'pelisplay':
         from channels import pelisplay
         item.channel = 'pelisplay'
         pelisplay.configurar_proxies(item)
 
-    elif item.from_channel == 'pelisvips':
-        from channels import pelisvips
-        item.channel = 'pelisvips'
-        pelisvips.configurar_proxies(item)
-
     elif item.from_channel == 'playview':
         from channels import playview
         item.channel = 'playview'
         playview.configurar_proxies(item)
-
-    elif item.from_channel == 'repelis':
-        from channels import repelis
-        item.channel = 'repelis'
-        repelis.configurar_proxies(item)
 
     elif item.from_channel == 'subtorrents':
         from channels import subtorrents

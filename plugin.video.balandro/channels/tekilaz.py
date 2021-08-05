@@ -27,6 +27,9 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', grupo = 'Peliculas', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Destacadas', action = 'list_all', url = host + 'category/destacadas/?type=movies', grupo = 'Destacadas', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Recomendadas', action = 'list_all', url = host + 'category/peliculas-recomendadas/?type=movies', grupo = 'peliculas recomendadas', search_type = 'movie' ))
+
+    itemlist.append(item.clone(action = 'list_all', title = 'Películas clásicas', url = host + 'category/peliculas-clasicas/?type=movies', grupo = 'Peliculas clasicas', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -47,6 +50,8 @@ def mainlist_series(item):
 
     # ~ No hay ninguna serie
     # ~ itemlist.append(item.clone( title = 'Destacadas', action = 'list_all', url = host + 'category/destacadas/?type=series', grupo = 'Destacadas', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone(action = 'list_all', title = 'Series clásicas', url = host + 'category/series-clasicas/?type=series', grupo = 'Series clasicas', search_type = 'tvshow' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -69,7 +74,7 @@ def generos(item):
 
         title = title.replace('&#038;', '&').strip()
 
-        if title == 'Destacadas': continue
+        if '/peliculas-destacadas/' in url: continue
 
         if item.search_type == 'movie':
             if title == 'Anime': continue
@@ -84,7 +89,7 @@ def generos(item):
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, grupo = grupo ))
 
     if item.search_type == 'movie':
-        itemlist.append(item.clone(action = 'list_all', title = 'Peliculas Marvel', url = host + 'category/peliculas-marvel/', grupo = 'Peliculas Marvel'))
+        itemlist.append(item.clone(action = 'list_all', title = 'Peliculas Marvel', url = host + 'category/peliculas-marvel/?type=movies', grupo = 'Peliculas Marvel'))
 
     return sorted(itemlist, key = lambda it: it.title)
 
@@ -143,7 +148,7 @@ def list_all(item):
 
     if not bloque:
          bloque = scrapertools.find_single_match(data.lower(), '<h1 class="section-title">' + item.grupo.lower() + '</h1>(.*?)<nav class="navigation pagination">')
-       
+
     matches = scrapertools.find_multiple_matches(bloque, '<li id="post-(.*?)</article>')
 
     for match in matches:
@@ -249,8 +254,6 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        if len(nro_season) == 1: nro_season = '0' + nro_season
-
         itemlist.append(item.clone( action = 'episodios', title = title, item_id = data_post,
                                     contentType = 'season', contentSeason = nro_season, page = 0 ))
 
@@ -272,7 +275,7 @@ def episodios(item):
 
     data = httptools.downloadpage(url, post = post).data
 
-    matches = scrapertools.find_multiple_matches(data, '<article (.*?)</article>')
+    matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
 
     for match in matches[item.page * perpage:]:
         thumb = scrapertools.find_single_match(match, '<img src="([^"]+)"')
@@ -355,7 +358,6 @@ def normalize_other(link_other):
     elif link_other == 'jetload': link_other = ''
     elif link_other == 'vidcloud': link_other = ''
     elif link_other == 'openload': link_other = ''
-    elif link_other == 'oload': link_other = ''
     elif link_other == 'clicknupload': link_other = ''
     elif link_other == 'onlystream': link_other = ''
     elif link_other == 'rapidvideo': link_other = ''

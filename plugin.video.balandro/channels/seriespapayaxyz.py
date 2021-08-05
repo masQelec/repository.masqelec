@@ -435,6 +435,8 @@ def findvideos(item):
 
             url = scrapertools.find_single_match(data, 'id="Opt' + opt + '".*?src="(.*?)"')
 
+            if url.startswith('https://acortar24.xyz/'): continue
+
             if url:
                 url= url.replace('&amp;#038;', '&').replace('&amp;', '&')
 
@@ -448,7 +450,7 @@ def play(item):
     logger.info()
     itemlist = []
 
-    item.url = item.url.replace('&#038;', '&')
+    item.url = item.url.replace('&#038;', '&').replace('&amp;', '&')
 
     if item.url.startswith(host):
         headers = {'Referer': host}

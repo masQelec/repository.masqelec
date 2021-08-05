@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import config, logger, platformtools
+from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -34,9 +34,9 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title='Catálogo', action = 'list_all', url = host + 'page/1/?s', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'page/1/?s', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title='Estrenos', action = 'list_all', url = host + 'category/estrenos/page/1/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'category/estrenos/page/1/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -51,7 +51,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title='Catálogo', action = 'list_all', url = host + 'series/page/1/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/page/1/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -68,11 +68,11 @@ def generos(item):
     data = do_downloadpage(host)
 
     if item.search_type == 'movie':
-        patron = 'id="moviehome".*?<h3>Géneros(.*?)<h3>Año de estreno'
+        patron = 'id="moviehome"'
     else:
-        patron = 'id="serieshome".*?<h3>Géneros(.*?)<h3>Año de estreno'
+        patron = 'id="serieshome"'
 
-    bloque = scrapertools.find_single_match(data, patron)
+    bloque = scrapertools.find_single_match(data, patron + '.*?<h3>Géneros(.*?)<h3>Año de estreno')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?>(.*?)</a>')
 
@@ -125,7 +125,6 @@ def list_all(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', '', data)
 
     patron = 'class=item>.*?<a href=(.*?)><div class=image>.*?<img src=(.*?) alt=(.*?) \(\d{4}.*?ttx>(.*?)'
@@ -134,7 +133,6 @@ def list_all(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, thumb, title, plot, year, qlty in matches:
-
         if qlty:
             qlty = scrapertools.find_single_match(qlty, 'calidad2>(.*?)<')
 
@@ -167,7 +165,6 @@ def temporadas(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', '', data)
 
     matches = re.compile('<span class=title>.*?- Temporada (.*?)<\/span>', re.DOTALL).findall(data)
@@ -198,7 +195,6 @@ def episodios(item):
     perpage = 50
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', '', data)
 
     season = item.contentSeason
@@ -229,46 +225,84 @@ def findvideos(item):
     IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'sub': 'Vose', 'Latino': 'Lat', 'Castellano': 'Esp', 'Subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
-
-    data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', '', data)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     _data = data
 
     matches = re.compile('id=(?:div|player)(\d+)>.*?data-lazy-src=(.*?) scrolling', re.DOTALL).findall(data)
+    if matches:
+        for option, _video in matches:
+            sub = ''
 
-    for option, _video in matches:
-        sub = ''
+            lang = scrapertools.find_single_match(_data, '<a href=#(?:div|player)%s.*?>.*?(.*?)<\/a>' % option)
+            if 'audio ' in lang.lower():
+                lang = lang.lower().replace('audio ', '')
+                lang = lang.capitalize()
 
-        lang = scrapertools.find_single_match(_data, '<a href=#(?:div|player)%s.*?>.*?(.*?)<\/a>' % option)
-        if 'audio ' in lang.lower():
-            lang = lang.lower().replace('audio ', '')
-            lang = lang.capitalize()
+            _data_opt = do_downloadpage(_video)
 
-        _data_opt = do_downloadpage(_video)
+            videos = scrapertools.find_multiple_matches(_data_opt, '<li><a href=(.*?)><span')
 
-        videos = scrapertools.find_multiple_matches(_data_opt, '<li><a href=(.*?)><span')
+            for video in videos:
+                _data_video = do_downloadpage(video)
 
-        for video in videos:
-            _data_video = do_downloadpage(video)
+                if 'openload' in video or 'your' in video:
+                    _url = scrapertools.find_single_match(_data_video, '<li><a href=(.*?srt)><span')
+                    datos = do_downloadpage(_url)
+                else:
+                    datos = _data_video
 
-            if 'openload' in video or 'your' in video:
-                _url = scrapertools.find_single_match(_data_video, '<li><a href=(.*?srt)><span')
-                datos = do_downloadpage(_url)
-            else:
-                datos = _data_video
+                url = scrapertools.find_single_match(datos, 'iframe src=(.*?) scrolling')
+                if not url:
+                    url = scrapertools.find_single_match(datos, "'file':'(.*?)'")
 
-            url = scrapertools.find_single_match(datos, 'iframe src=(.*?) scrolling')
-            if not url:
-                url = scrapertools.find_single_match(datos, "'file':'(.*?)'")
+                if url:
+                    quality = item.qualities
 
-            if url:
-                quality = item.qualities
+                    servidor = servertools.get_server_from_url(url)
+                    url = servertools.normalize_url(servidor, url)
 
-                servidor = servertools.get_server_from_url(url)
-                url = servertools.normalize_url(servidor, url)
+                    itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = quality, 
+                                        language = IDIOMAS.get(lang,lang) ))
+    else:
+        o2_matches = re.search('<iframe src="[^"]+"\s*data-lazy-src="([^"]+)".*?a href="[^"]+\W+([^<]+)', data, flags=re.DOTALL)
+        if o2_matches.group(1):
+            lng = o2_matches.group(2)
+            url = o2_matches.group(1)
+            headers = {'Referer': host}
 
-                itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = quality, 
-                                     language = IDIOMAS.get(lang,lang) ))
+            data = do_downloadpage(url, headers = headers)
+            data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+            matches = re.compile('<a href="([^"]+)".*?<span>([^<]+)', re.DOTALL).findall(data)
+
+            for url, servidor in matches:
+                servidor = servidor.lower()
+                if servidor == 'mail ru': servidor = 'mailru'
+
+                servidor = servertools.corregir_servidor(servidor)
+
+                itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lng,lng) ))
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    url = scrapertools.find_single_match(data, '<iframe src="([^"]+)\s*"')
+
+    if url:
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
 
@@ -283,4 +317,3 @@ def search(item, texto):
        for line in sys.exc_info():
            logger.error("%s" % line)
        return []
-

@@ -19,6 +19,8 @@ def get_video_url(page_url, url_referer=''):
 
     if "File is no longer available" in data:
         return 'El fichero no existe o ha sido borrado'
+    elif "Video link direct restricted" in data:
+        return 'El fichero está restringido'
 
     if not 'v2.zplayer' in page_url:
         matches = scrapertools.find_multiple_matches(data, '"file": "([^"]+)",.*?"type": "([^"]+)"')

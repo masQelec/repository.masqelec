@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
 
-import re
+import sys
+
+if sys.version_info[0] < 3:
+    import urlparse
+else:
+    import urllib.parse as urlparse
+
+
+import re, time
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www1.cuevana3.video'
+host = 'https://www2.cuevana3.video'
 
 perpage = 22
 
 
-# ~ def item_configurar_proxies(item):
-    # ~ plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    # ~ plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    # ~ return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-# ~ def configurar_proxies(item):
-    # ~ from core import proxytools
-    # ~ return proxytools.configurar_proxies_canal(item.channel, host)
-
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~  por si viene de enlaces guardados
+    url = url.replace('https://www1.', 'https://www2.')
+
     resp = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror)
-    # ~ resp = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, raise_weberror=raise_weberror)
 
     return resp.data
 
@@ -36,8 +37,6 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
-
-    # ~ itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -54,8 +53,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
-
     return itemlist
 
 
@@ -66,9 +63,9 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catalogo', action = 'list_all', url = host + '/serie', filtro = 'tabserie-1', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + '/serie', filtro = 'tabserie-4', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + '/serie', search_type = 'tvshow' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -97,8 +94,8 @@ def list_all(item):
 
     if not item.page: item.page = 0
 
-    if item.filtro: # series limitar
-        if item.pageser: # paginaciones series
+    if item.filtro:
+        if item.pageser:
             url = host + '/serie?action=cuevana_ajax_pagination&page=' + str(item.pageser)
             data = do_downloadpage(url, headers={'Referer': url})
         else:
@@ -107,8 +104,6 @@ def list_all(item):
         data = scrapertools.find_single_match(data, '<div\s*id="%s"(.*?)</nav>\s*</div>' % item.filtro)
     else:
         data = do_downloadpage(item.url)
-
-    # ~ logger.debug(data)
 
     matches = re.compile('<li\s*class="[^"]*TPostMv">(.*?)</li>', re.DOTALL).findall(data)
     num_matches = len(matches)
@@ -172,6 +167,33 @@ def list_all(item):
     return itemlist
 
 
+def last_episodes(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    bloque = scrapertools.find_single_match(data, 'Ultimos Episodios.*?</ul>')
+    patron  = '(?is)<a href="([^"]+).*?src="([^"]+).*?"Title">([^<]+).*?<p>([^<]+)'
+
+    matches = scrapertools.find_multiple_matches(bloque, patron)
+
+    for url, thumb, title, date in matches:
+        season, episode = scrapertools.get_season_and_episode(title).split("x")
+        contentSerieName = scrapertools.find_single_match(title, '(.*?) \d')
+
+        url = host + url
+        thumb = 'https://' + thumb
+        titulo = title + ' (%s)' % date
+
+        itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail=thumb, url = url,
+                                    contentType = 'episode', contentSerieName=contentSerieName, contentSeason = season, contentEpisodeNumber = episode ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
 def temporadas(item):
     logger.info()
     itemlist = []
@@ -198,7 +220,6 @@ def temporadas(item):
     return itemlist
 
 
-# Si una misma url devuelve los episodios de todas las temporadas, definir rutina tracking_all_episodes para acelerar el scrap en trackingtools.
 def tracking_all_episodes(item):
     return episodios(item)
 
@@ -211,7 +232,7 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
-    if item.contentSeason: # reducir datos a la temporada pedida
+    if item.contentSeason:
         data = scrapertools.find_single_match(data, '<ul\s*id="season-' + str(item.contentSeason) + '(.*?)</ul>')
 
     patron = '<li class="xxx TPostMv">.*?<a href="(.*?)">(.*?)</a>'
@@ -247,11 +268,11 @@ def episodios(item):
     return itemlist
 
 
-# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
 def puntuar_calidad(txt):
     orden = ['Cam', 'WEB-S', 'DVD-S', 'TS-HQ', 'DVD', 'DvdRip', 'HD', 'FullHD1080p']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
+
 
 def findvideos(item):
     logger.info()
@@ -260,7 +281,6 @@ def findvideos(item):
     IDIOMAS = {'Latino': 'Lat', 'Castellano': 'Esp', 'Subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     patron = '<ul class="anime_muti_link server-item-(.*?)</ul>'
     matches = re.compile(patron, re.DOTALL).findall(data)
@@ -279,6 +299,8 @@ def findvideos(item):
             if url.startswith('//'): url = 'https:' + url
 
             if url:
+                if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
+
                 servidor = servertools.get_server_from_url(url)
                 url = servertools.normalize_url(servidor, url)
 
@@ -289,8 +311,7 @@ def findvideos(item):
                     link_other = ''
 
                 if not config.get_setting('developer_mode', default=False):
-                   if link_other == 'Plus': continue
-                   elif link_other == 'hydrax': continue
+                   if link_other == 'hydrax': continue
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, other = link_other, title = '', url = url, referer = item.url,
                                       language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = quality_num ))
@@ -337,7 +358,6 @@ def normalize_other(url):
 def play(item):
     logger.info()
     itemlist = []
-    # ~ logger.debug(item.url)
 
     servidor = item.server
     url = item.url
@@ -345,7 +365,15 @@ def play(item):
     if servidor and servidor != 'directo':
         itemlist.append(item.clone(server = servidor, url = url))
 
-    if item.other == 'Plus':
+    if item.other == 'Hydrax':
+        v = scrapertools.find_single_match(url, 'v=(\w+)')
+        post = 'slug=%s&dataType=mp4' % v
+        data = do_downloadpage("https://ping.iamcdn.net/", post = post)
+        data = do_downloadpage('https://geoip.redirect-ads.com/?v=%s' % v, headers={'Referer' : url})
+
+        return itemlist
+
+    elif item.other == 'Plus':
         data = do_downloadpage(item.url)
 
         if item.url.startswith('https://pelisplus.icu/download'):
@@ -386,17 +414,20 @@ def play(item):
         return itemlist
 
     elif item.other == 'Cloud':
+        dominio = urlparse.urlparse(url)[1]
+        id = scrapertools.find_single_match(url, 'id=(\w+)')
+        tiempo = int(time.time())
+        url = 'https://' + dominio + '/playlist/' + id + '/%s.m3u8' % tiempo
         data = do_downloadpage(url)
-        matches = scrapertools.find_multiple_matches(data, "var urlVideo = '(.*?)'")
 
-        for url in matches:
-            if url == '//': continue
+        url = scrapertools.find_single_match(data, '/hls/\w+/\w+') + '?v=%s' % tiempo
+        url = "https://" + dominio + url
 
-            servidor = 'directo'
-            if '/hls/' in url: servidor = 'm3u8hls'
+        servidor = 'directo'
+        if '/hls/' in url: servidor = 'm3u8hls'
 
-            itemlist.append(item.clone(url=url , server=servidor))
-            return itemlist
+        itemlist.append(item.clone(url=url , server=servidor))
+        return itemlist
 
     elif item.other == 'Dame':
         url = item.url.replace('https://damedamehoy.xyz/embed.html#', 'https://damedamehoy.xyz/details.php?v=')

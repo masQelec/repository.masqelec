@@ -76,9 +76,10 @@ def list_all(item):
     if not item.page: item.page = 0
 
     data = httptools.downloadpage(item.url).data
-    if '<h2>' in data: data = data.split('<h2>')[1] # descartar lista de destacadas
-    if '<div class="dt_mainmeta">' in data: data = data.split('<div class="dt_mainmeta">')[0] # descartar lista de más vistas
-    # ~ logger.debug(data)
+
+    if '/peliculas/' in item.url:
+        if '<h2>' in data: data = data.split('<h2>')[1] # descartar lista de destacadas
+        if '<div class="dt_mainmeta">' in data: data = data.split('<div class="dt_mainmeta">')[0] # descartar lista de más vistas
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
 
@@ -129,7 +130,6 @@ def get_url(dpost, dnume, dtype, referer):
 
     post = {'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype}
     data = httptools.downloadpage(host + 'wp-admin/admin-ajax.php', post=post, headers={'Referer':referer}, raise_weberror=False).data
-    # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, "(?i) src=.*?'([^']+)")
     if not url: url = scrapertools.find_single_match(data, '(?i) src=.*?"([^"]+)')
@@ -144,14 +144,12 @@ def findvideos(item):
     IDIOMAS = {'es': 'Esp', 'mx': 'Lat', 'en': 'Vose'}
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     bloque = scrapertools.find_single_match(data, "<ul id='playeroptionsul'(.*?)</ul>")
 
     matches = scrapertools.find_multiple_matches(bloque, "<li id='player-option-(\d+)'(.*?)</li>")
 
     for optnum, enlace in matches:
-        # ~ logger.debug(enlace)
         lang = scrapertools.find_single_match(enlace, "/img/flags/([^.']+)").lower()
 
         dtype = scrapertools.find_single_match(enlace, "data-type='([^']+)")

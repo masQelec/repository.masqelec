@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www.mejortorrento.com'
+host = 'https://www.mejortorrento.net'
 
 
 selecc_pelis = host + '/peliculas-buscador.html'
@@ -27,6 +27,9 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    url = url.replace('//www.mejortorrento.com', '//www.mejortorrento.net')
+
     # ~ data = httptools.downloadpage(url, post=post).data
     data = httptools.downloadpage_proxy('mejortorrents', url, post=post, headers=headers).data
     return data

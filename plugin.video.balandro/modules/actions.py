@@ -15,7 +15,6 @@ color_avis  = config.get_setting('notification_avis_color', default='yellow')
 color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
 
-# Abrir ventana de Configuración
 def open_settings(item):
     logger.info()
 
@@ -24,17 +23,17 @@ def open_settings(item):
     platformtools.itemlist_refresh()
 
 
-# Comprobar nuevos episodios en cualquiera de las series en seguimiento
 def comprobar_nuevos_episodios(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, 'Comprobando existencia nuevos episodios', time=2000, sound=False)
+    la_notif = ('[B][COLOR %s]') % color_infor
+    la_notif += ('Comprobando existencia nuevos episodios[/B][/COLOR]')
+    platformtools.dialog_notification(config.__addon_name, la_notif, time=2000, sound=False)
 
     from core import trackingtools
     trackingtools.check_and_scrap_new_episodes()
 
 
-# Comprobar actualizaciones (llamada desde una opción de la Configuración)
 def check_addon_updates(item):
     logger.info()
 
@@ -45,7 +44,7 @@ def check_addon_updates(item):
 
     platformtools.itemlist_refresh()
 
-# Comprobar actualizaciones (llamada desde una opción de la Configuración)
+
 def check_addon_updates_force(item):
     logger.info()
 
@@ -57,7 +56,6 @@ def check_addon_updates_force(item):
     platformtools.itemlist_refresh()
 
 
-# Borrar caché de TMDB (llamada desde una opción de la Configuración)
 def drop_db_cache(item):
     logger.info()
 
@@ -67,7 +65,6 @@ def drop_db_cache(item):
             platformtools.dialog_notification(config.__addon_name, 'Caché Tmdb borrada', time=2000, sound=False)
 
 
-# Limpiar caché de TMDB (llamada desde una opción de la Configuración)
 def clean_db_cache(item):
     logger.info()
 
@@ -75,7 +72,7 @@ def clean_db_cache(item):
 
     import sqlite3, time
 
-    fecha_caducidad = time.time() - (31 * 24 * 60 * 60) # al cabo de 31 días
+    fecha_caducidad = time.time() - (31 * 24 * 60 * 60)
 
     fname = filetools.join(config.get_data_path(), "tmdb.sqlite")
     conn = sqlite3.connect(fname)
@@ -100,11 +97,10 @@ def clean_db_cache(item):
     conn.close()
 
 
-# Mostrar diálogo de información de un item haciendo una nueva llamada a Tmdb para recuperar más datos
 def more_info(item):
     logger.info()
 
-    # Si se llega aquí mediante el menú contextual, hay que recuperar los parámetros action y channel
+    # Si  menú contextual, recuperar parámetros action y channel
     if item.from_action: item.__dict__['action'] = item.__dict__.pop('from_action')
     if item.from_channel: item.__dict__['channel'] = item.__dict__.pop('from_channel')
 
@@ -118,7 +114,6 @@ def more_info(item):
     ret = xbmcgui.Dialog().info(xlistitem)
 
 
-# Mostrar diálogo con los trailers encontrados para un item
 def search_trailers(item):
     logger.info()
 
@@ -135,7 +130,6 @@ def search_trailers(item):
     opciones = []
     resultados = tmdb_search.get_videos()
     for res in resultados:
-        # ~ logger.debug(res)
         it = xbmcgui.ListItem(res['name'], '[%sp] (%s)' % (res['size'], res['language']))
         if item.thumbnail: it.setArt({ 'thumb': item.thumbnail })
         opciones.append(it)
@@ -145,9 +139,9 @@ def search_trailers(item):
         if notification_d_ok:
             platformtools.dialog_ok(nombre, 'No se encuentra ningún tráiler en TMDB')
         else:
-            platformtools.dialog_notification(nombre, '[B][COLOR %s]Sin ningún tráiler en TMDB[/COLOR][/B]' % color_alert)
+            platformtools.dialog_notification(nombre, '[B][COLOR %s]Sin tráiler en TMDB[/COLOR][/B]' % color_alert)
     else:
-        while not xbmc.Monitor().abortRequested(): # (while True)
+        while not xbmc.Monitor().abortRequested():
             ret = xbmcgui.Dialog().select('Tráilers para %s' % nombre, opciones, useDetails=True)
             if ret == -1: break
 
@@ -158,18 +152,21 @@ def search_trailers(item):
             if 'youtube' in resultados[ret]['url']:
                 video_urls, puedes, motivo = servertools.resolve_video_urls_for_playing('youtube', resultados[ret]['url'])
             else:
-                video_urls = [] #TODO si no es youtube ...
-                logger.debug(resultados[ret])
+                video_urls = []
+                logger.info("check-resultados: %s" % resultados[ret])
+
             if len(video_urls) > 0:
-                # ~ logger.debug(video_urls)
-                xbmc.Player().play(video_urls[-1][1]) # el último es el de más calidad
+                xbmc.Player().play(video_urls[0][1])
                 xbmc.sleep(1000)
                 while not xbmc.Monitor().abortRequested() and xbmc.Player().isPlaying():
                     xbmc.sleep(1000)
             else:
-                platformtools.dialog_notification(resultados[ret]['name'], 'No se pudo reproducir el tráiler', time=3000, sound=False)
+                la_notif = ('[B][COLOR %s]') % color_alert
+                la_notif += ('No se pudo reproducir el tráiler[/B][/COLOR]')
 
-            if len(resultados) == 1: break # si sólo hay un vídeo no volver al diálogo de tráilers
+                platformtools.dialog_notification(resultados[ret]['name'], la_notif, time=3000, sound=False)
+
+            if len(resultados) == 1: break
 
 
 def manto_proxies(item):
@@ -190,7 +187,7 @@ def manto_proxies(item):
            if not 'proxies' in ch['notes'].lower():
                continue
 
-           # por NAME vensiones anteriores a 2.0
+           # por NAME anteriores a 2.0
            cfg_proxies_channel = 'channel_' + ch['name'] + '_proxies'
 
            if config.get_setting(cfg_proxies_channel, default=''):
@@ -248,7 +245,7 @@ def manto_params(item):
 
         # ~ config.set_setting('downloadpath', '')  No funciona
 
-        config.set_setting('chrome_last_version', '89.0.4389.100')
+        config.set_setting('chrome_last_version', '90.0.4430.100')
 
         config.set_setting('debug', '0')
 
@@ -314,7 +311,7 @@ def manto_folder_downloads(item):
     if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar el contenido de Todas sus Descargas ?[/COLOR]'):
         filetools.rmdirtree(path)
 
-        # por si vario el path y quedaron descargas huerfanas en el path default
+        # por si varió el path y quedaron descargas huerfanas en el path default
         if downloadpath:
            try:
               path = os.path.join(config.get_data_path(), 'downloads')
@@ -332,7 +329,8 @@ def manto_folder_addon(item):
     existe = filetools.exists(path)
     if not existe == False:
         if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ ATENCION: Confirma Eliminar Todos los Datos del Addon ?[/COLOR]'):
-            filetools.rmdirtree(path) # ~  deja solo el fichero settings.xml porque lo tiene bloqueado el sistema
+            # ~  deja solo settings.xml lo tiene bloqueado el sistema
+            filetools.rmdirtree(path)
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Datos del Addon eliminados[/B][/COLOR]' % color_adver)
 
 def adults_password(item):
@@ -435,7 +433,7 @@ def test_internet(item):
            pass
 
         if your_info:
-            your_info = your_info.replace('{', '').replace('}', '').replace('[', '').replace(']', '').replace(',', '').replace('"', '').replace("'", '') #.strip()
+            your_info = your_info.replace('{', '').replace('}', '').replace('[', '').replace(']', '').replace(',', '').replace('"', '').replace("'", '')
             platformtools.dialog_textviewer('Información de su Internet', your_info)
         else:
             platformtools.dialog_ok(config.__addon_name, '[COLOR yellow][B]Hay conexión con internet.[/B][/COLOR]', your_ip)

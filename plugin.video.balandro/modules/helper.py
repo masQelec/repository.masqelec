@@ -3,12 +3,21 @@
 import os, sys, time, xbmcaddon
 import xbmc, xbmcgui, platform
 
+if sys.version_info[0] >= 3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    translatePath = xbmc.translatePath
+
 from platformcode import config, logger, platformtools
 from core import filetools
 from core.item import Item
 
 from modules import filters
 
+
+ADDON_REPO_ADDONS = 'https://balandro.tk/repo/addons.xml'
+ADDON_UPDATES_JSON = 'https://balandro.tk/addon_updates/updates-v2.0.0.json'
 
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
@@ -21,13 +30,6 @@ _foro = "[COLOR plum][B][I] balandro.tk [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] @balandro_asesor [/I][/B][/COLOR]"
 
 
-if sys.version_info[0] >= 3:
-    import xbmcvfs
-    translatePath = xbmcvfs.translatePath
-else:
-    translatePath = xbmc.translatePath
-
-
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -35,11 +37,11 @@ def mainlist(item):
     descartar_xxx = config.get_setting('descartar_xxx', default=False)
     descartar_anime = config.get_setting('descartar_anime', default=False)
 
-    itemlist.append(item.clone( action='', title= 'Contacto:', text_color='blue', folder=False ))
+    itemlist.append(item.clone( action='', title= 'Contacto:', text_color='blue', thumbnail=config.get_thumb('pencil'), folder=False ))
     itemlist.append(item.clone( action='', title= ' - Foro ' + _foro + ' Novedades, Sugerencias, Aportaciones, etc.', folder=False, thumbnail=config.get_thumb('support') ))
     itemlist.append(item.clone( action='', title= ' - Telegram ' + _telegram + ' Asesoramiento, Dudas, Ayuda, etc.', folder=False, thumbnail=config.get_thumb('support') ))
 
-    itemlist.append(item.clone( action='', title= 'Uso:', text_color='chartreuse', folder=False ))
+    itemlist.append(item.clone( action='', title= 'Uso:', text_color='chartreuse', thumbnail=config.get_thumb('dev'), folder=False ))
     itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están disponibles', folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están inestables', no_stable = True, folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están inactivos', no_active = True, folder=False, thumbnail=config.get_thumb('stack') ))
@@ -49,18 +51,18 @@ def mainlist(item):
     itemlist.append(item.clone( action='show_help_settings', title= ' - Notas sobre algunos parámetros de la configuración', folder=False ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría canales)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title= 'Proxies:', text_color='red', folder=False ))
+    itemlist.append(item.clone( action='', title= 'Proxies:', text_color='red', thumbnail=config.get_thumb('flame'), folder=False ))
     itemlist.append(item.clone( action='channels_with_proxies', title= ' - Qué canales pueden usar proxies', folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_help_proxies', title= ' - Información uso de proxies', folder=False ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría proxies)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title= 'Torrents:', text_color='moccasin', folder=False ))
+    itemlist.append(item.clone( action='', title= 'Torrents:', text_color='moccasin', thumbnail=config.get_thumb('torrents'), folder=False ))
     itemlist.append(item.clone( action='show_clients_torrent', title= ' - Clientes externos torrent soportados', folder=False, thumbnail=config.get_thumb('cloud') ))
     itemlist.append(item.clone( action='channels_only_torrents', title= ' - Qué canales pueden contener archivos torrent', folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_help_torrents', title= ' - ¿ Dónde obtener los add-ons para torrents ?', folder=False ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría torrents)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title='Buscar:', text_color='cyan', folder=False ))
+    itemlist.append(item.clone( action='', title='Buscar:', text_color='cyan', thumbnail=config.get_thumb('magnifyingglass'), folder=False ))
     itemlist.append(item.clone( channel='search', action='show_help', title = ' - Información sobre búsquedas', folder=False ))
     itemlist.append(item.clone( channel='tmdblists', action='show_help', title= ' - Información búsquedas y listas en TMDB', folder=False ))
     itemlist.append(item.clone( action='channels_no_actives', title= ' - Qué canales no intervienen en las búsquedas (desactivados)', folder=False, thumbnail=config.get_thumb('stack') ))
@@ -68,16 +70,16 @@ def mainlist(item):
     itemlist.append(item.clone( channel='proxysearch', title = ' - Configurar proxies a usar (en los canales que los necesiten)', action = 'proxysearch_all', thumbnail=config.get_thumb('flame') ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría buscar)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title='Preferidos:', text_color='springgreen', folder=False ))
+    itemlist.append(item.clone( action='', title='Preferidos:', text_color='springgreen', thumbnail=config.get_thumb('videolibrary'), folder=False ))
     itemlist.append(item.clone( action='show_help_tracking', title= ' - Información cómo funciona', folder=False ))
     itemlist.append(item.clone( action='show_help_tracking_update', title= ' - Búsqueda automática de nuevos episodios', folder=False, thumbnail=config.get_thumb('videolibrary') ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría preferidos)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title='Descargas:', text_color='plum', folder=False ))
-    itemlist.append(item.clone( channel='actions', action='show_ubicacion', title= ' - Donde se ubican las descargas', folder=False, thumbnail=config.get_thumb('download') ))
+    itemlist.append(item.clone( action='', title='Descargas:', text_color='plum', thumbnail=config.get_thumb('download'), folder=False ))
+    itemlist.append(item.clone( channel='actions', action='show_ubicacion', title= ' - Donde se ubican las descargas', folder=False, thumbnail=config.get_thumb('tools') ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría descargas)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title='Actualizar:', text_color='salmon', folder=False ))
+    itemlist.append(item.clone( action='', title='Actualizar:', text_color='salmon', thumbnail=config.get_thumb('tools'), folder=False ))
     itemlist.append(item.clone( channel='actions', title= ' - Comprobar últimas actualizaciones tipo Fix', action = 'check_addon_updates', folder=False, thumbnail=config.get_thumb('download') ))
     itemlist.append(item.clone( channel='actions', title= ' - Forzar todas las actualizaciones tipo Fix', action = 'check_addon_updates_force', folder=False, thumbnail=config.get_thumb('download') ))
     itemlist.append(item.clone( action='show_last_fix', title= ' - Información último fix instalado', folder=False, thumbnail=config.get_thumb('news') ))
@@ -88,7 +90,7 @@ def mainlist(item):
         if descartar_anime: presentar = False
 
     if presentar:
-        itemlist.append(item.clone( action='', title= 'Parental:', text_color='orangered', folder=False ))
+        itemlist.append(item.clone( action='', title= 'Parental:', text_color='orangered', thumbnail=config.get_thumb('roadblock'), folder=False ))
 
         if not descartar_anime:
             itemlist.append(item.clone( action='channels_only_animes', title= ' - Qué canales pueden tener contenido de animes', folder=False, thumbnail=config.get_thumb('anime') ))
@@ -99,7 +101,7 @@ def mainlist(item):
 
         itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría canales)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title='Servidores:', text_color='gold', folder=False ))
+    itemlist.append(item.clone( action='', title='Servidores:', text_color='gold', thumbnail=config.get_thumb('bolt'), folder=False ))
     itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores están disponibles', tipo = 'activos', folder=False, thumbnail=config.get_thumb('bolt') ))
     itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores se detectan pero no están soportados', tipo = 'sinsoporte', folder=False, thumbnail=config.get_thumb('bolt') ))
     itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores están inactivos', tipo = 'inactivos', folder=False, thumbnail=config.get_thumb('bolt') ))
@@ -109,21 +111,21 @@ def mainlist(item):
 
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría play)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title= 'Sistema:', text_color='yellow', folder=False ))
-    itemlist.append(item.clone( action='show_test', title= ' - Test status del sistema', folder=False, thumbnail=config.get_thumb('computer') ))
-    itemlist.append(item.clone( channel='actions', title= ' - Comprobar el estado de su internet', action = 'test_internet', folder=False, thumbnail=config.get_thumb('crossroads') ))
-    itemlist.append(item.clone( action='show_sets', title= ' - Visualizar sus ajustes personalizados', folder=False, thumbnail=config.get_thumb('settings') ))
-    itemlist.append(item.clone( action='show_cook', title= ' - Visualizar su fichero de cookies', folder=False, thumbnail=config.get_thumb('folder') ))
-    itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
-
-    itemlist.append(item.clone( action='', title= 'Media Center:', text_color='pink', folder=False ))
+    itemlist.append(item.clone( action='', title= 'Media Center:', text_color='pink', thumbnail=config.get_thumb('computer'), folder=False ))
     itemlist.append(item.clone( action='show_log', title= ' - Visualizar el fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('computer') ))
     itemlist.append(item.clone( action='copy_log', title= ' - Obtener una copia del fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('folder') ))
     #itemlist.append(item.clone( action='upload_pastebin', title= ' - Subir a Pastebin el fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('cloud') ))
     itemlist.append(item.clone( action='show_advs', title= ' - Visualizar el fichero advancedsettings de su Media Center', folder=False, thumbnail=config.get_thumb('keyboard') ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría sistema)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title='Desarrollo:', text_color='fuchsia', folder=False ))
+    itemlist.append(item.clone( action='', title= 'Sistema:', text_color='yellow', thumbnail=config.get_thumb('tools'), folder=False ))
+    itemlist.append(item.clone( action='show_test', title= ' - Test status del sistema', folder=False, thumbnail=config.get_thumb('computer') ))
+    itemlist.append(item.clone( channel='actions', title= ' - Comprobar el estado de su internet', action = 'test_internet', folder=False, thumbnail=config.get_thumb('crossroads') ))
+    itemlist.append(item.clone( action='show_sets', title= ' - Visualizar sus ajustes personalizados', folder=False, thumbnail=config.get_thumb('settings') ))
+    itemlist.append(item.clone( action='show_cook', title= ' - Visualizar su fichero de cookies', folder=False, thumbnail=config.get_thumb('folder') ))
+    itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
+
+    itemlist.append(item.clone( action='', title='Desarrollo:', text_color='fuchsia', thumbnail=config.get_thumb('quote'), folder=False ))
     itemlist.append(item.clone( action='show_version', title= ' - Información versión', folder=False, thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='show_changelog', title= ' - Historial de cambios', folder=False, thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='show_dev_notes', title= ' - Notas para developers', folder=False, thumbnail=config.get_thumb('tools') ))
@@ -182,7 +184,6 @@ def show_servers_list(item):
     filters.show_servers_list(item)
 
 
-# Diálogos para mostrar info de Ayuda
 def show_help_settings(item):
     logger.info()
 
@@ -456,34 +457,44 @@ def show_help_proxies(item):
 def show_version(item):
     logger.info()
 
+    txt = ''
     try:
        with open(os.path.join(config.get_runtime_path(), 'version.txt'), 'r') as f: txt=f.read(); f.close()
-
-       platformtools.dialog_textviewer('Información versión', txt)
-       return True
     except:
-       return False
+        try:
+            txt = open(os.path.join(config.get_runtime_path(), 'version.txt'), encoding="utf8").read()
+        except: pass
+
+    if txt:
+       platformtools.dialog_textviewer('Información versión', txt)
 
 def show_changelog(item):
     logger.info()
 
+    txt = ''
     try:
        with open(os.path.join(config.get_runtime_path(), 'changelog.txt'), 'r') as f: txt=f.read(); f.close()
-
-       platformtools.dialog_textviewer('Historial de cambios', txt)
     except:
-       pass
+        try:
+            txt = open(os.path.join(config.get_runtime_path(), 'changelog.txt'), encoding="utf8").read()
+        except: pass
+
+    if txt:
+       platformtools.dialog_textviewer('Historial de cambios', txt)
 
 def show_dev_notes(item):
     logger.info()
 
+    txt = ''
     try:
        with open(os.path.join(config.get_runtime_path(), 'dev-notes.txt'), 'r') as f: txt=f.read(); f.close()
-
-       platformtools.dialog_textviewer('Notas para developers', txt)
     except:
-       pass
+        try:
+            txt = open(os.path.join(config.get_runtime_path(), 'dev-notes.txt'), encoding="utf8").read()
+        except: pass
 
+    if txt:
+       platformtools.dialog_textviewer('Notas para developers', txt)
 
 def show_log(item):
     logger.info()
@@ -516,6 +527,7 @@ def show_log(item):
     size = filetools.getsize(file)
     if size > 999999:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Cargando fichero log[/COLOR][/B]' % color_infor)
+
     txt = ''
     try:
         with open(os.path.join(path, file_log), 'r') as f: txt=f.read(); f.close()
@@ -523,9 +535,10 @@ def show_log(item):
         try:
             txt = open(os.path.join(path, file_log), encoding="utf8").read()
         except: pass
+
     if txt:
         platformtools.dialog_textviewer('Fichero LOG de su Media Center', txt)
-    return txt
+
 
 def copy_log(item):
     logger.info()
@@ -556,13 +569,13 @@ def copy_log(item):
         return
 
     destino_path = xbmcgui.Dialog().browseSingle(3, 'Seleccionar carpeta dónde copiar', 'files', '', False, False, '')
-    if not destino_path: return False
+    if not destino_path: return
 
     origen = os.path.join(path, file_log)
     destino = filetools.join(destino_path, file_log)
     if not filetools.copy(origen, destino, silent=False):
         platformtools.dialog_ok(config.__addon_name, 'Error, no se ha podido copiar el fichero Log!', origen, destino)
-        return False
+        return
 
     platformtools.dialog_notification('Fichero Log copiado', file_log)
 
@@ -588,12 +601,16 @@ def show_advs(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero Advancedsettings[/COLOR][/B]' % color_infor)
         return
 
+    txt = ''
     try:
        with open(os.path.join(path, file_advs), 'r') as f: txt=f.read(); f.close()
-
-       platformtools.dialog_textviewer('Su fichero Advancedsettings de su Media Center', txt)
     except:
-        pass
+        try:
+            txt = open(os.path.join(path, file_advs), encoding="utf8").read()
+        except: pass
+
+    if txt:
+       platformtools.dialog_textviewer('Su fichero Advancedsettings de su Media Center', txt)
 
 
 def show_help_adults(item):
@@ -661,12 +678,16 @@ def show_legalidad(item):
 def show_license(item):
     logger.info()
 
+    txt = ''
     try:
        with open(os.path.join(config.get_runtime_path(), 'LICENSE'), 'r') as f: txt=f.read(); f.close()
-
-       platformtools.dialog_textviewer('Licencia (Gnu Gpl v3)', txt)
     except:
-       pass
+        try:
+            txt = open(os.path.join(config.get_runtime_path(), 'LICENSE'), encoding="utf8").read()
+        except: pass
+
+    if txt:
+       platformtools.dialog_textviewer('Licencia (Gnu Gpl v3)', txt)
 
 
 def show_test(item):
@@ -705,7 +726,6 @@ def show_test(item):
     access_repo = False
     tex_access_repo = ''
     if hay_repo:
-        ADDON_REPO_ADDONS = 'https://balandro.tk/repo/addons.xml'
         try:
            data = httptools.downloadpage(ADDON_REPO_ADDONS).data
            if data: access_repo = True
@@ -723,7 +743,6 @@ def show_test(item):
     tex_access_fixes = ''
     if hay_repo:
         if access_repo:
-            ADDON_UPDATES_JSON = 'https://balandro.tk/addon_updates/updates-v2.0.0.json'
             try:
                data = httptools.downloadpage(ADDON_UPDATES_JSON).data
                if data:
@@ -824,6 +843,13 @@ def show_test(item):
 
     txt += '[CR][CR]- [COLOR gold]Motor torrent:[/COLOR]  %s' % tex_tor
 
+    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+        tex_yt = '  Instalado'
+    else:
+        tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
+
+    txt += '[CR][CR]- [COLOR gold]Youtube addon:[/COLOR]  %s' % tex_yt
+
     loglevel = config.get_setting('debug', 0)
     if loglevel == 0: tex_niv = 'Solo Errores'
     elif loglevel == 1: tex_niv = 'Errores e Información'
@@ -861,14 +887,17 @@ def show_last_fix(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero Fix[/COLOR][/B]' % color_infor)
         return
 
+    txt = ''
     try:
        with open(path, 'r') as f: txt=f.read(); f.close()
-
-       txt = txt.replace('{', '').replace('}', '').replace('[', '').replace(']', '').replace(',', '').replace('"', '').replace("'", '').strip()
-
-       platformtools.dialog_textviewer('Información del último Fix instalado', txt)
     except:
-       pass
+        try:
+            txt = open(path, encoding="utf8").read()
+        except: pass
+
+    if txt:
+       txt = txt.replace('{', '').replace('}', '').replace('[', '').replace(']', '').replace(',', '').replace('"', '').replace("'", '').strip()
+       platformtools.dialog_textviewer('Información del último Fix instalado', txt)
 
 
 def show_sets(item):
@@ -882,13 +911,16 @@ def show_sets(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No existe settings.xml[/COLOR][/B]' % color_alert)
         return
 
+    txt = ''
     try:
        with open(os.path.join(file_sets), 'r') as f: txt=f.read(); f.close()
-
-       platformtools.dialog_textviewer('Su fichero de Ajustes personalizados', txt)
     except:
-       pass
+        try:
+            txt = open(os.path.join(file_sets), encoding="utf8").read()
+        except: pass
 
+    if txt:
+       platformtools.dialog_textviewer('Su fichero de Ajustes personalizados', txt)
 
 def show_cook(item):
     logger.info()
@@ -901,9 +933,13 @@ def show_cook(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No existe cookies.dat[/COLOR][/B]' % color_adver)
         return
 
+    txt = ''
     try:
        with open(os.path.join(file_cook), 'r') as f: txt=f.read(); f.close()
-
-       platformtools.dialog_textviewer('Su fichero de Cookies', txt)
     except:
-       pass
+        try:
+            txt = open(os.path.join(file_cook), encoding="utf8").read()
+        except: pass
+
+    if txt:
+       platformtools.dialog_textviewer('Su fichero de Cookies', txt)
