@@ -224,13 +224,16 @@ class WebVTTWriter(BaseWriter):
         self.global_layout = caption_set.get_layout_info(lang)
 
         captions = caption_set.get_captions(lang)
-
         for i, caption in enumerate(captions):
             merge = i > 0 and captions[i-1].start == caption.start and captions[i-1].end == caption.end
             if not merge:
                 output += '\n'
+            else:
+                #we merging with last subtitle so remove previous newline
+                output = output.rstrip()
+                output += ' '
 
-            output += self._write_caption(caption_set, caption, merge=i > 0 and captions[i-1].start == caption.start and captions[i-1].end == caption.end)
+            output += self._write_caption(caption_set, caption, merge=merge)
 
         return output
 
@@ -296,6 +299,8 @@ class WebVTTWriter(BaseWriter):
             cue_settings = self._cue_settings_from(layout)
             if not merge:
                 output += timespan + cue_settings + '\n'
+            elif cue_text.startswith('-'):
+                output += '\n'
             output += cue_style_tags[0] + cue_text + cue_style_tags[1] + '\n'
 
         return output

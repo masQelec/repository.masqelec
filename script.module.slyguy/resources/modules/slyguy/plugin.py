@@ -158,6 +158,7 @@ def search():
                     queries.remove(query)
 
                 queries.insert(0, query)
+                queries = queries[:MAX_SEARCH_HISTORY]
                 userdata.set('queries', queries)
                 gui.refresh()
 
@@ -449,6 +450,31 @@ def _autoplay(folder, pattern):
 default_thumb  = ADDON_ICON
 default_fanart = ADDON_FANART
 
+def resume_from(seconds):
+    if not seconds or seconds < 0:
+        return 0
+
+    minutes = seconds // 60
+    hours = minutes // 60
+    label = _(_.RESUME_FROM, '{:02d}:{:02d}:{:02d}'.format(hours, minutes % 60, seconds % 60))
+
+    index = gui.context_menu([label, _.PLAY_FROM_BEGINNING])
+    if index == -1:
+        return -1
+    elif index == 0:
+        return seconds
+    else:
+        return 0
+
+def live_or_start(seconds=1):
+    index = gui.context_menu([_.PLAY_FROM_LIVE_CONTEXT, _.PLAY_FROM_BEGINNING])
+    if index == -1:
+        return -1
+    elif index == 0:
+        return 0
+    else:
+        return seconds
+
 #Plugin.Item()
 class Item(gui.Item):
     def __init__(self, cache_key=None, play_next=None, callback=None, play_skips=None, geolock=None, bookmark=True, quality=None, *args, **kwargs):
@@ -524,7 +550,7 @@ class Item(gui.Item):
 
 #Plugin.Folder()
 class Folder(object):
-    def __init__(self, title=None, items=None, content='videos', updateListing=False, cacheToDisc=True, sort_methods=None, thumb=None, fanart=None, no_items_label=_.NO_ITEMS, no_items_method='dialog', show_news=True):
+    def __init__(self, title=None, items=None, content='AUTO', updateListing=False, cacheToDisc=True, sort_methods=None, thumb=None, fanart=None, no_items_label=_.NO_ITEMS, no_items_method='dialog', show_news=True):
         self.title = title
         self.items = items or []
         self.content = content
@@ -539,10 +565,12 @@ class Folder(object):
 
     def display(self):
         handle = _handle()
-        items  = [i for i in self.items if i]
+        items = [i for i in self.items if i]
 
         ep_sort = True
         last_show_name = ''
+
+        item_types = {}
 
         if not items and self.no_items_label:
             label = _(self.no_items_label, _label=True)
@@ -556,6 +584,7 @@ class Folder(object):
                     is_folder = False,
                 ))
 
+        count = 0.0
         for item in items:
             if self.thumb and not item.art.get('thumb'):
                 item.art['thumb'] = self.thumb
@@ -563,19 +592,40 @@ class Folder(object):
             if self.fanart and not item.art.get('fanart'):
                 item.art['fanart'] = self.fanart
 
-            episode = item.info.get('episode')
-            show_name = item.info.get('tvshowtitle')
-            if not episode or not show_name or (last_show_name and show_name != last_show_name):
-                ep_sort = False
+            if not item.specialsort:
+                media_type = item.info.get('mediatype')
+                show_name = item.info.get('tvshowtitle')
+                if media_type != 'episode' or not show_name or (last_show_name and show_name != last_show_name):
+                    ep_sort = False
 
-            if not last_show_name:
-                last_show_name = show_name
+                if not last_show_name:
+                    last_show_name = show_name
+
+                if media_type not in item_types:
+                    item_types[media_type] = 0
+
+                item_types[media_type] += 1
+                count += 1
 
             li = item.get_li()
             xbmcplugin.addDirectoryItem(handle, item.path, li, item.is_folder)
 
-        if settings.getBool('video_folder_content', True):
+        if self.content == 'AUTO':
             self.content = 'videos'
+
+            if not settings.getBool('video_folder_content', True) and item_types:
+                type_map = {
+                    'movie': 'movies',
+                    'tvshow': 'tvshows',
+                    'season': 'tvshows',
+                    'episode': 'episodes',
+                }
+
+                top_type = sorted(item_types, key=lambda k: item_types[k], reverse=True)[0]
+                percent = (item_types[top_type] / count) * 100
+                content_type = type_map.get(top_type)
+                if percent > 70 and content_type:
+                    self.content = content_type
 
         if self.content: xbmcplugin.setContent(handle, self.content)
         if self.title: xbmcplugin.setPluginCategory(handle, self.title)
@@ -625,15 +675,19 @@ def process_news():
     if not news:
         return
 
-    settings.common_settings.set('_news', '')
-
     try:
         news = json.loads(news)
         _time = time.time()
 
         if _time > news.get('timestamp', _time) + NEWS_MAX_TIME:
             log.debug('news is too old')
+            settings.common_settings.set('_news', '')
             return
+
+        if news.get('show_in') and ADDON_ID.lower() not in [x.lower() for x in news['show_in'].split(',')]:
+            return
+
+        settings.common_settings.set('_news', '')
 
         if news.get('country'):
             valid = False
@@ -649,14 +703,14 @@ def process_news():
                     valid = cur_country != rule[1:] if rule.startswith('!') else cur_country == rule
 
             if not valid:
-                log.debug('news is only for country: {}'.format(news['country']))
+                log.debug('news is only for countries: {}'.format(news['country']))
                 return
 
         if news.get('requires') and not get_addon(news['requires'], install=False):
-            log.debug('news is only for users with addon {} installed'.format(news['requires']))
+            log.debug('news only for users with add-on: {} '.format(news['requires']))
             return
 
-        elif news['type'] == 'message':
+        if news['type'] == 'message':
             gui.ok(news['message'], news.get('heading', _.NEWS_HEADING))
 
         elif news['type'] == 'addon_release':
@@ -671,5 +725,6 @@ def process_news():
 
                 url = url_for('', _addon_id=news['addon_id'])
                 xbmc.executebuiltin('ActivateWindow(Videos,{})'.format(url))
+
     except Exception as e:
         log.exception(e)

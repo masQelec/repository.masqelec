@@ -22,8 +22,9 @@ from slyguy.util import check_port, remove_file, get_kodi_string, set_kodi_strin
 from slyguy.plugin import failed_playback
 from slyguy.exceptions import Exit
 from slyguy.session import RawSession
-from slyguy.language import _
 from slyguy.router import add_url_args
+
+from .language import _
 
 REMOVE_IN_HEADERS = ['upgrade', 'host', 'accept-encoding']
 REMOVE_OUT_HEADERS = ['date', 'server', 'transfer-encoding', 'keep-alive', 'connection']
@@ -50,7 +51,7 @@ CODECS = [
 CODEC_RANKING = ['MPEG-4', 'H.264', 'H.265', 'HDR', 'H.265 Dolby Vision']
 
 PROXY_GLOBAL = {
-    'last_quality': QUALITY_BEST,
+    'last_qualities': [],
     'session': {},
 }
 
@@ -279,25 +280,26 @@ class RequestHandler(BaseHTTPRequestHandler):
             values = [x[0] for x in options]
             labels = [x[1] for x in options]
 
-            default = -1
-            if PROXY_GLOBAL['last_quality'] in values:
-                default = values.index(PROXY_GLOBAL['last_quality'])
-            else:
-                options = [streams[-1]]
-                for stream in streams:
-                    if PROXY_GLOBAL['last_quality'] >= stream['bandwidth']:
-                        options.append(stream)
-
-                default = values.index(sorted(options, key=quality_compare, reverse=True)[0])
+            default = 0
+            remove = None
+            for quality in PROXY_GLOBAL['last_qualities']:
+                if quality[0] == self._session['slug']:
+                    remove = quality
+                    default = quality[1]
+                    break
 
             index = gui.select(_.PLAYBACK_QUALITY, labels, preselect=default, autoclose=5000)
             if index < 0:
                 raise Exit('Cancelled quality select')
 
             quality = values[index]
+
+            if remove:
+                PROXY_GLOBAL['last_qualities'].remove(remove)
+
             if index != default:
-                PROXY_GLOBAL['last_quality'] = quality['bandwidth'] if quality in qualities else quality
-                set_kodi_string('_slyguy_last_quality', PROXY_GLOBAL['last_quality'])
+                PROXY_GLOBAL['last_qualities'].insert(0, [self._session['slug'], index])
+                PROXY_GLOBAL['last_qualities'] = PROXY_GLOBAL['last_qualities'][:MAX_QUALITY_HISTORY]
 
         if quality in (QUALITY_DISABLED, QUALITY_SKIP):
             quality = quality
@@ -370,6 +372,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         adap_parent = None
 
         default_language = self._session.get('default_language', '')
+        original_language = self._session.get('original_language', '')
 
         for period_index, period in enumerate(root.getElementsByTagName('Period')):
             rep_index = 0
@@ -394,17 +397,56 @@ class RequestHandler(BaseHTTPRequestHandler):
                     for key in stream.attributes.keys():
                         attribs[key] = stream.getAttribute(key)
 
-                    if default_language and 'audio' in attribs.get('mimeType', '') and attribs.get('lang').lower() == default_language.lower() and adap_set not in lang_adap_sets:
-                        lang_adap_sets.append(adap_set)
-
                     bandwidth = 0
                     if 'bandwidth' in attribs:
                         bandwidth = int(attribs['bandwidth'])
-                        if bandwidth > highest_bandwidth:
-                            highest_bandwidth = bandwidth
 
                     if 'maxPlayoutRate' in attribs:
                         is_trick = True
+
+                    if 'audio' in attribs.get('mimeType', ''):
+                        if default_language and attribs.get('lang').lower().split('-')[0] == default_language.lower().split('-')[0]:
+                            adap_set.setAttribute('default', 'true')
+
+                        if original_language and attribs.get('lang').lower().split('-')[0] == original_language.lower().split('-')[0]:
+                            adap_set.setAttribute('original', 'true')
+
+                        is_atmos = False
+                        atmos_channels = None
+                        for supelem in stream.getElementsByTagName('SupplementalProperty'):
+                            if supelem.getAttribute('value') == 'JOC':
+                                is_atmos = True
+                            if 'EC3_ExtensionComplexityIndex' in (supelem.getAttribute('schemeIdUri') or ''):
+                                atmos_channels = supelem.getAttribute('value')
+
+                        if is_atmos:
+                            adap_set.removeChild(stream)
+                            new_set = adap_set.cloneNode(deep=True)
+
+                            new_set.setAttribute('id', '{}-atmos'.format(attribs.get('id','')))
+                            new_set.setAttribute('lang', _(_.ATMOS, name=attribs.get('lang','')))
+
+                            for elem in new_set.getElementsByTagName("Representation"):
+                                new_set.removeChild(elem)
+                            new_set.appendChild(stream)
+
+                            if atmos_channels:
+                                for elem in stream.getElementsByTagName("AudioChannelConfiguration"):
+                                    stream.removeChild(elem)
+
+                                elem = root.createElement('AudioChannelConfiguration')
+                                elem.setAttribute('schemeIdUri', 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011')
+                                elem.setAttribute('value', atmos_channels)
+                                stream.appendChild(elem)
+
+                            audio_sets.append([bandwidth, new_set, adap_parent])
+                            if adap_set in lang_adap_sets:
+                                lang_adap_sets.append(new_set)
+                            log.debug('Dash Fix: Atmos representation moved to own adaption set')
+                            continue
+
+                    if bandwidth > highest_bandwidth:
+                        highest_bandwidth = bandwidth
 
                     if 'video' in attribs.get('mimeType', '') and not is_trick:
                         is_video = True
@@ -450,21 +492,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         for elem in audio_sets:
             elem[2].appendChild(elem[1])
 
-
-        ## Set default languae
-        if lang_adap_sets:
-            for elem in root.getElementsByTagName('Role'):
-                if elem.getAttribute('schemeIdUri') == 'urn:mpeg:dash:role:2011':
-                    elem.parentNode.removeChild(elem)
-
-            for adap_set in lang_adap_sets:
-                elem = root.createElement('Role')
-                elem.setAttribute('schemeIdUri', 'urn:mpeg:dash:role:2011')
-                elem.setAttribute('value', 'main')
-                adap_set.appendChild(elem)
-                log.debug('default language set to: {}'.format(default_language))
-        #############
-
         ## Insert subtitles
         if adap_parent:
             for idx, subtitle in enumerate(self._session.get('subtitles') or []):
@@ -473,10 +500,12 @@ class RequestHandler(BaseHTTPRequestHandler):
                 elem.setAttribute('mimeType', subtitle[0])
                 elem.setAttribute('lang', subtitle[1])
                 elem.setAttribute('id', 'caption_{}'.format(idx))
-                #elem.setAttribute('forced', 'true')
                 #elem.setAttribute('original', 'true')
                 #elem.setAttribute('default', 'true')
                 #elem.setAttribute('impaired', 'true')
+
+                if subtitle[3] == 'forced':
+                    elem.setAttribute('forced', 'true')
 
                 elem2 = root.createElement('Representation')
                 elem2.setAttribute('id', 'caption_rep_{}'.format(idx))
@@ -596,23 +625,48 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         response.stream.content = mpd
 
-    def _parse_m3u8_sub(self, m3u8, master_url):
+    def _parse_m3u8_sub(self, m3u8, url):
         lines = []
+        segments = []
 
         for line in m3u8.splitlines():
-            if not line.startswith('#') and '/beacon?' in line.lower():
-                parse = urlparse(line)
-                params = dict(parse_qsl(parse.query))
-                for key in params:
-                    if key.lower() == 'redirect_path':
-                        line = params[key]
-                        log.debug('M3U8 Fix: Beacon removed')
+            if not line.startswith('#'):
+                line = line.strip()
+                if not line:
+                    continue
+
+                segments.append(line.lower())
+                if '/beacon?' in line.lower():
+                    parse = urlparse(line)
+                    params = dict(parse_qsl(parse.query))
+                    for key in params:
+                        if key.lower() == 'redirect_path':
+                            line = params[key]
+                            log.debug('M3U8 Fix: Beacon removed')
 
             lines.append(line)
 
+        # # bad playlist test
+        # if ADDON_DEV:
+        #     error_every = 5
+        #     error_repeat = 2
+
+        #     self._session['count'] = self._session.get('count', 0) + 1
+        #     print(self._session['count'])
+        #     if self._session['count'] >= error_every:
+        #         if self._session['count'] == error_every + error_repeat - 1:
+        #             self._session['count'] = 0
+        #         segments = segments[:int(len(segments)/2)]
+
+        self._session['m3u8_last_lines'] = self._session.get('m3u8_last_lines', {})
+        if url in self._session['m3u8_last_lines'] and self._session['m3u8_last_lines'][url] not in segments:
+            raise Exception('Invalid M3U8 refresh. Could not find previous segment in playlist')
+
+        self._session['m3u8_last_lines'][url] = segments[-1]
+
         return '\n'.join(lines)
 
-    def _parse_m3u8_master(self, m3u8, master_url):
+    def _parse_m3u8_master(self, m3u8, url):
         def _process_media(line):
             attribs = {}
 
@@ -621,13 +675,13 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             return attribs
 
-        audio_whitelist   = [x.strip().lower() for x in self._session.get('audio_whitelist', '').split(',') if x]
-        subs_whitelist    = [x.strip().lower() for x in self._session.get('subs_whitelist', '').split(',') if x]
-        subs_forced       = self._session.get('subs_forced', True)
-        subs_non_forced   = self._session.get('subs_non_forced', True)
+        audio_whitelist = [x.strip().lower() for x in self._session.get('audio_whitelist', '').split(',') if x]
+        subs_whitelist = [x.strip().lower() for x in self._session.get('subs_whitelist', '').split(',') if x]
+        subs_forced = self._session.get('subs_forced', True)
+        subs_non_forced = self._session.get('subs_non_forced', True)
         audio_description = self._session.get('audio_description', True)
         original_language = self._session.get('original_language', '').lower().strip()
-        default_language  = self._session.get('default_language', '').lower().strip()
+        default_language = self._session.get('default_language', '').lower().strip()
 
         if original_language and not default_language:
             default_language = original_language
@@ -665,6 +719,10 @@ class RequestHandler(BaseHTTPRequestHandler):
             if not audio_description and attribs.get('TYPE') == 'AUDIO' and attribs.get('CHARACTERISTICS','').lower() == 'public.accessibility.describes-video':
                 m3u8 = m3u8.replace(line, '')
                 continue
+
+            if attribs.get('TYPE') == 'AUDIO' and 'JOC' in attribs.get('CHANNELS', ''):
+                attribs['NAME'] = _(_.ATMOS, name=attribs['NAME'])
+                attribs['CHANNELS'] = attribs['CHANNELS'].split('/')[0]
 
             groups[attribs['GROUP-ID']].append([attribs, line])
             if attribs.get('DEFAULT') == 'YES' and attribs['GROUP-ID'] not in default_groups:
@@ -719,10 +777,10 @@ class RequestHandler(BaseHTTPRequestHandler):
             elif line1 and not line.startswith('#'):
                 attribs = _process_media(lines[line1])
 
-                codecs     = [x for x in attribs.get('CODECS', '').split(',') if x]
-                bandwidth  = int(attribs.get('BANDWIDTH') or 0)
+                codecs = [x for x in attribs.get('CODECS', '').split(',') if x]
+                bandwidth = int(attribs.get('BANDWIDTH') or 0)
                 resolution = attribs.get('RESOLUTION', '')
-                frame_rate = attribs.get('FRAME_RATE', '')
+                frame_rate = attribs.get('FRAME-RATE', '')
 
                 url = line
                 if '://' in url:

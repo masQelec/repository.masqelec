@@ -466,7 +466,7 @@ Additional data charges may occur. The LibreELEC team doesn't take any resposibi
 
 <addon id="game.controller.genesis.mouse"
         name="Sega Mouse"
-        version="1.0.8"
+        version="1.0.10"
         provider-name="Team Kodi">
     <extension point="kodi.game.controller" library="resources/layout.xml"/>
     <extension point="xbmc.addon.metadata">
@@ -1951,20 +1951,53 @@ Supported files: .bin, .vec</description>
 
 <addon id="game.controller.default"
         name="Default Controller"
-        version="1.0.8"
+        version="1.0.10"
         provider-name="Team Kodi">
     <extension point="kodi.game.controller" library="resources/layout.xml"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Default Controller</summary>
-        <summary lang="es_ES">Controlador predeterminado</summary>
-        <description lang="en_GB">The default media center controller is based on the Xbox 360 controller.</description>
-        <description lang="es_ES">El mando de centro multimedia predeterminado se basa en el mando Xbox 360.</description>
-		<disclaimer lang="en_GB">Image credit: Wikipedia (wikipedia.org)</disclaimer>
-		<disclaimer lang="es_ES">Crédito de la imagen: Wikipedia (wikipedia.org)</disclaimer>
         <platform>all</platform>
         <assets>
             <icon>resources/icon.png</icon>
         </assets>
+        <summary lang="da_DK">Standard controller</summary>
+        <summary lang="de_DE">Standard-Controller</summary>
+        <summary lang="en_GB">Default Controller</summary>
+        <summary lang="es_ES">Mando por defecto</summary>
+        <summary lang="fa_IR">دستهٔ پیش‌گزیده</summary>
+        <summary lang="he_IL">בקר בררת מחדל</summary>
+        <summary lang="ko_KR">기본 콘트롤러</summary>
+        <summary lang="lt_LT">Numatytasis valdiklis</summary>
+        <summary lang="nl_NL">Standaard Controller</summary>
+        <summary lang="pl_PL">Kontroler domyślny</summary>
+        <summary lang="pt_BR">Controlador Padrão</summary>
+        <summary lang="ru_RU">Стандартный контроллер</summary>
+        <summary lang="zh_CN">默认控制器</summary>
+        <summary lang="zh_TW">預設控制器</summary>
+        <description lang="da_DK">Mediecentrets standardcontroller er baseret på Xbox 360-controlleren.</description>
+        <description lang="de_DE">Der Standard-Mediacenter-Controller basiert auf dem Xbox 360 Controller.</description>
+        <description lang="en_GB">The default media center controller is based on the Xbox 360 controller.</description>
+        <description lang="es_ES">El mando por defecto del media center está basado en el mando de Xbox 360.</description>
+        <description lang="fa_IR">دستهٔ پیش‌گزیدهٔ مرکز رسانه، بر پایهٔ دستهٔ اکس‌باکس ۳۶۰ است.</description>
+        <description lang="he_IL">בקר בררת המחדל של מרכז המדיה מבוסס על הבקר של Xbox 360.</description>
+        <description lang="lt_LT">Numatytasis media centro valdiklis yra paremtas Xbox 360 valdikliu.</description>
+        <description lang="pl_PL">Domyślny kontroler centrum multimedialnego jest oparty na kontrolerze Xbox 360.</description>
+        <description lang="pt_BR">O controlador do media center padrão é baseado no controlador do Xbox 360.</description>
+        <description lang="ru_RU">Стандартный контроллер, основанный на контроллере Xbox 360.</description>
+        <description lang="zh_CN">默认媒体中心控制器基于 Xbox 360 控制器。</description>
+        <description lang="zh_TW">預設的媒體中心控制器佈局是以Xbox 360控制器為基礎。</description>
+        <disclaimer lang="da_DK">Kildeangivelse: Wikipedia (wikipedia.org)</disclaimer>
+        <disclaimer lang="de_DE">Bildnachweis: Wikipedia (wikipedia.org)</disclaimer>
+        <disclaimer lang="en_GB">Image credit: Wikipedia (wikipedia.org)</disclaimer>
+        <disclaimer lang="es_ES">Crédito de la imagen: Wikipedia (wikipedia.org)</disclaimer>
+        <disclaimer lang="fa_IR">اعتبار تصویر: ویکی‌پدیا (wikipedia.org)</disclaimer>
+        <disclaimer lang="he_IL">זכויות על התמונה: ויקיפדיה (wikipedia.org)</disclaimer>
+        <disclaimer lang="lt_LT">Atvaizdo šaltinis: Wikipedia (wikipedia.org)</disclaimer>
+        <disclaimer lang="nl_NL">Bron afbeelding: Wikipedia (wikipedia.org)</disclaimer>
+        <disclaimer lang="pl_PL">Pochodzenie obrazu: Wikipedia (wikipedia.org)</disclaimer>
+        <disclaimer lang="pt_BR">Crédito da imagem: Wikipedia (wikipedia.org)</disclaimer>
+        <disclaimer lang="ru_RU">Источник изображения: Wikipedia (wikipedia.org)</disclaimer>
+        <disclaimer lang="zh_CN">图片来源：维基百科 (Wikipedia.org)</disclaimer>
+        <disclaimer lang="zh_TW">圖片來源：維基百科 (wikipedia.org)</disclaimer>
     </extension>
 </addon>
 
@@ -3021,20 +3054,22 @@ Boblight(478) is an opensource AmbiLight implementation.
 
 <addon id="game.controller.genesis.6button"
         name="Sega Genesis Controller"
-        version="1.0.8"
+        version="1.0.9"
         provider-name="Team Kodi">
     <extension point="kodi.game.controller" library="resources/layout.xml"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Sega Genesis controller</summary>
-        <description lang="en_GB">The original controller for the Sega Genesis was released in 1988. It had three main face buttons. Sega released a six-button version in 1993.</description>
-        <disclaimer lang="en_GB">Image credit: OpenEmu (openemu.org)</disclaimer>
-		<summary lang = "es_ES"> Controlador Sega Genesis </summary>
-        <description lang = "es_ES"> El controlador original para el Sega Genesis fue lanzado en 1988. Tenía tres botones principales. Sega lanzó una versión de seis botones en 1993. </description>
-        <disclaimer lang = "es_ES"> Crédito de imagen: OpenEmu (openemu.org) </disclaimer>
         <platform>all</platform>
         <assets>
             <icon>resources/icon.png</icon>
         </assets>
+        <summary lang="es_ES">Controlador Sega Genesis</summary>
+        <summary lang="en_GB">Sega Genesis controller</summary>
+        <description lang="da_DK">Den originale controller til Sega Genesis blev udgivet i 1988. Den havde tre face hovedknapper. Sega udgav en version med seks knapper i 1993.</description>
+        <description lang="en_GB">The original controller for the Sega Genesis was released in 1988. It had three main face buttons. Sega released a six-button version in 1993.</description>
+        <disclaimer lang="da_DK">Kildeangivelse: OpenEmu (openemu.org)</disclaimer>
+        <disclaimer lang="en_GB">Image credit: OpenEmu (openemu.org)</disclaimer>
+        <disclaimer lang="es_ES">Créditos de la imagen: OpenEmu (openemu.org)</disclaimer>
+        <disclaimer lang="ru_RU">Источник изображения: OpenEmu (openemu.org)</disclaimer>
     </extension>
 </addon>
 
@@ -3323,7 +3358,7 @@ FLAC stands out as the fastest and most widely supported lossless audio codec, a
   </extension>
 </addon>
 
-<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.8.1">
+<addon id="slyguy.disney.plus" name="Disney+" provider-name="Slyguy" version="0.9.4">
   <requires>
     <import addon="script.module.slyguy"/>
   </requires>
@@ -3341,7 +3376,7 @@ Abbonamento richiesto.</description>
     <license></license>
     <language></language>
     <website></website>
-    <news>Spanish translation thanks to @Zevenpipo</news>
+    <news>fix Skip Credits skipping after-credits scenes</news>
     <assets>
       <icon>icon.png</icon>
       <fanart>fanart.jpg</fanart>
@@ -3618,7 +3653,7 @@ Supported files: .bin, .cue, .img, .mdf, .pbp, .toc, .cbn, .m3u, .chd</descripti
   </extension>
 </addon>
 
-<addon id="plugin.video.youtube" name="YouTube" version="6.8.15" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.8.17" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -3632,60 +3667,68 @@ Supported files: .bin, .cue, .img, .mdf, .pbp, .toc, .cbn, .m3u, .chd</descripti
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fix] fix javascript player retrieval and playback of some videos for affected users |contrib: thomazz-nl|
-    - Invalid URL &amp;#39;http://&amp;#39;: No host supplied
+[fix] Fix comments on Kodi 19+ |contrib: ramateur|
+[fix] Fix ratebypass
+[upd] Update icon and fanart |contrib: papercore-dev|
+[lang] translation updates from Weblate
         </news>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
         </assets>
-        <summary lang="en_GB">Plugin for YouTube</summary>
-        <description lang="en_GB">YouTube is one of the biggest video-sharing websites of the world.</description>
-        <disclaimer lang="en_GB">This plugin is not endorsed by Google</disclaimer>
-        <summary lang="he_IL">תוסף עבור YouTube</summary>
-        <description lang="he_IL">YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם.</description>
-        <summary lang="de_DE">Plugin für YouTube</summary>
-        <description lang="de_DE">YouTube ist eines der größten Video-Sharing-Websites der Welt.</description>
-        <summary lang="pl_PL">Wtyczka YouTube</summary>
-        <description lang="pl_PL">YouTube jest jednym z największych na świecie serwisów udostępniania wideo.</description>
-        <summary lang="hu_HU">YouTube kiegészítő</summary>
-        <description lang="hu_HU">A YouTube világ egyik legnagyobb videómegosztó weboldala.</description>
-        <summary lang="es_ES">Plugin para YouTube</summary>
-        <description lang="es_ES">YouTube es uno de los sitios web más grande del mundo para compartir vídeos.</description>
-        <disclaimer lang="es_ES">Este add-on no está respaldado por Google</disclaimer>
-        <summary lang="es_MX">Plugin para YouTube</summary>
-        <description lang="es_MX">YouTube es uno de los más grandes sitios web de intercambio de videos del mundo.</description>
-        <disclaimer lang="es_MX">Este add-on no está respaldado por Google</disclaimer>
-        <summary lang="ru_RU">Видеодополнение YouTube</summary>
-        <description lang="ru_RU">YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео.</description>
-        <summary lang="fr_FR">Plugin pour YouTube</summary>
-        <description lang="fr_FR">YouTube est l'un des plus grands sites de partage vidéos du monde.</description>
-        <summary lang="zh_CN">YouTube附加元件</summary>
-        <description lang="zh_CN">「Youtube」是全世界最大的影片分享網站</description>
-        <summary lang="zh_TW">YouTube附加元件</summary>
-        <description lang="zh_TW">「Youtube」是全世界最大的影片分享網站</description>
-        <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
-        <summary lang="bg_BG">Добавка за YouTube</summary>
-        <description lang="bg_BG">YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят.</description>
-        <summary lang="el_GR">Πρόσθετο YouTube</summary>
-        <description lang="el_GR">Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο.</description>
-        <disclaimer lang="el_GR">Η παρούσα μικροεφαρμογή δεν έχει υϊοθετηθεί από την Google</disclaimer>
-        <summary lang="nb_NO">Tillegg for YouTube</summary>
-        <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>
-        <summary lang="ko_KR">유튜브 플러그인</summary>
-        <description lang="ko_KR">유튜브는 세상에서 가장 큰 동영상 공유 사이트 중의 하나입니다.</description>
-        <summary lang="cs_CZ">Plugin pro YouTube</summary>
-        <description lang="cs_CZ">YouTube je jedna z největších webových stránek světa sdílející video.</description>
-        <disclaimer lang="cs_CZ">Tento plugin není schválen společností Google</disclaimer>
-        <summary lang="tr_TR">YouTube için eklenti</summary>
-        <description lang="tr_TR">YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir</description>
-        <disclaimer lang="tr_TR">Bu eklenti Google tarafından üretilmemiştir</disclaimer>
         <platform>all</platform>
         <license>GPL-2.0-only</license>
         <forum>https://ytaddon.panicked.xyz/forum</forum>
         <website>https://www.youtube.com</website>
         <source>https://github.com/anxdpanic/plugin.video.youtube</source>
         <reuselanguageinvoker>true</reuselanguageinvoker>
+        <summary lang="bg_BG">Добавка за YouTube</summary>
+        <summary lang="cs_CZ">Plugin pro YouTube</summary>
+        <summary lang="de_DE">Plugin für YouTube</summary>
+        <summary lang="el_GR">Πρόσθετο YouTube</summary>
+        <summary lang="en_GB">Plugin for YouTube</summary>
+        <summary lang="es_ES">Plugin para YouTube</summary>
+        <summary lang="es_MX">Plugin para YouTube</summary>
+        <summary lang="fr_FR">Plugin pour YouTube</summary>
+        <summary lang="he_IL">תוסף עבור YouTube</summary>
+        <summary lang="hu_HU">YouTube kiegészítő</summary>
+        <summary lang="ko_KR">유튜브 플러그인</summary>
+        <summary lang="nb_NO">Tillegg for YouTube</summary>
+        <summary lang="pl_PL">Wtyczka YouTube</summary>
+        <summary lang="ru_RU">Видеодополнение YouTube</summary>
+        <summary lang="tr_TR">YouTube için eklenti</summary>
+        <summary lang="vi_VN">Plugin dành cho YouTube</summary>
+        <summary lang="zh_CN">YouTube附加元件</summary>
+        <summary lang="zh_TW">YouTube附加元件</summary>
+        <description lang="bg_BG">YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят.</description>
+        <description lang="cs_CZ">YouTube je jedna z největších webových stránek světa sdílející video.</description>
+        <description lang="de_DE">YouTube ist eines der größten Video-Sharing-Websites der Welt.</description>
+        <description lang="el_GR">Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο.</description>
+        <description lang="en_GB">YouTube is one of the biggest video-sharing websites of the world.</description>
+        <description lang="es_ES">YouTube es uno de los sitios web más grande del mundo para compartir vídeos.</description>
+        <description lang="es_MX">YouTube es uno de los más grandes sitios web de intercambio de videos del mundo.</description>
+        <description lang="fr_FR">YouTube est l'un des plus grands sites de partage vidéos du monde.</description>
+        <description lang="he_IL">YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם.</description>
+        <description lang="hu_HU">A YouTube világ egyik legnagyobb videómegosztó weboldala.</description>
+        <description lang="ko_KR">유튜브는 세상에서 가장 큰 동영상 공유 사이트 중의 하나입니다.</description>
+        <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>
+        <description lang="pl_PL">YouTube jest jednym z największych na świecie serwisów udostępniania wideo.</description>
+        <description lang="ru_RU">YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео.</description>
+        <description lang="tr_TR">YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir.</description>
+        <description lang="vi_VN">YouTube là một trong những trang web chia sẻ video lớn nhất trên thế giới.</description>
+        <description lang="zh_CN">「Youtube」是全世界最大的影片分享網站</description>
+        <description lang="zh_TW">「Youtube」是全世界最大的影片分享網站</description>
+        <disclaimer lang="cs_CZ">Tento plugin není schválen společností Google</disclaimer>
+        <disclaimer lang="de_DE">Dieses Plugin ist nicht von Google befürwortet</disclaimer>
+        <disclaimer lang="el_GR">Η παρούσα μικροεφαρμογή δεν έχει υϊοθετηθεί από την Google</disclaimer>
+        <disclaimer lang="en_GB">This plugin is not endorsed by Google</disclaimer>
+        <disclaimer lang="es_ES">Este add-on no está respaldado por Google</disclaimer>
+        <disclaimer lang="es_MX">Este add-on no está respaldado por Google</disclaimer>
+        <disclaimer lang="pl_PL">Ta wtyczka nie jest zatwierdzona przez Google</disclaimer>
+        <disclaimer lang="ru_RU">Плагин не поддерживается Google</disclaimer>
+        <disclaimer lang="tr_TR">Bu eklenti Google tarafından üretilmemiştir</disclaimer>
+        <disclaimer lang="vi_VN">Plugin này không được xác nhận bởi Google</disclaimer>
+        <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
     </extension>
 </addon>
 
@@ -4334,7 +4377,7 @@ Install this to add support for HDHomeRun devices.
 
 <addon id="game.controller.konami.justifier.ps"
         name="Konami Justifier (PS)"
-        version="1.0.9"
+        version="1.0.11"
         provider-name="Team Kodi">
     <extension point="kodi.game.controller" library="resources/layout.xml"/>
     <extension point="xbmc.addon.metadata">
@@ -11484,20 +11527,26 @@ Si hay una aplicación oficial disponible para su plataforma, úsela en lugar de
 
 <addon id="game.controller.3do"
         name="3DO Controller"
-        version="1.0.9"
+        version="1.0.10"
         provider-name="Team Kodi">
     <extension point="kodi.game.controller" library="resources/layout.xml"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">3D0 controller</summary>
-        <description lang="en_GB">The 3DO Interactive Multiplayer is a game console developed by the 3DO Company. Panasonic produced the first models in 1993, and further models were released by Sanyo and GoldStar (now LG) in 1994.</description>
-        <disclaimer lang="en_GB">Image credit: OpenEmu (openemu.org)</disclaimer>
-		<summary lang = "es_ES"> controlador 3D0 </summary>
-        <description lang = "es_ES"> El 3DO Interactive Multiplayer es una consola de juegos desarrollada por la compañía 3DO. Panasonic produjo los primeros modelos en 1993, y Sanyo y GoldStar (ahora LG) lanzaron otros modelos en 1994. </description>
-        <disclaimer lang = "es_ES"> Crédito de imagen: OpenEmu (openemu.org) </disclaimer>
         <platform>all</platform>
         <assets>
             <icon>resources/icon.png</icon>
         </assets>
+        <summary lang="da_DK">3D0 controller</summary>
+        <summary lang="en_GB">3D0 controller</summary>
+        <summary lang="es_ES">Control 3D0</summary>
+        <summary lang="ru_RU">3D0 контроллер</summary>
+        <description lang="da_DK">3DO Interactive Multiplayer er en spilkonsol udviklet af 3DO Company. Panasonic producerede de første modeller i 1993, og yderligere modeller blev frigivet af Sanyo og GoldStar (nu LG) i 1994.</description>
+        <description lang="en_GB">The 3DO Interactive Multiplayer is a game console developed by the 3DO Company. Panasonic produced the first models in 1993, and further models were released by Sanyo and GoldStar (now LG) in 1994.</description>
+        <description lang="es_ES">La 3D0 Interactive Multiplayer es una consola de juegos desarrollada por la 3DO Company. Panasonic produjo los primeros modelos en 1993, y los modelos consecutivos fueron producidos por Sanyo y Goldstar (actualmente LG) en 1994.</description>
+        <description lang="ru_RU">3DO Interactive Multiplayer - игровая консоль, разработаная компанией 3DO. Panasonic выпустила первые модели в 1993, и дальнейшие модели Sanyo и GoldStar (LG) выпустили в 1994.</description>
+        <disclaimer lang="da_DK">Kildeangivelse: OpenEmu (openemu.org)</disclaimer>
+        <disclaimer lang="en_GB">Image credit: OpenEmu (openemu.org)</disclaimer>
+        <disclaimer lang="es_ES">Créditos de la imagen: OpenEmu (openemu.org)</disclaimer>
+        <disclaimer lang="ru_RU">Источник изображения: OpenEmu (openemu.org)</disclaimer>
     </extension>
 </addon>
 
@@ -14575,7 +14624,7 @@ Mono is no longer maintained and has been removed.
   </extension>
 </addon>
 
-<addon id="script.module.slyguy" name="SlyGuy Common" provider-name="SlyGuy" version="0.37.6">
+<addon id="script.module.slyguy" name="SlyGuy Common" provider-name="SlyGuy" version="0.41.9">
   <requires>
   </requires>
   <extension point="xbmc.service" library="service.py" start="login" />

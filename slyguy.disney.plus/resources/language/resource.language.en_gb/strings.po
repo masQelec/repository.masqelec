@@ -34,10 +34,6 @@ msgctxt "#30008"
 msgid "Hubs"
 msgstr ""
 
-msgctxt "#30009"
-msgid "Widevine L1 Secure Device"
-msgstr ""
-
 msgctxt "#30010"
 msgid "Suggested"
 msgstr ""
@@ -64,7 +60,7 @@ msgid "Dolby Vision / 4K"
 msgstr ""
 
 msgctxt "#30016"
-msgid "Sync with Disney+"
+msgid "Disney+ Sync Playback"
 msgstr ""
 
 msgctxt "#30017"
@@ -76,7 +72,7 @@ msgid "HDR10 / 4K"
 msgstr ""
 
 msgctxt "#30019"
-msgid "H.265 / 1080P"
+msgid "H.265"
 msgstr ""
 
 msgctxt "#30020"

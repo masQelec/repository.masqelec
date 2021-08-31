@@ -10,15 +10,81 @@ msgid "No SlyGuy updates available"
 msgstr ""
 
 msgctxt "#30002"
-msgid "{count} updates available\n"
+msgid "{count} updates available\n\n"
+"{updates}\n\n"
 "These should automatically install shortly\n"
 "Sometimes a reboot may be required after updates"
 msgstr ""
 
 msgctxt "#30003"
-msgid "{count} updates available\n"
+msgid "{count} updates available\n\n"
+"{updates}\n\n"
 "You will need to manually update each add-on\n"
 "Sometimes a reboot may be required after updates"
+msgstr ""
+
+msgctxt "#30004"
+msgid "{name} [Atmos]"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Proxy Enabled (Required for some addons and features)"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Persist Cache"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Widevine Level (Restart Kodi after changing)"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Auto"
+msgstr ""
+
+msgctxt "#30009"
+msgid "L1 (Secure)"
+msgstr ""
+
+msgctxt "#30010"
+msgid "L3"
+msgstr ""
+
+msgctxt "#30011"
+msgid "HDCP Level (Restart Kodi after changing)"
+msgstr ""
+
+msgctxt "#30012"
+msgid "None"
+msgstr ""
+
+msgctxt "#30013"
+msgid "1.0"
+msgstr ""
+
+msgctxt "#30014"
+msgid "2.2"
+msgstr ""
+
+msgctxt "#30015"
+msgid "3.0"
+msgstr ""
+
+msgctxt "#30016"
+msgid "No SlyGuy errors found"
+msgstr ""
+
+msgctxt "#30017"
+msgid "SlyGuy errors"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Upload / share Kodi log?"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Check Kodi log for SlyGuy errors"
 msgstr ""
 
 ## COMMON ##
@@ -291,7 +357,7 @@ msgid "Playback Quality"
 msgstr ""
 
 msgctxt "#32062"
-msgid "Inputstream HLS required to watch streams From Live.\n"
+msgid "Inputstream HLS required to watch streams from live.\n"
 "Check HLS is enabled in settings and Inputstream Adaptive is installed"
 msgstr ""
 
@@ -571,4 +637,33 @@ msgstr ""
 
 msgctxt "#32128"
 msgid "SlyGuy News"
+msgstr ""
+
+msgctxt "#32129"
+msgid "Video view for all content"
+msgstr ""
+
+msgctxt "#32130"
+msgid "Play from live"
+msgstr ""
+
+msgctxt "#32131"
+msgid "Email Address"
+msgstr ""
+
+msgctxt "#32132"
+msgid "Password"
+msgstr ""
+
+msgctxt "#32133"
+msgid "Device Code"
+msgstr ""
+
+msgctxt "#32134"
+msgid "Email / Password"
+msgstr ""
+
+msgctxt "#32135"
+msgid "1. Go to: [B]{url}[/B]\n"
+"2. Enter code: [B]{code}[/B]"
 msgstr ""

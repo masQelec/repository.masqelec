@@ -5,6 +5,7 @@ from slyguy import settings
 from slyguy.session import Session
 from slyguy.log import log
 from slyguy.monitor import monitor
+from slyguy.drm import set_drm_level
 
 from .proxy import Proxy
 from .player import Player
@@ -30,6 +31,12 @@ def _check_news():
 
 def start():
     log.debug('Shared Service: Started')
+
+    try:
+        set_drm_level()
+    except Exception as e:
+        log.error('Failed to set DRM level')
+        log.exception(e)
 
     player = Player()
     proxy = Proxy()
