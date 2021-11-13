@@ -249,17 +249,34 @@ def findvideos(item):
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    ses = 0
+
+    srvs = scrapertools.find_multiple_matches(data, '<a title="(.*?)" href="(.*?)"')
+
     matches = re.compile(r"tabsArray\['\d+'\] = \".*?src='(?:\.\.|)([^']+)", re.DOTALL).findall(data)
 
     for url in matches:
-        if not url: continue
+        ses += 1
 
-        if '/hqq.' in url or '/waaw.' in url: continue
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url ))
+        serv = ''
+        for srv, vid in srvs:
+            vid = vid.replace('#vid', '')
+            if not vid == str(ses): continue
+
+            serv = srv.lower()
+            break
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = serv ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -286,8 +303,12 @@ def play(item):
         if not url.startswith("http"): url = host + url[1:]
 
         data = httptools.downloadpage(url).data
+
         url = scrapertools.find_single_match(data, '"file":"([^"]+)"')
+
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         url = servertools.normalize_url(servidor, url)
 
     elif '/redirect.php?' in url:
@@ -322,9 +343,11 @@ def play(item):
                     url = url + '|referer=https://www.burstcloud.co/'
 
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         url = servertools.normalize_url(servidor, url)
 
-    if '/hqq.' in url or '/waaw.' in url:
+    if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     if url:
@@ -338,7 +361,6 @@ def play(item):
 
 def search(item, texto):
     logger.info()
-
     try:
         item.url = host + 'animes?q=' + texto.replace(" ", "+")
         return list_all(item)

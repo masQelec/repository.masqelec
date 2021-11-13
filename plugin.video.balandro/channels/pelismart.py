@@ -180,7 +180,7 @@ def play(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_all(item)

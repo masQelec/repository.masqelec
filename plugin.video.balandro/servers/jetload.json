@@ -1,6 +1,6 @@
 {
   "id": "jetload",
-  "name": "JetLoad",
+  "name": "Jetload",
  
   "active": false,
   "notes": "Requiere recaptcha, y requería pairing desde navegador web, pero está anulado",

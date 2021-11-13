@@ -15,14 +15,15 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www2.cuevana3.video'
+host = 'https://cuevana3.so'
 
 perpage = 22
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~  por si viene de enlaces guardados
-    url = url.replace('https://www1.', 'https://www2.')
+    url = url.replace('https://www1.cuevana3.video', host)
+    url = url.replace('https://www2.cuevana3.video', host)
 
     resp = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror)
 
@@ -282,10 +283,13 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    patron = '<ul class="anime_muti_link server-item-(.*?)</ul>'
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('<ul class="anime_muti_link server-item-(.*?)</ul>', re.DOTALL).findall(data)
+
+    ses = 0
 
     for option in matches:
+        ses += 1
+
         links = scrapertools.find_multiple_matches(option, '<li data-(.*?)</li>')
 
         for link in links:
@@ -302,6 +306,8 @@ def findvideos(item):
                 if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
                 servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
+
                 url = servertools.normalize_url(servidor, url)
 
                 if servidor == 'directo':
@@ -313,15 +319,19 @@ def findvideos(item):
                 if not config.get_setting('developer_mode', default=False):
                    if link_other == 'hydrax': continue
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, other = link_other, title = '', url = url, referer = item.url,
-                                      language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = quality_num ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url,
+                                      language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = quality_num, other = link_other ))
 
     if '<li class="downloadopt">' in data:
         url = scrapertools.find_single_match(data, '<li class="downloadopt">.*?<a href="(.*?)"')
         if url:
+            ses += 1
+
             if url.startswith('//'): url = 'https:' + url
 
             servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
             url = servertools.normalize_url(servidor, url)
 
             if servidor == 'directo':
@@ -329,26 +339,37 @@ def findvideos(item):
             else:
                 link_other = ''
 
-            if not link_other == '':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, other = link_other, title = '', url = url, referer = item.url,
-                                      quality = 'HD' ))
+            if not config.get_setting('developer_mode', default=False):
+                if link_other == 'hydrax': link_other = ''
+
+            if link_other:
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url,
+                                      quality = 'HD', other = link_other ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
 
 def normalize_other(url):
+    # hydrax no es pot resoldre
+
     link_other = ''
     url = url.lower()
 
-    if 'pelisplus' in url: link_other = 'Plus'
-    elif 'peliscloud' in url: link_other = 'Cloud'
-    elif 'damedame' in url: link_other = 'Dame'
-    elif 'hydrax' in url: link_other = 'Hydrax'
+    if 'pelisplus' in url: link_other = 'plus'
+    elif 'peliscloud' in url: link_other = 'cloud'
+    elif 'damedame' in url: link_other = 'dame'
+    elif 'hydrax' in url: link_other = 'hydrax'
     else:
        if config.get_setting('developer_mode', default=False):
            try:
               link_other = url.split('//')[1]
               link_other = link_other.split('/')[0]
+              link_other.lower()
            except:
               link_other = url
 
@@ -359,13 +380,14 @@ def play(item):
     logger.info()
     itemlist = []
 
-    servidor = item.server
     url = item.url
+
+    servidor = item.server
 
     if servidor and servidor != 'directo':
         itemlist.append(item.clone(server = servidor, url = url))
 
-    if item.other == 'Hydrax':
+    if item.other == 'hydrax':
         v = scrapertools.find_single_match(url, 'v=(\w+)')
         post = 'slug=%s&dataType=mp4' % v
         data = do_downloadpage("https://ping.iamcdn.net/", post = post)
@@ -373,7 +395,7 @@ def play(item):
 
         return itemlist
 
-    elif item.other == 'Plus':
+    elif item.other == 'plus':
         data = do_downloadpage(item.url)
 
         if item.url.startswith('https://pelisplus.icu/download'):
@@ -385,6 +407,8 @@ def play(item):
                 url = url.replace('https://xstreamcdn.com/f/', '')
 
                 servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
+
                 url = servertools.normalize_url(servidor, url)
 
                 if servidor and servidor != 'directo':
@@ -405,6 +429,8 @@ def play(item):
                     return itemlist
 
             servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
             url = servertools.normalize_url(servidor, url)
 
             if servidor and servidor != 'directo':
@@ -413,7 +439,7 @@ def play(item):
 
         return itemlist
 
-    elif item.other == 'Cloud':
+    elif item.other == 'cloud':
         dominio = urlparse.urlparse(url)[1]
         id = scrapertools.find_single_match(url, 'id=(\w+)')
         tiempo = int(time.time())
@@ -429,7 +455,7 @@ def play(item):
         itemlist.append(item.clone(url=url , server=servidor))
         return itemlist
 
-    elif item.other == 'Dame':
+    elif item.other == 'dame':
         url = item.url.replace('https://damedamehoy.xyz/embed.html#', 'https://damedamehoy.xyz/details.php?v=')
         data = do_downloadpage(url, raise_weberror=False)
         url = scrapertools.find_single_match(data, '"file":"(.*?)"')

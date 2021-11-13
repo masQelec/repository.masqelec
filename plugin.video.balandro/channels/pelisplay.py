@@ -107,7 +107,7 @@ def generos(item):
         else:
             itemlist.append(item.clone( action="list_series", title='%s (%s)' % (title, cantidad), url=url ))
 
-    return sorted(itemlist, key=lambda it: it.title) # orden alfabético
+    return sorted(itemlist, key=lambda it: it.title)
 
 
 def list_pelis(item):
@@ -117,6 +117,7 @@ def list_pelis(item):
     data = do_downloadpage(item.url)
 
     matches = re.compile('<figure>(.*?)</figure>', re.DOTALL).findall(data)
+
     for article in matches:
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         if thumb.startswith('/'): thumb = host[:-1] + thumb
@@ -156,6 +157,7 @@ def list_series(item):
         title = scrapertools.find_single_match(article, '<h2>(.*?)</h2>').strip()
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
         plot = scrapertools.find_single_match(article, '<span class="lg margin-bottom">(.*?)</span>').strip()
+
         year = scrapertools.find_single_match(article, 'Año: (\d{4})')
         if not year: year = '-'
 
@@ -177,8 +179,7 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    patron =' class="abrir_temporada" href="([^"]+)">\s*<h4 class="name-movie"><strong>Temporada (\d+)'
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile(' class="abrir_temporada" href="([^"]+)">\s*<h4 class="name-movie"><strong>Temporada (\d+)', re.DOTALL).findall(data)
 
     for url, numtempo in matches:
         title = 'Temporada ' + numtempo
@@ -219,6 +220,7 @@ def episodios(item):
 
         s_e = scrapertools.find_single_match(url, '/temporada-(\d+)/episodio-(\d+)')
         if not s_e: continue
+
         titulo = '%sx%s %s' % (s_e[0], s_e[1], title)
 
         itemlist.append(item.clone( action='findvideos', title = titulo, url = url, thumbnail=thumb, plot = plot,
@@ -235,7 +237,6 @@ def episodios(item):
     return itemlist
 
 
-# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
 def puntuar_calidad(txt):
     txt = txt.replace(' ', '').replace('-', '').lower()
     if txt in ['hd1080p', 'hd1080']: txt = '1080p'
@@ -243,6 +244,7 @@ def puntuar_calidad(txt):
     orden = ['cam', 'screener', 'tshd', '360p', 'sd', '480p', 'hd', 'rip', 'dvdrip', '720p', '1080p']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
+
 
 def findvideos(item):
     logger.info()
@@ -253,6 +255,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
 
     data = scrapertools.find_single_match(data, '<div id="lista_online"(.*?)</table>')
+
     token = scrapertools.find_single_match(data, 'data-token="([^"]+)')
 
     matches = re.compile('<tr(.*?)</tr>', re.DOTALL).findall(data)
@@ -262,8 +265,6 @@ def findvideos(item):
         tds = scrapertools.find_multiple_matches(enlace, '<td[^>]*>(.*?)</td>')
         if len(tds) != 6: continue
         if 'data-player=' not in tds[0]: continue
-
-        # ~ logger.debug(enlace)
 
         calidad = tds[1].capitalize()
         lang = tds[2]
@@ -291,6 +292,7 @@ def play(item):
 
     url = item.url.split('?')[0]
     post = item.url.split('?')[1]
+
     data = do_downloadpage(url, post=post, raise_weberror=False).replace('\\/', '/')
 
     url = scrapertools.find_single_match(data, '"data":"([^"]+)')
@@ -320,7 +322,10 @@ def play(item):
             itemlist.append(item.clone(url = 'https://tutumeme.net/embed/' + f, server = 'm3u8hls'))
 
     elif url:
-        itemlist.append(item.clone(url=url, server=servertools.get_server_from_url(url)))
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        itemlist.append(item.clone(url=url, server=servidor))
 
     return itemlist
 
@@ -366,7 +371,6 @@ def list_all(item):
 
 def search(item, texto):
     logger.info()
-    itemlist = []
     try:
         if item.search_type == 'movie':
             item.url = host + 'peliculas?buscar=' + texto.replace(" ", "+")

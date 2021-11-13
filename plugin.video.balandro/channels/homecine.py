@@ -29,9 +29,9 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='plum' ))
 
-    itemlist.append(item.clone( title = ' Buscar intérprete ...', action = 'search', group = 'stars', search_type = 'person',
+    itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'stars', search_type = 'person',
                        plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
-    itemlist.append(item.clone( title = ' Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
+    itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
                        plot = 'Debe indicarse el nombre y apellido/s del director.'))
 
     return itemlist
@@ -415,7 +415,6 @@ def list_episodes(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     matches = re.compile('movie-id="\d+".*?<a href="([^"]+)".*?<.*?original="([^"]+)".*?<h2>([^<]+)</h2>.*?jtip(.*?)clearfix', re.DOTALL).findall(data)
 
@@ -533,9 +532,13 @@ def findvideos(item):
             lang = ''
             qlty = info
 
+        lang = lang.lower().capitalize()
+
         if url.startswith('//'): url = 'https:' + url
 
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if not servidor: servidor = 'directo'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
@@ -551,7 +554,11 @@ def findvideos(item):
 
             url = url.replace('?download=1', '')
 
+            lang = lang.lower().capitalize()
+
             servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
             if not servidor: servidor = 'directo'
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
@@ -592,7 +599,7 @@ def play(item):
                     itemlist.append(['m3u8', url])
                 return itemlist
 
-        # ~ return 'Opción aún sin desarrollar'
+        # Opción sin desarrollar
         response = recaptcha.get_recaptcha_response(sitekey, item.url)
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
@@ -616,18 +623,15 @@ def play(item):
 
     if 'embed.cload' in item.url:
         data = do_downloadpage(item.url, headers = headers, raise_weberror = False)
-        # ~ logger.debug(data)
 
         if '<div class="g-recaptcha"' in data or 'Solo los humanos pueden ver' in data:
             headers = {'Referer': referer, 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X)'}
             data = do_downloadpage(item.url, headers = headers, raise_weberror = False)
-            # ~ logger.debug(data)
 
             new_url = scrapertools.find_single_match(data, '<div id="option-players".*?src="([^"]+)"')
             if new_url:
                 new_url = new_url.replace('/cinemaupload.com/', '/embed.cload.video/')
                 data = do_downloadpage(new_url, raise_weberror = False)
-                # ~ logger.debug(data)
 
             url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
 
@@ -641,6 +645,8 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if servidor and servidor != 'directo':
             url = servertools.normalize_url(servidor, url)
             itemlist.append(item.clone( url = url, server = servidor ))
@@ -649,7 +655,7 @@ def play(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         if item.group:
             item.url = host + '/' + item.group + '/' + texto.replace(" ", "-")

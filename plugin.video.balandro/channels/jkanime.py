@@ -9,6 +9,7 @@ from core import httptools, scrapertools, servertools, jsontools, tmdb
 
 host = 'https://jkanime.net/'
 
+
 perpage = 25
 
 
@@ -97,18 +98,19 @@ def list_all(item):
     num_matches = len(matches)
 
     for url, title, thumb in matches[item.page * perpage:]:
-        if not url or not title: continue
+        if not title: continue
 
-        if item.search_type == "tvshow":
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year':'-'} ))
-        else:
-            url = url + 'pelicula/'
+        if url:
+            if item.search_type == "tvshow":
+                itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
+                                            contentType = 'tvshow', contentSerieName = title, infoLabels={'year':'-'} ))
+            else:
+                url = url + 'pelicula/'
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+                itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                            contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
-        if len(itemlist) >= perpage: break
+            if len(itemlist) >= perpage: break
 
     tmdb.set_infoLabels(itemlist)
 
@@ -266,7 +268,9 @@ def findvideos(item):
         elif "mixdrop" in url: other = 'mixdrop'
 
         servidor = servertools.get_server_from_url(url)
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other.capitalize() ))
+        servidor = servertools.corregir_servidor(servidor)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other ))
 
     return itemlist
 
@@ -300,6 +304,8 @@ def play(item):
            url_play = url_play.replace("\\/", "/")
 
            servidor = servertools.get_server_from_url(url_play)
+           servidor = servertools.corregir_servidor(servidor)
+
            url_play = servertools.normalize_url(servidor, url_play)
 
     if url_play:
@@ -315,7 +321,6 @@ def play(item):
 
 def search(item, texto):
     logger.info()
-
     try:
         item.url = host + 'buscar/' + texto.replace(" ", "_")
         return list_all(item)

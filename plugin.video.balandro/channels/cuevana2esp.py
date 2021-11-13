@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -12,21 +12,11 @@ host = 'https://cuevana2espanol.com/'
 perpage = 25
 
 
-# ~ def item_configurar_proxies(item):
-# ~     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-# ~     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-# ~     return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-# ~ def configurar_proxies(item):
-# ~     from core import proxytools
-# ~     return proxytools.configurar_proxies_canal(item.channel, host)
-
-
 def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False, raise_weberror=True):
     resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
-    # ~ resp = httptools.downloadpage_proxy('cuevana2espanol', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
 
     if only_headers: return resp.headers
+
     return resp.data
 
 
@@ -44,8 +34,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'calificaciones/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
-    # ~ itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -104,12 +92,17 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    lng = 'Esp'
+
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     matches = re.compile('<li><a class="options" href="#(.*?)">.*?</b>(.*?)</a>', re.DOTALL).findall(data)
 
+    ses = 0
+
     for opt, srv in matches:
+        ses += 1
+
         srv = srv.replace(' Servidor ', '').lower().strip()
 
         if srv:
@@ -119,7 +112,26 @@ def findvideos(item):
 
             if url.startswith('/'): url = 'https:' + url
 
-            itemlist.append(Item( channel = item.channel, action = 'play', other = srv, server = '', title = '', url = url, referer = item.url, language = 'Esp' ))
+            itemlist.append(Item( channel = item.channel, action = 'play', other = srv, server = '', title = '', url = url, referer = item.url, language = lng ))
+
+    bloque = scrapertools.find_single_match(data, '<div id="downloads" class="sbox">(.*?)</div>')
+
+    matches = re.compile('<img src=.*?domain=(.*?)".*?<a href="(.*?)".*?<td>(.*?)</td>', re.DOTALL).findall(bloque)
+
+    for dom, url, qlty in matches:
+        ses += 1
+
+        dom = dom.replace('.com', '').replace('.net', '').replace('.to', '').replace('.cc', '').replace('.nz', '').lower().strip()
+
+        if dom == 'filefactory': continue
+        elif dom == '1fichier': continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', other = dom, server = '', title = '', url = url, referer = item.url, language = lng ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -127,8 +139,6 @@ def findvideos(item):
 def play(item):
     logger.info()
     itemlist = []
-
-    # ~ logger.debug(item.url)
 
     player = 'https://player.cuevana2espanol.com/'
 
@@ -138,7 +148,7 @@ def play(item):
         hash = item.url.replace(player + 'sc/?h=', '')
         post = {'h': hash}
 
-        url = do_downloadpage(player + 'sc/r.php', post = post, follow_redirects=False, only_headers=True).get('location', '')
+        url = do_downloadpage(player + 'sc/r.php', post = post, follow_redirects = False, only_headers = True).get('location', '')
 
     elif '/irgoto.php' in item.url:
         headers = {'Referer': host}
@@ -150,6 +160,7 @@ def play(item):
             if url.startswith('goto.php'): url = player + url
 
             data = do_downloadpage(url, headers = headers)
+
             if 'action="r.php"' in data:
                 value = scrapertools.find_single_match(data, 'value="(.*?)"')
                 post = {'url': value, 'sub': ''}
@@ -169,28 +180,28 @@ def play(item):
             post = {'link': hash}
             url = do_downloadpage(player + 'plugins/gkpluginsphp.php', post = post, follow_redirects=False, only_headers=True, raise_weberror=False).get('location', '')
 
+    elif '/link/' in item.url:
+        data = do_downloadpage(item.url)
+        url = scrapertools.find_single_match(data, "location.href='(.*?)'")
+
     if url:
-        url = verificar_url(url)
+        if '/openload.' in url: url = ''
+        elif '/jetload.' in url: url = ''
+        elif '.premiumstream.' in url: url  = ''
+
         if url:
+            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
+
+            if servidor == 'zplayer':
+                url = url + '|' + player
+
             itemlist.append(item.clone( url = url, server = servidor ))
 
-    else:
-        url = verificar_url(item.url)
-        if url:
-            itemlist.append(item.clone( url = item.url, server = 'directo' ))
-
     return itemlist
-
-
-def verificar_url(url):
-    if '/waaw.' in url: url = ''
-    elif '/openload.' in url: url = ''
-    elif '/jetload.' in url: url = ''
-    elif '.premiumstream.' in url: url  = ''
-
-    return url
 
 
 def search(item, texto):

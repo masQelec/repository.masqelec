@@ -127,12 +127,12 @@ def list_all(item):
     return itemlist
 
 
-# Si hay excepciones concretas de este canal, añadir aquí, si son genéricas añadir en servertools.corregir_servidor
 def corregir_servidor(servidor):
     servidor = servertools.corregir_servidor(servidor)
     if servidor == 'embed': return 'mystream'
     if servidor == 'flixplayer': return 'directo'
     return servidor
+
 
 def findvideos(item):
     logger.info()
@@ -141,7 +141,6 @@ def findvideos(item):
     IDIOMAS = {'castellano': 'Esp', 'latino': 'Lat', 'subtitulado': 'Vose'}
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     matches = scrapertools.find_multiple_matches(data, '<li data-typ(?:e|)="movie"(.*?)</li>')
 
@@ -165,12 +164,12 @@ def findvideos(item):
 
     return itemlist
 
+
 def play(item):
     logger.info()
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, 'src="([^"]+)"')
 
@@ -188,7 +187,6 @@ def play(item):
 
     if '/flixplayer.' in url:
        data = httptools.downloadpage(url).data
-       # ~ logger.debug(data)
        url = scrapertools.find_single_match(data, 'link":"([^"]+)"')
 
     elif host in url and '?h=' in url:
@@ -200,7 +198,8 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        # ~ if servidor and servidor != 'directo': # descartado pq puede ser 'directo' si viene de flixplayer
+        servidor = servertools.corregir_servidor(servidor)
+
         url = servertools.normalize_url(servidor, url)
         itemlist.append(item.clone( url = url, server = servidor ))
 

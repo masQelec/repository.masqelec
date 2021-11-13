@@ -15,7 +15,10 @@ def get_video_url(page_url, url_referer=''):
         referer = page_url.split('|')[1]
         page_url = page_url.split('|')[0]
 
-    data = httptools.downloadpage(page_url, headers={"Referer":referer}).data
+    if '/download/' in page_url:
+         page_url = page_url.replace('/download/', '/embed/')
+
+    data = httptools.downloadpage(page_url, headers={"Referer": referer}).data
 
     if "File is no longer available" in data:
         return 'El fichero no existe o ha sido borrado'

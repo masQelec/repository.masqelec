@@ -24,12 +24,11 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/' ))
 
-    itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
-    itemlist.append(item.clone ( title = 'Por país', action = 'paises', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'movie' ))
 
-    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -43,22 +42,6 @@ def generos(item):
     bloque = scrapertools.find_single_match(data, '>Categorías de Películas<(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
-
-    for url, title in matches:
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
-
-    return itemlist
-
-
-def paises(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(host)
-
-    bloque = scrapertools.find_single_match(data, '>Películas por País<(.*?)</section>')
-
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?aria-label.*?>(.*?)</a>')
 
     for url, title in matches:
         itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
@@ -136,8 +119,6 @@ def findvideos(item):
 
     for option, servidor in matches:
         servidor = servidor.lower()
-        if not servidor: 
-            continue
 
         if '-' in servidor:
             servidor = servidor.strip()
@@ -147,9 +128,9 @@ def findvideos(item):
             lang = item.languages
 
         servidor = servidor.strip()
+        servidor = servertools.corregir_servidor(servidor)
 
-        if servidor == 'femax20': servidor = 'fembed'
-        elif servidor == 'embed': servidor = 'mystream'
+        if servidor == 'embed': servidor = 'mystream'
         elif servidor == 'player': servidor = 'directo'
 
         bloque = scrapertools.find_single_match(data, '<div id="options-' + str(option) + '"(.*?)</div>')
@@ -170,19 +151,26 @@ def play(item):
 
     item.url = item.url.replace('&#038;', '&').replace('&amp;', '&')
 
-    data = do_downloadpage(item.url)
+    try:
+       data = do_downloadpage(item.url)
 
-    url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"')
-    if not url: url = scrapertools.find_single_match(data, '<IFRAME SRC="(.*?)"')
+       url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"')
+       if not url: url = scrapertools.find_single_match(data, '<IFRAME SRC="(.*?)"')
+    except:
+       url = ''
 
     if '/player.pelisxd.com/' in url:
         data = do_downloadpage(url)
+
         url = scrapertools.find_single_match(data, 'link":"([^"]+)"')
+        if not url:
+            return itemlist
+
+    if not url:
+        if not '/player.pelisxd.com/' in item.url:
+            url = item.url
 
     if url:
-        if '/fembed.com/' in url:
-            url = url.replace('/fembed.com/', '/www.fembed.com/')
-
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
         itemlist.append(item.clone(url = url, server = servidor))
@@ -191,7 +179,7 @@ def play(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_all(item)

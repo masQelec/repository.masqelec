@@ -13,5 +13,5 @@
 
   "clusters": ["years", "kids", "docs", "vos"],
 
-  "notes": "Películas y Series en castellano, latino y subtitulado."
+  "notes": "Películas y Series en castellano, latino y subtitulado. Por géneros y año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

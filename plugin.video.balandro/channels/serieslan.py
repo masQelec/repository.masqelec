@@ -40,14 +40,13 @@ def mainlist_series(item):
     return itemlist
 
 
-# Una página devuelve todas las series (+/- 500)
 def list_all(item):
     logger.info()
     itemlist = []
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url, use_cache=True).data
+    data = httptools.downloadpage(item.url).data
 
     patron = ' data-original="([^"]+)"></div>\s*<div class="dt"><a href="([^"]+)" class="gol"><h2>(.*?)</h2></a><span>(.*?)</span>'
     matches = re.compile(patron, re.DOTALL).findall(data)
@@ -57,12 +56,12 @@ def list_all(item):
     hasta = desde + perpage
 
     for thumb, url, title, year in matches[desde:hasta]:
-        itemlist.append(item.clone( action='temporadas', url=host + url, title=title, thumbnail=host + thumb[1:], 
+        itemlist.append(item.clone( action='temporadas', url = host + url, title = title, thumbnail = host + thumb[1:], 
                                     contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > hasta: # subpaginación interna
+    if num_matches > hasta:
         itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='list_all', text_color='coral' ))
 
     return itemlist
@@ -111,10 +110,10 @@ def episodios(item):
 
     for num_s, episodios in matches[item.page * perpage:]:
         season = int(num_s) + 1
-        # ~ if item.contentSeason and item.contentSeason != season: continue # aquí no, por la conversión de numeración de episodios
 
         patron_epi = '<a href="([^"]+)"><li><span><strong>[^<]*</strong>(\d+)[^<]*</span>([^<]+)</li>'
         matches_epi = scrapertools.find_multiple_matches(episodios, patron_epi)
+
         for url, epi, title in matches_epi:
             # convertir numeración episodios consecutivos
             num_epi = int(epi)
@@ -126,7 +125,7 @@ def episodios(item):
             titulo = '%sx%s %s' % (season, episode, title)
             if season > 1 and num_epi > last_epi: titulo += ' (%s)' % epi
 
-            itemlist.append(item.clone( action='findvideos', url=host + url, title=titulo, 
+            itemlist.append(item.clone( action='findvideos', url= host + url, title = titulo, 
                                         contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
         if num_epi: last_epi = num_epi
 
@@ -147,7 +146,6 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
-    # ~ var _sl = ['din', '30', '2da6172e33862f27e3f02da449a46131d9294ad75e80ed20', 'Cosas de críos [Castellano]', 'Dinosaurios'];
     _sa = re.findall('var _sa = (true|false);', data, flags=re.DOTALL)[0]
     _sl = re.findall("var _sl = \['([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)'", data, flags=re.DOTALL)[0]
     if not _sa or not _sl: return itemlist
@@ -160,16 +158,16 @@ def findvideos(item):
         if 'Latino' in lang: lang = 'Lat'
 
     matches = re.findall('<button class="selop" sl="([^"]+)">([^<]+)</button>', data, flags=re.DOTALL)
+
     for num, nombre in matches:
-        # ~ logger.info('%s %s' % (num, nombre))
         url = resuelve_golink(int(num), _sa, _sl)
-        # ~ logger.info(url)
         server = servertools.corregir_servidor(nombre)
+
         if server:
             if not servertools.is_server_available(server):
                 server = '' # indeterminado
             elif not servertools.is_server_enabled(server):
-                continue # descartar desactivados
+                continue 
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = server, language = lang, title = '', url = url, 
                               other = nombre if not server else '' ))
@@ -194,14 +192,14 @@ def play(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     from lib import serieslanresolver
     url = serieslanresolver.decode_url(data)
-    # ~ logger.info(url)
 
     if url:
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if servidor and (servidor != 'directo' or 'googleusercontent' in url):
             url = servertools.normalize_url(servidor, url)
             itemlist.append(item.clone( url=url, server=servidor ))
@@ -210,8 +208,9 @@ def play(item):
 
 
 def search(item, texto):
-    logger.info("texto=%s" % texto)
+    logger.info()
     itemlist = []
+
     try:
         data = httptools.downloadpage(host+'b.php', post='k='+texto.replace(' ', '+')).data
         matches = jsontools.load(data)

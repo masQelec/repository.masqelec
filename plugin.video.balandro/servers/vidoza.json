@@ -9,7 +9,7 @@
     "patterns": [
       {
         "pattern": "vidoza.(net|co|org)/(?:embed-|)([A-z0-9]+)",
-        "url": "http://vidoza.\\1/embed-\\2.html"
+        "url": "https://vidoza.\\1/embed-\\2.html"
       }
     ]
   }

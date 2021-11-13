@@ -8,6 +8,10 @@
     "ignore_urls": [],
     "patterns": [
       {
+        "pattern": "https://fastream.to/embed-\\w+.html",
+        "url": "\\1"
+      },
+      {
         "pattern": "https://fastream.to/emb.html\\?(.+?)=",
         "url": "https://fastream.to/embed-\\1.html?auto=1&referer="
       }

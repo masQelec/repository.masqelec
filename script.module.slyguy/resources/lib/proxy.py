@@ -3,22 +3,23 @@ import os
 import re
 import time
 import json
+import shutil
 
 from xml.dom.minidom import parseString
-from collections import defaultdict
 from functools import cmp_to_key
 
 import arrow
+from requests import ConnectionError
 from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from six.moves.socketserver import ThreadingMixIn
-from six.moves.urllib.parse import urlparse, urljoin, unquote_plus, parse_qsl, quote_plus
+from six.moves.urllib.parse import urlparse, urljoin, unquote_plus, parse_qsl
 from kodi_six import xbmc
-from requests import ConnectionError
+from pycaption import detect_format, WebVTTWriter
 
 from slyguy import settings, gui, inputstream
 from slyguy.log import log
 from slyguy.constants import *
-from slyguy.util import check_port, remove_file, get_kodi_string, set_kodi_string, fix_url, run_plugin
+from slyguy.util import check_port, remove_file, get_kodi_string, set_kodi_string, fix_url, run_plugin, lang_allowed, fix_language
 from slyguy.plugin import failed_playback
 from slyguy.exceptions import Exit
 from slyguy.session import RawSession
@@ -55,15 +56,49 @@ PROXY_GLOBAL = {
     'session': {},
 }
 
-def _lang_allowed(lang, lang_list):
-    for _lang in lang_list:
-        if not _lang:
-            continue
+def middleware_regex(response, pattern, **kwargs):
+    data = response.stream.content.decode('utf8')
+    match = re.search(pattern, data)
+    if match:
+        response.stream.content = match.group(1).encode('utf8')
 
-        if lang.startswith(_lang):
-            return True
+def middleware_convert_sub(response, **kwargs):
+    data = response.stream.content.decode('utf8')
+    reader = detect_format(data)
+    if reader:
+        data = WebVTTWriter().write(reader().read(data))
+        response.stream.content = data.encode('utf8')
+        response.headers['content-type'] = 'text/vtt'
 
-    return False
+def middleware_plugin(response, url, **kwargs):
+    path = 'special://temp/proxy.middleware'
+    real_path = xbmc.translatePath(path)
+    with open(real_path, 'wb') as f:
+        f.write(response.stream.content)
+
+    if ADDON_DEV:
+        shutil.copy(real_path, real_path+'.in')
+
+    url = add_url_args(url, _path=path)
+    dirs, files = run_plugin(url, wait=True)
+    if not files:
+        raise Exception('No data returned from plugin')
+
+    data = json.loads(unquote_plus(files[0]))
+    with open(real_path, 'rb') as f:
+        response.stream.content = f.read()
+
+    response.headers.update(data.get('headers', {}))
+    if ADDON_DEV:
+        shutil.copy(real_path, real_path+'.out')
+
+    remove_file(real_path)
+
+middlewares = {
+    MIDDLEWARE_CONVERT_SUB: middleware_convert_sub,
+    MIDDLEWARE_REGEX: middleware_regex,
+    MIDDLEWARE_PLUGIN: middleware_plugin,
+}
 
 class RequestHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server):
@@ -79,11 +114,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         BaseHTTPRequestHandler.setup(self)
         self.request.settimeout(5)
 
-    def _get_url(self):
+    def _get_url(self, method):
         url = self.path.lstrip('/').strip('\\')
+        log.debug('{} IN: {}'.format(method, url))
 
         self._headers = {}
-        self._plugin_headers = {}
         for header in self.headers:
             if header.lower() not in REMOVE_IN_HEADERS:
                 self._headers[header.lower()] = self.headers[header]
@@ -108,95 +143,73 @@ class RequestHandler(BaseHTTPRequestHandler):
         url = self._session.get('path_subs', {}).get(url) or url
 
         if url.lower().startswith('plugin'):
-            new_url = self._plugin_request(url)
-
-            if url == self._session.get('license_url'):
-                self._session['license_url'] = new_url
-
-            url = new_url
+            url = self._update_urls(url, self._plugin_request(url))
 
         return url
 
+    def _update_urls(self, url, new_url):
+        if url == new_url:
+            return new_url
+
+        if url == self._session.get('manifest'):
+            self._session['manifest'] = new_url
+        if url == self._session.get('license_url'):
+            self._session['license_url'] = new_url
+        if url in self._session.get('middleware', {}):
+            self._session['middleware'][new_url] = self._session['middleware'].pop(url)
+
+        return new_url
+
     def _plugin_request(self, url):
-        data_path = xbmc.translatePath('special://temp/proxy.post')
-        with open(data_path, 'wb') as f:
-            f.write(self._post_data or b'')
-
-        url = add_url_args(url, _data_path=data_path, _headers=json.dumps(self._headers))
-
         log.debug('PLUGIN REQUEST: {}'.format(url))
         dirs, files = run_plugin(url, wait=True)
         if not files:
             raise Exception('No data returned from plugin')
 
-        path = unquote_plus(files[0])
-        split = path.split('|')
-        url = split[0]
+        data = json.loads(unquote_plus(files[0]))
+        self._headers.update(data.get('headers', {}))
+        return data['url']
 
-        if len(split) > 1:
-            self._plugin_headers = dict(parse_qsl(u'{}'.format(split[1]), keep_blank_values=True))
+    def _middleware(self, url, response):
+        if url not in self._session.get('middleware', {}):
+            return
 
-        return url
+        middleware = self._session['middleware'][url].copy()
 
-    def _manifest_middleware(self, data):
-        url = self._session.get('manifest_middleware')
-        if not url:
-            return data
+        _type = middleware.pop('type')
+        if _type not in middlewares:
+            return
 
-        data_path = xbmc.translatePath('special://temp/proxy.manifest')
-        with open(data_path, 'wb') as f:
-            f.write(data.encode('utf8'))
-
-        url = add_url_args(url, _data_path=data_path, _headers=json.dumps(self._headers))
-
-        log.debug('PLUGIN MANIFEST MIDDLEWARE REQUEST: {}'.format(url))
-        dirs, files = run_plugin(url, wait=True)
-        if not files:
-            raise Exception('No data returned from plugin')
-
-        path = unquote_plus(files[0])
-        split = path.split('|')
-        data_path = split[0]
-
-        if len(split) > 1:
-            self._plugin_headers = dict(parse_qsl(u'{}'.format(split[1]), keep_blank_values=True))
-
-        with open(data_path, 'rb') as f:
-            data = f.read().decode('utf8')
-
-        if not ADDON_DEV:
-            remove_file(data_path)
-
-        return data
+        log.debug('MIDDLEWARE: {}'.format(_type))
+        return middlewares[_type](response, **middleware)
 
     def do_GET(self):
-        url = self._get_url()
-
-        log.debug('GET IN: {}'.format(url))
+        url = self._get_url('GET')
         response = self._proxy_request('GET', url)
+        manifest = self._session.get('manifest')
 
-        if self._session.get('redirecting') or not self._session.get('type') or not self._session.get('manifest') or int(response.headers.get('content-length', 0)) > 1000000:
+        if self._session.get('redirecting') or not self._session.get('type') or not manifest or int(response.headers.get('content-length', 0)) > 1000000:
             self._output_response(response)
             return
 
         parse = urlparse(self.path.lower())
 
         try:
-            if self._session.get('type') == 'm3u8' and (url == self._session['manifest'] or parse.path.endswith('.m3u') or parse.path.endswith('.m3u8')):
+            if self._session.get('type') == 'm3u8' and (url == manifest or parse.path.endswith('.m3u') or parse.path.endswith('.m3u8')):
                 self._parse_m3u8(response)
 
-            elif self._session.get('type') == 'mpd' and url == self._session['manifest']:
+            elif self._session.get('type') == 'mpd' and url == manifest:
+                self._session['manifest'] = None  #unset manifest url so isn't parsed again
                 self._parse_dash(response)
-                self._session['manifest'] = None  # unset manifest url so isn't parsed again
         except Exception as e:
             log.exception(e)
 
-            if type(e) != Exit and url == self._session['manifest']:
+            if type(e) == Exit:
+                response.status_code = 500
+                response.stream.content = str(e).encode('utf-8')
+                failed_playback()
+            elif url == manifest:
                 gui.error(_.QUALITY_PARSE_ERROR)
-
-            response.status_code = 500
-            response.stream.content = str(e).encode('utf-8')
-            failed_playback()
 
         self._output_response(response)
 
@@ -322,26 +335,25 @@ class RequestHandler(BaseHTTPRequestHandler):
             return None
 
     def _parse_dash(self, response):
-        if ADDON_DEV:
-            root = parseString(response.stream.content)
-            mpd = root.toprettyxml(encoding='utf-8')
-            mpd = b"\n".join([ll.rstrip() for ll in mpd.splitlines() if ll.strip()])
-            with open(xbmc.translatePath('special://temp/in.mpd'), 'wb') as f:
-                f.write(mpd)
-
-            start = time.time()
-
         data = response.stream.content.decode('utf8')
-        data = self._manifest_middleware(data)
 
         ## SUPPORT NEW DOLBY FORMAT https://github.com/xbmc/inputstream.adaptive/pull/466
         data = data.replace('tag:dolby.com,2014:dash:audio_channel_configuration:2011', 'urn:dolby:dash:audio_channel_configuration:2011')
         ## SUPPORT EC-3 CHANNEL COUNT https://github.com/xbmc/inputstream.adaptive/pull/618
         data = data.replace('urn:mpeg:mpegB:cicp:ChannelConfiguration', 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011')
+        data = data.replace('dvb:', '') #showmax mpd has dvb: namespace without declaration
 
         root = parseString(data.encode('utf8'))
-        mpd = root.getElementsByTagName("MPD")[0]
 
+        if ADDON_DEV:
+            pretty = root.toprettyxml(encoding='utf-8')
+            pretty = b"\n".join([ll.rstrip() for ll in pretty.splitlines() if ll.strip()])
+            with open(xbmc.translatePath('special://temp/in.mpd'), 'wb') as f:
+                f.write(pretty)
+
+            start = time.time()
+
+        mpd = root.getElementsByTagName("MPD")[0]
         mpd_attribs = list(mpd.attributes.keys())
 
         ## Remove publishTime PR: https://github.com/xbmc/inputstream.adaptive/pull/564
@@ -371,8 +383,22 @@ class RequestHandler(BaseHTTPRequestHandler):
         streams, all_streams = [], []
         adap_parent = None
 
-        default_language = self._session.get('default_language', '')
+        audio_description = self._session.get('audio_description', True)
+        audio_whitelist = [x.strip().lower() for x in self._session.get('audio_whitelist', '').split(',') if x]
+        subs_whitelist = [x.strip().lower() for x in self._session.get('subs_whitelist', '').split(',') if x]
         original_language = self._session.get('original_language', '')
+        default_language = self._session.get('default_language', '').lower().strip()
+        default_subtitle = self._session.get('default_subtitle', '').lower().strip()
+
+        if default_language == 'original':
+            default_language = original_language
+
+        if default_subtitle == 'original':
+            default_subtitle = original_language
+
+        if audio_whitelist:
+            audio_whitelist.append(original_language)
+            audio_whitelist.append(default_language)
 
         for period_index, period in enumerate(root.getElementsByTagName('Period')):
             rep_index = 0
@@ -405,10 +431,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                         is_trick = True
 
                     if 'audio' in attribs.get('mimeType', ''):
-                        if default_language and attribs.get('lang').lower().split('-')[0] == default_language.lower().split('-')[0]:
+                        if lang_allowed(attribs.get('lang'), [default_language]):
                             adap_set.setAttribute('default', 'true')
 
-                        if original_language and attribs.get('lang').lower().split('-')[0] == original_language.lower().split('-')[0]:
+                        if lang_allowed(attribs.get('lang'), [original_language]):
                             adap_set.setAttribute('original', 'true')
 
                         is_atmos = False
@@ -492,9 +518,17 @@ class RequestHandler(BaseHTTPRequestHandler):
         for elem in audio_sets:
             elem[2].appendChild(elem[1])
 
+        overwrite_subs = self._session.get('subtitles') or []
+
         ## Insert subtitles
-        if adap_parent:
-            for idx, subtitle in enumerate(self._session.get('subtitles') or []):
+        if overwrite_subs and adap_parent:
+            # remove all built-in subs
+            for adap_set in root.getElementsByTagName('AdaptationSet'):
+                if adap_set.getAttribute('contentType') == 'text':
+                    adap_set.parentNode.removeChild(adap_set)
+
+            # add our subs
+            for idx, subtitle in enumerate(overwrite_subs):
                 elem = root.createElement('AdaptationSet')
                 elem.setAttribute('contentType', 'text')
                 elem.setAttribute('mimeType', subtitle[0])
@@ -502,7 +536,9 @@ class RequestHandler(BaseHTTPRequestHandler):
                 elem.setAttribute('id', 'caption_{}'.format(idx))
                 #elem.setAttribute('original', 'true')
                 #elem.setAttribute('default', 'true')
-                #elem.setAttribute('impaired', 'true')
+
+                if subtitle[4] == 'impaired':
+                    elem.setAttribute('impaired', 'true')
 
                 if subtitle[3] == 'forced':
                     elem.setAttribute('forced', 'true')
@@ -523,14 +559,35 @@ class RequestHandler(BaseHTTPRequestHandler):
                 adap_parent.appendChild(elem)
         ##################
 
-        ## REMOVE SUBS
-        # if subs_whitelist:
-        #     for adap_set in root.getElementsByTagName('AdaptationSet'):
-        #         if adap_set.getAttribute('contentType') == 'text':
-        #             language = adap_set.getAttribute('lang')
-        #             if not _lang_allowed(language.lower().strip(), subs_whitelist):
-        #                 adap_set.parentNode.removeChild(adap_set)
-        ##
+        ## Fix up languages
+        for adap_set in root.getElementsByTagName('AdaptationSet'):
+            language = adap_set.getAttribute('lang')
+            if language:
+                adap_set.setAttribute('lang', fix_language(language))
+
+            if adap_set.getAttribute('contentType') == 'audio':
+                if not lang_allowed(language, audio_whitelist):
+                    adap_set.parentNode.removeChild(adap_set)
+                    log.debug('Removed audio adapt set: {}'.format(adap_set.getAttribute('id')))
+
+            if adap_set.getAttribute('contentType') == 'text':
+                if lang_allowed(language, [default_subtitle]):
+                    adap_set.setAttribute('default', 'true')
+
+                if not lang_allowed(language, subs_whitelist):
+                    adap_set.parentNode.removeChild(adap_set)
+                    log.debug('Removed subtitle adapt set: {}'.format(adap_set.getAttribute('id')))
+        ################
+
+        ## Remove audio_description
+        if not audio_description:
+            for row in audio_sets:
+                for elem in row[1].getElementsByTagName('Accessibility'):
+                    if elem.getAttribute('schemeIdUri') == 'urn:tva:metadata:cs:AudioPurposeCS:2007':
+                        row[2].removeChild(row[1])
+                        log.debug('Removed audio description adapt set: {}'.format(row[1].getAttribute('id')))
+                        break
+        ############
 
         ## Convert BaseURLS
         base_url_parents = []
@@ -666,7 +723,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return '\n'.join(lines)
 
-    def _parse_m3u8_master(self, m3u8, url):
+    def _parse_m3u8_master(self, m3u8, manifest_url):
         def _process_media(line):
             attribs = {}
 
@@ -682,100 +739,56 @@ class RequestHandler(BaseHTTPRequestHandler):
         audio_description = self._session.get('audio_description', True)
         original_language = self._session.get('original_language', '').lower().strip()
         default_language = self._session.get('default_language', '').lower().strip()
+        default_subtitle = self._session.get('default_subtitle', '').lower().strip()
 
-        if original_language and not default_language:
+        if default_language == 'original':
             default_language = original_language
 
-        if audio_whitelist:
-            audio_whitelist.append(original_language)
-            audio_whitelist.append(default_language)
+        if default_subtitle == 'original':
+            default_subtitle = original_language
 
-        default_groups = []
-        groups = defaultdict(list)
-        for line in m3u8.splitlines():
-            if not line.startswith('#EXT-X-MEDIA'):
-                continue
-
-            attribs = _process_media(line)
-            if not attribs:
-                continue
-
-            if audio_whitelist and attribs.get('TYPE') == 'AUDIO' and 'LANGUAGE' in attribs and not _lang_allowed(attribs['LANGUAGE'].lower().strip(), audio_whitelist):
-                m3u8 = m3u8.replace(line, '')
-                continue
-
-            if subs_whitelist and attribs.get('TYPE') == 'SUBTITLES' and 'LANGUAGE' in attribs and not _lang_allowed(attribs['LANGUAGE'].lower().strip(), subs_whitelist):
-                m3u8 = m3u8.replace(line, '')
-                continue
-
-            if not subs_forced and attribs.get('TYPE') == 'SUBTITLES' and attribs.get('FORCED','').upper() == 'YES':
-                m3u8 = m3u8.replace(line, '')
-                continue
-
-            if not subs_non_forced and attribs.get('TYPE') == 'SUBTITLES' and attribs.get('FORCED','').upper() != 'YES':
-                m3u8 = m3u8.replace(line, '')
-                continue
-
-            if not audio_description and attribs.get('TYPE') == 'AUDIO' and attribs.get('CHARACTERISTICS','').lower() == 'public.accessibility.describes-video':
-                m3u8 = m3u8.replace(line, '')
-                continue
-
-            if attribs.get('TYPE') == 'AUDIO' and 'JOC' in attribs.get('CHANNELS', ''):
-                attribs['NAME'] = _(_.ATMOS, name=attribs['NAME'])
-                attribs['CHANNELS'] = attribs['CHANNELS'].split('/')[0]
-
-            groups[attribs['GROUP-ID']].append([attribs, line])
-            if attribs.get('DEFAULT') == 'YES' and attribs['GROUP-ID'] not in default_groups:
-                default_groups.append(attribs['GROUP-ID'])
-
-        if default_language:
-            for group_id in groups:
-                if group_id in default_groups:
-                    continue
-
-                languages = []
-                for group in groups[group_id]:
-                    attribs, line = group
-
-                    attribs['AUTOSELECT'] = 'NO'
-                    attribs['DEFAULT']    = 'NO'
-
-                    if attribs['LANGUAGE'] not in languages or attribs.get('TYPE') == 'SUBTITLES':
-                        attribs['AUTOSELECT'] = 'YES'
-
-                        if attribs['LANGUAGE'].lower().strip().startswith(default_language):
-                            attribs['DEFAULT'] = 'YES'
-
-                        languages.append(attribs['LANGUAGE'])
-
-        for group_id in groups:
-            for group in groups[group_id]:
-                attribs, line = group
-
-                # FIX es-ES > es / fr-FR > fr languages #
-                if 'LANGUAGE' in attribs:
-                    split = attribs['LANGUAGE'].split('-')
-                    if len(split) > 1 and split[1].lower() == split[0].lower():
-                        attribs['LANGUAGE'] = split[0]
-                #############################
-
-                new_line = '#EXT-X-MEDIA:' if attribs else ''
-                for key in attribs:
-                    new_line += u'{}="{}",'.format(key, attribs[key])
-
-                m3u8 = m3u8.replace(line, new_line.rstrip(','))
-
-        lines = list(m3u8.splitlines())
-        line1 = None
+        stream_inf = None
         streams, all_streams, urls, metas = [], [], [], []
-        for index, line in enumerate(lines):
+        audio = []
+        subtitles = []
+        video = []
+        new_lines = []
+        has_default_audio = False
+        found_default_language = False
+        has_default_subs = False
+        found_default_subs = False
+
+        for line in m3u8.splitlines():
             if not line.strip():
                 continue
 
-            if line.startswith('#EXT-X-STREAM-INF'):
-                line1 = index
-            elif line1 and not line.startswith('#'):
-                attribs = _process_media(lines[line1])
+            if line.startswith('#EXT-X-MEDIA'):
+                attribs = _process_media(line)
+                if not attribs:
+                    continue
+
+                lang = attribs.get('LANGUAGE','').lower().strip()
+                if attribs.get('TYPE') == 'AUDIO':
+                    audio.append(attribs)
+                    if attribs.get('DEFAULT') == 'YES':
+                        has_default_audio = True
+
+                    if default_language and lang.startswith(default_language):
+                        found_default_language = True
+
+                elif attribs.get('TYPE') == 'SUBTITLES':
+                    subtitles.append(attribs)
+                    if attribs.get('DEFAULT') == 'YES':
+                        has_default_subs = True
+
+                    if default_subtitle and lang.startswith(default_subtitle):
+                        found_default_subs = True
+
+            elif line.startswith('#EXT-X-STREAM-INF'):
+                stream_inf = line
+
+            elif stream_inf and not line.startswith('#'):
+                attribs = _process_media(stream_inf)
 
                 codecs = [x for x in attribs.get('CODECS', '').split(',') if x]
                 bandwidth = int(attribs.get('BANDWIDTH') or 0)
@@ -786,26 +799,104 @@ class RequestHandler(BaseHTTPRequestHandler):
                 if '://' in url:
                     url = '/'+'/'.join(url.lower().split('://')[1].split('/')[1:])
 
-                stream = {'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'url': url, 'lines': [line1, index]}
+                stream = {'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'url': url, 'index': len(video)}
                 all_streams.append(stream)
+                video.append([stream_inf, line])
 
-                if stream['url'] not in urls and lines[line1] not in metas:
+                if stream['url'] not in urls and stream_inf not in metas:
                     streams.append(stream)
                     urls.append(stream['url'])
-                    metas.append(lines[line1])
+                    metas.append(stream_inf)
 
-                line1 = None
+                stream_inf = None
+            else:
+                new_lines.append(line)
+
+        want_subs = None
+        if not found_default_language:
+            if default_language:
+                want_subs = default_language
+                default_language = None
+        else:
+            has_default_audio = False
+
+        if not default_language and not has_default_audio:
+            default_language = original_language
+
+        if audio_whitelist:
+            audio_whitelist.append(original_language)
+            audio_whitelist.append(default_language)
+
+        for attribs in audio:
+            lang = attribs.get('LANGUAGE','').lower().strip()
+
+            if not lang_allowed(lang, audio_whitelist):
+                continue
+
+            if not audio_description and attribs.get('CHARACTERISTICS','').lower() == 'public.accessibility.describes-video':
+                continue
+
+            if 'JOC' in attribs.get('CHANNELS', ''):
+                attribs['NAME'] = _(_.ATMOS, name=attribs['NAME'])
+                attribs['CHANNELS'] = attribs['CHANNELS'].split('/')[0]
+
+            if default_language:
+                attribs['DEFAULT'] = 'YES' if lang.startswith(default_language) else 'NO'
+
+            attribs['LANGUAGE'] = fix_language(attribs.get('LANGUAGE',''))
+
+            new_line = '#EXT-X-MEDIA:' if attribs else ''
+            for key in attribs:
+                if attribs[key] is not None:
+                    new_line += u'{}="{}",'.format(key, attribs[key])
+            new_lines.append(new_line)
+
+        if not found_default_subs:
+            default_subtitle = None
+        else:
+            has_default_subs = False
+
+        if not found_default_subs and not has_default_subs:
+            default_subtitle = want_subs
+
+        if subs_whitelist:
+            subs_whitelist.append(default_subtitle)
+
+        for attribs in subtitles:
+            lang = attribs.get('LANGUAGE','').lower().strip()
+
+            if not lang_allowed(lang, subs_whitelist):
+                continue
+
+            if not subs_forced and attribs.get('FORCED','').upper() == 'YES':
+                continue
+
+            if not subs_non_forced and attribs.get('FORCED','').upper() != 'YES':
+                continue
+
+            if default_subtitle:
+                attribs['DEFAULT'] = 'YES' if lang.startswith(default_subtitle) else 'NO'
+
+            attribs['LANGUAGE'] = fix_language(attribs.get('LANGUAGE',''))
+
+            new_line = '#EXT-X-MEDIA:' if attribs else ''
+            for key in attribs:
+                if attribs[key] is not None:
+                    new_line += u'{}="{}",'.format(key, attribs[key])
+            new_lines.append(new_line)
 
         selected = self._quality_select(streams)
         if selected:
             adjust = 0
             for stream in all_streams:
                 if stream['url'] != selected['url']:
-                    for index in stream['lines']:
-                        lines.pop(index-adjust)
-                        adjust += 1
+                    video.pop(stream['index']-adjust)
+                    adjust += 1
 
-        return '\n'.join(lines)
+        for stream in video:
+            new_lines.extend(stream)
+
+        return '\n'.join(new_lines)
 
     def _parse_m3u8(self, response):
         m3u8 = response.stream.content.decode('utf8')
@@ -828,7 +919,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                 f.write(_m3u8)
 
         if is_master:
-            m3u8 = self._manifest_middleware(m3u8)
             m3u8 = self._parse_m3u8_master(m3u8, response.url)
         else:
             m3u8 = self._parse_m3u8_sub(m3u8, response.url)
@@ -891,7 +981,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         # some reason we get connection errors every so often when using a session. something to do with the socket
         for i in range(retries):
             try:
-                response = self._session['session'].request(method=method, url=url, headers=self._headers, data=self._post_data, allow_redirects=False, verify=self._session.get('verify_ssl', True), stream=True)
+                response = self._session['session'].request(method=method, url=url, headers=self._headers, data=self._post_data, allow_redirects=False, stream=True)
             except ConnectionError as e:
                 if 'Connection aborted' not in str(e) or i == retries-1:
                     log.exception(e)
@@ -922,11 +1012,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 response.headers['location'] = urljoin(url, response.headers['location'])
 
             self._session['redirecting'] = True
-            if url == self._session.get('manifest'):
-                self._session['manifest'] = response.headers['location']
-            if url == self._session.get('license_url'):
-                self._session['license_url'] = response.headers['location']
-
+            self._update_urls(url, response.headers['location'])
             response.headers['location'] = PROXY_PATH + response.headers['location']
             response.stream.content = b''
 
@@ -935,12 +1021,13 @@ class RequestHandler(BaseHTTPRequestHandler):
             ## we handle cookies in the requests session
             response.headers.pop('set-cookie')
 
+        self._middleware(url, response)
+
         return response
 
     def _output_headers(self, response):
         self.send_response(response.status_code)
 
-        response.headers.update(self._plugin_headers)
         for d in list(response.headers.items()):
             self.send_header(d[0], d[1])
 
@@ -956,15 +1043,18 @@ class RequestHandler(BaseHTTPRequestHandler):
                 break
 
     def do_HEAD(self):
-        url = self._get_url()
-        log.debug('HEAD IN: {}'.format(url))
+        url = self._get_url('HEAD')
         response = self._proxy_request('HEAD', url)
         self._output_response(response)
 
     def do_POST(self):
-        url = self._get_url()
-        log.debug('POST IN: {}'.format(url))
+        url = self._get_url('POST')
         response = self._proxy_request('POST', url)
+
+        if response.status_code in (406,) and url == self._session.get('license_url') and not xbmc.getCondVisibility('System.Platform.Android') and gui.yes_no(_.WV_FAILED):
+            thread = threading.Thread(target=inputstream.install_widevine, kwargs={'reinstall': True})
+            thread.start()
+
         self._output_response(response)
 
 class Response(object):

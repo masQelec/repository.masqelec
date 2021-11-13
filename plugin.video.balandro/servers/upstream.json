@@ -10,6 +10,10 @@
       {
         "pattern": "upstream.to/(?:embed-|)([A-z0-9]+)",
         "url": "https://upstream.to/\\1"
+      },
+      {
+        "pattern": "https://(?:upstream.to|onlystream.tv)/([a-z0-9]+)",
+        "url": "https://upstream.to/\\1"
       }
     ]
   }

@@ -22,19 +22,20 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('cliver', url, post=post, headers=headers).data
+    # ~ timeout
+    timeout = 30
+
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+    data = httptools.downloadpage_proxy('cliver', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
-                # ~ logger.debug('Cookies: %s %s' % (ck_name, ck_value))
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-                data = httptools.downloadpage_proxy('cliver', url, post=post, headers=headers).data
-                # ~ logger.debug(data)
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+                data = httptools.downloadpage_proxy('cliver', url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -43,6 +44,7 @@ def do_downloadpage(url, post=None, headers=None):
 
 def mainlist(item):
     return mainlist_pelis(item)
+
     # ~ logger.info()
     # ~ itemlist = []
 
@@ -163,7 +165,6 @@ def list_all(item):
     if not item.pagina: item.pagina = 0
 
     if item.pagina == 0 and item.tipo == 'buscador':
-        # ~ data = do_downloadpage(item.url, headers={'Cookie': 'tipo_contenido=peliculas', 'Referer': host})
         httptools.save_cookie('tipo_contenido', 'peliculas', host.replace('https://', '')[:-1])
         data = do_downloadpage(item.url, headers={'Referer': host})
     else:
@@ -171,11 +172,9 @@ def list_all(item):
         if item.adicional: post['adicional'] = item.adicional
         data = do_downloadpage(host+'frm/cargar-mas.php', post=post, headers={'Referer': host})
 
-    # ~ logger.debug(data)
-
     matches = re.compile('<article class="contenido-p">(.*?)</article>', re.DOTALL).findall(data)
-    for article in matches:
 
+    for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         title = scrapertools.find_single_match(article, '<h2>(.*?)</h2>').strip()
@@ -240,7 +239,6 @@ def episodios(item):
     perpage = 50
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     matches = re.compile('<div class="mic">(.*?)<i class="fa fa-play">', re.DOTALL).findall(data)
 
@@ -259,7 +257,6 @@ def episodios(item):
         for opc in ['data-url-es', 'data-url-es-la', 'data-url-vose', 'data-url-en']:
             url = scrapertools.find_single_match(article, '%s="([^"]+)' % opc)
             if url: langs.append(opc.replace('data-url-', '').replace('es-la', 'lat').replace('es-es', 'esp').capitalize())
-            # ~ logger.debug(url)
 
         if langs: title += ' [COLOR %s][%s][/COLOR]' % (color_lang, ', '.join(langs))
 
@@ -318,35 +315,49 @@ def findvideos(item):
 
     IDIOMAS = {'es_la': 'Lat', 'es': 'Esp', 'vose': 'Vose', 'en': 'VO'}
 
+    ses = 0
+
     if item.contentType == 'movie':
         if not item.id_pelicula:
             data = do_downloadpage(item.url)
             item.id_pelicula = scrapertools.find_single_match(data, 'Idpelicula\s*=\s*"([^"]+)')
+
         header = {'Referer': item.url}
         data = do_downloadpage(host + 'frm/obtener-enlaces-pelicula.php', post={'pelicula': item.id_pelicula}, headers=header)
-        # ~ logger.debug(data)
 
         enlaces = jsontools.load(data)
         for lang in enlaces:
+            ses += 1
+
             for it in enlaces[lang]:
-                # ~ servidor = 'directo' if it['reproductor_nombre'] == 'SuperVideo' else it['reproductor_nombre'].lower()
                 servidor = 'directo' if it['reproductor_nombre'] in ['SuperVideo', 'FastPlayer'] else it['reproductor_nombre'].lower()
+                servidor = servertools.corregir_servidor(servidor)
+
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor,
                                       title = '', url = 'https://directv.clivertv.to/getFile.php?hash=' + it['token'],
                                       language = IDIOMAS.get(lang, lang), other = it['reproductor_nombre'] if servidor == 'directo' else '' ))
 
     else:
         data = do_downloadpage(item.url)
-        # ~ logger.debug(data)
+
         data = scrapertools.find_single_match(data, 'data-numcap="%s" data-numtemp="%s"(.*?)>' % (item.contentEpisodeNumber, item.contentSeason))
 
         for opc in ['data-url-es', 'data-url-es-la', 'data-url-vose', 'data-url-en']:
+            ses += 1
+
             url = scrapertools.find_single_match(data, '%s="([^"]+)' % opc)
             if url:
                 servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
                 if not servidor or servidor == 'directo': continue
+
                 lang = opc.replace('data-url-', '').replace('-', '_')
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -363,11 +374,9 @@ def play(item):
 
         data = do_downloadpage(url, post=post, headers={'Referer': host})
         data = data.replace('\\/', '/')
-        # ~ logger.debug(data)
 
         try:
             dom, vid = scrapertools.find_single_match(data, '(https://[^/]+)/player/([^&]+)')
-            # ~ url = '%s/hls/%s/i/%s.playlist.m3u8' % (dom, vid, vid)
             url = '%s/hls/%s/%s.m3u8' % (dom, vid, vid)
         except:
             url = scrapertools.find_single_match(data, '"url":"([^"]+)').replace(' ', '%20')
@@ -375,11 +384,11 @@ def play(item):
         if 'id=' in url:
             vid = scrapertools.find_single_match(url, 'id=([^&]+)')
             if vid:
-                dom = '/'.join(url.split('/')[:3]) # SuperVideo: https://www.zembed.to FastPlayer: https://www.xtream.to
+                dom = '/'.join(url.split('/')[:3])
                 url = dom + '/hls/' + vid + '/' + vid + '.playlist.m3u8'
 
                 data = httptools.downloadpage(url).data
-                # ~ logger.debug(data)
+
                 matches = scrapertools.find_multiple_matches(data, 'RESOLUTION=\d+x(\d+)\s*(.*?\.m3u8)')
                 if matches:
                     if 'xtream.to/' in url:
@@ -388,7 +397,7 @@ def play(item):
                             break
                     else:
                         for res, url in sorted(matches, key=lambda x: int(x[0])):
-                            itemlist.append([res+'p', dom + url])
+                            itemlist.append([res + 'p', dom + url])
                     return itemlist
 
             else:

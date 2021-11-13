@@ -10,7 +10,7 @@
     "patterns": [
       {
         "pattern": "(?:www.)?ok.../(?:videoembed|video)/(\\d+)",
-        "url": "http://ok.ru/videoembed/\\1"
+        "url": "https://ok.ru/videoembed/\\1"
       }
     ]
   }

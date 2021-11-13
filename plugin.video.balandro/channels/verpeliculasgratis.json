@@ -3,7 +3,7 @@
   "name": "VerPeliculasGratis",
   "thumbnail": "verpeliculasgratis.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast"],
 
-  "clusters": ["adults", "news", "rankings", "years", "countries", "lasts", "kids", "docs", "vos"],
+  "clusters": ["temporary", "adults", "news", "rankings", "years", "countries", "lasts", "kids", "docs", "vos"],
 
   "notes": "Películas: novedades, por género. Series: últimos episodios, por género. Esta web intercala películas de adultos en algunas secciones, pero puedes desactivarlas en la configuración del addon."
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.balandro" name="WebTV" version="2.0.3" provider-name="WebTV">
+<addon id="plugin.video.balandro" name="Balandro" version="2.1.2" provider-name="Balandro Team">
   <requires>
   </requires>
 
@@ -8,24 +8,41 @@
   </extension>
 
   <extension point="xbmc.addon.metadata">
-    <summary lang="es">WebTV addon</summary>
-    <description lang="es">WebTV es un navegador para webs con vídeos de películas y series, derivado de pelisalacarta y alfa.</description>
-    <disclaimer lang="es">[COLOR red]Los propietarios y remitentes de este complemento no alojan ni distribuyen ninguno de los contenidos mostrados por estos complementos ni tienen ninguna afiliación con los proveedores de contenido.[/COLOR]</disclaimer>
-
-    <news>
-    </news>
-
+    <summary>Balandro es un navegador de páginas webs</summary>
     <assets>
       <icon>icon.png</icon>
-	  <fanart>fanart.png</fanart>
+      <fanart>fanart.png</fanart>
     </assets>
-
+    <news>
+    [COLOR yellow]Octubre 2021[/COLOR]
+      Agradecimientos:
+        Mencion especial al grupo de Checkers
+      Canales modificados:
+        AniBox, CineCalidad, CineDeAntes,
+        CineLibreOnline, CineMatteFlix,
+        ClubCine, DixMaxLive, DocumaniaTv,
+        DonTorrents, HdFull, HdFullCom, HdFullSe,
+        MegaDede2, NewPct1, PelisMaraton,
+        PlayDede, Ppeliculas, PonnHd, PornHub,
+        Repeli24, SeriesKao, YesTorrent
+      Canales anulados:
+        PctFenix, PelisPlus24
+      Canales nuevos:
+        Ievenn, PelisEnCastellano
+      Servidores modificados:
+        Fembed, Streamsb, Upstream, Uptobox,
+        Vshare, Vup
+      Servidores nuevos:
+        Streamon, Vidhd
+    [COLOR darkorange]Media Centers soportados[COLOR plum][B][I] 19.X, 18.X y 17.X [/I][/B][/COLOR]
+    </news>
+    <summary>Balandro es un navegador de páginas webs</summary>
+    <description>[COLOR yellow][B]Balandro es un MOD derivado de Pelisalacarta y Alfa,[COLOR mediumaquamarine] y Tiene Como Objeto, Permitir Visualizar Películas, Series y Documentales, Todo a Través de Internet y Directamente Desde su Sistema Media Center. [COLOR orchid]Este Add-On es Tan Solo un Mero Ejercicio de Aprendizaje Del Lenguaje de Programación Python y se Distribuye Sin Ningún Contenido Multimedia Adjunto al Mismo [COLOR lightgrey][I]En Consecuencia Solo Las Webs Son Plenamente Responsables de Los Contenidos Que Publiquen.[/I][/B][/COLOR]</description>
+    <disclaimer>[COLOR tan][B]Está Prohibida su Distribución, Solo o Junto Con Contenidos Multimedia Protegidos Por Los Derechos de Autor. [COLOR chocolate]Si Este Tipo de Contenido Está Prohibido en su País, Solamente Usted Será el Responsable de su Uso. [COLOR white]La Vulneración de Estas Prohibiciones Exonerarán de Cualquier Culpa a sus Autores, [COLOR red]Siendo el Único Responsable Quien lo Haya Distribuido o Utilizado Ilegalmente.[/B][/COLOR]</disclaimer>
     <platform>all</platform>
     <license>GNU GPL v3</license>
-    <email>masqelec@gmail.com</email>
-    <source>...</source>
+    <source>https://balandro-tk.github.io/balandro/</source>
+    <forum>https://www.mimediacenter.info/foro/viewforum.php?f=44</forum>
   </extension>
-
   <extension point="xbmc.service" library="services.py" start="login|startup"/>
-
 </addon>

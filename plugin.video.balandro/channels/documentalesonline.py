@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools
 
@@ -166,14 +166,24 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(http[^"]+)')
 
+    ses = 0
+
     i = 0
 
     num_matches = len(matches)
 
     for url in matches:
+        ses += 1
+
         if 'amazon-adsystem.com' in url:
-            num_matches = num_matches - 1
-            continue
+            if num_matches == 1:
+                url = scrapertools.find_single_match(data, '<param name="src" value="(.*?)"')
+                if not url: continue
+            else:
+                num_matches = num_matches - 1
+                continue
+
+        url = url.replace('&amp;', '&')
 
         other = ''
         if num_matches > 1:
@@ -181,9 +191,15 @@ def findvideos(item):
             other = str(i)
 
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
 
         if servidor and servidor != 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url = url, language = 'Esp', other = other ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

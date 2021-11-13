@@ -8,13 +8,24 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
-    page_url = page_url.replace('/myurlshort.live/', '/www.fembed.com/').replace('/divload.com/', '/www.fembed.com/').replace('/jplayer.club/', '/www.fembed.com/').replace('/pelispng.online/', '/www.fembed.com/')
+    page_url = page_url.replace('/fembeder.com/', '/www.fembed.com/').replace('/divload.com/', '/www.fembed.com/').replace('/ilovefembed.best/', '/www.fembed.com/').replace('/myurlshort.live/', '/www.fembed.com/')
+    page_url = page_url.replace('/jplayer.club/', '/www.fembed.com/').replace('/fembedisthebest.rest/', '/www.fembed.com/').replace('/pelispng.online/', '/www.fembed.com/').replace('/hlshd.xyz/', '/www.fembed.com/')
+    page_url = page_url.replace('/embedsito.com/', '/www.fembed.com/').replace('/mrdhan.com/', '/www.fembed.com/').replace('/dutrag.com/', '/www.fembed.com/').replace('/fplayer.info/', '/www.fembed.com/')
 
-    # ~ dom = 'https://feurl.com'
-    # ~ dom = 'https://www.fembed.com'
+    if 'fembed.com' in page_url:
+        page_url = page_url.replace('/fembed.com/', '/www.fembed.com/')
+    elif 'fembed.live' in page_url:
+        page_url = page_url.replace('/www.fembed.live/', '/dutrag.com/').replace('/fembed.live/', '/dutrag.com/')
+    elif 'feurl.com' in page_url:
+        page_url = page_url.replace('/www.feurl.com/', '/dutrag.com/').replace('/feurl.com/', '/dutrag.com/')
+    elif 'femax20.com' in page_url:
+        page_url = page_url.replace('/www.femax20.com/', '/dutrag.com/').replace('/femax20.com/', '/dutrag.com/')
+    elif 'fcdn.stream' in page_url:
+        page_url = page_url.replace('/www.fcdn.stream/', '/dutrag.com/').replace('/fcdn.stream/', '/dutrag.com/')
+    elif 'fembad.org' in page_url:
+        page_url = page_url.replace('/www.fembad.org/', '/dutrag.com/').replace('/fembad.org/', '/dutrag.com/')
+
     dom = scrapertools.find_single_match(page_url, "(https://[^/]+)")
-
-    logger.info("check-00-dom: %s" % dom)
 
     vid = scrapertools.find_single_match(page_url, "/(?:v|f)/([A-z0-9_-]+)")
     if not vid or not dom: return video_urls
@@ -25,7 +36,6 @@ def get_video_url(page_url, url_referer=''):
 
     try:
         data = jsontools.load(data)
-        # ~ logger.debug(data)
 
         if 'data' not in data or 'success' not in data: return 'Vídeo no encontrado'
         if not data['success']: return 'Vídeo no encontrado o eliminado'

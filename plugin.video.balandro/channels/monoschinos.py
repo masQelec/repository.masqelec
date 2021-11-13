@@ -37,15 +37,21 @@ def mainlist_anime(item):
         if actions.adults_password(item) == False:
             return itemlist
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/animes', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + '/emision', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/animes/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host, search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + '/emision/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + '/genero/castellano/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + '/genero/latino/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'En blue-ray', action = 'list_all', url = host + '/genero/blu-ray/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow' ))
 
@@ -67,31 +73,29 @@ def generos(item):
     for url, title in matches:
         if title == 'Todo': continue
 
+        title = title.strip()
+
+        if '/blu-ray' in url: continue
+        elif '/castellano' in url: continue
+        elif '/emision' in url: continue
+        elif '/latino' in url: continue
+
         url = host + url
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
 
-    return itemlist
+    return sorted(itemlist,key=lambda x: x.title)
 
 
 def anios(item):
     logger.info()
     itemlist = []
 
-    url_anio = host + '/animes'
+    from datetime import datetime
+    current_year = int(datetime.today().year)
 
-    data = httptools.downloadpage(url_anio).data
-
-    bloque = scrapertools.find_single_match(data, '>Año<(.*?)</div>')
-
-    matches = re.compile('href="(.*?)">(.*?)</a>').findall(bloque)
-
-    for url, title in matches:
-        if title == 'Todo': continue
-
-        url = host + url
-
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
+    for x in range(current_year, 1951, -1):
+        itemlist.append(item.clone( title = str(x), url = host + '/year/' + str(x) + '/', action='list_all' ))
 
     return itemlist
 
@@ -225,7 +229,11 @@ def findvideos(item):
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
+    ses = 0
+
     for url in matches:
+        ses += 1
+
         url = urllib.unquote(url)
 
         if "cl?url=" in url: continue
@@ -234,7 +242,7 @@ def findvideos(item):
             url = scrapertools.find_single_match(url, '.*?url=([^&]+)?')
 
         if url:
-            if '/hqq.' in url or '/waaw.' in url: continue
+            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -243,12 +251,16 @@ def findvideos(item):
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose' ))
 
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
+
     return itemlist
 
 
 def search(item, texto):
     logger.info()
-
     try:
         item.url = host + '/search?q=' + texto.replace(" ", "+")
         return list_all(item)

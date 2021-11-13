@@ -51,6 +51,7 @@ def generos(item):
     itemlist.append(item.clone ( title = 'Bélicas (guerra de vietnam)', action = 'list_all', url = host + '/vietnam.html' ))
     itemlist.append(item.clone ( title = 'Bélicas (acciones bélicas)', action = 'list_all', url = host + '/acciones-beacutelicas.html' ))
 
+    itemlist.append(item.clone ( title = 'Cine alemán', action = 'list_all', url = host + '/cine-alemaacuten.html' ))
     itemlist.append(item.clone ( title = 'Cine argentino', action = 'list_all', url = host + '/cine-argentino.html' ))
     itemlist.append(item.clone ( title = 'Cine asiático', action = 'list_all', url = host + '/cine-asiaacutetico.html' ))
     itemlist.append(item.clone ( title = 'Cine británico', action = 'pelis', url = host, filtro_search = 'CINE BRIT&Aacute;NICO' ))
@@ -59,6 +60,7 @@ def generos(item):
     itemlist.append(item.clone ( title = 'Cine de romanos', action = 'list_all', url = host + '/cine-romanos.html' ))
     itemlist.append(item.clone ( title = 'Cine de terror', action = 'pelis', url = host, filtro_search = 'CINE DE TERROR' ))
     itemlist.append(item.clone ( title = 'Cine español', action = 'pelis', url = host, filtro_search = 'CINE ESPA&Ntilde;OL' ))
+    itemlist.append(item.clone ( title = 'Cine europeo oriental', action = 'list_all', url = host + '/cine-europa-oriental.html' ))
     itemlist.append(item.clone ( title = 'Cine francés', action = 'pelis', url = host, filtro_search = 'CINE FRANC&Eacute;S' ))
     itemlist.append(item.clone ( title = 'Cine infantil', action = 'pelis', url = host, filtro_search = 'CINE INFANTIL' ))
     itemlist.append(item.clone ( title = 'Cine italiano', action = 'pelis', url = host, filtro_search = 'CINE ITALIANO' ))
@@ -101,8 +103,8 @@ def news(item):
 
     data = httptools.downloadpage(host).data
 
-    block_esp = scrapertools.find_single_match(data, '<h2 class="wsite-content-title"><font color="#a88d2e">.*?especial(.*?)>NOVEDADES DE')
-    block_nov = scrapertools.find_single_match(data, '>NOVEDADES DE.*?(.*?)>ENLACE AL GRUPO LA TAQUILLA EN FACEBOOK')
+    block_esp = scrapertools.find_single_match(data, '<h2 class="wsite-content-title"><font color=".*?especial(.*?)>NOVEDADES DE')
+    block_nov = scrapertools.find_single_match(data, '>NOVEDADES DE(.*?)>ENLACE AL GRUPO LA TAQUILLA EN FACEBOOK')
     bloque = block_esp + block_nov
 
     slides = scrapertools.find_multiple_matches(bloque, '<div><div style="height:20px;overflow:hidden"></div>(.*?)<div style="height:20px;overflow:hidden"></div>')
@@ -147,12 +149,24 @@ def news(item):
        sort_news = sorted(sort_news, key=lambda x: x[1])
 
        for thumb, title, name in sort_news[desde:hasta]:
-           title = title.replace('º', 'ª')
+           if name == 'SAGA': continue
+
+           accion = 'pelis'
+           url = host
+
+           title = title.replace('º', 'ª').replace(' - ', ' ')
+
+           if ' - ' in name:
+               if not name.endswith('º'):
+                   name = name + 'º'
+
+               name = name.replace(' - ', ' ')
 
            if 'º' in name:
               grupo = 'temas'
 
               name = name.split('º')[0]
+
               if 'ACCIÓN' in name: name = name.replace('ACCIÓN', 'ACCI&Oacute;N')
               elif '-FICCIÓN' in name: name = name.replace('-FICCIÓN', '-FICCI&Oacute;N')
               elif 'BRITÁNICO' in name: name = name.replace('BRITÁNICO', 'BRIT&Aacute;NICO')
@@ -161,19 +175,33 @@ def news(item):
               elif 'CLÁSICO' in name: name = name.replace('CLÁSICO', 'CL&Aacute;SICO')
               elif 'BÉLICAS' in name: name = name.replace('BÉLICAS', 'B&Eacute;LICAS')
               elif 'AÑOS' in name: name = name.replace('AÑOS', 'A&Ntilde;OS')
+              elif 'WESTERN SPAGHETTI 1' in name: name = name.replace('WESTERN SPAGHETTI 1', 'SPAGHETTI WESTERN 1')
+              elif 'WESTERN SPAGHETTI 2' in name: name = name.replace('WESTERN SPAGHETTI 2', 'SPAGHETTI WESTERN 2')
+
            else:
               grupo = ''
 
               if name == 'AÑOS 80-90': name = name.replace('AÑOS 80-90', 'SAGAS A&Ntilde;OS 80 Y 90')
+              elif name == 'S A G A  AÑOS 80-90': name = name.replace('S A G A  AÑOS 80-90', 'SAGAS A&Ntilde;OS 80- 90')
               elif name == 'años 80-90': name = name.replace('años 80-90', 'SAGAS A&Ntilde;OS 80 Y 90')
               elif name == 'Paco Martínez Soria': name = name.replace('Paco Martínez Soria', 'PACO MART&Iacute;NEZ SORIA')
               elif name == 'Sissi': name = name.replace('Sissi', 'SISSI')
               elif name == 'JOAN CROWFORD': name = name.replace('JOAN CROWFORD', 'JOAN CRAWFORD')
+              elif name == 'HUMOR, BUSTER KEATON, CORTOS DEL AÑO 21': name = name.replace('HUMOR, BUSTER KEATON, CORTOS DEL AÑO 21', 'BUSTER KEATON')
+              elif name == 'LUÍS BUÑUEL': name = name.replace('LUÍS BUÑUEL', 'LU&Iacute;S BU&Ntilde;UEL (1900-1983)')
+	
+              elif name == 'CINE ALEMÁN':
+                    accion = 'list_all'
+                    url = host + '/cine-alemaacuten.html'
+              elif name == 'CINE EUROPA ORIENTAL':
+                    accion = 'list_all'
+                    url = host + '/cine-europa-oriental.html'
 
            if '/' in name: name = name.split('/')[0]
            elif '(' in name: name = name.split('(')[0]
 
-           itemlist.append(item.clone( action = 'pelis', title = title, url = host, thumbnail = thumb, grupo = grupo, filtro_search = name, page = 0 ))
+
+           itemlist.append(item.clone( action = accion, title = title, url = url, thumbnail = thumb, grupo = grupo, filtro_search = name, page = 0 ))
 
        if i > perpage:
           if num_matches > hasta:
@@ -273,9 +301,9 @@ def pelis(item):
     bloque = scrapertools.find_single_match(data, '<li id="active" class="wsite-menu-item-wrap">(.*?)</div><!-- end header-wrap -->')
 
     if item.grupo:
-       if item.grupo == 'sagas': bloque = scrapertools.find_single_match(data, '/s-a-g-a-s.html(.*?)/humor.html')
+       if item.grupo == 'sagas': bloque = scrapertools.find_single_match(data, '/s-a-g-a-s.html(.*?)/c-i-c-l-o-s.html')
        elif item.grupo == 'actor': bloque = scrapertools.find_single_match(data, '/actores.html(.*?)/actrices.html')
-       elif item.grupo == 'actri': bloque = scrapertools.find_single_match(data, '/actrices.html(.*?)/s-a-g-a-s.html')
+       elif item.grupo == 'actri': bloque = scrapertools.find_single_match(data, '/actrices.html(.*?)/humor.html')
        elif item.grupo == 'direc': bloque = scrapertools.find_single_match(data, '/directores.html(.*?)/actores.html')
        elif item.grupo == 'desta': bloque = scrapertools.find_single_match(data, '/humor.html(.*?)</div><!-- end header-wrap -->')
 
@@ -312,13 +340,16 @@ def pelis(item):
         if not title: continue
 
         if title == 'Blog': continue
+        elif title == 'ACCIONES B&Eacute;LICAS': continue
         elif title == 'AVENTURAS': continue
         elif title == 'BÉLICAS': continue
         elif title == 'CIENCIA-FICCIÓN': continue
+        elif title == 'CINE ALEMÁN': continue
         elif title == 'CINE BRITÁNICO': continue
         elif title == 'CINE DE ACCIÓN': continue
         elif title == 'CINE DE TERROR': continue
         elif title == 'CINE ESPAÑOL': continue
+        elif title == 'CINE EUROPA ORIENTAL': continue
         elif title == 'CINE INFANTIL': continue
         elif title == 'CINE ITALIANO': continue
         elif title == 'CINE MUSICAL': continue

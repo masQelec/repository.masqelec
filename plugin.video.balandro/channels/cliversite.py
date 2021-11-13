@@ -324,7 +324,11 @@ def findvideos(item):
 
     matches_idiomas = scrapertools.find_multiple_matches(data, '<img src="/static/img/bg/icon_(.*?)_.*?data-id="(.*?)"')
 
+    ses = 0
+
     for lang, data_id in matches_idiomas:
+        ses += 1
+
         bloque_enlaces_idioma = scrapertools.find_single_match(data, 'server-item-' + data_id + '(.*?)</div></div>')
         if not bloque_enlaces_idioma.startswith('</div>'):
             bloque_enlaces_idioma = bloque_enlaces_idioma + '</div>'
@@ -333,9 +337,13 @@ def findvideos(item):
 
         for data_video, srv in enlaces:
             url = data_video
+
             if url.startswith('//'): url = 'https:' + url
 
+            if '/netu.' in url or '/hqq.' in url or '/waaw.' in url: continue
+
             servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
 
             if servidor == 'directo':
                 link_other = normalize_other(srv)
@@ -345,11 +353,16 @@ def findvideos(item):
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                                   language = IDIOMAS.get(lang, lang), other = link_other ))
 
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
+
     return itemlist
 
 
 def normalize_other(srv):
-    # Descartat hydrax pq de moment no es poden resoldre
+    # hydrax no es pot resoldre
 
     srv = srv.replace('.to', '').lower()
 
@@ -368,6 +381,7 @@ def play(item):
     itemlist = []
 
     servidor = item.server
+    url = item.url
 
     if item.other:
         if item.other == 'cloud':
@@ -406,6 +420,8 @@ def play(item):
 
                 if url:
                     servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.corregir_servidor(servidor)
+
                     url = servertools.normalize_url(servidor, url)
 
                     itemlist.append(item.clone(url=url , server=servidor))
@@ -423,16 +439,18 @@ def play(item):
                         return itemlist
 
                 servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
+
                 url = servertools.normalize_url(servidor, url)
 
                 if servidor and servidor != 'directo':
                     itemlist.append(item.clone(url=url , server=servidor))
                     return itemlist
 
-    else:
-        url = item.url
-
     if url:
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
         itemlist.append(item.clone(url=url , server=servidor))
 
     return itemlist

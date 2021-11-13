@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www.mejortorrento.net'
+host = 'https://www.mejortorrentes.com'
 
 
 selecc_pelis = host + '/peliculas-buscador.html'
@@ -28,7 +28,9 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('//www.mejortorrento.com', '//www.mejortorrento.net')
+    url = url.replace('//www.mejortorrento.com', '//www.mejortorrentes.com')
+    url = url.replace('//www.mejortorrento.net', '//www.mejortorrentes.com')
+    url = url.replace('//www.mejortorrento.info', '//www.mejortorrentes.com')
 
     # ~ data = httptools.downloadpage(url, post=post).data
     data = httptools.downloadpage_proxy('mejortorrents', url, post=post, headers=headers).data
@@ -56,9 +58,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/secciones.php?sec=ultimos_torrents', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/torrents-de-peliculas-hd-alta-definicion.html', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_selecc', url = selecc_pelis, down = 100, search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Las más vistas', action = 'list_selecc', url = selecc_pelis, down = 100, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/torrents-de-peliculas-hd-alta-definicion.html', search_type = 'movie' ))
 
     itemlist.append(item.clone( action ='generos', title = 'Por género', search_type = 'movie' ))
     itemlist.append(item.clone( action ='anios', title = 'Por año', search_type = 'movie' ))
@@ -313,7 +315,6 @@ def list_selecc(item):
     return itemlist
 
 
-# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
 def puntuar_calidad(txt):
     txt = txt.lower().replace(' ', '').replace('-', '')
 
@@ -499,7 +500,7 @@ def list_search(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '/secciones.php?sec=buscador&valor=' + texto.replace(" ", "+")
         return list_search(item)

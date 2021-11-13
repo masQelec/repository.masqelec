@@ -1,14 +1,24 @@
 # -*- coding: utf-8 -*-
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 host = 'https://www.pepeliculas.org/'
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
 def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage_proxy('ppeliculas', url, post=post, headers=headers).data
 
     return data
 
@@ -22,6 +32,8 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
 
+    itemlist.append(item_configurar_proxies(item))
+
     return itemlist
 
 
@@ -33,13 +45,15 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'genre/estreno/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Destacadas', action = 'list_all', url = host + 'pelicula/', group = 'destacadas', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'pelicula/', group = 'destacadas', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_top', url = host, search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -52,11 +66,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + 'episodios/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Destacadas', action = 'list_all', url = host + 'series/', group = 'destacadas', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'series/', group = 'destacadas', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_top', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -308,7 +324,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, patron)
 
+    ses = 0
+
     for _type, _post, _nume, qlty_lang, _server in matches:
+        ses += 1
+
         url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
         if 'Latino' in qlty_lang:
@@ -325,10 +345,12 @@ def findvideos(item):
             lang = '?'
 
         other = _server.lower()
-        other = other.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.ru', '').replace('.tv', '').replace('my.', '')
-        other = other.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.site', '').strip()
+        other = other.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
+        other = other.replace('.ru', '').replace('.tv', '').replace('my.', '')
+        other = other.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
 
         if 'youtube' in other: continue
+
         elif 'waaw' in other: continue
         elif 'hqq' in other: continue
         elif 'netu' in other: continue
@@ -339,6 +361,9 @@ def findvideos(item):
         elif 'streamango' in other: continue
         elif 'verystream' in other: continue
         elif 'vidtodo' in other: continue
+        elif 'stormo' in other: continue
+
+        elif 'uploaded' in other: continue
 
         if other == qlty:
             qlty = ''
@@ -346,7 +371,7 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, other = other,
                               language = lang, quality = qlty ))
 
-    # ~ Ver en linea
+    # ~ Ver
     if 'Ver en línea' in data: 
         patron = "<tr id='link-.*?<img src=.*?"
         patron += "domain=(.*?)'>.*?<a href='(.*?)'.*?target='_blank'>(.*?)</a>.*?<strong class='quality'>(.*?)</strong>.*?</td><td>(.*?)</td>"
@@ -354,9 +379,28 @@ def findvideos(item):
         matches = scrapertools.find_multiple_matches(data, patron)
 
         for domain, url, tipo, qlty, lang in matches:
+            ses += 1
+
             if not tipo == 'Ver en línea': continue
 
-            servidor = domain.replace('.com', '').replace('.co', '').replace('.cc', '')
+            servidor = domain.lower()
+            servidor = servidor.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
+            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '')
+            servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
+
+            servidor = servertools.corregir_servidor(servidor)
+
+            if 'waaw' in servidor: continue
+            elif 'hqq' in servidor: continue
+            elif 'netu' in servidor: continue
+            elif 'openload' in servidor: continue
+            elif 'powvideo' in servidor: continue
+            elif 'streamplay' in servidor: continue
+            elif 'rapidvideo' in servidor: continue
+            elif 'streamango' in servidor: continue
+            elif 'verystream' in servidor: continue
+            elif 'vidtodo' in servidor: continue
+            elif 'stormo' in servidor: continue
 
             if lang == 'Latino':
                 lang = 'Lat'
@@ -367,7 +411,8 @@ def findvideos(item):
             else:
                 lang = '?'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'v', language = lang, quality = qlty ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'v',
+                                  language = lang, quality = qlty ))
 
     # ~ Descargas
     if 'Descarga' in data:
@@ -377,9 +422,29 @@ def findvideos(item):
         matches = scrapertools.find_multiple_matches(data, patron)
 
         for domain, url, tipo, qlty, lang in matches:
+            ses += 1
+
             if not tipo == 'Descarga': continue
 
-            servidor = domain.replace('.com', '').replace('.co', '').replace('.cc', '')
+            servidor = domain.lower()
+            servidor = servidor.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
+            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '')
+            servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
+
+            servidor = servertools.corregir_servidor(servidor)
+
+            if 'waaw' in servidor: continue
+            elif 'hqq' in servidor: continue
+            elif 'netu' in servidor: continue
+            elif 'openload' in servidor: continue
+            elif 'powvideo' in servidor: continue
+            elif 'streamplay' in servidor: continue
+            elif 'rapidvideo' in servidor: continue
+            elif 'streamango' in servidor: continue
+            elif 'verystream' in servidor: continue
+            elif 'vidtodo' in servidor: continue
+            elif 'stormo' in servidor: continue
+            elif 'uploaded' in servidor: continue
 
             if lang == 'Latino':
                 lang = 'Lat'
@@ -390,7 +455,13 @@ def findvideos(item):
             else:
                 lang = '?'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'd', language = lang, quality = qlty ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'd',
+                                  language = lang, quality = qlty ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -402,7 +473,7 @@ def play(item):
     url = item.url
 
     if item.other == 'v' or item.other == 'd':
-        resp = httptools.downloadpage(item.url, follow_redirects=False)
+        resp = httptools.downloadpage_proxy('ppeliculas', item.url, follow_redirects=False)
         if 'location' in resp.headers:
             url = resp.headers['location']
 
@@ -421,6 +492,7 @@ def play(item):
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
         itemlist.append(item.clone( url=url, server=servidor))
 
 

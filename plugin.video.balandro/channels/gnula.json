@@ -13,5 +13,5 @@
 
   "clusters": ["news", "rankings", "languages", "kids", "docs", "vos"],
 
-  "notes": "Estrenos, recomendadas, mucha diversidad de géneros, por idiomas. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Estrenos, recomendadas, por géneros, idiomas. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

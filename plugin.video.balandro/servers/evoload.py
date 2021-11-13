@@ -23,16 +23,23 @@ def get_video_url(page_url, url_referer=''):
     post = {"code": code, "token": tk}
 
     data = httptools.downloadpage(player_url, headers={"User-Agent": httptools.get_user_agent(), "Referer": page_url}, post=post).data
-    v_data = jsontools.load(data)
 
-    if "stream" in v_data:
-        if "backup" in v_data["stream"]:
-            media_url = v_data["stream"]["backup"]
-        else:
-            media_url = v_data["stream"]["src"]
+    if 'encoded_src' in data:
+        media_url = scrapertools.find_single_match(str(data), '"encoded_src".*?"(.*?)"')
+        if media_url:
+            video_urls.append(['mp4 ', media_url])
+    else:
+        v_data = jsontools.load(data)
 
-        ext = v_data["name"][-4:]
-        video_urls.append(['%s ' % ext, media_url])
+        if "stream" in v_data:
+            if "backup" in v_data["stream"]:
+                media_url = v_data["stream"]["backup"]
+            else:
+                media_url = v_data["stream"]["src"]
+
+            if media_url:
+                ext = v_data["name"][-4:]
+                video_urls.append(['%s ' % ext, media_url])
 
     return video_urls
 

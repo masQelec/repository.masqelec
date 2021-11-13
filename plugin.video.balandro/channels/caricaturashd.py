@@ -8,21 +8,10 @@ from core import httptools, scrapertools, servertools, tmdb
 host = "https://caricaturashd.net/"
 
 
-# ~ def item_configurar_proxies(item):
-    # ~ plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    # ~ plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    # ~ return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-# ~ def configurar_proxies(item):
-    # ~ from core import proxytools
-    # ~ return proxytools.configurar_proxies_canal(item.channel, host)
-
-
 def do_downloadpage(url, post=None, headers=None):
     headers = {'Referer': host}
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
-    # ~ data = httptools.downloadpage_proxy('caricaturashd', url, post=post, headers=headers, follow_redirects=follow_redirects).data
 
     return data
 
@@ -35,8 +24,6 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
-
-    # ~ itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -51,8 +38,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
-
     return itemlist
 
 
@@ -65,8 +50,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
-
-    # ~ itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -229,15 +212,19 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'sub': 'Vose', 'Latino': 'Lat', 'Castellano': 'Esp', 'Español': 'Esp', 'Subtitulado': 'Vose'}
+    IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'sub': 'Vose', 'latino': 'Lat', 'castellano': 'Esp', 'español': 'Esp', 'subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
 
     options = scrapertools.find_multiple_matches(data, 'data-opt=".*?options-(.*?)">.*?<span class="option">(.*?)</span>')
 
+    ses = 0
+
     for option, lang in options:
+        ses += 1
+
         lang = lang.split(" - ")[1]
-        lang = lang.strip()
+        lang = lang.lower().strip()
 
         url = scrapertools.find_single_match(data, '<div id="options-' + option + '.*?<iframe.*?src="(.*?)"')
 
@@ -258,6 +245,11 @@ def findvideos(item):
 
            itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                                 language = IDIOMAS.get(lang,lang) ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -301,7 +293,7 @@ def play(item):
                            itemlist.append(['m3u8', url])
                         return itemlist
 
-                # ~ return 'Opción aún sin desarrollar'
+                # ~ Opción aún sin desarrollar
                 response = recaptcha.get_recaptcha_response(sitekey, item.url)
                 return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
@@ -309,6 +301,7 @@ def play(item):
             servidor = servertools.corregir_servidor(servidor)
 
             itemlist.append(item.clone(server = servidor, url = url))
+
     elif item.url.startswith('https://cinemaupload.com/'):
         item.url = item.url.replace('/cinemaupload.com/', '/embed.cload.video/')
 
@@ -331,13 +324,12 @@ def play(item):
                    itemlist.append(['m3u8', url])
                    return itemlist
 
-        # ~ return 'Opción aún sin desarrollar'
+        # ~ Opción aún sin desarrollar
         response = recaptcha.get_recaptcha_response(sitekey, item.url)
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     else:
         data = do_downloadpage(item.url)
-        # ~ logger.debug(data)
 
         new_url = scrapertools.find_single_match(data, "location.href='([^']+)")
         if new_url:

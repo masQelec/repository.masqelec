@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -8,13 +8,24 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://www.estrenoscinesaa.com/'
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url):
-    data = httptools.downloadpage(url).data
+    # ~ data = httptools.downloadpage(url).data
+    data = httptools.downloadpage_proxy('estrenoscinesaa', url).data
     return data
 
 
 def mainlist(item):
-    # ~ De momento descartadas series pq solamente hay 13
+    # ~ descartadas series solo hay 22
     return mainlist_pelis(item)
 
 def mainlist_pelis(item):
@@ -31,6 +42,8 @@ def mainlist_pelis(item):
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -50,7 +63,7 @@ def generos(item):
         if '/genre/marvel/' in url: continue
         if '/genre/netflix/' in url: continue
         if '/genre/starwars/' in url: continue
-        if '/sci-fi-fantasy/' in url: continue # Solo son series
+        if '/sci-fi-fantasy/' in url: continue # son series
 
         if count: title = title + ' (' + count + ')'
 
@@ -65,7 +78,10 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
+    logger.info("check-00-data: %s" % data)
+
     hasta_data = '<div class="pagination">' if '<div class="pagination">' in data else '<nav class="genres">'
+
     bloque = scrapertools.find_single_match(data, '</h1>(.*?)' + hasta_data)
     if not bloque: bloque = scrapertools.find_single_match(data, '</h1>(.*)')
 
@@ -99,21 +115,21 @@ def list_all(item):
     return itemlist
 
 
-# Si hay excepciones concretas de este canal, añadir aquí, si son genéricas añadir en servertools.corregir_servidor
-def corregir_servidor(servidor):
-    servidor = servertools.corregir_servidor(servidor)
-    return servidor
-
 def findvideos(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(item.url)
 
-    # Fuentes de vídeo
+    ses = 0
+
     matches = scrapertools.find_multiple_matches(data, "(?i)<div class='pframe'><iframe.*?src=(?:'|\")([^'\"]+)")
+
     for url in matches:
-        if 'youtube.com' in url: continue # trailers
+        ses += 1
+
+        if 'youtube.com' in url: continue
+
         servidor = servertools.get_server_from_url(url)
         if servidor and servidor != 'directo':
             url = servertools.normalize_url(servidor, url)
@@ -123,15 +139,27 @@ def findvideos(item):
     bloque = scrapertools.find_single_match(data, "<div id='download'(.*?)</table></div></div></div>")
 
     matches = scrapertools.find_multiple_matches(bloque, "<tr id='link-[^']+'>(.*?)</tr>")
+
     for enlace in matches:
+        ses += 1
+
         url = scrapertools.find_single_match(enlace, " href='([^']+)")
-        servidor = corregir_servidor(scrapertools.find_single_match(enlace, "domain=(?:www.|dl.|)([^'.]+)"))
-        # ~ logger.info('url: %s Servidor: %s' % (url,servidor))
+
+        servidor = scrapertools.find_single_match(enlace, "domain=(?:www.|dl.|)([^'.]+)")
+        servidor = servertools.corregir_servidor(servidor)
+
         if not url or not servidor: continue
-        quality = 'HD'; lang = 'Esp' # siempre tienen las mismas !?
+
+        quality = 'HD'
+        lang = 'Esp'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                               language = lang, quality = quality , other = 'd' ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -153,17 +181,6 @@ def play(item):
 
     return itemlist
 
-
-def search(item, texto):
-    logger.info("texto: %s" % texto)
-    try:
-        item.url = host + '?s=' + texto.replace(" ", "+")
-        return list_search(item)
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
 
 def list_search(item):
     logger.info()
@@ -199,3 +216,16 @@ def list_search(item):
                 itemlist.append(item.clone (url = next_page, title = '>> Página siguiente', action = 'list_search', text_color='coral' ))
 
     return itemlist
+
+
+def search(item, texto):
+    logger.info()
+    try:
+        item.url = host + '?s=' + texto.replace(" ", "+")
+        return list_search(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []
+

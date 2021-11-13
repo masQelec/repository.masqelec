@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools
 
@@ -99,29 +99,36 @@ def findvideos(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
-
-    try:
-        sub_url, sub_lang = scrapertools.find_single_match(data, 'file:\s*"/(webvtt/[^"]+)",\s*label: "([^"]*)"')
-        sub_url = host + sub_url
-        sub_url += '|Referer=' + item.url
-    except:
-        sub_url = ''
-        sub_lang = ''
 
     matches = scrapertools.find_multiple_matches(data, 'file:\s*"([^"]+)",.*?label: "([^"]*)"')
 
-    for url, lbl in matches:
-        if '.mp4' not in url and url != 'video.php' and url != 'video3Dfull.php': continue
+    ses = 0
 
-        if url in ['video.php', 'video3Dfull.php']: 
+    for url, lbl in matches:
+        ses += 1
+
+        if '.mp4' not in url and url != 'video.php' and url != 'videoHD.php' and url != 'video3Dfull.php': continue
+
+        if url in ['video.php', 'videoHD.php', 'video3Dfull.php']:
             url = host + url + '|Referer=' + item.url 
-            url += '&Cookie=' + httptools.get_cookies('area-documental.com')
+            url += '&Cookie=' + httptools.get_cookies('www.area-documental.com')
+
+        sub_url = scrapertools.find_single_match(data, 'file:\s*"/(webvtt/[^"]+)"')
 
         lang = 'Vose'
+        if 'videoHD.php' in url:
+            sub_url = sub_url.replace('spa', 'eng')
+            lang = 'VO'
+
+        sub_url = host + sub_url + '|Referer=' + item.url
 
         itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', url = url, 
                               language = lang, quality = lbl, subtitle = sub_url ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

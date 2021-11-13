@@ -127,11 +127,10 @@ def list_all(item):
     if not item.page: item.page = 0
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     matches = re.compile('<div class="spotlight_image lazy"(.*?)<div class="playRing">', re.DOTALL).findall(data)
-    # ~ if '/search/' in item.url and item.search_type != 'all': # para búsquedas eliminar pelis/series según corresponda
-    if item.search_type != 'all': # eliminar pelis/series según corresponda
+
+    if item.search_type != 'all':
         matches = list(filter(lambda x: (' class="info-series"' not in x and item.search_type == 'movie') or \
                                    (' class="info-series"' in x and item.search_type == 'tvshow'), matches))
 
@@ -154,7 +153,7 @@ def list_all(item):
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
         else:
             title = scrapertools.find_single_match(title, '(.*?)<br').strip()
-            title = title[:1].upper() + title[1:] # algunas series no tienen la mayúscula inicial
+            title = title[:1].upper() + title[1:]
 
             season = scrapertools.find_single_match(url, '-temp-(\d+)$')
             if season:
@@ -169,9 +168,8 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    # Subpaginación interna y/o paginación de la web
     buscar_next = True
-    if num_matches > perpage: # subpaginación interna dentro de la página si hay demasiados items
+    if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
             itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='list_all', text_color='coral' ))
@@ -193,7 +191,7 @@ def temporadas(item):
 
     matches = scrapertools.find_multiple_matches(data, 'class="overviewPlay playLink" href="([^"]+)')
 
-    # averiguar cuantas temporadas hay
+    #  cuantas temporadas
     tot_temp = 0
 
     for url in matches:
@@ -275,13 +273,13 @@ def episodios(item):
     return itemlist
 
 
-# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
 def puntuar_calidad(txt):
     orden = ['CAM', 'TS', 'TSHQ', 'SD', 'DVDRip', 'HDTC', 'HDLine', 'HDLine 720p', 'HD 720p', 'HD 1080p']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
-# Si hay excepciones concretas de este canal, añadir aquí, si son genéricas añadir en servertools.corregir_servidor
+
+
 def corregir_servidor(servidor):
     servidor = servertools.corregir_servidor(servidor)
     if servidor == 'youtvgratis': return 'fembed'
@@ -313,15 +311,13 @@ def findvideos(item):
         else:
             post = 'set=LoadOptions&action=Step2&id=%s&type=%s&quality=%s' % (dataid, tipo, calidad.replace(' ', '+'))
         data = do_downloadpage(host + 'playview', post=post)
-        # ~ logger.debug(data)
 
-        # ~ enlaces = scrapertools.find_multiple_matches(data, 'data-id="([^"]+)">\s*<h4>([^<]+)</h4>\s*<small><img src="https://www\.google\.com/s2/favicons\?domain=([^"]+)')
         enlaces = scrapertools.find_multiple_matches(data, 'data-id="([^"]+)">\s*<h4>([^<]+)</h4>\s*<small><img src="https://www\.google\.com/s2/favicons\?domain=([^"]*)')
         for linkid, lang, servidor in enlaces:
-            # ~ logger.debug('%s %s %s %s' % (calidad, linkid, lang, servidor))
             servidor = servidor.replace('https://', '').replace('http://', '').replace('www.', '').lower()
             servidor = servidor.split('.', 1)[0]
             servidor = corregir_servidor(servidor)
+
             calidad = calidad.replace('(', '').replace(')', '').strip()
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '',
@@ -341,18 +337,16 @@ def play(item):
         post = 'set=LoadOptionsEpisode&action=Step3&id=%s&type=%s&episode=%s' % (item.linkid, item.linktype, str(item.linkepi))
 
     data = do_downloadpage(host + 'playview', post=post)
-    # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, 'data-url="([^"]+)"><span class="pull-left">Link directo')
     if 'http' not in url: url = None
+
     if not url: url = scrapertools.find_single_match(data, '<iframe class="[^"]*" src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, '<iframe src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, 'data-url="([^"]+)')
 
     if url.startswith(host):
-        # ~ url = httptools.downloadpage(url, follow_redirects=False, only_headers=True).headers.get('location', '') # TODO revisar...
         url = do_downloadpage(url, follow_redirects=False, only_headers=True).get('location', '')
-        # ~ logger.debug(url)
 
         url = url.replace('youtvgratis', 'fembed')
 
@@ -363,6 +357,8 @@ def play(item):
     if url:
         if not item.servidor:
             servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
             if servidor and servidor != 'directo':
                 url = servertools.normalize_url(servidor, url)
                 itemlist.append(item.clone( url=url, server=servidor ))
@@ -374,7 +370,6 @@ def play(item):
 
 def search(item, texto):
     logger.info()
-    itemlist = []
     try:
        item.url = host + 'search/' + texto.replace(" ", "+")
        return list_all(item)

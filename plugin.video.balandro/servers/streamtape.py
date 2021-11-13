@@ -7,11 +7,11 @@ from platformcode import logger
 def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
 
-    page_url = page_url.replace('streamtape.com/v/', 'streamtape.com/e/')
+    page_url = page_url.replace('/v/', '/e/')
     video_urls = get_aux(page_url)
 
     if len(video_urls) == 0:
-        page_url = page_url.replace('streamtape.com/e/', 'streamtape.com/v/')
+        page_url = page_url.replace('/e/', '/v/')
         video_urls = get_aux(page_url)
 
     return video_urls
@@ -19,28 +19,20 @@ def get_video_url(page_url, url_referer=''):
 def get_aux(page_url):
     video_urls = []
 
-    data = httptools.downloadpage(page_url).data
-    # ~ logger.debug(data)
+    # ~ referer = {"Referer": page_url}
+    referer = {}
 
-    url = scrapertools.find_single_match(data, 'document\.getElementById\("videolink"\)\.innerHTML\s*=\s*"([^"]+)')
+    data = httptools.downloadpage(page_url, headers=referer).data
 
-    if not url or (not url.startswith('//') and not url.startswith('http')): 
-        aux = scrapertools.find_single_match(data, '\.innerHTML\s*=\s*["\']([^"\']+)["\']\s*\+\s*["\']([^"\']+)')
-        if aux: url = aux[0] + aux[1]
+    if "Video not found" in data:
+        return  "El archivo no existe o ha sido borrado"
 
-    if not url or (not url.startswith('//') and not url.startswith('http')): 
-        url = scrapertools.find_single_match(data, "elem\['innerHTML'\]\s*=\s*'([^']+)")
+    url_data = scrapertools.find_single_match(data, """getElementById\('\w+link'\).innerHTML = "[^"]+" .* \('.+?/([^']+)'\)""")
 
-    if not url or (not url.startswith('//') and not url.startswith('http')): 
-        url = scrapertools.find_single_match(data, '<div id="videolink"[^>]*>(.*?)</div>')
-    if url:
-        url += '&stream=1'
-        if url.startswith('//'): url = 'https:' + url
-
-        resp = httptools.downloadpage(url, headers={'Referer': page_url}, follow_redirects=False, only_headers=True)
-        if 'location' in resp.headers: 
-                url = resp.headers['location']
+    if url_data:
+        url = "https://adblockstrtech.link/" + url_data + "&stream=1" + "|User-Agent=" + httptools.get_user_agent()
 
         video_urls.append(['mp4', url])
 
     return video_urls
+

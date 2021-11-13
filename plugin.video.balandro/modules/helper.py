@@ -9,15 +9,15 @@ if sys.version_info[0] >= 3:
 else:
     translatePath = xbmc.translatePath
 
-from platformcode import config, logger, platformtools
+from platformcode import config, logger, platformtools, updater
 from core import filetools
 from core.item import Item
 
 from modules import filters
 
 
-ADDON_REPO_ADDONS = 'https://balandro.tk/repo/addons.xml'
-ADDON_UPDATES_JSON = 'https://balandro.tk/addon_updates/updates-v2.0.0.json'
+ADDON_REPO_ADDONS = 'https://balandro-tk.github.io/balandro/'
+ADDON_UPDATES_JSON = 'https://raw.githubusercontent.com/balandro-tk/addon_updates/main/updates-v2.1.0.json'
 
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
@@ -26,8 +26,11 @@ color_avis  = config.get_setting('notification_avis_color', default='yellow')
 color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
 
-_foro = "[COLOR plum][B][I] balandro.tk [/I][/B][/COLOR]"
-_telegram = "[COLOR lightblue][B][I] @balandro_asesor [/I][/B][/COLOR]"
+_foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/viewforum.php?f=44 [/I][/B][/COLOR]"
+_source = "[COLOR coral][B][I] balandro-tk.github.io/balandro/ [/I][/B][/COLOR]"
+_telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
+
+_team = "[COLOR hotpink][B][I] t.me/Balandro_team [/I][/B][/COLOR]"
 
 
 def mainlist(item):
@@ -38,21 +41,36 @@ def mainlist(item):
     descartar_anime = config.get_setting('descartar_anime', default=False)
 
     itemlist.append(item.clone( action='', title= 'Contacto:', text_color='blue', thumbnail=config.get_thumb('pencil'), folder=False ))
-    itemlist.append(item.clone( action='', title= ' - Foro ' + _foro + ' Novedades, Sugerencias, Aportaciones, etc.', folder=False, thumbnail=config.get_thumb('support') ))
-    itemlist.append(item.clone( action='', title= ' - Telegram ' + _telegram + ' Asesoramiento, Dudas, Ayuda, etc.', folder=False, thumbnail=config.get_thumb('support') ))
+    itemlist.append(item.clone( action='', title= ' - Foro ' + _foro + ' Instalaciones, Novedades, Sugerencias, etc.', folder=False, thumbnail=config.get_thumb('foro') ))
+    itemlist.append(item.clone( action='', title= ' - Fuente ' + _source + ' Repositorio, Add-On, etc.', folder=False, thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( action='', title= ' - Telegram ' + _telegram + ' Asesoramiento, Dudas, Consultas, etc. ', folder=False, thumbnail=config.get_thumb('telegram') ))
 
-    itemlist.append(item.clone( action='', title= 'Uso:', text_color='chartreuse', thumbnail=config.get_thumb('dev'), folder=False ))
-    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están disponibles', folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están inestables', no_stable = True, folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están inactivos', no_active = True, folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='', title= 'Uso:', text_color='limegreen', thumbnail=config.get_thumb('dev'), folder=False ))
     itemlist.append(item.clone( action='show_help_tips', title= ' - Trucos y consejos varios', folder=False ))
     itemlist.append(item.clone( action='show_help_use', title= ' - Ejemplos de niveles de uso', folder=False ))
     itemlist.append(item.clone( action='show_help_faq', title= ' - FAQS - Preguntas y respuestas', folder=False ))
     itemlist.append(item.clone( action='show_help_settings', title= ' - Notas sobre algunos parámetros de la configuración', folder=False ))
+    itemlist.append(item.clone( action='show_help_register', title= ' - Información dominios que requieren registrarse', folder=False, thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría canales)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
+
+    itemlist.append(item.clone( action='', title= 'Canales:', text_color='chartreuse', thumbnail=config.get_thumb('stack'), folder=False ))
+    if config.get_setting('developer_mode', default=False):
+        itemlist.append(item.clone( action='show_channels_list', title= ' - Todos los canales', tipo = 'all', folder=False, thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( action='channels_status', title= ' - Personalizar canales Preferidos (Marcar o Des-marcar)', des_rea = False, folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_status', title= ' - Personalizar canales (Desactivar o Re-activar)', des_rea = True, folder=False, thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están disponibles', folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_prefered', title= ' - Qué canales tiene marcados como preferidos', folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_no_actives', title= ' - Qué canales tiene marcados como desactivados', folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están inestables', no_stable = True, folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales requieren cuenta', cta_register = True, folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están temporalmente inactivos', temp_no_active = True, folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están inactivos', no_active = True, folder=False, thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='', title= 'Proxies:', text_color='red', thumbnail=config.get_thumb('flame'), folder=False ))
     itemlist.append(item.clone( action='channels_with_proxies', title= ' - Qué canales pueden usar proxies', folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='proxysearch', title = ' - Configurar proxies a usar en los canales que los necesiten', action = 'proxysearch_all', thumbnail=config.get_thumb('flame') ))
     itemlist.append(item.clone( action='show_help_proxies', title= ' - Información uso de proxies', folder=False ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría proxies)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
@@ -65,9 +83,10 @@ def mainlist(item):
     itemlist.append(item.clone( action='', title='Buscar:', text_color='cyan', thumbnail=config.get_thumb('magnifyingglass'), folder=False ))
     itemlist.append(item.clone( channel='search', action='show_help', title = ' - Información sobre búsquedas', folder=False ))
     itemlist.append(item.clone( channel='tmdblists', action='show_help', title= ' - Información búsquedas y listas en TMDB', folder=False ))
+    itemlist.append(item.clone( action='channels_no_searchables', title= ' - Qué canales nunca intervendrán en las búsquedas', folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='channels_no_actives', title= ' - Qué canales no intervienen en las búsquedas (desactivados)', folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( channel='filters', title = ' - Excluir canales en las búsquedas', action = 'mainlist', thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( channel='proxysearch', title = ' - Configurar proxies a usar (en los canales que los necesiten)', action = 'proxysearch_all', thumbnail=config.get_thumb('flame') ))
+    itemlist.append(item.clone( channel='filters', title = ' - Excluir canales en las búsquedas', action = 'mainlist', thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría buscar)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( action='', title='Preferidos:', text_color='springgreen', thumbnail=config.get_thumb('videolibrary'), folder=False ))
@@ -102,19 +121,19 @@ def mainlist(item):
         itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría canales)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( action='', title='Servidores:', text_color='gold', thumbnail=config.get_thumb('bolt'), folder=False ))
+    if config.get_setting('developer_mode', default=False):
+        itemlist.append(item.clone( action='show_servers_list', title= ' - Todos los servidores', tipo = 'all', folder=False, thumbnail=config.get_thumb('bolt') ))
+
     itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores están disponibles', tipo = 'activos', folder=False, thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores tienen vías alternativas', tipo = 'alternativos', folder=False, thumbnail=config.get_thumb('bolt') ))
     itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores se detectan pero no están soportados', tipo = 'sinsoporte', folder=False, thumbnail=config.get_thumb('bolt') ))
     itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores están inactivos', tipo = 'inactivos', folder=False, thumbnail=config.get_thumb('bolt') ))
-
-    if config.get_setting('developer_mode', default=False):
-        itemlist.append(item.clone( action='show_servers_list', title= ' - Lista con todos los servidores', tipo = 'all', folder=False, thumbnail=config.get_thumb('bolt') ))
 
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría play)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( action='', title= 'Media Center:', text_color='pink', thumbnail=config.get_thumb('computer'), folder=False ))
     itemlist.append(item.clone( action='show_log', title= ' - Visualizar el fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('computer') ))
     itemlist.append(item.clone( action='copy_log', title= ' - Obtener una copia del fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('folder') ))
-    #itemlist.append(item.clone( action='upload_pastebin', title= ' - Subir a Pastebin el fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('cloud') ))
     itemlist.append(item.clone( action='show_advs', title= ' - Visualizar el fichero advancedsettings de su Media Center', folder=False, thumbnail=config.get_thumb('keyboard') ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración (categoría sistema)', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
@@ -125,9 +144,12 @@ def mainlist(item):
     itemlist.append(item.clone( action='show_cook', title= ' - Visualizar su fichero de cookies', folder=False, thumbnail=config.get_thumb('folder') ))
     itemlist.append(item.clone( channel='actions', title= ' - Ajustes configuración', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title='Desarrollo:', text_color='fuchsia', thumbnail=config.get_thumb('quote'), folder=False ))
+    itemlist.append(item.clone( action='', title='Versión:', text_color='violet', thumbnail=config.get_thumb('quote'), folder=False ))
     itemlist.append(item.clone( action='show_version', title= ' - Información versión', folder=False, thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='show_changelog', title= ' - Historial de cambios', folder=False, thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( action='', title='Desarrollo:', text_color='fuchsia', thumbnail=config.get_thumb('quote'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Team ' + _team + ' Unirse al Equipo de Desarrollo', folder=False, thumbnail=config.get_thumb('team') ))
     itemlist.append(item.clone( action='show_dev_notes', title= ' - Notas para developers', folder=False, thumbnail=config.get_thumb('tools') ))
     itemlist.append(item.clone( action='show_license', title= ' - Licencia (Gnu Gpl v3)', folder=False, thumbnail=config.get_thumb('megaphone') ))
     itemlist.append(item.clone( action='show_legalidad', title= ' - Legalidad', folder=False, thumbnail=config.get_thumb('megaphone') ))
@@ -150,6 +172,18 @@ def show_channels_list(item):
 
     filters.show_channels_list(item)
 
+def channels_status(item):
+    logger.info()
+
+    filters.channels_status(item)
+
+def channels_des_rea(item):
+    logger.info()
+
+    item.des_rea = True
+
+    filters.channels_status(item)
+
 def channels_with_proxies(item):
     logger.info()
 
@@ -160,10 +194,24 @@ def channels_no_actives(item):
 
     filters.no_actives(item)
 
+def channels_no_searchables(item):
+    logger.info()
+
+    item.no_searchables = True
+
+    filters.no_actives(item)
+
 def channels_prefered(item):
     logger.info()
 
     filters.only_prefered(item)
+
+def channels_inestables(item):
+    logger.info()
+
+    item.no_stable = True
+
+    filters.show_channels_list(item)
 
 def channels_only_torrents(item):
     logger.info()
@@ -182,6 +230,48 @@ def show_servers_list(item):
         item.tipo = 'activos'
 
     filters.show_servers_list(item)
+
+
+def show_help_register(item):
+    logger.info()
+
+    txt = '*) Determinadas webs obligan a registrase para permitir su acceso.'
+
+    txt += '[CR][CR]'
+    txt += ' Es importante usar [B][COLOR gold]cuentas secundarias[/COLOR][/B] para registrarse, nunca useis las vuestras personales.'
+
+    txt += '[CR][CR]'
+    txt += '*) Para ello desde otro equipo debeis accecder a la web en cuestión y registraros (darse de alta)'
+
+    txt += '[CR][CR]'
+    txt += ' Si desconoceis el dominio actual de esa web, mediante un navegador localizar su [B][COLOR gold]twitter[/COLOR][/B]'
+
+    txt += '[CR][CR]'
+    txt += ' Por ejemplo [B][COLOR gold]hdfull twitter oficial[/COLOR][/B]'
+
+    txt += '[CR][CR]'
+    txt += '*) Imprescindible tomar buena nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para cada web.'
+
+    txt += '[CR][CR]'
+    txt += '*) Una vez tengais vuestros datos, podeis informarlos en la configuración, o bien se os solicitará al acceder a ese canal determinado.'
+
+    txt += '[CR][CR]'
+    txt += '*) Para el caso concreto del servidor [B][COLOR gold]Uptobox[/COLOR][/B]'
+
+    txt += '[CR][CR]'
+    txt += ' Acceder desde otro equipo a [B][COLOR gold]uptobox.com/pin[/COLOR][/B]'
+
+    txt += '[CR][CR]'
+    txt += '*) En el caso de no estar registrados proceder a ello (darse de alta)'
+
+    txt += '[CR][CR]'
+    txt += ' Iniciar la sesión con vuestras credenciales'
+    txt += ' e introducir el [B][COLOR gold]PIN[/COLOR][/B] que se os mostró en la ventana al intentar reproducir, para tener vinculada vuestra cuenta.'
+
+    txt += '[CR][CR]'
+    txt += '*) Mientras mantengais las sesiones abiertas via navegador en estos dominios, no tendreis q volver a informar vuestras credenciales.'
+
+    platformtools.dialog_textviewer('Información dominios que requieren registrase', txt)
 
 
 def show_help_settings(item):
@@ -732,12 +822,18 @@ def show_test(item):
         except:
            tex_access_repo = '[COLOR lightblue][B]No se pudo comprobar[/B][/COLOR]'
 
-    last_ver = ''
+    ult_ver = ''
+
     access_last_ver = False
+
     if hay_repo:
         if access_repo:
-            last_ver = scrapertools.find_single_match(data, 'name="' + config.__addon_name + '.*?version="(.*?)"')
-            if last_ver: access_last_ver = True
+            try:
+                ult_ver = updater.check_addon_version()
+            except:
+                pass
+
+            if ult_ver: access_last_ver = True
 
     access_fixes = False
     tex_access_fixes = ''
@@ -753,49 +849,62 @@ def show_test(item):
                tex_access_fixes = '[COLOR lightblue][B]No se pudo comprobar[/B][/COLOR]'
 
 
-    txt = '[CR][CR][COLOR fuchsia]Balandro[/COLOR][CR]'
+    txt = '[CR][CR][COLOR fuchsia]BALANDRO[/COLOR][CR]'
 
     if not your_ip:
         your_ip = '[COLOR red][B] Sin Conexión [/B][/COLOR]'
 
-    txt += '- [COLOR gold]Conexión internet:[/COLOR]  %s ' % your_ip
+    txt += ' - [COLOR gold]Conexión internet:[/COLOR]  %s ' % your_ip
     txt += '[CR][CR]'
 
     tex_repo = ' Instalado'
-    if hay_repo == False: tex_repo = '[COLOR red][B] No instalado, No recibirá más versiones [/B][/COLOR]'
+    if hay_repo == False: tex_repo = '[I][B][COLOR %s] No instalado, No recibirá más versiones [/COLOR][/B][/I]' % color_adver
 
 
-    txt += '- [COLOR gold]Repositorio:[/COLOR]  %s ' % tex_repo
+    txt += ' - [COLOR gold]Repositorio:[/COLOR]  %s ' % tex_repo
     txt += '[CR][CR]'
     tex_access_repo = ' Accesible'
     if access_repo == False:
         if tex_access_repo == '':
             tex_access_repo = '[COLOR red][B] Sin conexión, No accesible [/B][/COLOR]'
 
-    txt += '- [COLOR gold]Conexión con repositorio:[/COLOR]  %s ' % tex_access_repo
+    txt += ' - [COLOR gold]Conexión con repositorio:[/COLOR]  %s ' % tex_access_repo
     txt += '[CR][CR]'
 
     if access_last_ver:
-        tex_access_last_ver = '  ' + last_ver
-    else: tex_access_last_ver = '[COLOR red][B] Última versión, No accesible [/B][/COLOR]'
+        tex_access_last_ver = ' Versión correcta '
+    else:
+        if not ult_ver:
+            if not access_repo:
+                tex_access_last_ver = '[I][B][COLOR %s] No accesible [/COLOR][/B][/I]' % color_adver
+            else:
+                tex_access_last_ver = '[I][B][COLOR %s] Accesible desde Repositorio [/COLOR][/B][/I]' % color_adver
+        else:
+            tex_access_last_ver = '[I][B][COLOR %s] (desfasada)[/COLOR][/B][/I]' % color_adver
 
-    txt += '- [COLOR gold]Última versión:[/COLOR]  %s ' % tex_access_last_ver
+    txt += ' - [COLOR gold]Última versión:[/COLOR]  %s ' % tex_access_last_ver
     txt += '[CR][CR]'
 
     if not tex_access_fixes:
         tex_access_fixes = ' Accesibles'
         if access_fixes == None: tex_access_fixes = '[COLOR yellow] Sin actualizaciones tipo Fix pendientes [/COLOR]'
-        elif access_fixes == False: tex_access_fixes = '[COLOR red][B] Fixes sobre ´última versión, No accesibles [/B][/COLOR]'
+        elif access_fixes == False: tex_access_fixes = '[I][B][COLOR %s] Fixes sobre última versión, No accesibles [/COLOR][/B][/I]' % color_adver
 
-    txt += '- [COLOR gold]Fixes sobre última versión:[/COLOR]  %s ' % tex_access_fixes
+    txt += ' - [COLOR gold]Fixes sobre última versión:[/COLOR]  %s ' % tex_access_fixes
     txt += '[CR][CR]'
 
-    txt += '- [COLOR gold]Versión instalada:[/COLOR]  [COLOR yellow][B]%s[/B][/COLOR]' % config.get_addon_version()
+    txt += ' - [COLOR gold]Versión instalada:[/COLOR]  [COLOR yellow][B]%s[/B][/COLOR]' % config.get_addon_version()
+    if not ult_ver:
+        if not access_repo:
+            txt = txt + '[I][COLOR %s] (Sin repositorio)[/COLOR][/I]' % color_adver
+        else:
+            txt = txt + '[I][COLOR %s] (desfasada)[/COLOR][/I]' % color_adver
+
     txt += '[CR][CR]'
 
     folder_down = config.get_setting('downloadpath', default='')
     if not folder_down == '':
-        txt += '- [COLOR gold]Carpeta descargas:[/COLOR]  [COLOR moccasin]%s[/COLOR]' % folder_down
+        txt += ' - [COLOR gold]Carpeta descargas:[/COLOR]  [COLOR moccasin]%s[/COLOR]' % folder_down
         txt += '[CR][CR]'
 
     tex_dom = ''
@@ -806,7 +915,7 @@ def show_test(item):
     if not hdfull_dominio == '': tex_dom = tex_dom + hdfull_dominio
 
     if tex_dom:
-        txt += '- [COLOR gold]Dominios:[/COLOR]  [COLOR springgreen]%s[/COLOR]' %  str(tex_dom).replace('https://', '').replace('/', '')
+        txt += ' - [COLOR gold]Dominios:[/COLOR]  [COLOR springgreen]%s[/COLOR]' %  str(tex_dom).replace('https://', '').replace('/', '')
         txt += '[CR][CR]'
 
     filtros = {'searchable': True}
@@ -828,7 +937,7 @@ def show_test(item):
            txt_ch += '[COLOR red]%s[/COLOR]  ' % ch['name']
 
        if not txt_ch: txt_ch = 'No hay canales con proxies' 
-       txt += '- [COLOR gold]Proxies:[/COLOR]  %s' %  str(txt_ch)
+       txt += ' - [COLOR gold]Proxies:[/COLOR]  %s' %  str(txt_ch)
 
     cliente_torrent = config.get_setting('cliente_torrent', default='Ninguno')
     if cliente_torrent == 'Ninguno': tex_tor = '[COLOR moccasin]Ninguno[/COLOR]'
@@ -841,38 +950,47 @@ def show_test(item):
       else:
           tex_tor += '  [COLOR red][B]No instalado[/B][/COLOR]'
 
-    txt += '[CR][CR]- [COLOR gold]Motor torrent:[/COLOR]  %s' % tex_tor
+    txt += '[CR][CR] - [COLOR gold]Motor torrent:[/COLOR]  %s' % tex_tor
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
         tex_yt = '  Instalado'
     else:
         tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
 
-    txt += '[CR][CR]- [COLOR gold]Youtube addon:[/COLOR]  %s' % tex_yt
+    txt += '[CR][CR] - [COLOR gold]YouTube addon:[/COLOR]  %s' % tex_yt
+
+    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+        tex_yt = '  Instalado'
+    else:
+        tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
+
+    txt += '[CR][CR] - [COLOR gold]ResolveUrl script:[/COLOR]  %s' % tex_yt
 
     loglevel = config.get_setting('debug', 0)
     if loglevel == 0: tex_niv = 'Solo Errores'
     elif loglevel == 1: tex_niv = 'Errores e Información'
     else: tex_niv = 'Máxima Información'
 
-    txt += '[CR][CR]- [COLOR gold]Log:[/COLOR]  %s' % tex_niv
+    txt += '[CR][CR] - [COLOR gold]Log:[/COLOR]  %s' % tex_niv
 
-    txt += '[CR][CR][COLOR fuchsia]Entorno[/COLOR][CR]'
+    txt += '[CR][CR][COLOR fuchsia]PLATAFORMA[/COLOR][CR]'
 
-    txt += '- [COLOR gold]Media center:[/COLOR]  [COLOR coral]%s[/COLOR]' % str(xbmc.getInfoLabel('System.BuildVersion'))
+    txt += ' - [COLOR gold]Media center:[/COLOR]  [COLOR coral]%s[/COLOR]' % str(xbmc.getInfoLabel('System.BuildVersion'))
     txt += '[CR][CR]'
 
     plataforma = platform.uname()
 
-    txt += '- [COLOR gold]Sistema:[/COLOR]  %s-%s-%s' %  (str(plataforma[0]), str(plataforma[2]), str(plataforma[3]))
+    txt += ' - [COLOR gold]Sistema:[/COLOR]  %s-%s-%s' %  (str(plataforma[0]), str(plataforma[2]), str(plataforma[3]))
     txt += '[CR][CR]'
 
-    txt += '- [COLOR gold]Python:[/COLOR]  %s.%s.%s' % (str(sys.version_info[0]), str(sys.version_info[1]), str(sys.version_info[2]))
+    txt += ' - [COLOR gold]Python:[/COLOR]  %s.%s.%s' % (str(sys.version_info[0]), str(sys.version_info[1]), str(sys.version_info[2]))
     txt += '[CR][CR]'
 
-    if last_ver:
-        if not config.get_addon_version() == last_ver:
-            platformtools.dialog_ok(config.__addon_name, 'Versión instalada[COLOR coral][B] ' + config.get_addon_version() + '[/B][/COLOR]', 'Última Versión disponible [COLOR yellow][B] ' + last_ver + '[/B][/COLOR]')
+    if not ult_ver:
+        if not access_repo:
+            platformtools.dialog_ok(config.__addon_name, 'Versión instalada sin repositorio[COLOR coral][B] ' + config.get_addon_version() + '[/B][/COLOR]', '[COLOR yellow][B] Instale la última Versión del Repositorio [/COLOR][/B]')
+        else:
+            platformtools.dialog_ok(config.__addon_name, 'Versión instalada desfasada[COLOR coral][B] ' + config.get_addon_version() + '[/B][/COLOR]', '[COLOR yellow][B] Instale la última Versión disponible del Add-On[/COLOR][/B]')
 
     platformtools.dialog_textviewer('Test status sistema', txt)
 

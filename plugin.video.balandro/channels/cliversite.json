@@ -13,5 +13,5 @@
 
   "clusters": ["news", "rankings", "years", "lasts", "kids", "docs", "vos"],
 
-  "notes": "Películas por género, por año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas por géneros, por año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

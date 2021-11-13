@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -100,10 +100,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, 'id="options-(.*?)".*?<iframe .*?src="(.*?)"')
 
-    i = 0
+    ses = 0
 
     for opt, url in matches:
-        i += 1
+        ses += 1
+
         srv, lang = scrapertools.find_single_match(data, 'href="#options-' + str(opt)+ '">.*?<span class="server">(.*?)-(.*?)</span>')
 
         srv = srv.lower().strip()
@@ -119,14 +120,19 @@ def findvideos(item):
         other = ''
         if servidor:
            if url.startswith('https://streamcrypt.net/'):
-               other = 'streamcrypt' + '-' + str(i)
+               other = 'streamcrypt' + '-' + str(ses)
            else:
               if not servidor == 'streamz':
-                 other = srv.lower() + '-' + str(i)
+                 other = srv.lower() + '-' + str(ses)
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = other, language = idioma ))
 
     # ~ downloads recatpcha
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -148,6 +154,8 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if servidor:
             url = servertools.normalize_url(servidor, url)
             itemlist.append(item.clone( url=url, server=servidor ))

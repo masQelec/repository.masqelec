@@ -1,6 +1,6 @@
 {
   "id": "fastplay",
-  "name": "FastPlay",
+  "name": "Fastplay",
 
   "active": true,
 
@@ -9,7 +9,7 @@
     "patterns": [
       {
         "pattern": "fastplay.(?:to|cc|sx)/(?:flash-|embed-|)([A-z0-9]+)",
-        "url": "http://fastplay.cc/embed-\\1.html"
+        "url": "https://fastplay.cc/embed-\\1.html"
       }
     ]
   }

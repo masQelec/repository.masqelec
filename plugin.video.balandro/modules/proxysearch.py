@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, re
-
-import xbmcgui
+import os, re, xbmcgui
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -20,10 +18,7 @@ color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
 
 channels_poe = [
-        ['documaniatv', 'https://www.documaniatv.com/'],
-        ['gdrive', 'https://drive.google.com/drive/'],
-        ['hdfull', 'https://hdfullcdn.cc/'],
-        ['playdede', 'https://playdede.com/']
+        ['gdrive', 'https://drive.google.com/drive/']
         ]
 
 
@@ -64,8 +59,12 @@ def proxysearch_all(item):
 
     if proxies_todos:
         if proxies_auto:
-            if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum][B]Este proceso requerirá un considerable espacio de tiempo según su configuración actual de proxies.[/B][/COLOR]', "[COLOR yellow]¿ Desea iniciar la búsqueda de proxies para 'Todos' los canales que los necesiten ?[/COLOR]"):
-               return
+            if item.extra:
+               if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum][B]Este proceso Podría necesitar un considerable espacio de tiempo según su configuración actual de proxies.[/B][/COLOR]', "[COLOR yellow]¿ Desea iniciar la búsqueda de proxies para 'Todos' los canales que los necesiten ?[/COLOR]"):
+                   return
+            else:
+               if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum][B]Este proceso Requerirá un considerable consumo de tiempo según su configuración actual de proxies.[/B][/COLOR]', "[COLOR yellow]¿ Desea iniciar la búsqueda de proxies para 'Todos' los canales que los necesiten ?[/COLOR]"):
+                   return
         else:
            platformtools.dialog_ok(config.__addon_name, '[COLOR red][B]En los Ajustes categoría proxies de la configuración, No tiene el Modo buscar automaticamente.[/B][/COLOR]')
            return
@@ -79,10 +78,39 @@ def proxysearch_all(item):
     ch_list = channeltools.get_channels_list(filtros=filtros)
 
     if ch_list:
-        if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Desea Quitar previamente los Proxies memorizados en Todos los canales ?[/COLOR]'):
+        txt_avis = '¿ Desea Quitar previamente los Proxies memorizados en TODOS los canales ?'
+        if item.extra:
+            txt_avis = '¿ Desea Quitar previamente los Proxies memorizados en los canales ?'
+
+        if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]' + txt_avis + '[/COLOR]'):
            for ch in ch_list:
                if not 'proxies' in ch['notes'].lower():
                    continue
+
+               if item.extra:
+                   if item.extra == 'movies':
+                       if not 'movie' in ch['search_types']:
+                           continue
+
+                   elif item.extra == 'tvshows':
+                         if not 'tvshow' in ch['search_types']:
+                             continue
+
+                   elif item.extra == 'mixed':
+                         if not 'all' in ch['search_types']:
+                             continue
+
+                   elif item.extra == 'documentaries':
+                         if not 'documentary' in ch['search_types']:
+                             continue
+
+                   elif item.extra == 'torrents':
+                         if not 'torrent' in ch['categories']:
+                             continue
+
+                   else:
+                        if not 'all' in ch['search_types']:
+                            continue
 
                # por NAME vensiones anteriores a 2.0
                cfg_proxies_channel = 'channel_' + ch['name'] + '_proxies'
@@ -255,11 +283,37 @@ def proxysearch_all(item):
                 platformtools.dialog_notification(ch['name'], '[B][COLOR %s]Ignorado por excluido[/COLOR][/B]' % color_exec)
                 continue
 
+        if item.extra:
+           if item.extra == 'movies':
+               if not 'movie' in ch['search_types']:
+                   continue
+
+           elif item.extra == 'tvshows':
+               if not 'tvshow' in ch['search_types']:
+                   continue
+
+           elif item.extra == 'mixed':
+               if not 'all' in ch['search_types']:
+                   continue
+
+           elif item.extra == 'documentaries':
+               if not 'documentary' in ch['search_types']:
+                   continue
+
+           elif item.extra == 'torrents':
+               if not 'torrent' in ch['categories']:
+                   continue
+
+           else:
+               if not 'all' in ch['search_types']:
+                   continue
+
         proxysearch_channel(item, ch['id'], ch['name'])
 
-    txt = 'Revise los canales, porque podria ser que algún canal no los necesite ó viceversa, '
-    txt += 'para ello bastará con entrar al canal y ver si se presentan listas en cualquiera de sus opciones, '
-    txt += 'en este caso deberá eliminar los proxies memorizados ó configurarlos de nuevo dentro del canal.'
+    txt = 'Revise los canales, porque podria ser que algún canal no los necesite ó viceversa. '
+    if not item.extra:
+        txt += 'Para ello bastará con entrar al canal y ver si se presentan listas en cualquiera de sus opciones, '
+        txt += 'si procede deberá eliminar los proxies memorizados ó configurarlos de nuevo dentro del canal.'
 
     platformtools.dialog_ok(config.__addon_name, 'Proceso configurar proxies a usar y su memorización Finalizado.', '[COLOR yellow][B]' + txt + '[/COLOR][/B]')
 
@@ -302,7 +356,7 @@ def proxysearch_channel(item, channel_id, channel_name):
 
     el_canal = '[B][COLOR %s]' % color_exec
     el_canal += channel_name
-    el_canal += '[COLOR %s] buscando ...[/COLOR][/B]' % color_avis
+    el_canal += '[COLOR %s] procesando ...[/COLOR][/B]' % color_avis
     platformtools.dialog_notification('Buscar proxies', el_canal)
 
     channel_py = channel_id + '.py'
@@ -334,9 +388,13 @@ def proxysearch_channel(item, channel_id, channel_name):
               platformtools.dialog_ok(config.__addon_name + ' ' + channel_name , el_canal + '[/COLOR][/B]')
               return
 
-           part_py = 'mainlist'
-           if 'configurar_proxies' in data: part_py = 'configurar_proxies'
-           elif 'do_downloadpage' in data: part_py = 'do_downloadpage'
+           part_py = 'def mainlist'
+           if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
+           elif 'CLASS ' in data or 'class ' in data: part_py = 'class '
+
+           elif 'def login' in data: part_py = 'def login'
+           elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
+           elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
 
            bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
            bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
@@ -351,7 +409,7 @@ def proxysearch_channel(item, channel_id, channel_name):
         if dominio:
             host = dominio
 
-    if not host:
+    if not host or not '//' in host:
         if channel_name == 'NewPct1':
             el_canal = ('Se ignora este canal en el proceso, porque Falta seleccionar que dominio "CLON" se utilizará  [B][COLOR %s]' + channel_name) % color_alert
         else:
@@ -365,7 +423,7 @@ def proxysearch_channel(item, channel_id, channel_name):
         response = httptools.downloadpage(host, raise_weberror=False)
         if response.sucess == True:
             if len(response.data) > 999:
-                 el_canal = ('[B][COLOR %s]No necesita proxies  ') % color_list_proxies
+                 el_canal = ('[B][COLOR %s]No necesita proxies ') % color_list_proxies
                  el_canal += ('[COLOR %s]' + channel_name + '[/COLOR][/B]') % color_exec
                  platformtools.dialog_notification(config.__addon_name, el_canal)
                  return

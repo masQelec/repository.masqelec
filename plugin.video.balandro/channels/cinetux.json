@@ -13,5 +13,5 @@
 
   "clusters": ["news", "rankings", "languages", "years", "adults", "kids", "docs", "vos"],
 
-  "notes": "Películas destacadas, actualizadas, por idioma, por género. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas destacadas, actualizadas, por idioma, por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

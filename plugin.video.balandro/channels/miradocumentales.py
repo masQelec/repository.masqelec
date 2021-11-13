@@ -42,7 +42,6 @@ def list_all(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     matches = scrapertools.find_multiple_matches(data, '<div class="mini_img">(.*?)<hr>')
 
@@ -50,9 +49,11 @@ def list_all(item):
         url, title = scrapertools.find_single_match(article, ' href="([^"]+)" title="([^"]+)')
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)')
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<div class="contenido_extracto_index">(.*?)<div')).strip()
-        if plot == '': continue # entradas que no contienen vídeos
-        if title == 'La guía definitiva para crear un negocio exitoso en Internet': continue # entradas que no contienen vídeos
-        if title == 'Ventajas y desventajas de las criptomonedas que necesitas conocer': continue # entradas que no contienen vídeos
+
+        # entradas que no contienen vídeos
+        if plot == '': continue
+        elif title == 'La guía definitiva para crear un negocio exitoso en Internet': continue
+        elif title == 'Ventajas y desventajas de las criptomonedas que necesitas conocer': continue
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, plot=plot, 
                                     contentType='movie', contentTitle=title, contentExtra='documentary' ))
@@ -69,19 +70,22 @@ def findvideos(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, '<p><iframe src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, '<p><iframe.*? src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, '<div class="single_player">\s*<iframe.*? src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, '<div class="single_player">\s*<a href="([^"]+)')
+
     if not url: url = scrapertools.find_single_match(data, '<p>\[\w+\]([^\[]+)') #Ex: <p>[vimeo]https://vimeo.com/...[/vimeo]</p>
 
     if url:
         url = url.replace('&#038;', '&').replace('&amp;', '&')
+
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if servidor and servidor != 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = servidor.capitalize(), url = url ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Esp' ))
 
     return itemlist
 

@@ -3,7 +3,7 @@
   "name": "PelisHouse",
   "thumbnail": "pelishouse.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["adults", "news", "rankings", "languages", "years", "countries", "kids", "docs", "vos", "3d"],
 
-  "notes": "Películas: novedades, por género, años e idiomas. Series: novedades."
+  "notes": "Películas: novedades, por géneros, año e idiomas. Series: novedades. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

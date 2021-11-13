@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -10,19 +10,8 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://www.peliculasflv.io/'
 
 
-# ~ def item_configurar_proxies(item):
-    # ~ plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    # ~ plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    # ~ return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-# ~ def configurar_proxies(item):
-    # ~ from core import proxytools
-    # ~ return proxytools.configurar_proxies_canal(item.channel, host)
-
-
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
-    # ~ data = httptools.downloadpage_proxy('peliculasflv', url, post=post, headers=headers).data
 
     return data
 
@@ -44,7 +33,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -53,7 +41,6 @@ def list_all(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     matches = re.compile('<article>(.*?)</article>', re.DOTALL).findall(data)
     num_matches = len(matches)
@@ -113,7 +100,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(bloque,'<tr>(.*?)</tr>')
 
+    ses = 0
+
     for match in matches:
+        ses += 1
+
         servidor = scrapertools.find_single_match(match,'img src=".*?.*?/>\s.*?<span>(.*?)<').strip().lower()
         if not servidor: continue
 
@@ -124,6 +115,11 @@ def findvideos(item):
         if url:
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, title = '',
                                   language = IDIOMAS.get(lang, lang), quality = qlty ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

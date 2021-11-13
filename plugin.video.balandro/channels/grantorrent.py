@@ -2,12 +2,12 @@
 
 import re, base64
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://grantorrent.nl/'
+host = 'https://grantorrent.ch/'
 
 
 def item_configurar_proxies(item):
@@ -23,8 +23,9 @@ def configurar_proxies(item):
 def do_downloadpage(url, post=None):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['http://grantorrent.net/', 'https://grantorrent1.com/', 'https://grantorrent.one/', 
-                 'https://grantorrent.tv/', 'https://grantorrent.la/', 'https://grantorrent.io/', 'https://grantorrent.eu/'
-                 'https://grantorrent.cc/', 'https://grantorrent.li/', 'https://grantorrent.online/', 'https://grantorrentt.com/']
+                 'https://grantorrent.tv/', 'https://grantorrent.la/', 'https://grantorrent.io/', 'https://grantorrent.eu/',
+                 'https://grantorrent.cc/', 'https://grantorrent.li/', 'https://grantorrent.online/', 'https://grantorrentt.com/',
+                 'https://grantorrent.nl/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -88,7 +89,8 @@ def generos(item):
         'musica': 'Música',
         'romance': 'Romance',
         'suspense': 'Suspense',
-        'terror': 'Terror'
+        'terror': 'Terror',
+        'western': 'Western'
         }
 
     for opc in sorted(opciones):
@@ -191,7 +193,11 @@ def findvideos(item):
         patron = '<tr class="lol">\s*<td><img ([^>]*)>.*?</td>\s*<td>([^<]+)</td>\s*<td>([^<]+)</td>\s*<td><a class="link" href="([^"]+)'
         matches = re.compile(patron, re.DOTALL).findall(data)
 
+    ses = 0
+
     for lang, quality, peso, onclick in matches:
+        ses += 1
+
         if onclick.startswith('http'):
             url = onclick
         else:
@@ -207,11 +213,16 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
                               language = detectar_idioma(lang), quality = quality, quality_num = puntuar_calidad(quality), other = peso ))
 
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
+
     return itemlist
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_categ_search(item)

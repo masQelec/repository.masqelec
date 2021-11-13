@@ -5,7 +5,7 @@
 
   "active": true,
 
-  "searchable": true,
+  "searchable": false,
   "search_types": ["movie"],
 
   "categories": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["classic", "categories", "years", "lists", "kids", "docs", "vos"],
 
-  "notes": "Cine Clásico en Español y Subtitulado. Acceso por género, año."
+  "notes": "Cine Clásico en Español y Subtitulado. Acceso por géneros, año."
 }

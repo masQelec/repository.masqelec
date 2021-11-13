@@ -7,19 +7,31 @@ from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 
 
-host = "https://hdfull.so"
+host = "https://hdfull.fm"
 
 perpage = 20
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post = None, referer = None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/hdfull.se', '/hdfull.so')
+    url = url.replace('/hdfull.se', '/hdfull.fm')
+    url = url.replace('/hdfull.so', '/hdfull.fm')
 
     if not referer: referer = host
     headers = {'Referer': referer}
 
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage_proxy('hdfullse', url, post=post, headers=headers).data
 
     return data
 
@@ -35,11 +47,13 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='plum' ))
 
-    itemlist.append(item.clone( title = ' Buscar intérprete ...', action = 'search', group = 'star', search_type = 'person', 
+    itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'star', search_type = 'person', 
                        plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
 
-    itemlist.append(item.clone( title = ' Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
+    itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
                        plot = 'Debe indicarse el nombre y apellido/s del director.'))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -60,6 +74,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
+    itemlist.append(item_configurar_proxies(item))
+
     return itemlist
 
 
@@ -76,6 +92,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
+    itemlist.append(item_configurar_proxies(item))
+
     return itemlist
 
 
@@ -84,7 +102,6 @@ def generos(item):
     itemlist = []
 
     data = do_downloadpage(host)
-    # ~ logger.debug(data)
 
     tipo = 'TV' if item.search_type == 'tvshow' else 'Películas'
     bloque = scrapertools.find_single_match(data, '<b class="caret"></b>&nbsp;&nbsp;%s</a>\s*<ul class="dropdown-menu">(.*?)</ul>' % tipo)
@@ -118,7 +135,6 @@ def list_all(item):
 
     if item.search_post: data = do_downloadpage(item.url, post=item.search_post)
     else: data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     patron = '<div class="item"[^>]*">'
     patron += '\s*<a href="([^"]+)"[^>]*>\s*<img class="[^"]*"\s+src="([^"]+)"[^>]*>'
@@ -152,8 +168,8 @@ def list_all(item):
 
         if len(itemlist) >= perpage: break
 
-    # ~ al no tener year no se cooresponde caratula con el titulo peg. peli wolf no es el lobo de wall street
-    # ~ tmdb.set_infoLabels(itemlist)
+    # ~ al no tener year puede no corresponer caratula con el titulo
+    tmdb.set_infoLabels(itemlist)
 
     buscar_next = True
     if num_matches > perpage:
@@ -185,8 +201,7 @@ def temporadas(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
-
+ 
     patron = 'itemprop="season".*?'
     patron += "<a href='(.*?)'.*?"
     patron += '<img class=.*?original-title="(.*?)".*?'
@@ -245,7 +260,6 @@ def episodios(item):
     perpage = 50
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     patron = '<div class="item center">.*?'
     patron += '<a href="(.*?)".*?'
@@ -297,7 +311,6 @@ def findvideos(item):
     itemlist = []
 
     data_js = do_downloadpage(host + '/static/style/js/jquery.hdfull.view.min.js')
-    # ~ logger.debug(data_js)
 
     keys = scrapertools.find_multiple_matches(data_js, 'JSON.parse\(atob.*?substrings\((.*?)\)')
     if not keys: 
@@ -310,18 +323,21 @@ def findvideos(item):
     from lib import balandroresolver
     try:
         provs = balandroresolver.hdfull_providers(data_js)
-        if provs == '': return []
+        if not provs: return itemlist
     except:
-        return []
+        return itemlist
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     data_obf = scrapertools.find_single_match(data, "var ad\s*=\s*'(.*?)'")
+
+    data_decrypt = ''
 
     for key in keys:
         data_decrypt = jsontools.load(balandroresolver.obfs(base64.b64decode(data_obf), 126 - int(key)))
         if data_decrypt: break
+
+    if not data_decrypt: return itemlist
 
     matches = []
     for match in data_decrypt:
@@ -333,15 +349,22 @@ def findvideos(item):
             except:
                 pass
 
+    ses = 0
+
     for idioma, calidad, url, embed in matches:
-        # ~ logger.info('%s %s' % (embed, url))
+        ses += 1
+
         if embed == 'd' and 'uptobox' not in url: continue
+        elif 'onlystream.tv' in url:
+              url = url.replace('onlystream.tv', 'upstream.to')
+
         try:
             calidad = unicode(calidad, 'utf8').upper().encode('utf8')
         except: 
             try:
                 calidad = str(calidad, 'utf8').upper()
-            except: calidad  = calidad.upper()
+            except:
+                calidad  = calidad.upper()
 
         idioma = idioma.capitalize() if idioma != 'ESPSUB' else 'Vose'
 
@@ -349,6 +372,11 @@ def findvideos(item):
                               language = idioma, quality = calidad, quality_num = puntuar_calidad(calidad) ))
 
     itemlist = servertools.get_servers_itemlist(itemlist)
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

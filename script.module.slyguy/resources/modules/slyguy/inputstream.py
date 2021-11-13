@@ -91,9 +91,9 @@ class HLS(InputstreamItem):
         self.live  = live
 
     def do_check(self):
-        legacy   = settings.getBool('use_ia_hls', False)
+        legacy = settings.getBool('use_ia_hls', False)
         hls_live = settings.getBool('use_ia_hls_live', legacy)
-        hls_vod  = settings.getBool('use_ia_hls_vod', legacy)
+        hls_vod = settings.getBool('use_ia_hls_vod', legacy)
         return (self.force or (self.live and hls_live) or (not self.live and hls_vod)) and require_version(self.minversion, required=self.force)
 
 class MPD(InputstreamItem):
@@ -116,7 +116,7 @@ class Playready(InputstreamItem):
 class Widevine(InputstreamItem):
     license_type = 'com.widevine.alpha'
 
-    def __init__(self, license_key=None, content_type='application/octet-stream', challenge='R{SSM}', response='', manifest_type='mpd', mimetype='application/dash+xml', license_data=None, wv_secure=False, **kwargs):
+    def __init__(self, license_key=None, content_type='application/octet-stream', challenge='R{SSM}', response='', manifest_type='mpd', mimetype='application/dash+xml', license_data=None, license_headers=None, wv_secure=False, **kwargs):
         super(Widevine, self).__init__(**kwargs)
         self.license_key = license_key
         self.content_type = content_type
@@ -126,6 +126,7 @@ class Widevine(InputstreamItem):
         self.mimetype = mimetype
         self.license_data = license_data
         self.wv_secure = wv_secure
+        self.license_headers = license_headers
 
     def do_check(self):
         return install_widevine()
@@ -185,6 +186,18 @@ def require_version(required_version, required=False):
 
     return ia_addon if result else False
 
+def supports_arm64tls():
+    try:
+        return int(os.environ['LIBC_WIDEVINE_PATCHLEVEL']) >= 1
+    except KeyError:
+        pass
+
+    try:
+        return 'arm64tls' in subprocess.check_output(['ldd', '--version'], stderr=subprocess.STDOUT).decode('utf-8').split('\n')[0].lower()
+    except Exception as e:
+        log.exception(e)
+        return False
+
 def install_widevine(reinstall=False):
     DST_FILES = {
         'Linux': 'libwidevinecdm.so',
@@ -207,11 +220,11 @@ def install_widevine(reinstall=False):
     if system not in DST_FILES:
         raise InputStreamError(_(_.IA_NOT_SUPPORTED, system=system, arch=arch, kodi_version=KODI_VERSION))
 
-    userdata     = Userdata(COMMON_ADDON)
-    decryptpath  = xbmc.translatePath(ia_addon.getSetting('DECRYPTERPATH') or ia_addon.getAddonInfo('profile'))
-    wv_path      = os.path.join(decryptpath, DST_FILES[system])
-    installed    = md5sum(wv_path)
-    last_check   = int(userdata.get('_wv_last_check', 0))
+    userdata = Userdata(COMMON_ADDON)
+    decryptpath = xbmc.translatePath(ia_addon.getSetting('DECRYPTERPATH') or ia_addon.getAddonInfo('profile'))
+    wv_path = os.path.join(decryptpath, DST_FILES[system])
+    installed = md5sum(wv_path)
+    last_check = int(userdata.get('_wv_last_check', 0))
 
     if not installed:
         if system == 'UWP':
@@ -244,6 +257,40 @@ def install_widevine(reinstall=False):
     if not wv_versions:
         raise InputStreamError(_(_.IA_NOT_SUPPORTED, system=system, arch=arch, kodi_version=KODI_VERSION))
 
+    current = None
+    latest = None
+    tls_min_version = LooseVersion('4.10.2252.0')
+    for wv in wv_versions:
+        wv['compatible'] = True
+        wv['label'] = str(wv['ver'])
+        wv['ver'] = LooseVersion(wv['ver'])
+        wv['confirm'] = wv.get('confirm', None)
+        wv['notes'] = wv.get('notes', None)
+
+        if 'arm' in arch.lower() and wv['ver'] >= tls_min_version and not supports_arm64tls():
+            wv['compatible'] = False
+            wv['label'] = _(_.WV_UNSUPPORTED_OS, label=wv['label'])
+            if not wv['confirm']:
+                wv['confirm'] = _.WV_UNSUPPORTED_OS_CONFIRM
+
+        if wv.get('revoked'):
+            wv['compatible'] = False
+            wv['label'] = _(_.WV_REVOKED, label=wv['label'])
+            if not wv['confirm']:
+                wv['confirm'] = _.WV_REVOKED_CONFIRM
+
+        if not latest:
+            latest = wv
+            if wv['compatible']:
+                wv['label'] = _(_.WV_LATEST, label=wv['label'])
+
+        if wv['md5'] == installed:
+            current = wv
+            wv['label'] = _(_.WV_INSTALLED, label=wv['label'])
+
+        if wv['notes']:
+            wv['label'] = u'{}\n{}'.format(wv['label'], wv['notes'])
+
     latest = wv_versions[0]
     latest_known = userdata.get('_wv_latest_md5')
     userdata.set('_wv_latest_md5', latest['md5'])
@@ -251,21 +298,10 @@ def install_widevine(reinstall=False):
     if not reinstall and (installed == latest['md5'] or latest['md5'] == latest_known):
         return True
 
-    current = None
-    for wv in wv_versions:
-        wv['label'] = _(_.WV_LATEST, label=wv['ver']) if wv == latest and not wv.get('revoked') else wv['ver']
-
-        if wv.get('revoked'):
-            wv['label'] = _(_.WV_REVOKED, label=wv['label'])
-
-        if wv['md5'] == installed:
-            current = wv
-            wv['label'] = _(_.WV_INSTALLED, label=wv['label'])
-
     if installed and not current:
-        wv_versions.append({
+        wv_versions.insert(0, {
             'ver': installed[:6],
-            'label': _(_.WV_UNKNOWN, version=installed[:6]),
+            'label': _(_.WV_INSTALLED, label=_(_.WV_UNKNOWN, label=str(installed[:6]))),
         })
 
     while True:
@@ -274,11 +310,7 @@ def install_widevine(reinstall=False):
             return False
 
         selected = wv_versions[index]
-
-        if selected.get('revoked') and not gui.yes_no(_.WV_REVOKED_CONFIRM):
-            continue
-
-        if 'confirm' in selected and not gui.yes_no(selected['confirm']):
+        if selected.get('confirm') and not gui.yes_no(selected['confirm']):
             continue
 
         if 'src' in selected:
@@ -295,12 +327,7 @@ def install_widevine(reinstall=False):
         except Exception as e:
             log.debug('libnss3 failed to install')
 
-    if selected != latest:
-        message = _.WV_NOT_LATEST
-    else:
-        message = _.IA_WV_INSTALL_OK
-
-    gui.ok(_(message, version=selected['ver']))
+    gui.ok(_(_.IA_WV_INSTALL_OK, version=selected['ver']))
 
     return True
 

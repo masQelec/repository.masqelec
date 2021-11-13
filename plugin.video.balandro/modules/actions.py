@@ -216,13 +216,39 @@ def manto_proxies(item):
        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Proxies eliminados[/B][/COLOR]' % color_infor)
 
 
+def del_datos_hdfull(item):
+    logger.info()
+
+    username = config.get_setting('hdfull_username', 'hdfull', default='')
+    password = config.get_setting('hdfull_password', 'hdfull', default='')
+
+    if not username or not password:
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma eliminar sus credenciales de HdFull ?[/COLOR]'):
+        config.set_setting('channel_hdfull_hdfull_login', False)
+        config.set_setting('channel_hdfull_hdfull_password', '')
+        config.set_setting('channel_hdfull_hdfull_username', '')
+
+def del_datos_playdede(item):
+    logger.info()
+
+    username = config.get_setting('playdede_username', 'playdede', default='')
+    password = config.get_setting('playdede_password', 'playdede', default='')
+
+    if not username or not password:
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma eliminar sus credenciales de PlayDede ?[/COLOR]'):
+        config.set_setting('channel_playdede_playdede_login', False)
+        config.set_setting('channel_playdede_playdede_password', '')
+        config.set_setting('channel_playdede_playdede_username', '')
+
 def manto_params(item):
     logger.info()
 
     if platformtools.dialog_yesno(config.__addon_name, "Se quitarán: 'Logins' en canales, 'Dominios' seleccionados en los canales, 'Canales Excluidos' en búsquedas, 'Canales Excluidos' en buscar proxies global, y se Inicializarán otros 'Parámetros'.", '[COLOR yellow]¿ Confirma Restablecer a sus valores por defecto los Parámetros Internos del addon ?[/COLOR]'):
         config.set_setting('adults_password', '')
-
-        config.set_setting('channel_cinecalidad_dominio', '')
 
         config.set_setting('channel_documaniatv_rua', '')
 
@@ -245,7 +271,7 @@ def manto_params(item):
 
         # ~ config.set_setting('downloadpath', '')  No funciona
 
-        config.set_setting('chrome_last_version', '90.0.4430.100')
+        config.set_setting('chrome_last_version', '93.0.4577.60')
 
         config.set_setting('debug', '0')
 
@@ -342,6 +368,10 @@ def adults_password(item):
 
         if len(password) != 4:
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Pin obligatorio 4 dígitos[/B][/COLOR]' % color_alert)
+            return
+        
+        if str(password) == '0000':
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Pin NO admitido[/COLOR][/B]' % color_avis)
             return
 
         confirmpassword = platformtools.dialog_numeric(0, 'Confirme el Pin')

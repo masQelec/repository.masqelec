@@ -1,94 +1,95 @@
 [COLOR coral]Balandro[/COLOR]
 
-Version 2.0.3  [COLOR darkorange]Agosto 2021[/COLOR]
+Version 2.1.2  [COLOR darkorange]Octubre 2021[/COLOR]
 
    [COLOR yellow]INCIDENCIAS CORREGIDAS:[/COLOR]
       Bugs de la version anterior
-      Trailers
+      Implementado nuevo sistema de Fixes
 
    [COLOR yellow]MODIFICACIONES:[/COLOR]
-      Canales inactivos:
-         DescargaCineClasico, MegadedeLa, PelisHouse, PelisVips
+      Configuracion:
+         Buscar - En que canales nunca se buscara
+
+      Menus:
+        Generos: Re-configurados
+        Ayuda: Buscar - En que canales nunca se buscara
+
+      Especiales: Las mejores del cine de siempre
 
       Canales modificados:
-         AniBox, AnimeFenix, AnimeFlv, AreaDocumental, CaricaturasHd,
-         CiberDocumentales, CineCalidad, CineMatteFlix, CliverSite,
-         Cuevana3, Cuevana3Video, Daftsex, Dilo, DocumaniaTv,
-         DocumentalesOnline, DonTorrents, EntrePeliculasySeries,
-         Gnula, GranTorrent, HdFull, HentaiSd, JKAnime,
-         LegalmenteGratis, Mega1Link, MejorTorrents, MiraDeTodo,
-         MiraPeliculas, MonosChinos, NewPct1, PctFenix, Pelis24,
-         PelisGratis, PelisPlanet, PelisPlay, PlayDede, PornHd,
-         SeriesAntiguas, SeriesAnimadas, SeriesFlix, SeriesFlixIo,
-         SeriesKao, SeriesPapayaXyz, SigloXX, SubTorrents, Tekilaz,
-         TorrentDivx, TuCneClasico, TuPeliHd
+         AniBox, CineCalidad, CineDeAntes, CineLibreOnline,
+         CineMatteFlix, ClubCine, DixMaxLive, DocumaniaTv,
+         DonTorrents, HdFull, HdFullCom, HdFullSe,
+         MegaDede2, NewPct1, PelisMaraton, PlayDede,
+         Ppeliculas, PonnHd, PornHub, Repelis24, SeriesKao,
+         YesTorrent
 
-      Generos: Re-configurados
+      Canales anulados:
+         PctFenix
 
-      Servidores inactivos:
-        Mystream
-
-      Servidores modificados:
-         ClicknUpload, DoodStream, Fembed, Gamovideo, Playtube,
-         Sbembed, Streamsb, Streamz, YourUpload,, YouTube, Zplayer
+      Servidores:
+         Fembed, Streamsb, Upstream, Uptobox, Vshare, Vup
 
    [COLOR yellow]NOVEDADES:[/COLOR]
-      Menu principal: nueva opcion Torrents
-
-      Canales nuevos:
-        AresHd, CineLibreOnline, Cuevana3Mobi, DixmaxLive,
-        HdFullCom, Megadede2, MegaSerie, MundoKaos, PelisForte,
-        PepecinePro, Pelismart, Ppeliculas, SeriesYonkis
-
-      Servidores nuevos:
-        Anonfiles, Bayfiles, Streams3
+      Canales:
+         Ievenn, PelisEnCastellano
+      Servidores:
+         Streamon, Vidhd
 
    [COLOR yellow]SITUACION:[/COLOR]
-      Canales Inestables (siguen Activados):
-         Dilo, PctFenix
-
-      Canales que pueden usar proxies (Bloqueo operadoras):
-         CineTux
-         Cliver
-         CliverSite
-         Cuevana3
+      [COLOR plum]Canales Inestables:[/COLOR]
          Dilo
-         DixmaxLive
-         DocumaniaTv
-         DonTorrents
-         Gnula
-         GranTorrent
-         HdFull
-         HdFullCom
-         Megadede2
-         MejorTorrents
-         Newpct1
-         PctFenix
-         PelisGratis
-         PelisPlanet
-         PelisPlay
-         PlayView
-         SubTorrents
+
+      [COLOR teal]Canales que requieren Cuenta:[/COLOR]
+         HdFull, PlayDede
+
+      [COLOR cyan]Canales Temporalmente Inactivos:[/COLOR]
+         DescargaCineClasico, MiraDetodo, MundoKaos, PelisPlus24,
+         SeriesManta, VerPeliculasGratis
+
+      [COLOR red]Canales que pueden usar proxies (Bloqueo Operadoras):[/COLOR]
+         CineTux, Cliver, CliverSite, Cuevana3, Dilo, DixmaxLive,
+         DocumaniaTv, DonTorrents, EstrenosCinesaa, Gnula,
+         GranTorrent, HdFull, HdFullCom, HdFullSe, Megadede2,
+         MegaSerie, MejorTorrents, Newpct1, PelisGratis,
+         PelisHouse, PelisPlanet, PelisPlay, PlayDede, PlayView,
+         Ppeliculas, SeriesFlix, SeriesYonkis, SubTorrents,
          TorrentDivx
+
+      [COLOR fuchsia]Canales que nunca intervendran en las busquedas:[/COLOR]
+         AniBox. AnimeFenix, AnimeFlv, Beeg, CineDeAntes,
+         CineLibreOnline, CumLoader, DatfSex, HentaiSd,
+         JKAnime, MonosChinos, PornHd, PornHub, PornTube,
+         SeriesAnimadas, SigloXX, TioAnime, TubeHentai,
+         TvSeries, XVideos
+
+      [COLOR tan]Servidores con vias alternativas:[/COLOR]
+         Doodstream, Streamsb, Youtube
 
    [COLOR yellow]RESUMENES:[/COLOR]
       Numero de Canales:
-       121 Canales
-         22 Inactivos
-         99 Disponibles
+       141 Canales
+           1 Inestables
+           2 Requieren Cuenta
+           6 Temporalmente Inactivos
+         24 Inactivos
+         29 Pueden Usar Proxies
+         20 No intervendran en busquedas
+       111 Disponibles
 
-      Distribucion Canales:
-         67 de Peliculas
-         48 de Series
-         41 de Peliculas y Series
-           6 de Documentales
-         10 de Torrents 
+      Distribucion Canales Disponibles:
+         73 de Peliculas
+         56 de Series
+         44 de Peliculas y Series
+           7 de Documentales
+         12 de Torrents 
            7 de Animes
            9 de Adultos
            1 Privados
 
       Numero de Servidores:
-       135 Servidores
+       145 Servidores
          53 Inactivos
          18 Sin Soporte
-         82 Disponibles
+           3 Con Vias alternativas
+         92 Disponibles

@@ -2,12 +2,12 @@
 
 import re, base64
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'http://pelisgratis.nu/'
+host = 'https://pelisgratis.nu/'
 
 perpage = 18
 
@@ -27,6 +27,9 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    url = url.replace('http://pelisgratis.nu/', host)
+
     raise_weberror = False if '/ano/' in url else True
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -194,7 +197,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, 'aria-labelledby="([^"]+)">(.*?)</li>')
 
+    ses = 0
+
     for lang, data in matches:
+        ses += 1
+
         if 'trailer' in lang.lower():
             continue
 
@@ -214,20 +221,32 @@ def findvideos(item):
 
                 if '/hqq.' in url or '/waaw.' in url or '/netu' in url: url = ''
                 elif '/ninjastream.to/' in url: url = ''
+                elif '/gounlimited.to/' in url: url = ''
 
                 if url:
                     servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.corregir_servidor(servidor)
+
                     url = servertools.normalize_url(servidor, url)
+
+                    if servidor == 'zplayer':
+                        player = 'https://pelisgratis.itatroniks.com/'
+                        url = url + '|' + player
 
                     if servidor: 
                         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
                                               language = IDIOMAS.get(lang, lang), quality = item.quality, quality_num = puntuar_calidad(item.quality) ))
 
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
+
     return itemlist
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_all(item)

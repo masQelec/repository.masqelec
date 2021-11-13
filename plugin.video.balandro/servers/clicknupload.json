@@ -1,6 +1,6 @@
 {
   "id": "clicknupload",
-  "name": "ClicknUpload",
+  "name": "Clicknupload",
 
   "active": true,
 
@@ -8,8 +8,8 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "https://clicknupload.(?:org|com|me|co)/([A-z0-9]+)",
-        "url": "https://clicknupload.co/\\1"
+        "pattern": "https://clicknupload.(?:org|com|me|co|cc)/([A-z0-9]+)",
+        "url": "https://clicknupload.cc/\\1"
       }
     ]
   }

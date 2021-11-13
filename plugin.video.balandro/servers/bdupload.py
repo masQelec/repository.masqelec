@@ -24,6 +24,6 @@ def get_video_url(page_url, url_referer=''):
     videourl = scrapertools.find_single_match(data, "window.open\('([^']+)").replace(" ","%20")
     if videourl:
         # ~ if 'fs30.indifiles.com' in videourl: return 'Vídeo no disponible'
-        video_urls.append([".MP4", videourl])
+        video_urls.append(["mp4", videourl])
 
     return video_urls

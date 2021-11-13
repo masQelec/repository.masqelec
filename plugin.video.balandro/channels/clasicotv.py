@@ -2,7 +2,7 @@
 
 import re, base64
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, jsontools, tmdb
 
@@ -190,7 +190,6 @@ def list_epis(item):
     if not item.page: item.page = 1
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     matches = re.compile('<article (.*?)</article>', re.DOTALL).findall(data)
 
@@ -245,7 +244,6 @@ def list_letra(item):
     else: url = url + 'tvshows'
 
     data = httptools.downloadpage(url).data
-    # ~ logger.debug(data)
 
     try:
         data_js = jsontools.load(data)
@@ -365,10 +363,9 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
-
     lang = 'Lat'
+
+    data = httptools.downloadpage(item.url).data
 
     if 'subtitulado' in item.title.lower() or 'subtitulada' in item.title.lower(): lang = 'Vose'
 
@@ -376,7 +373,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, "<li id='player-option-(.*?)</li>")
 
+    ses = 0
+
     for match in matches:
+        ses += 1
+
         if 'youtube' in match: continue
 
         data_post = scrapertools.find_single_match(match, "data-post='(.*?)'")
@@ -389,7 +390,6 @@ def findvideos(item):
         headers = {'Referer': item.url}
 
         data = httptools.downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers).data
-        # ~ logger.debug(data)
 
         url = scrapertools.find_single_match(str(data), ' src=.*?"(.*?)"')
 
@@ -410,25 +410,19 @@ def findvideos(item):
            if url.startswith('//') == True: url = 'https:' + url
 
            servidor = servertools.get_server_from_url(url)
+           servidor = servertools.corregir_servidor(servidor)
 
            if servidor and servidor != 'directo':
                url = servertools.normalize_url(servidor, url)
 
                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang ))
 
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
+
     return itemlist
-
-
-def search(item, texto):
-    logger.info()
-    try:
-        item.url = host + '?s=' + texto.replace(" ", "+")
-        return search_results(item)
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
 
 
 def search_results(item):
@@ -470,3 +464,15 @@ def search_results(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
+
+
+def search(item, texto):
+    logger.info()
+    try:
+        item.url = host + '?s=' + texto.replace(" ", "+")
+        return search_results(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []

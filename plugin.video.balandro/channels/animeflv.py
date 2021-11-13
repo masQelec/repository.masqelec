@@ -247,10 +247,12 @@ def findvideos(item):
                 data = httptools.downloadpage(new_url).data
                 matches = re.compile(r'<li role="presentation" data-video="([^"]+)" title="([^"]+)">\s*<a href="[^"]+', re.DOTALL).findall(data)
 
-    for url, server in matches:
-        if not url: continue
+    ses = 0
 
-        if '/hqq.' in url or '/waaw.' in url: continue
+    for url, server in matches:
+        ses += 1
+
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
         if not url.startswith('http'):
             url = 'https:' + url
@@ -259,6 +261,11 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -280,7 +287,7 @@ def play(item):
             servidor = servertools.get_server_from_url(url)
             url = servertools.normalize_url(servidor, url)
 
-    if '/hqq.' in url or '/waaw.' in url:
+    if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     if url:

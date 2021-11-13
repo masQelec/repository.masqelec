@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -259,7 +259,11 @@ def findvideos(item):
 
     options = scrapertools.find_multiple_matches(data, '<h3 class="select-idioma">(.*?)<div class="')
 
+    ses = 0
+
     for option in options:
+        ses += 1
+
         language = scrapertools.find_single_match(option, '</span>(.*?)<i').strip()
 
         if language == 'Subtitulado': language = 'Vose'
@@ -269,12 +273,9 @@ def findvideos(item):
         links = scrapertools.find_multiple_matches(option, '<li class="option".*?data-link="(.*?)".*?</span>(.*?)</li>')
 
         for url, servidor in links:
-            servidor = servidor.strip().lower()
+            servidor = servertools.corregir_servidor(servidor)
 
             if servidor:
-               if servidor == 'google drive': servidor ='gvideo'
-               elif servidor == 'mega.nz': servidor ='mega'
-
                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = language ))
 
     # Descargas
@@ -284,6 +285,8 @@ def findvideos(item):
         descargas = scrapertools.find_multiple_matches(data, patron)
 
         for servidor, language, qlty, url in descargas:
+            ses += 1
+
             language = language.strip()
 
             if language == 'Subtitulado': language = 'Vose'
@@ -292,17 +295,19 @@ def findvideos(item):
 
             qlty = qlty.replace(' - ', ' ').strip()
 
-            servidor = servidor.strip().lower()
+            servidor = servertools.corregir_servidor(servidor)
 
             if servidor:
                 if servidor == '1fitchier': continue
 
                 if servidor:
-                    if servidor == 'google drive': servidor ='gvideo'
-                    elif servidor == 'mega.nz': servidor ='mega'
-
                     itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = language,
                                           quality = qlty, other = 'D' ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -335,16 +340,23 @@ def play(item):
                servidor = servertools.get_server_from_url(url)
                servidor = servertools.corregir_servidor(servidor)
 
-       elif '/play.php?' in url:
+       elif '/player.php?' in url:
            url = url.replace('.html', '')
 
            data = do_downloadpage(url)
 
-           url = scrapertools.find_single_match(data, '<iframe src="([^"]+)"')
+           vid = scrapertools.find_single_match(data, 'name="h" value="(.*?)"')
 
-           if url:
-               servidor = servertools.get_server_from_url(url)
-               servidor = servertools.corregir_servidor(servidor)
+           if vid:
+               post = {'h': vid}
+               ref = url.replace('.html', '')
+               headers = {'Referer': ref}
+
+               url = httptools.downloadpage(host + 'r.php', post = post, headers= headers, follow_redirects=False).headers.get('location', '')
+
+               if url:
+                   servidor = servertools.get_server_from_url(url)
+                   servidor = servertools.corregir_servidor(servidor)
 
     if url:
         if not url.startswith('http'): url = 'https:' + url
@@ -396,7 +408,7 @@ def list_search(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_search(item)

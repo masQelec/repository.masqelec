@@ -3,6 +3,7 @@
   "name": "Youtube",
 
   "active": true,
+  "notes": "Alternative vía: Plugin.Video.Youtube",
 
   "find_videos": {
     "ignore_urls": [],

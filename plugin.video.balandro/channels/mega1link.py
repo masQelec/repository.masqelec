@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -151,7 +151,11 @@ def findvideos(item):
 
     matches = re.compile('<tr(.*?)</tr>', re.DOTALL).findall(bloque)
 
+    ses = 0
+
     for lin in matches:
+        ses += 1
+
         if '<th' in lin: continue
 
         url = scrapertools.find_single_match(lin, " href='([^']+)")
@@ -164,6 +168,11 @@ def findvideos(item):
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, 
                               language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty) ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -178,6 +187,8 @@ def play(item):
         url = scrapertools.find_single_match(data, '<a id="link"[^>]*href="([^"]+)')
         if url:
             servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
             if servidor and servidor != 'directo':
                 url = servertools.normalize_url(servidor, url)
                 itemlist.append(item.clone( url=url, server=servidor ))
@@ -229,7 +240,7 @@ def list_search(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '/?s=' + texto.replace(" ", "+")
         return list_search(item)

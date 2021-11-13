@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -245,7 +245,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, "<li id='player-option-(.*?)</span></li>")
 
+    ses = 0
+
     for match in matches:
+        ses += 1
+
         dpost = scrapertools.find_single_match(match, "data-post='(.*?)'")
         dtype = scrapertools.find_single_match(match, "data-type='(.*?)'")
         dnume = scrapertools.find_single_match(match, "data-nume='(.*?)'")
@@ -273,6 +277,11 @@ def findvideos(item):
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '',
                               dpost = dpost, dtype = dtype, dnume = dnume, language = lang, other = other ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -359,7 +368,6 @@ def list_search(item):
 
 def search(item, texto):
     logger.info()
-
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_search(item)

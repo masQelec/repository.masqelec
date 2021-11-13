@@ -1,5 +1,8 @@
-BALANDRO - DEVELOPER NOTES
-==========================
+BALANDRO TEAM  AGOSTO/2021
+
+
+DESARROLLO NORMAS GENERALES
+============================
 
 - Preferidos en bases de datos sqlite pero no integrada en el Media Center
 
@@ -59,7 +62,7 @@ BALANDRO - DEVELOPER NOTES
   Tiene que haber mainlist_pelis y/o mainlist_series a parte del mainlist.
   Eliminadas referencias a autoplay, filtertools, thumbnails, newest, 
   Intentar ir clonando los items en lugar de crearlos nuevos, excepto en findvideos sin infolabels.
-  Eliminar configuraciones concretas, ly de ser necesarias deberian formar parte de la configuracion general.
+  Eliminar configuraciones concretas, y de ser necesarias deberian formar parte de la configuracion general.
   En las funciones search, tener en cuenta search_type para buscar solamente peliculas, series o ambas a la vez.
   Generar el item.url para buscar en la propia rutina search para que funcione en las busquedas globales.
   Tener los thumbnails de los canales en local para no depender de webs externas.
@@ -83,8 +86,8 @@ BALANDRO - DEVELOPER NOTES
   - Servicio de busqueda de nuevos episodios configurable cada n horas o ejecutable manualmente.
 
 
-DESARROLLO DE CANALES:
-======================
+DESARROLLO CANALES
+===================
 
 - A parte del mainlist, hay que implementar mainlist_pelis y/o mainlist_series.
 - Intentar que sean lo más simples y genericos posibles.
@@ -152,25 +155,30 @@ DESARROLLO DE CANALES:
       - ['all'] : si la busqueda no diferencia peliculas y series
       - ['movie','tvshow'] : si se puede buscar solo peliculas o solo series
       - ['all','movie','tvshow'] : si se puede buscar solo peliculas, solo series, o ambas a la vez.
-
+  - Rellenar "clusters"
+    - obligatorio y en funcion de las opciones del canal
 
 - Canales que necesitan proxies: (ejemplos: gnula, etc.)
 
-def configurar_proxies(item):
-    from core import proxytools
-    return proxytools.configurar_proxies_canal(item.channel, HOST)
+  Json canal:
+      obligatorio en "notes"
+      'Puede requerir el uso de proxies en funcion del pais/operadora desde el que se accede.'
+
+  def configurar_proxies(item):
+      from core import proxytools
+      return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-En mainlist_pelis, mainlist_series la llamada para configurar los proxies:
-    plot = 'Es posible que para poder utilizar este canal necesites configurar algun proxy, ya que no es accesible desde algunos paises/operadoras.'
-    plot += '[CR]Si desde un navegador web no te funciona el sitio por ejemplo "canalseries.com" necesitarás un proxy.'
-    itemlist.append(item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' ))
+  En mainlist_pelis, mainlist_series la llamada para configurar los proxies:
+      plot = 'Es posible que para poder utilizar este canal necesites configurar algun proxy, ya que no es accesible desde algunos paises/operadoras.'
+      plot += '[CR]Si desde un navegador web no te funciona el sitio por ejemplo "canalseries.com" necesitarás un proxy.'
+      itemlist.append(item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' ))
 
-Y finalmente substituir las llamadas a httptools.downloadpage(...) por httptools.downloadpage_proxy(item.channel, ...)
+   y finalmente substituir las llamadas a httptools.downloadpage(...) por httptools.downloadpage_proxy(item.channel, ...)
 
 
-CRITERIOS DE SELECCION PARA WEBS/CANALES:
-=========================================
+CRITERIOS SELECCION NUEVAS WEBS/CANALES
+=======================================
 
 - que la web sea estable y no tarde demasiado en responder.
 - que no se necesiten recaptchas.

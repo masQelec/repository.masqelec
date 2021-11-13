@@ -44,12 +44,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Catálogo castellano', action = 'list_all', url = host + 'descargar-peliculas/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Catálogo latino', action = 'list_all', url = host + 'descargar-peliculas/latino', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo (castellano)', action = 'list_all', url = host + 'descargar-peliculas/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo (latino)', action = 'list_all', url = host + 'descargar-peliculas/latino', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'descargar-peliculas/estrenos-de-cine/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'descargar-lo-ultimo/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + 'descargar-lo-ultimo/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'mas-valorados/', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'mas-visitados/', search_type = 'movie' ))
@@ -58,9 +58,9 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'En x264 MKV', action ='list_all', url = host + 'descargar-peliculas/x264-mkv/', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'En 3D', action ='list_all', url = host + 'descargar-peliculas/3d/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por calidad en castellano', action = 'calidades', url = host + '/torrents-de-peliculas.html',
+    itemlist.append(item.clone( title = 'Por calidad (en castellano)', action = 'por_calidad', url = host + '/torrents-de-peliculas.html',
                                 search_type = 'movie', calidad_type = 'cast' ))
-    itemlist.append(item.clone( title = 'Por calidad en latino', action = 'calidades', url = host + '/secciones.php?sec=ultimos_torrents',
+    itemlist.append(item.clone( title = 'Por calidad (en latino)', action = 'por_calidad', url = host + '/secciones.php?sec=ultimos_torrents',
                                 search_type = 'movie', calidad_type = 'latino' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
@@ -73,10 +73,10 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'descargar-lo-ultimo/', search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Series TV', action = 'list_all', url = host + 'descargar-series/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Series HD', action = 'list_all', url = host + 'descargar-series/hd/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + 'descargar-lo-ultimo/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'mas-valorados/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'mas-visitados/', search_type = 'tvshow' ))
@@ -87,7 +87,20 @@ def mainlist_series(item):
     return itemlist
 
 
+# ~ por si venimos de grupos
 def calidades(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Por calidad (en castellano)', action = 'por_calidad', url = host + '/torrents-de-peliculas.html',
+                                search_type = 'movie', calidad_type = 'cast' ))
+    itemlist.append(item.clone( title = 'Por calidad (en latino)', action = 'por_calidad', url = host + '/secciones.php?sec=ultimos_torrents',
+                                search_type = 'movie', calidad_type = 'latino' ))
+
+    return itemlist
+
+
+def por_calidad(item):
     logger.info()
     itemlist = []
 
@@ -112,8 +125,6 @@ def calidades(item):
 def list_all(item): 
     logger.info()
     itemlist = []
-
-    cargar_mas = False
 
     if not item.page: item.page = 0
 
@@ -152,16 +163,7 @@ def list_all(item):
 
             if len(itemlist) >= perpage: break          
 
-        # ~ 2021/27/07
-        if not matches:
-            if '>Cargar Mas</button>' in data: cargar_mas = True
-
-    # ~ else:
-
-    # ~ 2021/27/07
-    if not item.page == 0 or cargar_mas == True:
-        if cargar_mas == True:
-            if item.page == 0: item.page = 1
+    else:
 
         data = do_downloadpage(host + "controllers/load-more.php", post="i=%s&c=%s&u=%s" % (item.page, perpage, '/' + item.url.replace(host, '')))
 
@@ -259,10 +261,61 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
+    notificado = False
+    titulo = item.contentSerieName.replace('&#038;', '&').replace('-', '').strip()
+
+    if 'function loadDD' in data:
+        notificado = True
+        platformtools.dialog_notification(titulo, '[COLOR blue]Cargando vídeos [/COLOR]')
+
+        data0 = ''
+        data1 = ''
+        data2 = ''
+
+        url = host + 'controllers/load.chapters.type.php'
+
+        patron = '<script type="text/javascript">var.*?CNAME.*?'
+        patron += "'(.*?)'.*?CID.*?"
+        patron += "'(.*?)'"
+
+        try:
+           _cname, _cid, = scrapertools.find_single_match(data, patron)
+
+           bloque = scrapertools.find_single_match(data, r'function loadDD(.*?)console.dir')
+
+           _cidr = scrapertools.find_single_match(bloque, '==0.*?CIDR.*?=(.*?);')
+           _cidr = _cidr.strip()
+           if _cidr:
+               _o = 0
+               post = {'_cname': _cname, '_cid': _cid, '_cidr': _cidr, '_o': _o}
+               data0 = do_downloadpage(url, post = post)
+
+           _cidr = scrapertools.find_single_match(bloque, '==1.*?CIDR.*?=(.*?);')
+           _cidr = _cidr.strip()
+           if _cidr:
+               _o = 1
+               post = {'_cname': _cname, '_cid': _cid, '_cidr': _cidr, '_o': _o}
+               data1 = do_downloadpage(url, post = post)
+
+           else:
+
+               _cidr = scrapertools.find_single_match(bloque, '==1.*?else.*?CIDR.*?=(.*?);')
+               _cidr = _cidr.strip()
+               if _cidr:
+                   _o = 2
+                   post = {'_cname': _cname, '_cid': _cid, '_cidr': _cidr, '_o': _o}
+                   data2 = do_downloadpage(url, post = post)
+
+           data = data0 + data1 + data2   
+
+        except:
+           pass
+
     matches = scrapertools.find_multiple_matches(data, r"onClick='modCap\((\d+)\)'>\s*([^<]+)")
 
     if len(matches) >= 50:
-        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), '[COLOR blue]Cargando vídeos [/COLOR]')
+        if not notificado:
+            platformtools.dialog_notification(titulo, '[COLOR blue]Cargando vídeos [/COLOR]')
 
     i = 0
 
@@ -329,7 +382,7 @@ def play(item):
 
     if item.url.endswith('.torrent'):
         from platformcode import config
-            
+
         data = do_downloadpage(item.url)
         file_local = os.path.join(config.get_data_path(), "temp.torrent")
         with open(file_local, 'wb') as f: f.write(data); f.close()
@@ -340,18 +393,6 @@ def play(item):
 
     return itemlist
 
-
-def search(item, texto):
-    logger.info()
-    try:
-       item.url = host + 'controllers/search-mini.php'
-       item.post = 's=%s' % texto.replace(" ", "+")
-       return list_search(item)
-    except:
-       import sys
-       for line in sys.exc_info():
-           logger.error("%s" % line)
-       return []
 
 def list_search(item):
     logger.info()
@@ -403,3 +444,16 @@ def list_search(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
+	
+def search(item, texto):
+    logger.info()
+    try:
+       item.url = host + 'controllers/search-mini.php'
+       item.post = 's=%s' % texto.replace(" ", "+")
+       return list_search(item)
+    except:
+       import sys
+       for line in sys.exc_info():
+           logger.error("%s" % line)
+       return []
+

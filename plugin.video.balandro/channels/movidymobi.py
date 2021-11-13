@@ -13,17 +13,7 @@ ruta_pelis  = 'browse?type=movie'
 ruta_series = 'browse?type=series'
 
 
-# ~ def item_configurar_proxies(item):
-    # ~ plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    # ~ plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    # ~ return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-# ~ def configurar_proxies(item):
-    # ~ from core import proxytools
-    # ~ return proxytools.configurar_proxies_canal(item.channel, host)
-
 def do_downloadpage(url, post=None, headers=None):
-    # ~ data = httptools.downloadpage_proxy('movidymobi', url, post=post, headers=headers).data
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -38,7 +28,6 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -61,7 +50,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -84,7 +72,6 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -455,7 +442,6 @@ def list_all(item):
     if item.calificacion: url += '&certification=' + item.calificacion
 
     data = do_downloadpage(url)
-    # ~ logger.debug(data)
 
     dict_data = jsontools.load(data)
 
@@ -465,7 +451,6 @@ def list_all(item):
         thumb = element['poster'] if element['poster'] else item.thumbnail
         new_item = item.clone( title = element['name'], thumbnail = thumb, infoLabels = {'year':element['year'], 'plot': element['description']})
 
-        # ~ new_item.url = host + 'titles/' + str(element['id'])
         new_item.url = host + 'secure/titles/' + str(element['id']) + '?titleId=' + str(element['id'])
 
         if not element['is_series']:
@@ -497,7 +482,7 @@ def temporadas(item):
 
     if 'title' not in dict_data: return itemlist
 
-    # averiguar cuantas temporadas hay
+    # averiguar temporadas
     tot_temp = 0
 
     for element in dict_data['title']['seasons']:
@@ -558,13 +543,13 @@ def episodios(item):
     return itemlist
 
 
-# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
 def puntuar_calidad(txt):
     if txt == None: txt = '?'
     txt = txt.lower()
     orden = ['?', 'cam', 'ts-scr', 'tc-scr', 'rip', 'dvd rip', 'sd', 'hd micro', 'hd rip', 'hd-tv', 'hd real', 'hd 720', 'hd 1080', 'hd']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
+
 
 def _extraer_idioma(lang):
     lang = lang.lower()
@@ -574,12 +559,12 @@ def _extraer_idioma(lang):
     if 'en' in lang: return 'Vose'
     return 'VO'
 
+
 def findvideos(item):
     logger.info()
     itemlist=[]
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     dict_data = jsontools.load(data)
 
@@ -596,24 +581,42 @@ def findvideos(item):
     if len(elementos) == 0:
         elementos = dict_data['title']['videos']
 
+    ses = 0
+
     for element in elementos:
-        if '/z' in element['name'] and 'clicknupload' not in element['url']: continue # descartar descargas directas (menos clicknupload)
-        if 'youtube.com/' in element['url']: continue # descartar tráilers
-        # ~ logger.debug(element)
+        ses += 1
+
+        if '/z' in element['name'] and 'clicknupload' not in element['url']: continue # descartar descargas directas
+        if 'youtube.com/' in element['url']: continue 
 
         url = element['url']
+        qlty = element['quality']
 
-        if url.startswith('https://goo.gl/'): # acortador de google
+        if url.startswith('https://goo.gl/'): # acortador google
             url = do.downloadpage(url, follow_redirects=False, only_headers=True).headers.get('location', '')
             if not url: continue
         elif 'streamcrypt.net/' in url: # acortador
             url = scrapertools.decode_streamcrypt(url)
             if not url: continue
+        elif '/1fichier.com/' in url : continue
+        elif '.mystream.' in url : continue
 
-        itemlist.append(Item(channel = item.channel, action = 'play', title = item.title, url = url, language = _extraer_idioma(element['language']), 
-                             quality = element['quality'], quality_num = puntuar_calidad(element['quality']) ))
+        url = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', url)
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        itemlist.append(Item(channel = item.channel, action = 'play', title = '', server = servidor, url = url,
+                        language = _extraer_idioma(element['language']), quality = qlty, quality_num = puntuar_calidad(element['quality']) ))
 
     itemlist = servertools.get_servers_itemlist(itemlist)
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -631,7 +634,6 @@ def sub_search(item):
     if 'results' not in dict_data: return itemlist
 
     for element in dict_data['results']:
-        # ~ logger.debug(element)
         if 'is_series' not in element or 'name' not in element: continue
 
         if element['is_series'] and item.search_type == 'movie': continue
@@ -640,7 +642,6 @@ def sub_search(item):
         thumb = element['poster'] if element['poster'] else item.thumbnail
         new_item = item.clone( title = element['name'], thumbnail = thumb, infoLabels = {'year':element['year'], 'plot': element['description']})
 
-        # ~ new_item.url = host + 'titles/' + str(element['id'])
         new_item.url = host + 'secure/titles/' + str(element['id']) + '?titleId=' + str(element['id'])
 
         if not element['is_series']:

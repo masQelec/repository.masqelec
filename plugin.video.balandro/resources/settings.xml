@@ -1,14 +1,45 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
 
-    <category label="Canales">
-        <setting label="Opciones para las listas de canales:" type="lsep"/>
-        <setting id="channels_link_main" type="bool" label="Añadir acceso por canales en menú principal" default="true"/>
-        <setting id="channels_link_pyse" type="bool" label="Añadir acceso por películas y series (solo los canales con ambos contenidos)" default="false"/>
+    <category label="Menu">
+        <setting label="Opciones para el menú simplificado:" type="lsep"/>
+        <setting id="mnu_simple" type="bool" label="Activar Menú Simplificado" default="false"/>
 
         <setting type="sep"/>
+        <setting label="Opciones para el menú principal:" type="lsep"/>
+        <setting id="mnu_oppciones" type="bool" label="Seleccionar opciones" default="false"/>
+        <setting id="channels_link_main" type="bool" label="Añadir la opción Canales (simplificado y principal)" default="true" visible="eq(-1,true)"/>
+        <setting id="mnu_idiomas" type="bool" label="Añadir la opción Idiomas (simplificado y principal)" default="true" visible="eq(-2,true)"/>
+        <setting id="mnu_grupos" type="bool" label="Añadir la opción Grupos (simplificado y principal)" default="true" visible="eq(-3,true)"/>
+        <setting id="mnu_pelis" type="bool" label="Añadir la opción Películas" default="true" visible="eq(-4,true)"/>
+        <setting id="mnu_series" type="bool" label="Añadir la opción Series" default="true" visible="eq(-5,true)"/>
+        <setting id="channels_link_pyse" type="bool" label="Añadir la opción Películas y Series (solo los canales con ambos contenidos)" default="false" visible="eq(-6,true)"/>
+        <setting id="mnu_generos" type="bool" label="Añadir la opción Géneros" default="true" visible="eq(-7,true)"/>
+        <setting id="mnu_documentales" type="bool" label="Añadir la opción Documentales" default="true" visible="eq(-8,true)"/>
+        <setting id="mnu_torrents" type="bool" label="Añadir la opción Torrents" default="true" visible="eq(-9,true)"/>
+        <setting id="mnu_animes" type="bool" label="Añadir la opción Animes" default="true" visible="eq(-10,true)"/>
+        <setting id="mnu_adultos" type="bool" label="Añadir la opción Adultos" default="true" visible="eq(-11,true)"/>
+        <setting id="mnu_preferidos" type="bool" label="Añadir la opción Preferidos" default="true" visible="eq(-12,true)"/>
+        <setting id="mnu_desargas" type="bool" label="Añadir la opción Descargas" default="true" visible="eq(-13,true)"/>
+
+        <setting type="sep"/>
+        <setting label="Opciones varias para los sub-menús:" type="lsep"/>
+        <setting id="search_extra_main" type="bool" label="Añadir acceso al detalle de Búsquedas especiales" default="false"/>
+
+        <setting type="sep"/>
+        <setting id="sub_mnu_special" type="bool" label="Añadir acceso al detalle de opciones Especiales" default="true"/>
+    </category>
+
+    <category label="Canales">
+        <setting label="Opciones para las listas de canales:" type="lsep"/>
         <setting id="channels_list_status" type="enum" values="Todos|Preferidos y Activos|Sólo Preferidos" label="Qué canales se mostrarán" default="0"/>
         <setting id="channels_list_order" type="bool" label="Ordenar canales preferidos al principio" default="true"/>
+
+        <setting type="sep"/>
+        <setting id="top_channels" type="action" label="Personalizar canales Preferidos (Marcar o Des-marcar)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_status)"/>
+
+        <setting type="sep"/>
+        <setting id="all_channels" type="action" label="Personalizar canales (Desactivar o Re-activar)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_des_rea)"/>
 
         <setting type="sep"/>
         <setting label="Opciones para el control parental:" type="lsep"/>
@@ -27,6 +58,25 @@
         <setting id="xxx_password" type="action" label="Establecer un pin parental" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=adults_password)"/>
         <setting id="xxx_password_del" type="action" label="Eliminar pin parental" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=adults_password_del)"/>
 		<setting id="adults_password" type="text" label="Clave parental" enable="true" visible="false" default=""/>
+    </category>
+
+    <category label="Cuentas">
+        <setting label="Informacion cuentas:" type="lsep"/>
+        <setting id="show_help_register" type="action" label="Información dominios que requieren registrase" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_register)"/>
+
+        <setting type="sep"/>
+        <setting label="Canal HdFull:" type="lsep"/>
+        <setting id="show_credenciales_hdfull" type="action" label="Credenciales cuenta" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuctext&action=_credenciales_hdfull)"/>
+        <setting id="del_credenciales_hdfull" type="action" label="Pulsar para eliminarlas" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=del_datos_hdfull)"/>
+		<setting id="channel_hdfull_hdfull_username" type="text" label="Usuario" enable="false" visible="true" default=""/>
+		<setting id="channel_hdfull_hdfull_password" type="text" label="Contraseña" option="hidden" enable="false" visible="true" default=""/>
+
+        <setting type="sep"/>
+        <setting label="Canal PlayDede:" type="lsep"/>
+        <setting id="show_credenciales_playdede" type="action" label="Credenciales cuenta" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuctext&action=_credenciales_playdede)"/>
+        <setting id="del_credenciales_playdede" type="action" label="Pulsar para eliminarlas" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=del_datos_playdede)"/>
+		<setting id="channel_playdede_playdede_username" type="text" label="Usuario" enable="false" visible="true" default=""/>
+		<setting id="channel_playdede_playdede_password" type="text" label="Contraseña" option="hidden" enable="false" visible="true" default=""/>
     </category>
 
     <category label="Play">
@@ -97,7 +147,7 @@
 
     <category label="Buscar">
         <setting label="Opciones para configurar las búsquedas:" type="lsep"/>
-        <setting id="search_extra_main" type="bool" label="Añadir acceso a búsquedas en TMDB y Filmaffinity en sub-opciones menú " default="false"/>
+        <setting id="search_no_searchables" type="action" label="Qué canales nunca intervendrán en las búsquedas" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_no_searchables)"/>
 
         <setting type="sep"/>
         <setting id="search_no_channels_actives" type="action" label="Qué canales no intervienen en las búsquedas (marcados como desactivados)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_no_actives)"/>
@@ -110,6 +160,7 @@
         <setting id="search_no_torrents" type="bool" label="Descartar búsquedas en los canales que pueden contener archivos torrent" default="false"/>
 
         <setting type="sep"/>
+        <setting id="search_no_channels_inestables" type="action" label="Qué canales están inestables" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_inestables)"/>
         <setting id="search_no_inestables" type="bool" label="Descartar búsquedas en los canales inestables" default="false"/>
 
         <setting type="sep"/>
@@ -365,8 +416,9 @@
 
     <category label="Ayuda">
         <setting label="Informacion para contactar:" type="lsep"/>
-        <setting label="Foro [COLOR yellow][B][I] balandro.tk [/I][/B][/COLOR] para Novedades, Sugerencias, Aportaciones, etc." visible="true"/>
-        <setting label="Telegram [COLOR cyan][B][I] @balandro_asesor [/I][/B][/COLOR] para Asesoramiento, Dudas, Ayuda, etc." visible="true"/>
+        <setting label="Foro [COLOR plum][B][I] www.mimediacenter.info/foro/viewforum.php?f=44 [/I][/B][/COLOR] Instalaciones, Novedades, Sugerencias, etc." visible="true"/>
+        <setting label="Fuente [COLOR coral][B][I] balandro-tk.github.io/balandro/ [/I][/B][/COLOR] Repositorio, Add-On, etc." visible="true"/>
+        <setting label="Telegram [COLOR lightblue][B][I] t.me/@balandro_asesor [/I][/B][/COLOR] Asesoramiento, Dudas, Consultas, etc." visible="true"/>
 
         <setting type="sep"/>
         <setting label="Opciones principales de uso:" type="lsep"/>
@@ -376,9 +428,13 @@
         <setting id="show_help_settings" type="action" label="Notas sobre algunos parámetros de la configuración" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_settings)"/>
 
         <setting type="sep"/>
-        <setting label="Información desarrollo:" type="lsep"/>
+        <setting label="Información versión:" type="lsep"/>
         <setting id="show_version" type="action" label="Información versión" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_version)"/>
         <setting id="show_changelog" type="action" label="Historial de cambios" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_changelog)"/>
+
+        <setting type="sep"/>
+        <setting label="Información desarrollo:" type="lsep"/>
+        <setting label="Team [COLOR hotpink][B][I] t.me/Balandro_team [/I][/B][/COLOR] Unirse al Equipo de Desarrollo" visible="true"/>
         <setting id="show_dev_notes" type="action" label="Notas para developers" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_dev_notes)"/>
     </category>
 

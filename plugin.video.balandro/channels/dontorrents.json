@@ -13,5 +13,5 @@
 
   "clusters": ["torrents", "last", "qualityes", "kids", "docs"],
 
-  "notes": "Películas, series y documentales con enlaces torrent exclusivamente. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas, series y documentales con enlaces torrent exclusivamente, por géneros, calidades y años. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

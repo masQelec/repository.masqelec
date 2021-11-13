@@ -7,7 +7,9 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://www.torrentdivx.net/'
+host = 'https://www.torrentdivx.com/'
+
+# ~  las series con recaptcha
 
 
 def item_configurar_proxies(item):
@@ -20,12 +22,15 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, headers=None):
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/www.torrentdivx.com/', '/www.torrentdivx.net/')
+    url = url.replace('/www.torrentdivx.net/', '/www.torrentdivx.com/')
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('torrentdivx', url, post=post, headers=headers).data
+    if '/release/' in url:
+        raise_weberror = False
+
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('torrentdivx', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
@@ -33,8 +38,8 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-                data = httptools.downloadpage_proxy('torrentdivx', url, post=post, headers=headers).data
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                data = httptools.downloadpage_proxy('torrentdivx', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -43,19 +48,6 @@ def do_downloadpage(url, post=None, headers=None):
 
 def mainlist(item):
     return mainlist_pelis(item)
-
-    # ~  las series con recaptcha
-
-    # ~ logger.info()
-    # ~ itemlist = []
-
-    # ~ itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
-    # ~ itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' )) # de momento se quitan por hidenn captacha
-
-    # ~ itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
-
-    # ~ itemlist.append(item_configurar_proxies(item))
-    # ~ return itemlist
 
 
 def mainlist_pelis(item):
@@ -149,7 +141,9 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>Top IMDB<')
+    bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>LO MAS VISITADO<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<h1>(.*?)>LO MAS VISITADO<')
+
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
     for article in matches:
@@ -243,6 +237,7 @@ def findvideos(item):
     bloque = scrapertools.find_single_match(data, '<div class="box_links">(.*?)</table>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr(.*?)</tr>')
+
     for enlace in matches:
         if '<th' in enlace or 'torrent' not in enlace: continue
         if "id='link-fake'" in enlace: continue
@@ -250,10 +245,15 @@ def findvideos(item):
         url = scrapertools.find_single_match(enlace, " href='([^']+)")
         if not url: continue
 
+        if url.startswith('https://uii.io/'):
+            url = scrapertools.find_single_match(url, "&url=(.*?)$")
+
         tds = scrapertools.find_multiple_matches(enlace, '<td>(.*?)</td>')
         qlty = scrapertools.find_single_match(tds[1], "<strong class='quality'>([^<]+)")
         lang = tds[2]
+
         othr = tds[3] if tds[3] != '----' else ''
+        if othr == 'No Aplica': othr = '?'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'torrent', title = '', url = url,
                               language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = othr ))
@@ -275,7 +275,7 @@ def play(item):
 
         url = scrapertools.find_single_match(data, '<a id="link" rel="nofollow" href="([^"]+)')
 
-        if ('/www.pastexts.com/') in url or '/tmearn.com/' in url:
+        if '/www.pastexts.com/' in url or '/tmearn.com/' in url or '/sturl.in/' in url or '/uiio.io/' in url or '/down.fast-' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
         if url.endswith('.torrent'):
@@ -290,10 +290,13 @@ def play(item):
             return itemlist
 
         if url:
-            itemlist.append(item.clone(url = url))
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
 
-    else:
-        itemlist.append(item.clone())
+            url = servertools.normalize_url(servidor, url)
+
+            if servidor and servidor != 'directo':
+                itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
 
@@ -348,7 +351,7 @@ def list_search(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_search(item)

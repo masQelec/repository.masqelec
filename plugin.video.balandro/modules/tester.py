@@ -14,14 +14,12 @@ color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
 
 channels_poe = [
-        ['documaniatv', 'https://www.documaniatv.com/'],
-        ['gdrive', 'https://drive.google.com/drive/'],
-        ['hdfull', 'https://hdfullcdn.cc/'],
-        ['playdede', 'https://playdede.com/']
+        ['gdrive', 'https://drive.google.com/drive/']
         ]
 
 servers_poe = [
         ['directo'],
+        ['gamovideo'],
         ['m3u8hls'],
         ['torrent']
         ]
@@ -45,8 +43,9 @@ def test_channel(channel_name):
 
     if params['active'] == False:
         el_canal = ('[B][COLOR %s]' + channel_name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
+        if not 'temporary' in str(params['clusters']):
+            platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+            return
 
     txt = test_internet()
 
@@ -95,16 +94,22 @@ def test_channel(channel_name):
               platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
               return
 
-           part_py = 'mainlist'
-           if 'configurar_proxies' in data: part_py = 'configurar_proxies'
-           elif 'do_downloadpage' in data: part_py = 'do_downloadpage'
+           part_py = 'def mainlist'
+           if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
+           elif 'CLASS' in data or 'class ' in data: part_py = 'class '
+
+           elif 'def login' in data: part_py = 'def login'
+           elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
+           elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
 
            bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
-           bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
 
-           host = scrapertools.find_single_match(bloc, 'host.*?"(.*?)"')
-           if not host:
-               host = scrapertools.find_single_match(bloc, "host.*?'(.*?)'")
+           if bloc:
+               bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
+
+               host = scrapertools.find_single_match(bloc, 'host.*?"(.*?)"')
+               if not host:
+                   host = scrapertools.find_single_match(bloc, "host.*?'(.*?)'")
 
     host = host.strip()
 
@@ -112,8 +117,8 @@ def test_channel(channel_name):
         if dominio:
             host = dominio
 
-    if not host:
-        el_canal = ('Falta host/clon [B][COLOR %s]' + channel_py) % color_alert
+    if not host or not '//' in host:
+        el_canal = ('Falta Dominio/Host/Clon en [B][COLOR %s]' + channel_py) % color_alert
         platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
         return
 
@@ -139,7 +144,7 @@ def info_channel(channel_name, channel_poe, host, dominio, txt):
         return txt
 
     if response.sucess == False:
-        response = acces_channel(channel_name, host, '', txt, follow_redirects=True)
+        response, txt = acces_channel(channel_name, host, '', txt, follow_redirects=True)
 
     if not dominio:
         dominio = config.get_setting('dominio', channel_id, default='')
@@ -149,7 +154,7 @@ def info_channel(channel_name, channel_poe, host, dominio, txt):
     return txt
 
 
-def acces_channel(channel_name, host, dominio, txt, follow_redirects=True):
+def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
     el_canal = ('Testeando [B][COLOR %s]' + channel_name) % color_infor
     platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
 
@@ -305,11 +310,11 @@ def info_server(server_name, server_poe, url, txt):
     response, txt = acces_server(server_name, url, txt, follow_redirects=False)
 
     if response.sucess == False:
-        response = acces_server(server_name, url, txt, follow_redirects=True)
+        response, txt = acces_server(server_name, url, txt, follow_redirects=True)
 
     return txt
 
-def acces_server(server_name, url, txt, follow_redirects=True):
+def acces_server(server_name, url, txt, follow_redirects=None):
     el_server = ('Testeando [B][COLOR %s]' + server_name) % color_avis
     platformtools.dialog_notification(config.__addon_name, el_server + '[/COLOR][/B]')
 

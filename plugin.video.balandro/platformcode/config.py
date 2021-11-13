@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-# ------------------------------------------------------------
-# Balandro - Config
-# ------------------------------------------------------------
 
-import os, sys, re
-import xbmc, xbmcaddon, xbmcvfs  
+import sys
+
+import xbmc, xbmcvfs  
+
 if sys.version_info[0] >= 3:
     translatePath = xbmcvfs.translatePath
     long = int
@@ -12,8 +11,8 @@ if sys.version_info[0] >= 3:
 else:
     translatePath = xbmc.translatePath   
 
-# GLOBAL ADDON VARIABLES
-# ======================
+import os, re, xbmcaddon  
+
 
 __base_url = sys.argv[0]
 
@@ -22,9 +21,6 @@ __addon_id = __base_url.replace('plugin://','').replace('/','')
 
 __settings__ = xbmcaddon.Addon(id=__addon_id)
 
-
-# HELPERS
-# =======
 
 def build_url(item):
     return __base_url + '?' + item.tourl()
@@ -36,7 +32,7 @@ def build_ContainerRefresh(item):
     return 'Container.Refresh(%s?%s)' % (__base_url, item.tourl())
 
 def build_ContainerUpdate(item, replace=False):
-    if replace: # reset the path history
+    if replace:
         return 'Container.Update(%s?%s, replace)' % (__base_url, item.tourl())
     else:
         return 'Container.Update(%s?%s)' % (__base_url, item.tourl())
@@ -59,7 +55,7 @@ def get_addon_version(with_fix=True):
 
 def get_addon_version_fix():
     try:
-        last_fix_json = os.path.join(get_runtime_path(), 'last_fix.json')   # información de la versión fixeada del usuario
+        last_fix_json = os.path.join(get_runtime_path(), 'last_fix.json')
         if os.path.exists(last_fix_json):
             with open(last_fix_json, 'r') as f: data=f.read(); f.close()
             fix = re.findall('"fix_version"\s*:\s*(\d+)', data)
@@ -67,17 +63,24 @@ def get_addon_version_fix():
                 return '.fix%s' % fix[0]
     except:
         pass
+
     return ''
 
 
-def get_thumb(thumb_name, theme='default'):
+def get_thumb(thumb_name, theme='default', mtype='themes'):
     ficheros = {
         'movie': 'clapboard', 'tvshow': 'tv', 'documentary': 'genius', 'search': 'magnifyingglass', 
         'videolibrary': 'star', 'downloads': 'download', 'settings': 'settings', 
         'hot': 'bolt', 'help': 'help', 'genres': 'swatches'
     }
-    path = os.path.join(get_runtime_path(), 'resources', 'media', 'themes', theme, ficheros.get(thumb_name, thumb_name) + '.png')
-    if os.path.exists(path): return path
+
+    path = os.path.join(get_runtime_path(), 'resources', 'media', mtype, theme, ficheros.get(thumb_name, thumb_name) + '.png')
+    if not os.path.exists(path):
+        path = os.path.join(get_runtime_path(), 'resources', 'media', mtype, theme, ficheros.get(thumb_name, thumb_name) + '.jpg')
+
+    if os.path.exists(path):
+        return path
+
     return ''
 
 def get_localized_category(categ):
@@ -85,12 +88,9 @@ def get_localized_category(categ):
                   'documentary': 'Documentales', 'vos': 'Versiones originales',
                   'anime': 'Anime', 'adult': 'Adultos',
                   'direct': 'Directos', 'torrent': 'Torrents'}
+
     return categories[categ] if categ in categories else categ
 
-
-
-# FUNCIONES DE USO COMÚN
-# ======================
 
 # Eliminar tags de color de un texto
 def quitar_colores(texto):
@@ -103,6 +103,7 @@ def text_clean(txt, disallowed_chars = '[^a-zA-Z0-9\-_()\[\]. ]+', blank_char = 
         txt = unicode(txt, 'utf-8')
     except: # unicode is a default on python 3 
         pass
+
     txt = unicodedata.normalize('NFKD', txt).encode('ascii', 'ignore')
     txt = txt.decode('utf-8').strip()
     if blank_char != ' ': txt = txt.replace(' ', blank_char)
@@ -115,6 +116,7 @@ def format_bytes(num):
     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
         if num < step_unit:
             return "%3.1f %s" % (num, x)
+
         num /= step_unit
 
 # This function will convert seconds to HhMMm
@@ -122,15 +124,15 @@ def format_seconds_to_duration(seconds):
     hours = seconds // (60*60)
     seconds %= (60*60)
     minutes = seconds // 60
-    if hours == 0: return '%dm' % minutes
+
+    if hours == 0:
+        return '%dm' % minutes
+
     return '%dh%02dm' % (hours, minutes)
 
 
-# PARÁMETROS CONFIGURABLES
-# ========================
-
 def get_lang_preferences():
-    # 0:no mostrar  1:primera opción  2:segunda opción  3:tercera
+    # 0:no mostrar  1:primera 2:segunda 3:tercera
     pref_esp = get_setting('preferencia_idioma_esp', default='1')
     pref_lat = get_setting('preferencia_idioma_lat', default='2')
     pref_vos = get_setting('preferencia_idioma_vos', default='3')
@@ -146,6 +148,7 @@ def get_setting(name, channel="", server="", default=None):
     Si se especifica el nombre de un canal o servidor se guarda en la configuración global con un prefijo channel_ o server_.
     Los parametros channel y server no deben usarse simultaneamente.
     """
+
     if channel:
         name = 'channel_' + channel + '_' + name
     elif server:
@@ -170,7 +173,7 @@ def get_setting(name, channel="", server="", default=None):
             return value
         elif name.startswith('search_last_'): # Para los settings de textos buscados no convertir si hay numéros (ej: 007)
             return str(value)
-        elif name.endswith('_color'): # Para los settings acabados en _color, quitar tags de colores al devolver el valor (Ej: [COLOR gold]gold[/COLOR] => gold)
+        elif name.endswith('_color'):
             return quitar_colores(value)
         else:
             try:
@@ -190,6 +193,7 @@ def set_setting(name, value, channel="", server=""):
     Si se especifica el nombre de un canal o servidor se guarda en la configuración global con un prefijo channel_ o server_.
     Los parametros channel y server no deben usarse simultaneamente.
     """
+
     if channel:
         name = 'channel_' + channel + '_' + name
     elif server:
@@ -216,7 +220,6 @@ def set_setting(name, value, channel="", server=""):
 
 
 # Obtener y guardar últimas búsquedas
-
 def get_last_search(search_type):
     if get_setting('search_show_last', default=False):
         if search_type not in ['all', 'movie', 'tvshow', 'documentary', 'person']: search_type = 'all'
@@ -230,9 +233,6 @@ def set_last_search(search_type, tecleado):
     if search_type not in ['all', 'movie', 'tvshow', 'documentary', 'person']: search_type = 'all'
     set_setting('search_last_' + search_type, tecleado)
 
-
-# CLASSES
-# =======
 
 class WebErrorException(Exception):
     def __init__(self, *args, **kwargs):

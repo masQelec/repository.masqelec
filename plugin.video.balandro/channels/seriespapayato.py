@@ -9,21 +9,10 @@ from core import httptools, scrapertools, servertools, tmdb
 host = "https://seriespapaya.to/"
 
 
-# ~ def item_configurar_proxies(item):
-    # ~ plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    # ~ plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    # ~ return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-# ~ def configurar_proxies(item):
-    # ~ from core import proxytools
-    # ~ return proxytools.configurar_proxies_canal(item.channel, host)
-
 def do_downloadpage(url, post=None, referer=None, raise_weberror=True):
     headers = {'Referer': host}
-    #if referer: headers['Referer'] = referer
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    # ~ data = httptools.downloadpage_proxy('seriespapayato', url, post=post, headers=headers, raise_weberror=raise_weberror).data
     return data
 
 
@@ -41,7 +30,6 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -203,11 +191,11 @@ def episodios(item):
     return itemlist
 
 
-# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
 def puntuar_calidad(txt):
     orden = ['360P', '480P', '720P', '1080P']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
+
 
 def findvideos(item):
     logger.info()
@@ -216,7 +204,6 @@ def findvideos(item):
     IDIOMAS = {'Español Latino': 'Lat', 'Castellano': 'Esp', 'VOSE': 'Vose'}
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     patron = '<li data-typ="episode" data-key="(.*?)" data-id="(.*?)".*?<p class="AAIco-language">(.*?)</p>.*?<p class="AAIco-dns">(.*?)</p>.*?<p class="AAIco-equalizer">(.*?)</p>'
     links = scrapertools.find_multiple_matches(data, patron)
@@ -242,7 +229,6 @@ def play(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     new_url = scrapertools.find_single_match(data, ' src="(.*?)"')
     if not new_url: new_url = scrapertools.find_single_match(data, ' SRC="(.*?)"')
@@ -252,7 +238,6 @@ def play(item):
             new_url = new_url.replace('/cinemaupload.com/', '/embed.cload.video/')
 
             data = do_downloadpage(new_url, raise_weberror = False)
-            # ~ logger.debug(data)
 
             url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
 
@@ -275,7 +260,7 @@ def play(item):
         if servidor:
            itemlist.append(item.clone(server = servidor, url = new_url))
         else:
-           itemlist.append(item.clone(server = '', url = new_url))
+           itemlist.append(item.clone(server = 'directo', url = new_url))
 
     return itemlist
 

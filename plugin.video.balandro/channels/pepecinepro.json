@@ -1,6 +1,6 @@
 {
   "id": "pepecinepro",
-  "name": "PepecinePro",
+  "name": "PepeCinePro",
   "thumbnail": "pepecinepro.png",
 
   "active": true,
@@ -13,5 +13,5 @@
 
   "clusters": ["years", "kids", "docs", "vos"],
 
-  "notes": "Películas en castellano, latino y subtitulado."
+  "notes": "Películas en castellano, latino y subtitulado. Por géneros, año."
 }

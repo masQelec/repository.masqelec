@@ -1,26 +1,25 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-import os
-import re
-import time
+import os, re, time, datetime
+
 import sys
 
-PY2 = False
-PY3 = False
+
 if sys.version_info[0] >= 3:
     from urllib.parse import urlparse
     PY3 = True
     unicode = str
 else:
-    PY2 = True
+    PY3 = False
     from urlparse import urlparse    
 
-from core import httptools, jsontools, filetools
+
+from core import httptools, scrapertools, jsontools, filetools
 from core.item import Item
 from platformcode import config, logger, platformtools
 
 dict_servers_parameters = {}
+
 
 def find_video_items(item=None, data=None):
     """
@@ -36,13 +35,13 @@ def find_video_items(item=None, data=None):
     @return: devuelve el itemlist con los resultados
     @rtype: list
     """
+
     logger.info()
     itemlist = []
 
     if data is None and item is None:
         return itemlist
 
-    # Descarga la página
     if data is None:
         data = httptools.downloadpage(item.url).data
 
@@ -56,7 +55,6 @@ def find_video_items(item=None, data=None):
         itemlist.append(Item(channel=item.channel, action='play', title=title, url=url, server=server))
 
     return itemlist
-
 
 
 # Para un servidor y una url, devuelve la url normalizada según patrones del json
@@ -96,6 +94,7 @@ def get_servers_itemlist(itemlist):
      - Asigna el servidor y la url modificada.
      - Si no se encuentra servidor para una url, se asigna "directo"
     """
+
     # Recorre los servidores
     for serverid in get_servers_list().keys():
         server_parameters = get_server_parameters(serverid)
@@ -132,8 +131,10 @@ def findvideos(data, skip=False, disabled_servers=False):
     retorne algun enlace. Tambien puede ser un entero mayor de 1, que representaria el numero maximo de enlaces a buscar.
     :return:
     """
+
     logger.info()
     devuelve = []
+
     skip = int(skip)
     servers_list = get_servers_list().keys()
 
@@ -200,8 +201,9 @@ def get_server_from_url(url, disabled_servers=False):
 
 # Para un servidor y una url, devuelve video_urls ([]), puede (True/False), motivo_no_puede
 def resolve_video_urls_for_playing(server, url, url_referer=''):
-    logger.info("Server: %s, Url: %s" % (server, url))
     video_urls = []
+
+    logger.info("Server: %s, Url: %s" % (server, url))
 
     server = get_server_id(server) # por si hay servers con múltiples ids
 
@@ -215,12 +217,12 @@ def resolve_video_urls_for_playing(server, url, url_referer=''):
         server_name = server_parameters['name'] if 'name' in server_parameters else server.capitalize()
 
         if 'active' not in server_parameters:
-            errmsg = 'No existe conector para el servidor %s' % server_name
+            errmsg = 'Falta conector del servidor %s' % server_name
             logger.error(errmsg)
             return [], False, errmsg
 
         if server_parameters['active'] == False:
-            errmsg = 'El conector para el servidor %s está desactivado' % server_name
+            errmsg = 'Conector del servidor %s está desactivado' % server_name
             if 'notes' in server_parameters: errmsg += '. ' + server_parameters['notes']
             logger.debug(errmsg)
             return [], False, errmsg
@@ -229,7 +231,7 @@ def resolve_video_urls_for_playing(server, url, url_referer=''):
         try:
             server_module = __import__('servers.%s' % server, None, None, ["servers.%s" % server])
         except:
-            errmsg = 'No se ha podido importar el servidor %s' % server_name
+            errmsg = 'No se pudo importar el servidor %s' % server_name
             logger.error(errmsg)
             import traceback
             logger.error(traceback.format_exc())
@@ -243,14 +245,14 @@ def resolve_video_urls_for_playing(server, url, url_referer=''):
             elif len(response) > 0:
                 video_urls.extend(response)
         except:
-            errmsg = 'Se ha producido un error en el servidor %s' % server_name
+            errmsg = 'Error inesperado en el servidor %s' % server_name
             logger.error(errmsg)
             import traceback
             logger.error(traceback.format_exc())
             return [], False, errmsg
 
         if len(video_urls) == 0:
-            return [], False, ' No se encuentra el vídeo en %s' % server_name
+            return [], False, 'Vídeo No localizado en %s' % server_name
 
     return video_urls, True, ''
 
@@ -289,10 +291,12 @@ def is_server_enabled(server):
     @return: resultado de la comprobación
     @rtype: bool
     """
+
     server_parameters = get_server_parameters(server)
     if 'active' not in server_parameters or server_parameters['active'] == False:
         return False
     return config.get_setting('status', server=server, default=0) >= 0
+
 
 def is_server_available(server):
     """
@@ -303,6 +307,7 @@ def is_server_available(server):
     @return: resultado de la comprobación
     @rtype: bool
     """
+
     path = os.path.join(config.get_runtime_path(), 'servers', server + '.json')
     return os.path.isfile(path)
 
@@ -316,6 +321,7 @@ def get_server_parameters(server):
     @return: datos del servidor
     @rtype: dict
     """
+
     global dict_servers_parameters
     if server not in dict_servers_parameters:
         try:
@@ -326,7 +332,7 @@ def get_server_parameters(server):
 
             path = os.path.join(config.get_runtime_path(), 'servers', server + '.json')
             if not os.path.isfile(path):
-                logger.info('No se encuentra el json del servidor: %s' % server)
+                logger.info('Falta el .json del servidor: %s' % server)
                 return {}
 
             data = filetools.read(path)
@@ -341,7 +347,7 @@ def get_server_parameters(server):
             dict_servers_parameters[server] = dict_server
 
         except:
-            mensaje = "Error al cargar el json del servidor: %s\n" % server
+            mensaje = "Error carga .json del servidor: %s\n" % server
             import traceback
             logger.error(mensaje + traceback.format_exc())
             return {}
@@ -366,16 +372,15 @@ def get_servers_list():
     y como valor un diccionario con los parametros del servidor.
     @rtype: dict
     """
+
     server_list = {}
     for server in os.listdir(os.path.join(config.get_runtime_path(), 'servers')):
         if server.endswith('.json'):
             serverid = server.replace('.json', '')
             server_parameters = get_server_parameters(serverid)
             if server_parameters['id'] != serverid:
-                logger.error('El id: %s no coincide con el fichero del server %s' % (server_parameters['id'], serverid))
+                logger.error('El id: %s no coincide con el servidor %s' % (server_parameters['id'], serverid))
                 continue
-            # ~ if server_parameters['active'] == True:
-                # ~ server_list[serverid] = server_parameters
             server_list[serverid] = server_parameters # devolver aunque no esté activo para poder detectar sus patrones.
 
     return server_list
@@ -384,19 +389,31 @@ def get_servers_list():
 # Normalizar nombre del servidor (para los canales que no lo obtienen de los patrones, y para evitar bucle more_ids en get_server_id())
 def corregir_servidor(servidor):
     servidor = servidor.strip().lower()
+
     if servidor in ['netutv', 'waaw', 'waaw1', 'waav', 'netu', 'hqq', 'megavideo', 'megaplay']: return 'netutv'
     elif servidor in ['powvideo', 'povwideo', 'powvldeo', 'powv1deo', 'povw1deo']: return 'powvideo'
     elif servidor in ['streamplay', 'steamplay', 'streamp1ay']: return 'streamplay'
-    elif servidor in ['fembed', 'jplayer', 'feurl', 'femax20', 'fcdn']: return 'fembed'
-    elif servidor in ['gvideo', 'google', 'google drive', 'gdrive']: return 'gvideo'
-    elif servidor in ['vidtodo', 'vidto','vidtodoo','vixtodo']: return 'vidtodo'
-    elif servidor in ['mailru', 'my', 'my.mail', 'my.mail.ru']: return 'mailru'
+
+    elif servidor in ['fembed', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer']: return 'fembed'
+    elif servidor in ['evoplay']: return 'evoload'
+    elif servidor in ['streamta.pe', 'strtapeadblock', 'adblockstrtech', 'adblockstrtape', 'playstp']: return 'streamtape'
+    elif servidor in ['sbembed2', 'sbvideo']: return 'sbembed'
+    elif servidor in ['streams1', 'streams2']: return 'streams3'
+    elif servidor in ['sbplay', 'sbplay1', 'pelistop', 'cloudemb', 'tubesb', 'sbembed', 'embedsb' ,'sbembed.com', 'playersb']: return 'streamsb'
+    elif servidor in ['chouhaa']: return 'youwatch'
+    elif servidor in ['mega.nz']: return 'mega'
+    elif servidor in ['gloria.tv']: return 'gloria'
+    elif servidor in ['vev.io']: return 'vevio'
+    elif servidor in ['gvideo', 'google', 'google drive', 'gdrive', 'drive']: return 'gvideo'
+    elif servidor in ['mailru', 'my.mail', 'my.mail.ru', 'my', 'mail']: return 'mailru'
+
+    elif servidor in ['vidtodo', 'vidto', 'vidtodoo', 'vixtodo']: return 'vidtodo'
     elif servidor in ['okru', 'ok', 'ok.ru', 'ok server']: return 'okru'
     elif servidor in ['streamz', 'streamzz']: return 'streamz'
     elif servidor in ['vevio', 'vev']: return 'vevio'
     elif servidor in ['vsmobi', 'v-s']: return 'vsmobi'
     elif servidor in ['doodstream', 'dood']: return 'doodstream'
-    elif servidor in ['archiveorg', 'archive']: return 'archiveorg'
+    elif servidor in ['archiveorg', 'archive.org', 'archive']: return 'archiveorg'
     elif servidor in ['youtube', 'youtu']: return 'youtube'
     elif servidor in ['mp4upload', 'mp4up']: return 'mp4upload'
     elif servidor in ['yourupload', 'yourup']: return 'yourupload'
@@ -411,12 +428,11 @@ def corregir_servidor(servidor):
 
 
 # Reordenación/Filtrado de enlaces
-
 def filter_and_sort_by_quality(itemlist):
     servers_sort_quality = config.get_setting('servers_sort_quality', default=0) # 0: orden web, 1: calidad desc, 2: calidad asc
 
     # Ordenar por preferencia de calidades
-    logger.info('Preferencias de orden para calidades: %s' % servers_sort_quality)
+    logger.info('Preferencias orden calidades: %s' % servers_sort_quality)
     
     if servers_sort_quality == 1:
         return sorted(itemlist, key=lambda it: it.quality_num, reverse=True)
@@ -433,8 +449,7 @@ def filter_and_sort_by_server(itemlist):
     servers_discarded = config.get_setting('servers_discarded', default='')
     if servers_discarded != '':
         servers_discarded_list = servers_discarded.lower().replace(' ', '').split(',')
-        logger.info('Servidores descartados por el usuario: %s' % ', '.join(servers_discarded_list))
-        # ~ itemlist = filter(lambda it: not it.server or it.server.lower() not in servers_discarded_list, itemlist)
+        logger.info('Servidores descartados usuario: %s' % ', '.join(servers_discarded_list))
         itemlist = filter(lambda it: (not it.server and 'indeterminado' not in servers_discarded_list) or (it.server and it.server.lower() not in servers_discarded_list), itemlist)
 
     # Ordenar enlaces de servidores preferidos del usuario
@@ -443,8 +458,8 @@ def filter_and_sort_by_server(itemlist):
     if servers_preferred != '' or servers_unfavored != '':
         servers_preferred_list = servers_preferred.lower().replace(' ', '').split(',')
         servers_unfavored_list = servers_unfavored.lower().replace(' ', '').split(',')
-        if servers_preferred != '': logger.info('Servidores preferentes para el usuario: %s' % ', '.join(servers_preferred_list))
-        if servers_unfavored != '': logger.info('Servidores última opción para el usuario: %s' % ', '.join(servers_unfavored_list))
+        if servers_preferred != '': logger.info('Servidores preferentes usuario: %s' % ', '.join(servers_preferred_list))
+        if servers_unfavored != '': logger.info('Servidores última opción usuario: %s' % ', '.join(servers_unfavored_list))
 
         def numera_server(servidor):
             if not servidor: servidor = 'indeterminado'
@@ -466,14 +481,63 @@ def get_lang(lang):
     if lang in ['Esp','Lat']: return lang
     return 'VO'
 
+
 def filter_and_sort_by_language(itemlist):
     # prefs = {'Esp': pref_esp, 'Lat': pref_lat, 'VO': pref_vos} dónde pref_xxx "0:Descartar|1:Primero|2:Segundo|3:Tercero"
 
     # Quitar enlaces de idiomas descartados y ordenar por preferencia de idioma
     prefs = config.get_lang_preferences()
-    logger.info('Preferencias de idioma para servidores: %s' % str(prefs))
+    logger.info('Preferencias idioma servidores: %s' % str(prefs))
     prefs['?'] = 4 # Cuando no hay idioma mostrar al final
 
     itemlist = filter(lambda it: prefs[get_lang(it.language)] != 0, itemlist)
 
     return sorted(itemlist, key=lambda it: prefs[get_lang(it.language)])
+
+
+def get_parse_hls(video_urls):
+    logger.info()
+
+    import codecs
+
+    hs = ''
+    new_video_urls = list()
+    headers = dict()
+
+    if not (len(video_urls)) == 1:
+        return video_urls
+
+    url = video_urls[0][1]
+    if '|' in url:
+        part = url.split('|')
+        url = part[0]
+
+        if not url.endswith('master.m3u8'):
+            return video_urls
+
+        khs = part[1]
+        hs = '|' + khs
+
+        matches = scrapertools.find_multiple_matches(khs, r'(\w+)=([^&]+)')
+
+        for key, val in matches:
+            headers[key] = val
+
+    if not url.endswith('master.m3u8'):
+        return video_urls
+
+    data = httptools.downloadpage(url, headers=headers).data
+    if not isinstance(data, str):
+        data = codecs.decode(data, "utf-8")
+
+    matches = scrapertools.find_multiple_matches(data, r'#EXT-X-STREAM-INF.*?RESOLUTION=(\d+x\d+).*?\s(http.*?)\s')
+
+    if len(matches) > 1:
+        for res, video_url in matches:
+            video_url += hs
+            info = '.m3u8 (%s)' % res
+            new_video_urls.append([info, video_url])
+
+        return new_video_urls
+
+    return video_urls

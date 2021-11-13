@@ -198,10 +198,13 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
-    patron = 'video\[(\d+)\] = .*?src="([^"]+)".*?;'
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('video\[(\d+)\] = .*?src="([^"]+)".*?;', re.DOTALL).findall(data)
+
+    ses = 0
 
     for option, url in matches:
+        ses += 1
+
         lang = scrapertools.find_single_match(data, '"#option%s".*?<span>(.*?)</span>' % str(option))
         lang = lang.strip().lower()
 
@@ -223,6 +226,11 @@ def findvideos(item):
             if servidor == 'directo': continue
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = IDIOMAS.get(lang, lang) ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

@@ -12,6 +12,23 @@ host = "https://www.xvideos.com/"
 perpage = 30
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage_proxy('xvideos', url, post=post, headers=headers).data
+
+    return data
+
+
 def mainlist(item):
     return mainlist_pelis(item)
 
@@ -28,15 +45,17 @@ def mainlist_pelis(item):
         if actions.adults_password(item) == False:
             return itemlist
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, page=0 ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, page = 0 ))
 
-    itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host + 'channels-index', page=0 ))
+    itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host + 'channels-index', page = 0 ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
-    itemlist.append(item.clone( title = 'Por estrella', action = 'list_pornstars', url = host + 'pornstars-index', page=0 ))
+    itemlist.append(item.clone( title = 'Por estrella', action = 'list_pornstars', url = host + 'pornstars-index', page = 0 ))
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -47,20 +66,17 @@ def list_all(item):
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
-
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-    patron = '<div class="thumb"><a href="([^"]+)".*?data-src="([^"]+)".*?title="([^"]+)"'
 
-    matches = re.compile(patron).findall(data)
+    matches = re.compile('<div class="thumb"><a href="([^"]+)".*?data-src="([^"]+)".*?title="([^"]+)"').findall(data)
 
     for url, thumb, title in matches:
         itemlist.append(item.clone( action = 'findvideos', url = url if url.startswith('http') else host[:-1] + url,
                                     title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title ))
 
     if itemlist:
-        patron = '<a href="([^"]+)" class="no-page next-page">'
-        next_url = scrapertools.find_single_match(data, patron)
+        next_url = scrapertools.find_single_match(data, '<a href="([^"]+)" class="no-page next-page">')
 
         if next_url:
             itemlist.append(item.clone( title = '>> Página siguiente', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
@@ -77,13 +93,10 @@ def categorias(item):
 
     perpage = 250
 
-    data = httptools.downloadpage(host + 'tags').data
-
+    data = do_downloadpage(host + 'tags')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<li><a href="(/tags/[^"]+)"><b>([^<]+)'
-
-    matches = re.compile(patron).findall(data)
+    matches = re.compile('<li><a href="(/tags/[^"]+)"><b>([^<]+)').findall(data)
 
     num_matches = len(matches)
     desde = item.page * perpage
@@ -92,7 +105,7 @@ def categorias(item):
     for url, title in matches[desde:hasta]:
         titulo = title.capitalize()
 
-        itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url, title = titulo))
+        itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url, title = titulo ))
 
     if itemlist:
         if num_matches > hasta:
@@ -105,11 +118,10 @@ def list_pornstars(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
-
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-    patron = '<li><a href="([^"]+)" class="btn btn-default">\s*([^<]+)'
-    matches = re.compile(patron).findall(data)
+
+    matches = re.compile('<li><a href="([^"]+)" class="btn btn-default">\s*([^<]+)').findall(data)
 
     for url, title in matches:
         itemlist.append(item.clone( action = 'pornstars', url = url if url.startswith('http') else host[:-1] + url, title = title))
@@ -121,18 +133,16 @@ def pornstars(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
-
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-    patron = r'xv.thumbs.replaceThumbUrl\(\'<img src="([^"]+)".*?<a href="([^"]+)">([^<]+)'
-    matches = re.compile(patron).findall(data)
+
+    matches = re.compile(r'xv.thumbs.replaceThumbUrl\(\'<img src="([^"]+)".*?<a href="([^"]+)">([^<]+)').findall(data)
+
     for thumb, url, title in matches:
-        itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url,
-                                    title = title, thumbnail = thumb ))
+        itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail = thumb ))
 
     if itemlist:
-        patron = '<a href="([^"]+)" class="no-page next-page">'
-        next_url = scrapertools.find_single_match(data, patron)
+        next_url = scrapertools.find_single_match(data, '<a href="([^"]+)" class="no-page next-page">')
         if next_url:
             itemlist.append(item.clone( title = '>> Página siguiente', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
                                         action = 'pornstars', page = item.page + 1, text_color = 'coral' ))
@@ -145,11 +155,11 @@ def canales(item):
     
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
-
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-    patron = '<li><a href="(\/channels[^"]+)">([^<|\d+]+)'
-    matches = re.compile(patron).findall(data)
+
+    matches = re.compile('<li><a href="(\/channels[^"]+)">([^<|\d+]+)').findall(data)
+
     for url, title in matches:
         itemlist.append(item.clone( action = 'list_channels', url = url if url.startswith('http') else host[:-1] + url, title = title))
 
@@ -162,10 +172,11 @@ def list_channels(item):
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
-
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
     patron = '<div class="thumb-inside"><div class="thumb"><a href="([^"]+)">.*?xv.thumbs.replaceThumbUrl\(\'<img src="([^"]+)".*?span class="profile-name">([^<]+)'
+
     matches = re.compile(patron).findall(data)
 
     for url, thumb, title in matches:
@@ -175,8 +186,8 @@ def list_channels(item):
         itemlist.append(item.clone( action = 'list_all', url = url, title = title, thumbnail = thumb ))
 
     if itemlist:
-        patron = '<li class="page_next"><a href="([^"]+)'
-        next_url = scrapertools.find_single_match(data, patron)
+        next_url = scrapertools.find_single_match(data, '<li class="page_next"><a href="([^"]+)')
+
         if next_url:
             next_url = next_url.replace('&amp;', '&')
 
@@ -192,11 +203,12 @@ def list_channels_categories(item):
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     patron = '<div class="floatLeft"><h2>([^<]+)</h2></div>'
     patron += '<div class="floatRight"><a class="seeAllButton greyButton light" href="([^"]+)'
+
     matches = re.compile(patron).findall(data)
 
     for title, url in matches:
@@ -215,20 +227,20 @@ def list_channels_videos(item):
 
     url = item.url + 'videos/best/' if item.url.endswith('/') else item.url + '/videos/best/'
 
-    data = httptools.downloadpage(url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<ul class="videos row-5-thumbs videosGridWrapper" id="showAllChanelVideos">(.*?)<\/ul>')
-    patron = '<a href="([^"]+)" title="([^"]+)"class="[^"]+"[^<]+<imgsrc="([^"]+)"data-thumb_url = "([^"]+)'
-    matches = re.compile(patron).findall(bloque)
+
+    matches = re.compile('<a href="([^"]+)" title="([^"]+)"class="[^"]+"[^<]+<imgsrc="([^"]+)"data-thumb_url = "([^"]+)').findall(bloque)
 
     for url, title, thumb, thumb2 in matches:
         itemlist.append(item.clone( action = 'findvideos', url = url if url.startswith('http') else host[:-1] + url,
                                     title = title, thumbnail = thumb if not 'base64' else thumb2, contentType = 'movie', contentTitle = title ))
 
     if itemlist:
-        patron = '<li class="page_next"><a href="([^"]+)'
-        next_url = scrapertools.find_single_match(data, patron)
+        next_url = scrapertools.find_single_match(data, '<li class="page_next"><a href="([^"]+)')
+
         if next_url:
             next_url = next_url.replace('&amp;', '&')
 
@@ -237,16 +249,22 @@ def list_channels_videos(item):
 
     return itemlist
 
+
 def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
-    m3u8url = re.findall(r"html5player\.setVideoHLS\('([^']+)'", data)[0]
-    data = httptools.downloadpage(m3u8url).data
+    try:
+       m3u8url = re.findall(r"html5player\.setVideoHLS\('([^']+)'", data)[0]
+    except:
+       return itemlist
+
+    data = do_downloadpage(m3u8url)
 
     matches = re.compile('(?i)name="([^"]+)"\s*(.*?m3u8)').findall(data)
+
     for calidad, url in matches:
         if not calidad or not url: continue
         url = m3u8url.replace("hls.m3u8", url)

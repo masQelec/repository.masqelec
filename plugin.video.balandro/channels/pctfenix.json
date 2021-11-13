@@ -3,7 +3,7 @@
   "name": "PctFenix",
   "thumbnail": "pctfenix.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow", "torrent"],
   "language": ["cast", "lat"],
 
-  "clusters": ["inestable", "torrents", "news", "lasts", "lists", "rankings", "qualityes", "3d"],
+  "clusters": ["torrents", "news", "lasts", "lists", "rankings", "qualityes", "3d"],
 
   "notes": "Películas y series con enlaces torrent exclusivamente. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

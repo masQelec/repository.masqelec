@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -180,20 +180,30 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
+    ses = 0
+
     for url in matches:
+        ses += 1
+
         if url.startswith('//'): url = 'https:' + url
         url = url.replace('&amp;', '&')
 
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
 
         if servidor and servidor != 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, title = '', language = lang)) 
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '/?s=' + texto.replace(" ", "+") + '&submit=Search'
         return list_all(item)

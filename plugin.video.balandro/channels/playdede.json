@@ -9,9 +9,9 @@
   "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["movie", "tvshow"],
-  "language": ["cast", "lat", "vose"],
+  "language": ["cast", "lat", "vose", "vo"],
 
-  "clusters": ["register", "news", "rankings", "years", "lasts", "producers", "kids", "docs", "vos", "anime"],
+  "clusters": ["register", "news", "rankings", "years", "lists", "lasts", "producers", "kids", "docs", "vos", "anime"],
 
-  "notes": "Películas y Series, por género, por año, ..."
+  "notes": "Películas, Series y Animes, por géneros, por año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

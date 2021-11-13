@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["countries", "kids", "docs", "vos"],
+  "clusters": ["kids", "docs", "vos"],
 
-  "notes": "Acceso por separado a Castellano, Latino y Subtitulado. Películas por género."
+  "notes": "Acceso por separado a Castellano, Latino y Subtitulado. Películas por géneros."
 }

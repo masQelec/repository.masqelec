@@ -13,5 +13,5 @@
 
   "clusters": ["classic", "categories", "epochs", "countries", "stars", "directors", "rankings", "docs", "vos"],
 
-  "notes": "Cine clasico, moderno y mas historias."
+  "notes": "Cine clasico, moderno y mas historias. Por géneros, etc."
 }

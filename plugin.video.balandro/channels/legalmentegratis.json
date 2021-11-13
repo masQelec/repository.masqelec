@@ -13,5 +13,5 @@
 
   "clusters": ["classic", "categories", "stars", "directors", "docs", "vos"],
 
-  "notes": "Películas por Géenros y categorias."
+  "notes": "Películas por géneros y categorias."
 }

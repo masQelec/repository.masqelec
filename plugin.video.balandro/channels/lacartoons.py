@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -19,7 +18,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
-    itemlist.append(item.clone( title = 'Destacadas', action = 'list_all', url = host + '/?Categoria_id=1' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + '/?Categoria_id=1' ))
 
     itemlist.append(item.clone( title = 'Por productora', action = 'categorias', url = host ))
 
@@ -36,8 +35,7 @@ def list_all(item):
 
     data = httptools.downloadpage(item.url).data
 
-    patron  = 'a href="(/serie[^"]+).*?'
-    patron += 'src="([^"]+).*?'
+    patron  = 'a href="(/serie[^"]+).*?src="([^"]+).*?'
     patron += 'nombre-serie">(.*?)</p>.*?class="marcador marcador-ano">(.*?)</span>'
 
     matches = scrapertools.find_multiple_matches(data, patron)
@@ -178,17 +176,24 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
-    patron  = '<iframe src="([^"]+)'
+    matches = scrapertools.find_multiple_matches(data, '<iframe src="([^"]+)')
 
-    matches = scrapertools.find_multiple_matches(data, patron)
+    ses = 0
 
     for url in matches:
+        ses += 1
+
         servidor = servertools.get_server_from_url(url)
 
         if servidor:
             url = normalize_other(url)
             if url:
                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Lat' ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

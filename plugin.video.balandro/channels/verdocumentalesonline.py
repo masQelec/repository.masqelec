@@ -90,7 +90,6 @@ def list_all(item):
         data = jsontools.load(data)
 
         for vid in data['list']:
-            # ~ logger.info(vid['title'])
             vid['title'] = re.sub('-\s*documental.*$', '', vid['title'], flags=re.I)
             vid['title'] = re.sub('[-| ]+$', '', vid['title'])
             title = '[COLOR tan](%s)[/COLOR] %s' % (config.format_seconds_to_duration(vid['duration']), vid['title'])

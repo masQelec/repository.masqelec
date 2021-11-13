@@ -1,7 +1,7 @@
 {
   "id": "uploadedto",
   "more_ids": ["uploaded", "ul.to"],
-  "name": "UploadedTo",
+  "name": "Uploadedto",
  
   "active": false,
   "notes": "Requiere Debrider",

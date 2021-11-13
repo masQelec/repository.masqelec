@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["all", "movie", "tvshow"],
+  "search_types": ["movie"],
 
-  "categories": ["movie", "tvshow", "torrent"],
+  "categories": ["movie", "torrent"],
   "language": ["cast", "lat"],
 
   "clusters": ["torrents", "news", "qualityes", "years", "kids", "docs"],
 
-  "notes": "Películas y Series en castellano, y algunas en latino."
+  "notes": "Películas en castellano, latino y por géneros."
 }

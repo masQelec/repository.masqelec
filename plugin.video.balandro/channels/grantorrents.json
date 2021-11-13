@@ -1,0 +1,17 @@
+{
+  "id": "grantorrents",
+  "name": "GranTorrents",
+  "thumbnail": "grantorrents.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["torrent", "movie", "tvshow"],
+  "language": ["cast"],
+
+  "clusters": ["torrents", "years", "kids", "docs"],
+
+  "notes": "Películas y Series con enlaces torrent exclusivamente, por géneros y años."
+}

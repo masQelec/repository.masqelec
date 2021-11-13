@@ -1,6 +1,6 @@
 {
   "id": "dixmaxlive",
-  "name": "DixmaxLive",
+  "name": "DixMaxLive",
   "thumbnail": "dixmaxlive.jpg",
 
   "active": true,
@@ -13,5 +13,5 @@
 
   "clusters": ["news", "years", "lists", "lasts", "kids", "docs", "vos"],
 
-  "notes": "Películas: y Series por género y años. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas: y Series por géneros y año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

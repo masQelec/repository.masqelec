@@ -1,4 +1,5 @@
 import os
+import sys
 import hashlib
 import shutil
 import platform
@@ -15,10 +16,16 @@ import binascii
 from contextlib import closing
 
 from kodi_six import xbmc, xbmcgui, xbmcaddon, xbmcvfs
-from six.moves import queue
+from six.moves import queue, range
 from six.moves.urllib.parse import urlparse, urlunparse
 from six import PY2
 import requests
+
+if sys.version_info >= (3, 8):
+    import html
+else:
+    from six.moves.html_parser import HTMLParser
+    html = HTMLParser()
 
 from .language import _
 from .log import log
@@ -243,6 +250,9 @@ def FileIO(file_name, method, chunksize=CHUNK_SIZE):
         return open(file_name, method, chunksize)
 
 def same_file(path_a, path_b):
+    if path_a.lower().strip() == path_b.lower().strip():
+        return True
+
     stat_a = os.stat(path_a) if os.path.isfile(path_a) else None
     if not stat_a:
         return False
@@ -251,9 +261,9 @@ def same_file(path_a, path_b):
     if not stat_b:
         return False
 
-    return (stat_a.st_dev == stat_b.st_dev) and (stat_a.st_ino == stat_b.st_ino)
+    return (stat_a.st_dev == stat_b.st_dev) and (stat_a.st_ino == stat_b.st_ino) and (stat_a.st_mtime == stat_b.st_mtime)
 
-def _safe_copy(src, dst, del_src=False):
+def safe_copy(src, dst, del_src=False):
     src = xbmc.translatePath(src)
     dst = xbmc.translatePath(dst)
 
@@ -261,10 +271,15 @@ def _safe_copy(src, dst, del_src=False):
         return
 
     if xbmcvfs.exists(dst):
-        xbmcvfs.delete(dst)
+        if xbmcvfs.delete(dst):
+            log.debug('Deleted: {}'.format(dst))
+        else:
+            log.debug('Failed to delete: {}'.format(dst))
 
-    log.debug('Copying: {} > {}'.format(src, dst))
-    xbmcvfs.copy(src, dst)
+    if xbmcvfs.copy(src, dst):
+        log.debug('Copied: {} > {}'.format(src, dst))
+    else:
+        log.debug('Failed to copy: {} > {}'.format(src, dst))
 
     if del_src:
         xbmcvfs.delete(src)
@@ -522,18 +537,6 @@ def get_system_arch():
 
     return system, arch
 
-def strip_namespaces(tree):
-    for el in tree.iter():
-        tag = el.tag
-        if tag and isinstance(tag, str) and tag[0] == '{':
-            el.tag = tag.partition('}')[2]
-        attrib = el.attrib
-        if attrib:
-            for name, value in list(attrib.items()):
-                if name and isinstance(name, str) and name[0] == '{':
-                    del attrib[name]
-                    attrib[name.partition('}')[2]] = value
-
 def cenc_init(data=None, uuid=None, kids=None, version=None):
     data = data or bytearray()
     uuid = uuid or WIDEVINE_UUID
@@ -687,3 +690,45 @@ def pthms_to_seconds(duration):
             seconds += float(count) * key[1]
 
     return int(seconds)
+
+def strip_html_tags(text):
+    if not text:
+        return ''
+
+    text = re.sub('\([^\)]*\)', '', text)
+    text = re.sub('<[^>]*>', '', text)
+    text = html.unescape(text)
+    return text
+
+def chunked(lst, n):
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+def lang_allowed(lang, lang_list):
+    if not lang_list:
+        return True
+
+    lang = fix_language(lang)
+    if not lang:
+        return False
+
+    for _lang in lang_list:
+        _lang = fix_language(_lang)
+        if not _lang:
+            continue
+
+        if lang.startswith(_lang):
+            return True
+
+    return False
+
+def fix_language(language=None):
+    if not language:
+        return None
+
+    language = language.lower().strip()
+    split = language.split('-')
+    if len(split) > 1 and split[1].lower() == split[0].lower():
+        return split[0]
+
+    return language

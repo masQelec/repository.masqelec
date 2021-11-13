@@ -177,7 +177,7 @@ def list_all(item):
 
     order = 0
 
-    if matches: platformtools.dialog_notification('TvSeries', '[COLOR blue]Cargando episodios [/COLOR]')
+    if matches: platformtools.dialog_notification('TvSeries', '[COLOR blue]Cargando episodios[/COLOR]')
 
     for match in matches:
         if match.startswith('//') == True: url = 'https:' + match
@@ -240,6 +240,8 @@ def findvideos(item):
     itemlist = []
 
     servidor = servertools.get_server_from_url(item.url)
+    servidor = servertools.corregir_servidor(servidor)
+
     if servidor:
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, language = item.language, url = item.url ))
 

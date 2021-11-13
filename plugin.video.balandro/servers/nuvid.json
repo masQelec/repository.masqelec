@@ -1,0 +1,25 @@
+{
+  "id": "nuvid",
+  "name": "Nuvid",
+
+  "active": true,
+
+  "find_videos": {
+    "ignore_urls": [],
+    "patterns": [
+      {
+        "pattern": "((?:http|https)://www.(?:nuvid|drtuber|iceporn|viptube|vivatube|tubeon|hd21|yeptube|winporn|proporn).com/embed/[0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "((?:http|https)://www.(?:nuvid|drtuber|iceporn|viptube|vivatube|tubeon|hd21|yeptube|winporn|proporn).com/(?:es/|)video/[0-9]+/[A-z0-9-]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "((?:http|https)://www.pornlib.com/video/[A-z0-9-]+)",
+        "url": "\\1"
+      }
+    ]
+  }
+
+}

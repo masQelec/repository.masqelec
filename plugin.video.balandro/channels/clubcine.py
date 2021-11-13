@@ -13,7 +13,9 @@ perpage = 25
 
 
 labels_generos = [
+      ('007'),
       ('Acción'),
+      ('Abogados'),
       ('Abusos sexuales'),
       ('Acoso escolar'),
       ('Adolescencia'),
@@ -24,24 +26,37 @@ labels_generos = [
       ('Amistad'),
       ('Animación'), 
       ('Animales'),
+      ('AsesinosEnSerie'),
       ('Autismo'),
+      ('Aventura espacial'),
       ('Aventuras'),
+      ('Baile'),
+      ('Ballet'),
+      ('Bandas/pandillas'),
       ('Basado en hechos reales'),
       ('Biográfica'),
       ('Bélico'),
+      ('Boxeo'),
+      ('Brujería'),
       ('Celos'),
       ('Ciencia ficción'),
       ('Cinenegro'),
+      ('CineDCine'),
+      ('CineMudo'),
+      ('CineQuinqui'),
+      ('Colegios/Universidad'),
       ('Comedia'),
       ('Comedia dramática'),
       ('Comedia negra'),
       ('Comedia romántica'),
       ('Crimen'),
+      ('Cuentos'),
       ('Deporte'),
       ('Dictadura argentina'),
       ('Dictadura chilena'),
       ('Dictadura uruguaya'),
       ('Discapacidad'),
+      ('Distopía'),
       ('Documental'),
       ('Drama'),
       ('Drama carcelario'),
@@ -50,47 +65,71 @@ labels_generos = [
       ('Drama romántico'),
       ('Drama social'),
       ('Drogas'),
+      ('Episodios'),
       ('ETA'),
       ('Ejército'),
       ('Enfermedad'),
       ('Enseñanza'),
+      ('Erótico'),
       ('Esclavitud'),
       ('Espionaje'),
+      ('Experimental'),
+      ('ExpresionismoAlemán'),
+      ('Extraterrestres'),
       ('Familia'),
       ('Fantástico'),
+      ('Feminismo'),
+      ('Gore'),
       ('Guerra Civil española'),
+      ('Guerra fría'),
       ('Historias cruzadas'),
       ('Histórica'),
+      ('Holocausto'),
+      ('Homosexualidad.'),
       ('I guerra mundial'),
       ('II guerra mundial'),
       ('Infancia'),
       ('Inmigración'),
       ('Intriga'),
       ('Juego'),
+      ('Literatura'),
       ('Mafia'),
       ('Medicina'),
+      ('Mediometraje'),
+      ('Melodrama'),
       ('Musical'),
       ('Música'),
+      ('Naturaleza'),
       ('Nazismo'),
+      ('Neo-noir'),
       ('Parodia'),
       ('Periodismo'),
+      ('Pintura'),
+      ('Piratas'),
       ('Pobreza'),
       ('Policiaco'),
       ('Politica'),
+      ('Postguerra Española'),
       ('Prostitución'),
       ('Racismo'),
       ('Religión'),
+      ('Remake'),
       ('Road Movie'),
       ('Robos & Atracos'),
       ('Romance'),
       ('Sátira'),
       ('Secuela'),
       ('Secuestros%2FDesapariciones'),
+      ('SerieB'),
       ('Sobrenatural'),
+      ('Surrealismo'),
       ('Teatro'),
       ('Terror'),
       ('Terrorismo'),
       ('Thriller'),
+      ('Trabajo/empleo'),
+      ('Trenes/metros'),
+      ('Vampiros'),
       ('Vejez'),
       ('Venganza'),
       ('Vida rural'),
@@ -100,6 +139,8 @@ labels_generos = [
 
 
 labels_epocas = [
+      ('Siglo XVII'),
+      ('Siglo XIX'),
       ('1900-1920'),
       ('Años 20'),
       ('Años 30'),
@@ -120,13 +161,21 @@ labels_paises = [
       ('Alemania'),
       ('Argentina'),
       ('Asiático'),
+      ('Australia'),
+      ('Brasil'),
+      ('Cuba'),
       ('Dinamarca'),
       ('España'),
       ('Europeo'),
       ('Francia'),
+      ('Grecia'),
+      ('Holanda'),
       ('Italia'),
       ('Latino'),
+      ('Mexico'),
+      ('Polonia'),
       ('Reino Unido'),
+      ('Rusia'),
       ('Suecia')
       ]
 
@@ -150,12 +199,17 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por época', action ='generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por país', action ='generos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por interprete, dirección', action = 'list_labels', url = host ))
+    itemlist.append(item.clone( title = 'Por dirección', action = 'list_labels', url = host, group = 'DIRECTORES'))
+    itemlist.append(item.clone( title = 'Por interprete', action = 'list_labels', url = host, group = 'ACTORES' ))
 
-    itemlist.append(item.clone( title = 'Las mejores de la historia (Filmaffinity)', action = 'list_las150', thumbnail = thumb_filmaffinity,
+    itemlist.append(item.clone( title = 'Las mejores de la historia', action = 'list_best', thumbnail = thumb_filmaffinity,
                                 url = host + '2018/11/ver-las-150-mejores-peliculas-de-la.html' ))
-    itemlist.append(item.clone( title = 'Las mejores del cine negro (IMDb)', action = 'list_las150', thumbnail = thumb_imdb,
+    itemlist.append(item.clone( title = 'Las mejores del cine negro', action = 'list_best', thumbnail = thumb_imdb,
                                 url = host + '2020/10/ver-las-150-mejores-peliculas-de-cine.html' ))
+
+    itemlist.append(item.clone( title = 'Las mejores del cine español', action = 'list_best',
+                                url = host + '2021/04/ver-las-100-mejores-peliculas-de-la.html' ))
+
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
@@ -185,6 +239,8 @@ def generos(item):
     logger.info()
     itemlist = []
 
+    descartar_xxx = config.get_setting('descartar_xxx', default=False)
+
     opciones = []
 
     if item.title == 'Por época': 
@@ -198,7 +254,17 @@ def generos(item):
         grupo = 'generos'
 
     for label in opciones:
-        title = label.replace('%2F', '-').replace('Cinenegro', 'Cine negro')
+        title = label.replace('%2F', '-')
+
+        title = title.replace('Cinenegro', 'Cine negro')
+        title = title.replace('AsesinosEnSerie', 'Asesinos en serie').replace('ExpresionismoAlemán', 'Expresionismo Alemán')
+        title = title.replace('CineDCine', 'Cine D Cine').replace('CineMudo', 'Cine Mudo').replace('CineQuinqui', 'Cine Quinqui')
+
+        if grupo == 'generos':
+            if title == 'Erótico':
+                if descartar_xxx: continue
+
+        label = label.replace('/', '%2F')
 
         itemlist.append(item.clone( title = title, url = host + 'search/label/' + label, action = 'list_all', grupo = grupo ))
 
@@ -291,36 +357,24 @@ def list_labels(item):
 
     sort_labels = []
 
+    perpage = 50
+
     if not item.page: item.page = 0
 
     data = httptools.downloadpage(item.url).data
 
-    bloque = scrapertools.find_single_match(data, ">BUSCA POR TEMA O DIRECTOR<(.*?)<div class='clear'></div>")
-    matches = scrapertools.find_multiple_matches(bloque, 'span class="label-size label-size-2".*?href="(.*?)".*?>(.*?)</a>')
+    final = '<h2>'
+    if item.group == 'ACTORES':
+        final = '>TRIBUNA'
+
+    bloque = scrapertools.find_single_match(data, ">" + str(item.group) + "(.*?)" + final)
+
+    matches = scrapertools.find_multiple_matches(bloque, "<a dir='ltr'.*?href='(.*?)'>(.*?)</a>")
 
     i = 0
 
     for url, title in matches:
-        if not item.grupo:
-            if title == 'España': continue
-            elif title == 'Europeo': continue
-            elif title == 'Latino': continue
-            elif title == 'Asiático': continue
-            elif title == 'Culto': continue
-            elif title == 'Independiente': continue
-
-        if title == 'Premiada': continue
-        elif title == 'RANKING': continue
-
         title = title.replace('&amp;', '&')
-
-        if title in labels_generos: continue
-        if title in labels_epocas: continue
-        if title in labels_paises: continue
-
-        if title == '2000/2010': continue
-        elif title == '2011/2020': continue
-        elif title == 'Secuestros/Desapariciones': continue
 
         title = title.replace(';', '')
 
@@ -346,7 +400,7 @@ def list_labels(item):
     return itemlist
 
 
-def list_las150(item): 
+def list_best(item): 
     logger.info()
     itemlist = []
 
@@ -404,7 +458,7 @@ def list_las150(item):
 
     if num_matches > hasta:
         next_page = item.page + 1
-        itemlist.append(item.clone( title = '>> Página siguiente', page = next_page, action = 'list_las150', text_color='coral' ))
+        itemlist.append(item.clone( title = '>> Página siguiente', page = next_page, action = 'list_best', text_color='coral' ))
 
     return itemlist
 
@@ -421,18 +475,13 @@ def list_tumblr(item):
 
     for article in matches:
         url_redir = scrapertools.find_single_match(article, ' href="([^"]+)')
-        url_redir = url_redir.replace('&amp;', '&').strip()
+        url_redir = url_redir.replace('https://href.li/?', '').replace('&amp;', '&').strip()
         if not url_redir: continue
 
         if not 'mycinedesiempre.blogspot.com' in url_redir: continue
-        if not '/redirect?z=' in url_redir: continue
-        if not '.html' in url_redir: continue
+        elif not '.html' in url_redir: continue
 
-        url = scrapertools.find_single_match(url_redir, '.*?/redirect(.*?).html')
-        url = url.replace('?z=', '').strip()
-        if not url: continue
-
-        url = url.replace('%3A', ':').replace('%2F', '/') + '.html'
+        url = url_redir.replace('%3A', ':').replace('%2F', '/')
 
         title = scrapertools.find_single_match(article, '<h2>(.*?)<i').strip()
         if not title: continue
@@ -488,6 +537,11 @@ def list_tumblr(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if '/filmografia-' in item.url:
+        return itemlist
+    elif '/ver-coleccion-' in item.url:
+        return itemlist
 
     items_play = []
 
@@ -629,8 +683,12 @@ def findvideos(item):
                    if matches: itemlist, items_play = (get_enlaces(item, matches, itemlist, items_play, langs))
 
     if not itemlist:
-        if '>Sinopsis<' in data:
-            bloque = scrapertools.find_single_match(data, '>Sinopsis<(.*?)Share this article')
+        if '>sinopsis<' in data.lower():
+            bloque = scrapertools.find_single_match(data.lower(), '>sinopsis<(.*?)share this article')
+            matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)"')
+            if matches: itemlist, items_play = (get_enlaces(item, matches, itemlist, items_play, langs))
+        elif "<div class='post-body entry-content'>" in data:
+            bloque = scrapertools.find_single_match(data, "<div class='post-body entry-content'>(.*?)Share this article")
             matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)"')
             if matches: itemlist, items_play = (get_enlaces(item, matches, itemlist, items_play, langs))
 
@@ -658,6 +716,7 @@ def get_enlaces(item, matches, itemlist, items_play, langs):
         elif '/video.tlencloud.com/' in url: url = url.replace('/video.tlencloud.com/', '/tlencloud.com/')
 
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             link_other = normalize_other(url)
@@ -677,8 +736,7 @@ def get_enlaces(item, matches, itemlist, items_play, langs):
 
                 items_play.append(url)
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                      language = langs, other = link_other.capitalize() ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = langs, other = link_other ))
 
     return itemlist, items_play
 
@@ -714,12 +772,12 @@ def normalize_other(url):
           if not '/video/' in url: return ''
           else: return 'vimeo'
 
-    elif '//mega.nz/' in url: return 'mega'
+    elif 'mega.nz/' in url: return 'mega'
     elif 'my.mail.ru/' in url: return 'mailru'
     elif 'myvi.ru/' in url: return 'myvi'
     elif 'ok.ru/' in url: return 'okru'
     elif 'vk.com/' in url: return 'vk'
-    elif '.archive.org/' in url: return'archiveorg'
+    elif 'archive.org/' in url: return'archiveorg'
     elif 'gloria.tv/' in url: return 'gloria'
     elif '2000peliculassigloxx.com/' in url: return 'sigloxx'
 
@@ -766,6 +824,8 @@ def normalize_other(url):
                  return link_other
 
              servidor = servertools.get_server_from_url(url)
+             servidor = servertools.corregir_servidor(servidor)
+
              if servidor and servidor != 'directo': return servidor
              return ''
          except:
@@ -863,6 +923,35 @@ def langs_idiomas(tex):
           ]
 
     return langs
+
+
+def _besthistoria(item):
+    logger.info()
+
+    item.url = host + '2018/11/ver-las-150-mejores-peliculas-de-la.html'
+
+    return list_best(item)
+
+def _bestcinespa(item):
+    logger.info()
+
+    item.url = host + '2021/04/ver-las-100-mejores-peliculas-de-la.html'
+
+    return list_best(item)
+
+def _bestcinenegro(item):
+    logger.info()
+
+    item.url = host + '2020/10/ver-las-150-mejores-peliculas-de-cine.html'
+
+    return list_best(item)
+
+def _bestcinedesiempre(item):
+    logger.info()
+
+    item.url = 'https://cinedesiempre.tumblr.com'
+
+    return list_tumblr(item)
 
 
 def search(item, texto):

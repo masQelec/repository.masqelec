@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 from lib import jsunpack
@@ -14,8 +14,10 @@ host = 'https://mundokaos.net/'
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     headers = {'Referer': host}
 
-    if 'release/' in url:
+    if '/release/' in url:
         raise_weberror = False
+
+    # ~ Pendiente de resolver HTTP Error 403: Forbidden
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -273,7 +275,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, patron)
 
+    ses = 0
+
     for _key, _id, lang, srv, qlty in matches:
+        ses += 1
+
         url = host + '?trembed=%s&trid=%s&trtype=%s'  %  (_key, _id, _type)
 
         idioma = IDIOMAS.get(lang, lang)
@@ -293,6 +299,11 @@ def findvideos(item):
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = other,
                               language = idioma, quality = qlty ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

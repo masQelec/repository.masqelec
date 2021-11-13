@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www.subtorrents.ch/'
+host = 'https://www.subtorrents.nz/'
 
 perpage = 30
 
@@ -24,7 +24,8 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/www.subtorrents.nl/', '/www.subtorrents.ch/')
+    url = url.replace('/www.subtorrents.nl/', '/www.subtorrents.nz/')
+    url = url.replace('/www.subtorrents.ch/', '/www.subtorrents.nz/')
 
     data = httptools.downloadpage_proxy('subtorrents', url, post=post, headers=headers).data
     # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
@@ -55,19 +56,19 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas-subtituladas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Catálogo castellano ó latino', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=audio-latino',
+    itemlist.append(item.clone( title = 'Catálogo subtitulado (castellano ó latino)', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=audio-latino',
                                 search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos castellano ó latino', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino',
+    itemlist.append(item.clone( title = 'Estrenos subtitulado (castellano ó latino)', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino',
                                 search_type = 'movie', ))
 
     itemlist.append(item.clone( title = 'En DVD', action = 'list_all', url = host + 'calidad/dvd-full/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'En 3D', action = 'list_all', url = host + 'peliculas-3d/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title='Por letra (A - Z)', action='alfabetico', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
@@ -82,7 +83,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_series', url = host + 'series-2/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title='Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     itemlist.append(item.clone ( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 

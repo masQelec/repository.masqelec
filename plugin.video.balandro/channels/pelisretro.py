@@ -147,13 +147,14 @@ def findvideos(item):
 
     for opt, servidor in matches:
         servidor = servidor.replace('<strong>', '').replace('</strong>', '')
-        servidor = servertools.corregir_servidor(servidor)
 
         url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '.*?src="([^"]+)"')
         if url.startswith('//') == True:
             url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '.*?src=&quot;(.*?)&quot;')
 
         if not servidor or not url: continue
+
+        servidor = servertools.corregir_servidor(servidor)
 
         if 'opción' in servidor:
             link_other = servidor
@@ -222,6 +223,13 @@ def play(item):
 
                 url = httptools.downloadpage(url, post = post, headers = headers, follow_redirects=False, only_headers=True).headers.get('location', '')
 
+                if 'www.bajarpelisgratis.com' in url:
+                    data = httptools.downloadpage(url).data
+                    url = scrapertools.find_single_match(data, '<a target="_blank".*?href="(.*?)"')
+
+                elif '/hopepaste.' in url:
+                    return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
         else:
             data = httptools.downloadpage(url).data
             if item.other == 'anavids':
@@ -236,6 +244,8 @@ def play(item):
         if url.startswith('//') == True: url = 'https:' + url
 
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if servidor:
             url = servertools.normalize_url(servidor, url)
             itemlist.append(item.clone(url = url, server = servidor))
@@ -244,7 +254,7 @@ def play(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
        item.url = host + '?s=' + texto.replace(" ", "+")
        return list_all(item)

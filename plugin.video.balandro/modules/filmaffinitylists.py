@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
+
 from datetime import datetime
 
-from platformcode import logger
+from platformcode import config, logger
 from core.item import Item
 from modules import search
 from core import httptools, scrapertools, tmdb
-from platformcode import config
 
 host = "https://www.filmaffinity.com/es/"
 
@@ -22,6 +22,9 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
+    por_plataforma = False
+    por_tema = False
+
     presentar = True
     if item.search_type == 'tvshow': presentar = False
     elif item.search_type == 'documentary': presentar = False
@@ -29,6 +32,9 @@ def mainlist(item):
        if item.search_type == 'movie': presentar = False
 
     if presentar:
+        por_plataforma = True
+        por_tema = True
+
         itemlist.append(item.clone( title = 'En cartelera', action = 'list_all', url = host + 'cat_new_th_es.html' ))
 
         itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas' ))
@@ -38,7 +44,6 @@ def mainlist(item):
         itemlist.append(item.clone( title = 'Por tema', action = 'temas', url = host + 'topics.php' ))
 
         itemlist.append(item.clone( title = 'Premios Oscar', action = 'oscars', url = host + 'oscar_data.php' ))
-        itemlist.append(item.clone( title = 'Premios Emmy', action = 'emmy_ediciones', url = host + 'awards.php?award_id=emmy&year=' ))
 
         itemlist.append(item.clone( title = 'Sagas y colecciones', action = 'sagas', url = host + 'movie-groups-all.php', page = 1 ))
 
@@ -51,6 +56,16 @@ def mainlist(item):
        if item.search_type == 'tvshow': presentar = False
 
     if presentar:
+        if not por_plataforma:
+            por_plataforma = True
+            itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas' ))
+
+        if not por_tema:
+            por_tema = True
+            itemlist.append(item.clone( title = 'Por tema', action = 'temas', url = host + 'topics.php' ))
+
+        itemlist.append(item.clone( title = 'Premios Emmy', action = 'emmy_ediciones', url = host + 'awards.php?award_id=emmy&year=' ))
+
         itemlist.append(item.clone( title = 'Mejores series', action = 'list_sel', url = host + ruta_sel + '&nodoc=1', cod_genre = 'TV_SE' ))
 
     presentar = True
@@ -59,6 +74,9 @@ def mainlist(item):
     elif item.extra == 'mixed': presentar = False
 
     if presentar:
+        if not por_tema:
+            itemlist.append(item.clone( title = 'Por tema', action = 'temas', url = host + 'topics.php' ))
+
         itemlist.append(item.clone( title = 'Mejores documentales', action = 'list_sel', url = host + ruta_sel + '&notvse=1', cod_genre = 'DO' ))
 
     if not item.search_type:
@@ -88,10 +106,6 @@ def oscars(item):
     logger.info()
     itemlist = []
 
-    if not item.url:
-        item.url = host + 'oscar_data.php'
-
-    itemlist.append(item.clone( title = '[B]Especial Oscars 2021[/B]', action = 'oscars_2021', url = host + 'awards.php?award_id=academy_awards&year=2021'))
     itemlist.append(item.clone( title = 'Películas con Más Oscars', action = 'list_oscars', url = item.url, grupo = 'Películas con más Oscars' ))
     itemlist.append(item.clone( title = 'Películas con Más Nominaciones (sin Oscar a la mejor película)', action = 'list_oscars', url = item.url, grupo = 'Películas con más nominaciones' ))
     itemlist.append(item.clone( title = 'Películas con Más Nominaciones y Ningún Oscar', action = 'list_oscars', url = item.url, grupo = 'Películas con más nominaciones y ningún Oscar' ))
@@ -144,27 +158,30 @@ def generos(item):
     itemlist = []
 
     labels_generos = [
-          ('Animación','AN'), 
-          ('Aventuras','AV'), 
-          ('Bélico','BE'), 
-          ('Ciencia ficción','C-F'), 
-          ('Cine negro','F-N'), 
-          ('Comedia','CO'), 
-          ('Documental','DO'), 
-          ('Drama','DR'), 
-          ('Fantástico','FAN'), 
-          ('Infantil','INF'), 
-          ('Intriga','INT'), 
-          ('Musical','MU'), 
-          ('Romance','RO'), 
-          ('Serie de TV','TV_SE'), 
-          ('Terror','TE'), 
-          ('Thriller','TH'), 
-          ('Western','WE') 
+          ('Accion', 'AC'),
+          ('Animación', 'AN'),
+          ('Aventuras', 'AV'),
+          ('Bélico', 'BE'),
+          ('Ciencia ficción', 'C-F'),
+          ('Cine negro', 'F-N'),
+          ('Comedia', 'CO'),
+          ('Documental', 'DO'),
+          ('Drama', 'DR'),
+          ('Fantástico', 'FAN'),
+          ('Infantil', 'INF'),
+          ('Intriga', 'INT'),
+          ('Musical', 'MU'),
+          ('Romance', 'RO'),
+          ('Serie de TV', 'TV_SE'),
+          ('Terror', 'TE'),
+          ('Thriller', 'TH'),
+          ('Western', 'WE')
     ]
 
+    ruta_gen = 'topgen.php?country=%s&genres=%s&fromyear=%s&toyear=%s'
+
     for genero in labels_generos:
-        url = host + ruta_sel
+        url = host + ruta_gen
 
         if not genero[0] == 'Serie de TV': url = url + '&notvse=1'
         elif not genero[0] == 'Documental': url = url + '&nodoc=1'
@@ -480,24 +497,38 @@ def list_sel(item):
 
     url = item.url
 
-    if item.cod_country: cod_country = item.cod_country
-    else: cod_country = ''
+    cod_country = ''
+    cod_genre = ''
 
-    if item.cod_genre: cod_genre = item.cod_genre
-    else: cod_genre = ''
+    if item.cod_country: cod_country = item.cod_country
+
+    if item.cod_genre:
+        if not item.cod_genre == 'TV_SE': 
+           if not item.cod_genre == 'DO':
+               cod_genre = '%2B' + item.cod_genre
 
     if item.fromyear: fromyear = item.fromyear
-    else: fromyear = ''
+    else: fromyear = '1874'
 
     if item.toyear: toyear = item.toyear
-    else: toyear = ''
+    else: toyear = str(current_year)
 
     url = url % (cod_country, cod_genre, fromyear, toyear)
+
+    if item.cod_genre == 'TV_SE':
+        url = url + '&chv=1&orderby=avg&movietype=serie%7C&ratingcount=3&runtimemin=0&runtimemax=4'
+    elif item.cod_genre == 'DO':
+        url = url + '&chv=1&orderby=avg&movietype=documentary%7C&ratingcount=3&runtimemin=0&runtimemax=8'
+    else:
+        url = url + '&chv=1&orderby=avg&movietype=movie%7C&ratingcount=3&runtimemin=0&runtimemax=4'
 
     post = {'from': item.page}
     data = httptools.downloadpage(url, post = post).data
 
     matches = scrapertools.find_multiple_matches(data, '<li class="position">(.*?)</ul>')
+
+    if not matches:
+        matches = scrapertools.find_multiple_matches(data, '<li>(.*?)</li>')
 
     for match in matches:
         title = scrapertools.find_single_match(match, ' title="(.*?)"').strip()
@@ -510,7 +541,7 @@ def list_sel(item):
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
         thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
 
-        if '(Serie de TV)' in title or '(Miniserie de TV)' in title:
+        if '(Serie de TV)' in title or '(Miniserie de TV)' in title or cod_genre == 'TV_SE':
             name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '')
 
             itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', 
@@ -534,52 +565,123 @@ def list_sel(item):
     return itemlist
 
 
-def oscars_2021(item):
+def _oscars(item):
     logger.info()
     itemlist = []
-    
-    if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
+    url = host + 'awards.php?award_id=academy_awards&year=' + str(current_year)
+
+    data = httptools.downloadpage(url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-    patron = '<div class="full-content"><div class="header" id="([^"]+)">([^<]+)'
-    matches = re.compile(patron).findall(data)
+
+    matches = re.compile('<div class="full-content"><div class="header" id="([^"]+)">([^<]+)').findall(data)
+
     for oscars_id, title in matches:
-        itemlist.append(item.clone( action = 'oscars_2021_categories', title = title, oscars_id = oscars_id))
+        itemlist.append(item.clone( action = '_oscars_categories', title = title, oscars_id = oscars_id))
 
     return itemlist
 
-def oscars_2021_categories(item):
+def _oscars_categories(item):
     logger.info()
     itemlist = []
     
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
     bloque_patron = '(<div class="full-content"><div class="header" id="%s">.*?</div></div></li></ul></div></div>)' % (item.oscars_id)
+
     bloque = scrapertools.find_single_match(data, bloque_patron)
-    patron = '<li class="(fa-shadow.*?)">(.*?)</li>'
-    matches = scrapertools.find_multiple_matches(bloque, patron)
+
+    matches = scrapertools.find_multiple_matches(bloque, '<li class="(fa-shadow.*?)">(.*?)</li>')
+
     for info, match in matches:
         titulo = ''
         title = scrapertools.find_single_match(match, '<a class="movie-title-link" href="[^"]+" title="([^"]+)\W+"')
         titulo += title
+
         nominated = scrapertools.find_single_match(match, '<div class="nom-text">([^<]+)</div>')
         if nominated:
             titulo += ' - ' + nominated
+
         nominations = scrapertools.find_single_match(match, '<b>(.*?)</a>')
         if nominations:
             nominations = re.sub('<.*?>', '', nominations) if scrapertools.find_single_match(nominations, '(<.*?>)') else nominations
             titulo += ' - ' + nominations
         else:
             nominations = '1 nominación'
+
         if 'win' in info:
-            titulo = ''.join(("[COLOR gold]", titulo, "[/COLOR]"))
-        itemlist.append(item.clone( action = 'find_search', title = titulo, search_type = 'movie',
-                                        name = title, contentTitle = title, infoLabels={'year': '-'} ))
+            titulo = ''.join(("[COLOR pink]", titulo, "[/COLOR]"))
+
+        itemlist.append(item.clone( action = 'find_search', title = titulo, search_type = 'movie', name = title, contentTitle = title, infoLabels={'year': '-'} ))
         
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
+
+
+def _emmys(item):
+    logger.info()
+
+    item.url = host + 'awards.php?award_id=emmy&year=' + str(current_year)
+
+    return list_premios_anyo(item)
+
+
+def _sagas(item):
+    logger.info()
+
+    item.url = host + 'movie-groups-all.php'
+    item.page = 1
+
+    return sagas(item)
+
+
+def _bestmovies(item):
+    logger.info()
+
+    item.url = host + ruta_sel + '&notvse=1&nodoc=1'
+
+    return list_sel(item)
+
+
+def _besttvshows(item):
+    logger.info()
+
+    item.url = host + ruta_sel + '&nodoc=1'
+    item.cod_genre = 'TV_SE'
+
+    return list_sel(item)
+
+
+def _bestdocumentaries(item):
+    logger.info()
+
+    item.url = host + ruta_sel + '&notvse=1'
+    item.cod_genre = 'DO'
+
+    return list_sel(item)
+
+
+def _genres(item):
+    logger.info()
+
+    return generos(item)
+
+
+def _years(item):
+    logger.info()
+
+    return anios(item)
+
+
+def _themes(item):
+    logger.info()
+
+    item.url = host + 'topics.php'
+
+    return temas(item)
+
 
 def find_search(item):
     logger.info()

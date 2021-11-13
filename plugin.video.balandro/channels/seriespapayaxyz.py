@@ -23,32 +23,18 @@ notification_d_ok = config.get_setting('notification_d_ok', default=True)
 color_alert = config.get_setting('notification_alert_color', default='red')
 
 
-# ~ def item_configurar_proxies(item):
-    # ~ plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    # ~ plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    # ~ return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-# ~ def configurar_proxies(item):
-    # ~ from core import proxytools
-    # ~ return proxytools.configurar_proxies_canal(item.channel, host)
-
-
 def do_downloadpage(url, post=None, headers=None):
     headers = {'Referer': host}
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
-    # ~ data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers, follow_redirects=follow_redirects).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
-                # ~ logger.debug('Cookies: %s %s' % (ck_name, ck_value))
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
                 data = httptools.downloadpage(url, post=post, headers=headers).data
-                # ~ data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers).data
-                # ~ logger.debug(data)
         except:
             pass
 
@@ -63,8 +49,6 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
-
-    # ~ itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -82,8 +66,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
-
     return itemlist
 
 
@@ -99,8 +81,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
-
-    # ~ itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -368,7 +348,6 @@ def episodios(item):
     return itemlist
 
 
-# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
 def puntuar_calidad(txt):
     orden = ['ts-scr', '240-p', '360-p', '480-p', 'w-rip', 'hd-rip', '720-p', '1080-p']
     if txt not in orden: return 0
@@ -399,7 +378,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, patron)
 
+    ses = 0
+
     for url, tipo, servidor, lang, qlty in matches:
+        ses += 1
+
         if url.startswith('https://acortar24.xyz/'): continue
 
         lang = IDIOMAS.get(lang)
@@ -410,8 +393,7 @@ def findvideos(item):
         servidor = servidor.strip().lower()
         if servidor == 'ok': servidor = 'okru'
 
-        server = servertools.corregir_servidor(servidor)
-        # ~ logger.debug('%s %s' % (server, url))
+        servidor = servertools.corregir_servidor(servidor)
 
         itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                              language = IDIOMAS.get(lang,lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
@@ -420,6 +402,8 @@ def findvideos(item):
         options = scrapertools.find_multiple_matches(data, 'data-tplayernv="Opt(.*?)"><span>(.*?)</span><span>(.*?) - (.*?)</span>')
 
         for opt, servidor, lang, qlty in options:
+            ses += 1
+
             lang = IDIOMAS.get(lang)
 
             quality = qlty.lower()
@@ -428,7 +412,7 @@ def findvideos(item):
             servidor = servidor.strip().lower()
             if servidor == 'ok': servidor = 'okru'
 
-            server = servertools.corregir_servidor(servidor)
+            servidor = servertools.corregir_servidor(servidor)
 
             if 'src=&quot;' in data:
                 data = data.replace('src=&quot;', 'src="').replace('&quot;', '"')
@@ -442,6 +426,11 @@ def findvideos(item):
 
                 itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                                      language = IDIOMAS.get(lang,lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -464,7 +453,6 @@ def play(item):
         if not url:
             headers = {'Referer': host, 'Connection': 'keep-alive'}
             data = httptools.downloadpage(item.url, headers=headers).data
-            # ~ logger.debug(data)
 
             url = scrapertools.find_single_match(data, 'src="(.*?)"')
             if not url: url = scrapertools.find_single_match(data, 'SRC="(.*?)"')
@@ -505,18 +493,20 @@ def play(item):
             if url.startswith('//') == True: url = 'https:' + url
 
             servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
             if servidor:
                 url = servertools.normalize_url(servidor, url)
                 itemlist.append(item.clone(url = url, server = servidor))
 
     else:
         data = httptools.downloadpage(item.url).data
-        # ~ logger.debug(data)
 
         new_url = scrapertools.find_single_match(data, "location.href='([^']+)")
         if new_url:
             servidor = servertools.get_server_from_url(new_url)
             servidor = servertools.corregir_servidor(servidor)
+
             itemlist.append(item.clone(url = new_url, server = servidor))
 
     return itemlist

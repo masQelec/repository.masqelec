@@ -78,8 +78,8 @@ def list_all(item):
     data = httptools.downloadpage(item.url).data
 
     if '/peliculas/' in item.url:
-        if '<h2>' in data: data = data.split('<h2>')[1] # descartar lista de destacadas
-        if '<div class="dt_mainmeta">' in data: data = data.split('<div class="dt_mainmeta">')[0] # descartar lista de más vistas
+        if '<h2>' in data: data = data.split('<h2>')[1] # descartar destacadas
+        if '<div class="dt_mainmeta">' in data: data = data.split('<div class="dt_mainmeta">')[0] # descartar más vistas
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
 
@@ -108,7 +108,6 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    # Subpaginación interna y/o paginación de la web
     buscar_next = True
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
@@ -162,9 +161,14 @@ def findvideos(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
             if not servidor or servidor == 'directo': continue
 
             url = servertools.normalize_url(servidor, url)
+
+            if '\\' in url:
+                url = url.replace('\\', '/')
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
 
@@ -209,7 +213,6 @@ def list_search(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    # Subpaginación interna y/o paginación de la web
     buscar_next = True
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
@@ -226,7 +229,7 @@ def list_search(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_search(item)

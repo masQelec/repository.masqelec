@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import sys
+
 from platformcode import logger
 from core.item import Item
 from core import httptools, scrapertools, servertools
-PY3 = sys.version_info[0] >= 3
 
-host = "http://www.ciberdocumentales.com"
+host = "https://www.ciberdocumentales.com"
 
 
 def mainlist(item):
@@ -42,7 +41,6 @@ def list_all(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    if PY3: data = data.decode('iso-8859-1').encode('utf8')
 
     patron = '<div class="fotonoticia">\s*<a\s*target="_blank" href="([^"]+)"><img src="([^"]+)" alt="([^"]+)"'
     patron += ' /></a><br /><br />\s*</div>\s*<div class="textonoticia">.*?<br /><br />(.*?)</div>'
@@ -75,8 +73,6 @@ def findvideos(item):
         servidor = servertools.get_server_from_url(url)
         if servidor and servidor != 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url = url, language = 'Esp' ))
-    # ~ else:
-        # ~ logger.debug(data)
 
     return itemlist
 

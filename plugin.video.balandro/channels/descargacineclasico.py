@@ -17,13 +17,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'tag/peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'tag/castellano/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'tag/latino/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'tag/subtitulada/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Versión original', action = 'list_all', url = host + 'tag/vo/', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Documentales', action = 'list_all', url = host + 'tag/documentales/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
@@ -41,15 +37,28 @@ def generos(item):
     data = httptools.downloadpage(host).data
     bloque = scrapertools.find_single_match(data, '<h3>Géneros(.*?)</ul>')
 
-    patron = '<li[^>]*><a href="([^"]+)" title="[^"]*">([^<]+)</a></li>'
-    matches = scrapertools.find_multiple_matches(bloque, patron)
+    matches = scrapertools.find_multiple_matches(bloque, '<li[^>]*><a href="([^"]+)" title="[^"]*">([^<]+)</a></li>')
+
     if not matches:
         patron = '<li[^>]*><a href=([^ ]+) title="[^"]*">([^<]+)</a></li>'
         matches = scrapertools.find_multiple_matches(bloque, patron)
 
     for url, titulo in matches:
         if descartar_xxx and scrapertools.es_genero_xxx(titulo): continue
+
         itemlist.append(item.clone( title=titulo, url=url, action='list_all' ))
+
+    return itemlist
+
+
+def idiomas(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'tag/castellano/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'tag/latino/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'tag/subtitulada/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Versión original', action = 'list_all', url = host + 'tag/vo/', search_type = 'movie' ))
 
     return itemlist
 
@@ -71,27 +80,27 @@ def list_all(item):
     raise_weberror = False if '/fecha/' in item.url else True
 
     data = httptools.downloadpage(item.url, raise_weberror=raise_weberror).data
-    # ~ logger.debug(data)
 
-    # descartados idiomas pq los VO y Vose no se acostrumbran a cumplir
+    # descartar idiomas pq los VO y Vose no se acostrumbran a cumplir
     patron = '<div class="post-thumbnail">\s*<a href="([^"]+)" title="([^"]+)">\s*'
-    patron += '<img width="[^"]*" height="[^"]*" style="[^"]*" src="([^"]+)"'
-    patron += '.*?<p>(.*?)</p>'
+    patron += '<img width="[^"]*" height="[^"]*" style="[^"]*" src="([^"]+)".*?<p>(.*?)</p>'
+
     matches = scrapertools.find_multiple_matches(data, patron)
     if not matches:
-        patron = '<div class=post-thumbnail>\s*<a href=([^ ]+) title="([^"]+)">'
-        patron += '.*? data-src=([^ ]+)'
-        patron += '.*?<p>(.*?)</p>'
+        patron = '<div class=post-thumbnail>\s*<a href=([^ ]+) title="([^"]+)">.*?<p>(.*?)</p>.*?<p>(.*?)</p>'
         matches = scrapertools.find_multiple_matches(data, patron)
 
     for url, title, thumb, plot in matches:
         if 'indice-de-peliculas-clasicas' in url: continue
+
         title = title.replace(' Descargar y ver Online', '')
+
         year = scrapertools.find_single_match(title, '\((\d{4})\)')
         if year:
             title = title.replace('(%s)' % year, '').strip()
         else:
             year = '-'
+
         plot = scrapertools.decodeHtmlentities(plot)
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, 
@@ -112,7 +121,6 @@ def findvideos(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     if '<h2>Ver online' in data: data = data.split('<h2>Ver online')[1]
 
@@ -121,8 +129,9 @@ def findvideos(item):
     patron += '<span>.*?</span>\s*'
     patron += '<span>(.*?)</span>\s*'
     patron += '<span>.*?</span>\s*'
-    patron += '<span>.*?</span>\s*'
+    patron += '<span>.*?/imgdes/(.*?).jpg".*?</span>\s*'
     patron += '</a>.*?<div id="([^"]+)"[^>]*>\s*<a href=([^ ]+)'
+
     matches = scrapertools.find_multiple_matches(data, patron)
     if not matches:
         patron = '<a href=#(div_\d+_v) class=MO>\s*'
@@ -130,16 +139,18 @@ def findvideos(item):
         patron += '<span>.*?</span>\s*'
         patron += '<span>(.*?)</span>\s*'
         patron += '<span>.*?</span>\s*'
-        patron += '<span>.*?</span>\s*'
+        patron += '<span>.*?/imgdes/(.*?).jpg".*?</span>\s**'
         patron += '</a>.*?<div id=([^ ]+) [^>]*>\s*<a href=([^ ]+)'
         matches = scrapertools.find_multiple_matches(data, patron)
 
-    # ~ logger.debug(matches)
-    for div1, lg, qlty, div2, url in matches:
+    ses = 0
+
+    for div1, lg, qlty, servidor, div2, url in matches:
+        ses += 1
+
         if div1 != div2: continue
 
         url = url.replace('"', '')
-        # ~ if url.startswith('https://adf.ly/'): url = scrapertools.decode_adfly(url)
         if not url.startswith('http'): continue
 
         if '/esp.png' in lg: lang = 'Esp'
@@ -147,31 +158,55 @@ def findvideos(item):
         elif '/vose.png' in lg or '/dual-sub.png' in lg: lang = 'Vose'
         else: lang = 'VO'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = url, referer = item.url,
-                              language = lang, quality = qlty ))
+        other = ''
+        if '/fumacrom.com/' in url:
+            if servidor == 'odysee': continue
 
-    itemlist = servertools.get_servers_itemlist(itemlist)
+            other = servidor
+            servidor = 'directo'
 
-    # Dejar desconocidos de adfly como indeterminados para resolverse en el play ya que si se quieren resolver 
-    # todos de golpe en findvideos adfly necesita esperas entre las llamadas
-    for it in itemlist:
-        if it.server == 'desconocido' and it.url.startswith('https://adf.ly/'):
-            it.server = ''
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url,
+                              language = lang, quality = qlty , other = other))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
+
 
 def play(item):
     logger.info()
     itemlist = []
 
-    if item.url.startswith('https://adf.ly/'): 
-        item.url = scrapertools.decode_adfly(item.url)
-        if item.url:
-            item.server = servertools.get_server_from_url(item.url)
-            if item.server == 'directo': return itemlist # si no encuentra el server o está desactivado
+    url = item.url
 
-    if item.url != '': 
-        itemlist.append(item.clone())
+    if item.server == 'directo':
+        new_url = httptools.downloadpage(item.url, follow_redirects=False).headers.get('location', '')
+
+        if new_url:
+            # ~ Pendiente de resolver
+            data = httptools.downloadpage(new_url).data
+            fbm_url = scrapertools.find_single_match(data, 'id="fbm".*?<script src="(.*?)"')
+
+            if fbm_url:
+                headers = {'Referer': new_url}
+                data = httptools.downloadpage(fbm_url, headers = headers).data
+
+        return itemlist
+
+    elif item.url.startswith('https://adf.ly/'): 
+        url = scrapertools.decode_adfly(item.url)
+
+    if url: 
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
 

@@ -216,6 +216,7 @@ def corregir_servidor(servidor):
     if servidor == 'flixplayer': return 'directo'
     return servidor
 
+
 def findvideos(item):
     logger.info()
     itemlist = []
@@ -237,8 +238,7 @@ def findvideos(item):
 
         url = url.replace('&#038;', '&')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                              language = IDIOMAS.get(lang, lang) ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
 
     return itemlist
 
@@ -266,6 +266,8 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         url = servertools.normalize_url(servidor, url)
         itemlist.append(item.clone( url = url, server = servidor ))
 

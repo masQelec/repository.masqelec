@@ -291,7 +291,11 @@ def findvideos(item):
     items_patron = "<li class=\"dooplay_player_option\" data-type='([^']+)' data-post='(\d+)' data-nume='(\d+)'"
     items_matches = re.compile(items_patron, re.DOTALL).findall(data)
 
+    ses = 0
+
     for datatype, datapost, datanume in items_matches:
+        ses += 1
+
         if not datatype or not datapost or not datanume: continue
 
         post = {'action': 'doo_player_ajax', 'post': datapost, 'nume': datanume, 'type': datatype}
@@ -307,11 +311,12 @@ def findvideos(item):
         matches = re.compile(r'<li onclick=.*?data-lang="(.*?)".*?data-r="(.*?)"').findall(serversdata)
 
         if not matches:
-            if '/hqq.' in url or '/waaw.' in url: url = ''
+            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
             if url:
                 other = ''
                 if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaocentro.net' in url: other = 'kplayer'
                 elif 'kaodrive/embed.php' in url: other = 'amazon'
                 elif 'hydrax.com' in url: other = 'hydrax'
                 elif '.xyz/v/' in url: other = 'fembed'
@@ -324,15 +329,18 @@ def findvideos(item):
                 return itemlist
 
         for lang, b64url in matches:
+            ses += 1
+
             url = base64.b64decode(b64url)
             if isinstance(url, bytes):
                 url = url.decode('utf-8')
 
-            if '/hqq.' in url or '/waaw.' in url: url = ''
+            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
             if url:
                 other = ''
                 if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaocentro.net' in url: other = 'kplayer'
                 elif 'kaodrive/embed.php' in url: other = 'amazon'
                 elif 'hydrax.com' in url: other = 'hydrax'
                 elif '.xyz/v/' in url: other = 'fembed'
@@ -344,6 +352,11 @@ def findvideos(item):
                 itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = url,
                                       language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
 
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
+
     return itemlist
 
 
@@ -353,7 +366,7 @@ def play(item):
 
     url = item.url
 
-    if '.animekao.club/embed' in url:
+    if '.animekao.club/embed' in url or '.kaocentro.net/embed' in url:
         from lib import jsunpack
         sdata = httptools.downloadpage(url).data
 
@@ -389,7 +402,7 @@ def play(item):
          if '#' in url:
              url = url.split('#')[0]
 
-    if '/hqq.' in url or '/waaw.' in url:
+    if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     if url:

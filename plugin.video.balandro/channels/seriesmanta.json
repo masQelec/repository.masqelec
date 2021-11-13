@@ -3,7 +3,7 @@
   "name": "SeriesManta",
   "thumbnail": "Seriesmanta.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["rankings", "years", "stars", "kids", "docs", "vos"],
+  "clusters": ["temporary", "rankings", "years", "stars", "kids", "docs", "vos"],
 
   "notes": "Películas: novedades, por género. Series: últimos episodios, por género."
 }

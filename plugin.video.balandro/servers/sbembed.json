@@ -18,6 +18,10 @@
       {
         "pattern": "http(?:s|)://sbembed2.com/(?:embed-|d/|e/|)([A-z0-9]+)",
         "url": "https://sbvideo.net/play/\\1"
+      },
+      {
+        "pattern": "http(?:s|)://sbvideo.net/(?:embed-|d/|e/|)([A-z0-9]+)",
+        "url": "https://sbvideo.net/play/\\1"
       }
     ]
   }

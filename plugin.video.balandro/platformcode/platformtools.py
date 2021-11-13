@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os
+import sys, os, re
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs
 
 from platformcode import config, logger
@@ -26,9 +26,17 @@ color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
 # Diálogos de Kodi
 
-def compat(**kwargs):
-    message = '\n'.join([line for line in kwargs.values()])
+def compat(line1, line2, line3):
+    message = line1
+    if line2:
+        message += '\n' + line2
+    if line3:
+        message += '\n' + line3
     return message
+
+# ~  def compat(**kwargs):
+    # ~  message = '\n'.join([line for line in kwargs.values()])
+    # ~  return message
 
 
 def dialog_ok(heading, line1, line2="", line3=""):
@@ -72,10 +80,22 @@ def dialog_multiselect(heading, _list, autoclose=0, preselect=[], useDetails=Fal
     return xbmcgui.Dialog().multiselect(heading, _list, autoclose=autoclose, preselect=preselect, useDetails=useDetails)
 
 
-def dialog_progress(heading, line1, line2=" ", line3=" "):
+def dialog_progress(heading, line1, line2="", line3=""):
     dialog = xbmcgui.DialogProgress()
-    dialog.create(heading, compat(line1=line1, line2=line2, line3=line3))
+    def compat(line1, line2, line3):
+        message = line1
+        if line2:
+            message += '\n' + line2
+        if line3:
+            message += '\n' + line3
+        return message
+    dialog.create(heading, compat(line1, line2, line3))
     return dialog
+
+# ~  def dialog_progress(heading, line1, line2=" ", line3=" "):
+    # ~  dialog = xbmcgui.DialogProgress()
+    # ~  dialog.create(heading, compat(line1=line1, line2=line2, line3=line3))
+    # ~  return dialog
 
 
 def dialog_progress_bg(heading, message=""):
@@ -378,12 +398,13 @@ def set_context_commands(item, parent_item, colores):
 
 
     # Guardar seguimiento (preferidos)
-    if item.contentType in ['movie', 'tvshow', 'season', 'episode'] and item.contentExtra != 'documentary' \
-       and parent_item.channel not in ['tracking', 'downloads', 'tmdblists']:
-        tipo = {'movie':'película', 'tvshow':'serie', 'season':'temporada', 'episode':'episodio',}
-        context_commands.append( ('[B][COLOR %s]Guardar %s en preferidos[/COLOR][/B]' % (colores['tracking'], tipo[item.contentType]), config.build_RunPlugin(
-            item.clone(channel="tracking", action="addFavourite",
-                       from_channel=item.channel, from_action=item.action))) )
+    if not config.get_setting('mnu_simple', default=False):
+        if config.get_setting('mnu_preferidos', default=True):
+            if item.contentType in ['movie', 'tvshow', 'season', 'episode'] and item.contentExtra != 'documentary' \
+               and parent_item.channel not in ['tracking', 'downloads', 'tmdblists']:
+                tipo = {'movie':'película', 'tvshow':'serie', 'season':'temporada', 'episode':'episodio',}
+                context_commands.append( ('[B][COLOR %s]Guardar %s en preferidos[/COLOR][/B]' % (colores['tracking'], tipo[item.contentType]), config.build_RunPlugin(
+                    item.clone(channel="tracking", action="addFavourite", from_channel=item.channel, from_action=item.action))) )
 
     # Buscar misma peli/serie en otros canales
     if item.contentType in ['movie', 'tvshow'] and parent_item.channel != 'tmdblists': # and parent_item.channel != 'search':
@@ -399,10 +420,11 @@ def set_context_commands(item, parent_item, colores):
         context_commands.append( ('[COLOR %s]Buscar parecido en los canales[/COLOR]' % colores['search_similar'], config.build_ContainerUpdate(item_search)) )
 
     # Descargar vídeo
-    if item.channel != '' and item.action == 'findvideos' and parent_item.channel != 'downloads':
-        context_commands.append( ('[COLOR %s]Descargar vídeo[/COLOR]' % colores['download'], config.build_RunPlugin(
-            item.clone(channel="downloads", action="save_download",
-                       from_channel=item.channel, from_action=item.action))) )
+    if not config.get_setting('mnu_simple', default=False):
+        if config.get_setting('mnu_preferidos', default=True):
+            if item.channel != '' and item.action == 'findvideos' and parent_item.channel != 'downloads':
+                context_commands.append( ('[COLOR %s]Descargar vídeo[/COLOR]' % colores['download'], config.build_RunPlugin(
+                    item.clone(channel="downloads", action="save_download", from_channel=item.channel, from_action=item.action))) )
 
     # Buscar trailer
     if item.contentType in ['movie', 'tvshow'] and item.infoLabels['tmdb_id']:
@@ -995,7 +1017,6 @@ def dialogo_busquedas_por_fallo_web(item):
 file_kodi_db = '' # como variable global para no repetir get_kodi_db() si hay múltiples querys
 
 def get_kodi_db():
-    import re
     from core import filetools
 
     # Buscamos el archivo de la BBDD de vídeos más reciente (MyVideos[NUM].db)
@@ -1066,3 +1087,7 @@ def execute_sql_kodi(sql, parms_sql=None):
         logger.debug("Base de datos no encontrada")
 
     return nun_records, records
+
+def get_kodi_version():
+    kodi_version = re.match("\d+\.\d+", xbmc.getInfoLabel('System.BuildVersion')).group(0)
+    return float(kodi_version), int(kodi_version.split('.')[0]), int(kodi_version.split('.')[1]) # ~ Completed Ex: 19.1, Version Build Ex 19, Extension Ex 1

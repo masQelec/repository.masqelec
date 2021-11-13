@@ -24,7 +24,7 @@ color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
 # Ruta para las descargas
 download_path = config.get_setting('downloadpath', default='')
-if download_path == '':
+if not download_path:
     download_path = filetools.join(config.get_data_path(), 'downloads')
 
 if not filetools.exists(download_path):
@@ -338,8 +338,14 @@ def do_download(mediaurl, file_name, parent_item, server_item):
 
     download_path = config.get_setting('downloadpath', default='')
 
+    if not download_path:
+        download_path = filetools.join(config.get_data_path(), 'downloads')
+
+    if not filetools.exists(download_path):
+        filetools.mkdir(download_path)
+
     if config.get_setting('conf_ubicacion', default=True):
-        if download_path == '':
+        if not download_path:
             download_path = filetools.join(config.get_data_path(), 'downloads')
 
         la_ubicacion = ('[B][COLOR %s]' + download_path) % color_infor
@@ -352,7 +358,7 @@ def do_download(mediaurl, file_name, parent_item, server_item):
             actions.open_settings(parent_item)
 
             download_path = config.get_setting('downloadpath', default='')
-            if download_path == '':
+            if not download_path:
                 download_path = filetools.join(config.get_data_path(), 'downloads')
 
             if not filetools.exists(download_path):

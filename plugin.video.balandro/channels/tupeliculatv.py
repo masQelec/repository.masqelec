@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'http://www.tupelicula.tv/'
+host = 'https://www.tupelicula.tv/'
 
 
 def mainlist(item):
@@ -149,7 +149,6 @@ def findvideos(item):
     descartar_xxx = config.get_setting('descartar_xxx', default=False)
 
     data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
 
     if descartar_xxx:
        genres = scrapertools.find_single_match(data, '&bull;(.*?)</span>')
@@ -160,11 +159,14 @@ def findvideos(item):
 
     go_url = scrapertools.find_single_match(data, '<iframe id="playerframe" data-src="([^"]+)"')
     data = httptools.downloadpage(go_url).data
-    # ~ logger.debug(data)
 
     matches = re.compile('title="(.*?)" data-id="(\d+)">.*?img src="([^"]+)".*?>([^<]+)<', re.DOTALL).findall(data)
 
+    ses = 0
+
     for title, id, list_idiomas, qlty in matches:
+        ses += 1
+
         servidor = servertools.corregir_servidor(title)
         if servidor == '': continue
 
@@ -192,6 +194,11 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', id = id, referer = go_url,
                               language = ','.join(langs), quality = qlty.strip(), other = link_other ))
 
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
+
     return itemlist
 
 
@@ -201,9 +208,8 @@ def play(item):
 
     id_url =  host + 'player/rep/' + item.id
     data = httptools.downloadpage(id_url, headers={'Referer': item.referer}).data
-    # ~ logger.debug(data)
 
-    url = scrapertools.find_single_match(data.lower(), 'iframe src=.?"([^"]+)"')
+    url = scrapertools.find_single_match(data.lower(), 'iframe src=.*?"([^"]+)"')
 
     if not url:
         if '<center>' in data:
@@ -215,10 +221,12 @@ def play(item):
 
     if url:
        url = url.replace('\\/', '/')
+       url = url.replace('https://uqload.com/embed-https://', 'https://')
 
        if url.startswith('//') == True: url = 'https://' + url
 
        servidor = servertools.get_server_from_url(url)
+       servidor = servertools.corregir_servidor(servidor)
 
        if servidor == 'directo':
            if item.server == 'vk':
@@ -229,12 +237,27 @@ def play(item):
        url = normalize_other(url)
 
        if url:
-           if item.server == 'vidoza':
-               if not item.server in url: url = ''
-           elif '.blogspot.com' in url: url = ''
+           if '.blogspot.com' in url: url = ''
            elif url.endswith('/embed-https.html') == True: url = ''
+           elif url.startswith('https://es.xhamster.com/') == True: url = ''
+
+       if not url:
+           platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Enlace NO Soportado[/B][/COLOR]')
 
        if url:
+           if '\\/' in url:
+               url = url.replace('\\', '/')
+
+           if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+               return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+           elif 'openload' in url or 'powvideo' in url or 'streamplay' in url or 'rapidvideo' in url or 'streamango' in url or 'verystream' in url or 'vidtodo' in url:
+               return 'Servidor [COLOR yellow]NO soportado[/COLOR]'
+
+           servidor = servertools.get_server_from_url(url)
+           servidor = servertools.corregir_servidor(servidor)
+
+           url = servertools.normalize_url(servidor, url)
+
            itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
@@ -317,11 +340,14 @@ def normalize_other(server):
         elif '/www.uploadmp4.' in server: server = ''
         elif '/verystream.' in server: server = ''
 
+        elif '/mangovideo.club' in server: server = ''
+        elif '/daxab.com' in server: server = ''
+
     return server
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + 'search?q=' + texto.replace(" ", "+")
         return list_all(item)

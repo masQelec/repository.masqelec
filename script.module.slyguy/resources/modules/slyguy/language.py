@@ -122,7 +122,7 @@ class BaseLanguage(object):
     QUALITY_FPS                 = 32069
     SELECT_WV_VERSION           = 32070
     WV_UNKNOWN                  = 32071
-    WV_NOT_LATEST               = 32072
+    DEFAULT_LANGUAGE            = 32072
     DISABLED                    = 32073
     QUALITY_HTTP_ERROR          = 32074
     IA_ANDROID_REINSTALL        = 32075
@@ -170,8 +170,8 @@ class BaseLanguage(object):
     RENAME_BOOKMARK             = 32117
     XZ_ERROR                    = 32118
     INSTALLING_APT_IA           = 32119
-    FOLDERS_FOR_SHOW_SERIES     = 32120
-    IA_TESTING_NOT_AVAILABLE    = 32121
+
+    DEFAULT_SUBTITLE            = 32121
     WV_REVOKED                  = 32122
     WV_REVOKED_CONFIRM          = 32123
     WV_FAILED                   = 32124
@@ -179,16 +179,24 @@ class BaseLanguage(object):
     NEW_SEARCH                  = 32126
     REMOVE_SEARCH               = 32127
     NEWS_HEADING                = 32128
-    VIDEO_FOLDER_CONTENT        = 32129
+
     PLAY_FROM_LIVE_CONTEXT      = 32130
     ASK_EMAIL                   = 32131
     ASK_PASSWORD                = 32132
     DEVICE_CODE                 = 32133
     EMAIL_PASSWORD              = 32134
     DEVICE_LINK_STEPS           = 32135
+    WV_UNSUPPORTED_OS           = 32136
+    WV_UNSUPPORTED_OS_CONFIRM   = 32137
+    DONATIONS                   = 32138
+    LOOK_AND_FEEL               = 32139
+    DONATE_HEADER               = 32140
+    SEASON                      = 32141
 
+    LANGUAGE                    = 304
     RESUME_FROM                 = 12022
     PLAY_FROM_BEGINNING         = 12021
+    AUTO                        = 16316
 
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)

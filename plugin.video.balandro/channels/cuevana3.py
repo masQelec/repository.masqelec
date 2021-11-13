@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -156,10 +156,10 @@ def list_all(item):
         next_page_link = scrapertools.find_single_match(data, '\s*href=(?:"|)([^ >"]+) class="next')
     if next_page_link:
         if not item.filtro:
-            itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, action='list_all' ))
+            itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, action='list_all', text_color='coral' ))
         else:
             pagina = 2 if not item.page else item.page + 1
-            itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, action='list_all', page=pagina ))
+            itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, action='list_all', page=pagina, text_color='coral' ))
 
     return itemlist
 
@@ -246,7 +246,11 @@ def findvideos(item):
 
     matches = re.compile('TPlayerNv=Opt(\w\d+).*?img\s*src=(.*?)<span>\d+ - (.*?) - ([^<]+)<', re.DOTALL).findall(data)
 
+    ses = 0
+
     for option, url_data, language, quality in matches:
+        ses += 1
+
         url = scrapertools.find_single_match(data, 'id=Opt%s><iframe.*? data-src=(?:"|)([^ >"]+)' % option)
         if url.startswith('/'): url = 'https:' + url
 
@@ -260,6 +264,8 @@ def findvideos(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for language, quality, url in matches:
+        ses += 1
+
         if url.startswith('/'): url = 'https:' + url
         itemlist.append(Item( channel = item.channel, action = 'play', other = 'D', server = 'uptobox', title = '', url = url, referer = item.url,
                               language = IDIOMAS.get(language, language), quality = quality, quality_num = puntuar_calidad(quality) ))
@@ -272,6 +278,11 @@ def findvideos(item):
             it.server = 'fembed' if '/fembed/?' in it.url else 'directo' if '//damedamehoy.' in it.url else ''
         elif it.server == 'desconocido' and 'openloadpremium.com/' in it.url:
             it.server = 'm3u8hls'
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -294,7 +305,8 @@ def play(item):
 
     if '//damedamehoy.' in item.url:
         url = resuelve_damedamehoy(item.url)
-        if url: itemlist.append(['mp4', url])
+        if url:
+            itemlist.append(['mp4', url])
         return itemlist
 
     if '//api.cuevana3' in item.url:
@@ -316,8 +328,6 @@ def play(item):
                         return itemlist
 
                 elif 'openloadpremium.com/embed/' in url:
-                    # ~ data = do.downloadpage(url)
-                    # ~ logger.debug(data)
                     continue # no encontrado ningún ejemplo válido
 
                 else:
@@ -332,13 +342,13 @@ def play(item):
             fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
             if 'https://api.cuevana3.io/sc/index.php?h=' in item.url:
                 api_url = 'https://api.cuevana3.io/sc/r.php'
-                api_post = 'h='+fid
+                api_post = 'h=' + fid
             elif 'https://api.cuevana3.io/ir/goto_ddh.php' in item.url:
                 api_url = 'https://api.cuevana3.io/ir/redirect_ddh.php'
-                api_post = 'url='+fid
+                api_post = 'url=' + fid
             else:
                 api_url = 'https://api.cuevana3.io/ir/rd.php'
-                api_post = 'url='+fid
+                api_post = 'url=' + fid
 
             url = do_downloadpage(api_url, post=api_post, headers={'Referer': item.url}, follow_redirects=False, only_headers=True).get('location', '')
 
@@ -347,9 +357,12 @@ def play(item):
 
             if '//damedamehoy.' in url:
                 url = resuelve_damedamehoy(url)
-                if url: itemlist.append(['mp4', url])
+                if url:
+                    itemlist.append(['mp4', url])
             else:
                 servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
+
                 if servidor != 'directo':
                     url = servertools.normalize_url(servidor, url)
                     itemlist.append(item.clone( url = url, server = servidor ))

@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -117,14 +117,19 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(data, patron)
 
     for url, title, Title, year, thumb in matches:
-        if year:
-            title = title.replace(year, '').strip()
-            title = title.replace('()', '').strip()
+        if not year:
+            year = '-'
+        else:
+            if year in title:
+                title = title.replace('(' + year + ')', '').strip()
+                if year in title:
+                    title = title.replace(year, '').strip()
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                     contentType='movie', contentTitle=Title, infoLabels={'year': year} ))
 
-    tmdb.set_infoLabels(itemlist)
+    if not '/search?q=' in item.url:
+        tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, """blog-pager-older-link.*?href='([^']+)""")
@@ -163,7 +168,13 @@ def list_list(item):
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
         year = scrapertools.find_single_match(match, '<i>Año</i>: (.*?)"<br />').strip()
-        if not year: year = '-'
+        if not year:
+            year = '-'
+        else:
+            if year in title:
+                title = title.replace('(' + year + ')', '').strip()
+                if year in title:
+                    title = title.replace(year, '').strip()
 
         bloque = scrapertools.find_single_match(match, '>Ver online(.*?)$')
 
@@ -316,7 +327,11 @@ def findvideos(item):
             bloque = scrapertools.find_single_match(data, '<b><u>(.*?)<div')
             matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)".*?</span>(.*?)<br />' )
 
+    ses = 0
+
     for url, idioma in matches:
+        ses += 1
+
         if '.blogspot.' in url: continue
 
         if url.startswith('//'): url = 'https:' + url
@@ -335,6 +350,11 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -357,7 +377,7 @@ def play(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + 'search?q=' + texto.replace(" ", "+")
         return list_all(item)

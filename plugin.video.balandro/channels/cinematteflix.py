@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools, jsontools
 
@@ -128,7 +128,8 @@ def list_all(item):
             itemlist.append(item.clone( action = 'list_col', url = url, title = title, thumbnail = thumb, languages = langs, grupo = 'colec',
                                         contentType = 'movie', contentTitle = title, infoLabels={'year': year} ))
 
-    tmdb.set_infoLabels(itemlist)
+    if not '/?s=' in item.url:
+        tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if '>Siguientes<' in data:
@@ -215,7 +216,11 @@ def findvideos(item):
     links = scrapertools.find_multiple_matches(data, '<div class="jetpack-video-wrapper">.*?src="(.*?)"')
     if not links: links = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
+    ses = 0
+
     for url in links:
+        ses += 1
+
         url = url.replace('?feature=oembed', '')
 
         servidor = servertools.get_server_from_url(url)
@@ -223,11 +228,16 @@ def findvideos(item):
         if servidor and servidor != 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, title = '', language = item.languages)) 
 
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
+
     return itemlist
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_all(item)

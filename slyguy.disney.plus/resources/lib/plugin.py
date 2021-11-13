@@ -30,7 +30,7 @@ def index(**kwargs):
         folder.add_item(label=_(_.SEARCH, _bold=True), path=plugin.url_for(search))
 
         if settings.getBool('sync_watchlist', False):
-            folder.add_item(label=_(_.WATCHLIST, _bold=True), path=plugin.url_for(collection, slug='watchlist', content_class='watchlist'))
+            folder.add_item(label=_(_.WATCHLIST, _bold=True), path=plugin.url_for(sets, set_id=WATCHLIST_SET_ID, set_type=WATCHLIST_SET_TYPE))
 
         if settings.getBool('sync_playback', False):
             folder.add_item(label=_(_.CONTINUE_WATCHING, _bold=True), path=plugin.url_for(sets, set_id=CONTINUE_WATCHING_SET_ID, set_type=CONTINUE_WATCHING_SET_TYPE))
@@ -67,7 +67,7 @@ def login(**kwargs):
 def hubs(**kwargs):
     folder = plugin.Folder(_.HUBS)
 
-    data = api.collection_by_slug('home', 'home')
+    data = api.collection_by_slug('home', 'home', 'StandardCollection')
     for row in data['containers']:
         _style = row.get('style')
         _set = row.get('set')
@@ -143,7 +143,7 @@ def _switch_profile(profile):
 
 @plugin.route()
 def collection(slug, content_class, label=None, **kwargs):
-    data = api.collection_by_slug(slug, content_class)
+    data = api.collection_by_slug(slug, content_class, 'PersonalizedCollection' if slug == 'home' else 'StandardCollection')
     folder = plugin.Folder(label or _get_text(data['text'], 'title', 'collection'), thumb=_get_art(data.get('image', []).get('fanart')))
 
     for row in data['containers']:
@@ -160,20 +160,15 @@ def collection(slug, content_class, label=None, **kwargs):
         if not set_id:
             return None
 
-        if slug == 'home' and _style == 'brandSix':
+        if slug == 'home' and _style in ('brandSix', 'ContinueWatchingSet', 'hero', 'WatchlistSet'):
             continue
 
-        if _style in ('hero', 'WatchlistSet'):
-            items = _process_rows(_set.get('items', []), content_class=_style)
-            folder.add_items(items)
+        if _style == 'BecauseYouSet':
             continue
-
-        elif _style == 'BecauseYouSet':
-            data = api.set_by_id(set_id, _style, page_size=0)
-            if not data['meta']['hits']:
-                continue
-
-            title = _get_text(data['text'], 'title', 'set')
+            # data = api.set_by_id(set_id, _style, page_size=0)
+            # if not data['meta']['hits']:
+            #     continue
+            # title = _get_text(data['text'], 'title', 'set')
         else:
             title = _get_text(_set['text'], 'title', 'set')
 
@@ -227,7 +222,7 @@ def _process_rows(rows, content_class=None):
         elif content_type == 'DmcSeries':
             item = _parse_series(row)
 
-        elif content_type == 'StandardCollection':
+        elif content_type in ('PersonalizedCollection', 'StandardCollection'):
             item = _parse_collection(row)
 
         if not item:
@@ -235,9 +230,9 @@ def _process_rows(rows, content_class=None):
 
         if watchlist_enabled:
             if content_class == 'WatchlistSet':
-                item.context.insert(0, (_.DELETE_WATCHLIST, 'RunPlugin({})'.format(plugin.url_for(delete_watchlist, content_id=row['contentId']))))
+                item.context.append((_.DELETE_WATCHLIST, 'RunPlugin({})'.format(plugin.url_for(delete_watchlist, content_id=row['contentId']))))
             elif (content_type == 'DmcSeries' or (content_type == 'DmcVideo' and program_type != 'episode')):
-                item.context.insert(0, (_.ADD_WATCHLIST, 'RunPlugin({})'.format(plugin.url_for(add_watchlist, content_id=row['contentId'], title=item.label, icon=item.art.get('thumb')))))
+                item.context.append((_.ADD_WATCHLIST, 'RunPlugin({})'.format(plugin.url_for(add_watchlist, content_id=row['contentId'], title=item.label, icon=item.art.get('thumb')))))
 
         items.append(item)
 
@@ -539,7 +534,7 @@ def play(content_id=None, family_id=None, **kwargs):
         path = media_stream,
         inputstream = ia,
         headers = headers,
-        proxy_data = {'default_language': original_language, 'original_language': original_language},
+        proxy_data = {'original_language': original_language},
     )
 
     milestones = video.get('milestone', [])

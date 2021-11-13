@@ -2,7 +2,7 @@
 
 import codecs
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -11,7 +11,7 @@ host = 'https://pelisforte.co/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if '&years[]' in url:
+    if '/release/' in url:
         raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -26,9 +26,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ultimas-peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'sg/marvel-mcu/', search_type = 'movie' ))
 
@@ -75,10 +73,10 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1977, -1):
-        url = '%s?s=trfilter&trfilter=1&years[]=%s,' % (host, str(x))
+    url = host + 'release/'
 
-        itemlist.append(item.clone( title=str(x), url = url, action='list_all' ))
+    for x in range(current_year, 1939, -1):
+         itemlist.append(item.clone( title=str(x), url = url + str(x), action='list_all' ))
 
     return itemlist
 
@@ -89,31 +87,32 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
+    bloque = scrapertools.find_single_match(data, '<h1(.*?)>TOP<')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-        title = scrapertools.find_single_match(match, '<h3 class="Title">(.*?)</h3>')
+        title = scrapertools.find_single_match(match, 'class="entry-title">(.*?)</')
 
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
-        plot = scrapertools.find_single_match(match, '<div class="Description"><p>(.*?)</p>')
 
         year = scrapertools.find_single_match(match, '<span class="Year">(.*?)</span>')
         if not year:
             year ='-'
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
+                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<a class="next page-numbers"' in data:
-        if '>Siguiente' in data:
-            next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="(.*?)"')
-            if next_page:
-                next_page = next_page.replace('&#038;', '&')
+    if '>SIGUIENTE' in data:
+        next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?<a class="page-link" .*?href="(.*?)"')
+        if next_page:
+            next_page = next_page.replace('&#038;', '&')
+            if '/page/' in next_page:
                 itemlist.append(item.clone (url = next_page, title = '>> Página siguiente', action = 'list_all', text_color='coral'))
 
     return itemlist
@@ -125,41 +124,43 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '<ul id="fenifdev-lang-ul">(.*?)<div>Trailer</div>')
+    bloque = scrapertools.find_single_match(data, '>OPCIONES<(.*?)</section>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '.*?<div>(.*?)<span class="quality">(.*?)</span>')
+    matches = scrapertools.find_multiple_matches(bloque, 'href="#options-(.*?)">.*?<span class="server">(.*?)-(.*?)</span>')
 
-    for idioma, qlty in matches:
+    ses = 0
+
+    for opt, srv, idioma in matches:
+        ses += 1
+
+        srv = srv.lower().strip()
+
+        if not srv: continue
+        elif srv == 'trailer': continue
+
+        idioma = idioma.strip()
+       
         if 'Latino' in idioma: lang = 'Lat'
         elif 'Castellano' in idioma: lang = 'Esp'
         elif 'Subtitulado' in idioma: lang = 'Vose'
         else:
            lang = idioma
 
-        blok_lang = scrapertools.find_single_match(bloque, '<div>' + idioma + '.*?<i class="fa fa-chevron-down">(.*?)/img/')
+        url = scrapertools.find_single_match(data, '<div id="options-' + opt + '".*?src="([^"]+)"')
 
-        options = scrapertools.find_multiple_matches(blok_lang, 'data-tplayernv="(.*?)"')
-
-        blok_opts = scrapertools.find_single_match(data, '<div class="TPlayer">(.*?)<span class="')
-        blok_opts = blok_opts.replace('&quot;', '"')
-
-        for opt in options:
-            srv = scrapertools.find_single_match(blok_lang, 'data-tplayernv="' + opt + '".*?<img src=".*?/>(.*?)</li>')
-            srv = scrapertools.find_single_match(srv, '.*?-(.*?)-').strip()
-
-            if not srv: continue
-
+        if url:
             servidor = 'directo'
             other = srv
 
-            url = scrapertools.find_single_match(blok_opts, 'id="' + opt + '".*?src="([^"]+)"')
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other,
+                                  language = lang ))
 
-            if url:
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other,
-                                      language = lang, quality = qlty ))
+    # ~ descargas recaptcha
 
-    # ~ descargas requieren recaptcha
-    # ~ links = scrapertools.find_multiple_matches(data, '<td><span class="Num">(.*?)</tr>')
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -196,6 +197,11 @@ def play(item):
             except:
                pass
 
+        if '/rehd.net/' in url:
+            data = do_downloadpage(url)
+
+            url = scrapertools.find_single_match(data, '"url": "(.*?)"')
+
         elif url.startswith(host):
             if url.endswith('&'):
                 url = url + '='
@@ -220,7 +226,7 @@ def play(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_all(item)

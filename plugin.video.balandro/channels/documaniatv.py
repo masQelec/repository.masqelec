@@ -9,10 +9,15 @@ from core import httptools, scrapertools
 
 host = 'https://www.documaniatv.com/'
 
+metodos = ['0', '1', '2', '3', '4']
+
 cnomv = 'DocumaniaTv'
 canal = 'documaniatv'
 
 url_check_header = host + 'article.html'
+
+plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
 
 tex_cpau = '[COLOR yellow]O bien, si persiste este aviso vuelva a [/COLOR][COLOR red] Configurar proxies a usar ...[/COLOR]'
 tex_esrn = ' por favor espere unos segundos ... y Reintentelo de nuevo'
@@ -23,10 +28,8 @@ perpage = 25
 documaniatv_rua = config.get_setting('channel_documaniatv_rua', default='')
 
 if config.get_setting('developer_mode', default=False):
-    config.set_setting('debug', '2')
     developer = True
 else:
-    config.set_setting('debug', '0')
     developer = False
 
 # Versiones Chrome
@@ -47,25 +50,27 @@ ff_rnd = str(random.choice(ff_versions))
 ver_chrome = ''
 if config.get_setting("ver_stable_chrome", default=True):
     if config.get_setting('chrome_last_version', default=''):
-       ver_chrome = config.get_setting('chrome_last_version')
+        ver_chrome = config.get_setting('chrome_last_version')
 
 # Lista custom_headers
 list_headers = []
 
-if ver_chrome:
-    list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 Chrome/%s Safari/537.36 Gecko/20100101 Firefox/%s.0' % (ver_chrome, fver)})
-else:
-    list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 Chrome/%s Safari/537.36 Gecko/20100101 Firefox/%s.0' % (verc, fver)})
+list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36 Firefox/%s.0' % (verc, fver)})
 
 list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:%s.0) Gecko/20100101 Firefox/%s.0' % (ff_rnd, ff_rnd)})
 
-list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36 Firefox/%s.0' % (verc, fver)})
+list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:%s.0) Safari/537.36 (KHTML, like Gecko) Chrome/%s Gecko/20100101 Firefox/%s.0' % (fver, verc, fver)})
 
-list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Linux; Android 5.0; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/%s Mobile Safari/537.36  Firefox/%s.0' % (verc, fver)})
+list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:%s.0) Chrome/%s Gecko/20100101 Firefox/%s.0' % (fver, verc, fver)})
 
 list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:%s.0) Gecko/20100101 Firefox/%s.0' % (fver, fver)})
 
 if developer == True:
+    if ver_chrome:
+        list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 Chrome/%s Safari/537.36 Gecko/20100101 Firefox/%s.0' % (ver_chrome, fver)})
+    else:
+        list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 Chrome/%s Safari/537.36 Gecko/20100101 Firefox/%s.0' % (verc, fver)})
+
     list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X)'})
     list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36 Firefox/%s.0' % (fver)})
 
@@ -74,17 +79,16 @@ if developer == True:
 
     list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36 Gecko/20100101 Firefox/%s.0' % (verc, fver)})
 
-    list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:%s.0) Safari/537.36 (KHTML, like Gecko) Chrome/%s Gecko/20100101 Firefox/%s.0' % (fver, verc, fver)})
-
     list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N; X11; Linux x86_64) (compatible; MSIE 7.0; Windows NT 10.0; WOW64; rv:%s.0; Trident/4.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506) Chrome/%s Firefox/%s.0' % (fver, verc, fver)})
     list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) (Windows NT 10.0; WOW64; rv:%s.0; Win64; x64; U) (Macintosh; Intel Mac OS X 10.8; rv:%s.0) Gecko/20100101 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36 Firefox/%s.0' % (fver, fver, verc, fver)})
 
-    list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:%s.0) Chrome/%s Gecko/20100101 Firefox/%s.0' % (fver, verc, fver)})
     list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:%s.0) Gecko/20100101 Firefox/%s.0' % (fver, fver)})
 
     list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 10_2_1 like Mac OS X) AppleWebKit/602.4.6 (KHTML, like Gecko) Version/10.0 Mobile/14D27 Chrome/%s Safari/537.36 Firefox/%s.0' % (verc, fver)})
 
     list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) (Windows NT 10.0; WOW64; rv:%s.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36 Gecko/20100101 Firefox/%s.0' % (fver, verc, fver)})
+
+    list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Linux; Android 5.0; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/%s Mobile Safari/537.36  Firefox/%s.0' % (verc, fver)})
 
     list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36 Firefox/%s.0' % (verc, fver)})
     list_headers.append({'Referer': host, 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:%s.0) Chrome/%s Gecko/20100101 Firefox/%s.0' % (fver, verc, fver)})
@@ -94,6 +98,8 @@ if developer == True:
 
 
 def localize_header(test, last_chrome):
+    documaniatv_rua = config.get_setting('channel_documaniatv_rua', default='')
+
     if developer == True:
         if test == True:
             ver = verc
@@ -139,7 +145,6 @@ def localize_header(test, last_chrome):
 
             resp = httptools.downloadpage_proxy(canal, url = url_check_header, headers = headers_check)
             data = resp.data
-            # logger.debug(data)
 
             if len(data) == 0: data = ''
 
@@ -213,6 +218,28 @@ def test_headers(item):
     localize_header(True, last_chrome)
 
 
+def configurar_metodo(item):
+    metodo = config.get_setting('channel_documaniatv_rua', default='')
+
+    if metodo:
+        if str(metodo) == '0': num_metodo = 0
+        elif str(metodo) == '1': num_metodo = 1
+        elif str(metodo) == '2': num_metodo = 2
+        elif str(metodo) == '3': num_metodo = 3
+        elif str(metodo) == '4': num_metodo = 4
+        else:
+            num_metodo = 0
+    else:
+        num_metodo = 0
+
+    ret = platformtools.dialog_select('DocumaniaTv - Métodos de acceso', metodos, preselect=num_metodo)
+    if ret == -1: return False
+
+    config.set_setting('channel_documaniatv_rua', metodos[ret])
+
+    return True
+
+
 def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
@@ -234,8 +261,8 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Por tema', action = 'series', url = host + 'top-series-documentales.html' ))
     itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary' ))
 
-    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    itemlist.append(item.clone ( title = 'Configurar método acceso a usar ...', action = 'configurar_metodo', folder = False, text_color = 'yellowgreen' ))
+
     itemlist.append(item.clone ( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder = False, plot = plot, text_color = 'red' ))
 
     if developer == True: itemlist.append(item.clone ( title = 'Test agentes a utilizar ...', action = 'test_headers', folder = False, text_color = 'yellow' ))
@@ -392,7 +419,6 @@ def list_all(item):
     if item.referer: acces_headers['Referer'] = item.referer
 
     data = do_downloadpage(item.url, headers = acces_headers)
-    # logger.debug(data)
 
     matches = scrapertools.find_multiple_matches(data, '<li class="col-xs-6 col-sm-6 col-md-4">(.*?)</li>')
     if not matches: matches = scrapertools.find_multiple_matches(data, '<li class="col-xs-6 col-sm-6 col-md-3">(.*?)</li>')
@@ -439,7 +465,6 @@ def findvideos(item):
     notification_d_ok = config.get_setting('notification_d_ok', default=True)
 
     data = do_downloadpage(item.url, headers = custom_headers)
-    # logger.debug(data)
 
     if 'lo sentimos este documental ha sido eliminado' in data.lower():
         platformtools.dialog_notification(cnomv, '[COLOR red]Documental eliminado[/COLOR]')
@@ -491,7 +516,6 @@ def findvideos(item):
         if url_embed.endswith('mp4') == True: url = url_embed
         else:
            data = do_downloadpage(url_embed, headers = custom_headers)
-           # logger.debug(data)
 
            if '<meta name="captcha-bypass"' in data:
                platformtools.dialog_ok(cnomv, '[COLOR blue]Vídeo transitoriamente bloqueado,' + tex_esrn + '[/COLOR]', '', tex_cpau)
@@ -505,13 +529,16 @@ def findvideos(item):
 
             url_final = url
 
-            itemlist.append(Item ( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'Esp' ))
+    if not url_final:
+        url_final = scrapertools.find_single_match(data, 'jwplayer.*?.setup.*?file:.*?"(.*?)"')
 
-    if url_final == '':
+    if not url_final:
         if len(data) == 0: platformtools.dialog_ok(cnomv, '[COLOR tan]Vídeo sin respuesta del canal,' + tex_esrn + '[/COLOR]', '', tex_cpau)
         else:
            if developer == True: platformtools.dialog_ok(cnomv, 'Al parecer el canal cambió de estructura')
         return
+
+    itemlist.append(Item ( channel = item.channel, action = 'play', server = 'directo', title = '', url = url_final, language = 'Esp' ))
 
     return itemlist
 

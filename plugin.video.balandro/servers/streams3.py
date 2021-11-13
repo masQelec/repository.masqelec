@@ -24,6 +24,6 @@ def get_video_url(page_url, url_referer=''):
     url = url.replace("\\r","").replace("\\","").replace("\r","")
 
     if url:
-        video_urls.append(['mp4',  url])
+        video_urls.append(['mp4', url])
 
     return video_urls

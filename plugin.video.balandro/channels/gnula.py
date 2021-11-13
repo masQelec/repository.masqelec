@@ -26,9 +26,9 @@ def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
 
-def do_downloadpage(url, post=None, use_cache=False):
-    # ~ data = httptools.downloadpage(url, post=post, use_cache=use_cache).data
-    data = httptools.downloadpage_proxy('gnula', url, post=post, use_cache=use_cache).data
+def do_downloadpage(url, post=None):
+    # ~ data = httptools.downloadpage(url, post=post).data
+    data = httptools.downloadpage_proxy('gnula', url, post=post).data
     return data
 
 
@@ -92,7 +92,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    if item.page == '': item.page = 0
+    if not item.page: item.page = 0
 
     data = do_downloadpage(item.url)
 
@@ -101,14 +101,14 @@ def list_all(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     if item.filtro_lang: # reducir lista según idioma
-        matches = filter(lambda m: '(%s)' % item.filtro_lang in m[3], matches)
+        matches = list(filter(lambda m: '(%s)' % item.filtro_lang in m[3], matches))
 
     if item.filtro_search: # reducir lista según texto buscado
         buscado = item.filtro_search.lower().strip()
         if ' ' not in buscado:
-            matches = filter(lambda m: buscado in m[1].lower(), matches)
+            matches = list(filter(lambda m: buscado in m[1].lower(), matches))
         else:
-            palabras = filter(lambda p: len(p) > 3, buscado.split(' ')) # descartar palabras demasiado cortas (la, de, los, etc)
+            palabras = list(filter(lambda p: len(p) > 3, buscado.split(' '))) # descartar palabras demasiado cortas (la, de, los, etc)
             if len(palabras) == 0: return [] # No hay palabras a buscar
 
             def contiene(texto, palabras):
@@ -117,7 +117,7 @@ def list_all(item):
                     if palabra in texto: found = True; break
                 return found
 
-            matches = filter(lambda m: contiene(m[1].lower(), palabras), matches)
+            matches = list(filter(lambda m: contiene(m[1].lower(), palabras), matches))
 
     for url, title, thumb, resto in list(matches)[item.page * perpage:]:
         year = scrapertools.find_single_match(url, '-(\d+)-online/$')

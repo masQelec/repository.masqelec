@@ -175,7 +175,6 @@ def list_all(item):
     descartar_xxx = config.get_setting('descartar_xxx', default=False)
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     matches = re.compile('<div class="col-lg-2 col-md-3 col-6 mb-3">\s*<a(.*?)</a>\s*</div>', re.DOTALL).findall(data)
     for article in matches:
@@ -203,14 +202,13 @@ def temporadas(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     item_id = scrapertools.find_single_match(data, 'data-json=\'\{"item_id": "([^"]+)')
     url = 'https://www.dilo.nu/api/web/seasons.php'
     post = 'item_id=%s' % item_id
     data = jsontools.load(do_downloadpage(url, post=post))
 
-    # averiguar cuantas temporadas hay
+    # cuantas temporadas
     tot_temp = 0
 
     for tempo in data:
@@ -237,9 +235,6 @@ def temporadas(item):
 
     return itemlist
 
-# Si una misma url devuelve los episodios de todas las temporadas, definir rutina tracking_all_episodes para acelerar el scrap en trackingtools.
-# ~ def tracking_all_episodes(item):
-    # ~ return episodios(item)
 
 def episodios(item):
     logger.info()
@@ -252,13 +247,11 @@ def episodios(item):
 
     if not item.item_id:
         data = do_downloadpage(item.url)
-        # ~ logger.debug(data)
         item.item_id = scrapertools.find_single_match(data, 'data-json=\'\{"item_id": "([^"]+)')
 
     url = 'https://www.dilo.nu/api/web/episodes.php'
     post = 'item_id=%s&season_number=%s' % (item.item_id, item.contentSeason)
     data = jsontools.load(do_downloadpage(url, post=post))
-    # ~ logger.debug(data)
 
     for epi in data[item.page * perpage:]:
         titulo = '%sx%s %s' % (epi['season_number'], epi['number'], epi['name'])
@@ -292,7 +285,6 @@ def last_episodes(item):
     perpage = 25
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
@@ -336,21 +328,28 @@ def findvideos(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     patron = '<a href="#" class="[^"]*" data-link="([^"]+)".*?\?domain=([^."]+).*?/languajes/([^.]+).png'
     matches = re.compile(patron, re.DOTALL).findall(data)
+
+    ses = 0
+
     for url, servidor, language in matches:
+        ses += 1
+
         if '/download?' in url:
             server = servertools.corregir_servidor(servidor)
-            if server not in ['uptobox']: continue # limitar a ciertos servidores
+            if server not in ['uptobox']: continue
         else:
             server = scrapertools.find_single_match(url, '/servers/([^.]+)')
-            # ~ logger.debug('%s %s %s' % (url, language, server))
             server = servertools.corregir_servidor(server)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url,
-                              language = IDIOMAS.get(language, language) ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = IDIOMAS.get(language, language) ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -360,10 +359,10 @@ def play(item):
     itemlist = []
 
     data = do_downloadpage(item.url, raise_weberror=False)
-    # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, 'iframe class="" src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, 'a href="([^"]+)" target="_blank" class="player"')
+
     if not url:
         action = scrapertools.find_single_match(data, ' action="([^"]+)')
         token = scrapertools.find_single_match(data, ' name="token" value="([^"]+)')

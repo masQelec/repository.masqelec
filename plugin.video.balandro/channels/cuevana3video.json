@@ -13,5 +13,5 @@
 
   "clusters": ["news", "rankings", "lasts", "kids", "docs", "vos"],
 
-  "notes": "Películas por género, estrenos."
+  "notes": "Películas por géneros, estrenos."
 }

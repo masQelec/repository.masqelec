@@ -5,13 +5,13 @@
 
   "active": true,
 
-  "searchable": false,
+  "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["rankings", "years", "lasts", "producers", "Docs", "kids", "vos"],
+  "clusters": ["rankings", "years", "lasts", "producers", "docs", "kids", "vos"],
 
-  "notes": "Películas por género, por año y Series"
+  "notes": "Películas por géneros, por año y Series"
 }

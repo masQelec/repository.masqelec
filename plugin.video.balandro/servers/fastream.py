@@ -2,12 +2,31 @@
 
 import re
 
-from core import httptools, scrapertools, servertools
 from platformcode import logger
+from core import httptools, scrapertools, servertools
+
+
+def resolve_patterns(page_url):
+    if '/embed-' in page_url:
+        return page_url
+
+    server_parameters = servertools.get_server_parameters("fastream")
+    patterns = server_parameters.get("find_videos", {}).get("patterns")
+
+    for pattern in patterns:
+        for match in re.compile(pattern["pattern"], re.DOTALL).finditer(page_url):
+            url = pattern["url"]
+            for x in range(len(match.groups())):
+                url = url.replace("\\{}".format(x + 1), match.groups()[x])
+
+            page_url = url
+
+    return page_url
 
 
 def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
+
     video_urls = []
 
     if '|' in page_url:
@@ -31,22 +50,16 @@ def get_video_url(page_url, url_referer=''):
     for url in matches:
         if 'referer' in locals():
             url += "|Referer={}".format(referer)
+
         video_urls.append(['.m3u8 ', url])
+
+    if not (len(video_urls)) == 1:
+        return video_urls
+
+    if not 'master.m3u8' in str(video_urls):
+        return video_urls
+
+    video_urls = servertools.get_parse_hls(video_urls)
 
     return video_urls
 
-
-def resolve_patterns(page_url):
-    server_parameters = servertools.get_server_parameters("fastream")
-    patterns = server_parameters.get("find_videos", {}).get("patterns")
-
-    for pattern in patterns:
-        for match in re.compile(pattern["pattern"], re.DOTALL).finditer(page_url):
-            url = pattern["url"]
-
-            for x in range(len(match.groups())):
-                url = url.replace("\\{}".format(x + 1), match.groups()[x])
-
-            page_url = url
-
-    return page_url

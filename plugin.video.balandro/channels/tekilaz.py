@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -26,7 +26,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', grupo = 'Peliculas', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Destacadas', action = 'list_all', url = host + 'category/destacadas/?type=movies', grupo = 'Destacadas', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'category/destacadas/?type=movies', grupo = 'Destacadas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Recomendadas', action = 'list_all', url = host + 'category/peliculas-recomendadas/?type=movies', grupo = 'peliculas recomendadas', search_type = 'movie' ))
 
     itemlist.append(item.clone(action = 'list_all', title = 'Películas clásicas', url = host + 'category/peliculas-clasicas/?type=movies', grupo = 'Peliculas clasicas', search_type = 'movie' ))
@@ -314,7 +314,11 @@ def findvideos(item):
     matches = scrapertools.find_multiple_matches(data, 'href="#options-(.*?)".*?OPCION.*?class="server">(.*?)</span>')
     if not matches: matches = scrapertools.find_multiple_matches(data, 'href="#options-(.*?)".*?OPTION.*?class="server">(.*?)</span>')
 
+    ses = 0
+
     for option, servidor in matches:
+        ses += 1
+
         servidor = servidor.replace(" - ", "-")
 
         language = scrapertools.find_single_match(servidor, '-(.*)').strip()
@@ -343,6 +347,11 @@ def findvideos(item):
 
            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = language,
                                  referer = item.url, other = play_other.capitalize() ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -491,7 +500,7 @@ def languages_flags(data_flags):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.grupo = texto.strip()
         item.url = host + '?s=' + texto.replace(" ", "+")

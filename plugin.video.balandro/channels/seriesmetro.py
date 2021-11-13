@@ -25,7 +25,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone ( title='Catálogo', action ='list_all', url = host + 'series' ))
+    itemlist.append(item.clone ( title='Catálogo', action ='list_all', url = host + 'series/' ))
 
     itemlist.append(item.clone ( title='Por género', action = 'generos' ))
 
@@ -80,6 +80,7 @@ def generos(item):
 
     return itemlist
 
+
 def alfabetico(item):
     logger.info()
     itemlist = []
@@ -109,6 +110,7 @@ def list_all(item):
         if thumb.startswith('//'): thumb = 'https:' + url
         year = scrapertools.find_single_match(article, '<span class="date">(\d+)</span>')
         if not year: year = '-'
+
         plot = scrapertools.find_single_match(article, '<p><p>(.*?)</p>')
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
@@ -153,7 +155,7 @@ def temporadas(item):
     return itemlist
 
 
-#TODO!? limitar episodios a mostrar y no hacer paginación automàtica (menos añadiendo a videoteca) !? Ej: El señor de los cielos (74 episodios temp 1)
+# limitar episodios a mostrar y no hacer paginación automàtica (menos añadiendo a videoteca) !? Ej: El señor de los cielos (74 episodios temp 1)
 def episodios(item): 
     logger.info()
     itemlist = []
@@ -162,25 +164,22 @@ def episodios(item):
 
     post = {'action': 'action_select_season', 'post': item.dpost, 'object': item.dobject, 'season': item.contentSeason}
     data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post)
-    # ~ logger.debug(data)
 
-    # ~ while True:
     for i in range(10):
         matches = scrapertools.find_multiple_matches(data, '<li><a href="([^"]+)"[^>]*>([^<]+)')
         for url, title in matches:
             s_e = scrapertools.find_single_match(title, '(\d+)(?:x|X)(\d+)')
             if not s_e: continue
+
             season = int(s_e[0])
             episode = int(s_e[1])
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, 
-                                        contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
 
         next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="[^"]*page/(\d+)/')
         if next_page:
             post = {'action': 'action_pagination_ep', 'object': item.dobject, 'season': item.contentSeason, 'page': next_page}
             data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post)
-            # ~ logger.debug(data)
         else:
             break
 
@@ -193,10 +192,18 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Español Latino':'Lat', 'Latino':'Lat', 'Español Castellano':'Esp', 'Español':'Esp', 'Sub Latino':'Vose', 'Sub Español':'Vose', 'Sub':'Vose', 'Ingles':'VO'}
+    IDIOMAS = {
+      'Español Latino': 'Lat',
+      'Latino': 'Lat',
+      'Español Castellano': 'Esp',
+      'Español': 'Esp',
+      'Sub Latino': 'Vose',
+      'Sub Español': 'Vose',
+      'Sub': 'Vose',
+      'Ingles':'VO'
+      }
 
     data = do_downloadpage(item.url)
-    # ~ logger.debug(data)
 
     dterm = scrapertools.find_single_match(data, ' data-term="([^"]+)')
     if not dterm: return itemlist
@@ -204,8 +211,7 @@ def findvideos(item):
     matches = scrapertools.find_multiple_matches(data, '<a data-opt="([^"]+)".*?<span class="option">(?:Cload|CinemaUpload) - ([^<]*)')
     for dopt, lang in matches:
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', dterm = dterm, dopt = dopt, url = item.url, 
-                              language = IDIOMAS.get(lang, lang) ))   #, other = dopt
-
+                              language = IDIOMAS.get(lang, lang) ))
 
     return itemlist
 
@@ -216,14 +222,13 @@ def play(item):
 
     post = {'action': 'action_player_series', 'term_id': item.dterm, 'ide': item.dopt}
     data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post, raise_weberror=False)
-    # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, '(?i)<iframe[^>]* src="([^"]+)')
     if not url: return itemlist
+
     url = url.replace('&#038;', '&')
 
     data = do_downloadpage(url, headers={'Referer': item.url}, raise_weberror=False)
-    # ~ logger.debug(data)
 
     url = scrapertools.find_single_match(data, '(?i)<iframe[^>]* src="([^"]+)')
     if not url: return itemlist
@@ -233,16 +238,15 @@ def play(item):
 
     if 'embed.cload' in url:
         data = do_downloadpage(url, headers={'Referer': host}, raise_weberror=False)
-        # ~ logger.debug(data)
+
         if '<div class="g-recaptcha"' in data or 'Solo los humanos pueden ver' in data:
             headers = {'Referer': host, 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X)'}
             data = do_downloadpage(item.url, headers=headers, raise_weberror=False)
-            # ~ logger.debug(data)
+
             new_url = scrapertools.find_single_match(data, '<div id="option-players".*?src="([^"]+)"')
             if new_url:
                 new_url = new_url.replace('/cinemaupload.com/', '/embed.cload.video/')
                 data = do_downloadpage(new_url, raise_weberror=False)
-                # ~ logger.debug(data)
 
         url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
         if url:
@@ -262,6 +266,8 @@ def play(item):
         if 'dailymotion' in url: url = 'https://www.dailymotion.com/' + url.split('/')[-1]
 
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if servidor and servidor != 'directo':
             url = servertools.normalize_url(servidor, url)
             itemlist.append(item.clone( url=url, server=servidor ))
@@ -270,7 +276,7 @@ def play(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_all(item)

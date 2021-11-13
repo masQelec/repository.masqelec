@@ -87,42 +87,60 @@ def list_all(item):
     logger.info()
     itemlist = []
 
+    if not item.page: item.page = 0
+
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="video-item(.*?)"card-content is-block"')
+    matches = scrapertools.find_multiple_matches(data, '<phd-video-item(.*?)</phd-video-item')
 
-    for match in matches:
+    num_matches = len(matches)
+
+    for match in matches[item.page * perpage:]:
         if 'live-video-item">' in match: continue
 
-        url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
+        url = scrapertools.find_single_match(match, 'href="([^"]+)"')
 
         if url:
-            title = scrapertools.find_single_match(match, '<img alt="(.*?)"').strip()
+            title = scrapertools.find_single_match(match, 'img.*?alt="(.*?)"').strip()
 
             thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-            if url.startswith('/') == True: url = host2 + url
+            if url.startswith('/') == True:
+               if '/videos/' in url:
+                   url = host + url
+               else:
+                   url = host2 + url
 
             if thumb.startswith('//') == True: thumb = 'https:' + thumb
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title ))
 
-    if itemlist:
-       if not 'pager next disabled' in data:
-           if '<a class="pagination-next"' in data:
-               if 'page=' in item.url:
-                   if '/?page=' in item.url: active_page = item.url.split("/?page=")[1]
-                   else: active_page = item.url.split("&page=")[1]
+            if len(itemlist) >= perpage: break
 
-                   if '/?page=' in item.url: next_url = item.url.replace('/?page=' + active_page, '')
-                   else: next_url = item.url.replace('&page=' + active_page, '')
+    buscar_next = True
+    if num_matches > perpage:
+        hasta = (item.page * perpage) + perpage
+        if hasta < num_matches:
+            itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, pagina = item.pagina, action='list_all', text_color='coral' ))
+            buscar_next = False
 
-                   next_page = int(active_page) + 1
+    if buscar_next:
+       if itemlist:
+          if not 'pager next disabled' in data:
+              if '<a class="pagination-next"' in data:
+                  if 'page=' in item.url:
+                      if '/?page=' in item.url: active_page = item.url.split("/?page=")[1]
+                      else: active_page = item.url.split("&page=")[1]
 
-                   if '/?page=' in item.url: next_url = next_url + '/?page=' + str(next_page)
-                   else: next_url = next_url + '&page=' + str(next_page)
+                      if '/?page=' in item.url: next_url = item.url.replace('/?page=' + active_page, '')
+                      else: next_url = item.url.replace('&page=' + active_page, '')
 
-                   itemlist.append(item.clone(title = ">> Página siguiente", url = next_url, action = 'list_all', text_color='coral'))
+                      next_page = int(active_page) + 1
+
+                      if '/?page=' in item.url: next_url = next_url + '/?page=' + str(next_page)
+                      else: next_url = next_url + '&page=' + str(next_page)
+
+                      itemlist.append(item.clone(title = ">> Página siguiente", url = next_url, page = 0, action = 'list_all', text_color='coral'))
 
     return itemlist
 
@@ -148,7 +166,7 @@ def list_canales(item):
 
         if not url: continue
 
-        title = scrapertools.find_single_match(match, '<img alt="(.*?)"')
+        title = scrapertools.find_single_match(match, 'img.*?alt="(.*?)"')
 
         if 'data-src=' in match: thumb = scrapertools.find_single_match(match, 'data-src="([^"]+)"')
         else: thumb = scrapertools.find_single_match(match, 'src="([^"]+)"')
@@ -186,7 +204,7 @@ def list_categorias(item):
 
         if not url: continue
 
-        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+        title = scrapertools.find_single_match(match, 'img.*?alt="(.*?)"')
 
         if 'data-src=' in match: thumb = scrapertools.find_single_match(match, 'data-src="([^"]+)"')
         else: thumb = scrapertools.find_single_match(match, 'src="([^"]+)"')

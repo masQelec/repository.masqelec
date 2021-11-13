@@ -173,7 +173,11 @@ def findvideos(item):
 
     videos = eval(scrapertools.find_single_match(data, "var videos = (\[.*?);"))
 
+    ses = 0
+
     for datos in videos:
+        ses += 1
+
         servidor = datos[0]
         servidor = servidor.lower()
 
@@ -196,6 +200,11 @@ def findvideos(item):
             servidor = servertools.corregir_servidor(servidor)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose' ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

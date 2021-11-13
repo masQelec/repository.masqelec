@@ -1,20 +1,34 @@
 # -*- coding: utf-8 -*-
 
-from core import httptools, scrapertools, jsontools
 from platformcode import logger
+from core import httptools, scrapertools
 from lib import balandroresolver
 
 def get_video_url(page_url, url_referer=''):
     logger.info("url=" + page_url)
+
     video_urls = []
-    
-    vid = scrapertools.find_single_match(page_url, "uptobox.com/(?:iframe/|)([A-z0-9]+)")
+
+    page_url = page_url.replace('/uptobox/', '/uptobox.com/')
+
+    vid = scrapertools.find_single_match(page_url, "(?:uptobox.com/|uptostream.com/)(?:iframe/|)([A-z0-9]+)")
     if not vid: return video_urls
-    data = httptools.downloadpage('https://uptostream.com/api/streaming/source/get?token=null&file_code='+vid).data
-    matches = balandroresolver.decode_video_uptostream(data)
-    for match in matches:
-        lbl = match.get('label')
-        url = match.get('src')
-        video_urls.append([lbl, url])
+
+    try:
+       video_urls = balandroresolver.resolve_uptobox().getLink(vid, video_urls)
+    except Exception as e:
+       if '150 minutos' in e:
+           return "Debes esperar 150 minutos para poder reproducir"
+       elif 'Unfortunately, the file you want is not available' in e or 'Unfortunately, the video you want to see is not available' in e or 'This stream doesn' in e or 'Page not found' in e or 'Archivo no encontrado' in e:
+           return "El archivo no existe o ha sido borrado"
+       elif "'str' object has no attribute 'get'":
+           return video_urls
+
+       return "Acceso temporalmente restringido"
+
+    except:
+       import traceback
+       logger.error(traceback.format_exc(1))
+
     return video_urls
 

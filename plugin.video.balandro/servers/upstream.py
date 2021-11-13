@@ -4,20 +4,25 @@ from core import httptools, scrapertools
 from platformcode import logger, platformtools
 from lib import jsunpack
 
+
 def get_video_url(page_url, url_referer=''):
     logger.info("url=" + page_url)
     video_urls = []
 
-    if 'embed-' not in page_url: page_url = page_url.replace('upstream.to/', 'upstream.to/embed-') + '.html'
+    if 'embed-' not in page_url:
+        page_url = page_url.replace('upstream.to/', 'upstream.to/embed-') + '.html'
 
     data = httptools.downloadpage(page_url).data
-    # ~ logger.debug(data)
+
+    if '"title">File Not Found</div>' in data or 'player_blank.jpg' in data or 'assets/images/image-404.png' in data:
+        return  "El archivo no existe o ha sido borrado"
+    elif '_msg">File was locked by administrator</div>' in data:
+        return  "El archivo está bloqueado"
 
     if 'sources:' not in data:
         packed = scrapertools.find_single_match(data, "eval\((function\(p,a,c,k,e,d.*?)\)\s*</script>")
         if not packed: return video_urls
         data = jsunpack.unpack(packed)
-        # ~ logger.debug(data)
 
     bloque = scrapertools.find_single_match(data, 'sources:\s*\[(.*?)\]')
 
@@ -35,7 +40,6 @@ def get_video_url(page_url, url_referer=''):
         url = scrapertools.find_single_match(bloque, '"(http.*?)"')
         if url and 'm3u8' in url:
             data = httptools.downloadpage(url, headers={'Referer': page_url}).data
-            # ~ logger.debug(data)
 
             matches = scrapertools.find_multiple_matches(data, 'RESOLUTION=\d+x(\d+).*?(http.*?\.m3u8)')
             if matches:
@@ -45,5 +49,5 @@ def get_video_url(page_url, url_referer=''):
 
         elif url and 'mp4' in url:
             video_urls.append(['mp4', url])
-    logger.info(video_urls)
+
     return video_urls

@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["vo"],
 
-  "clusters": ["adults", "news", "rankings", "categories", "stars", "vos"],
+  "clusters": ["adults"],
 
   "notes": "Videos en Version Original para Adultos +18"
 }

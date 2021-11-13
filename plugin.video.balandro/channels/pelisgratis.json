@@ -13,5 +13,5 @@
 
   "clusters": ["news", "languages", "qualityes", "years", "kids", "docs", "vos"],
 
-  "notes": "Acceso por separado a Castellano, Latino y Subtitulado. Películas por género, año y calidad. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Acceso por separado a Castellano, Latino y Subtitulado. Películas por géneros, año y calidad. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

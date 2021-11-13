@@ -6,7 +6,20 @@ from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
-host = 'https://www.pelispedia.de/'
+
+host = 'https://pelispedia.co/'
+
+
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    url = url.replace('/www.pelispedia.de/', '/pelispedia.co/')
+
+    if '/release/' in url:
+        raise_weberror = False
+
+    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    return data
 
 
 def mainlist(item):
@@ -123,8 +136,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url, raise_weberror=False).data
-    # ~ logger.debug(data)
+    data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
 
@@ -182,7 +194,7 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, 'click="tab = ' + "'season-(.*?)'" + '">T(.*?)</button>')
     for nro_temp, tempo in matches:
@@ -206,10 +218,6 @@ def temporadas(item):
     return itemlist
 
 
-# Si una misma url devuelve los episodios de todas las temporadas, definir rutina tracking_all_episodes para acelerar el scrap en trackingtools.
-# ~ def tracking_all_episodes(item):
-    # ~ return episodios(item)
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -217,8 +225,7 @@ def episodios(item):
     if not item.page: item.page = 0
     perpage = 50
 
-    data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
+    data = do_downloadpage(item.url)
 
     tempo = scrapertools.find_single_match(data, 'x-show="tab === ' + "'season-" + str(item.nrotemp) + '(.*?)</div>')
 
@@ -250,21 +257,20 @@ def episodios(item):
     return itemlist
 
 
-# Asignar un numérico según las calidades del canal, para poder ordenar por este valor
 def puntuar_calidad(txt):
     txt = txt.replace(' ', '').replace('-', '').lower()
     orden = ['cam', 'tsscreener', 'brscreener', 'sd240p', 'sd480p', 'dvdrip', 'hd', 'hdrip', 'hd720p', 'hd1080p']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
+
 def corregir_servidor(servidor):
-    # ~ 'streams3' no se ha conseguido
     servidor = servertools.corregir_servidor(servidor)
     if servidor == 'fcom': return 'fembed'
     elif servidor in ['mp4', 'api', 'drive']: return 'gvideo'
-    elif servidor == 'streamcrypt': return ''
     elif servidor in ['stream', 'stream-mx', 'stream mx', 'streammx', 'mx server']: return 'directo'
     else: return servidor
+
 
 def findvideos(item):
     logger.info()
@@ -281,8 +287,7 @@ def findvideos(item):
        'ingles': 'VO'
        }
 
-    data = httptools.downloadpage(item.url).data
-    # ~ logger.debug(data)
+    data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, '<div class="op-srv brd1"(.*?)</div>')
 
@@ -319,7 +324,12 @@ def play(item):
         url_b64 = url_b64.replace('&#038;', '&').replace('&amp;', '&')
 
         data = httptools.downloadpage(url_b64, raise_weberror = False).data
-        # ~ logger.debug(data)
+
+        if '.bayfiles.' in data or '.anonfiles.' in data:
+            new_url = scrapertools.find_single_match(data, '<a type="button" id="download-url".*?href="(.*?)"')
+            if new_url:
+               itemlist.append(item.clone(server = 'directo', url = new_url))
+               return itemlist
 
         new_url = scrapertools.find_single_match(data, '<h1 class.*?<a href="(.*?)"')
         if not new_url: new_url = scrapertools.find_single_match(data, ' src="(.*?)"')
@@ -334,7 +344,6 @@ def play(item):
 
                 url = 'https://stream-mx.com/player.php?id=%s&v=2&ver=si' % fid
                 data = httptools.downloadpage(url, headers={'Referer': new_url}).data
-                # ~ logger.debug(data)
 
                 bloque = scrapertools.find_single_match(data, '"sources":\s*\[(.*?)\]')
                 for enlace in scrapertools.find_multiple_matches(bloque, "\{(.*?)\}"):
@@ -367,13 +376,22 @@ def play(item):
             if url.startswith('http'): break
 
         if not url.startswith('http'): url = None
+
+    elif url.startswith('https://streamcrypt.net/'):
+        url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
+        if url:
+            url = url.replace('?id=', '?p=2&id=')
+            url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
+        else:
+            data = do_downloadpage(url)
+            url = scrapertools.find_single_match(data, "window.open.*?'(.*?)'")
+
     else:
         item.url = item.url.replace('&#038;', '&').replace('&amp;', '&')
         resp = httptools.downloadpage(item.url, headers={'Referer': item.referer}, follow_redirects=False)
         if 'location' in resp.headers: 
             url = resp.headers['location']
         else:
-            # ~ logger.debug(resp.data)
             url = scrapertools.find_single_match(resp.data, "src='([^']+)")
             if not url: url = scrapertools.find_single_match(resp.data, 'src="([^"]+)')
             if not url: url = scrapertools.find_single_match(resp.data, 'src=([^ >]+)')
@@ -381,15 +399,17 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if servidor and servidor != 'directo':
             url = servertools.normalize_url(servidor, url)
-            itemlist.append(item.clone( url=url, server=servidor ))
+            itemlist.append(item.clone(url=url, server=servidor))
 
     return itemlist
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
         return list_all(item)

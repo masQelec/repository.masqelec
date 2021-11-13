@@ -13,7 +13,7 @@ def get_video_url(page_url, url_referer=''):
 
     if "Page not found" in data or "File was deleted" in data:
         return 'El archivo no existe o ha sido borrado'
-    elif "processing" in data:
+    elif "processing" in data or 'Video encoding error' in data:
         return 'El archivo no está disponible'
 
     s = scrapertools.find_single_match(data, 'sourcesCode\s*:\s*(\[\{.*?\}\])')

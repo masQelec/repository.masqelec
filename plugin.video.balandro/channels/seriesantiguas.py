@@ -95,7 +95,7 @@ def temporadas(item):
     bloque = scrapertools.find_single_match(data, '>Temporadas<(.*?)</ul></li>')
     matches = scrapertools.find_multiple_matches(bloque, "<a href='(.*?)'>Temp (.*?)</a>")
 
-    # averiguar cuantas temporadas hay
+    # cuantas temporadas
     tot_temp = 0
 
     for url, numtempo in matches:
@@ -177,6 +177,8 @@ def findvideos(item):
         url = url.replace('&amp;', '&')
 
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         url = servertools.normalize_url(servidor, url)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Lat' ))

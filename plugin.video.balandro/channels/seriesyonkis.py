@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -10,8 +10,20 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://seriesyonkis.cc/'
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('seriesyonkis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
     return data
 
 
@@ -23,6 +35,8 @@ def mainlist(item):
     itemlist.append(item.clone ( title = 'Series', action = 'mainlist_series' ))
 
     itemlist.append(item.clone ( title = 'Buscar ...', action = 'search', search_type = 'all' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -43,6 +57,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
+    itemlist.append(item_configurar_proxies(item))
+
     return itemlist
 
 
@@ -61,6 +77,8 @@ def mainlist_series(item):
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
     itemlist.append(item.clone ( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -224,7 +242,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, 'data-tplayernv="(.*?)".*?</img></span>(.*?)</span>')
 
+    ses = 0
+
     for opt, lang in matches:
+        ses += 1
+
         lang = lang.strip()
 
         url = scrapertools.find_single_match(data, 'id="' + str(opt) + '".*?<iframe.*?src="(.*?)"')
@@ -259,7 +281,7 @@ def findvideos(item):
                     matches2 = scrapertools.find_multiple_matches(data3, "go_to_player.*?'(.*?)'.*?<span>(.*?)</span>.*?<p>(.*?)-.*?</p>")
 
                     for url, servidor, lng in matches2:
-                        servidor = servidor.replace('.com', '').replace('.net', '').replace('.cc', '').replace('.to', '')
+                        servidor = servidor.replace('.com', '').replace('.net', '').replace('.cc', '').replace('.to', '').replace('.sx', '')
 
                         lng = lng.strip()
                         if lng == 'Espanol': lng = 'Esp'
@@ -268,6 +290,11 @@ def findvideos(item):
                         elif lng == 'Ingles': lng = 'VO'
 
                         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lng ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -281,8 +308,12 @@ def play(item):
     url = item.url
 
     if item.server == 'directo':
-        data = do_downloadpage(item.url)
-        url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+           data = do_downloadpage(url)
+           url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
     else:
         if 'pelispluss' in url:
             vid = scrapertools.find_single_match(url, 'h=(.*?)$')
@@ -299,6 +330,8 @@ def play(item):
         if url.startswith('//'): url = 'https:' + url
 
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if servidor:
             url = servertools.normalize_url(servidor, url)
             itemlist.append(item.clone( url=url, server=servidor ))

@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -122,24 +122,32 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, patron)
 
+    ses = 0
+
     for lang, qlty, url in matches:
+        ses += 1
+
         url = url.replace('https://www.google.com/s2/favicons?domain=', '')
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu' in url:
-            continue
+        if '/hqq.' in url or '/waaw.' in url or '/netu' in url: continue
 
         if servidor:
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
                                   language = IDIOMAS.get(lang, lang), quality = qlty ))
 
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
+
     return itemlist
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         item.url = host + 'buscar/?q=' + texto.replace(" ", "+")
         return list_all(item)

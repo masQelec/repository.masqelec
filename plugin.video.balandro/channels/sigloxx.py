@@ -40,7 +40,6 @@ def sagas(item):
     bloque = scrapertools.find_single_match(data, '>Sagas</h2>(.*?)</main>')
 
     matches = scrapertools.find_multiple_matches(bloque, '.*?<a href="(.*?)".*?title="(.*?)"')
-    logger.info("check-000-sxx: %s" % bloque)
 
     for url, title in matches:
         if not title: continue
@@ -166,24 +165,14 @@ def findvideos(item):
 
     if url:
            servidor = servertools.get_server_from_url(url)
+           servidor = servertools.corregir_servidor(servidor)
+
            if servidor and servidor != 'directo':
                url = servertools.normalize_url(servidor, url)
 
                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, language = 'Esp', url = url ))
 
     return itemlist
-
-
-def search(item, texto):
-    logger.info()
-    try:
-        item.url = host + '?s=' + texto.replace(" ", "+")
-        return list_search(item)
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
 
 
 def list_search(item):
@@ -204,3 +193,15 @@ def list_search(item):
                                     contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
 
     return itemlist
+
+
+def search(item, texto):
+    logger.info()
+    try:
+        item.url = host + '?s=' + texto.replace(" ", "+")
+        return list_search(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []

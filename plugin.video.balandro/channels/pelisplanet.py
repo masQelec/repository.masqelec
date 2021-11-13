@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -165,7 +165,11 @@ def findvideos(item):
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
+    ses = 0
+
     for url, lang, servidor in matches:
+        ses += 1
+
         servidor = servidor.lower().strip()
 
         if servidor == 'streamvips': continue
@@ -173,12 +177,22 @@ def findvideos(item):
 
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
         elif '.mystream' in url: continue
+        elif '.rapidvideo' in url: continue
+        elif 'streamango.' in url: continue
+        elif 'openload.' in url: continue
+
+        if url.startswith('ttps://') == True: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         if servidor:
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -200,7 +214,7 @@ def sub_search(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         texto = texto.replace(" ", "+")
         item.url = host + 'search/' + texto +'/'

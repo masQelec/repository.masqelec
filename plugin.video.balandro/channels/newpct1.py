@@ -3,8 +3,9 @@
 import sys
 
 if sys.version_info[0] < 3:
-    pass
+    PY3 = False
 else:
+    PY3 = True
     unicode = str
 
 
@@ -15,9 +16,9 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://pctmix1.com/'
+host = 'https://atomixhq.com/'
 
-clon_name = 'Pctmix'
+clon_name = 'Atomix'
 
 perpage = 20
 
@@ -25,13 +26,10 @@ color_list_proxies = config.get_setting('channels_list_proxies_color', default='
 
 
 CLONES = [
-   ['pctmix', 'https://pctmix1.com/', 'movie, tvshow', 'pctmix.jpg'],
-   ['pctreload', 'https://pctreload1.com/', 'movie, tvshow', 'pctreload.png'],
-   ['maxitorrent', 'https://maxitorrent.com/', 'movie, tvshow', 'maxitorrent.jpg'],
+   ['atomix', 'https://atomixhq.com/', 'movie, tvshow', 'atomixhq.png'],
    ['descargas2020', 'https://descargas2020.net/', 'movie', 'descargas2020.jpg']
    ]
 
-# ~ 'maxitorrent'    los .torrent disparan a 'pctreload'  pueden requerir proxies
 # ~ 'descargas2020'  prescindimos de series y buscar      sin proxies
 
 # ~ Para una misma peli/serie no siempre hay uno sólo enlace, pueden ser múltiples. La videoteca de momento no está preparada para acumular
@@ -54,10 +52,13 @@ def configurar_proxies(item):
 
 def do_downloadpage(item, url, post=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/pctmix.com/', '/pctmix1.com/')
-    url = url.replace('/pctreload.com/', '/pctreload1.com/')
+    url = url.replace('/pctmix.com/', '/atomixhq.com/')
+    url = url.replace('/pctmix1.com/', '/atomixhq.com/')
+    url = url.replace('/pctreload.com/', '/atomixhq.com/')
+    url = url.replace('/pctreload1.com/', '/atomixhq.com/')
+    url = url.replace('/maxitorrent.com/', '/atomixhq.com/')
 
-    # ~ primer intento sin proxies
+    # ~ intento sin proxies
     data = ''
 
     try:
@@ -120,13 +121,13 @@ def mainlist_pelis_clon(item):
 
     enlaces = [
         ['Estrenos', 'estrenos-de-cine/'],
-        ['Castellano', 'peliculas/'],
-        ['Latino', 'peliculas-latino/'],
+        ['En castellano', 'peliculas/'],
+        ['En latino', 'peliculas-latino/'],
         # - ['Películas en Subtitulado', 'peliculas-vo/'],
         ['En HD', 'peliculas-hd/'],
-        ['En HD FullBluRay 1080p', 'peliculas-hd/fullbluray-1080p/'],
-        ['En HD BluRay 1080p', 'peliculas-hd/bluray-1080p/'],
-        ['En HD MicroHD 1080p', 'peliculas-hd/microhd-1080p/'],
+        ['En HD FullBluRay', 'peliculas-hd/fullbluray-1080p/'],
+        ['En HD BluRay', 'peliculas-hd/bluray-1080p/'],
+        ['En HD MicroHD', 'peliculas-hd/microhd-1080p/'],
         ['En X264', 'peliculas-x264-mkv/'],
         ['En 4K UltraHD', 'peliculas-hd/4kultrahd/'],
         ['En 4K UHDremux', 'peliculas-hd/4k-uhdremux/'],
@@ -141,8 +142,8 @@ def mainlist_pelis_clon(item):
         item.url += 'categoria/'
         enlaces = [
             ['Estrenos', 'estrenos-de-cine/'],
-            ['Castellano', 'peliculas-castellano/'],
-            ['Latino', 'peliculas-latino/'],
+            ['En castellano', 'peliculas-castellano/'],
+            ['En latino', 'peliculas-latino/'],
             ['En HD', 'peliculas-hd/'],
             ['En X264', 'peliculas-x264-mkv/'],
             ['En Rip', 'peliculas-rip/'],
@@ -256,6 +257,7 @@ def list_all(item):
 
         title = limpiar_titulo(title, quitar_sufijo)
         titulo = title
+
         if item.search_type == 'tvshow':
             m = re.match(r"^(.*?) - (Temporada \d+) Capitulo \d*", title)
             if not m:
@@ -291,7 +293,6 @@ def list_all(item):
     return itemlist
 
 
-# Devuelve los episodios de todas las temporadas para scrap en trackingtools
 def tracking_all_episodes(item):
     itemlist = episodios(item)
     while itemlist[-1].title == '>> Página siguiente':
@@ -335,9 +336,11 @@ def episodios(item):
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
+
         title = scrapertools.find_single_match(article, '<strong[^>]*>(.*?)</strong>')
         if title == '':
             title = scrapertools.find_single_match(article, '<h2[^>]*>(.*?)</h2>')
+
         title = scrapertools.htmlclean(title)
 
         show, season, episode = extrae_show_s_e(title)
@@ -379,7 +382,7 @@ def findvideos(item):
 
     data = do_downloadpage(item, item.url)
 
-    # Enlace torrent
+    # torrent
     calidad = ''
     idioma = ''
 
@@ -416,7 +419,7 @@ def findvideos(item):
             itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
                                                          language = idioma, quality = calidad, other = tamano ))
 
-    # Enlaces streaming con idioma y calidad
+    # streaming
     patron = '<div class="box2">([^<]+)</div>\s*<div class="box3">([^<]+)</div>\s*<div class="box4">([^<]+)</div>'
     patron += '\s*<div class="box5"><a href=\'([^\']+)[^>]+>([^<]+)'
 
@@ -435,7 +438,7 @@ def findvideos(item):
         itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = servidor,
                                                      language = extrae_idioma(idioma), quality = calidad ))
 
-    # Otros Enlaces
+    # Otros
     if not matches:
         patron = '<div class="box2">(.*?)</div>.*?<div class="box3">(.*?)</div>.*?<div class="box4">(.*?)</div>.*?<div class="box5">.*?'
         patron += "<a href='(.*?)'"
@@ -462,14 +465,33 @@ def play(item):
     itemlist = []
 
     if item.url.endswith('.torrent'):
-        if config.get_setting('proxies', item.channel, default=''):
+        if '/atomtt.com/' in item.url:
+            item.url = item.url.replace('/download/', '/download-link/').replace('.torrent', '')
+
+            if config.get_setting('proxies', item.channel, default=''):
+                data = do_downloadpage(item, item.url)
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                if PY3 and not isinstance(file_local, bytes): file_local = file_local.encode('utf-8')
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            else:
+                itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+
+        else:
             data = do_downloadpage(item, item.url)
 
-            file_local = os.path.join(config.get_data_path(), "temp.torrent")
-            with open(file_local, 'wb') as f: f.write(data); f.close()
-            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
-        else:
-            itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+            new_url = scrapertools.find_single_match(data, 'window.location.href.*?"(.*?)"')
+            if new_url:
+                if config.get_setting('proxies', item.channel, default=''):
+                    data = do_downloadpage(item, new_url)
+
+                    file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                    if PY3 and not isinstance(file_local, bytes): file_local = file_local.encode('utf-8')
+                    with open(file_local, 'wb') as f: f.write(data); f.close()
+                    itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+                else:
+                    itemlist.append(item.clone( url = new_url, server = 'torrent' ))
 
     else:
         itemlist.append(item.clone( url= item.url, server = item.server ))
@@ -478,7 +500,7 @@ def play(item):
 
 
 def busqueda(item):
-    logger.info(item)
+    logger.info()
     itemlist = []
 
     post = 'categoryIDR=&categoryID=&idioma=&calidad=&ordenar=Fecha&inon=Descendente&s=%s&pg=%d' % (item.busca_texto, item.busca_pagina)
@@ -498,7 +520,7 @@ def busqueda(item):
 
         is_tvshow = '/serie' in url or '/descargar-serie' in url
         if (item.search_type == 'tvshow' and not is_tvshow) or (item.search_type == 'movie' and is_tvshow): continue
-        if url in [it.url for it in itemlist]: continue # descartar urls duplicadas
+        if url in [it.url for it in itemlist]: continue
 
         title = unicode(tname, 'unicode-escape', 'ignore').encode('utf8')
 
@@ -542,7 +564,7 @@ def busqueda(item):
 
 
 def search(item, texto):
-    logger.info("texto: %s" % texto)
+    logger.info()
     try:
         if item.url == '': item.url = host
         item.url += 'get/result/'

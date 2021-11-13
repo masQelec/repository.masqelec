@@ -1,6 +1,6 @@
 {
   "id": "inkapelis",
-  "name": "Inkapelis",
+  "name": "InkaPelis",
   "thumbnail": "inkapelis.jpg",
 
   "active": true,
@@ -13,5 +13,5 @@
 
   "clusters": ["news", "rankings", "languages", "years", "lasts", "kids", "docs", "vos"],
 
-  "notes": "Películas y Series, por género, por año, por idioma, ..."
+  "notes": "Películas y Series, por géneros, año, idioma, etc."
 }

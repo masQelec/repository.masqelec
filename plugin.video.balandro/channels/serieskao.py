@@ -30,7 +30,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'pelicula/', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'pelicula/estrenos/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Mejor valoradas', action = 'list_all', url = host + 'pelicula/mejor-valoradas/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Má valoradas', action = 'list_all', url = host + 'pelicula/mejor-valoradas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -96,9 +96,8 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    # Subpaginación interna y/o paginación de la web
     buscar_next = True
-    if num_matches > perpage: # subpaginación interna dentro de la página si hay demasiados items
+    if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
             itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
@@ -249,9 +248,8 @@ def last_episodes(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    # Subpaginación interna y/o paginación de la web
     buscar_next = True
-    if num_matches > perpage: # subpaginación interna dentro de la página si hay demasiados items
+    if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
             itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
@@ -278,7 +276,11 @@ def findvideos(item):
     items_patron = "<li class=\"dooplay_player_option\" data-type='([^']+)' data-post='(\d+)' data-nume='(\d+)'"
     items_matches = re.compile(items_patron, re.DOTALL).findall(data)
 
+    ses = 0
+
     for datatype, datapost, datanume in items_matches:
+        ses += 1
+
         if not datatype or not datapost or not datanume: continue
 
         post = {'action': 'doo_player_ajax', 'post': datapost, 'nume': datanume, 'type': datatype}
@@ -299,15 +301,16 @@ def findvideos(item):
             if url:
                 other = ''
                 if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaocentro.net' in url: other = 'kplayer'
                 elif 'kaodrive/embed.php' in url: other = 'amazon'
                 elif 'hydrax.com' in url: other = 'hydrax'
                 elif '.xyz/v/' in url: other = 'fembed'
 
-                if other == '':
+                if not other:
                     other = servertools.get_server_from_url(url)
                     other = servertools.corregir_servidor(other)
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = url, other = other.capitalize() ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = url, other = other ))
                 return itemlist
 
         for lang, b64url in matches:
@@ -320,16 +323,22 @@ def findvideos(item):
             if url:
                 other = ''
                 if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaocentro.net' in url: other = 'kplayer'
                 elif 'kaodrive/embed.php' in url: other = 'amazon'
                 elif 'hydrax.com' in url: other = 'hydrax'
                 elif '.xyz/v/' in url: other = 'fembed'
 
-                if other == '':
+                if not other:
                     other = servertools.get_server_from_url(url)
                     other = servertools.corregir_servidor(other)
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = url,
-                                      language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
+                lng = IDIOMAS.get(lang, lang)
+                itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = url, language = lng, other = other ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -340,7 +349,7 @@ def play(item):
 
     url = item.url
 
-    if '.animekao.club/embed' in url:
+    if '.animekao.club/embed' in url or '.kaocentro.net/embed' in url:
         from lib import jsunpack
         sdata = httptools.downloadpage(url).data
 
@@ -382,6 +391,7 @@ def play(item):
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
         itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist

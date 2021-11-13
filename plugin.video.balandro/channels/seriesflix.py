@@ -6,16 +6,30 @@ from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
-host = 'https://seriesflix.nu/'
+host = 'https://seriesflix.la/'
 
 perpage = 24
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/seriesflix.to/', '/seriesflix.nu/')
+    url = url.replace('/seriesflix.to/', '/seriesflix.la/')
+    url = url.replace('/seriesflix.nu/', '/seriesflix.la/')
 
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    headers = {'Referer': host}
+
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage_proxy('seriesflix', url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
@@ -23,7 +37,8 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                data = httptools.downloadpage(url, post=post, headers=headers).data
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+                data = httptools.downloadpage_proxy('seriesflix', url, post=post, headers=headers).data
         except:
             pass
 
@@ -46,6 +61,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -286,6 +303,9 @@ def findvideos(item):
 
         servidor = corregir_servidor(scrapertools.find_single_match(match, '-dns">(.*?)</p>'))
 
+        if servidor == 'server':
+            servidor = 'directo'
+
         url = host + '?trembed=%s&trid=%s&trtype=2' % (data_key, data_id)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
@@ -298,10 +318,15 @@ def play(item):
     logger.info()
     itemlist = []
 
+    item.url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
+
     data = do_downloadpage(item.url)
 
     url = scrapertools.find_single_match(data, 'src="([^"]+)"')
     if url.startswith('/'): url = host + url[1:]
+
+    if item.server == 'directo':
+        url = scrapertools.find_single_match(data, '<div class="Video"><iframe.*?src="(.*?)"')
 
     if '/flixplayer.' in url:
         data = do_downloadpage(url)
@@ -317,6 +342,8 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         url = servertools.normalize_url(servidor, url)
         itemlist.append(item.clone( url = url, server = servidor ))
 

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import xbmcgui
+import os, xbmc, xbmcgui
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import channeltools, scrapertools
+
 
 color_list_prefe = config.get_setting('channels_list_prefe_color', default='gold')
 color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
@@ -19,12 +20,14 @@ color_exec  = config.get_setting('notification_exec_color', default='cyan')
 cfg_search_excluded_movies = 'search_excludes_movies'
 cfg_search_excluded_tvshows = 'search_excludes_tvshows'
 cfg_search_excluded_documentaries = 'search_excludes_documentaries'
+cfg_search_excluded_torrents = 'search_excludes_torrents'
 cfg_search_excluded_mixed = 'search_excludes_mixed'
 cfg_search_excluded_all = 'search_excludes_all'
 
 channels_search_excluded_movies = config.get_setting(cfg_search_excluded_movies, default='')
 channels_search_excluded_tvshows = config.get_setting(cfg_search_excluded_tvshows, default='')
 channels_search_excluded_documentaries = config.get_setting(cfg_search_excluded_documentaries, default='')
+channels_search_excluded_torrents = config.get_setting(cfg_search_excluded_torrents, default='')
 channels_search_excluded_mixed = config.get_setting(cfg_search_excluded_mixed, default='')
 channels_search_excluded_all = config.get_setting(cfg_search_excluded_all, default='')
 
@@ -50,6 +53,7 @@ def mainlist(item):
     itemlist.append(item.clone( action = 'channels_excluded', title='Excluir canales en las búsquedas de Películas', extra = 'movies', folder = False ))
     itemlist.append(item.clone( action = 'channels_excluded', title='Excluir canales en las búsquedas de Series', extra = 'tvshows', folder = False ))
     itemlist.append(item.clone( action = 'channels_excluded', title='Excluir canales en las búsquedas de Documentales', extra = 'documentaries', folder = False ))
+    itemlist.append(item.clone( action = 'channels_excluded', title='Excluir canales en las búsquedas de Torrents', extra = 'torrents', folder = False ))
 
     if config.get_setting('channels_link_main', default=True):
         itemlist.append(item.clone( action = 'channels_excluded', title='Excluir canales en las búsquedas de Películas, Series y Documentales', extra = 'all', folder = False ))
@@ -66,6 +70,9 @@ def mainlist(item):
 
     if channels_search_excluded_documentaries:
         itemlist.append(item.clone( title = 'Anular las exclusiones para Documentales', action = 'channels_excluded_del', extra = 'documentaries', folder = False, text_color='coral' ))
+
+    if channels_search_excluded_torrents:
+        itemlist.append(item.clone( title = 'Anular las exclusiones para Torrents', action = 'channels_excluded_del', extra = 'torrents', folder = False, text_color='coral' ))
 
     if config.get_setting('channels_link_main', default=True):
         if channels_search_excluded_all or tot_opt_anular > 1:
@@ -116,16 +123,16 @@ def only_animes(item):
 
         if ch['searchable'] == False:
             tipos = str(tipos).replace('movie', 'Vídeos')
-            tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series')
+            tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('all,', '').strip()
         else:
-            tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '')
+            tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '').strip()
 
         if info: info = info + '  '
         info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
-        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose')
+        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
         if info: info = info + '  '
         info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
@@ -181,20 +188,23 @@ def only_adults(item):
         if config.get_setting(cfg_proxies_channel, default=''):
             info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
+        if '+18' in ch['notes']:
+            info = info + '[B][COLOR pink] %s [/B][/COLOR]' % '+18'
+
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
 
         if ch['searchable'] == False:
             tipos = str(tipos).replace('movie', 'Vídeos')
         else:
-            tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '')
+            tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '').strip()
 
         if info: info = info + '  '
         info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
-        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose')
+        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
         if info: info = info + '  '
         info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
@@ -270,14 +280,14 @@ def with_proxies(item):
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
-        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '')
+        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '').strip()
 
         if info: info = info + '  '
         info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
-        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose')
+        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
         if info: info = info + '  '
         info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
@@ -299,28 +309,34 @@ def with_proxies(item):
 def no_actives(item):
     logger.info()
 
-    cabecera = 'Canales Desactivados'
-    filtros = {'searchable': True}
+    if item.no_searchables:
+        cabecera = 'Canales que Nunca intervendrán en las búsquedas'
+        filtros = {'searchable': False}
+    else:
+        cabecera = 'Canales Desactivados'
+        filtros = {'searchable': True}
 
     opciones_channels = []
     canales_no_actives = []
 
     ch_list = channeltools.get_channels_list(filtros=filtros)
 
-    i = 0
+    if not item.no_searchables:
+        i = 0
+        for ch in ch_list:
+            if not ch['status'] == -1:
+                continue
+
+            i =+1
+
+        if i == 0:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales desactivados[/B][/COLOR]' % color_adver)
+            return
+
     for ch in ch_list:
-        if not ch['status'] == -1:
-            continue
-
-        i =+1
-
-    if i == 0:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales desactivados[/B][/COLOR]' % color_adver)
-        return
-
-    for ch in ch_list:
-        if not ch['status'] == -1:
-            continue
+        if not item.no_searchables:
+            if not ch['status'] == -1:
+                continue
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
         cfg_proxytools_max_channel = 'channel_' + ch['id'] + '_proxytools_max'
@@ -328,7 +344,13 @@ def no_actives(item):
 
         info = ''
 
-        info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        if not item.no_searchables:
+            info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        else:
+            if 'adults' in ch['clusters']:
+                info = info + '[COLOR red][B] Adultos [/B][/COLOR]'
+            elif 'anime' in ch['clusters']:
+                info = info + '[COLOR fuchsia][B] Anime [/B][/COLOR]'
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
@@ -345,14 +367,14 @@ def no_actives(item):
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
-        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '')
+        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '').strip()
 
         if info: info = info + '  '
         info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
-        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose')
+        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
         if info: info = info + '  '
         info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
@@ -420,14 +442,14 @@ def only_prefered(item):
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
-        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '')
+        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '').strip()
 
         if info: info = info + '  '
         info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
-        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose')
+        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
         if info: info = info + '  '
         info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
@@ -481,14 +503,14 @@ def only_torrents(item):
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
-        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '')
+        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '').strip()
 
         if info: info = info + '  '
         info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
-        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose')
+        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
         if info: info = info + '  '
         info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
@@ -507,6 +529,123 @@ def only_torrents(item):
         tests_channels(canal[0], canal[1], canal[2])
 
 
+def channels_status(item):
+    logger.info()
+
+    if item.des_rea:
+        cabecera = 'Desactivar o Re-activar'
+    else:
+        cabecera = 'Marcar o Des-marcar Preferidos'
+
+    filtros = {}
+
+    preselect = []
+    channels_ids = []
+    opciones = []
+
+    ch_list = channeltools.get_channels_list(filtros=filtros)
+
+    for ch in ch_list:
+        info = ''
+
+        if ch['status'] == 1:
+            info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
+        elif ch['status'] == -1:
+            info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+
+        if 'dominios' in ch['notes'].lower():
+            dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
+            if dominio:
+                dominio = dominio.replace('https://', '').replace('/', '')
+                info = info + '[B][COLOR cyan] %s [/B][/COLOR]' % dominio
+
+        cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
+        if config.get_setting(cfg_proxies_channel, default=''):
+            info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+
+        tipos = ch['search_types']
+        tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
+        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '').strip()
+
+        if info: info = info + '  '
+        info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
+
+        idiomas = ch['language']
+        idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
+        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
+
+        if info: info = info + '  '
+        info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
+
+        it = xbmcgui.ListItem(ch['name'], info)
+        it.setArt({'thumb': ch['thumbnail']})
+        opciones.append(it)
+
+        channels_ids.append(ch['id'])
+
+    ret = xbmcgui.Dialog().multiselect('Personalizar canales  [COLOR yellow]' + cabecera + '[/COLOR]', opciones, preselect=preselect, useDetails=True)
+
+    if ret is None: return
+
+    if item.des_rea:
+        seleccionados = channels_des_rea_make(ret, channels_ids)
+    else:
+        seleccionados = channels_preferidos_make(ret, channels_ids)
+
+    if not str(seleccionados) == '[]':
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Canales Re-ajustados[/B][/COLOR]' % color_exec)
+
+        platformtools.itemlist_refresh()
+
+
+def channels_des_rea_make(ret, channels_ids):
+    logger.info()
+
+    seleccionados = []
+
+    for ord_channel in ret:
+        channel_id = channels_ids[ord_channel]
+        seleccionados.append(channel_id)
+
+        status = config.get_setting('status', channel_id)
+
+        if status is None:
+            config.set_setting('status', -1, channel_id)
+        else:
+            if status == -1:
+                config.set_setting('status', 0, channel_id)
+            elif status == '0':
+                config.set_setting('status', -1, channel_id)
+            else:
+                config.set_setting('status', -1, channel_id)
+
+    return seleccionados
+
+
+def channels_preferidos_make(ret, channels_ids):
+    logger.info()
+
+    seleccionados = []
+
+    for ord_channel in ret:
+        channel_id = channels_ids[ord_channel]
+        seleccionados.append(channel_id)
+
+        status = config.get_setting('status', channel_id)
+
+        if status is None:
+            config.set_setting('status', 1, channel_id)
+        else:
+            if status == -1:
+                config.set_setting('status', 1, channel_id)
+            elif status == '0':
+                config.set_setting('status', 1, channel_id)
+            else:
+                config.set_setting('status', 0, channel_id)
+
+    return seleccionados
+
+
 def channels_excluded(item):
     logger.info()
 
@@ -518,11 +657,13 @@ def channels_excluded(item):
         filtros = {'categories': 'tvshow', 'searchable': True}
     elif item.extra == 'documentaries':
         cabecera = 'Documentales'
-        filtros = {'categories': 'documentary' ,'searchable': True}
+        filtros = {'categories': 'documentary', 'searchable': True}
+    elif item.extra == 'torrents':
+        cabecera = 'Torrents'
+        filtros = {'categories': 'torrent', 'searchable': True}
     elif item.extra == 'mixed':
         cabecera = 'Películas y/o Series'
         filtros = {'searchable': True}
-
     else:
         cabecera = 'Todos'
         filtros = {'searchable': True}
@@ -603,14 +744,14 @@ def channels_excluded(item):
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
-        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '')
+        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '').strip()
 
         if info: info = info + '  '
         info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
-        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose')
+        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
         if info: info = info + '  '
         info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
@@ -643,6 +784,9 @@ def channels_excluded_del(item):
     elif item.extra == 'documentaries':
         canales_excluidos = channels_search_excluded_documentaries
         txt = 'Documentales'
+    elif item.extra == 'torrents':
+        canales_excluidos = channels_search_excluded_torrents
+        txt = 'Torrents'
     elif item.extra == 'mixed':
         canales_excluidos = channels_search_excluded_mixed
         txt = 'Películas y/o Series'
@@ -667,12 +811,15 @@ def channels_excluded_del(item):
         config.set_setting(cfg_search_excluded_tvshows, '')
     elif item.extra == 'documentaries':
         config.set_setting(cfg_search_excluded_documentaries, '')
+    elif item.extra == 'torrents':
+        config.set_setting(cfg_search_excluded_torrents, '')
     elif item.extra == 'mixed':
         config.set_setting(cfg_search_excluded_mixed, '')
     else:
         if channels_search_excluded_movies: config.set_setting(cfg_search_excluded_movies, '')
         if channels_search_excluded_tvshows: config.set_setting(cfg_search_excluded_tvshows, '')
         if channels_search_excluded_documentaries: config.set_setting(cfg_search_excluded_documentaries, '')
+        if channels_search_excluded_torrents: config.set_setting(cfg_search_excluded_torrents, '')
         if channels_search_excluded_mixed: config.set_setting(cfg_search_excluded_mixed, '')
         if channels_search_excluded_all: config.set_setting(cfg_search_excluded_all, '')
 
@@ -713,14 +860,15 @@ def channels_excluded_list(ret, channels_ids, channels_search):
 
 
 def show_servers_list(item):
-    import os
+    logger.info()
 
     from core import filetools, jsontools
 
-    logger.info()
-
     if item.tipo == 'activos':
         cabecera = 'Servidores Disponibles'
+        filtro = True
+    if item.tipo == 'alternativos':
+        cabecera = 'Servidores Vías Alternativas'
         filtro = True
     elif item.tipo == 'inactivos':
         cabecera = 'Servidores Inactivos'
@@ -771,8 +919,21 @@ def show_servers_list(item):
 
         if item.tipo == 'sinsoporte':
             if not "Requiere" in notes: continue
-			
+        elif item.tipo == 'alternativos':
+            if not "Alternative" in notes: continue
+
+            add_on = scrapertools.find_single_match(notes, 'vía:(.*?)$').strip().lower()
+
+            if xbmc.getCondVisibility('System.HasAddon("%s")' % add_on):
+               exists_addon = ' [COLOR tan][B] Instalada [/B]'
+            else:
+               exists_addon = ' [COLOR red][B] No instalada [/B]'
+
+            info = info + exists_addon
+
         if dict_server['active'] == False:
+            if item.tipo == 'activos': continue
+
             info = info + '[COLOR red][B] Inactivo [/B][/COLOR]'
 
         if notes:
@@ -785,6 +946,11 @@ def show_servers_list(item):
         opciones_servers.append(platformtools.listitem_to_select('[COLOR yellow]' + server_name + '[/COLOR]', info, server_thumb))
 
         servers.append((server_name, info))
+
+    if not opciones_servers:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin servidores de este tipo[/B][/COLOR]' % color_adver)
+        return
+
 
     ret = platformtools.dialog_select(cabecera, opciones_servers, useDetails=True)
 
@@ -810,14 +976,26 @@ def show_channels_list(item):
     opciones_channels = []
     canales = []
 
-    if item.no_active == True:
+    if item.tipo == 'all':
         filtros = {'active': False}
-    elif item.no_stable == True:
-        filtros = {'clusters': 'inestable'}
-    else:
-        filtros = {}
+        ch_list_f = channeltools.get_channels_list(filtros=filtros)
+        filtros = {'active': True}
+        ch_list_t = channeltools.get_channels_list(filtros=filtros)
+        ch_list = ch_list_f + ch_list_t
 
-    ch_list = channeltools.get_channels_list(filtros=filtros)
+        ch_list.sort(key=lambda ch: ch['id']) #.lower().strip()
+
+    else:
+        if item.no_active == True or item.temp_no_active == True:
+            filtros = {'active': False}
+        elif item.no_stable == True:
+            filtros = {'clusters': 'inestable'}
+        elif item.cta_register == True:
+            filtros = {'clusters': 'register'}
+        else:
+           filtros = {}
+
+        ch_list = channeltools.get_channels_list(filtros=filtros)
 
     if not ch_list:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales de este tipo[/B][/COLOR]' % color_adver)
@@ -826,10 +1004,21 @@ def show_channels_list(item):
     for ch in ch_list:
         info = ''
 
+        if item.temp_no_active:
+            if not 'temporary' in ch['clusters']: continue
+        elif item.no_active:
+            if 'temporary' in ch['clusters']: continue
+
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
+        if 'register' in ch['clusters']:
+            info = info + '[COLOR fuchsia][B] Cuenta [/B][/COLOR]'
+
         if ch['active'] == False:
-            info = info + '[COLOR red][B] Inactivo [/B][/COLOR]'
+            if 'temporary' in ch['clusters']:
+                info = info + '[COLOR pink][B] Temporalmente Inactivo [/B][/COLOR]'
+            else:
+                info = info + '[COLOR red][B] Inactivo [/B][/COLOR]'
         elif ch['searchable'] == False:
             info = info + '[COLOR coral][B] No búsquedas [/B][/COLOR]'
         elif channels_search:
@@ -858,14 +1047,14 @@ def show_channels_list(item):
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
-        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '')
+        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '').strip()
 
         if info: info = info + '  '
         info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
-        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose')
+        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
         if info: info = info + '  '
         info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
@@ -877,12 +1066,23 @@ def show_channels_list(item):
 
         canales.append((ch['name'], info, ch['notes']))
 
-    if item.no_active == True:
-        cabecera = 'Canales [COLOR yellow]Inactivos[/COLOR]'
-    elif item.no_stable == True:
-        cabecera = 'Canales [COLOR yellow]Inestables[/COLOR]'
+    if not canales:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales de este tipo[/B][/COLOR]' % color_adver)
+        return
+
+    if item.tipo == 'all':
+        cabecera = 'Canales [COLOR yellow]Todos[/COLOR]'
     else:
-        cabecera = 'Canales [COLOR yellow]Disponibles[/COLOR]'
+        if item.no_active == True:
+            cabecera = 'Canales [COLOR yellow]Inactivos[/COLOR]'
+        elif item.temp_no_active == True:
+            cabecera = 'Canales [COLOR yellow]Temporalmente Inactivos[/COLOR]'
+        elif item.no_stable == True:
+            cabecera = 'Canales [COLOR yellow]Inestables[/COLOR]'
+        elif item.cta_register == True:
+            cabecera = 'Canales [COLOR yellow]con Cuenta[/COLOR]'
+        else:
+            cabecera = 'Canales [COLOR yellow]Disponibles[/COLOR]'
 
     ret = platformtools.dialog_select(cabecera, opciones_channels, useDetails=True)
 
@@ -892,8 +1092,6 @@ def show_channels_list(item):
 
 def show_clients_torrent(item):
     logger.info()
-
-    import os, xbmc
 
     from core import jsontools
     torrent_clients = jsontools.get_node_from_file('torrent.json', 'clients', os.path.join(config.get_runtime_path(), 'servers'))

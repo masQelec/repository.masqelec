@@ -7,11 +7,10 @@ import json
 from functools import wraps
 from six.moves.urllib_parse import quote_plus
 
-from pycaption import detect_format, WebVTTWriter
 from kodi_six import xbmc, xbmcplugin
 from six.moves.urllib.parse import quote
 
-from . import router, gui, settings, userdata, inputstream, signals, migrate, bookmarks
+from . import router, gui, settings, userdata, inputstream, signals, migrate, bookmarks, mem_cache
 from .constants import *
 from .log import log
 from .language import _
@@ -84,26 +83,45 @@ def route(url=None):
         return decorated_function
     return lambda f: decorator(f, url)
 
-# @plugin.plugin_callback()
-def plugin_callback():
+# @plugin.plugin_middleware()
+def plugin_middleware():
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
-            with open(kwargs['_data_path'], 'rb') as f:
+            kwargs['_path'] = xbmc.translatePath(kwargs['_path'])
+            with open(kwargs['_path'], 'rb') as f:
                 kwargs['_data'] = f.read()
 
-            remove_file(kwargs['_data_path'])
-            kwargs['_headers'] = json.loads(kwargs['_headers'])
+            remove_file(kwargs['_path'])
 
             try:
-                path = func(*args, **kwargs)
+                data = func(*args, **kwargs)
             except Exception as e:
                 log.exception(e)
-                path = None
+                data = None
 
             folder = Folder(show_news=False)
             folder.add_item(
-                path = quote_plus(path or ''),
+                path = quote_plus(json.dumps(data or {})),
+            )
+            return folder
+        return decorated_function
+    return lambda func: decorator(func)
+
+# @plugin.plugin_request()
+def plugin_request():
+    def decorator(func):
+        @wraps(func)
+        def decorated_function(*args, **kwargs):
+            try:
+                data = func(*args, **kwargs)
+            except Exception as e:
+                log.exception(e)
+                data = None
+
+            folder = Folder(show_news=False)
+            folder.add_item(
+                path = quote_plus(json.dumps(data or {})),
             )
             return folder
         return decorated_function
@@ -209,6 +227,7 @@ def _error(e):
         signals.emit(signals.ON_EXCEPTION, e)
         return
 
+    mem_cache.empty()
     _close()
 
     log.debug(e, exc_info=True)
@@ -217,6 +236,7 @@ def _error(e):
 
 @signals.on(signals.ON_EXCEPTION)
 def _exception(e):
+    mem_cache.empty()
     _close()
 
     if type(e) == FailedPlayback:
@@ -319,20 +339,6 @@ def _settings(**kwargs):
     _close()
     settings.open()
     gui.refresh()
-
-@route(ROUTE_WEBVTT)
-@plugin_callback()
-def _webvtt(url, _data_path, _headers, **kwargs):
-    r = Session().get(url, headers=_headers)
-
-    data = r.content.decode('utf8')
-    reader = detect_format(data)
-
-    data = WebVTTWriter().write(reader().read(data))
-    with open(_data_path, 'wb') as f:
-        f.write(data.encode('utf8'))
-
-    return _data_path + '|content-type=text/vtt'
 
 @route(ROUTE_RESET)
 def _reset(**kwargs):
@@ -522,26 +528,29 @@ class Item(gui.Item):
 
         self.proxy_data['quality'] = quality
 
+        if self.resume_from is not None and self.resume_from < 0:
+            self.play_skips.append({'to': int(self.resume_from)})
+            self.resume_from = 1
+
         li = self.get_li()
         handle = _handle()
 
+        play_data = {
+            'playing_file': self.path,
+            'next': {'time': 0, 'next_file': None},
+            'skips': self.play_skips or [],
+            'callback': {'type': 'interval', 'interval': 0, 'callback': None},
+        }
+
         if self.play_next:
-            data = {'playing_file': self.path, 'time': 0, 'next_file': None, 'show_dialog': True}
-            data.update(self.play_next)
-
-            if data['next_file']:
-                data['next_file'] = router.add_url_args(data['next_file'], _play=1)
-
-            set_kodi_string('_slyguy_play_next', json.dumps(data))
-
-        if self.play_skips:
-            data = {'playing_file': self.path, 'skips': self.play_skips}
-            set_kodi_string('_slyguy_play_skips', json.dumps(data))
+            play_data['next'].update(self.play_next)
+            if play_data['next']['next_file']:
+                play_data['next']['next_file'] = router.add_url_args(play_data['next']['next_file'], _play=1)
 
         if self.callback:
-            data = {'type': 'interval', 'playing_file': self.path, 'interval': 0, 'callback': None}
-            data.update(self.callback)
-            set_kodi_string('_slyguy_play_callback', json.dumps(data))
+            play_data['callback'].update(self.callback)
+
+        set_kodi_string('_slyguy_play_data', json.dumps(play_data))
 
         if handle > 0:
             xbmcplugin.setResolvedUrl(handle, True, li)
@@ -613,7 +622,7 @@ class Folder(object):
         if self.content == 'AUTO':
             self.content = 'videos'
 
-            if not settings.getBool('video_folder_content', True) and item_types:
+            if not settings.common_settings.getBool('video_folder_content', False) and item_types:
                 type_map = {
                     'movie': 'movies',
                     'tvshow': 'tvshows',
@@ -631,7 +640,7 @@ class Folder(object):
         if self.title: xbmcplugin.setPluginCategory(handle, self.title)
 
         if not self.sort_methods:
-            self.sort_methods = [xbmcplugin.SORT_METHOD_EPISODE, xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL]
+            self.sort_methods = [xbmcplugin.SORT_METHOD_EPISODE, xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL, xbmcplugin.SORT_METHOD_VIDEO_YEAR, xbmcplugin.SORT_METHOD_DATEADDED, xbmcplugin.SORT_METHOD_PLAYCOUNT]
             if not ep_sort:
                 self.sort_methods.pop(0)
 
@@ -677,13 +686,6 @@ def process_news():
 
     try:
         news = json.loads(news)
-        _time = time.time()
-
-        if _time > news.get('timestamp', _time) + NEWS_MAX_TIME:
-            log.debug('news is too old')
-            settings.common_settings.set('_news', '')
-            return
-
         if news.get('show_in') and ADDON_ID.lower() not in [x.lower() for x in news['show_in'].split(',')]:
             return
 

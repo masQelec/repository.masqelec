@@ -62,9 +62,9 @@ class Session(RawSession):
         self._headers = headers or {}
         self._cookies_key = cookies_key
         self._base_url = base_url
-        self._timeout = settings.getInt('http_timeout', 30) if timeout is None else timeout
-        self._attempts = settings.getInt('http_retries', 2) if attempts is None else attempts
-        self._verify = settings.getBool('verify_ssl', True) if verify is None else verify
+        self._timeout = settings.common_settings.getInt('http_timeout', 30) if timeout is None else timeout
+        self._attempts = settings.common_settings.getInt('http_retries', 2) if attempts is None else attempts
+        self._verify = settings.common_settings.getBool('verify_ssl', True) if verify is None else verify
         self.before_request = None
         self.after_request = None
 
@@ -81,7 +81,7 @@ class Session(RawSession):
         json_text = GzipFile(fileobj=BytesIO(resp.content)).read()
         return json.loads(json_text)
 
-    def request(self, method, url, timeout=None, attempts=None, verify=None, error_msg=None, retry_not_ok=False, retry_delay=1000, **kwargs):
+    def request(self, method, url, timeout=None, attempts=None, verify=None, error_msg=None, retry_not_ok=False, retry_delay=1000, log_url=None, **kwargs):
         method = method.upper()
 
         if not url.startswith('http'):
@@ -104,7 +104,7 @@ class Session(RawSession):
             if self.before_request:
                 self.before_request()
 
-            log('{}{} {}'.format(attempt, method, url))
+            log('{}{} {}'.format(attempt, method, log_url or url))
 
             try:
                 resp = super(Session, self).request(method, url, **kwargs)

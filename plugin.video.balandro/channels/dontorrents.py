@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://dontorrent.app/'
+host = 'https://dontorrent.rip/'
 
 
 def item_configurar_proxies(item):
@@ -22,9 +22,12 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/dontorrents.org/', '/dontorrent.app/')
-    url = url.replace('/dontorrents.net/', '/dontorrent.app/')
-    url = url.replace('/dontorrent.one/', '/dontorrent.app/')
+    url = url.replace('https://dontorrents.org/', host)
+    url = url.replace('https://dontorrents.net/', host)
+    url = url.replace('https://dontorrent.one/', host)
+    url = url.replace('https://dontorrent.app/', host)
+    url = url.replace('https://dontorrent.lol/', host )
+    url = url.replace('https://dontorrent.nz/', host)
 
     # ~ data = httptools.downloadpage(url, post=post).data
     data = httptools.downloadpage_proxy('dontorrents', url, post=post, headers=headers).data
@@ -73,11 +76,11 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Catálogo alfabético', action = 'list_all', url = host + 'series/letra-.', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'series/letra-.', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'En HD alfabético', action = 'list_all', url = host + 'series/hd/letra-.', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En HD (alfabético)', action = 'list_all', url = host + 'series/hd/letra-.', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = host + 'tv-series', search_type = 'tvshow' ))
 
@@ -91,7 +94,7 @@ def mainlist_documentary(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Catálogo alfabético', action = 'list_all', url = host + 'documentales/letra-.', search_type = 'documentary'))
+    itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'documentales/letra-.', search_type = 'documentary'))
 
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary' ))
 
@@ -149,8 +152,7 @@ def list_all(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     if item.search_type == "movie":
-        patron = r'<a href="([^"]+)">\s*<img.*?src="([^"]+)'
-        matches = re.compile(patron).findall(data)
+        matches = re.compile(r'<a href="([^"]+)">\s*<img.*?src="([^"]+)').findall(data)
 
         for url, thumb in matches:
             title = os.path.basename(os.path.normpath(url)).replace("-", " ")
@@ -163,8 +165,7 @@ def list_all(item):
                                         contentType='movie', contentTitle=title, infoLabels={'year': "-"} ))
 
     elif item.search_type== 'tvshow':
-        patron = r"<a href='([^']+)'>([^<]+)"
-        matches = re.compile(patron).findall(data)
+        matches = re.compile(r"<a href='([^']+)'>([^<]+)").findall(data)
 
         for url, title in matches:
             if "-" in title: SerieName = title.split("-")[0]
@@ -173,8 +174,7 @@ def list_all(item):
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':"-"} ))
 
     else:
-        patron = r"<a href='([^']+)'>([^<]+)"
-        matches = re.compile(patron).findall(data)
+        matches = re.compile(r"<a href='([^']+)'>([^<]+)").findall(data)
 
         for url, title in matches:
             itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title,
@@ -255,6 +255,7 @@ def list_post(item):
     patron = '''<a class="position-relative" href="([^"]+)" data-toggle="popover" '''
     patron += '''data-content="<div><p class='lead text-dark mb-0'>([^<]+)'''
     patron += '''<\/p><hr class='my-2'><p>([^<]+).*?src='([^']+)'''
+
     matches = re.compile(patron).findall(data)
 
     for url, title, info, thumb in matches:
@@ -319,12 +320,12 @@ def findvideos(item):
 
     if item.contentType == "episode":
         url = item.url
-        quality = ""
+        qlty = ''
 
     elif not item.contentType == "tvshow":
         data = do_downloadpage(item.url)
 
-        quality = scrapertools.find_single_match(data, '<b class="bold">Formato:</b>(.*?)</p>').strip()
+        qlty = scrapertools.find_single_match(data, '<b class="bold">Formato:</b>(.*?)</p>').strip()
 
         patron = '<div class="text-center">.*?'
         patron += "href='([^']+)'.*?download>Descargar</a>"
@@ -340,13 +341,13 @@ def findvideos(item):
             url = url if url.startswith("http") else "https:" + url
     else:
         url = item.url
-        quality = ""
+        qlty = ''
 
     if url:
         if not url == 'https:':
            lang = 'Esp'
 
-           itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, quality=quality, url = url, server = 'torrent'))
+           itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, quality = qlty, url = url, server = 'torrent'))
 
     return itemlist
 

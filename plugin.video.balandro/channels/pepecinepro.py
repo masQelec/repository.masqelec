@@ -41,13 +41,33 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host)
+    opciones = [
+       ('accion', 'Acción'),
+       ('action-adventure', 'Action & Adventure'),
+       ('animacion', 'Animación'),
+       ('aventura', 'Aventura'),
+       ('belica', 'Bélica'),
+       ('ciencia-ficcion', 'Ciencia ficción'),
+       ('comedia', 'Comedia'),
+       ('crimen', 'Crimen'),
+       ('documental', 'Documental'),
+       ('drama', 'Drama'),
+       ('familia', 'Familia'),
+       ('fantasia', 'Fantasía'),
+       ('historia', 'Historia'),
+       ('misterio', 'Misterio'),
+       ('musica', 'Música'),
+       ('Película de TV', 'pelicula-de-tv'),
+       ('reality', 'Reality'),
+       ('romance', 'Romance'),
+       ('sci-fi-fantasy', 'Sci-Fi & Fantasy'),
+       ('suspense', 'Suspense'),
+       ('terror', 'Terror'),
+       ('western', 'Western')
+    ]
 
-    bloque = scrapertools.find_single_match(data,'>Categorias<(.*?)</ul>')
-    matches = scrapertools.find_multiple_matches(bloque,'<a href="(.*?)">(.*?)</a>')
-
-    for url, tit in matches:
-        itemlist.append(item.clone( title = tit, url = url, action = 'list_all' ))
+    for opc, tit in opciones:
+        itemlist.append(item.clone( title=tit, url= host + 'category/' + opc + '/', action = 'list_all' ))
 
     return itemlist
 
@@ -174,6 +194,8 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if servidor:
             url = servertools.normalize_url(servidor, url)
             itemlist.append(item.clone( url=url, server=servidor ))

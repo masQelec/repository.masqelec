@@ -848,6 +848,66 @@ def add_metaclass(metaclass):
     return wrapper
 
 
+def ensure_binary(s, encoding='utf-8', errors='strict'):
+    """Coerce **s** to six.binary_type.
+
+    For Python 2:
+      - `unicode` -> encoded to `str`
+      - `str` -> `str`
+
+    For Python 3:
+      - `str` -> encoded to `bytes`
+      - `bytes` -> `bytes`
+    """
+    if isinstance(s, binary_type):
+        return s
+    if isinstance(s, text_type):
+        return s.encode(encoding, errors)
+    raise TypeError("not expecting type '%s'" % type(s))
+
+
+def ensure_str(s, encoding='utf-8', errors='strict'):
+    """Coerce *s* to `str`.
+
+    For Python 2:
+      - `unicode` -> encoded to `str`
+      - `str` -> `str`
+
+    For Python 3:
+      - `str` -> `str`
+      - `bytes` -> decoded to `str`
+    """
+    # Optimization: Fast return for the common case.
+    if type(s) is str:
+        return s
+    if PY2 and isinstance(s, text_type):
+        return s.encode(encoding, errors)
+    elif PY3 and isinstance(s, binary_type):
+        return s.decode(encoding, errors)
+    elif not isinstance(s, (text_type, binary_type)):
+        raise TypeError("not expecting type '%s'" % type(s))
+    return s
+
+
+def ensure_text(s, encoding='utf-8', errors='strict'):
+    """Coerce *s* to six.text_type.
+
+    For Python 2:
+      - `unicode` -> `unicode`
+      - `str` -> `unicode`
+
+    For Python 3:
+      - `str` -> `str`
+      - `bytes` -> decoded to `str`
+    """
+    if isinstance(s, binary_type):
+        return s.decode(encoding, errors)
+    elif isinstance(s, text_type):
+        return s
+    else:
+        raise TypeError("not expecting type '%s'" % type(s))
+
+
 def python_2_unicode_compatible(klass):
     """
     A decorator that defines __unicode__ and __str__ methods under Python 2.

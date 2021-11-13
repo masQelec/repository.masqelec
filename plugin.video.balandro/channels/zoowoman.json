@@ -3,15 +3,15 @@
   "name": "Zoowoman",
   "thumbnail": "zoowoman.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
 
-  "categories": ["movie"],
-  "language": ["cast", "lat", "vose"],
+  "categories": ["movie", "torrent"],
+  "language": ["cast", "lat", "vose", "vo"],
 
-  "clusters": ["classic", "adults", "rankings", "lists", "epochs", "years", "directors", "kids", "docs", "vos"],
+  "clusters": ["torrents", "classic", "adults", "rankings", "lists", "epochs", "years", "directors", "kids", "docs", "vos"],
 
   "notes": "Películas clásicas y cine independiente, por géneros, subgéneros, años, directores."
 }

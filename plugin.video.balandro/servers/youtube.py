@@ -191,26 +191,27 @@ def extract_from_player_response(params, youtube_page_data=''):
 
 
 def import_libs(module):
-        import os, xbmcaddon
-        from core import filetools
+    import os, xbmcaddon
+    from core import filetools
 
-        path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
-        addon_xml = filetools.read(filetools.join(path, "addon.xml"))
-        if addon_xml:
-            require_addons = scrapertools.find_multiple_matches(addon_xml, '(<import addon="[^"]+"[^\/]+\/>)')
-            require_addons = list(filter(lambda x: not 'xbmc.python' in x and 'optional="true"' not in x, require_addons))
+    path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
+    addon_xml = filetools.read(filetools.join(path, "addon.xml"))
 
-            for addon in require_addons:
-                addon = scrapertools.find_single_match(addon, 'import addon="([^"]+)"')
-                if xbmc.getCondVisibility('System.HasAddon("%s")' % (addon)):
-                    import_libs(addon)
-                else:
-                    xbmc.executebuiltin('InstallAddon(%s)' % (addon))
-                    import_libs(addon)
+    if addon_xml:
+        require_addons = scrapertools.find_multiple_matches(addon_xml, '(<import addon="[^"]+"[^\/]+\/>)')
+        require_addons = list(filter(lambda x: not 'xbmc.python' in x and 'optional="true"' not in x, require_addons))
 
-            lib_path = scrapertools.find_multiple_matches(addon_xml, 'library="([^"]+)"')
-            for lib in list(filter(lambda x: not '.py' in x, lib_path)):
-                sys.path.append(os.path.join(path, lib))
+        for addon in require_addons:
+            addon = scrapertools.find_single_match(addon, 'import addon="([^"]+)"')
+            if xbmc.getCondVisibility('System.HasAddon("%s")' % (addon)):
+                import_libs(addon)
+            else:
+                xbmc.executebuiltin('InstallAddon(%s)' % (addon))
+                import_libs(addon)
+
+        lib_path = scrapertools.find_multiple_matches(addon_xml, 'library="([^"]+)"')
+        for lib in list(filter(lambda x: not '.py' in x, lib_path)):
+            sys.path.append(os.path.join(path, lib))
 
 
 def extract_videos(video_id):

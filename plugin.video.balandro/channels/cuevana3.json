@@ -13,5 +13,5 @@
 
   "clusters": ["news", "rankings", "languages", "lasts", "kids", "docs", "vos"],
 
-  "notes": "Películas por idiomas, por género, estrenos. También series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas por idiomas, por géneros, estrenos. También series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

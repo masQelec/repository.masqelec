@@ -1,57 +1,44 @@
 # -*- coding: utf-8 -*-
 
-# Fix para error de validación del certificado del tipo:
-# [downloadpage] Response code: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:661)>
-# [downloadpage] Response error: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:661)
-# Fix desde la página: https://stackoverflow.com/questions/27835619/urllib-and-ssl-certificate-verify-failed-error
+import sys
+
+if sys.version_info[0] >= 3:
+    PY2 = False
+    PY3 = True
+
+    unicode = str
+    from urllib.parse import quote, urlencode, urlparse
+    from urllib.response import addinfourl
+    from http.cookiejar import MozillaCookieJar, Cookie
+    from urllib.error import HTTPError
+    from urllib.request import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler
+else:
+    PY2 = True
+    PY3 = False
+
+    from urllib import quote, urlencode, addinfourl
+    from urlparse import urlparse
+    from cookielib import MozillaCookieJar, Cookie
+    from urllib2 import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler, HTTPError
+
 
 import ssl
-try:
-    _create_unverified_https_context = ssl._create_unverified_context
-except AttributeError:
-    # Legacy Python that doesn't verify HTTPS certificates by default
-    pass
-else:
-    # Handle target environment that doesn't support HTTPS verification
-    ssl._create_default_https_context = _create_unverified_https_context
+ssl._create_default_https_context = ssl._create_unverified_context
 
+import os, inspect, gzip, time
 
-import inspect
-import gzip
-import os
-import time
-import urllib
-import sys
 from io import BytesIO
 from threading import Lock
 
 from platformcode import config, logger
 from platformcode.config import WebErrorException
 
-PY3 = False
-PY2 = False
-
-if sys.version_info[0] >= 3:
-    PY3 = True
-    unicode = str
-    from urllib.parse import quote, urlencode, urlparse
-    from urllib.response import addinfourl
-    from http.cookiejar import MozillaCookieJar,Cookie
-    from urllib.error import HTTPError
-    from urllib.request import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler
-else:
-    PY2 = True
-    from urllib import quote, urlencode, addinfourl
-    from urlparse import urlparse
-    from cookielib import MozillaCookieJar,Cookie
-    from urllib2 import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler, HTTPError
-
 try:
     from core.cloudflare import Cloudflare
 except:
     pass
 
-## Obtiene la versión del addon
+
 __addon_name = config.__addon_name
 __version = config.get_addon_version()
 
@@ -60,9 +47,9 @@ cookies_lock = Lock()
 cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
-# Headers por defecto, si no se especifica nada
+
 # ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.100 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.100 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.60 Safari/537.36"
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
 if ver_stable_chrome:
@@ -78,7 +65,7 @@ default_headers["Accept-Language"] = "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3"
 default_headers["Accept-Charset"] = "UTF-8"
 default_headers["Accept-Encoding"] = "gzip"
 
-# Tiempo máximo de espera para downloadpage, si no se especifica nada
+
 HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = config.get_setting('httptools_timeout', default=15)
 if HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT == 0: HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = None
 
@@ -105,6 +92,7 @@ def get_url_headers(url):
 
 def load_cookies():
     cookies_lock.acquire()
+
     if os.path.isfile(ficherocookies):
         logger.info("Leyendo fichero cookies")
         try:
@@ -112,6 +100,7 @@ def load_cookies():
         except:
             logger.info("El fichero de cookies existe pero es ilegible, se borra")
             os.remove(ficherocookies)
+
     cookies_lock.release()
 
 
@@ -136,30 +125,33 @@ def get_cookies(domain):
 load_cookies()
 
 # Mismos parámetros que downloadpage pero con el canal de dónde obtener los proxies como primer parámetro.
-# Bucle con los proxies que tenga el canal hasta recibir respuesta válida
 def downloadpage_proxy(canal,
                        url, post=None, headers=None, timeout=None, follow_redirects=True, cookies=True, replace_headers=False,
                        add_referer=False, only_headers=False, bypass_cloudflare=True, count_retries=0, raise_weberror=True, 
                        use_proxy=None, use_cache=False, cache_duration=36000):
 
     proxies = config.get_setting('proxies', canal, default='').replace(' ', '')
+
     if ';' in proxies: # Si los proxies estan separados por ; orden aleatorio
         proxies = proxies.replace(',', ';').split(';')
         import random
         random.shuffle(proxies)
     else:
         proxies = proxies.split(',')
+
     if len(proxies) == 0: proxies = ['']
 
     proxy_ok = False
+
     for n, proxy in enumerate(proxies):
         use_proxy = None if proxy == '' else {'http': proxy, 'https': proxy}
 
         resp = downloadpage(url, use_proxy=use_proxy, raise_weberror=False,
-                            post=post, headers=headers, timeout=timeout, follow_redirects=follow_redirects, cookies=cookies, 
+                            post=post, headers=headers, timeout=timeout, follow_redirects=follow_redirects, cookies=cookies,
                             replace_headers=replace_headers, add_referer=add_referer, only_headers=only_headers,
                             bypass_cloudflare=bypass_cloudflare, count_retries=count_retries, 
                             use_cache=use_cache, cache_duration=cache_duration)
+
         if (type(resp.code) == int and (resp.code < 200 or resp.code > 399)) or not resp.sucess: 
             if proxy != '':
                 logger.info('El proxy %s NO responde adecuadamente. %s' % (proxy, resp.code))
@@ -201,8 +193,9 @@ def downloadpage_proxy(canal,
 
 
 def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=True, cookies=True, replace_headers=False,
-                 add_referer=False, only_headers=False, bypass_cloudflare=True, count_retries=0, raise_weberror=True, 
+                 add_referer=False, only_headers=False, bypass_cloudflare=True, count_retries=0, raise_weberror=True,
                  use_proxy=None, use_cache=False, cache_duration=36000):
+
     """
     Abre una url y retorna los datos obtenidos
 
@@ -242,10 +235,10 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
             HTTPResponse.time:      float  Tiempo empleado para realizar la petición
 
     """
+
     response = {}
 
     # Si existe el fichero en la caché y no ha caducado, se devuelve su contenido sin hacer ninguna petición.
-    # Solamente se tiene en cuenta la url, si se tuviera que usar con peticiones POST habría que adaptarlo.
     if use_cache:
             from hashlib import md5
 
@@ -339,9 +332,11 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
 
     # Contador
     inicio = time.time()
+
     if post:
         if isinstance(post, unicode):
             post = post.encode('utf-8', 'strict')
+
     req = Request(url ,post,request_headers)
 
     try:
@@ -417,6 +412,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
         save_cookies()
 
     logger.info("Encoding: %s" % (response["headers"].get('content-encoding')))
+
     if response["headers"].get('content-encoding') == 'gzip':
         try:
             response["data"] = gzip.GzipFile(fileobj=BytesIO(response["data"])).read()
@@ -452,17 +448,20 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
                     auth_url = auth_url.split('?jschl_answer=')[0]
                 else:
                     post_cf = None
+
                 if not request_headers: request_headers = {'Referer': url }
                 else: request_headers['Referer'] = url
 
-                resp_auth = downloadpage(auth_url, post=post_cf, headers=request_headers, replace_headers=True, count_retries=count_retries, 
+                resp_auth = downloadpage(auth_url, post=post_cf, headers=request_headers, replace_headers=True, count_retries=count_retries,
                                      use_proxy=use_proxy, raise_weberror=False)
+
                 if count_retries == 1 and type(resp_auth.code) == int and resp_auth.code == 403: # repetir desde inicio con cookies recargadas
                     load_cookies()
-                    return downloadpage(url, post=post, headers=headers, timeout=timeout, follow_redirects=follow_redirects, cookies=cookies, 
+                    return downloadpage(url, post=post, headers=headers, timeout=timeout, follow_redirects=follow_redirects, cookies=cookies,
                                     replace_headers=replace_headers, add_referer=add_referer, only_headers=only_headers, 
                                     bypass_cloudflare=bypass_cloudflare, count_retries=1, raise_weberror=raise_weberror, 
                                     use_proxy=use_proxy, use_cache=use_cache, cache_duration=cache_duration)
+
                 if resp_auth.sucess:
                     logger.info("Autorización correcta, descargando página")
                     resp = downloadpage(url=response["url"], post=post, headers=headers, timeout=timeout,
@@ -479,6 +478,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
                 else:
                     logger.info("No se ha podido autorizar")
         except: pass
+
     try:
        if PY3 and isinstance(response['data'], bytes) and 'content-type' in response["headers"] \
                   and ('text/' in response["headers"]['content-type'] or 'json' in response["headers"]['content-type'] \
@@ -504,18 +504,20 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
        and 'ERROR 404 - File not found' not in str(response['data']) and '<title>Site Blocked</title>' not in str(response['data']) \
        and 'HTTP/1.1 400 Bad Request' not in str(response['data']) \
        and ('href=' in str(response['data']) or str(response['data']).startswith('{')):
-        with open(cache_file, 'w') as f: f.write(str(response['data'])); f.close()
+        with open(cache_file, 'wb') as f: f.write(str(response['data'])); f.close()
         logger.info("Guardado en caché %s la url %s" % (cache_md5url, url))
-        #TODO borrar ficheros en caché caducados ? o hacerlo en el servicio del addon ? o que sea responsabilidad del canal/servidor que use caché ?
+
     try:
         if isinstance(response['data'], bytes):
             try:
                 if not isinstance(response['data'], (unicode, bytes)):
                     raise TypeError("not expecting type '%s'" % type(response['data']))
+
                 if PY2 and isinstance(response['data'], unicode):
                     response['data'] = response['data'].encode('utf-8', 'strict')
                 elif PY3 and isinstance(response['data'], bytes):
                     response['data'] = response['data'].decode('utf-8', 'strict')
+
                 response['data'] = (response['data'])
             except:
                 try:
@@ -523,7 +525,8 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
                 except:
                     response['data'] = response['data'].decode('utf-8')
     except:
-        logger.error("Unable to convert data into str")                    
+        logger.error("Unable to convert data into str")
+
     return type('HTTPResponse', (), response)
 
 
@@ -540,14 +543,16 @@ class NoRedirectHandler(HTTPRedirectHandler):
     http_error_307 = http_error_302
 
 
-# Devuelve un diccionario con las cookies pedidas con set-cookie en los headers de una descarga
+# Devuelve un diccionario con las cookies set-cookie en headers de descarga
 def get_cookies_from_headers(headers):
     import re
     cookies = {}
+
     for h in headers:
         if h == 'set-cookie':
             cks = re.findall('(\w+)=([^;]+)', headers[h], re.DOTALL)
             for ck in cks:
                 if ck[0].lower() not in ['path', 'domain', 'expires']:
                     cookies[ck[0]] = ck[1]
+
     return cookies

@@ -8,17 +8,7 @@ from core import httptools, scrapertools, servertools, jsontools, tmdb
 host = 'https://seriesmanta.in/'
 
 
-# ~ def item_configurar_proxies(item):
-    # ~ plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    # ~ plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    # ~ return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-# ~ def configurar_proxies(item):
-    # ~ from core import proxytools
-    # ~ return proxytools.configurar_proxies_canal(item.channel, host)
-
 def do_downloadpage(url, post=None, headers=None):
-    # ~ data = httptools.downloadpage_proxy('seriesmanta', url, post=post, headers=headers).data
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -36,7 +26,6 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Buscar intérprete ...', action = 'search', group = 'star', search_type = 'person', 
                                 plot = 'Debe indicarse el nombre y apellido/s del intérprete.', text_color='plum'))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -59,7 +48,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -82,8 +70,6 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
-
-    # ~ itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -165,7 +151,6 @@ def list_all(item):
     url = host + query
 
     data = do_downloadpage(url)
-    # ~ logger.debug(data)
 
     dict_data = jsontools.load(data)
 
@@ -293,6 +278,8 @@ def findvideos(item):
         elif lang == '/sub.png': lang = 'Vose'
 
         servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
         if not servidor or servidor == 'directo': continue
 
         itemlist.append(Item(channel = item.channel, action = 'play', title = '', server = servidor, url = url, quality = qlty, language = lang )) 
@@ -305,28 +292,13 @@ def findvideos(item):
            qlty = ''
 
            servidor = servertools.get_server_from_url(url)
+           servidor = servertools.corregir_servidor(servidor)
+
            if not servidor or servidor == 'directo': continue
 
            itemlist.append(Item(channel = item.channel, action = 'play', title = '', server = servidor, url = url, quality = qlty, language = lang )) 
 	
     return itemlist
-
-
-def search(item, texto):
-    logger.info()
-    itemlist = []
-    try:
-       if item.group == 'star':
-           item.star = texto.replace(" ", "+")
-           return list_all(item)
-
-       item.url = host + 'busca-series-y-peliculas?q=' + texto.replace(" ", "+")
-       return list_search(item)
-    except:
-       import sys
-       for line in sys.exc_info():
-           logger.error("%s" % line)
-       return []
 
 
 def list_search(item):
@@ -372,3 +344,19 @@ def list_search(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
+
+
+def search(item, texto):
+    logger.info()
+    try:
+       if item.group == 'star':
+           item.star = texto.replace(" ", "+")
+           return list_all(item)
+
+       item.url = host + 'busca-series-y-peliculas?q=' + texto.replace(" ", "+")
+       return list_search(item)
+    except:
+       import sys
+       for line in sys.exc_info():
+           logger.error("%s" % line)
+       return []

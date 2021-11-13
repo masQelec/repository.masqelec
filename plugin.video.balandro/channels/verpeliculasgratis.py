@@ -483,7 +483,7 @@ def temporadas(item):
 
     if 'title' not in dict_data: return itemlist
 
-    # averiguar cuantas temporadas hay
+    # averiguar temporadas
     tot_temp = 0
 
     for element in dict_data['title']['seasons']:
@@ -583,7 +583,11 @@ def findvideos(item):
     if len(elementos) == 0:
         elementos = dict_data['title']['videos']
 
+    ses = 0
+
     for element in elementos:
+        ses += 1
+
         if '/z' in element['name'] and 'clicknupload' not in element['url']: continue # descartar descargas directas (menos clicknupload)
         if 'youtube.com/' in element['url']: continue
 
@@ -595,24 +599,24 @@ def findvideos(item):
             url = scrapertools.decode_streamcrypt(url)
             if not url: continue
 
-        itemlist.append(Item(channel = item.channel, action = 'play', title = item.title, url = url, language = _extraer_idioma(element['language']), 
-                             quality = element['quality'], quality_num = puntuar_calidad(element['quality']) ))
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor and servidor != 'directo':
+            itemlist.append(Item(channel = item.channel, action = 'play', title = '', server = servidor,  url = url,
+                                 language = _extraer_idioma(element['language']), 
+                                 quality = element['quality'], quality_num = puntuar_calidad(element['quality']) ))
 
     itemlist = servertools.get_servers_itemlist(itemlist)
 
-    return itemlist
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
-def search(item, texto):
-    logger.info()
-    try:
-        if item.search_type not in ['movie', 'tvshow', 'all']: item.search_type = 'all'
-        item.url = host + 'secure/search/' + texto.replace(" ", "+")
-        return sub_search(item)
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
+    return itemlist
 
 
 def sub_search(item):
@@ -655,3 +659,15 @@ def sub_search(item):
 
     return itemlist
 
+
+def search(item, texto):
+    logger.info()
+    try:
+        if item.search_type not in ['movie', 'tvshow', 'all']: item.search_type = 'all'
+        item.url = host + 'secure/search/' + texto.replace(" ", "+")
+        return sub_search(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []

@@ -224,7 +224,9 @@ def findvideos(item):
 
     IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'sub': 'Vose', 'Latino': 'Lat', 'Castellano': 'Esp', 'Subtitulado': 'Vose'}
 
+    # ~ Pendiente de resolver HTTP Error 403: Forbidden
     data = do_downloadpage(item.url)
+
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     _data = data
@@ -260,6 +262,8 @@ def findvideos(item):
                     quality = item.qualities
 
                     servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.corregir_servidor(servidor)
+
                     url = servertools.normalize_url(servidor, url)
 
                     itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = quality, 
