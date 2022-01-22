@@ -8,10 +8,15 @@ from core import httptools, scrapertools, servertools, tmdb
 
 host = 'https://seriesmetro.net/'
 
+perpage = 30
+
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     url = url.replace('seriesmetro.com', 'seriesmetro.net')
+
+    # ~ canal inestable 2021-11-07 (solo 10 elementos)
+    if '/ver/' in url or '/series' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     return data
@@ -25,13 +30,15 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone ( title='Catálogo', action ='list_all', url = host + 'series/' ))
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone ( title='Por género', action = 'generos' ))
+    itemlist.append(item.clone( title = 'Catálogo', action ='list_all', url = host + 'series/' ))
 
-    itemlist.append(item.clone ( title='Por letra (A - Z)', action = 'alfabetico' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ultimos-capitulos/' ))
 
-    itemlist.append(item.clone ( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
+
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico' ))
 
     return itemlist
 
@@ -86,7 +93,7 @@ def alfabetico(item):
     itemlist = []
 
     for letra in '#ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-        itemlist.append(item.clone ( title = letra, url = host + 'ver/letter/%s/' % (letra.replace('#', '0-9')), action = 'list_all' ))
+        itemlist.append(item.clone ( title = letra, url = host + 'letter/%s/' % (letra.replace('#', '0-9')), action = 'list_all' ))
 
     return itemlist
 
@@ -107,7 +114,8 @@ def list_all(item):
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
-        if thumb.startswith('//'): thumb = 'https:' + url
+        if thumb.startswith('//'): thumb = 'https:' + thumb
+
         year = scrapertools.find_single_match(article, '<span class="date">(\d+)</span>')
         if not year: year = '-'
 
@@ -120,7 +128,67 @@ def list_all(item):
 
     next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]*><i class="fa-arrow-right">')
     if next_page:
-       itemlist.append(item.clone (url = next_page, title = '>> Página siguiente', action = 'list_all', text_color='coral' ))
+       itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
+
+    return itemlist
+
+
+def last_epis(item):
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+
+    data = do_downloadpage(item.url)
+
+    bloque = scrapertools.find_single_match(data, '>Últimos Capítulos<(.*?)>Series populares<')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<article (.*?)</article>')
+
+    num_matches = len(matches)
+
+    for article in matches[item.page * perpage:]:
+        url = scrapertools.find_single_match(article, ' href="(.*?)"')
+        title = scrapertools.find_single_match(article, '<span class="tvshow">(.*?)</span>').strip()
+
+        season, episode = scrapertools.find_single_match(article, '<span class="tv-num">T(.*?)E(.*?)</span>')
+        season = season.strip()
+        episode = episode.strip()
+
+        if not title or not url or not season or not episode: continue
+
+        if len(season) == 2:
+            if season.startswith('0'):
+                season = season.replace('0', '')
+
+        if len(episode) == 2:
+            if episode.startswith('0'):
+                episode = episode.replace('0', '')
+
+        title = title.replace(season + 'x' + episode, '').strip()
+
+        thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
+        if thumb.startswith('//'): thumb = 'https:' + thumb
+
+        titulo = '%sx%s %s' % (season, episode, title)
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail = thumb,
+                                    contentType='episode', contentSerieName=title, contentSeason=season, contentEpisodeNumber=episode ))
+
+        if len(itemlist) >= perpage: break
+
+    buscar_next = True
+    if num_matches > perpage:
+        hasta = (item.page * perpage) + perpage
+        if hasta < num_matches:
+            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='last_epis', text_color='coral' ))
+            buscar_next = False
+
+    if buscar_next:
+        next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination".*?class="page-numbers current">.*?href="([^"]+)"')
+        if next_page:
+            if '/page/' in next_page:
+                itemlist.append(item.clone (url = next_page, page = 0, title = 'Siguientes ...', action = 'last_epis', text_color='coral' ))
 
     return itemlist
 
@@ -140,7 +208,7 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]' + title + '[/COLOR]')
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.dobject = dobject
             item.dpost = dpost
             item.contentType = 'season'
@@ -165,7 +233,19 @@ def episodios(item):
     post = {'action': 'action_select_season', 'post': item.dpost, 'object': item.dobject, 'season': item.contentSeason}
     data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post)
 
-    for i in range(10):
+    tot_pages = scrapertools.find_single_match(data, '<span class="page-numbers dots">.*?href=.*?>(.*?)</a>')
+
+    if not tot_pages: pages = 12
+    else:
+        try:
+           pages = int(tot_pages)
+        except:
+           pages = 12
+
+    if pages > 1:
+        platformtools.dialog_notification('SeriesMetro', '[COLOR blue]Cargando episodios[/COLOR]')
+
+    for i in range(pages):
         matches = scrapertools.find_multiple_matches(data, '<li><a href="([^"]+)"[^>]*>([^<]+)')
         for url, title in matches:
             s_e = scrapertools.find_single_match(title, '(\d+)(?:x|X)(\d+)')

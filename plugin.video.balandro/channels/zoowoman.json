@@ -13,5 +13,5 @@
 
   "clusters": ["torrents", "classic", "adults", "rankings", "lists", "epochs", "years", "directors", "kids", "docs", "vos"],
 
-  "notes": "Películas clásicas y cine independiente, por géneros, subgéneros, años, directores."
+  "notes": "Web CERRADA. Películas clásicas y cine independiente, por géneros, subgéneros, año."
 }

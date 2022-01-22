@@ -17,7 +17,7 @@ IDIOMAS = {'la': 'Lat', 'es': 'Esp', 'en_es': 'Vose', 'en': 'VO'}
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 def configurar_proxies(item):
     from core import proxytools
@@ -42,6 +42,10 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host_catalogue ))
 
     itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_episodes', url = host ))
@@ -55,10 +59,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios' ))
     itemlist.append(item.clone( title = 'Por país', action = 'paises' ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
-
-    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -192,7 +192,7 @@ def list_all(item):
 
     next_page_link = scrapertools.find_single_match(data, '<li class="page-item"><a href="([^"]+)" aria-label="(?:Netx|Next)"')
     if next_page_link:
-        itemlist.append(item.clone( title='>> Página siguiente', url=host_catalogue + next_page_link, action='list_all', text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', url=host_catalogue + next_page_link, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -221,15 +221,14 @@ def temporadas(item):
         numtempo = tempo['number']
 
         if tot_temp == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]' + title + '[/COLOR]')
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.id = item_id
-            item.page = 0
             item.contentType = 'season'
             item.contentSeason = numtempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, item_id = item_id, contentType = 'season', contentSeason = numtempo, page = 0 ))
+        itemlist.append(item.clone( action = 'episodios', title = title, item_id = item_id, contentType = 'season', contentSeason = numtempo ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -243,7 +242,7 @@ def episodios(item):
     color_lang = config.get_setting('list_languages_color', default='red')
 
     if not item.page: item.page = 0
-    perpage = 50
+    if not item.perpage: item.perpage = 50
 
     if not item.item_id:
         data = do_downloadpage(item.url)
@@ -253,7 +252,14 @@ def episodios(item):
     post = 'item_id=%s&season_number=%s' % (item.item_id, item.contentSeason)
     data = jsontools.load(do_downloadpage(url, post=post))
 
-    for epi in data[item.page * perpage:]:
+    if item.page == 0:
+        sum_parts = len(data)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('Dilo', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
+
+    for epi in data[item.page * item.perpage:]:
         titulo = '%sx%s %s' % (epi['season_number'], epi['number'], epi['name'])
         plot = epi['description']
         langs = re.findall('languajes/([^.]+).png', epi['audio'])
@@ -263,13 +269,14 @@ def episodios(item):
         itemlist.append(item.clone( action='findvideos', url=host+epi['permalink']+'/', title=titulo, plot=plot, thumbnail=thumb,
                                     contentType='episode', contentSeason=epi['season_number'], contentEpisodeNumber=epi['number'] ))
 
-        if len(itemlist) >= perpage:
+        if len(itemlist) >= item.perpage:
             break
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(data) > ((item.page + 1) * perpage):
-        itemlist.append(item.clone( title=">> Página siguiente", action="episodios", page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(data) > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
 
@@ -318,7 +325,7 @@ def last_episodes(item):
     tmdb.set_infoLabels(itemlist)
 
     if num_matches > ((item.page + 1) * perpage):
-        itemlist.append(item.clone( title=">> Página siguiente", action="last_episodes", page=item.page + 1, text_color='coral' ))
+        itemlist.append(item.clone( title="Siguientes ...", action="last_episodes", page=item.page + 1, text_color='coral' ))
 
     return itemlist
 

@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
 import re
 
-from platformcode import logger
+from platformcode import logger, config, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -15,7 +20,7 @@ host = 'https://www.torrentdivx.com/'
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 def configurar_proxies(item):
     from core import proxytools
@@ -26,8 +31,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     url = url.replace('/www.torrentdivx.net/', '/www.torrentdivx.com/')
 
-    if '/release/' in url:
-        raise_weberror = False
+    if '/release/' in url: raise_weberror = False
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('torrentdivx', url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -49,10 +53,18 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 def mainlist(item):
     return mainlist_pelis(item)
 
+    # ~ itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
+
+    # ~ itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    # ~ itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
@@ -63,9 +75,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -73,11 +82,12 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
     itemlist.append(item.clone( title='Catálogo', action='list_all', url= host + 'tvshows/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
-
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -141,8 +151,8 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>LO MAS VISITADO<')
-    if not bloque: bloque = scrapertools.find_single_match(data, '<h1>(.*?)>LO MAS VISITADO<')
+    bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>TMDB PROMEDIO<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<h1>(.*?)>TMDB PROMEDIO<')
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
@@ -177,7 +187,7 @@ def list_all(item):
 
     next_page = scrapertools.find_single_match(data, '<span class="current">.*?<a href="([^"]+)"')
     if next_page:
-       itemlist.append(item.clone (url = next_page, title = '>> Página siguiente', action = 'list_all', text_color='coral' ))
+       itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -229,8 +239,8 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Castellano':'Esp', 'Latino':'Lat', 'V.O. Subtitulado':'Vose', 'Version Original':'VO',
-                'Version Original +Sub': 'VOS', 'Latino - Varios': 'Varios'}
+    IDIOMAS = {'Castellano': 'Esp', 'Latino': 'Lat', 'V.O. Subtitulado': 'Vose', 'Version Original': 'VO',
+                'Subtitulo Español': 'Vose', 'Version Original +Sub': 'VOS', 'Latino - Varios': 'Varios'}
 
     data = do_downloadpage(item.url)
 
@@ -238,7 +248,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr(.*?)</tr>')
 
+    ses = 0
+
     for enlace in matches:
+        ses += 1
+
         if '<th' in enlace or 'torrent' not in enlace: continue
         if "id='link-fake'" in enlace: continue
 
@@ -252,16 +266,21 @@ def findvideos(item):
         qlty = scrapertools.find_single_match(tds[1], "<strong class='quality'>([^<]+)")
         lang = tds[2]
 
-        othr = tds[3] if tds[3] != '----' else ''
-        if othr == 'No Aplica': othr = '?'
+        other = tds[3] if tds[3] != '----' else ''
+        if other == 'No Aplica': other = '?'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'torrent', title = '', url = url,
-                              language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = othr ))
+                              language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = other ))
 
     if len(itemlist) == 0:
         matches = scrapertools.find_multiple_matches(data, ' href="(magnet[^"]+)')
         for url in matches:
             itemlist.append(Item( channel = item.channel, action = 'play', server = 'torrent', title = '', url = url ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -275,18 +294,27 @@ def play(item):
 
         url = scrapertools.find_single_match(data, '<a id="link" rel="nofollow" href="([^"]+)')
 
-        if '/www.pastexts.com/' in url or '/tmearn.com/' in url or '/sturl.in/' in url or '/uiio.io/' in url or '/down.fast-' in url:
+        if '/www.pastexts' in url or '/tmearn' in url or '/sturl' in url or '/uii' in url or '/uiio' in url or '/down.fast-' in url or '/adshort' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-        if url.endswith('.torrent'):
-            import os
-            from platformcode import config
+        if url.startswith('magnet:') or url.endswith('.torrent'):
+            if config.get_setting('proxies', item.channel, default=''):
+                if PY3:
+                    from core import requeststools
+                    data = requeststools.read(url, 'torrentdivx')
+                else:
+                    data = do_downloadpage(url)
 
-            data = do_downloadpage(url)
-            file_local = os.path.join(config.get_data_path(), "temp.torrent")
-            with open(file_local, 'wb') as f: f.write(data); f.close()
+                if data:
+                    import os
 
-            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+                    file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                    with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                    itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            else:
+                itemlist.append(item.clone( url = url, server = 'torrent' ))
+
             return itemlist
 
         if url:
@@ -345,7 +373,7 @@ def list_search(item):
 
     next_page = scrapertools.find_single_match(data, '<span class="current">.*?<a href="([^"]+)"')
     if next_page:
-       itemlist.append(item.clone (url = next_page, title = '>> Página siguiente', action = 'list_search', text_color='coral' ))
+       itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_search', text_color='coral' ))
 
     return itemlist
 

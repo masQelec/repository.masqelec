@@ -13,5 +13,5 @@
 
   "clusters": ["torrents", "languages", "qualityes", "kids", "docs", "vos"],
 
-  "notes": "Películas por idiomas, géneros y calidades."
+  "notes": "Películas por idiomas, géneros y calidad."
 }

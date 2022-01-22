@@ -18,8 +18,7 @@ class login_dialog(xbmcgui.WindowDialog):
         avis = True
         if config.get_setting('playdede_username', 'playdede', default=False): 
             if config.get_setting('playdede_password', 'playdede', default=False):
-                if config.get_setting('playdede_login', 'playdede', default=False):
-                    avis = False
+                if config.get_setting('playdede_login', 'playdede', default=False): avis = False
 
         if avis:
             self.login_result = False
@@ -44,8 +43,7 @@ class login_dialog(xbmcgui.WindowDialog):
         self.addControl(self.buttonOk)
         self.password.controlDown(self.buttonOk)
         self.username.setLabel('Indicar su usuario: ')
-        if int(platformtools.get_kodi_version()[1]) >= 18:
-            self.password.setType(xbmcgui.INPUT_TYPE_PASSWORD, 'Indicar la contraseña: ')
+        if int(platformtools.get_kodi_version()[1]) >= 18: self.password.setType(xbmcgui.INPUT_TYPE_PASSWORD, 'Indicar la contraseña: ')
 
         self.password.setLabel('Indicar la contraseña: ')
         self.setFocus(self.username)
@@ -75,13 +73,11 @@ class login_dialog(xbmcgui.WindowDialog):
 
     def onControl(self, control):
         control = control.getId()
-        if control in range(3000, 30010):
-            self.close()
+        if control in range(3000, 30010): self.close()
 
 def do_make_login_logout(url, post=None, headers=None):
     add_referer = True
-    if '/user/' in url:
-        add_referer=False
+    if '/user/' in url: add_referer=False
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False).data
     data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False).data
@@ -99,8 +95,7 @@ def login(item):
 
     if not username or not password:
         login = login_dialog()
-        if not login.login_result:
-            return False
+        if not login.login_result: return False
 
         if not item:
             platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]PlayDede Credenciales guardadas[/COLOR]')
@@ -117,16 +112,19 @@ def login(item):
        if user:
            if username:
                if username in user:
-                   if not status:
-                       config.set_setting('playdede_login', True, 'playdede')
+                   if not status: config.set_setting('playdede_login', True, 'playdede')
 
                    platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
+
+                   platformtools.itemlist_refresh()
                    return True
 
        if 'UserOn' in data:
            if not status:
                config.set_setting('playdede_login', True, 'playdede')
                platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
+
+           platformtools.itemlist_refresh()
            return True
     except:
        platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Sin acceso Web[/COLOR]')
@@ -142,10 +140,14 @@ def login(item):
        if not jdata['alert']:
            platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
            config.set_setting('playdede_login', True, 'playdede')
+
+           platformtools.itemlist_refresh()
            return True
        elif bool(jdata['reload']):
            platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
            config.set_setting('playdede_login', True, 'playdede')
+
+           platformtools.itemlist_refresh()
            return True
        else:
            platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Login incorrecto[/COLOR]')
@@ -154,12 +156,13 @@ def login(item):
        platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Sin acceso Login[/COLOR]')
        return False
 
-    if not httptools.get_cookie(host, 'MoviesWebsite'):
-        do_make_login_logout(host)
+    if not httptools.get_cookie(host, 'MoviesWebsite'): do_make_login_logout(host)
 
     if httptools.get_cookie(host, 'utoken'):
         platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
         config.set_setting('playdede_login', True, 'playdede')
+
+        platformtools.itemlist_refresh()
         return True
 
     try:
@@ -171,6 +174,8 @@ def login(item):
     if httptools.get_cookie(host, 'utoken'):
         platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
         config.set_setting('playdede_login', True, 'playdede')
+
+        platformtools.itemlist_refresh()
         return True
 
     platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Login incorrecto[/COLOR]')
@@ -186,17 +191,19 @@ def logout(item):
         data = do_make_login_logout(host + 'user/' + username + '/salir/')
 
         config.set_setting('playdede_login', False, 'playdede')
-        platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]PlayDede Sesión cerrada[/COLOR]')
+        platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Sesión cerrada[/COLOR]')
+
+        platformtools.itemlist_refresh()
         return True
 
-    platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede No se cerró la Sesión[/COLOR]')
+    platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Sin cerrar Sesión[/COLOR]')
     return False
 
 
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 def configurar_proxies(item):
     from core import proxytools
@@ -205,19 +212,15 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, referer=None):
     # ~ por si viene de enlaces guardados posteriores
-    if url.startswith('/'):  # ~ solo v. 2.0.0
-        url = host + url[1:]
+    if url.startswith('/'): url = host + url[1:] # ~ solo v. 2.0.0
 
     headers = {}
 
-    if referer:
-        headers = {'Referer': referer}
-    else:
-        headers = {'Referer': host}
+    if referer: headers = {'Referer': referer}
+    else: headers = {'Referer': host}
 
     timeout = None
-    if '?genre=' in url:
-        timeout = 50
+    if '?genre=' in url: timeout = 50
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
     data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
@@ -226,8 +229,8 @@ def do_downloadpage(url, post=None, referer=None):
         if not config.get_setting('playdede_login', 'playdede', default=False):
             platformtools.dialog_notification(config.__addon_name, '[COLOR yellow][B]PlayDede Debe iniciar Sesión[/B][/COLOR]')
 
-        login('')
-        return do_downloadpage(url, post=post, referer=referer)
+        result = login('')
+        if result == True: return do_downloadpage(url, post=post, referer=referer)
 
     return data
 
@@ -236,23 +239,23 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    if not config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item_configurar_proxies(item))
 
-        itemlist.append(item.clone( title = '[COLOR teal]Iniciar sesión[/COLOR]', action = 'login' ))
+    if not config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
 
         itemlist.append(Item( channel='helper', action='show_help_register', title='Información para registrase', thumbnail=config.get_thumb('help'), text_color='green' ))
 
+        platformtools.itemlist_refresh()
+
     if config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
-        itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
-        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes' ))
+        itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
-        itemlist.append(item.clone( title = 'Listas', action = 'list_listas', search_type = 'all' ))
+        itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+        itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
-        itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
-
-        itemlist.append(item_configurar_proxies(item))
+        itemlist.append(item.clone( title = 'Listas', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
 
         itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR]', action = 'logout' ))
 
@@ -263,14 +266,18 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if not config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item_configurar_proxies(item))
 
-        itemlist.append(item.clone( title = '[COLOR teal]Iniciar sesión[/COLOR]', action = 'login' ))
+    if not config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
 
         itemlist.append(Item( channel='helper', action='show_help_register', title='Información para registrase', thumbnail=config.get_thumb('help'), text_color='green' ))
 
+        platformtools.itemlist_refresh()
+
     if config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
         itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas/estrenos/', slug = 'peliculas/estrenos', nro_pagina = 1, search_type = 'movie' ))
         itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'peliculas/mejor-valoradas/', slug = 'peliculas/mejor-valoradas', nro_pagina = 1, search_type = 'movie' ))
@@ -281,10 +288,6 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = 'Listas', action = 'list_listas', search_type = 'all' ))
 
-        itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
-        itemlist.append(item_configurar_proxies(item))
-
         itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR]', action = 'logout' ))
 
     return itemlist
@@ -294,14 +297,18 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    if not config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item_configurar_proxies(item))
 
-        itemlist.append(item.clone( title = '[COLOR teal]Iniciar sesión[/COLOR]', action = 'login' ))
+    if not config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
 
         itemlist.append(Item( channel='helper', action='show_help_register', title='Información para registrase', thumbnail=config.get_thumb('help'), text_color='green' ))
 
+        platformtools.itemlist_refresh()
+
     if config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'series/novedades/', slug = 'series/novedades', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series/mejor-valoradas/', slug = 'series/mejor-valoradas', nro_pagina = 1, search_type = 'tvshow' ))
@@ -314,10 +321,6 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Listas', action = 'list_listas', search_type = 'all' ))
 
-        itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
-
-        itemlist.append(item_configurar_proxies(item))
-
         itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR]', action = 'logout' ))
 
     return itemlist
@@ -327,14 +330,18 @@ def mainlist_animes(item):
     logger.info()
     itemlist = []
 
-    if not config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item_configurar_proxies(item))
 
-        itemlist.append(item.clone( title = '[COLOR teal]Iniciar sesión[/COLOR]', action = 'login' ))
+    if not config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
 
         itemlist.append(Item( channel='helper', action='show_help_register', title='Información para registrase', thumbnail=config.get_thumb('help'), text_color='green' ))
 
+        platformtools.itemlist_refresh()
+
     if config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
+
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes/', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'animes/novedades/', slug = 'animes/novedades', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'animes/mejor-valoradas/', slug = 'animes/mejor-valoradas', nro_pagina = 1, search_type = 'tvshow' ))
@@ -344,10 +351,6 @@ def mainlist_animes(item):
         itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = 'Listas', action = 'list_listas', search_type = 'all' ))
-
-        itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow' ))
-
-        itemlist.append(item_configurar_proxies(item))
 
         itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR]', action = 'logout' ))
 
@@ -396,10 +399,8 @@ def generos(item):
     itemlist = []
 
     if not item.group:
-        if item.search_type == 'movie':
-            url_generos = host + 'peliculas/'
-        else:
-            url_generos = host + 'series/'
+        if item.search_type == 'movie': url_generos = host + 'peliculas/'
+        else: url_generos = host + 'series/'
     else:
         url_generos = host + 'animes/'
 
@@ -428,10 +429,8 @@ def anios(item):
     logger.info()
     itemlist = []
 
-    if item.search_type == 'movie':
-        tope_year = 1934
-    else:
-        tope_year = 1969
+    if item.search_type == 'movie': tope_year = 1934
+    else: tope_year = 1969
 
     from datetime import datetime
     current_year = int(datetime.today().year)
@@ -493,8 +492,7 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, '<img src=(.*?)"')
 
         year = scrapertools.find_single_match(match, '<p>(.*?)</p>')
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         if '/pelicula/' in url:
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
@@ -511,7 +509,7 @@ def list_all(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
             buscar_next = False
 
     if num_matches < elepage:
@@ -523,7 +521,7 @@ def list_all(item):
 
              post = {'_method': 'items', 'page': item.nro_pagina, 'AjaxName': 'main', 'slug': item.slug}
 
-             itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_all',
+             itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all',
                                          nro_pagina = item.nro_pagina, post = post, page = 0, text_color = 'coral' ))
 
     return itemlist
@@ -555,7 +553,7 @@ def list_listas(item):
 
             next_url = scrapertools.find_single_match(data, patron)
             if next_url:
-                itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, action = 'list_listas', text_color = 'coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_listas', text_color = 'coral' ))
 
     return itemlist
 
@@ -595,8 +593,7 @@ def list_network(item):
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<p>(.*?)</p>')
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
                                     contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
@@ -609,7 +606,7 @@ def list_network(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_network', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_network', text_color = 'coral' ))
             buscar_next = False
 
     if num_matches < elepage:
@@ -621,7 +618,7 @@ def list_network(item):
 
              post = {'_method': 'items', 'page': item.nro_pagina, 'networks': item.id_network, 'AjaxName': 'main', 'slug': item.slug}
 
-             itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_network',
+             itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_network',
                                          nro_pagina = item.nro_pagina, post = post, page = 0, text_color = 'coral' ))
 
     return itemlist
@@ -642,14 +639,13 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]' + title + '[/COLOR]')
-            item.page = 0
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.contentType = 'season'
             item.contentSeason = int(tempo)
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = int(tempo), page = 0 ))
+        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = int(tempo) ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -661,7 +657,7 @@ def episodios(item):
     itemlist = []
 
     if not item.page: item.page = 0
-    perpage = 50
+    if not item.perpage: item.perpage = 50
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -671,9 +667,17 @@ def episodios(item):
     patron = '<a href="([^"]+)"><div class="imagen">'
     patron += '<img src="([^"]+)"><\/div>.*?<div class="epst">([^<]+)'
     patron += '<\/div><div class="numerando">([^<]+)'
+
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    for url, thumb, titulo, name in matches[item.page * perpage:]:
+    if item.page == 0:
+        sum_parts = len(matches)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('PlayDede', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
+
+    for url, thumb, titulo, name in matches[item.page * item.perpage:]:
         s_e = scrapertools.get_season_and_episode(name)
         season = int(s_e.split("x")[0])
         episode = s_e.split("x")[1]
@@ -683,13 +687,14 @@ def episodios(item):
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
 
-        if len(itemlist) >= perpage:
+        if len(itemlist) >= item.perpage:
             break
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(matches) > ((item.page + 1) * perpage):
-        itemlist.append(item.clone( title = ">> Página siguiente", action = "episodios", page = item.page + 1, text_color = 'coral' ))
+    if itemlist:
+        if len(matches) > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage, text_color = 'coral' ))
 
     return itemlist
 
@@ -713,8 +718,7 @@ def findvideos(item):
 
         if not server or not sid: continue
 
-        if lang.lower() == 'espsub':
-            lang = 'Vose'
+        if lang.lower() == 'espsub': lang = 'Vose'
 
         lang = lang.capitalize()
         server = servertools.corregir_servidor(server)
@@ -731,8 +735,7 @@ def findvideos(item):
 
         if not url or not server: continue
 
-        if lang.lower() == 'espsub':
-            lang = 'Vose'
+        if lang.lower() == 'espsub': lang = 'Vose'
 
         lang = lang.capitalize()
         server = servertools.corregir_servidor(server)
@@ -749,8 +752,11 @@ def findvideos(item):
 
         if not url or not server: continue
 
-        if lang.lower() == 'espsub':
-            lang = 'Vose'
+        if 'https://netload.cc/st?' in url:
+             url = scrapertools.find_single_match(url, '&url=(.*?)$')
+             if not url: continue
+
+        if lang.lower() == 'espsub': lang = 'Vose'
 
         lang = lang.capitalize()
         server = servertools.corregir_servidor(server)
@@ -795,7 +801,7 @@ def clean_title(title, url):
     logger.info()
 
     title = title.replace('\\u00e1', 'a').replace('\\u00c1', 'a').replace('\\u00e9', 'e').replace('\\u00ed', 'i').replace('\\u00f3', 'o').replace('\\u00fa', 'u')
-    title = title.replace('\\u00f1', 'ñ').replace('\\u00bf', '¿').replace('\\u00a1', '¡')
+    title = title.replace('\\u00f1', 'ñ').replace('\\u00bf', '¿').replace('\\u00a1', '¡').replace('\\u00ba', 'º')
     title = title.replace('\\u00eda', 'a').replace('\\u00f3n', 'o').replace('\\u00fal', 'u')
 
     if '\\u' in title:
@@ -852,7 +858,7 @@ def list_search(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_search', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_search', text_color = 'coral' ))
             buscar_next = False
 
     if buscar_next:
@@ -865,7 +871,7 @@ def list_search(item):
 
                 next_url = scrapertools.find_single_match(data, patron)
                 if next_url:
-                    itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, action = 'list_search', page = 0, text_color = 'coral' ))
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_search', page = 0, text_color = 'coral' ))
 
     return itemlist
 

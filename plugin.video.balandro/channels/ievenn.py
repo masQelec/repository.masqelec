@@ -24,6 +24,8 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'seccion/cine/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
@@ -31,8 +33,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -151,7 +151,7 @@ def list_all(item):
         next_url = scrapertools.find_single_match(data, '<nav class="navigation pagination".*?class="page-numbers current">.*?href="(.*?)"')
         if next_url:
             if '/page/' in next_url:
-                itemlist.append(item.clone( title='>> Página siguiente', url=next_url, action='list_all', text_color='coral' ))
+                itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
 
     return itemlist
 

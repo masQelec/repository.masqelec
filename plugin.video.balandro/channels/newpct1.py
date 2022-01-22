@@ -6,7 +6,6 @@ if sys.version_info[0] < 3:
     PY3 = False
 else:
     PY3 = True
-    unicode = str
 
 
 import os, re
@@ -16,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://atomixhq.com/'
+host = 'https://atomixhq.top/'
 
 clon_name = 'Atomix'
 
@@ -26,7 +25,7 @@ color_list_proxies = config.get_setting('channels_list_proxies_color', default='
 
 
 CLONES = [
-   ['atomix', 'https://atomixhq.com/', 'movie, tvshow', 'atomixhq.png'],
+   ['atomix', 'https://atomixhq.top/', 'movie, tvshow', 'atomixhq.png'],
    ['descargas2020', 'https://descargas2020.net/', 'movie', 'descargas2020.jpg']
    ]
 
@@ -42,7 +41,7 @@ def item_configurar_proxies(item, clon_host):
     plot = 'Es posible que para poder "utilizar/reproducir" este canal en alguno de sus clones necesites configurar algún proxy,'
     plot += ' ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + clon_host + ' necesitarás un proxy.'
-    title = 'Configurar proxies a usar ... [COLOR plum](comunes en todos los clones)[/COLOR]'
+    title = 'Configurar proxies a usar ...  [COLOR plum](si no hay resultados)[COLOR moccasin] comunes en todos los clones[/COLOR]'
     return item.clone( title = title, action = 'configurar_proxies', host = clon_host, folder=False, plot=plot, text_color='red' )
 
 def configurar_proxies(item):
@@ -52,11 +51,13 @@ def configurar_proxies(item):
 
 def do_downloadpage(item, url, post=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/pctmix.com/', '/atomixhq.com/')
-    url = url.replace('/pctmix1.com/', '/atomixhq.com/')
-    url = url.replace('/pctreload.com/', '/atomixhq.com/')
-    url = url.replace('/pctreload1.com/', '/atomixhq.com/')
-    url = url.replace('/maxitorrent.com/', '/atomixhq.com/')
+    ant_hosts = ['https://pctmix.com/', 'https://pctmix1.com/', 
+                 'https://pctreload.com/', 'https://pctreload1.com/',
+                 'https://maxitorrent.com/',
+                 'https://atomixhq.com/', 'https://atomixhq.one/', 'https://atomixhq.net/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
 
     # ~ intento sin proxies
     data = ''
@@ -77,10 +78,12 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
-    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
+    itemlist.append(item_configurar_proxies(item, host))
 
-    itemlist.append(item.clone( title = 'Buscar ... (búsquedas solo en ' + clon_name + ')', action = 'search', search_type = 'all' ))
+    itemlist.append(item.clone( title = '[COLOR yellow]Buscar ...[/COLOR] (búsquedas solo en ' + clon_name + ')', action = 'search', search_type = 'all' ))
+
+    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -88,6 +91,11 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item, host))
+
+    itemlist.append(item.clone( title = '[COLOR deepskyblue]Buscar película ...[/COLOR] (búsquedas solo en ' + clon_name + ')',
+                                action = 'search', search_type = 'movie' ))
 
     for clone in CLONES:
         if 'movie' in clone[2]:
@@ -100,8 +108,6 @@ def mainlist_pelis(item):
                 color = color_list_proxies
 
             itemlist.append(item.clone( title = clone[0].capitalize(), action = 'mainlist_pelis_clon', url = url, thumbnail = thumb, text_color=color ))
-
-    itemlist.append(item.clone( title = 'Buscar película ... (búsquedas solo en ' + clon_name + ')', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -117,7 +123,7 @@ def mainlist_pelis_clon(item):
     itemlist.append(item_configurar_proxies(item, clon_host))
 
     if not 'descargas2020' in clon_host:
-        itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', url = item.url, search_type = 'movie', text_color='yellowgreen' ))
+        itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', url = item.url, search_type = 'movie', text_color='deepskyblue' ))
 
     enlaces = [
         ['Estrenos', 'estrenos-de-cine/'],
@@ -160,6 +166,11 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item_configurar_proxies(item, host))
+
+    itemlist.append(item.clone( title = '[COLOR hotpink]Buscar serie ...[/COLOR] (búsquedas solo en ' + clon_name + ')',
+                                action = 'search', search_type = 'tvshow' ))
+
     for clone in CLONES:
         if 'tvshow' in clone[2]:
             thumb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', clone[3])
@@ -171,8 +182,6 @@ def mainlist_series(item):
                 color = color_list_proxies
 
             itemlist.append(item.clone( title = clone[0].capitalize(), action = 'mainlist_series_clon', url = url, thumbnail = thumb, text_color=color ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ... (búsquedas solo en ' + clon_name + ')', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -187,7 +196,7 @@ def mainlist_series_clon(item):
 
     itemlist.append(item_configurar_proxies(item, clon_host))
 
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', url = item.url, search_type = 'tvshow', text_color='yellowgreen' ))
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', url = item.url, search_type = 'tvshow', text_color='hotpink' ))
 
     enlaces = [
         ['Catálogo', 'series/'],
@@ -282,20 +291,20 @@ def list_all(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, text_color='coral' ))
             buscar_next = False
 
     if buscar_next:
         next_page_link = scrapertools.find_single_match(data, '<li><a href="([^"]+)">Next</a>')
         if next_page_link:
-            itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, page=0, text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, page=0, text_color='coral' ))
 
     return itemlist
 
 
 def tracking_all_episodes(item):
     itemlist = episodios(item)
-    while itemlist[-1].title == '>> Página siguiente':
+    while itemlist[-1].title == 'Siguientes ...':
         itemlist = itemlist[:-1] + episodios(itemlist[-1])
     return itemlist
 
@@ -358,7 +367,7 @@ def episodios(item):
 
     next_page_link = scrapertools.find_single_match(data, '<li><a href="([^"]+)">Next</a>')
     if next_page_link:
-        itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, text_color='coral' ))
 
     return itemlist
 
@@ -427,7 +436,8 @@ def findvideos(item):
     for servidor, idioma, calidad, url, tipo in matches:
         if url.startswith('javascript:'): continue
 
-        servidor = servidor.replace('.com', '').strip()
+        servidor = servidor.replace('.com', '').replace('.net', '').replace('.org', '').replace('.co', '').replace('.cc', '').strip()
+        servidor = servidor.replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '').replace('.eu', '').replace('.ws', '').strip()
         servidor = servertools.corregir_servidor(servidor)
 
         if not idioma:
@@ -447,7 +457,8 @@ def findvideos(item):
         for servidor, idioma, calidad, url in matches:
             if url.startswith('javascript:'): continue
 
-            servidor = servidor.replace('.com', '').strip()
+            servidor = servidor.replace('.com', '').replace('.net', '').replace('.org', '').replace('.co', '').replace('.cc', '').strip()
+            servidor = servidor.replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '').replace('.eu', '').replace('.ws', '').strip()
             servidor = servertools.corregir_servidor(servidor)
 
             if not idioma:
@@ -468,13 +479,21 @@ def play(item):
         if '/atomtt.com/' in item.url:
             item.url = item.url.replace('/download/', '/download-link/').replace('.torrent', '')
 
-            if config.get_setting('proxies', item.channel, default=''):
-                data = do_downloadpage(item, item.url)
+            dominio = scrapertools.find_single_match(host, '.*?//(.*?)/')
+            item.url = item.url + 'dom-t/' + dominio
 
-                file_local = os.path.join(config.get_data_path(), "temp.torrent")
-                if PY3 and not isinstance(file_local, bytes): file_local = file_local.encode('utf-8')
-                with open(file_local, 'wb') as f: f.write(data); f.close()
-                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            if config.get_setting('proxies', item.channel, default=''):
+                if PY3:
+                    from core import requeststools
+                    data = requeststools.read(item.url, 'newpct1')
+                else:
+                    data = do_downloadpage(item.url)
+
+                if data:
+                    file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                    with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                    itemlist.append(item.clone( url = file_local, server = 'torrent' ))
             else:
                 itemlist.append(item.clone( url = item.url, server = 'torrent' ))
 
@@ -483,15 +502,23 @@ def play(item):
 
             new_url = scrapertools.find_single_match(data, 'window.location.href.*?"(.*?)"')
             if new_url:
-                if config.get_setting('proxies', item.channel, default=''):
-                    data = do_downloadpage(item, new_url)
+                item.url = new_url
 
-                    file_local = os.path.join(config.get_data_path(), "temp.torrent")
-                    if PY3 and not isinstance(file_local, bytes): file_local = file_local.encode('utf-8')
-                    with open(file_local, 'wb') as f: f.write(data); f.close()
-                    itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            if config.get_setting('proxies', item.channel, default=''):
+                if PY3:
+                    from core import requeststools
+                    data = requeststools.read(item.url, 'newpct1')
                 else:
-                    itemlist.append(item.clone( url = new_url, server = 'torrent' ))
+                    data = do_downloadpage(item.url)
+
+                if data:
+                    file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                    with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                    itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            else:
+                itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+
 
     else:
         itemlist.append(item.clone( url= item.url, server = item.server ))
@@ -522,7 +549,7 @@ def busqueda(item):
         if (item.search_type == 'tvshow' and not is_tvshow) or (item.search_type == 'movie' and is_tvshow): continue
         if url in [it.url for it in itemlist]: continue
 
-        title = unicode(tname, 'unicode-escape', 'ignore').encode('utf8')
+        title = tname
 
         idioma = ''
         if 'Castellano]' in title: idioma = 'Esp'
@@ -558,7 +585,7 @@ def busqueda(item):
     tmdb.set_infoLabels(itemlist)
 
     if '"items":30,' in data:
-        itemlist.append(item.clone( title='>> Página siguiente', action='busqueda', busca_pagina = item.busca_pagina + 1, text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', action='busqueda', busca_pagina = item.busca_pagina + 1, text_color='coral' ))
 
     return itemlist
 

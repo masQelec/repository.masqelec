@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 from platformcode import logger, config, platformtools
 from core.item import Item
 
@@ -31,8 +33,33 @@ def _dominios(item):
 def _credenciales_hdfull(item):
     logger.info()
 
+    from core import filetools, jsontools
+
+    channel_json = 'hdfull.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] HdFull') % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
     from channels import hdfull
+
     item.channel = 'hdfull'
+
+    if config.get_setting('hdfull_login', 'hdfull', default=False): hdfull.logout(item)
+
     hdfull.login('')
 
     _refresh_menu(item)
@@ -40,8 +67,33 @@ def _credenciales_hdfull(item):
 def _credenciales_playdede(item):
     logger.info()
 
+    from core import filetools, jsontools
+
+    channel_json = 'playdede.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] PlayDede') % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
     from channels import playdede
+
     item.channel = 'playdede'
+
+    if config.get_setting('playdede_login', 'playdede', default=False): playdede.logout(item)
+
     playdede.login('')
 
     _refresh_menu(item)
@@ -49,7 +101,12 @@ def _credenciales_playdede(item):
 def _proxies(item):
     logger.info()
 
-    if item.from_channel == 'cinetux':
+    if item.from_channel == 'cinecalidad':
+        from channels import cinecalidad
+        item.channel = 'cinecalidad'
+        cinecalidad.configurar_proxies(item)
+
+    elif item.from_channel == 'cinetux':
         from channels import cinetux
         item.channel = 'cinetux'
         cinetux.configurar_proxies(item)
@@ -69,15 +126,15 @@ def _proxies(item):
         item.channel = 'cuevana3'
         cuevana3.configurar_proxies(item)
 
+    elif item.from_channel == 'cuevana3video':
+        from channels import cuevana3video
+        item.channel = 'cuevana3video'
+        cuevana3video.configurar_proxies(item)
+
     elif item.from_channel == 'dilo':
         from channels import dilo
         item.channel = 'dilo'
         dilo.configurar_proxies(item)
-
-    elif item.from_channel == 'dixmaxlive':
-        from channels import dixmaxlive
-        item.channel = 'dixmaxlive'
-        dixmaxlive.configurar_proxies(item)
 
     elif item.from_channel == 'documaniatv':
         from channels import documaniatv
@@ -88,6 +145,16 @@ def _proxies(item):
         from channels import dontorrents
         item.channel = 'dontorrents'
         dontorrents.configurar_proxies(item)
+
+    elif item.from_channel == 'dontorrentsin':
+        from channels import dontorrentsin
+        item.channel = 'dontorrentsin'
+        dontorrentsin.configurar_proxies(item)
+
+    elif item.from_channel == 'entrepeliculasyseries':
+        from channels import entrepeliculasyseries
+        item.channel = 'entrepeliculasyseries'
+        entrepeliculasyseries.configurar_proxies(item)
 
     elif item.from_channel == 'estrenoscinesaa':
         from channels import estrenoscinesaa
@@ -134,13 +201,13 @@ def _proxies(item):
         item.channel = 'mejortorrents'
         mejortorrents.configurar_proxies(item)
 
+    elif item.from_channel == 'movidytv':
+        from channels import movidytv
+        item.channel = 'movidytv'
+        movidytv.configurar_proxies(item)
+
     elif item.from_channel == 'newpct1':
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Configurar proxies desde el canal[/COLOR][/B]' % color_avis)
-
-    elif item.from_channel == 'pctfenix':
-        from channels import pctfenix
-        item.channel = 'pctfenix'
-        pctfenix.configurar_proxies(item)
 
     elif item.from_channel == 'pelisgratis':
         from channels import pelisgratis
@@ -152,6 +219,16 @@ def _proxies(item):
         item.channel = 'pelishouse'
         pelishouse.configurar_proxies(item)
 
+    elif item.from_channel == 'pelispedia':
+        from channels import pelispedia
+        item.channel = 'pelispedia'
+        pelispedia.configurar_proxies(item)
+
+    elif item.from_channel == 'pelispedia2':
+        from channels import pelispedia2
+        item.channel = 'pelispedia2'
+        pelispedia2.configurar_proxies(item)
+
     elif item.from_channel == 'pelisplanet':
         from channels import pelisplanet
         item.channel = 'pelisplanet'
@@ -161,6 +238,11 @@ def _proxies(item):
         from channels import pelisplay
         item.channel = 'pelisplay'
         pelisplay.configurar_proxies(item)
+
+    elif item.from_channel == 'pelisxd':
+        from channels import pelisxd
+        item.channel = 'pelisxd'
+        pelisxd.configurar_proxies(item)
 
     elif item.from_channel == 'playdede':
         from channels import playdede
@@ -177,10 +259,10 @@ def _proxies(item):
         item.channel = 'ppeliculas'
         ppeliculas.configurar_proxies(item)
 
-    elif item.from_channel == 'seriesflix':
-        from channels import seriesflix
-        item.channel = 'seriesflix'
-        seriesflix.configurar_proxies(item)
+    elif item.from_channel == 'repelishd':
+        from channels import repelishd
+        item.channel = 'repelishd'
+        repelishd.configurar_proxies(item)
 
     elif item.from_channel == 'seriesyonkis':
         from channels import seriesyonkis

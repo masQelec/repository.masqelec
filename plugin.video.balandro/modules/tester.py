@@ -98,18 +98,18 @@ def test_channel(channel_name):
            if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
            elif 'CLASS' in data or 'class ' in data: part_py = 'class '
 
+           elif 'documaniatv_rua' in data: part_py = 'documaniatv_rua'
+
            elif 'def login' in data: part_py = 'def login'
            elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
            elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
 
            bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
+           bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
 
-           if bloc:
-               bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
-
-               host = scrapertools.find_single_match(bloc, 'host.*?"(.*?)"')
-               if not host:
-                   host = scrapertools.find_single_match(bloc, "host.*?'(.*?)'")
+           host = scrapertools.find_single_match(bloc, '.*?host.*?"(.*?)"')
+           if not host:
+               host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
 
     host = host.strip()
 
@@ -118,7 +118,7 @@ def test_channel(channel_name):
             host = dominio
 
     if not host or not '//' in host:
-        el_canal = ('Falta Dominio/Host/Clon en [B][COLOR %s]' + channel_py) % color_alert
+        el_canal = ('Falta Dominio/Host/Clon/Metodo en [B][COLOR %s]' + channel_py) % color_alert
         platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
         return
 

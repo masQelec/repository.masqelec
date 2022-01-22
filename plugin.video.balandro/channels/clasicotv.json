@@ -11,7 +11,7 @@
   "categories": [ "movie", "tvshow" ],
   "language": ["lat"],
 
-  "clusters": ["lasts", "kids", "docs"],
+  "clusters": ["producers", "lasts", "kids", "docs"],
 
-  "notes": "Peliculas y series, por géneros."
+  "notes": "Películas y Series, por géneros."
 }

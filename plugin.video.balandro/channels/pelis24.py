@@ -11,8 +11,7 @@ host = 'https://pelis24.in/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if '/release/' in url:
-        raise_weberror = False
+    if '/release/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     return data
@@ -29,14 +28,14 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Recomendadas (al azar)', action = 'list_all', url = host + 'peliculas/', group = 'azar', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -122,7 +121,7 @@ def list_all(item):
     if not item.group == 'azar':
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)">SIGUIENTE')
         if next_page:
-            itemlist.append(item.clone( title='>> Página siguiente', url = next_page, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', url = next_page, action='list_all', text_color='coral' ))
 
     return itemlist
 

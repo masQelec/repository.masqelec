@@ -14,7 +14,7 @@ IDIOMAS = {'Latino': 'Lat', 'Subtitulado': 'Vose', 'Español': 'Esp', 'Espa%C3%B
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 def configurar_proxies(item):
     from core import proxytools
@@ -38,6 +38,10 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title='Catálogo', action='peliculas', url=host + 'pelicula/' ))
 
     itemlist.append(item.clone( title='Estrenos', action='peliculas', url=host + 'genero/estrenos/' ))
@@ -47,9 +51,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title='Por género', action='generos' ))
     itemlist.append(item.clone( title='Por año', action = 'anios' ))
 
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -152,7 +153,7 @@ def peliculas(item):
     if next_page_link == '':
         next_page_link = scrapertools.find_single_match(data, '<div class=\'resppages\'><a href="([^"]+)')
     if next_page_link != '':
-        itemlist.append(item.clone( title='>> Página siguiente', action='peliculas', url=next_page_link, text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', action='peliculas', url=next_page_link, text_color='coral' ))
 
     return itemlist
 
@@ -329,7 +330,7 @@ def busqueda(item):
 
     next_page_link = scrapertools.find_single_match(data, '<link rel="next" href="([^"]+)')
     if next_page_link != '':
-        itemlist.append(item.clone( action='busqueda', title='>> Página siguiente', url=next_page_link, text_color='coral' ))
+        itemlist.append(item.clone( action='busqueda', title='Siguientes ...', url=next_page_link, text_color='coral' ))
 
     return itemlist
 

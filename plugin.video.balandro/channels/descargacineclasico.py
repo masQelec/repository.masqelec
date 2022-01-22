@@ -4,6 +4,9 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
+from lib import decrypters
+
+
 host = 'https://descargacineclasico.net/'
 
 
@@ -15,6 +18,8 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'tag/peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Documentales', action = 'list_all', url = host + 'tag/documentales/', search_type = 'movie' ))
@@ -22,8 +27,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -111,7 +114,7 @@ def list_all(item):
     next_page_link = scrapertools.find_single_match(data, ' rel=next href=([^ >]+)')
     if not next_page_link: next_page_link = scrapertools.find_single_match(data, ' rel="next" href="([^"]+)"')
     if next_page_link:
-        itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, action='list_all', text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -132,16 +135,19 @@ def findvideos(item):
     patron += '<span>.*?/imgdes/(.*?).jpg".*?</span>\s*'
     patron += '</a>.*?<div id="([^"]+)"[^>]*>\s*<a href=([^ ]+)'
 
-    matches = scrapertools.find_multiple_matches(data, patron)
-    if not matches:
-        patron = '<a href=#(div_\d+_v) class=MO>\s*'
-        patron += '<span>(.*?)</span>\s*'
-        patron += '<span>.*?</span>\s*'
-        patron += '<span>(.*?)</span>\s*'
-        patron += '<span>.*?</span>\s*'
-        patron += '<span>.*?/imgdes/(.*?).jpg".*?</span>\s**'
-        patron += '</a>.*?<div id=([^ ]+) [^>]*>\s*<a href=([^ ]+)'
+    try:
         matches = scrapertools.find_multiple_matches(data, patron)
+        if not matches:
+            patron = '<a href=#(div_\d+_v) class=MO>\s*'
+            patron += '<span>(.*?)</span>\s*'
+            patron += '<span>.*?</span>\s*'
+            patron += '<span>(.*?)</span>\s*'
+            patron += '<span>.*?</span>\s*'
+            patron += '<span>.*?/imgdes/(.*?).jpg".*?</span>\s**'
+            patron += '</a>.*?<div id=([^ ]+) [^>]*>\s*<a href=([^ ]+)'
+            matches = scrapertools.find_multiple_matches(data, patron)
+    except:
+        return itemlist
 
     ses = 0
 
@@ -158,11 +164,16 @@ def findvideos(item):
         elif '/vose.png' in lg or '/dual-sub.png' in lg: lang = 'Vose'
         else: lang = 'VO'
 
-        other = ''
-        if '/fumacrom.com/' in url:
-            if servidor == 'odysee': continue
+        if 'adshrink.it' in url: continue
+        elif 'theicongenerator' in url: continue
 
-            other = servidor
+        other = ''
+
+        servidor = servidor.lower()
+        if servidor == 'clip': servidor = 'clipwatching'
+
+        elif '/fumacrom.com/' in url or 'tmearn.com/' in url or '/tinyurl.com/' in url:
+            other = servidor.capitalize()
             servidor = 'directo'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url,
@@ -182,27 +193,53 @@ def play(item):
 
     url = item.url
 
-    if item.server == 'directo':
+    if 'tmearn.com/' in item.url:
+        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+    elif item.url.startswith('https://adf.ly/'): 
+        url = decrypters.decode_adfly(item.url)
+
+        if url: 
+            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            itemlist.append(item.clone(server = servidor, url = url))
+    
+    elif item.server == 'directo':
         new_url = httptools.downloadpage(item.url, follow_redirects=False).headers.get('location', '')
 
         if new_url:
-            # ~ Pendiente de resolver
-            data = httptools.downloadpage(new_url).data
-            fbm_url = scrapertools.find_single_match(data, 'id="fbm".*?<script src="(.*?)"')
+            if new_url.startswith('https://odysee.com'):
+                data = httptools.downloadpage(new_url).data
+                url = scrapertools.find_single_match(data, '"contentUrl": "(.*?)"')
 
-            if fbm_url:
-                headers = {'Referer': new_url}
-                data = httptools.downloadpage(fbm_url, headers = headers).data
+                if url:
+                   itemlist.append(item.clone(server = item.server, url = url))
 
-        return itemlist
+            else:
+                data = httptools.downloadpage(new_url).data
+                fbm_url = scrapertools.find_single_match(data, 'id="fbm".*?<script src="(.*?)"')
 
-    elif item.url.startswith('https://adf.ly/'): 
-        url = scrapertools.decode_adfly(item.url)
+                if fbm_url:
+                    url = decrypters.decrypt_dcs(data)
 
-    if url: 
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+                    if url:
+                        servidor = servertools.get_server_from_url(url)
+                        servidor = servertools.corregir_servidor(servidor)
 
+                        url = str(url)
+
+                        if url.startswith('https://odysee.com'):
+                            data = httptools.downloadpage(url).data
+                            url = scrapertools.find_single_match(data, '"contentUrl": "(.*?)"')
+
+                        if url:
+                            itemlist.append(item.clone(server = servidor, url = url))
+
+    else:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

@@ -1,0 +1,17 @@
+{
+  "id": "todotorrents",
+  "name": "TodoTorrents",
+  "thumbnail": "todotorrents.png",
+
+  "active": false,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow", "torrent"],
+  "language": ["cast"],
+
+  "clusters": ["temporary", "torrents", "last", "qualityes", "kids", "docs"],
+
+  "notes": "Películas, Series y Documentales con enlaces torrent exclusivamente, por géneros, calidad y año"
+}

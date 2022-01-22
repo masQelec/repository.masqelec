@@ -1,7 +1,7 @@
 {
   "id": "cinecalidad",
   "name": "CineCalidad",
-  "thumbnail": "cinecalidad.png",
+  "thumbnail": "cinecalidad.jpg",
 
   "active": true,
 
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow", "torrent"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["torrents", "rankings", "years", "kids", "docs", "vos"],
+  "clusters": ["suggested", "torrents", "news", "rankings", "years", "kids", "docs", "vos", "anime"],
 
-  "notes": "Acceso por separado en Castellano y Latino. Películas, destacadas, por géneros y por año. y Series"
+  "notes": "Acceso por separado Castellano y Latino. Películas por géneros y año. También Series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

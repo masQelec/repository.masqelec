@@ -20,10 +20,10 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
-    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
+    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
-    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -31,6 +31,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
@@ -42,8 +44,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
     return itemlist
 
 
@@ -51,13 +51,13 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host, search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'destacadas/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más recomendadas', action = 'list_all', url = host + 'recomendadas/', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -116,7 +116,7 @@ def list_all(item):
     if itemlist:
         next_url = scrapertools.find_single_match(bloque, '<div class="pazza">.*?<a class="ffas">.*?<a href="(.*?)"')
         if next_url:
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, action = 'list_all', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 
@@ -135,16 +135,13 @@ def temporadas(item):
 
     for elem in json_data:
         i +=1
-        if i > 1:
-            break
 
     if i == 1:
         data_epi = json_data[elem]
 
-        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]Temporada' + str(i) + '[/COLOR]')
+        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]Temporada' + str(i) + '[/COLOR]')
         item.data_epi = data_epi
         item.hash = hash
-        item.page = 0
         item.contentType = 'season'
         item.contentSeason = i
         itemlist = episodios(item)
@@ -155,13 +152,14 @@ def temporadas(item):
         data_epi = json_data[elem]
 
         season = str(elem)
-        if len(str(season)) == 1:
-            season = '0' + season 
+        if i > 9:
+            if len(str(season)) == 1:
+                season = '0' + season 
 
         titulo = 'Temporada ' + season
 
         itemlist.append(item.clone( action = 'episodios', title = titulo, data_epi = data_epi, hash = hash,
-                                    contentType = 'season', contentSeason = season, page = 0 ))
+                                    contentType = 'season', contentSeason = season ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -172,24 +170,28 @@ def episodios(item):
     logger.info()
     itemlist = []
 
+    tab_epis = []
+
     if not item.page: item.page = 0
-    perpage = 50
+    if not item.perpage: item.perpage = 50
 
     matches = item.data_epi
-
-    matches = matches.items()
+    matches = list(matches.items())
 
     num_matches = len(matches)
 
-    if num_matches > 100: 
-        platformtools.dialog_notification('Kindor', '[COLOR blue]Cargando episodios[/COLOR]')
+    if item.page == 0:
+        sum_parts = num_matches
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('Kindor', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
 
     season = str(item.contentSeason)
+    if season.startswith('0'):
+        season = season.replace('0', '')
 
-    for episode, info in matches[item.page * perpage:]:
-        if season.startswith('0'):
-            season = season.replace('0', '')
-
+    for episode, info in matches:
         ord_epis = str(episode)
 
         if len(str(ord_epis)) == 1:
@@ -199,23 +201,41 @@ def episodios(item):
         elif len(str(ord_epis)) == 3:
             ord_epis = '00' + ord_epis
         else:
-            ord_epis = '0' + ord_epis
+            if num_matches > 50:
+                ord_epis = '0' + ord_epis
 
-        titulo = '%sx%s - %s' % (season, episode, info["name"])
+        titulo = '%sx%s %s' % (season, episode, info['name'])
 
-        json_data = info["all"]
+        thumb = info['img']
+        if thumb:
+            thumb = 'https:' + thumb
 
-        itemlist.append(item.clone( action='findvideos', url = item.url, title = titulo, json_data = json_data, hash = item.hash, orden = ord_epis,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = episode ))
+        json_data = info['all']
 
-        if len(itemlist) >= perpage:
-            break
+        if num_matches > 50:
+            tab_epis.append([ord_epis, item.url, titulo, thumb, json_data, episode])
+        else:
+            itemlist.append(item.clone( action = 'findvideos', url = item.url, title = titulo, thumbnail=thumb, json_data = json_data, hash = item.hash,
+                                        orden = ord_epis, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = episode ))
 
-    if num_matches > ((item.page + 1) * perpage):
-        itemlist.append(item.clone( title=">> Página siguiente", action="episodios", data_epi = item.data_epi, hash = item.hash, orden = '10000',
-                                    page=item.page + 1, text_color='coral' ))
+    if num_matches > 50:
+        tab_epis = sorted(tab_epis, key=lambda x: x[0])
 
-    itemlist = sorted(itemlist, key=lambda i: i.orden)
+        for orden, url, tit, cov, jdat, epi in tab_epis[item.page * item.perpage:]:
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = tit, thumbnail=cov, json_data = jdat, hash = item.hash,
+                                    orden = orden, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
+
+            if len(itemlist) >= item.perpage:
+                break
+
+        if num_matches > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", data_epi = item.data_epi, orden = '10000',
+                                        page = item.page + 1, perpage = item.perpage, text_color = 'coral' ))
+
+        return itemlist
+
+    else:
+        return sorted(itemlist, key=lambda i: i.orden)
 
 
 def findvideos(item):
@@ -234,12 +254,13 @@ def findvideos(item):
         hash = scrapertools.find_single_match(data, "hash:'([^']+)'")
 
     for lang in json_data:
-        url = "%s?h=%s" % (base64.b64decode(json_data[lang]), hash)
+        url = base64.b64decode(json_data[lang])
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        url = servertools.normalize_url(servidor, url)
+        url = str(servertools.normalize_url(servidor, url))
+        url = "%s?h=%s" % (url, hash)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, title = '', language = IDIOMAS.get(lang, lang) ))
 

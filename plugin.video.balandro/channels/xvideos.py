@@ -15,7 +15,7 @@ perpage = 30
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 def configurar_proxies(item):
     from core import proxytools
@@ -45,6 +45,10 @@ def mainlist_pelis(item):
         if actions.adults_password(item) == False:
             return itemlist
 
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, page = 0 ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host + 'channels-index', page = 0 ))
@@ -52,10 +56,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
     itemlist.append(item.clone( title = 'Por estrella', action = 'list_pornstars', url = host + 'pornstars-index', page = 0 ))
-
-    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie' ))
-
-    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -79,7 +79,7 @@ def list_all(item):
         next_url = scrapertools.find_single_match(data, '<a href="([^"]+)" class="no-page next-page">')
 
         if next_url:
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
                                         action = 'list_all', page = item.page + 1, text_color = 'coral' ))
 
     return itemlist
@@ -109,7 +109,7 @@ def categorias(item):
 
     if itemlist:
         if num_matches > hasta:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'categorias', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'categorias', text_color='coral' ))
 
     return itemlist
 
@@ -144,7 +144,7 @@ def pornstars(item):
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a href="([^"]+)" class="no-page next-page">')
         if next_url:
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
                                         action = 'pornstars', page = item.page + 1, text_color = 'coral' ))
 
     return itemlist
@@ -191,7 +191,7 @@ def list_channels(item):
         if next_url:
             next_url = next_url.replace('&amp;', '&')
 
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
                                         action = 'list_channels', page = item.page + 1, text_color = 'coral' ))
 
     return itemlist
@@ -244,7 +244,7 @@ def list_channels_videos(item):
         if next_url:
             next_url = next_url.replace('&amp;', '&')
 
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
                                         action = 'list_channels_videos', page = item.page + 1, text_color = 'coral' ))
 
     return itemlist

@@ -29,6 +29,8 @@ def mainlist_anime(item):
         if actions.adults_password(item) == False:
             return itemlist
 
+    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes?page=1', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow' ))
@@ -46,14 +48,36 @@ def mainlist_anime(item):
     itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'animes?type%5B%5D=special&order=default',
                                 search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Por categorías', action = 'categorias', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por categorías', action = 'categorias', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow' ))
-
     return itemlist
+
+
+def categorias(item):
+    logger.info()
+    itemlist = []
+
+    url_cat = host + 'animes'
+
+    data = httptools.downloadpage(url_cat).data
+
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    data = scrapertools.find_single_match(data, r'<select name="[^"]+" id="order_select"(.*?)<\/select>')
+
+    matches = re.compile(r'<option value="([^"]+)"\s*>([^<]+)').findall(data)
+
+    for categoria, title in matches:
+        if title == "Calificación": continue
+
+        url = "%s?order=%s&page=1" % (url_cat, categoria)
+
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
+
+    return sorted(itemlist,key=lambda x: x.title)
 
 
 def generos(item):
@@ -98,30 +122,6 @@ def anios(item):
     return itemlist
 
 
-def categorias(item):
-    logger.info()
-    itemlist = []
-
-    url_cat = host + 'animes'
-
-    data = httptools.downloadpage(url_cat).data
-
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    data = scrapertools.find_single_match(data, r'<select name="[^"]+" id="order_select"(.*?)<\/select>')
-
-    matches = re.compile(r'<option value="([^"]+)"\s*>([^<]+)').findall(data)
-
-    for categoria, title in matches:
-        if title == "Calificación": continue
-
-        url = "%s?order=%s&page=1" % (url_cat, categoria)
-
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
-
-    return sorted(itemlist,key=lambda x: x.title)
-
-
 def list_all(item):
     logger.info()
     itemlist = []
@@ -141,7 +141,7 @@ def list_all(item):
         if not url or not title: continue
 
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year':year, 'plot': info} ))
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year':year, 'plot': info} ))
 
         if len(itemlist) >= perpage: break
 
@@ -150,7 +150,7 @@ def list_all(item):
     if '<a class="pagination-link" href="' in data:
         next_url = scrapertools.find_single_match(data, '<a class="pagination-link" href="([^"]+)">Siguiente')
         next_url = item.url.split("?")[0] + next_url
-        itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
 
     return itemlist
 
@@ -202,25 +202,20 @@ def episodios(item):
     itemlist = []
 
     if not item.page: item.page = 0
-
-    perpage = 50
+    if not item.perpage: item.perpage = 50
 
     data = httptools.downloadpage(item.url).data
 
     matches = re.compile('<a class="fa-play-circle d-inline-flex align-items-center is-rounded " href="([^"]+)".*?<span>([^<]+)', re.DOTALL).findall(data)
 
-    tot_epis = len(matches)
-
-    all_epis = False
-
     if item.page == 0:
-        if tot_epis > 100:
-            if platformtools.dialog_yesno(config.__addon_name, 'La serie  ' + '[COLOR tan]' + item.contentSerieName + '[/COLOR] tiene [COLOR yellow]' + str(tot_epis) + '[/COLOR] episodios ¿ Desea cargarlos Todos de una sola vez ?'):
-                color_infor = config.get_setting('notification_infor_color', default='pink')
-                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Cargando episodios[/B][/COLOR]' % color_infor)
-                all_epis = True
+        sum_parts = len(matches)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('AnimeFenix', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
 
-    for url, title in matches[item.page * perpage:]:
+    for url, title in matches[item.page * item.perpage:]:
         try:
             episode = scrapertools.find_single_match(title, "Episodio.*?(\d+)")
         except:
@@ -228,15 +223,14 @@ def episodios(item):
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode ))
 
-        if not all_epis:
-            if len(itemlist) >= perpage:
-                break
+        if len(itemlist) >= item.perpage:
+            break
 
     tmdb.set_infoLabels(itemlist)
 
-    if not all_epis:
-        if len(matches) > ((item.page + 1) * perpage):
-            itemlist.append(item.clone( title=">> Página siguiente", action="episodios", page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(matches) > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
 
@@ -339,8 +333,7 @@ def play(item):
 
                 url = scrapertools.find_single_match(data, '"cdnUrl".*?"([^"]+)"')
 
-                if url:
-                    url = url + '|referer=https://www.burstcloud.co/'
+                if url: url = url + '|referer=https://www.burstcloud.co/'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

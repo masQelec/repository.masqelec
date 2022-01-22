@@ -18,7 +18,7 @@ IDIOMAS = {'latino': 'Lat', 'espanol': 'Esp', 'castellano': 'Esp', 'subtitulado'
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 
 def configurar_proxies(item):
@@ -45,6 +45,10 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'genero/estrenos/' ))
@@ -53,10 +57,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
-
-    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
-    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -161,13 +161,13 @@ def list_all(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
             buscar_next = False
 
     if buscar_next:
         next_page = scrapertools.find_single_match(data, '>Página actual.*?<a class="page-link" href="(.*?)"')
         if next_page:
-           itemlist.append(item.clone (url = next_page, page = 0, title = '>> Página siguiente', action = 'list_all', text_color='coral'))
+           itemlist.append(item.clone (url = next_page, page = 0, title = 'Siguientes ...', action = 'list_all', text_color='coral'))
 
     return itemlist
 

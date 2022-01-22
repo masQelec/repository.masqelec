@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["lasts", "rankings", "vos"],
+  "clusters": ["suggested", "lasts", "rankings", "vos"],
 
   "notes": "Series, con capítulos de estreno en castellano, latino y Vose."
 }

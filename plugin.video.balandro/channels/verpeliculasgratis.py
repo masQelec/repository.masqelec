@@ -23,10 +23,10 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
-    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
+    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
-    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -34,6 +34,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Últimas (fecha lanzamiento)', action = 'list_all', url = host + ruta_pelis, orden = 'release_date:desc', search_type = 'movie' ))
 
@@ -48,14 +50,14 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por calificación de edad', action = 'edades', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
     return itemlist
 
 
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Últimas (fecha lanzamiento)', action = 'list_all', url = host + ruta_series, orden = 'release_date:desc', search_type = 'tvshow' ))
 
@@ -69,8 +71,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por calificación de edad', action = 'edades', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -467,7 +467,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if dict_data['pagination']['next_page_url']:
-        itemlist.append(item.clone( title = '>> Página siguiente', page = dict_data['pagination']['next_page_url'].replace('/?page=', ''),
+        itemlist.append(item.clone( title = 'Siguientes ...', page = dict_data['pagination']['next_page_url'].replace('/?page=', ''),
 		                            action='list_all', text_color='coral' ))
 
     return itemlist

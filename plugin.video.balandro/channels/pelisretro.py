@@ -19,13 +19,13 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico' ))
-
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -96,14 +96,14 @@ def list_all(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
             buscar_next = False
 
     if buscar_next:
         if '<div class="wp-pagenavi">' in data:
             next_page = scrapertools.find_single_match(data, '<div class="wp-pagenavi">.*?<a class="next page-numbers" href="([^"]+)"')
             if next_page:
-                itemlist.append(item.clone( action = 'list_all', page = 0, url = next_page, title = '>> Página siguiente', text_color='coral' ))
+                itemlist.append(item.clone( action = 'list_all', page = 0, url = next_page, title = 'Siguientes ...', text_color='coral' ))
 
     return itemlist
 

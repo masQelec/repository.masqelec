@@ -12,6 +12,8 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'resultados-reciente.php?buscar=&genero=' ))
 
     itemlist.append(item.clone( title = 'Destacados', action = 'list_all', url = host + 'resultados.php?buscar=&genero=' ))
@@ -24,8 +26,6 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'En 3D', action = 'list_all', url = host + '3D.php' ))
 
     itemlist.append(item.clone( title = 'Series', action = 'list_all', url = host + 'series.php' ))
-
-    itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary' ))
 
     return itemlist
 
@@ -89,7 +89,7 @@ def list_all(item):
         else: next_page_link = host + next_page_link[1:]
 
         next_page_link = next_page_link.replace('&amp;', '&')
-        itemlist.append(item.clone( title='>> Página siguiente', action='list_all', url = next_page_link, text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page_link, text_color='coral' ))
 
     return itemlist
 

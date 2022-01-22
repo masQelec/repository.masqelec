@@ -109,7 +109,12 @@ def proxysearch_all(item):
                              continue
 
                    else:
-                        if not 'all' in ch['search_types']:
+                        if 'movie' in ch['search_types']: pass
+                        elif 'tvshow' in ch['search_types']: pass
+                        elif 'documentary' in ch['search_types']: pass
+                        elif 'torrent' in ch['categories']: pass
+                        elif 'all' in ch['search_types']: pass
+                        else:
                             continue
 
                # por NAME vensiones anteriores a 2.0
@@ -392,6 +397,8 @@ def proxysearch_channel(item, channel_id, channel_name):
            if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
            elif 'CLASS ' in data or 'class ' in data: part_py = 'class '
 
+           elif 'documaniatv_rua' in data: part_py = 'documaniatv_rua'
+
            elif 'def login' in data: part_py = 'def login'
            elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
            elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
@@ -399,9 +406,9 @@ def proxysearch_channel(item, channel_id, channel_name):
            bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
            bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
 
-           host = scrapertools.find_single_match(bloc, 'host.*?"(.*?)"')
+           host = scrapertools.find_single_match(bloc, '.*?host.*?"(.*?)"')
            if not host:
-               host = scrapertools.find_single_match(bloc, "host.*?'(.*?)'")
+               host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
 
     host = host.strip()
 
@@ -410,10 +417,13 @@ def proxysearch_channel(item, channel_id, channel_name):
             host = dominio
 
     if not host or not '//' in host:
-        if channel_name == 'NewPct1':
+        if channel_name == 'DocumaniaTv':
+            el_canal = ('Se ignora este canal en el proceso, porque Falta seleccionar que "METODO" se utilizará  [B][COLOR %s]' + channel_name) % color_alert
+        elif channel_name == 'NewPct1':
             el_canal = ('Se ignora este canal en el proceso, porque Falta seleccionar que dominio "CLON" se utilizará  [B][COLOR %s]' + channel_name) % color_alert
         else:
             el_canal = ('Se ignora este canal en el proceso, porque Falta seleccionar que dominio "HOST" se utilizará  [B][COLOR %s]' + channel_name) % color_alert
+
         platformtools.dialog_ok(config.__addon_name, el_canal + '[/COLOR][/B]')
         return
 
@@ -423,7 +433,7 @@ def proxysearch_channel(item, channel_id, channel_name):
         response = httptools.downloadpage(host, raise_weberror=False)
         if response.sucess == True:
             if len(response.data) > 999:
-                 el_canal = ('[B][COLOR %s]No necesita proxies ') % color_list_proxies
+                 el_canal = ('[B][COLOR %s]No necesita proxies ') % color_infor
                  el_canal += ('[COLOR %s]' + channel_name + '[/COLOR][/B]') % color_exec
                  platformtools.dialog_notification(config.__addon_name, el_canal)
                  return

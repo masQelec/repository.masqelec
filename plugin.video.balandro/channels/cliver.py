@@ -13,7 +13,7 @@ host = 'https://www.cliver.to/'
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 
 def configurar_proxies(item):
@@ -45,19 +45,27 @@ def do_downloadpage(url, post=None, headers=None):
 def mainlist(item):
     return mainlist_pelis(item)
 
+    # ~ las series las han quitado en la web
     # ~ logger.info()
     # ~ itemlist = []
 
-    # ~ itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
-    # ~ itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' )) # de momento las han quitado en la web
-
     # ~ itemlist.append(item_configurar_proxies(item))
+
+    # ~ itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
+
+    # ~ itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    # ~ itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+
     # ~ return itemlist
 
 
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, 
                                 search_type = 'movie', tipo = 'index', pagina = 0 ))
@@ -74,15 +82,16 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', 
                                 search_type = 'tvshow', tipo = 'indexSeries', pagina = 0 ))
@@ -97,9 +106,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por plataforma', action = 'networks', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
-
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -182,11 +188,16 @@ def list_all(item):
         if not year: year = '-'
 
         if item.search_type == 'movie':
+            if '<div class="es"' in article: article = article.replace('<div class="es"', '<div class="Esp"')
+            if '<div class="lat"' in article: article = article.replace('<div class="lat"', '<div class="Lat"')
+            if '<div class="vose"' in article: article = article.replace('<div class="vose"', '<div class="Vose"')
+
             langs = scrapertools.find_multiple_matches(article, '<div class="([^"]+)"></div>')
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                        id_pelicula = scrapertools.find_single_match(thumb, '/(\d+)_min'),
-                                        contentType='movie', contentTitle=title, infoLabels={'year': year}, languages = ', '.join(langs).capitalize() ))
+            id_pelicula = scrapertools.find_single_match(thumb, '/(\d+)_min')
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, id_pelicula = id_pelicula,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year}, languages = ', '.join(langs) ))
         else:
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
@@ -195,7 +206,7 @@ def list_all(item):
 
     num = 12 if item.tipo.startswith('index') else 18
     if len(matches) >= num:
-        itemlist.append(item.clone( title='>> Página siguiente', pagina = item.pagina + 1, action='list_all', text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', pagina = item.pagina + 1, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -269,7 +280,7 @@ def episodios(item):
     tmdb.set_infoLabels(itemlist)
 
     if len(matches) > (item.page + 1) * perpage:
-        itemlist.append(item.clone( title=">> Página siguiente", action="episodios", page=item.page + 1, text_color='coral' ))
+        itemlist.append(item.clone( title="Siguientes ...", action="episodios", page=item.page + 1, text_color='coral' ))
 
     return itemlist
 
@@ -304,7 +315,7 @@ def list_episodes(item):
     tmdb.set_infoLabels(itemlist)
 
     if len(matches) >= 18:
-        itemlist.append(item.clone( title='>> Página siguiente', pagina = item.pagina + 1, action='list_episodes', text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', pagina = item.pagina + 1, action='list_episodes', text_color='coral' ))
 
     return itemlist
 

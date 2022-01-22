@@ -29,6 +29,8 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/search?max-results=' + str(results), search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'La butaca', action = 'list_genre', url = host + 'p/butaca.html', search_type = 'movie' ))
@@ -40,8 +42,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -139,7 +139,7 @@ def list_all(item):
                 next_page += '&'
 
             next_page = next_page.replace(res, '') + 'max-results=' + str(results)
-            itemlist.append(item.clone (url = next_page, title = '>> Página siguiente', action = 'list_all', text_color='coral'))
+            itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral'))
 
     return itemlist
 
@@ -208,7 +208,7 @@ def list_list(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='list_genre', text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_genre', text_color='coral' ))
 
     return itemlist
 
@@ -249,7 +249,7 @@ def list_genre(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='list_genre', text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_genre', text_color='coral' ))
 
     return itemlist
 
@@ -296,7 +296,7 @@ def listas(item):
     if num_matches > perpage_lis:
         hasta = (item.page * perpage_lis) + perpage_lis
         if hasta < num_matches:
-            itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='listas', text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='listas', text_color='coral' ))
 
     return itemlist
 

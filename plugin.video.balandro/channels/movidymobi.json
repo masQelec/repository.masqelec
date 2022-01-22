@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["all", "movie", "tvshow"],
+  "search_types": ["movie"],
 
-  "categories": ["movie", "tvshow"],
-  "language": ["cast"],
+  "categories": ["movie"],
+  "language": ["cast", "lat"],
 
-  "clusters": ["adults", "news", "rankings", "years", "countries", "lasts", "kids", "docs", "vos"],
+  "clusters": ["rankings", "years", "docs"],
 
-  "notes": "Películas: novedades, por géneros. Series: últimos episodios, por género. Esta web intercala películas de adultos en algunas secciones, pero puedes desactivarlas en la configuración."
+  "notes": "Películas por géneros."
 }

@@ -8,23 +8,27 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://www.genteclic.com/'
 
 
-def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    if '/page/' in url: raise_weberror = False
+
+    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
+
 def mainlist(item):
     return mainlist_pelis(item)
+
 
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -33,9 +37,11 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Conspiraciones', action = 'list_all', url = host + 'category/conspiraciones/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Conspiraciones', action = 'list_all', url = host + 'category/conspiraciones/' ))
 
-    itemlist.append(item.clone( title = 'Documentales', action = 'list_all', url = host + 'category/documentales/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Curiosidades', action = 'list_all', url = host + 'category/curiosidades/' ))
+
+    itemlist.append(item.clone( title = 'Documentales', action = 'list_all', url = host + 'category/documentales/' ))
 
     return itemlist
 
@@ -44,7 +50,11 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(item.url)
+    if not item.page: item.page = 1
+
+    page_url = item.url + 'page/' + str(item.page) + '/'
+
+    data = do_downloadpage(page_url)
 
     matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
 
@@ -65,9 +75,10 @@ def list_all(item):
             title = title.replace('&#8211;', '-')
         else:
             title = title.replace('&#8211;', '')
- 
-        if '-' in title:
-            title = scrapertools.find_single_match(title, '(.*?)-')
+
+        if not '/documentales/' in item.url:
+            if '-' in title:
+                title = scrapertools.find_single_match(title, '(.*?)-')
 
         if 'pelicula' in title:
             title = scrapertools.find_single_match(title.lower(), '(.*?)pelicula')
@@ -88,9 +99,9 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page_link = scrapertools.find_single_match(data, '<a class="page_nav next".*?href="(.*?)"')
-    if next_page_link:
-        itemlist.append(item.clone( title='>> Página siguiente', url = next_page_link, action = 'list_all', text_color='coral' ))
+    if itemlist:
+        if len(itemlist) == 30:
+            itemlist.append(item.clone( title='Siguientes ...', url = item.url, page = item.page + 1, action = 'list_all', text_color='coral' ))
 
     return itemlist
 

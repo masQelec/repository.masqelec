@@ -191,6 +191,8 @@ def mainlist_pelis(item):
     thumb_filmaffinity = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'filmaffinity.jpg')
     thumb_imdb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'imdb.jpg')
 
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
@@ -210,8 +212,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Las mejores del cine español', action = 'list_best',
                                 url = host + '2021/04/ver-las-100-mejores-peliculas-de-la.html' ))
 
-
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -346,7 +346,7 @@ def list_all(item):
             data_next = httptools.downloadpage(next_page).data
             matches = scrapertools.find_multiple_matches(data_next, "<div class='post bar hentry'>(.*?)<span class='post-labels'>")
             if matches:
-               itemlist.append(item.clone( title = '>> Página siguiente', url = next_page, action = 'list_all', text_color='coral' ))
+               itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -395,7 +395,7 @@ def list_labels(item):
         if i > perpage:
             if num_matches > hasta:
                 next_page = item.page + 1
-                itemlist.append(item.clone( title = '>> Página siguiente', page = next_page, action = 'list_labels', text_color='coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'list_labels', text_color='coral' ))
 
     return itemlist
 
@@ -458,7 +458,7 @@ def list_best(item):
 
     if num_matches > hasta:
         next_page = item.page + 1
-        itemlist.append(item.clone( title = '>> Página siguiente', page = next_page, action = 'list_best', text_color='coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'list_best', text_color='coral' ))
 
     return itemlist
 
@@ -529,7 +529,7 @@ def list_tumblr(item):
             if next_page:
                 if not next_page == '/page/16':
                    url = 'https://cinedesiempre.tumblr.com' + next_page
-                   itemlist.append(item.clone( title = '>> Página siguiente', url = url, action = 'list_tumblr', text_color='coral' ))
+                   itemlist.append(item.clone( title = 'Siguientes ...', url = url, action = 'list_tumblr', text_color='coral' ))
 
     return itemlist
 

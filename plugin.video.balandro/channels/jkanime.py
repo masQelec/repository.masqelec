@@ -30,6 +30,8 @@ def mainlist_anime(item):
         if actions.adults_password(item) == False:
             return itemlist
 
+    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
+
     itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow' ))
@@ -44,8 +46,6 @@ def mainlist_anime(item):
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -118,14 +118,14 @@ def list_all(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
             buscar_next = False
 
     if buscar_next:
         if itemlist:
             next_url = scrapertools.find_single_match(data, '<a class="text nav-next".*?href="(.*?)".*?">Resultados')
             if next_url:
-                itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
 
     return itemlist
 
@@ -155,7 +155,7 @@ def list_last(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_last', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_last', text_color = 'coral' ))
 
     return itemlist
 
@@ -187,7 +187,7 @@ def list_caps(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_caps', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_caps', text_color = 'coral' ))
 
     return itemlist
 
@@ -203,6 +203,7 @@ def episodios(item):
     itemlist = []
 
     if not item.page: item.page = 1
+    if not item.perpage: item.perpage = 50
 
     data = httptools.downloadpage(item.url).data
 
@@ -218,7 +219,7 @@ def episodios(item):
        paginas, capitulos = pages_episodes(data)
 
        if paginas > 1:
-           platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), '[COLOR tan]cargando páginas[/COLOR]')
+           platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Cargando Temporadas y Episodios[/COLOR]')
 
        for pag in range(1, paginas + 1):
            pag_nro = str(pag)

@@ -39,11 +39,23 @@ def get_video_url(page_url, url_referer=''):
 
     if '//tubesb.com/' in page_url:
         page_url = page_url.replace('//tubesb.com/e/', '//streamsb.net/play/').replace('//tubesb.com/d/', '//streamsb.net/play/')
+    elif '//watchsb.com/' in page_url:
+        page_url = page_url.replace('//watchsb.com/e/', '//streamsb.net/play/').replace('//watchsb.com/d/', '//streamsb.net/play/')
 
     data = httptools.downloadpage(page_url).data
 
     if 'File Not Found' in data or 'File is no longer available' in data:
         return 'El fichero no existe o ha sido borrado'
+
+    if not "text/javascript'>(eval" in data:
+        import time
+        from platformcode import platformtools
+        espera = 5
+
+        platformtools.dialog_notification('Cargando Streamsb', 'Espera requerida de %s segundos' % espera)
+        time.sleep(int(espera))
+
+        data = httptools.downloadpage(page_url).data
 
     if not "text/javascript'>(eval" in data:
         media_url = scrapertools.find_single_match(str(data), 'sources:.*?file.*?"(.*?)"')

@@ -28,6 +28,8 @@ def mainlist_pelis(item):
         if actions.adults_password(item) == False:
             return itemlist
 
+    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color='orange' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'hentai/' ))
 
     itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'hentai/sin-censura/' ))
@@ -35,8 +37,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_list', url = host + 'hentai/estrenos/' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
-
-    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -73,7 +73,7 @@ def list_all(item):
 
     next_page = scrapertools.find_single_match(data, '<li class="next"><a href="([^"]+)"')
     if next_page:
-        itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_all', url = next_page, text_color = 'coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
     return itemlist
 
@@ -94,7 +94,7 @@ def list_list(item):
 
     next_page = scrapertools.find_single_match(data, '<li class="next"><a href="([^"]+)"')
     if next_page:
-        itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_list', url = next_page, text_color = 'coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_list', url = next_page, text_color = 'coral' ))
 
     return itemlist
 

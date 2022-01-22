@@ -1,95 +1,103 @@
 [COLOR coral]Balandro[/COLOR]
 
-Version 2.1.2  [COLOR darkorange]Octubre 2021[/COLOR]
+Version 2.2.1  [COLOR darkorange]Enero 2022[/COLOR]
 
    [COLOR yellow]INCIDENCIAS CORREGIDAS:[/COLOR]
       Bugs de la version anterior
-      Implementado nuevo sistema de Fixes
 
    [COLOR yellow]MODIFICACIONES:[/COLOR]
       Configuracion:
-         Buscar - En que canales nunca se buscara
+         Nuevos Proveedores de proxies
 
       Menus:
-        Generos: Re-configurados
-        Ayuda: Buscar - En que canales nunca se buscara
+         Nueva opcion Doramas
+         Generos: Re-configurados
 
-      Especiales: Las mejores del cine de siempre
-
-      Canales modificados:
-         AniBox, CineCalidad, CineDeAntes, CineLibreOnline,
-         CineMatteFlix, ClubCine, DixMaxLive, DocumaniaTv,
-         DonTorrents, HdFull, HdFullCom, HdFullSe,
-         MegaDede2, NewPct1, PelisMaraton, PlayDede,
-         Ppeliculas, PonnHd, PornHub, Repelis24, SeriesKao,
-         YesTorrent
-
+      Canales:
+         Revision generalizada
       Canales anulados:
-         PctFenix
-
+        DixMaxLive, FullSerieHd, PelisPlus24, VerPeliculasRd,
+        SeriesFlvXyz
       Servidores:
-         Fembed, Streamsb, Upstream, Uptobox, Vshare, Vup
+         Revision generalizada
 
    [COLOR yellow]NOVEDADES:[/COLOR]
       Canales:
-         Ievenn, PelisEnCastellano
+        Canales Doramas
+
       Servidores:
-         Streamon, Vidhd
+        Sin novedades
 
-   [COLOR yellow]SITUACION:[/COLOR]
-      [COLOR plum]Canales Inestables:[/COLOR]
-         Dilo
+   [COLOR yellow]SITUACION CANALES Y SERVIDORES:[/COLOR]
+      [B][COLOR plum]Inestables:[/COLOR][/B] Dilo, SeriesMetro
 
-      [COLOR teal]Canales que requieren Cuenta:[/COLOR]
-         HdFull, PlayDede
+      [B][COLOR teal]Requieren Cuenta:[/COLOR][/B] HdFull, PlayDede
 
-      [COLOR cyan]Canales Temporalmente Inactivos:[/COLOR]
-         DescargaCineClasico, MiraDetodo, MundoKaos, PelisPlus24,
-         SeriesManta, VerPeliculasGratis
+      [B][COLOR moccasin]Sugeridos:[/COLOR][/B] CineCalidad, CineDeAntes, CineTux, ClubCine, Cuevana3,
+         Dilo, DocumaniaTv, EntrePeliculasySseries, EstrenosCinesaa,
+         EstrenosPapaya, HdFull, InkaPelis, PlayDede, Tekilaz,
+         VerDocumentalesOnline
 
-      [COLOR red]Canales que pueden usar proxies (Bloqueo Operadoras):[/COLOR]
-         CineTux, Cliver, CliverSite, Cuevana3, Dilo, DixmaxLive,
-         DocumaniaTv, DonTorrents, EstrenosCinesaa, Gnula,
-         GranTorrent, HdFull, HdFullCom, HdFullSe, Megadede2,
-         MegaSerie, MejorTorrents, Newpct1, PelisGratis,
-         PelisHouse, PelisPlanet, PelisPlay, PlayDede, PlayView,
-         Ppeliculas, SeriesFlix, SeriesYonkis, SubTorrents,
-         TorrentDivx
+      [B][COLOR cyan]Temporalmente Inactivos:[/COLOR][/B] MejorTorrentLa, PelisRetro, TodoTorrents,
+         VerPeliculasGratis
 
-      [COLOR fuchsia]Canales que nunca intervendran en las busquedas:[/COLOR]
-         AniBox. AnimeFenix, AnimeFlv, Beeg, CineDeAntes,
-         CineLibreOnline, CumLoader, DatfSex, HentaiSd,
-         JKAnime, MonosChinos, PornHd, PornHub, PornTube,
-         SeriesAnimadas, SigloXX, TioAnime, TubeHentai,
-         TvSeries, XVideos
+      [B][COLOR red]Pueden usar proxies (Bloqueo Operadoras):[/COLOR][/B]
+         - [B][COLOR deepskyblue]Películas[/COLOR][/B]: CineTux, Cliver, EstrenosCinesaa, Gnula, PelisGratis,
+           PelisPlanet, PelisXd
 
-      [COLOR tan]Servidores con vias alternativas:[/COLOR]
-         Doodstream, Streamsb, Youtube
+         - [B][COLOR hotpink]Series[/COLOR][/B]: Dilo
 
-   [COLOR yellow]RESUMENES:[/COLOR]
-      Numero de Canales:
-       141 Canales
-           1 Inestables
+         - [B][COLOR yellow]Peliculas y Series[/COLOR][/B]: CineCalidad, CliverSite, Cuevana3, Cuevana3Video,
+           EntrePeliculasySseries, HdFull, HdFullCom, HdFullSe, Megadede2,
+           MegaSerie, MovidyTv, PelisHouse, PelisPedia, PelisPedia2,
+           PelisPlay, PlayDede, PlayView, Ppeliculas, RepelisHd, SeriesYonkis
+
+         - [B][COLOR cyan]Documentales[/COLOR][/B]: DocumaniaTv
+
+         - [B][COLOR blue]Torrents[/COLOR][/B]: DonTorrents, DonTorrentsIn, GranTorrent, MejorTorrents,
+           Newpct1, SubTorrents. TorrentDivx
+
+         - [B][COLOR orange]Adultos[/COLOR][/B]: PornHub, XVideos
+
+      [B][COLOR fuchsia]Cuales nunca intervendran en las busquedas:[/COLOR][/B]
+         - [B][COLOR deepskyblue]Películas[/COLOR][/B]: CineDeAntes, CineLibreOnline, SigloXX
+
+         - [B][COLOR hotpink]Series[/COLOR][/B]: TvSeries
+
+         - Todos los canales con contenido exclusivo de [B][COLOR firebrick]Doramas[/COLOR][/B]
+         - Todos los canales con contenido exclusivo de [B][COLOR springgreen]Animes[/COLOR][/B]
+         - Todos los canales con contenido exclusivo de [B][COLOR orange]Adultos[/COLOR][/B]
+
+      [B][COLOR tan]Servidores con vias alternativas:[/COLOR][/B]
+         Doodstream, Streamsb, Uptobox, Youtube
+
+   [COLOR yellow]RESUMENEN CANALES Y SERVIDORES:[/COLOR]
+      Totales Canales:
+       156 Canales
+           2 Inestables
            2 Requieren Cuenta
-           6 Temporalmente Inactivos
-         24 Inactivos
-         29 Pueden Usar Proxies
-         20 No intervendran en busquedas
-       111 Disponibles
+           1 Con varios dominios
+           4 Temporalmente Inactivos
+         34 Inactivos
+         38 Pueden Usar Proxies
+         23 No intervendran en busquedas
+       118 Disponibles
 
       Distribucion Canales Disponibles:
-         73 de Peliculas
-         56 de Series
-         44 de Peliculas y Series
+         15 de Sugeridos
+         78 de Peliculas
+         58 de Series
+         49 de Peliculas y Series
            7 de Documentales
-         12 de Torrents 
+         14 de Torrents
+           3 de Doramas
            7 de Animes
            9 de Adultos
-           1 Privados
+           1 de Privados
 
-      Numero de Servidores:
-       145 Servidores
+      Totales Servidores:
+       146 Servidores
          53 Inactivos
          18 Sin Soporte
-           3 Con Vias alternativas
-         92 Disponibles
+           4 Con Vias alternativas
+         93 Disponibles

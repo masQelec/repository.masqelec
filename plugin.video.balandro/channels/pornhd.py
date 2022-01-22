@@ -28,6 +28,8 @@ def mainlist_pelis(item):
         if actions.adults_password(item) == False:
             return itemlist
 
+    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color='orange' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/?page=1' ))
 
     itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + '/?order=newest&page=1' ))
@@ -40,8 +42,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host + '/channel/' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + '/pornstars/' ))
-
-    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -121,7 +121,7 @@ def list_all(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, pagina = item.pagina, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, pagina = item.pagina, action='list_all', text_color='coral' ))
             buscar_next = False
 
     if buscar_next:
@@ -140,7 +140,7 @@ def list_all(item):
                       if '/?page=' in item.url: next_url = next_url + '/?page=' + str(next_page)
                       else: next_url = next_url + '&page=' + str(next_page)
 
-                      itemlist.append(item.clone(title = ">> Página siguiente", url = next_url, page = 0, action = 'list_all', text_color='coral'))
+                      itemlist.append(item.clone(title = "Siguientes ...", url = next_url, page = 0, action = 'list_all', text_color='coral'))
 
     return itemlist
 
@@ -178,7 +178,7 @@ def list_canales(item):
         itemlist.append(item.clone( action = 'list_all', url = url + '/?page=1', title = title, thumbnail = thumb ))
 
     if num_matches > hasta:
-        itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_canales', text_color='coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_canales', text_color='coral' ))
 
     return itemlist
 
@@ -216,7 +216,7 @@ def list_categorias(item):
         itemlist.append(item.clone( action = 'list_all', url = url + '/?page=1', title = title, thumbnail = thumb ))
 
     if num_matches > hasta:
-        itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_categorias', text_color='coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_categorias', text_color='coral' ))
 
     return itemlist
 
@@ -261,7 +261,7 @@ def list_pornstars(item):
 
                next_url = next_url + '&page=' + str(next_page)
 
-               itemlist.append(item.clone(title = ">> Página siguiente", url = next_url, action = 'list_pornstars', text_color='coral'))
+               itemlist.append(item.clone(title = "Siguientes ...", url = next_url, action = 'list_pornstars', text_color='coral'))
 
     return itemlist
 

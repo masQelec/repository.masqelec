@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-from platformcode import logger
+from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -19,6 +19,10 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone ( title = 'Búsquedas:', action = '', folder=False, text_color='plum' ))
+    itemlist.append(item.clone ( title = ' - Buscar película ...', action = 'search', grupo = 'alfab', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone ( title = ' - Buscar agrupación ...', action = 'search', grupo = 'agrupa', search_type = 'movie', text_color='salmon' ))
+
     itemlist.append(item.clone ( title = 'Novedades', action = 'news', url = host ))
 
     itemlist.append(item.clone ( title = 'Joyas del cine', action = 'list_all', url = host + '/joyas-del-cine.html' ))
@@ -32,9 +36,8 @@ def mainlist_pelis(item):
     itemlist.append(item.clone ( title = 'Por actriz', action = 'pelis', url = host, grupo = 'actri' ))
     itemlist.append(item.clone ( title = 'Por dirección', action = 'pelis', url = host, grupo = 'direc' ))
 
-    itemlist.append(item.clone ( title = 'Por agrupación (A - Z)', action = 'alfab' ))
-
-    itemlist.append(item.clone ( title = 'Buscar agrupación ...', action = 'search', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = 'Por letra (A - Z)', action = 'alfab' ))
+    itemlist.append(item.clone ( title = 'Por agrupación (A - Z)', action = 'agrupa' ))
 
     return itemlist
 
@@ -87,6 +90,21 @@ def alfab(item):
     logger.info()
     itemlist = []
 
+    for letra in '#abcdefghijklmnopqrstuvwxyz':
+        if letra in '#abcdefghijk':
+            url = host + '/iacutendice-de-peliacuteculas-a---k.html'
+        else:
+            url = host + '/iacutendice-de-peliacuteculas-l---z.html'
+
+        itemlist.append(item.clone ( title = letra.upper(), url = url, action = 'list_letra', filtro_search = letra ))
+
+    return itemlist
+
+
+def agrupa(item):
+    logger.info()
+    itemlist = []
+
     for letra in 'abcdefghijklmnopqrstuvwxyz#':
         itemlist.append(item.clone ( title = letra.upper(), url = host, action = 'pelis', filtro_search = letra ))
 
@@ -105,6 +123,7 @@ def news(item):
 
     block_esp = scrapertools.find_single_match(data, '<h2 class="wsite-content-title"><font color=".*?especial(.*?)>NOVEDADES DE')
     block_nov = scrapertools.find_single_match(data, '>NOVEDADES DE(.*?)>ENLACE AL GRUPO LA TAQUILLA EN FACEBOOK')
+
     bloque = block_esp + block_nov
 
     slides = scrapertools.find_multiple_matches(bloque, '<div><div style="height:20px;overflow:hidden"></div>(.*?)<div style="height:20px;overflow:hidden"></div>')
@@ -150,17 +169,23 @@ def news(item):
 
        for thumb, title, name in sort_news[desde:hasta]:
            if name == 'SAGA': continue
+           elif name == 'S A G A  AÑOS 80-90': continue
+           elif 'V.O.S.E.' in name: continue
+           elif '/VOSE' in name: continue
+           elif 'CINE ASIÁTICO' in name: continue
+           elif 'CIENCIA-FUCCIÓN' in name: continue
+           elif 'CINE MUDO' in name: continue
 
            accion = 'pelis'
            url = host
 
-           title = title.replace('º', 'ª').replace(' - ', ' ')
+           title = title.replace('º', 'ª').replace(' - ', ' ').replace(' -', ' ')
 
-           if ' - ' in name:
+           if ' -' in name:
                if not name.endswith('º'):
                    name = name + 'º'
 
-               name = name.replace(' - ', ' ')
+               name = name.replace(' - ', ' ').replace(' -', ' ')
 
            if 'º' in name:
               grupo = 'temas'
@@ -182,14 +207,16 @@ def news(item):
               grupo = ''
 
               if name == 'AÑOS 80-90': name = name.replace('AÑOS 80-90', 'SAGAS A&Ntilde;OS 80 Y 90')
-              elif name == 'S A G A  AÑOS 80-90': name = name.replace('S A G A  AÑOS 80-90', 'SAGAS A&Ntilde;OS 80- 90')
               elif name == 'años 80-90': name = name.replace('años 80-90', 'SAGAS A&Ntilde;OS 80 Y 90')
               elif name == 'Paco Martínez Soria': name = name.replace('Paco Martínez Soria', 'PACO MART&Iacute;NEZ SORIA')
               elif name == 'Sissi': name = name.replace('Sissi', 'SISSI')
               elif name == 'JOAN CROWFORD': name = name.replace('JOAN CROWFORD', 'JOAN CRAWFORD')
+              elif name == 'HUMOR BOB HOPE (Camino a la utopía)': name = name.replace('HUMOR BOB HOPE (Camino a la utopía)', 'BOB HOPE (1903-2003)')
               elif name == 'HUMOR, BUSTER KEATON, CORTOS DEL AÑO 21': name = name.replace('HUMOR, BUSTER KEATON, CORTOS DEL AÑO 21', 'BUSTER KEATON')
+              elif name == 'HUMOR CANTINFLAS': name = name.replace('HUMOR CANTINFLAS', 'CANTINFLAS')
+              elif name == 'HUMOR LOUIS DE FUNES': name = name.replace('HUMOR LOUIS DE FUNES', 'LOUIS DE FUNES')
               elif name == 'LUÍS BUÑUEL': name = name.replace('LUÍS BUÑUEL', 'LU&Iacute;S BU&Ntilde;UEL (1900-1983)')
-	
+
               elif name == 'CINE ALEMÁN':
                     accion = 'list_all'
                     url = host + '/cine-alemaacuten.html'
@@ -197,16 +224,12 @@ def news(item):
                     accion = 'list_all'
                     url = host + '/cine-europa-oriental.html'
 
-           if '/' in name: name = name.split('/')[0]
-           elif '(' in name: name = name.split('(')[0]
-
-
            itemlist.append(item.clone( action = accion, title = title, url = url, thumbnail = thumb, grupo = grupo, filtro_search = name, page = 0 ))
 
        if i > perpage:
           if num_matches > hasta:
              next_page = item.page + 1
-             itemlist.append(item.clone( title = '>> Página siguiente', page = next_page, action = 'news', text_color='coral' ))
+             itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'news', text_color='coral' ))
 
     return itemlist
 
@@ -283,7 +306,116 @@ def list_all(item):
     if matches:
        if num_matches > hasta:
            next_page = item.page + 1
-           itemlist.append(item.clone( title = '>> Página siguiente', page = next_page, action = 'list_all', text_color='coral' ))
+           itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'list_all', text_color='coral' ))
+
+    return itemlist
+
+
+def list_letra(item):
+    logger.info()
+    itemlist = []
+
+    if not item.desde: item.desde = 0
+
+    data = httptools.downloadpage(item.url).data
+
+    bloque = scrapertools.find_single_match(data, '<div style="display:block;font-size(.*?)<div id="main-wrap">')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<h2 class="wsite-content-title"(.*?)</h2>')
+
+    num_matches = len(matches)
+
+    if not item.desde :
+        for match in matches:
+            item.desde = item.desde + 1
+
+            match = match.replace('<font size="4"><em><u>', '').replace('</u></em></font>', '').replace('L<u style=""><em style="">', 'L')
+            match = match.replace('<font size="3">', '').replace('<font size="4">', '').replace('</font>', '')
+            match = match.replace('title=""><u><em>', '>').replace('</em></u>', '').strip()
+
+            title = scrapertools.find_single_match(match, '.*?<a href=.*?>(.*?)<')
+
+            if '<em style="">' in title:
+                title = scrapertools.find_single_match(title, '<em style="">(.*?)<')
+            elif '<em>' in title:
+                title = scrapertools.find_single_match(title, '<em>(.*?)<')
+
+            title = title.replace('&Aacute;', 'A').replace('&Eacute;', 'E').replace('&Iacute;', 'I').replace('&Oacute;', 'O').replace('&Uacute;', 'U')
+            title = title.replace('&iquest;', '').replace('&iexcl;', '').replace('&#8203;', '').replace('&nbsp;', '').strip()
+
+            letra = item.filtro_search.lower().strip()
+            titulo = title.lower().strip()
+
+            if item.title_search:
+               if not item.title_search == title: continue
+
+            try:
+                letra_titulo = titulo[0]
+                if not letra_titulo == letra:
+                    if letra == '#':
+                        if not letra_titulo in '0123456789': continue
+                    else: continue
+            except:
+                continue
+
+            item.desde = item.desde - 1
+            break
+
+    desde = item.desde
+    hasta = desde + perpage
+
+    for match in matches[desde:hasta]:
+        match = match.replace('<font size="4"><em><u>', '').replace('</u></em></font>', '').replace('L<u style=""><em style="">', 'L')
+        match = match.replace('<font size="3">', '').replace('<font size="4">', '').replace('</font>', '')
+        match = match.replace('title=""><u><em>', '>').replace('</em></u>', '').strip()
+
+        title = scrapertools.find_single_match(match, '.*?<a href=.*?>(.*?)<')
+
+        if '<em style="">' in title:
+            title = scrapertools.find_single_match(title, '<em style="">(.*?)<')
+        elif '<em>' in title:
+            title = scrapertools.find_single_match(title, '<em>(.*?)<')
+        elif '<font size="4">' in title:
+            title = scrapertools.find_single_match(title, '<font size="4">(.*?)<')
+
+        title = title.replace('&Aacute;', 'A').replace('&Eacute;', 'E').replace('&Iacute;', 'I').replace('&Oacute;', 'O').replace('&Uacute;', 'U')
+        title = title.replace('&iquest;', '').replace('&iexcl;', '').replace('&#8203;', '').replace('&nbsp;', '').strip()
+
+        letra = item.filtro_search.lower().strip()
+        titulo = title.lower().strip()
+
+        try:
+            letra_titulo = titulo[0]
+            if not letra_titulo == letra:
+                if letra == '#':
+                    if not letra_titulo in '0123456789': continue
+                else: continue
+        except:
+            continue
+
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        url = host + url
+
+        lang = 'Esp'
+
+        itemlist.append(item.clone( action='list_all', url = url, title = title, language = lang, filtro_search = '',
+                                    contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
+
+        if len(itemlist) == 20: break
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if len(itemlist) == 20:
+            itemlist.append(item.clone( title = 'Siguientes ...', desde = hasta, action = 'list_letra',
+                                        filtro_search = item.filtro_search, text_color = 'coral' ))
+
+        elif item.filtro_search.upper() == 'L':
+            if title == 'Madame Curie':
+                itemlist.append(item.clone( title = 'Siguientes ...', desde = 0,
+                                            title_search = 'Los diablos de la guerra', action = 'list_letra',
+                                            filtro_search = item.filtro_search, text_color = 'coral' ))
 
     return itemlist
 
@@ -340,7 +472,8 @@ def pelis(item):
         if not title: continue
 
         if title == 'Blog': continue
-        elif title == 'ACCIONES B&Eacute;LICAS': continue
+        elif title == 'C I C L O S': continue
+        elif title == 'S A G A S': continue
         elif title == 'AVENTURAS': continue
         elif title == 'BÉLICAS': continue
         elif title == 'CIENCIA-FICCIÓN': continue
@@ -364,8 +497,9 @@ def pelis(item):
         elif title == 'SEGUNDA GUERRA': continue
         elif title == 'SPAGHETTI WESTERN': continue
         elif title == 'WESTERNS': continue
-        elif title == 'C I C L O S': continue
-        elif title == 'S A G A S': continue
+
+        if not item.filtro_search:
+            if title == 'ACCIONES B&Eacute;LICAS': continue
 
         url = host + url
 
@@ -421,7 +555,7 @@ def pelis(item):
            elif title == 'Cine romanos': continue
            elif title == 'Cine de terror': continue
            elif title == 'Cine español': continue
-           elif title == 'Cine francés': continue
+           elif title == 'Cine francÉs': continue
            elif title == 'Cine infantil': continue
            elif title == 'Cine italiano': continue
            elif title == 'Cine latino': continue
@@ -440,6 +574,14 @@ def pelis(item):
            elif title == 'Peplum': continue
            elif title == 'Westerns': continue
 
+        if item.filtro_search:
+           if title == 'Artes marciales': continue
+           elif title == 'Cine argentino': continue
+           elif title == 'Cine asiático': continue
+           elif title == 'Cine francÉs': continue
+           elif title == 'Cine mejicano': continue
+           elif title == 'Clásico': continue
+
         if 'ª' in title: title = title.replace('ª', 'ª - L')
 
         i +=1
@@ -456,15 +598,17 @@ def pelis(item):
        for url, title in sort_pelis[desde:hasta]:
            itemlist.append(item.clone( action = 'list_all', title = title, url = url, page = 0 ))
 
-       if not item.filtro_search:
+       if itemlist:
           if i > perpage:
              if num_matches > hasta:
                 next_page = item.page + 1
-                itemlist.append(item.clone( title = '>> Página siguiente', page = next_page, action = 'pelis', text_color='coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, filtro_search = item.filtro_search,
+                                            action = 'pelis', text_color='coral' ))
 
     return itemlist
 
-# Por si viene del menu de Agrupaciones
+
+#  viene del menu de Grupos
 def categorias(item):
     logger.info()
 
@@ -487,12 +631,75 @@ def findvideos(item):
     return itemlist
 
 
+def list_search(item):
+    logger.info()
+    itemlist = []
+
+    url1 = host + '/iacutendice-de-peliacuteculas-a---k.html'
+    data1 = httptools.downloadpage(url1).data
+    bloque1 = scrapertools.find_single_match(data1, '<div style="display:block;font-size(.*?)<div id="main-wrap">')
+
+    url2 = host + '/iacutendice-de-peliacuteculas-l---z.html'
+    data2 = httptools.downloadpage(url2).data
+    bloque2 = scrapertools.find_single_match(data2, '<div style="display:block;font-size(.*?)<div id="main-wrap">')
+
+    bloques = bloque1 + bloque2
+
+    matches = scrapertools.find_multiple_matches(bloques, '<h2 class="wsite-content-title"(.*?)</h2>')
+
+    if matches: platformtools.dialog_notification('CineDeAntes', '[COLOR blue]Cargando películas[/COLOR]')
+
+    for match in matches:
+        match = match.replace('<font size="4"><em><u>', '').replace('</u></em></font>', '').replace('L<u style=""><em style="">', 'L')
+        match = match.replace('<font size="3">', '').replace('<font size="4">', '').replace('</font>', '')
+        match = match.replace('title=""><u><em>', '>').replace('</em></u>', '').strip()
+
+        title = scrapertools.find_single_match(match, '.*?<a href=.*?>(.*?)<')
+
+        if '<em style="">' in title:
+            title = scrapertools.find_single_match(title, '<em style="">(.*?)<')
+        elif '<em>' in title:
+            title = scrapertools.find_single_match(title, '<em>(.*?)<')
+        elif '<font size="4">' in title:
+            title = scrapertools.find_single_match(title, '<font size="4">(.*?)<')
+
+        title = title.replace('&Aacute;', 'A').replace('&Eacute;', 'E').replace('&Iacute;', 'I').replace('&Oacute;', 'O').replace('&Uacute;', 'U')
+        title = title.replace('&iquest;', '').replace('&iexcl;', '').replace('&#8203;', '').replace('&nbsp;', '').strip()
+
+        title = title.replace('Á', 'A').replace('É', 'E').replace('Í', 'i').replace('Ó', 'o').replace('Ú', 'u').replace('Ñ', 'ñ')
+        title = title.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
+
+        titulo = title.lower().strip()
+
+        if not item.title_search.lower() in titulo:
+            continue
+
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        url = host + url
+
+        lang = 'Esp'
+
+        itemlist.append(item.clone( action='list_all', url = url, title = title, language = lang, filtro_search = '',
+                                    contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
+
+        if len(itemlist) > 100: break
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
 def search(item, texto):
     logger.info()
     try:
        item.url = host
-       item.filtro_search = texto
-       return pelis(item)
+       if item.grupo == 'agrupa':
+            item.filtro_search = texto
+            return pelis(item)
+       else:
+            item.title_search = texto
+            return list_search(item)
     except:
        import sys
        for line in sys.exc_info():

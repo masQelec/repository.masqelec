@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["movie"],
+  "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
   "clusters": ["years", "kids", "docs", "vos"],
 
-  "notes": "Películas en castellano, latino y subtitulado. Por géneros, año."
+  "notes": "Películas y Series por géneros, año."
 }

@@ -11,7 +11,7 @@ def mainlist(item):
 
     item.category = 'TMDB'
 
-    itemlist.append(item.clone( action='', title= 'Búsquedas a través de Personas:', text_color='yellowgreen', folder=False ))
+    itemlist.append(item.clone( action='', title= 'Búsquedas a través de [COLOR pink]Personas[/COLOR]', text_color='yellowgreen', folder=False ))
 
     itemlist.append(item.clone( action='personas', search_type='cast', title=' - Buscar intérprete ...',
                                 plot = 'Escribir el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
@@ -19,7 +19,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='personas', search_type='crew', title=' - Buscar dirección ...',
                                 plot = 'Escribir el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
 
-    itemlist.append(item.clone( action='', title= 'Búsquedas a través de Listas:', text_color='yellowgreen', folder=False ))
+    itemlist.append(item.clone( action='', title= 'Búsquedas a través de [COLOR pink]Listas[/COLOR]', text_color='yellowgreen', folder=False ))
 
     itemlist.append(item.clone( action='listado_personas', search_type='person', extra = 'popular', title=' - Personas con Mayor popularidad' ))
 
@@ -30,13 +30,15 @@ def mainlist(item):
        if item.search_type == 'movie': presentar = False
 
     if presentar:
-        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'now_playing', title=' - Películas en Cartelera' ))
-        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'popular', title=' - Películas Más populares' ))
-        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'top_rated', title=' - Películas Mejor valoradas' ))
-        # ~ itemlist.append(item.clone( action='listado', search_type='movie', url = 'movie/upcoming', title=' - Próximas Películas' ))
-        itemlist.append(item.clone( action='generos', search_type='movie', title=' - Películas por Género' ))
-        itemlist.append(item.clone( action='networks', search_type='movie', title=' - Películas por productoras' ))
-        itemlist.append(item.clone( action='anios', search_type='movie', title=' - Películas por Año' ))
+        itemlist.append(item.clone( title = ' - Películas', thumbnail=config.get_thumb('movie'), action = '', text_color='deepskyblue' ))
+
+        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'now_playing', title='   - En Cartelera' ))
+        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'popular', title='   - Más populares' ))
+        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'top_rated', title='   - Mejor valoradas' ))
+        # ~ itemlist.append(item.clone( action='listado', search_type='movie', url = 'movie/upcoming', title='   - Próximas' ))
+        itemlist.append(item.clone( action='generos', search_type='movie', title='   - Por Género' ))
+        itemlist.append(item.clone( action='networks', search_type='movie', title='   - Por productoras' ))
+        itemlist.append(item.clone( action='anios', search_type='movie', title='   - Por Año' ))
 
     presentar = True
     if item.search_type == 'movie': presentar = False
@@ -45,12 +47,14 @@ def mainlist(item):
        if item.search_type == 'tvshow': presentar = False
 
     if presentar:
-        itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'on_the_air', title=' - Series en Emisión' ))
-        itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'popular', title=' - Series Más populares' ))
-        itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'top_rated', title=' - Series Mejor valoradas' ))
-        # ~ itemlist.append(item.clone( action='listado', search_type='tvshow', url = 'tv/airing_today', title=' - Series que se emiten Hoy' ))
-        itemlist.append(item.clone( action='generos', search_type='tvshow', title=' - Series por Género' ))
-        itemlist.append(item.clone( action='anios', search_type='tvshow', title=' - Series por Año' ))
+        itemlist.append(item.clone( title = ' - Series', thumbnail=config.get_thumb('tvshow'), action = '', text_color='hotpink' ))
+
+        itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'on_the_air', title='   - En Emisión' ))
+        itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'popular', title='   - Más populares' ))
+        itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'top_rated', title='   - Mejor valoradas' ))
+        # ~ itemlist.append(item.clone( action='listado', search_type='tvshow', url = 'tv/airing_today', title='   - Que se emiten Hoy' ))
+        itemlist.append(item.clone( action='generos', search_type='tvshow', title='   - Por Género' ))
+        itemlist.append(item.clone( action='anios', search_type='tvshow', title='   - Por Año' ))
 
     itemlist.append(item.clone( action='show_help', title='Información y ayuda', folder=False, thumbnail=config.get_thumb('help'), text_color='green' ))
 

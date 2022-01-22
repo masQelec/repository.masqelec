@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
 import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
+from lib import decrypters
 
 host = 'https://grantorrent.ch/'
 
@@ -13,7 +19,7 @@ host = 'https://grantorrent.ch/'
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 def configurar_proxies(item):
     from core import proxytools
@@ -55,14 +61,15 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -145,7 +152,7 @@ def list_all(item):
 
     next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
     if next_page_link:
-        itemlist.append(item.clone( title='>> Página siguiente', action='list_all', url=next_page_link, text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page_link, text_color='coral' ))
 
     return itemlist
 
@@ -170,7 +177,7 @@ def list_categ_search(item):
 
     next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
     if next_page_link:
-        itemlist.append(item.clone( title='>> Página siguiente', url=next_page_link, action='list_categ_search', text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, action='list_categ_search', text_color='coral' ))
 
     return itemlist
 
@@ -181,16 +188,17 @@ def puntuar_calidad(txt):
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
+
 def findvideos(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(item.url)
 
-    patron = '<tr class="lol">\s*<td><img ([^>]*)>.*?</td>\s*<td>([^<]+)</td>\s*<td>([^<]+)</td>\s*<td><a class="link" onclick="([^"]+)'
+    patron = '<tr class="lol">\s*<td><img ([^>]*)>.*?</td>\s*<td>([^<]+)</td>\s*<td>([^<]+)</td>\s*<td><a class="link".*?onclick="([^"]+)'
     matches = re.compile(patron, re.DOTALL).findall(data)
     if not matches:
-        patron = '<tr class="lol">\s*<td><img ([^>]*)>.*?</td>\s*<td>([^<]+)</td>\s*<td>([^<]+)</td>\s*<td><a class="link" href="([^"]+)'
+        patron = '<tr class="lol">\s*<td><img ([^>]*)>.*?</td>\s*<td>([^<]+)</td>\s*<td>([^<]+)</td>\s*<td><a class="link".*?href="([^"]+)'
         matches = re.compile(patron, re.DOTALL).findall(data)
 
     ses = 0
@@ -217,6 +225,39 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    if not item.url.endswith('.torrent'):
+        host_torrent = host[:-1]
+        url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
+
+        if url_base64.endswith('.torrent'):
+           if not url_base64.startswith('https://files.'): url_base64 = url_base64.replace(host, 'https://files.grantorrent.ch/' )
+           item.url = url_base64
+
+    if item.url.endswith('.torrent'):
+        if config.get_setting('proxies', item.channel, default=''):
+            if PY3:
+                from core import requeststools
+                data = requeststools.read(item.url, 'grantorrent')
+            else:
+                data = do_downloadpage(item.url)
+
+            if data:
+                import os
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+        else:
+            itemlist.append(item.clone( url = item.url, server = 'torrent' ))
 
     return itemlist
 

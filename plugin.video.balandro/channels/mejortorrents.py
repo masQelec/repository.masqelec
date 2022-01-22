@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
 import re
 
 from platformcode import logger
@@ -7,7 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www.mejortorrentes.com'
+host = 'https://www.mejortorrentes.net'
 
 
 selecc_pelis = host + '/peliculas-buscador.html'
@@ -18,19 +23,20 @@ perpage = 30
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('//www.mejortorrento.com', '//www.mejortorrentes.com')
-    url = url.replace('//www.mejortorrento.net', '//www.mejortorrentes.com')
-    url = url.replace('//www.mejortorrento.info', '//www.mejortorrentes.com')
+    ant_hosts = ['https://www.mejortorrento.com', 'https://www.mejortorrento.net', 'https://www.mejortorrento.info', 
+                 'https://www.mejortorrentes.com']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
 
     # ~ data = httptools.downloadpage(url, post=post).data
     data = httptools.downloadpage_proxy('mejortorrents', url, post=post, headers=headers).data
@@ -41,18 +47,25 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
-    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
-
-    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
-
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
+
+    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+    itemlist.append(item.clone( title = 'Documentales', action = 'list_all', url = host + '/torrents-de-documentales.html',
+	                            search_type = 'documentary', text_color = 'cyan' ))
+
     return itemlist
 
 
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/torrents-de-peliculas.html', search_type = 'movie' ))
 
@@ -64,11 +77,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( action ='generos', title = 'Por género', search_type = 'movie' ))
     itemlist.append(item.clone( action ='anios', title = 'Por año', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -76,19 +87,20 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/torrents-de-series.html', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/secciones.php?sec=ultimos_torrents', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/torrents-de-series-hd-alta-definicion.html', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Documentales', action = 'list_all', url = host + '/torrents-de-documentales.html', search_type = 'documentary' ))
 
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
 
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -177,7 +189,7 @@ def list_all(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
             buscar_next = False
 
     if buscar_next:
@@ -188,7 +200,7 @@ def list_all(item):
             if not next_page.startswith('/'): next_page = '/' + next_page
             next_page = host + next_page
 
-            itemlist.append(item.clone( title='>> Página siguiente', page = 0, action='list_all', url=next_page, text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', page = 0, action='list_all', url=next_page, text_color='coral' ))
 
     return itemlist
 
@@ -308,7 +320,7 @@ def list_selecc(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action='list_selecc', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_selecc', text_color='coral' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -434,6 +446,33 @@ def findvideos(item):
     return itemlist
 
 
+def play(item):
+    logger.info()
+    itemlist = []
+
+    if item.url.endswith('.torrent'):
+        from platformcode import config
+
+        if config.get_setting('proxies', item.channel, default=''):
+            if PY3:
+                from core import requeststools
+                data = requeststools.read(item.url, 'mejortorrents')
+            else:
+                data = do_downloadpage(item.url)
+
+            if data:
+                import os
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+        else:
+            itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+
+    return itemlist
+
+
 def list_search(item):
     logger.info()
     itemlist = []
@@ -492,7 +531,7 @@ def list_search(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action='list_search', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_search', text_color='coral' ))
 
     tmdb.set_infoLabels(itemlist)
 

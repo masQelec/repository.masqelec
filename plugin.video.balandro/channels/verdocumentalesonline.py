@@ -25,13 +25,13 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color = 'cyan' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all' ))
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', group = 'vistos' ))
 
     itemlist.append(item.clone( title = 'Por listas', action = 'list_playlists' ))
-
-    itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary' ))
 
     return itemlist
 
@@ -60,7 +60,7 @@ def list_playlists(item):
                                         thumbnail=vid['thumbnail_480_url'], plot=plot ))
 
         if data['has_more']:
-            itemlist.append(item.clone( title='>> Página siguiente', action='list_playlists', page = item.page + 1, text_color='coral'))
+            itemlist.append(item.clone( title='Siguientes ...', action='list_playlists', page = item.page + 1, text_color='coral'))
     except:
         pass
 
@@ -100,7 +100,7 @@ def list_all(item):
                                         contentType='movie', contentTitle=vid['title'], contentExtra='documentary' ))
 
         if data['has_more']:
-            itemlist.append(item.clone( title='>> Página siguiente', action='list_all', page = item.page + 1, text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', action='list_all', page = item.page + 1, text_color='coral' ))
     except:
         pass
 

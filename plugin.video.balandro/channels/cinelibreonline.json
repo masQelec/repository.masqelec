@@ -13,5 +13,5 @@
 
   "clusters": ["classic", "categories", "years", "lists", "kids", "docs", "vos"],
 
-  "notes": "Cine Clásico en Español y Subtitulado. Acceso por géneros, año."
+  "notes": "Películas clásicas, por géneros y año."
 }

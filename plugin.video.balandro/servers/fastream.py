@@ -4,20 +4,21 @@ import re
 
 from platformcode import logger
 from core import httptools, scrapertools, servertools
-
+from lib import jsunpack
 
 def resolve_patterns(page_url):
     if '/embed-' in page_url:
         return page_url
 
-    server_parameters = servertools.get_server_parameters("fastream")
-    patterns = server_parameters.get("find_videos", {}).get("patterns")
+    server_parameters = servertools.get_server_parameters('fastream')
+    patterns = server_parameters.get('find_videos', {}).get('patterns')
 
     for pattern in patterns:
-        for match in re.compile(pattern["pattern"], re.DOTALL).finditer(page_url):
-            url = pattern["url"]
+        for match in re.compile(pattern['pattern'], re.DOTALL).finditer(page_url):
+            url = pattern['url']
+
             for x in range(len(match.groups())):
-                url = url.replace("\\{}".format(x + 1), match.groups()[x])
+                url = url.replace('\\{}'.format(x + 1), match.groups()[x])
 
             page_url = url
 
@@ -35,23 +36,28 @@ def get_video_url(page_url, url_referer=''):
     page_url = resolve_patterns(page_url)
 
     if 'referer' in locals():
-        page_url += referer
+         page_url += referer
 
     data = httptools.downloadpage(page_url).data
 
     if 'File is no longer available as it expired or has been deleted' in data:
         return 'El archivo no existe o ha sido borrado'
 
-    page_url = resolve_patterns(page_url)
-    data = scrapertools.find_single_match(data, "(?is)var player =.+?sources.+?\[(.+?)\]")
+    try:
+        packed = scrapertools.find_single_match(data, "text/javascript'>(eval.*?)\s*</script>")
+        unpacked = jsunpack.unpack(packed)
+    except:
+        return video_urls
 
-    matches = scrapertools.find_multiple_matches(data, "(?is)src: [\"'](.+?)[\"']")
+    data = scrapertools.find_single_match(unpacked, "(?is)var player\s?=.+?sources.+?\[(.+?)\]")
+
+    matches = scrapertools.find_multiple_matches(data, "src:\s?[\"'](.+?)[\"']")
 
     for url in matches:
         if 'referer' in locals():
-            url += "|Referer={}".format(referer)
+            url += '|Referer={}'.format(referer)
 
-        video_urls.append(['.m3u8 ', url])
+        video_urls.append(['.m3u8', url])
 
     if not (len(video_urls)) == 1:
         return video_urls
@@ -62,4 +68,3 @@ def get_video_url(page_url, url_referer=''):
     video_urls = servertools.get_parse_hls(video_urls)
 
     return video_urls
-

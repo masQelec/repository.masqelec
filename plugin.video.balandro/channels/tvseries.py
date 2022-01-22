@@ -20,6 +20,8 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    # ~ itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
     itemlist.append(item.clone( title = 'TV-SeriesDeAntes Ciencia Ficción', action = 'menu_series', url = host + '-2.weebly.com' ))
 
     itemlist.append(item.clone( title = 'TV-SeriesDeAntes Comedias', action = 'menu_series', url = host + '5.weebly.com' ))
@@ -159,7 +161,7 @@ def series(item):
             if i > perpage:
                 if num_matches > hasta:
                     next_page = item.page + 1
-                    itemlist.append(item.clone( title = '>> Página siguiente', page = next_page, action = 'series', text_color='coral' ))
+                    itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'series', text_color='coral' ))
 
     return itemlist
 

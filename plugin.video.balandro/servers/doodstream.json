@@ -9,7 +9,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "http(?:s|)://(?:doodstream.com|dood.watch|dood.to|dood.so|dood.cx|dood.la|dood.ws)/(d|e)/(?:embed-|)([A-z0-9]+)",
+        "pattern": "http(?:s|)://(?:doodstream.com|dood.watch|dood.to|dood.so|dood.cx|dood.la|dood.ws|dood.sh)/(d|e)/(?:embed-|)([A-z0-9]+)",
         "url": "https://dood.to/\\1/\\2"
       }
     ]

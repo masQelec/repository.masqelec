@@ -3,7 +3,7 @@
   "name": "DescargaCineClasico",
   "thumbnail": "descargacineclasico.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["temporary", "classic", "languages", "years", "adults", "docs", "vos"],
+  "clusters": ["classic", "languages", "years", "adults", "docs", "vos"],
 
-  "notes": "Películas clásicas, por idiomas, por géneros y categorías."
+  "notes": "Películas clásicas, por idiomas, géneros y categorías."
 }

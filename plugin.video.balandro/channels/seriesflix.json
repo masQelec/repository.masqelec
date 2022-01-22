@@ -3,7 +3,7 @@
   "name": "SeriesFlix",
   "thumbnail": "seriesflix.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["producers", "countries", "kids", "docs", "vos"],
 
-  "notes": "Muchas series, por géneros, por productoras. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web CERRADA. Series por géneros, productora. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

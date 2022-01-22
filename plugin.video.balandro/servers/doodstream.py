@@ -5,7 +5,12 @@ import xbmc, random, time
 from platformcode import config, logger, platformtools
 from core import httptools, scrapertools
 
-host = 'https://dood.la'
+host = 'https://dood.ws'
+
+
+color_exec = config.get_setting('notification_exec_color', default='cyan')
+el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
+el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
@@ -37,7 +42,7 @@ def get_video_url(page_url, url_referer=''):
 
     video_urls = []
 
-    page_url = page_url.replace('/doodstream.com/', '/dood.la/').replace('/dood.cx/' ,'/dood.la/')
+    page_url = page_url.replace('/dood.cx/', '/dood.ws/').replace('/dood.to/', '/dood.ws/')
 
     page_url = page_url.replace('/d/', '/e/')
 
@@ -56,14 +61,12 @@ def get_video_url(page_url, url_referer=''):
                     video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
                     return video_urls
 
-                color_exec = config.get_setting('notification_exec_color', default='cyan')
-                el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
-                el_srv += ('ResolveUrl[/B][/COLOR]')
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
-
             except:
                 import traceback
                 logger.error(traceback.format_exc())
+                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
         else:
            return 'Acceso Denegado' # ~ Cloudflare recaptcha
 
@@ -71,6 +74,27 @@ def get_video_url(page_url, url_referer=''):
     if url:
         data2 = httptools.downloadpage(host + url, headers={'Referer': page_url}).data
         if not data2: return 'Vídeo sin resolver'
+
+        if '<title>Access denied' in data2:
+            if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+                try:
+                    import_libs('script.module.resolveurl')
+
+                    import resolveurl
+                    resuelto = resolveurl.resolve(page_url)
+
+                    if resuelto:
+                        video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
+                        return video_urls
+
+                    platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
+                except:
+                   import traceback
+                   logger.error(traceback.format_exc())
+                   platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+            else:
+               return 'Segundo Acceso Denegado' # ~ Cloudflare recaptcha
 
         token = scrapertools.find_single_match(data, '"?token=([^"&]+)')
         if not token: return video_urls

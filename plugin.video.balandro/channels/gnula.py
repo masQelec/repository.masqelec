@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = "http://gnula.nu/"
+host = 'https://gnula.nu/'
 
 url_estrenos = host + 'peliculas-online/lista-de-peliculas-online-parte-1/'
 url_recomendadas = host + 'peliculas-online/lista-de-peliculas-recomendadas/'
@@ -20,15 +20,23 @@ perpage = 15
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 def do_downloadpage(url, post=None):
-    # ~ data = httptools.downloadpage(url, post=post).data
-    data = httptools.downloadpage_proxy('gnula', url, post=post).data
+    # ~ por si viene de enlaces guardados
+    url = url.replace('http://gnula.nu/', host)
+
+    # ~ timeout
+    timeout = 40
+
+    if '/generos/' in url: timeout = 50
+
+    # ~ data = httptools.downloadpage(url, post=post, timeout=timeout).data
+    data = httptools.downloadpage_proxy('gnula', url, post=post, timeout=timeout).data
     return data
 
 
@@ -39,6 +47,10 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = url_estrenos ))
 
     itemlist.append(item.clone( title = 'Recomendadas', action = 'list_all', url = url_recomendadas ))
@@ -46,9 +58,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -139,7 +148,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if not item.filtro_search and len(list(matches)) > (item.page + 1) * perpage:
-        itemlist.append(item.clone( title=">> Página siguiente", page=item.page + 1, action='list_all', text_color='coral' ))
+        itemlist.append(item.clone( title="Siguientes ...", page=item.page + 1, action='list_all', text_color='coral' ))
 
     return itemlist
 

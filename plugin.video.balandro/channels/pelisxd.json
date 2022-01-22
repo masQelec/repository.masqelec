@@ -13,5 +13,5 @@
 
   "clusters": ["kids", "docs", "vos"],
 
-  "notes": "Acceso por separado a Castellano, Latino y Subtitulado. Películas por géneros."
+  "notes": "Películas por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

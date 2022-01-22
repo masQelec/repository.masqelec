@@ -26,14 +26,14 @@ def mainlist_pelis(item):
         if actions.adults_password(item) == False:
             return itemlist
 
+    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color='orange' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all' ))
 
     itemlist.append(item.clone( title = 'Por repertorio', action = 'repertorios' ))
     itemlist.append(item.clone( title = 'Por canal', action = 'canales' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars' ))
-
-    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -64,7 +64,7 @@ def repertorios(item):
         if next_url:
             #next_url = host + next_url
 
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, page = item.page + 1, action = 'repertorios', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, page = item.page + 1, action = 'repertorios', text_color = 'coral' ))
 
     return itemlist
 
@@ -98,7 +98,7 @@ def canales(item):
         if next_url:
             next_url = host + next_url
 
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, page = item.page + 1, action = 'canales', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, page = item.page + 1, action = 'canales', text_color = 'coral' ))
 
     return itemlist
 
@@ -129,7 +129,7 @@ def categorias(item):
         if next_url:
             next_url = host + next_url
 
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, page = item.page + 1, action = 'categorias', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, page = item.page + 1, action = 'categorias', text_color = 'coral' ))
 
     return itemlist
 
@@ -164,7 +164,7 @@ def pornstars(item):
         if next_url:
             next_url = host + next_url
 
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, page = item.page + 1, action = 'pornstars', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, page = item.page + 1, action = 'pornstars', text_color = 'coral' ))
 
     return itemlist
 
@@ -201,7 +201,7 @@ def list_all(item):
         if next_url:
             next_url = host + next_url
 
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url, page = item.page + 1, action = 'list_all', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, page = item.page + 1, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 

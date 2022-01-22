@@ -13,5 +13,5 @@
 
   "clusters": ["adults", "languages", "qualityes", "years", "kids", "docs", "vos", "3d"],
 
-  "notes": "Peliculas en Español, Latino, Ingles, Subtitulado, por géneros, años y calidades."
+  "notes": "Películas en por idioma, géneros, año y calidad."
 }

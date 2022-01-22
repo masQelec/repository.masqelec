@@ -3,7 +3,7 @@
   "name": "FullSerieHd",
   "thumbnail": "fullseriehd.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["news", "years", "lasts", "producers", "docs", "kids", "vos"],
 
-  "notes": "Películas por géneros, por año y Series"
+  "notes": "Web CERRADA. Películas por géneros, año y también Series"
 }

@@ -13,5 +13,5 @@
 
   "clusters": ["torrents", "news", "qualityes", "years", "kids", "docs"],
 
-  "notes": "Películas en castellano, latino y por géneros."
+  "notes": "Películas por idioma, géneros, calidad y año."
 }

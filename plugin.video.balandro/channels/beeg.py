@@ -76,7 +76,7 @@ def list_all(item):
     next_page = (page + 48)
     if next_page:
         next_page = re.sub(r"&offset=\d+", "&offset={0}".format(next_page), item.url)
-        itemlist.append(item.clone( title = '>> Página siguiente', url = next_page, action = 'list_all', text_color = 'coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 

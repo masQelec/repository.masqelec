@@ -76,7 +76,7 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Ubicación de las descargas', action = 'show_folder_downloads',
                                 thumbnail=config.get_thumb('downloads'), text_color='green' ))
 
-    itemlist.append(item.clone( channel='actions', title= 'Ajustes categoría descargas ', action = 'open_settings',
+    itemlist.append(item.clone( channel='actions', title= 'Ajustes categoría descargas', action = 'open_settings',
                                 thumbnail=config.get_thumb('settings'), text_color='yellowgreen', folder=False ))
 
     return itemlist

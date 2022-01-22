@@ -13,5 +13,5 @@
 
   "clusters": ["news", "rankings", "lasts", "kids", "docs", "vos"],
 
-  "notes": "Películas por géneros y Series en Castellano, Latino y SubtituladasPuede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas y Series por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

@@ -27,6 +27,8 @@ def mainlist_pelis(item):
         if actions.adults_password(item) == False:
             return itemlist
 
+    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color='orange' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, page=0 ))
     itemlist.append(item.clone( title = 'Más caliente', action = 'list_all', url = host + 'hottest'))
 
@@ -35,8 +37,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars', page=0 ))
-
-    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -62,10 +62,10 @@ def list_all(item):
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<li><a href="([^"]+)" title="Next page"')
         if next_url:
-            itemlist.append(item.clone( title = '>> Página siguiente', url= host + next_url if next_url.startswith('http') else host[:-1] + next_url,
+            itemlist.append(item.clone( title = 'Siguientes ...', url= host + next_url if next_url.startswith('http') else host[:-1] + next_url,
                                         action = 'list_all', page = item.page + 1, text_color = 'coral' ))
         else:    
-            itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_all', page = item.page + 1, text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', page = item.page + 1, text_color = 'coral' ))
 
     return itemlist
 
@@ -90,7 +90,7 @@ def listas(item):
         next_url = scrapertools.find_single_match(data, patron)
         if next_url:
             next_url = next_url.replace('&amp;', '&')
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
                                         action = 'listas', page = item.page + 1, text_color = 'coral' ))
 
     return itemlist
@@ -135,7 +135,7 @@ def pornstars(item):
         next_url = scrapertools.find_single_match(data, patron)
         if next_url:
             next_url = next_url.replace('&amp;', '&')
-            itemlist.append(item.clone( title = '>> Página siguiente', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
                                         action = 'pornstars', page = item.page + 1, text_color = 'coral' ))
 
     return itemlist

@@ -4,8 +4,9 @@ import os, re
 import xbmcgui, xbmc
 
 from platformcode import config, logger, platformtools
-from core.item import Item
 from core import filetools
+
+from core.item import Item
 
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -21,6 +22,34 @@ def open_settings(item):
     config.__settings__.openSettings()
 
     platformtools.itemlist_refresh()
+
+
+def _marcar_canales(item):
+    cfg_cchannel_status = 'channel_' + item.canal + '_status'
+    status = config.get_setting(cfg_cchannel_status, default='')
+
+    if status:
+        ant_tipo = 'Activo'
+        if status == 1: ant_tipo = 'Preferido'
+        if status == -1: ant_tipo = 'Desactivado'
+
+    new_tipo = 'Activo'
+    if item.estado == 1: new_tipo = 'Preferido'
+    if item.estado == -1: new_tipo = 'Desactivado'
+
+    if status:
+        if ant_tipo == new_tipo:
+            el_canal = ('Sin cambio en [B][COLOR %s] %s [COLOR %s] ' + item.canal.capitalize() + '[/COLOR][/B]') % (color_exec, new_tipo, color_infor)
+            platformtools.dialog_notification(config.__addon_name, el_canal)
+            return
+
+        if not platformtools.dialog_yesno(config.__addon_name + ' - ' + item.canal.capitalize(), '[COLOR red]¿ Confirma cambiar la personalización del canal ?[/COLOR]', 'de:  [COLOR cyan]' + ant_tipo + '[/COLOR]', 'a:    [COLOR yellow]' + new_tipo + '[/COLOR]'): 
+            return
+
+    config.set_setting('status', item.estado, item.canal)
+	
+    el_canal = ('Cambiado a [B][COLOR %s] %s [COLOR %s] ' + item.canal.capitalize() + '[/COLOR][/B]') % (color_exec, new_tipo, color_avis)
+    platformtools.dialog_notification(config.__addon_name, el_canal)
 
 
 def comprobar_nuevos_episodios(item):
@@ -169,6 +198,14 @@ def search_trailers(item):
             if len(resultados) == 1: break
 
 
+def global_proxies(item):
+    logger.info()
+
+    from modules import proxysearch
+
+    proxysearch.proxysearch_all(item)
+
+
 def manto_proxies(item):
     logger.info()
 
@@ -216,6 +253,59 @@ def manto_proxies(item):
        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Proxies eliminados[/B][/COLOR]' % color_infor)
 
 
+def last_domain_hdfull(item):
+    logger.info()
+
+    from core import httptools, scrapertools, jsontools
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando dominio[/B][/COLOR]' % color_exec)
+
+    channel_json = 'hdfull.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] HdFull') % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    try:
+       data = httptools.downloadpage('https://hdfullcdn.cc/login').data
+       last_domain = scrapertools.find_single_match(data, 'location.replace.*?"(.*?)"')
+       if last_domain:
+           last_domain = last_domain.replace('login', '')
+           if not last_domain.endswith('/'):
+               last_domain = last_domain + '/'
+    except:
+      last_domain = ''
+
+    if not last_domain:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
+        return
+
+    domain = config.get_setting('dominio', 'hdfull', default='')
+
+    if domain == last_domain:
+        platformtools.dialog_ok(config.__addon_name + ' - HdFull', '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name + ' - HdFull', '¿ [COLOR red] Último dominio memorizado incorrecto. [/COLOR] Desea cambiarlo  ?','Memorizado:  [COLOR yellow][B]' + domain + '[/B][/COLOR]', 'Vigente:           [COLOR cyan][B]' + last_domain + '[/B][/COLOR]'): 
+        config.set_setting('dominio', last_domain, 'hdfull')
+
+        if not item.desde_el_canal:
+            if not item.from_action == 'mainlist':
+                platformtools.dialog_ok(config.__addon_name + ' - HdFull', '[COLOR yellow]Ultimo dominio vigente memorizado, pero aún NO guardado.', '[COLOR cyan][B]Recuerde, que para que el cambio surta efecto deberá abandonar la configuración/ajustes de Balandro a través de su correspondiente botón --> OK[/B][/COLOR]')
+
 def del_datos_hdfull(item):
     logger.info()
 
@@ -230,6 +320,7 @@ def del_datos_hdfull(item):
         config.set_setting('channel_hdfull_hdfull_password', '')
         config.set_setting('channel_hdfull_hdfull_username', '')
 
+
 def del_datos_playdede(item):
     logger.info()
 
@@ -243,6 +334,7 @@ def del_datos_playdede(item):
         config.set_setting('channel_playdede_playdede_login', False)
         config.set_setting('channel_playdede_playdede_password', '')
         config.set_setting('channel_playdede_playdede_username', '')
+
 
 def manto_params(item):
     logger.info()
@@ -271,7 +363,7 @@ def manto_params(item):
 
         # ~ config.set_setting('downloadpath', '')  No funciona
 
-        config.set_setting('chrome_last_version', '93.0.4577.60')
+        config.set_setting('chrome_last_version', '96.0.4664.110')
 
         config.set_setting('debug', '0')
 

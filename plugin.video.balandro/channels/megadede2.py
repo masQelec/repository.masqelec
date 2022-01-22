@@ -13,7 +13,7 @@ host = 'https://www.megadede2.com/'
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
 
 def configurar_proxies(item):
     from core import proxytools
@@ -21,13 +21,11 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if 'release/' in url:
-        raise_weberror = False
+    if '/release/' in url: raise_weberror = False
 
     # ~ timeout
     timeout = 30
-    if '/?s=' in url:
-        timeout = 50
+    if '/?s=' in url: timeout = 50
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     data = httptools.downloadpage_proxy('megadede2', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
@@ -39,12 +37,12 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
-    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
-
-    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
-
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
+
+    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -52,6 +50,10 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-peliculas-online-gratis/', search_type = 'movie' ))
 
@@ -64,10 +66,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
-    itemlist.append(item_configurar_proxies(item))
-
     return itemlist
 
 
@@ -75,17 +73,17 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-series-online-gratis/', search_type = 'tvshow' ))
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-series-online-gratis-hd-15/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Episodios recientes', action = 'list_epis', url = host + 'ver-episodios-online/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'category/destacadas/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
-
-    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -198,7 +196,7 @@ def list_epis(item):
 
     buscar_next = True
     if num_matches > ((item.page + 1) * perpage):
-        itemlist.append(item.clone( title=">> Página siguiente", action="list_epis", page=item.page + 1, text_color='coral' ))
+        itemlist.append(item.clone( title="Siguientes ...", action="list_epis", page=item.page + 1, text_color='coral' ))
         buscar_next = False
 
     if buscar_next:
@@ -206,7 +204,7 @@ def list_epis(item):
 
         if next_page:
             if '/page/' in next_page:
-                itemlist.append(item.clone(title = '>> Página siguiente', url = next_page, action = 'list_epis', text_color = 'coral'))
+                itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_epis', text_color = 'coral'))
 
     return itemlist
 
@@ -259,7 +257,7 @@ def list_all(item):
 
     if next_page:
         if '/page/' in next_page:
-            itemlist.append(item.clone(title = '>> Página siguiente', url = next_page, action = 'list_all', text_color = 'coral'))
+            itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
 
     return itemlist
 
@@ -326,7 +324,7 @@ def episodios(item):
     tmdb.set_infoLabels(itemlist)
 
     if len(matches) > (item.page + 1) * perpage:
-        itemlist.append(item.clone( title = ">> Página siguiente", action = "episodios", page = item.page + 1, text_color= 'coral' ))
+        itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, text_color= 'coral' ))
 
     return itemlist
 
@@ -410,8 +408,10 @@ def play(item):
 
     item.url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
+    headers = {'Referer': item.url}
+
     if item.other == 'd':
-        url = httptools.downloadpage(item.url, follow_redirects=False).headers.get('location', '')
+        url = httptools.downloadpage(item.url, headers=headers, follow_redirects=False).headers.get('location', '')
 
         if url:
             url = url.replace('uptobox', 'uptostream')
@@ -424,13 +424,13 @@ def play(item):
         return itemlist
 
     elif item.other == 'dop':
-        data = do_downloadpage(item.url)
+        data = do_downloadpage(item.url, headers=headers)
 
         url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
 
         if '/validaEnlace' in url:
-            url = httptools.downloadpage(url, timeout = 30, follow_redirects=False).headers.get('location', '')
+            url = httptools.downloadpage(url, headers=headers, timeout = 30, follow_redirects=False).headers.get('location', '')
             if url == 'https://streamplusvip.xyz': url = ''
 
         if '/hqq.' in url or '/waaw.' in url or '/netu' in url:
@@ -443,13 +443,13 @@ def play(item):
 
         return itemlist
 
-    data = do_downloadpage(item.url)
+    data = do_downloadpage(item.url, headers=headers)
 
     url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"')
     if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
 
     if '.streamplusvip.' in url:
-        data = do_downloadpage(url)
+        data = do_downloadpage(url, headers=headers)
 
         video = scrapertools.find_single_match(data, "watch_video.php(.*?)'")
         hostr = scrapertools.find_single_match(data, "hostRedirection.*?'(.*?)'")
@@ -461,14 +461,14 @@ def play(item):
         if video:
             if hostr:
                 url = 'https://1.streamplusvip.xyz/player/ip.php/' + video
-                data = do_downloadpage(url)
+                data = do_downloadpage(url, headers=headers)
 
                 _iss = scrapertools.find_single_match(data, 'iss="(.*?)"')
                 if _iss: url = hostr +'/' + _iss
 
     elif '/mostrarEnlace' in url or '/validaEnlace' in url:
         url = url.replace('/mostrarEnlace', '/validaEnlace')
-        url = httptools.downloadpage(url, timeout = 30, follow_redirects=False).headers.get('location', '')
+        url = httptools.downloadpage(url, headers=headers, timeout = 30, follow_redirects=False).headers.get('location', '')
         if url == 'https://streamplusvip.xyz': url = ''
 
     if '/hqq.' in url or '/waaw.' in url or '/netu' in url:

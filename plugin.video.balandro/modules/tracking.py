@@ -126,6 +126,9 @@ def mainlist(item):
 
     itemlist.append(item.clone( title='Gestionar listas', action='mainlist_listas' )) 
 
+    itemlist.append(item.clone( channel='actions', title= 'Ajustes categoría preferidos', action = 'open_settings',
+                                thumbnail=config.get_thumb('settings'), text_color='yellowgreen', folder=False ))
+
     itemlist.append(item.clone( channel='helper', title = 'Información preferidos', action = 'show_help_tracking', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     return itemlist

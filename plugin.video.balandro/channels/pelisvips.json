@@ -13,5 +13,5 @@
 
   "clusters": ["news", "producers", "languages", "qualityes", "kids", "docs", "vos"],
 
-  "notes": "Películas por idioma, por género, por calidad, Estrenos, Netflix."
+  "notes": "Web CERRADA. Películas por idioma, géneros y calidad."
 }

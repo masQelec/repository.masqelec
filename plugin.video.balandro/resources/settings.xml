@@ -8,19 +8,21 @@
         <setting type="sep"/>
         <setting label="Opciones para el menú principal:" type="lsep"/>
         <setting id="mnu_oppciones" type="bool" label="Seleccionar opciones" default="false"/>
-        <setting id="channels_link_main" type="bool" label="Añadir la opción Canales (simplificado y principal)" default="true" visible="eq(-1,true)"/>
-        <setting id="mnu_idiomas" type="bool" label="Añadir la opción Idiomas (simplificado y principal)" default="true" visible="eq(-2,true)"/>
-        <setting id="mnu_grupos" type="bool" label="Añadir la opción Grupos (simplificado y principal)" default="true" visible="eq(-3,true)"/>
-        <setting id="mnu_pelis" type="bool" label="Añadir la opción Películas" default="true" visible="eq(-4,true)"/>
-        <setting id="mnu_series" type="bool" label="Añadir la opción Series" default="true" visible="eq(-5,true)"/>
-        <setting id="channels_link_pyse" type="bool" label="Añadir la opción Películas y Series (solo los canales con ambos contenidos)" default="false" visible="eq(-6,true)"/>
-        <setting id="mnu_generos" type="bool" label="Añadir la opción Géneros" default="true" visible="eq(-7,true)"/>
-        <setting id="mnu_documentales" type="bool" label="Añadir la opción Documentales" default="true" visible="eq(-8,true)"/>
-        <setting id="mnu_torrents" type="bool" label="Añadir la opción Torrents" default="true" visible="eq(-9,true)"/>
-        <setting id="mnu_animes" type="bool" label="Añadir la opción Animes" default="true" visible="eq(-10,true)"/>
-        <setting id="mnu_adultos" type="bool" label="Añadir la opción Adultos" default="true" visible="eq(-11,true)"/>
-        <setting id="mnu_preferidos" type="bool" label="Añadir la opción Preferidos" default="true" visible="eq(-12,true)"/>
-        <setting id="mnu_desargas" type="bool" label="Añadir la opción Descargas" default="true" visible="eq(-13,true)"/>
+        <setting id="mnu_sugeridos" type="bool" label="Añadir la opción Sugeridos (simplificado y principal)" default="true" visible="eq(-1,true)"/>
+        <setting id="channels_link_main" type="bool" label="Añadir la opción Canales (simplificado y principal)" default="true" visible="eq(-2,true)"/>
+        <setting id="mnu_idiomas" type="bool" label="Añadir la opción Idiomas (simplificado y principal)" default="true" visible="eq(-3,true)"/>
+        <setting id="mnu_grupos" type="bool" label="Añadir la opción Grupos (simplificado y principal)" default="true" visible="eq(-4,true)"/>
+        <setting id="mnu_pelis" type="bool" label="Añadir la opción Películas" default="true" visible="eq(-5,true)"/>
+        <setting id="mnu_series" type="bool" label="Añadir la opción Series" default="true" visible="eq(-6,true)"/>
+        <setting id="channels_link_pyse" type="bool" label="Añadir la opción Películas y Series (solo los canales con ambos contenidos)" default="false" visible="eq(-7,true)"/>
+        <setting id="mnu_generos" type="bool" label="Añadir la opción Géneros" default="true" visible="eq(-8,true)"/>
+        <setting id="mnu_documentales" type="bool" label="Añadir la opción Documentales" default="true" visible="eq(-9,true)"/>
+        <setting id="mnu_torrents" type="bool" label="Añadir la opción Torrents" default="true" visible="eq(-10,true)"/>
+        <setting id="mnu_doramas" type="bool" label="Añadir la opción Doramas" default="true" visible="eq(-11,true)"/>
+        <setting id="mnu_animes" type="bool" label="Añadir la opción Animes" default="true" visible="eq(-12,true)"/>
+        <setting id="mnu_adultos" type="bool" label="Añadir la opción Adultos" default="true" visible="eq(-13,true)"/>
+        <setting id="mnu_preferidos" type="bool" label="Añadir la opción Preferidos" default="true" visible="eq(-14,true)"/>
+        <setting id="mnu_desargas" type="bool" label="Añadir la opción Descargas" default="true" visible="eq(-15,true)"/>
 
         <setting type="sep"/>
         <setting label="Opciones varias para los sub-menús:" type="lsep"/>
@@ -33,45 +35,55 @@
     <category label="Canales">
         <setting label="Opciones para las listas de canales:" type="lsep"/>
         <setting id="channels_list_status" type="enum" values="Todos|Preferidos y Activos|Sólo Preferidos" label="Qué canales se mostrarán" default="0"/>
-        <setting id="channels_list_order" type="bool" label="Ordenar canales preferidos al principio" default="true"/>
 
         <setting type="sep"/>
+        <setting id="show_channels_list" type="action" label="Qué canales están disponibles" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list)"/>
+
+        <setting type="sep"/>
+        <setting id="channels_suggesteds" type="action" label="Qué canales están sugeridos" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_suggesteds)"/>
+        <setting id="no_channels_inestables" type="action" label="Qué canales están inestables" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_inestables)"/>
+
+        <setting label="Opciones para los canales preferidos:" type="lsep"/>
+        <setting id="channels_list_order" type="bool" label="Ordenar los canales preferidos al principio" default="true"/>
+        <setting id="channels_prefered" type="action" label="Qué canales tiene marcados como preferidos" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_prefered)"/>
         <setting id="top_channels" type="action" label="Personalizar canales Preferidos (Marcar o Des-marcar)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_status)"/>
 
-        <setting type="sep"/>
+        <setting label="Opciones para los canales desactivados:" type="lsep"/>
+        <setting id="no_channels_actives" type="action" label="Qué canales tiene marcados como desactivados" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_no_actives)"/>
         <setting id="all_channels" type="action" label="Personalizar canales (Desactivar o Re-activar)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_des_rea)"/>
+    </category>
 
-        <setting type="sep"/>
+    <category label="Parental">
         <setting label="Opciones para el control parental:" type="lsep"/>
-        <setting id="show_help_adults" type="action" label="Informacion control parental" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_adults)"/>
+        <setting id="show_help_adults" type="action" label="Información control parental" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_adults)"/>
 
-        <setting type="sep"/>
+        <setting label="Canales de anime:" type="lsep"/>
         <setting id="channels_only_anime" type="action" label="Qué canales pueden tener contenido de animes" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_only_animes)"/>
         <setting id="descartar_anime" type="bool" label="Descartar canales exclusivos de animes" default="false"/>
 
-        <setting type="sep"/>
+        <setting label="Canales de adultos:" type="lsep"/>
         <setting id="channels_only_adults" type="action" label="Qué canales pueden tener contenido para adultos" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_only_adults)"/>
         <setting id="descartar_xxx" type="bool" label="Descartar canales exclusivos adultos y listas/géneros con ese contenido" default="false"/>
 
         <setting label="Opciones para el PIN parental:" type="lsep"/>
-        <setting type="sep"/>
         <setting id="xxx_password" type="action" label="Establecer un pin parental" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=adults_password)"/>
         <setting id="xxx_password_del" type="action" label="Eliminar pin parental" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=adults_password_del)"/>
 		<setting id="adults_password" type="text" label="Clave parental" enable="true" visible="false" default=""/>
     </category>
 
     <category label="Cuentas">
-        <setting label="Informacion cuentas:" type="lsep"/>
+        <setting label="Información cuentas:" type="lsep"/>
         <setting id="show_help_register" type="action" label="Información dominios que requieren registrase" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_register)"/>
 
-        <setting type="sep"/>
         <setting label="Canal HdFull:" type="lsep"/>
+        <setting id="last_domain_hdfull" type="action" label="Pulsar para comprobar el dominio vigente" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=last_domain_hdfull)"/>
+
+        <setting type="sep"/>
         <setting id="show_credenciales_hdfull" type="action" label="Credenciales cuenta" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuctext&action=_credenciales_hdfull)"/>
         <setting id="del_credenciales_hdfull" type="action" label="Pulsar para eliminarlas" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=del_datos_hdfull)"/>
 		<setting id="channel_hdfull_hdfull_username" type="text" label="Usuario" enable="false" visible="true" default=""/>
 		<setting id="channel_hdfull_hdfull_password" type="text" label="Contraseña" option="hidden" enable="false" visible="true" default=""/>
 
-        <setting type="sep"/>
         <setting label="Canal PlayDede:" type="lsep"/>
         <setting id="show_credenciales_playdede" type="action" label="Credenciales cuenta" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuctext&action=_credenciales_playdede)"/>
         <setting id="del_credenciales_playdede" type="action" label="Pulsar para eliminarlas" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=del_datos_playdede)"/>
@@ -82,22 +94,18 @@
     <category label="Play">
         <setting label="Opciones para la reproducción automática:" type="lsep"/>
         <setting id="autoplay" type="bool" label="Activar AutoPlay" default="false"/>
-        <setting id="show_channels_list" type="action" label="Qué canales están disponibles" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list)" visible="eq(-1,true)"/>
-        <setting id="autoplay_max_links" type="labelenum" values="3|5|10|15|20|25|30" label="Número máximo de enlaces a intentar" default="10" visible="eq(-2,true)"/>
-        <setting id="autoplay_channels_discarded" label="Canales sin autoplay (separados por comas)" type="text" default="" visible="eq(-3,true)"/>
-        <setting id="autoplay_one_link" type="bool" label="Si solamente hay un enlace para reproducir activar AutoPlay" default="true" visible="eq(-4,false)"/>
+        <setting id="autoplay_max_links" type="labelenum" values="3|5|10|15|20|25|30" label="Número máximo de enlaces a intentar" default="10" visible="eq(-1,true)"/>
+        <setting id="autoplay_channels_discarded" label="Canales sin autoplay (separados por comas)" type="text" default="" visible="eq(-2,true)"/>
+        <setting id="autoplay_one_link" type="bool" label="Si solamente hay un enlace para reproducir activar AutoPlay" default="true" visible="eq(-3,false)"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para ordenar/filtrar enlaces por idioma:" type="lsep"/>
         <setting id="preferencia_idioma_esp" type="enum" values="Descartar|Primero|Segundo|Tercero" label="Idioma Esp (castellano de España)" default="1"/>
         <setting id="preferencia_idioma_lat" type="enum" values="Descartar|Primero|Segundo|Tercero" label="Idioma Lat (castellano de América)" default="2"/>
         <setting id="preferencia_idioma_vos" type="enum" values="Descartar|Primero|Segundo|Tercero" label="Idioma VO (versión original y/o subtitulada)" default="3"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para ordenar enlaces por calidad:" type="lsep"/>
         <setting id="servers_sort_quality" type="enum" values="Orden de la Web|Calidad Desc|Calidad Asc" label="En cada idioma ordenar enlaces según" default="0"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para ordenar/filtrar enlaces por servidores:" type="lsep"/>
         <setting id="show_servers_list" type="action" label="Qué servidores están disponibles" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_servers_list)"/>
 
@@ -106,29 +114,44 @@
         <setting id="servers_unfavored" label="Servidores última opción (separados por comas)" type="text" default=""/>
         <setting id="servers_discarded" label="Servidores descartados (separados por comas)" type="text" default=""/>
 
-        <setting type="sep"/>
         <setting label="Opciones para errores al reproducir los enlaces:" type="lsep"/>
         <setting id="tracking_weberror_dialog" type="bool" label="Si la web da error, ¿ mostrar diálogo para búsqueda alternativa ?" default="true"/>
     </category>
 
     <category label="Proxies">
         <setting label="Opciones para los proxies:" type="lsep"/>
-        <setting id="channels_with_proxies" type="action" label="Qué canales pueden usar proxies" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
         <setting id="show_help_proxies" type="action" label="Información uso de proxies" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_proxies)"/>
+        <setting id="channels_with_proxies" type="action" label="Qué canales pueden usar proxies" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
+
+        <setting label="Opciones para configurar proxies a usar:" type="lsep"/>
+        <setting id="proxies_auto" type="bool" label="Proceso buscar proxies automáticamente (solo con el proveedor 'Todos' seleccionado)" default="true"/>
+        <setting id="proxies_provider" type="enum" values="spys.one|hidemy.name|httptunnel.ge|proxynova.com|free-proxy-list|spys.me|proxyscrape.com|proxyservers.pro|us-proxy.org|proxy-list.download|Todos|proxysource.org|silverproxy.xyz|dailyproxylists.com|sslproxies.org|clarketm|google-proxy.net|ip-adress.com|proxydb.net" label="Proveedor habitual de proxies" default="10"/>
 
         <setting type="sep"/>
-        <setting id="proxies_auto" type="bool" label="Buscar proxies automáticamente (solo con el proveedor 'Todos' seleccionado)" default="true"/>
-        <setting id="proxies_provider" type="enum" values="spys.one|hidemy.name|httptunnel.ge|proxynova.com|free-proxy-list|spys.me|proxyscrape.com|proxyservers.pro|us-proxy.org|proxy-list.download|Todos|proxysource.org|silverproxy.xyz" label="Proveedor habitual de proxies" default="10"/>
-        <setting id="proxies_validos" type="bool" label="Limitar la cantidad de proxies válidos a memorizar" default="true"/>
-        <setting id="proxies_limit" type="bool" label="Si se encontraron suficientes válidos dejar de buscar más proxies" default="true"/>
+        <setting id="global_proxies" type="action" label="Pulsar para obtener proxies (en los canales que los necesiten)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=global_proxies)"/>
+        <setting id="manto_proxies" type="action" label="Pulsar para eliminar los proxies en todos los canales" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_proxies)"/>
 
-        <setting type="sep"/>
-        <setting label="Opciones para el proceso de configurar proxies a usar:" type="lsep"/>
+        <setting label="Opciones para el proceso de búsquedas en configurar proxies a usar:" type="lsep"/>
+        <setting id="proxies_limit" type="bool" label="Si se encontraron suficientes válidos dejar de buscar más" default="false"/>
+        <setting id="proxies_validos" type="bool" label="Limitar la cantidad de proxies válidos a buscar" default="true" visible="eq(-1,false)"/>
+        <setting id="proxies_memory" type="labelenum" values="3|4|5|6|7|8|9" label="Número máximo de proxies válidos a buscar" default="5" visible="eq(-1,true) + eq(-2,false)"/>
+
+        <setting label="Opciones para proveedores en el proceso de búsqueda de proxies:" type="lsep"/>
         <setting id="proxies_tipos" type="bool" label="Solicitar tipo de anonimidad" default="false"/>
         <setting id="proxies_paises" type="bool" label="Solicitar país" default="false"/>
         <setting id="proxies_maximo" type="bool" label="No solicitar y forzar el valor máximo de los proxies a analizar" default="true"/>
-        <setting id="proxies_list" type="bool" label="Habilitar selección por su lista personalizada (.../lista_proxies.txt)" default="false"/>
-        <setting id="proxies_help" type="bool" label="Presentar ayuda" default="true"/>
+        <setting id="proxies_list" type="bool" label="Habilitar selección por su lista personalizada (.../Lista-proxies.txt)" default="false"/>
+
+        <setting label="Opciones especiales en configurar proxies a usar:" type="lsep"/>
+        <setting id="proxies_totales" type="bool" label="Obtener el máximo de proxies posibles a analizar en cada proveedor" default="false"/>
+        <setting id="proxies_totales_limit" type="labelenum" values="100|200|300|400|500|600|700|800|900" label="Límite máximo total de proxies a buscar" default="500"/>
+
+        <setting type="sep"/>
+        <setting id="proxies_extended" type="bool" label="Ampliar la lista de proveedores de proxies a seleccionar" default="false"/>
+        <setting id="proxies_search_extended" type="bool" label="Tratar primero en las búsquedas los proveedores de la lista ampliada" default="false"/>
+
+        <setting type="sep"/>
+        <setting id="proxies_help" type="bool" label="Presentar ayuda en el proceso de configurar proxies a usar" default="true"/>
     </category>
 
     <category label="Torrents">
@@ -147,50 +170,55 @@
 
     <category label="Buscar">
         <setting label="Opciones para configurar las búsquedas:" type="lsep"/>
-        <setting id="search_no_searchables" type="action" label="Qué canales nunca intervendrán en las búsquedas" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_no_searchables)"/>
+        <setting id="show_help_search" type="action" label="Información sobre búsquedas" action="RunPlugin(plugin://plugin.video.balandro/?channel=search&action=show_help)"/>
+        <setting id="show_help_tmbdblist" type="action" label="Información búsquedas y listas en TMDB" action="RunPlugin(plugin://plugin.video.balandro/?channel=tmdblists&action=show_help)"/>
 
         <setting type="sep"/>
+        <setting id="search_no_searchables" type="action" label="Qué canales nunca intervendrán en las búsquedas" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_no_searchables)"/>
+
+        <setting label="Opciones para personalizar las búsquedas:" type="lsep"/>
         <setting id="search_no_channels_actives" type="action" label="Qué canales no intervienen en las búsquedas (marcados como desactivados)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_no_actives)"/>
+
+        <setting type="sep"/>
+        <setting id="search_no_torrents" type="bool" label="Descartar búsquedas en los canales que pueden contener archivos torrent" default="false"/>
 
         <setting type="sep"/>
         <setting id="search_channels_prefered" type="action" label="Qué canales tiene marcados como preferidos" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_prefered)"/>
         <setting id="search_only_prefered" type="bool" label="Efectuar búsquedas solo en los canales preferidos" default="false"/>
 
         <setting type="sep"/>
-        <setting id="search_no_torrents" type="bool" label="Descartar búsquedas en los canales que pueden contener archivos torrent" default="false"/>
+        <setting id="search_no_channels_with_proxies" type="action" label="Qué canales pueden usar proxies" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
+        <setting id="search_no_proxies" type="bool" label="Descartar búsquedas en los canales con proxies informados" default="false"/>
+
+        <setting type="sep"/>
+        <setting id="search_channels_suggesteds" type="action" label="Qué canales están sugeridos" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_suggesteds)"/>
+        <setting id="search_only_suggesteds" type="bool" label="Efectuar búsquedas solo en los canales sugeridos" default="false"/>
 
         <setting type="sep"/>
         <setting id="search_no_channels_inestables" type="action" label="Qué canales están inestables" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_inestables)"/>
         <setting id="search_no_inestables" type="bool" label="Descartar búsquedas en los canales inestables" default="false"/>
 
-        <setting type="sep"/>
-        <setting id="search_no_channels_with_proxies" type="action" label="Qué canales pueden usar proxies" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
-        <setting id="search_no_proxies" type="bool" label="Descartar búsquedas en los canales con proxies informados" default="false"/>
-
-        <setting type="sep"/>
         <setting label="Opciones para el proceso de las búsquedas:" type="lsep"/>
         <setting id="search_show_last" type="bool" label="Recordar último texto buscado" default="true"/>
-        <setting id="search_multithread" type="bool" label="Activar multithread" default="true"/>
         <setting id="search_limit_by_channel" type="labelenum" values="1|2|3|4|5|6|7|8|9|10" label="Cuantos resultados desea previsualizar por cada canal" default="2"/>
 
         <setting type="sep"/>
+        <setting id="search_no_results_proxies" type="bool" label="Presentar en que canales deberá configurar nuevos proxies" default="true"/>
         <setting id="search_no_results" type="bool" label="Presentar los canales sin resultados" default="false"/>
         <setting id="search_no_channels" type="bool" label="Notificar los canales ignorados" default="false"/>
 
         <setting type="sep"/>
-        <setting id="show_help_search" type="action" label="Información sobre búsquedas" action="RunPlugin(plugin://plugin.video.balandro/?channel=search&action=show_help)"/>
-        <setting id="show_help_tmbdblist" type="action" label="Información búsquedas y listas en TMDB" action="RunPlugin(plugin://plugin.video.balandro/?channel=tmdblists&action=show_help)"/>
+        <setting id="search_multithread" type="bool" label="Activar multithread" default="true"/>
     </category>
 
     <category label="Preferidos">
-        <setting label="Informacion opción preferidos:" type="lsep"/>
+        <setting label="Opciones para preferidos:" type="lsep"/>
         <setting id="show_help_tracking" type="action" label="¿ Cómo funciona ?" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_tracking)"/>
         <setting id="show_help_tracking_update" type="action" label="Búsqueda automática de nuevos episodios" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_tracking_update)"/>
 
         <setting label="Opciones para guardar enlaces:" type="lsep"/>
         <setting id="tracking_confirm_tmdbid" type="bool" label="Confirmar siempre la identificación de la película/serie" default="false"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para la lista de películas:" type="lsep"/>
         <setting id="tracking_order_movies" type="enum" values="Actualización|Título|Fecha de estreno" label="Ordenar por" default="0"/>
         <setting id="tracking_perpage_movies" type="labelenum" values="5|10|15|20|25|30" label="Número de películas por página" default="10"/>
@@ -203,7 +231,6 @@
         <setting id="tracking_order_episodes" type="enum" values="Actualización|Fecha de emisión" label="Ordenar por" default="1"/>
         <setting id="tracking_perpage_episodes" type="labelenum" values="5|10|15|20|25|30" label="Número de episodios por página" default="10"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para fijar el tipo de vista por defecto:" type="lsep"/>
         <setting id="tracking_viewmode_movies" type="enum" values="No fijar|Lista|Cartel|Mays.|Muro de información|Lista amplia|Muro|Fanart" label="Películas" default="0"/>
         <setting id="tracking_viewmode_tvshows" type="enum" values="No fijar|Lista|Cartel|Mays.|Muro de información|Lista amplia|Muro|Fanart" label="Series" default="0"/>
@@ -230,6 +257,9 @@
 
     <category label="Actualizar">
         <setting label="Opciones para las actualizaciones de tipo Fix:" type="lsep"/>
+        <setting id="show_last_fix" type="action" label="Información último fix" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_last_fix)"/>
+
+        <setting type="sep"/>
         <setting id="addon_update_atstart" type="bool" label="Comprobar actualizaciones al iniciar su Media Center" default="true"/>
         <setting id="addon_update_verbose" type="bool" label="Mostrar aviso del resultado de la actualización" default="false"/>
 
@@ -237,16 +267,14 @@
         <setting id="addon_update_doit" type="action" label="Pulsar para 'Comprobar' actualizaciones" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=check_addon_updates)"/>
         <setting id="addon_update_doitforce" type="action" label="Pulsar para 'Forzar' actualizaciones'" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=check_addon_updates_force)"/>
 
-        <setting type="sep"/>
-        <setting id="show_last_fix" type="action" label="Información fix" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_last_fix)"/>
-
-        <setting type="sep"/>
         <setting label="Opciones para buscar nuevos episodios:" type="lsep"/>
         <setting id="addon_tracking_atstart" type="bool" label="Activar servicio al iniciar su Media Center (obligado re-iniciar si se activa)" default="false"/>
         <setting id="addon_tracking_interval" type="labelenum" values="6|8|12|24" label="Ejecutar el servicio por intervalo de horas" default="12" visible="eq(-1,true)"/>
         <setting id="addon_tracking_verbose" type="bool" label="Notificar aviso del resultado final de la búsqueda" default="false" visible="eq(-2,true)"/>
-        <setting id="addon_tracking_doit" type="action" label="Pulsar para 'Comprobar nuevos episodios'" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=comprobar_nuevos_episodios)"/>
         <setting id="addon_tracking_lastscrap" label="Last scrap" type="text" default="" visible="false"/>
+
+        <setting type="sep"/>
+        <setting id="addon_tracking_doit" type="action" label="Pulsar para 'Comprobar nuevos episodios'" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=comprobar_nuevos_episodios)"/>
     </category>
 
     <category label="Visual">
@@ -263,7 +291,6 @@
                  values="[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR tomato]tomato[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR lime]lime[/COLOR]|[COLOR aqua]aqua[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]"
                  default="[COLOR gray]gray[/COLOR]"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para las acciones en las notificaciones:" type="lsep"/>
 
         <setting id="notification_alert_color" type="labelenum" label="Color para Alertas"
@@ -286,7 +313,6 @@
                  values="[COLOR blue]blue[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]"
                  default="[COLOR cyan]cyan[/COLOR]"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para las acciones en los menús contextuales:" type="lsep"/>
 
         <setting id="context_tracking_color" type="labelenum" label="Color Guardar enlaces"
@@ -309,8 +335,8 @@
                  values="[COLOR blue]blue[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]"
                  default="[COLOR pink]pink[/COLOR]"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para los títulos de películas/series en las listas de canales:" type="lsep"/>
+
         <setting id="list_show_year" type="enum" values="No|En películas|En series|En películas y series" label="Mostrar el año" default="3"/>
         <setting id="list_info_order" type="enum" values="Ninguno|Idiomas|Calidades|Idiomas y calidades|Calidades e idiomas" label="Mostrar idiomas y calidades" default="3"/>
 
@@ -334,9 +360,9 @@
                  values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]"
                  default="[COLOR limegreen]limegreen[/COLOR]"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para los enlaces al seleccionar el servidor:" type="lsep"/>
-        <setting id="colorear_enlaces_play" type="bool" label="Colorear los enlaces a servidores" default="true"/>
+
+        <setting id="colorear_enlaces_play" type="bool" label="Asignar color en los enlaces a servidores" default="true"/>
 
         <setting id="play_server_color" type="labelenum" label="Color Servidor"
                  values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
@@ -367,7 +393,6 @@
         <setting id="tmdb_cache" type="bool" label="Usar caché (mejora las búsquedas recurrentes)" default="true"/>
         <setting id="tmdb_cache_expire" type="enum" values="cada 1 día|cada 7 días|cada 15 días|cada 30 días|No" label="¿Renovar caché?" enable="eq(-1,true)" default="4"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para el mantenimiento de la caché" type="lsep"/>
         <setting id="tmdb_clean_db_cache" type="action" label="Pulsar para 'Limpiar caché' actual" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=clean_db_cache)"/>
         <setting id="tmdb_drop_db_cache" type="action" label="Pulsar para 'Borrar caché' actual" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=drop_db_cache)"/>
@@ -379,20 +404,16 @@
         <setting id="show_log" type="action" label="Pulsar para visualizar el fichero log de su Media Center" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_log)"/>
         <setting id="copy_log" type="action" label="Pulsar para obtener una copia del fichero log de su Media Center"  action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=copy_log)"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para el User-Agent por defecto:" type="lsep"/>
         <setting id="ver_stable_chrome" type="bool" label="Obtener y usar la versión más reciente/estable de chrome" default="true"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para evitar tiempos de espera excesivos en los accesos:" type="lsep"/>
         <setting id="httptools_timeout" type="labelenum" values="0|5|10|15|20|25|30" label="Timeout (tiempo máximo de espera)" default="15"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para las notificaciones:" type="lsep"/>
         <setting id="notification_d_ok" type="bool" label="Diálogo en ciertas notificaciones con el botón para pulsar 'OK'" default="false"/>
         <setting id="notification_beep" type="bool" label="Emitir un sonido al mostrar notificaciones" default="false"/>
 
-        <setting type="sep"/>
         <setting label="Opciones para el mantenimiento:" type="lsep"/>
         <setting id="manto_internet" type="action" label="Pulsar para comprobar el estado de su internet" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=test_internet)"/>
 
@@ -404,18 +425,19 @@
 		<setting id="chrome_last_version" type="text" label="Chrome (Last Estable Version)" enable="true" visible="false" default="86.0.4240.75"/>
 
         <setting type="sep"/>
-        <setting id="manto_proxies" type="action" label="Pulsar para eliminar los 'Proxies' en todos los canales" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_proxies)"/>
         <setting id="manto_cookies" type="action" label="Pulsar para eliminar el fichero de 'Cookies'" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_cookies)"/>
         <setting id="manto_cache" type="action" label="Pulsar para eliminar la carpeta 'Caché'" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_folder_cache)"/>
 
         <setting type="sep"/>
         <setting id="manto_descargas" type="action" label="Pulsar para eliminar 'Todo' el contenido de 'Descargas'" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_folder_downloads)"/>
         <setting id="manto_preferidos" type="action" label="Pulsar para eliminar 'Todo' el contenido de 'Preferidos'" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_tracking_dbs)"/>
+
+        <setting type="sep"/>
         <setting id="manto_datos" type="action" label="Pulsar para eliminar 'Todos' los 'Datos del usuario'" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_folder_addon)"/>
     </category>
 
     <category label="Ayuda">
-        <setting label="Informacion para contactar:" type="lsep"/>
+        <setting label="Información para contactar:" type="lsep"/>
         <setting label="Foro [COLOR plum][B][I] www.mimediacenter.info/foro/viewforum.php?f=44 [/I][/B][/COLOR] Instalaciones, Novedades, Sugerencias, etc." visible="true"/>
         <setting label="Fuente [COLOR coral][B][I] balandro-tk.github.io/balandro/ [/I][/B][/COLOR] Repositorio, Add-On, etc." visible="true"/>
         <setting label="Telegram [COLOR lightblue][B][I] t.me/@balandro_asesor [/I][/B][/COLOR] Asesoramiento, Dudas, Consultas, etc." visible="true"/>
@@ -430,7 +452,7 @@
         <setting type="sep"/>
         <setting label="Información versión:" type="lsep"/>
         <setting id="show_version" type="action" label="Información versión" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_version)"/>
-        <setting id="show_changelog" type="action" label="Historial de cambios" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_changelog)"/>
+        <setting id="show_changelog" type="action" label="Historial de versiones" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_changelog)"/>
 
         <setting type="sep"/>
         <setting label="Información desarrollo:" type="lsep"/>

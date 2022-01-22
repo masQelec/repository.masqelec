@@ -13,5 +13,5 @@
 
   "clusters": ["news", "years", "kids", "docs", "vos"],
 
-  "notes": "Películas Latino y Subtitulado. Por géneros, año."
+  "notes": "Películas por géneros, año."
 }

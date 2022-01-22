@@ -19,6 +19,8 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista-series/' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/' ))
@@ -27,8 +29,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por año', action = 'anios' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico' ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -113,7 +113,7 @@ def list_all(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
             buscar_next = False
 
     if buscar_next:
@@ -124,7 +124,7 @@ def list_all(item):
                 if next_url:
                     next_url = next_url.strip()
                     if '/page/' in next_url:
-                       itemlist.append(item.clone( action = 'list_all', page = 0, url = next_url, title = '>> Página siguiente', text_color='coral' ))
+                       itemlist.append(item.clone( action = 'list_all', page = 0, url = next_url, title = 'Siguientes ...', text_color='coral' ))
 
     return itemlist
 
@@ -170,7 +170,7 @@ def list_epis(item):
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
         url = url.strip()
 
-        seas_epis = scrapertools.find_single_match(match, '<span class=ClB>(\d+)x(\d+)</span>')
+        seas_epis = scrapertools.find_single_match(match, '<span class="ClB">(\d+)x(\d+)</span>')
 
         if not seas_epis: continue
 
@@ -189,14 +189,15 @@ def list_epis(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<div class="wp-pagenavi">' in data:
-         if '<a class="page-numbers"' in data:
-            next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
+    if itemlist:
+        if '<div class="wp-pagenavi">' in data:
+             if '<a class="page-numbers"' in data:
+                next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
 
-            if next_url:
-                next_url = next_url.strip()
-                if '/page/' in next_url:
-                    itemlist.append(item.clone (url = next_url, title = '>> Página siguiente', action = 'list_epis', text_color='coral' ))
+                if next_url:
+                    next_url = next_url.strip()
+                    if '/page/' in next_url:
+                        itemlist.append(item.clone (url = next_url, title = 'Siguientes ...', action = 'list_epis', text_color='coral' ))
 
     return itemlist
 
@@ -213,14 +214,13 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]' + title + '[/COLOR]')
-            item.page = 0
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo, page = 0 ))
+        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -232,7 +232,7 @@ def episodios(item):
     itemlist = []
 
     if not item.page: item.page = 0
-    perpage = 50
+    if not item.perpage: item.perpage = 50
 
     data = httptools.downloadpage(item.url).data
 
@@ -242,12 +242,14 @@ def episodios(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
 
-    for data_epi in matches[item.page * perpage:]:
-        episode = scrapertools.find_single_match(data_epi, '<span class="Num">(.*?)</span>')
+    if item.page == 0:
+        sum_parts = len(matches)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('RetroTv', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
 
-        thumb = scrapertools.find_single_match(data_epi, '<img src="([^"]+)"')
-        thumb = 'https:' + thumb
-
+    for data_epi in matches[item.page * item.perpage:]:
         title = scrapertools.find_single_match(data_epi, ' alt="Imagen.*?<a href=.*?>(.*?)</a>')
         if not title: title = scrapertools.find_single_match(data_epi, ' alt=.*?Imagen.*?<a href=.*?>(.*?)</a>')
 
@@ -255,18 +257,24 @@ def episodios(item):
 
         if not url or not title: continue
 
+        episode = scrapertools.find_single_match(data_epi, '<span class="Num">(.*?)</span>')
+
+        thumb = scrapertools.find_single_match(data_epi, '<img src="([^"]+)"')
+        thumb = 'https:' + thumb
+
         titulo = '%sx%s %s' % (season, episode, title)
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, 
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
 
-        if len(itemlist) >= perpage:
+        if len(itemlist) >= item.perpage:
             break
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(matches) > (item.page + 1) * perpage:
-        itemlist.append(item.clone( title=">> Página siguiente", action="episodios", page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(matches) > (item.page + 1) * item.perpage:
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
 

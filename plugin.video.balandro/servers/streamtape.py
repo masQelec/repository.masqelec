@@ -19,7 +19,6 @@ def get_video_url(page_url, url_referer=''):
 def get_aux(page_url):
     video_urls = []
 
-    # ~ referer = {"Referer": page_url}
     referer = {}
 
     data = httptools.downloadpage(page_url, headers=referer).data
@@ -28,6 +27,18 @@ def get_aux(page_url):
         return  "El archivo no existe o ha sido borrado"
 
     url_data = scrapertools.find_single_match(data, """getElementById\('\w+link'\).innerHTML = "[^"]+" .* \('.+?/([^']+)'\)""")
+
+    if not url_data:
+        import time
+        from platformcode import platformtools
+        espera = 3
+
+        platformtools.dialog_notification('Cargando Streamtape', 'Espera requerida de %s segundos' % espera)
+        time.sleep(int(espera))
+
+        referer = {"Referer": page_url}
+        data = httptools.downloadpage(page_url, headers=referer).data
+        url_data = scrapertools.find_single_match(data, """getElementById\('\w+link'\).innerHTML = "[^"]+" .* \('.+?/([^']+)'\)""")
 
     if url_data:
         url = "https://adblockstrtech.link/" + url_data + "&stream=1" + "|User-Agent=" + httptools.get_user_agent()

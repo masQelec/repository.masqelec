@@ -13,5 +13,5 @@
 
   "clusters": ["classic", "categories", "languages", "docs", "vos"],
 
-  "notes": "Películas en español y otros idiomas, por géneros."
+  "notes": "Películas por idiomas, géneros."
 }

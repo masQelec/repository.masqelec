@@ -8,7 +8,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "((?:fembed.com|fembed.live|fembeder.com|divload.com|ilovefembed.best|myurlshort.live|jplayer.club|feurl.com|fembedisthebest.rest|femax20.com|fcdn.stream|fembad.org|pelispng.online|hlshd.xyz|embedsito.com|mrdhan.com|dutrag.com|fplayer.info)/(?:v|f)/[A-z0-9_-]+)",
+        "pattern": "((?:fembed.com|fembed.live|fembed-hd.com|fembeder.com|divload.com|ilovefembed.best|myurlshort.live|jplayer.club|feurl.com|fembedisthebest.rest|femax20.com|fcdn.stream|fembad.org|pelispng.online|hlshd.xyz|embedsito.com|mrdhan.com|dutrag.com|fplayer.info|diasfem.com)/(?:v|f)/[A-z0-9_-]+)",
         "url": "https://www.\\1"
       }
     ]

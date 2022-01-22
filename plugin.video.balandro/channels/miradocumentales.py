@@ -12,11 +12,11 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
-
-    itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary' ))
 
     return itemlist
 
@@ -60,7 +60,7 @@ def list_all(item):
 
     next_page_link = scrapertools.find_single_match(data, '<a href="([^"]+)">Pr&oacute;xima')
     if next_page_link:
-        itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_all', url = next_page_link, text_color='coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page_link, text_color='coral' ))
 
     return itemlist
 

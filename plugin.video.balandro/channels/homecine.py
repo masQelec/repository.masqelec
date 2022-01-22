@@ -22,10 +22,10 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
-    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
+    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
-    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='plum' ))
 
@@ -41,6 +41,8 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + '/top-imdb/', search_type = 'movie' ))
@@ -49,14 +51,14 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
-
     return itemlist
 
 
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/series/', search_type = 'tvshow' ))
 
@@ -65,8 +67,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por estudio', action = 'estudios', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -405,7 +405,7 @@ def list_all(item):
     if url_next_page:
         url_next_page = host + url_next_page
 
-        itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_all', url = url_next_page, text_color='coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = url_next_page, text_color='coral' ))
 
     return itemlist
 
@@ -441,7 +441,7 @@ def list_episodes(item):
     if url_next_page:
         url_next_page = host + url_next_page
 
-        itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_episodes', url = url_next_page, text_color='coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_episodes', url = url_next_page, text_color='coral' ))
 
     return itemlist
 
@@ -462,15 +462,14 @@ def temporadas(item):
         url = item.url
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]' + title + '[/COLOR]')
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.url = url
-            item.page = 0
             item.contentType = 'season'
             item.contentSeason = season
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, contentType = 'season', contentSeason = season, page = 0 ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, contentType = 'season', contentSeason = season ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -482,7 +481,7 @@ def episodios(item):
     itemlist = []
 
     if not item.page: item.page = 0
-    perpage = 50
+    if not item.perpage: item.perpage = 50
 
     season = item.contentSeason
 
@@ -493,7 +492,14 @@ def episodios(item):
 
     matches = re.compile('<a href="([^"]+)">(?:Episode|Capitulo) (\d+)', re.DOTALL).findall(data)
 
-    for url, epis in matches[item.page * perpage:]:
+    if item.page == 0:
+        sum_parts = len(matches)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('HomeCine', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
+
+    for url, epis in matches[item.page * item.perpage:]:
         url = host + url
 
         try: titulo = '%sx%s - Capítulo %s' % (season, epis, epis)
@@ -502,13 +508,14 @@ def episodios(item):
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo,
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
-        if len(itemlist) >= perpage:
+        if len(itemlist) >= item.perpage:
             break
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(matches) > (item.page + 1) * perpage:
-        itemlist.append(item.clone( title=">> Página siguiente", action="episodios", page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(matches) > (item.page + 1) * item.perpage:
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
 

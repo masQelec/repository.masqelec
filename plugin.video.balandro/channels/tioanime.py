@@ -21,12 +21,15 @@ def mainlist_anime(item):
     descartar_xxx = config.get_setting('descartar_xxx', default=False)
 
     if descartar_xxx: return itemlist
+
     if config.get_setting('adults_password'):
         from modules import actions
         if actions.adults_password(item) == False:
             return itemlist
 
     current_year = int(datetime.today().year)
+
+    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/directorio', search_type = 'tvshow' ))
 
@@ -43,8 +46,6 @@ def mainlist_anime(item):
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos',  search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -108,14 +109,14 @@ def list_all(item):
         thumb = host + thumb
 
         itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
-                                    contentType = 'tvshow', contentSerieName = title ))
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
     next_page = scrapertools.find_single_match(data,'<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
     if next_page:
         if itemlist:
             next_page = host + next_page
 
-            itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_all', url = next_page, text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
     return itemlist
 
@@ -125,7 +126,7 @@ def episodios(item):
     itemlist = []
 
     if not item.page: item.page = 0
-    perpage = 50
+    if not item.perpage: item.perpage = 50
 
     data = httptools.downloadpage(item.url).data
 
@@ -134,18 +135,14 @@ def episodios(item):
 
     epis = epis[::-1]
 
-    tot_epis = len(epis)
-
-    all_epis = False
-
     if item.page == 0:
-        if tot_epis > 100:
-            if platformtools.dialog_yesno(config.__addon_name, 'La serie  ' + '[COLOR tan]' + item.contentSerieName + '[/COLOR] tiene [COLOR yellow]' + str(tot_epis) + '[/COLOR] episodios ¿ Desea cargarlos Todos de una sola vez ?'):
-                color_infor = config.get_setting('notification_infor_color', default='pink')
-                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Cargando episodios[/B][/COLOR]' % color_infor)
-                all_epis = True
+        sum_parts = len(epis)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('TioAnime', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
 
-    for epi in epis[item.page * perpage:]:
+    for epi in epis[item.page * item.perpage:]:
         url =  host + '/ver/' + '%s-%s' % (info[1], epi)
         epi_num = epi
 
@@ -154,13 +151,12 @@ def episodios(item):
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, 
                                     contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epi_num ))
 
-        if not all_epis:
-            if len(itemlist) >= perpage:
-                break
+        if len(itemlist) >= item.perpage:
+            break
 
-    if not all_epis:
-        if tot_epis > ((item.page + 1) * perpage):
-            itemlist.append(item.clone( title=">> Página siguiente", action="episodios", page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(epis) > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
 

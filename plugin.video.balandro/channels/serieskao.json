@@ -13,5 +13,5 @@
 
   "clusters": ["news", "rankings", "years", "kids", "docs", "vos", "anime"],
 
-  "notes": "Películas y series, por géneros, últimos, etc."
+  "notes": "Películas y Series, por géneros, año."
 }

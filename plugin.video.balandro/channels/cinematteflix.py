@@ -25,13 +25,13 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/videoclub/' ))
 
     itemlist.append(item.clone( title = 'Magazine', action = 'list_all', url = host, group = 'magazine', page = 1))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
-
-    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -110,6 +110,9 @@ def list_all(item):
         if title.startswith('|'):
             title = title.split("|")[1]
             title = title.strip()
+        elif ('gratis') in title:
+            title = title.replace(' | ', '')
+            title = title.replace('gratis', '').strip()
 
         title = title.capitalize()
 
@@ -138,14 +141,14 @@ def list_all(item):
                 next_page = host + 'page/' + str(item.page) + '/'
 
                 if next_page:
-                    itemlist.append(item.clone( title = '>> Página siguiente', url = next_page, group = item.group, page = item.page,
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, group = item.group, page = item.page,
                                                 action = 'list_all', text_color='coral' ))
 
             elif '<nav class="navigation pagination"' in data:
                 next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination".*?class="page-numbers current".*?href="(.*?)"')
 
                 if next_page:
-                    itemlist.append(item.clone( title = '>> Página siguiente', url = next_page, action = 'list_all', text_color='coral' ))
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 

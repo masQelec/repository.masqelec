@@ -48,8 +48,8 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.100 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.60 Safari/537.36"
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.100 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
 if ver_stable_chrome:
@@ -279,8 +279,6 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     else:
         url = quote(url, safe="%/:=&?~#+!$,;'@()*[]")
 
-    url = quote(url, safe="%/:=&?~#+!$,;'@()*[]")
-
     if type(post) == dict: post = urlencode(post)
 
     # Limitar tiempo de descarga si no se ha pasado timeout y hay un valor establecido en la variable global
@@ -337,7 +335,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
         if isinstance(post, unicode):
             post = post.encode('utf-8', 'strict')
 
-    req = Request(url ,post,request_headers)
+    req = Request(url, post, request_headers)
 
     try:
         handle = opener.open(req, timeout=timeout)

@@ -19,6 +19,8 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista-series/' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/' ))
@@ -27,8 +29,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por año', action = 'anios' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico' ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -39,13 +39,11 @@ def generos(item):
 
     data = httptools.downloadpage(host).data
    
-    patron = 'class="menu-item menu-item-type-taxonomy menu-item-object-category.*?<a href=(.*?)>(.*?)</a>'
+    patron = 'class="menu-item menu-item-type-taxonomy menu-item-object-category.*?<a href="(.*?)">(.*?)</a>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, title in matches:
-        url = url.strip()
-
         itemlist.append(item.clone( action = "list_all", title = title, url = url ))
 
     return sorted(itemlist, key=lambda it: it.title)
@@ -58,7 +56,9 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1954, -1):
+    current_year = current_year - 10
+
+    for x in range(current_year, 1935, -1):
         itemlist.append(item.clone( title = str(x), url = host + '?s=trfilter&trfilter=1&years%5B%5D=' + str(x), action = 'list_all' ))
 
     return itemlist
@@ -91,10 +91,9 @@ def list_all(item):
 
     for match in matches[item.page * perpage:]:
         title = scrapertools.find_single_match(match, '<h3 class="Title">(.*?)</h3>')
-        url = scrapertools.find_single_match(match, '<a href=(.*?)>')
-        if not url or not title: continue
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
-        url = url.strip()
+        if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, 'data-src="([^"]+)"')
         if not thumb: thumb = scrapertools.find_single_match(match, '<img src="([^"]+)"')
@@ -119,18 +118,16 @@ def list_all(item):
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
         if hasta < num_matches:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
             buscar_next = False
 
     if buscar_next:
         if '<div class=wp-pagenavi>' in data:
-            if '<a class=page-numbers' in data:
-                next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href=(.*?)>')
+            next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
 
-                if next_url:
-                    next_url = next_url.strip()
-                    if '/page/' in next_url:
-                       itemlist.append(item.clone( action = 'list_all', page = 0, url = next_url, title = '>> Página siguiente', text_color='coral' ))
+            if next_url:
+                if '/page/' in next_url:
+                    itemlist.append(item.clone( action = 'list_all', page = 0, url = next_url, title = 'Siguientes ...', text_color='coral' ))
 
     return itemlist
 
@@ -145,11 +142,9 @@ def list_alfa(item):
     num_matches = len(matches)
 
     for match in matches:
-        url = scrapertools.find_single_match(match, '<a href=(.*?)>')
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
         title = scrapertools.find_single_match(match, '<strong>(.*?)</strong>').strip()
         if not url or not title: continue
-
-        url = url.strip()
 
         if '/aplicacion-oficial-de-seriesretro-com/' in url: continue
 
@@ -175,10 +170,9 @@ def list_epis(item):
     matches = re.compile('<article (.*?)</article>', re.DOTALL).findall(data)
 
     for match in matches:
-        url = scrapertools.find_single_match(match, ' href=(.*?)>')
-        url = url.strip()
+        url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        seas_epis = scrapertools.find_single_match(match, '<span class=ClB>(\d+)x(\d+)</span>')
+        seas_epis = scrapertools.find_single_match(match, '<span class="ClB">(\d+)x(\d+)</span>')
 
         if not seas_epis: continue
 
@@ -197,15 +191,12 @@ def list_epis(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<div class=wp-pagenavi>' in data:
-        if '<a class=page-numbers' in data:
-            next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href=(.*?)>')
+    if '<div class="wp-pagenavi"' in data:
+        next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
 
-            if next_url:
-                next_url = next_url.strip()
-
-                if '/page/' in next_url:
-                    itemlist.append(item.clone (url = next_url, title = '>> Página siguiente', action = 'list_epis', text_color='coral' ))
+        if next_url:
+            if '/page/' in next_url:
+                itemlist.append(item.clone (url = next_url, title = 'Siguientes ...', action = 'list_epis', text_color='coral' ))
 
     return itemlist
 
@@ -216,20 +207,19 @@ def temporadas(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = re.compile(' data-tab=(.*?)>Temporada', re.DOTALL).findall(data)
+    matches = re.compile(' data-tab="(.*?)">Temporada', re.DOTALL).findall(data)
 
     for tempo in matches:
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]' + title + '[/COLOR]')
-            item.page = 0
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo, page = 0 ))
+        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -241,43 +231,49 @@ def episodios(item):
     itemlist = []
 
     if not item.page: item.page = 0
-    perpage = 50
+    if not item.perpage: item.perpage = 50
 
     data = httptools.downloadpage(item.url).data
 
     season = str(item.contentSeason)
 
-    bloque = scrapertools.find_single_match(data, ' data-tab=' + season + '>.*?<tbody>(.*?)</tbody>' )
+    bloque = scrapertools.find_single_match(data, ' data-tab="' + season + '">.*?<tbody>(.*?)</tbody>' )
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
 
-    for data_epi in matches[item.page * perpage:]:
-        episode = scrapertools.find_single_match(data_epi, '<span class=Num>(.*?)</span>')
+    if item.page == 0:
+        sum_parts = len(matches)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('SeriesRetro', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
 
-        thumb = scrapertools.find_single_match(data_epi, '<img src="([^"]+)"')
-        thumb = 'https:' + thumb
-
+    for data_epi in matches[item.page * item.perpage:]:
         title = scrapertools.find_single_match(data_epi, ' alt="Imagen.*?<a href=.*?>(.*?)</a>')
         if not title: title = scrapertools.find_single_match(data_epi, ' alt=.*?Imagen.*?<a href=.*?>(.*?)</a>')
 
-        url = scrapertools.find_single_match(data_epi, '<a href=(.*?)class=')
+        url = scrapertools.find_single_match(data_epi, '<a href="(.*?)"')
 
         if not url or not title: continue
 
-        url = url.strip()
+        episode = scrapertools.find_single_match(data_epi, '<span class="Num">(.*?)</span>')
+
+        thumb = scrapertools.find_single_match(data_epi, '<img src="([^"]+)"')
+        thumb = 'https:' + thumb
 
         titulo = '%sx%s %s' % (season, episode, title)
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, 
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
 
-        if len(itemlist) >= perpage:
+        if len(itemlist) >= item.perpage:
             break
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(matches) > (item.page + 1) * perpage:
-        itemlist.append(item.clone( title=">> Página siguiente", action="episodios", page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(matches) > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
 
@@ -288,7 +284,7 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, 'data-tplayernv=Opt(.*?)><span>(.*?)</span>')
+    matches = scrapertools.find_multiple_matches(data, 'data-tplayernv="Opt(.*?)"><span>(.*?)</span>')
 
     ses = 0
 
@@ -298,12 +294,12 @@ def findvideos(item):
         servidor = servidor.replace('<strong>', '').replace('</strong>', '')
         servidor = servertools.corregir_servidor(servidor)
 
-        url = scrapertools.find_single_match(data, ' id=Opt' + str(opt) + '.*?src="(.*?)"')
+        url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '.*?src="(.*?)"')
         if not url:
-            url = scrapertools.find_single_match(data, ' id=Opt' + str(opt) + '.*?src=&quot;(.*?)&quot;')
+            url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '.*?src=&quot;(.*?)&quot;')
 
         if url.startswith('//') == True:
-            url = scrapertools.find_single_match(data, ' id=Opt' + str(opt) + '.*?src=&quot;(.*?)&quot;')
+            url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '.*?src=&quot;(.*?)&quot;')
 
         if not servidor or not url: continue
 
@@ -318,21 +314,19 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = link_other ))
 
     # Descargas
-    matches = scrapertools.find_multiple_matches(data, '<span class=Num>(.*?)</tr>')
+    matches = scrapertools.find_multiple_matches(data, '<span class="Num">(.*?)</tr>')
 
     for match in matches:
         ses += 1
 
         servidor = scrapertools.find_single_match(match, 'alt="Descargar(.*?)">')
-        servidor = servidor.replace('.', '').strip()
+        servidor = servidor.replace('.', '').lower().strip()
 
         if not servidor: continue
 
         servidor = servertools.corregir_servidor(servidor)
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
-
-        url = url.strip()
 
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = 'd' ))
 
@@ -348,7 +342,7 @@ def play(item):
     logger.info()
     itemlist = []
 
-    url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&').strip()
+    url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
     if url.startswith(host):
         if item.other == 'd':
@@ -362,7 +356,7 @@ def play(item):
                 data = httptools.downloadpage(url).data
                 url = scrapertools.find_single_match(str(data), 'sources.*?"(.*?)"')
             else:
-                url = scrapertools.find_single_match(data, 'src=([^"]+) ')
+                url = scrapertools.find_single_match(data, 'src="(.*?)"')
 
     if url:
         if url.startswith('//') == True: url = 'https:' + url

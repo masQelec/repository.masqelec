@@ -421,7 +421,7 @@ def set_context_commands(item, parent_item, colores):
 
     # Descargar vídeo
     if not config.get_setting('mnu_simple', default=False):
-        if config.get_setting('mnu_preferidos', default=True):
+        if config.get_setting('mnu_desargas', default=True):
             if item.channel != '' and item.action == 'findvideos' and parent_item.channel != 'downloads':
                 context_commands.append( ('[COLOR %s]Descargar vídeo[/COLOR]' % colores['download'], config.build_RunPlugin(
                     item.clone(channel="downloads", action="save_download", from_channel=item.channel, from_action=item.action))) )

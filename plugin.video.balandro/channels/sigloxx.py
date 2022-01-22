@@ -17,6 +17,8 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    # ~ itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone ( title = 'Sagas', action = 'sagas', url = host + 'sagas/', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -25,8 +27,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone ( title = 'Por actriz', action = 'listas', url = host + 'actrices/' ))
     itemlist.append(item.clone ( title = 'Por dirección, guionistas, productores', action = 'listas', url = host + 'directores/' ))
     itemlist.append(item.clone ( title = 'Por compositores, escritores, novelistas', action = 'listas', url = host + 'otras-biografias/' ))
-
-    # ~ itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -53,8 +53,7 @@ def anios(item):
     logger.info()
     itemlist = []
 
-    url = host
-    data = httptools.downloadpage(url).data
+    data = httptools.downloadpage(host).data
 
     bloque = scrapertools.find_single_match(data, '>Décadas<(.*?)>Biografías<')
 
@@ -139,7 +138,7 @@ def list_films(item):
 
     if num_matches > hasta:
         next_page = item.page + 1
-        itemlist.append(item.clone( title='>> Página siguiente', page = next_page, action = 'list_films', text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', page = next_page, action = 'list_films', text_color='coral' ))
 
     return itemlist
 

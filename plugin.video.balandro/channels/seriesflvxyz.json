@@ -3,7 +3,7 @@
   "name": "SeriesFlvXyz",
   "thumbnail": "seriesflvxyz.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["lasts", "years", "producers", "kids", "docs", "vos", "anime"],
 
-  "notes": "Muchas series, por género, año, últimos episodios."
+  "notes": "Web CERRADA. Series, por género, año."
 }

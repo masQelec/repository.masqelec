@@ -35,19 +35,21 @@ def mainlist(item):
         por_plataforma = True
         por_tema = True
 
-        itemlist.append(item.clone( title = 'En cartelera', action = 'list_all', url = host + 'cat_new_th_es.html' ))
+        itemlist.append(item.clone( title = 'Películas', thumbnail=config.get_thumb('movie'), action = '', text_color='deepskyblue' ))
 
-        itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas' ))
-        itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
-        itemlist.append(item.clone( title = 'Por país', action = 'paises' ))
-        itemlist.append(item.clone( title = 'Por año', action = 'anios' ))
-        itemlist.append(item.clone( title = 'Por tema', action = 'temas', url = host + 'topics.php' ))
+        itemlist.append(item.clone( title = ' - En cartelera', action = 'list_all', url = host + 'cat_new_th_es.html' ))
 
-        itemlist.append(item.clone( title = 'Premios Oscar', action = 'oscars', url = host + 'oscar_data.php' ))
+        itemlist.append(item.clone( title = ' - Por plataforma', action = 'plataformas' ))
+        itemlist.append(item.clone( title = ' - Por género', action = 'generos' ))
+        itemlist.append(item.clone( title = ' - Por país', action = 'paises' ))
+        itemlist.append(item.clone( title = ' - Por año', action = 'anios' ))
+        itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php' ))
 
-        itemlist.append(item.clone( title = 'Sagas y colecciones', action = 'sagas', url = host + 'movie-groups-all.php', page = 1 ))
+        itemlist.append(item.clone( title = ' - Premios Oscar', action = 'oscars', url = host + 'oscar_data.php' ))
 
-        itemlist.append(item.clone( title = 'Mejores películas', action = 'list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1' ))
+        itemlist.append(item.clone( title = ' - Sagas y colecciones', action = 'sagas', url = host + 'movie-groups-all.php', page = 1 ))
+
+        itemlist.append(item.clone( title = ' - Las mejores películas', action = 'list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1' ))
 
     presentar = True
     if item.search_type == 'movie': presentar = False
@@ -58,15 +60,17 @@ def mainlist(item):
     if presentar:
         if not por_plataforma:
             por_plataforma = True
-            itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas' ))
+            itemlist.append(item.clone( title = ' - Por plataforma', action = 'plataformas' ))
 
         if not por_tema:
             por_tema = True
-            itemlist.append(item.clone( title = 'Por tema', action = 'temas', url = host + 'topics.php' ))
+            itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php' ))
 
-        itemlist.append(item.clone( title = 'Premios Emmy', action = 'emmy_ediciones', url = host + 'awards.php?award_id=emmy&year=' ))
+        itemlist.append(item.clone( title = 'Series', thumbnail=config.get_thumb('tvshow'), action = '', text_color='hotpink' ))
 
-        itemlist.append(item.clone( title = 'Mejores series', action = 'list_sel', url = host + ruta_sel + '&nodoc=1', cod_genre = 'TV_SE' ))
+        itemlist.append(item.clone( title = ' - Premios Emmy', action = 'emmy_ediciones', url = host + 'awards.php?award_id=emmy&year=' ))
+
+        itemlist.append(item.clone( title = ' - Las mejores series', action = 'list_sel', url = host + ruta_sel + '&nodoc=1', cod_genre = 'TV_SE' ))
 
     presentar = True
     if item.search_type == 'movie': presentar = False
@@ -75,16 +79,20 @@ def mainlist(item):
 
     if presentar:
         if not por_tema:
-            itemlist.append(item.clone( title = 'Por tema', action = 'temas', url = host + 'topics.php' ))
+            itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php' ))
 
-        itemlist.append(item.clone( title = 'Mejores documentales', action = 'list_sel', url = host + ruta_sel + '&notvse=1', cod_genre = 'DO' ))
+        itemlist.append(item.clone( title = 'Documentales', thumbnail=config.get_thumb('documentary'), action = '', text_color='cyan' ))
+
+        itemlist.append(item.clone( title = ' - Los mejores documentales', action = 'list_sel', url = host + ruta_sel + '&notvse=1', cod_genre = 'DO' ))
 
     if not item.search_type:
-        itemlist.append(item.clone( title = 'Novedades a la venta', action = 'list_all', url = host + 'cat_new_sa_es.html' ))
-        itemlist.append(item.clone( title = 'Novedades en alquiler', action = 'list_all', url = host + 'cat_new_re_es.html' ))
+        itemlist.append(item.clone( title = 'Películas y Series', thumbnail=config.get_thumb('heart'), action = '', text_color='yellow' ))
+
+        itemlist.append(item.clone( title = ' - Novedades a la venta', action = 'list_all', url = host + 'cat_new_sa_es.html' ))
+        itemlist.append(item.clone( title = ' - Novedades en alquiler', action = 'list_all', url = host + 'cat_new_re_es.html' ))
 
     return itemlist
-
+ 
 
 def plataformas(item):
     logger.info()
@@ -623,10 +631,22 @@ def _oscars_categories(item):
 def _emmys(item):
     logger.info()
 
-    item.url = host + 'awards.php?award_id=emmy&year=' + str(current_year)
+    item.url = host + 'awards.php?award_id=emmy&year='
+    if item.origen == 'mnu_esp':
+        return emmy_ediciones(item)
+
+    item.url = item.url + str(current_year)
 
     return list_premios_anyo(item)
 
+
+def _oscars(item):
+    logger.info()
+
+    item.url = host + 'oscar_data.php'
+    item.page = 1
+
+    return oscars(item)
 
 def _sagas(item):
     logger.info()

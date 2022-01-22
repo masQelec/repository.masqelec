@@ -11,8 +11,9 @@ host = 'https://pasateatorrent.net/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if '/categoria/' in url:
-        raise_weberror = False
+    if not headers: headers = {'Referer': host}
+
+    if '/categoria/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -23,10 +24,10 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
-    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
+    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
-    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -35,13 +36,13 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -50,12 +51,12 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -112,7 +113,7 @@ def calidades(item):
 
     itemlist.append(item.clone( title='En 4K', url=host + 'categoria/4k-2/', action='list_all' ))
     itemlist.append(item.clone( title='En BluRay', url=host + 'categoria/BluRay-1080p/', action='list_all' ))
-    itemlist.append(item.clone( title='En Dvd Rip', url=host + 'categoria/dvdrip/', action='' ))
+    itemlist.append(item.clone( title='En Dvd Rip', url=host + 'categoria/dvdrip/', action='list_all' ))
     itemlist.append(item.clone( title='En HD Rip', url=host + 'categoria/HDRip-2/', action='list_all' ))
     itemlist.append(item.clone( title='En Micro HD', url=host + 'categoria/MicroHD-1080p/', action='list_all' ))
     itemlist.append(item.clone( title='En 3D', url=host + 'categoria/3D/', action='list_all' ))
@@ -132,12 +133,13 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, " href='(.*?)'")
-
         if not url:
             url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, '<div class="title">(.*?)</div>')
-        title = title.replace('<h2 style="font-size:20px;">', '').replace('</h2>', '').strip()
+        title = scrapertools.find_single_match(match, "alt='(.*?)'")
+        if not title:
+            title = scrapertools.find_single_match(match, '<div class="title">(.*?)</div>')
+            title = title.replace('<h2 style="font-size:20px;">', '').replace('</h2>', '').strip()
 
         if not url or not title: continue
 
@@ -171,7 +173,6 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
-
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = lang, qualities=qlty, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
         else:
@@ -188,7 +189,7 @@ def list_all(item):
 
         if next_page:
             if '/page/' in next_page:
-                itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_all', url = next_page, text_color='coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -224,6 +225,7 @@ def findvideos(item):
         peso = peso.strip()
 
         other = peso + ' ' + episodio + ' ' + password
+        other = other.strip()
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, other = other ))
 

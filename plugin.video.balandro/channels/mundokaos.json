@@ -3,7 +3,7 @@
   "name": "MundoKaos",
   "thumbnail": "mundokaos.png",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["temporary", "news", "years", "lists", "kids", "docs", "vos", "anime"],
+  "clusters": ["lists", "kids", "docs", "vos"],
 
-  "notes": "Películas: por géneros, años. Series y Animes."
+  "notes": "Películas y Series por géneros, año."
 }

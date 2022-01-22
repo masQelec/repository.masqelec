@@ -27,6 +27,8 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
     itemlist.append(item.clone( title='Catálogo por alfabético (A - Z)', action ='list_all', url = host + 'lista.php?or=abc' ))
     itemlist.append(item.clone( title='Catálogo por alfabético (Z - A)', action ='list_all', url = host + 'lista.php?or=cba' ))
 
@@ -34,8 +36,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title='Más antiguas', action ='list_all', url = host + 'lista.php?or=ler' ))
     itemlist.append(item.clone( title='Más actuales', action ='list_all', url = host + 'lista.php?or=rel' ))
     itemlist.append(item.clone( title='Más impopulares', action ='list_all', url = host + 'lista.php?or=sam' ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -62,7 +62,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if num_matches > hasta:
-        itemlist.append(item.clone( title='>> Página siguiente', page=item.page + 1, action='list_all', text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -79,14 +79,13 @@ def temporadas(item):
         if not title: title = 'Temporada ' + str( n + 1)
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]' + title + '[/COLOR]')
-            item.page = 0
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.contentType = 'season'
             item.contentSeason = n + 1
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action='episodios', title = title, contentType = 'season', contentSeason = n + 1, page = 0 ))
+        itemlist.append(item.clone( action='episodios', title = title, contentType = 'season', contentSeason = n + 1 ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -98,7 +97,7 @@ def episodios(item):
     itemlist = []
 
     if not item.page: item.page = 0
-    perpage = 50
+    if not item.perpage: item.perpage = 50
 
     data = httptools.downloadpage(item.url).data
 
@@ -106,9 +105,16 @@ def episodios(item):
     if not matches: # Temporada única
         matches = [(0, data)]
 
+    if item.page == 0:
+        sum_parts = len(matches)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('SeriesLan', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
+
     last_epi = 0
 
-    for num_s, episodios in matches[item.page * perpage:]:
+    for num_s, episodios in matches[item.page * item.perpage:]:
         season = int(num_s) + 1
 
         patron_epi = '<a href="([^"]+)"><li><span><strong>[^<]*</strong>(\d+)[^<]*</span>([^<]+)</li>'
@@ -129,13 +135,14 @@ def episodios(item):
                                         contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
         if num_epi: last_epi = num_epi
 
-        if len(itemlist) >= perpage:
+        if len(itemlist) >= item.perpage:
             break
 
     # ~ tmdb.set_infoLabels(itemlist)
 
-    if len(matches) > (item.page + 1) * perpage:
-        itemlist.append(item.clone( title=">> Página siguiente", action="episodios", page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(matches) > (item.page + 1) * item.perpage:
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
 

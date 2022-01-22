@@ -29,6 +29,8 @@ def mainlist_pelis(item):
         if actions.adults_password(item) == False:
             return itemlist
 
+    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'most-recent/'))
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'most-viewed/'))
@@ -36,8 +38,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host + 'longest/' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias'))
-
-    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie' ))
 
     return itemlist
 
@@ -62,7 +62,7 @@ def list_all(item):
     if next_page:
         next_page = host + next_page
 
-        itemlist.append(item.clone( title = '>> Página siguiente', action = 'list_all', url = next_page, text_color = 'coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
     return itemlist
 

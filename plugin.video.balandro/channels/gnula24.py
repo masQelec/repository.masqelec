@@ -12,8 +12,7 @@ IDIOMAS = {'Latino': 'Lat', 'Español': 'Esp', 'Subtitulado': 'Vose', 'Ingles': 
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if not headers:
-        headers = {'Referer': host}
+    if not headers: headers = {'Referer': host}
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     return data
@@ -22,9 +21,12 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 def mainlist(item):
     return mainlist_series(item)
 
+
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie/' ))
 
@@ -33,8 +35,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Novelas', action = 'list_all', url = host + 'genero/novelas/' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -96,7 +96,7 @@ def list_all(item):
         next_page = scrapertools.find_single_match(data, patron)
         if next_page:
             if '/page/' in next_page:
-                itemlist.append(item.clone( title = '>> Página siguiente', url = next_page, action = 'list_all', text_color='coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -139,7 +139,7 @@ def last_episodes(item):
         next_page = scrapertools.find_single_match(data, patron)
         if next_page:
             if '/page/' in next_page:
-                itemlist.append(item.clone( title = '>> Página siguiente', url = next_page, action = 'last_episodes', text_color='coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'last_episodes', text_color='coral' ))
 
     return itemlist
 
@@ -167,15 +167,14 @@ def temporadas(item):
         tempo = title.replace('Temporada ', '').strip()
 
         if len(seasons) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]' + title + '[/COLOR]')
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.data_id = data_id
-            item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, data_id = data_id, contentType = 'season', contentSeason = tempo, page = 0 ))
+        itemlist.append(item.clone( action = 'episodios', title = title, data_id = data_id, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -191,7 +190,7 @@ def episodios(item):
     itemlist = []
 
     if not item.page: item.page = 0
-    perpage = 50
+    if not item.perpage: item.perpage = 50
 
     post = {'action': 'seasons', 'id': item.data_id}
     headers = {'Referer': item.url}
@@ -207,7 +206,14 @@ def episodios(item):
 
     episodes = scrapertools.find_multiple_matches(bloque, patron)
 
-    for data_id, thumb, temp_epis, url, title, idiomas in episodes[item.page * perpage:]:
+    if item.page == 0:
+        sum_parts = len(episodes)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('Gnula24', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
+
+    for data_id, thumb, temp_epis, url, title, idiomas in episodes[item.page * item.perpage:]:
         langs = []
         if '<img title="Español"' in idiomas: langs.append('Esp')
         if '<img title="Latino"' in idiomas: langs.append('Lat')
@@ -221,13 +227,14 @@ def episodios(item):
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, languages = ', '.join(langs),
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
-        if len(itemlist) >= perpage:
+        if len(itemlist) >= item.perpage:
             break
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(episodes) > ((item.page + 1) * perpage):
-        itemlist.append(item.clone( title = ">> Página siguiente", action = "episodios", page = item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(episodes) > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
 

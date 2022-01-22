@@ -13,5 +13,5 @@
 
   "clusters": ["languages", "years", "kids", "docs", "vos"],
 
-  "notes": "Acceso por separado a Castellano, Latino y Subtitulado. Películas por géneros y año."
+  "notes": "Películas por idiomas, géneros y año."
 }
