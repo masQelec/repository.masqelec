@@ -147,7 +147,6 @@ def collection(slug, content_class, label=None, **kwargs):
     folder = plugin.Folder(label or _get_text(data['text'], 'title', 'collection'), thumb=_get_art(data.get('image', []).get('fanart')))
 
     for row in data['containers']:
-        _type = row.get('type')
         _set = row.get('set')
         _style = row.get('style')
         ref_type = _set['refType'] if _set['type'] == 'SetRef' else _set['type']
@@ -160,15 +159,14 @@ def collection(slug, content_class, label=None, **kwargs):
         if not set_id:
             return None
 
-        if slug == 'home' and _style in ('brandSix', 'ContinueWatchingSet', 'hero', 'WatchlistSet'):
+        if slug == 'home' and (_style in ('brandSix', 'hero') or ref_type in ('ContinueWatchingSet', 'WatchlistSet')):
             continue
 
-        if _style == 'BecauseYouSet':
-            continue
-            # data = api.set_by_id(set_id, _style, page_size=0)
-            # if not data['meta']['hits']:
-            #     continue
-            # title = _get_text(data['text'], 'title', 'set')
+        if ref_type == 'BecauseYouSet':
+            data = api.set_by_id(set_id, ref_type, page_size=0)
+            if not data['meta']['hits']:
+                continue
+            title = _get_text(data['text'], 'title', 'set')
         else:
             title = _get_text(_set['text'], 'title', 'set')
 
@@ -180,6 +178,7 @@ def collection(slug, content_class, label=None, **kwargs):
     return folder
 
 @plugin.route()
+@plugin.pagination()
 def sets(set_id, set_type, page=1, **kwargs):
     page = int(page)
     data = api.set_by_id(set_id, set_type, page=page)
@@ -189,15 +188,7 @@ def sets(set_id, set_type, page=1, **kwargs):
     items = _process_rows(data.get('items', []), data['type'])
     folder.add_items(items)
 
-    if (data['meta']['page_size'] + data['meta']['offset']) < data['meta']['hits']:
-        folder.add_item(
-            label = _(_.NEXT_PAGE, page=page+1),
-            path  = plugin.url_for(sets, set_id=set_id, set_type=set_type, page=page+1),
-            specialsort = 'bottom',
-        )
-
-    return folder
-
+    return folder, (data['meta']['page_size'] + data['meta']['offset']) < data['meta']['hits']
 
 def _process_rows(rows, content_class=None):
     sync_enabled = settings.getBool('sync_playback', True)
@@ -430,6 +421,7 @@ def series(series_id, **kwargs):
     return folder
 
 @plugin.route()
+@plugin.pagination()
 def season(season_id, title, page=1, **kwargs):
     page = int(page)
     data = api.episodes(season_id, page=page)
@@ -439,14 +431,7 @@ def season(season_id, title, page=1, **kwargs):
     items = _process_rows(data['videos'], content_class='episode')
     folder.add_items(items)
 
-    if (data['meta']['page_size'] + data['meta']['offset']) < data['meta']['hits']:
-        folder.add_item(
-            label = _(_.NEXT_PAGE, page=page+1),
-            path  = plugin.url_for(season, season_id=season_id, title=title, page=page+1),
-            specialsort = 'bottom',
-        )
-
-    return folder
+    return folder, (data['meta']['page_size'] + data['meta']['offset']) < data['meta']['hits']
 
 @plugin.route()
 def suggested(family_id=None, series_id=None, **kwargs):
@@ -520,6 +505,28 @@ def play(content_id=None, family_id=None, **kwargs):
     video = data.get('video')
     if not video:
         raise PluginError(_.NO_VIDEO_FOUND)
+
+    versions = video['mediaMetadata']['facets']
+
+    has_imax = False
+    for row in versions:
+        if row['activeAspectRatio'] == 1.9:
+            has_imax = True
+
+    if has_imax:
+        deault_ratio = settings.getEnum('default_ratio', RATIO_TYPES, default=RATIO_IMAX)
+
+        if deault_ratio == RATIO_ASK:
+            index = gui.context_menu([_.IMAX, _.WIDESCREEN])
+            if index == -1:
+                return
+            imax = True if index == 0 else False
+        else:
+            imax = True if deault_ratio == RATIO_IMAX else False
+
+        profile = api.profile()[0]
+        if imax != profile['attributes']['playbackSettings']['preferImaxEnhancedVersion']:
+            api.set_imax(imax)
 
     playback_url = video['mediaMetadata']['playbackUrls'][0]['href']
     playback_data = api.playback_data(playback_url, ia.wv_secure)

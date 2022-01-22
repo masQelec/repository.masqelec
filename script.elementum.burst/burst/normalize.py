@@ -15,13 +15,15 @@ import json
 import re
 import unicodedata
 if PY3:
+    import html
     from urllib.parse import unquote
-    from html.parser import HTMLParser
     unicode = str
 else:
     from urllib import unquote
     from .parser.HTMLParser import HTMLParser
 from kodi_six import py2_encode, py2_decode
+
+from elementum.provider import log
 
 def clean_title(string=None):
     """
@@ -62,12 +64,15 @@ def remove_accents(string):
     :return: string without accents
     :rtype: unicode
     """
-    if not isinstance(string, unicode):
-        string = normalize_string(string)
+
+    try:
+        string = unicode(string, 'utf-8')
+    # unicode is a default on python 3
+    except (TypeError, NameError):
+        pass
 
     nfkd_form = unicodedata.normalize('NFKD', string)
-    only_ascii = py2_encode(nfkd_form, 'ASCII', 'ignore').strip()
-    return string if only_ascii == u'' else only_ascii
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
 def remove_control_chars(string):
@@ -179,15 +184,23 @@ def normalize_string(string, charset=None, replacing=False):
             string = unicode(string, errors='ignore')
             pass
 
-    string = remove_control_chars(string)
-    string = fix_bad_unicode(string)
-    string = unquote(string)
-    string = string.replace(u'<![CDATA[', u'').replace(u']]', u'')
-    string = HTMLParser().unescape(string)
-    if replacing:
-        string = string.replace(u"'", '')
+    try:
+        string = remove_control_chars(string)
+        string = fix_bad_unicode(string)
+        string = unquote(string)
+        string = string.replace(u'<![CDATA[', u'').replace(u']]', u'')
 
-    string = string.lower()
+        if PY3:
+            string = html.unescape(string)
+        else:
+            string = HTMLParser().unescape(string)
+
+        if replacing:
+            string = string.replace(u"'", '')
+
+        string = string.lower()
+    except:
+        pass
 
     return string
 
@@ -270,31 +283,35 @@ def fix_bad_unicode(string):
         return string
 
     else:
-        attempts = [(string, text_badness(string) + len(string))]
-        if max_ord < 256:
-            tried_fixing = reinterpret_latin1_as_utf8(string)
-            tried_fixing2 = reinterpret_latin1_as_windows1252(string)
-            attempts.append((tried_fixing, text_cost(tried_fixing)))
-            attempts.append((tried_fixing2, text_cost(tried_fixing2)))
+        try:
+            attempts = [(string, text_badness(string) + len(string))]
+            if max_ord < 256:
+                tried_fixing = reinterpret_latin1_as_utf8(string)
+                tried_fixing2 = reinterpret_latin1_as_windows1252(string)
+                attempts.append((tried_fixing, text_cost(tried_fixing)))
+                attempts.append((tried_fixing2, text_cost(tried_fixing2)))
 
-        elif all(ord(char) in WINDOWS_1252_CODEPOINTS for char in string):
-            tried_fixing = reinterpret_windows1252_as_utf8(string)
-            attempts.append((tried_fixing, text_cost(tried_fixing)))
+            elif all(ord(char) in WINDOWS_1252_CODEPOINTS for char in string):
+                tried_fixing = reinterpret_windows1252_as_utf8(string)
+                attempts.append((tried_fixing, text_cost(tried_fixing)))
 
-        else:
-            # We can't imagine how this would be anything but valid text.
-            return string
+            else:
+                # We can't imagine how this would be anything but valid text.
+                return string
 
-        # Sort the results by badness
-        attempts.sort(key=lambda x: x[1])
-        # print attempts
-        good_text = attempts[0][0]
-        if good_text == string:
-            return good_text
+            # Sort the results by badness
+            attempts.sort(key=lambda x: x[1])
+            # print attempts
+            good_text = attempts[0][0]
+            if good_text == string:
+                return good_text
 
-        else:
-            return fix_bad_unicode(good_text)
-
+            else:
+                return fix_bad_unicode(good_text)
+        except Exception as e:
+            import traceback
+            log.warning("Could not fix unicode string: %s" % repr(e))
+            map(log.debug, traceback.format_exc().split("\n"))
 
 def reinterpret_latin1_as_utf8(wrong_text):
     new_bytes = py2_encode(wrong_text, 'latin-1', 'replace')

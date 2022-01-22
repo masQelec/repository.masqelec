@@ -1,13 +1,10 @@
 import os
-import platform
-import re
-import shutil
 import time
 import struct
 import subprocess
 from distutils.version import LooseVersion
 
-from kodi_six import xbmc, xbmcaddon
+from kodi_six import xbmc
 
 from . import gui, settings
 from .userdata import Userdata
@@ -15,7 +12,7 @@ from .session import Session
 from .log import log
 from .constants import *
 from .language import _
-from .util import md5sum, remove_file, get_system_arch, hash_6, kodi_rpc, get_addon
+from .util import md5sum, remove_file, get_system_arch, get_addon
 from .exceptions import InputStreamError
 
 def get_id():
@@ -25,28 +22,11 @@ def get_ia_addon(required=False, install=True):
     addon_id = get_id()
 
     addon = get_addon(addon_id, required=False, install=install)
-
-    if not addon and addon_id == IA_ADDON_ID and install and get_system_arch()[0] == 'Linux':
-        with gui.progress(_.INSTALLING_APT_IA, heading=_.IA_WIDEVINE_DRM, percent=20) as progress:
-            try:
-                subprocess.check_output('apt-get -y install {0} || sudo apt-get -y install {0}'.format(IA_LINUX_PACKAGE), shell=True)
-                log.debug('{} installed'.format(IA_LINUX_PACKAGE))
-                progress.update(70)
-                xbmc.executebuiltin('UpdateLocalAddons()')
-
-                max_wait = 5
-                for i in range(max_wait):
-                    xbmc.sleep(1000)
-                    progress.update(70+(i*(30/max_wait)))
-                    addon = get_addon(addon_id, required=False, install=False)
-                    if addon:
-                        break
-            except Exception as e:
-                log.exception(e)
-                log.debug('{} failed to install'.format(IA_LINUX_PACKAGE))
-
     if not addon and required:
-        raise InputStreamError(_(_.ADDON_REQUIRED, addon_id=addon_id))
+        if addon_id == IA_ADDON_ID and get_system_arch()[0] == 'Linux':
+            raise InputStreamError(_(_.IA_LINUX_MISSING, addon_id=addon_id))
+        else:
+            raise InputStreamError(_(_.ADDON_REQUIRED, addon_id=addon_id))
 
     return addon
 
@@ -61,6 +41,8 @@ class InputstreamItem(object):
     response      = None
     properties    = None
     minversion    = None
+    flags         = None
+    server_certificate = None
 
     def __init__(self, minversion=None, properties=None):
         if minversion:
@@ -116,7 +98,7 @@ class Playready(InputstreamItem):
 class Widevine(InputstreamItem):
     license_type = 'com.widevine.alpha'
 
-    def __init__(self, license_key=None, content_type='application/octet-stream', challenge='R{SSM}', response='', manifest_type='mpd', mimetype='application/dash+xml', license_data=None, license_headers=None, wv_secure=False, **kwargs):
+    def __init__(self, license_key=None, content_type='application/octet-stream', challenge='R{SSM}', response='', manifest_type='mpd', mimetype='application/dash+xml', server_certificate=None, license_data=None, license_headers=None, wv_secure=False, flags=None, **kwargs):
         super(Widevine, self).__init__(**kwargs)
         self.license_key = license_key
         self.content_type = content_type
@@ -124,6 +106,8 @@ class Widevine(InputstreamItem):
         self.response = response
         self.manifest_type = manifest_type
         self.mimetype = mimetype
+        self.flags = flags
+        self.server_certificate = server_certificate
         self.license_data = license_data
         self.wv_secure = wv_secure
         self.license_headers = license_headers
@@ -319,13 +303,6 @@ def install_widevine(reinstall=False):
                 continue
 
         break
-
-    if system == 'Linux':
-        try:
-            subprocess.check_output('apt-get -y install libnss3 || sudo apt-get -y install libnss3', shell=True)
-            log.debug('libnss3 installed')
-        except Exception as e:
-            log.debug('libnss3 failed to install')
 
     gui.ok(_(_.IA_WV_INSTALL_OK, version=selected['ver']))
 

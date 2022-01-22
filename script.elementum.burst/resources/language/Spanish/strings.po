@@ -22,18 +22,6 @@ msgctxt "#32000"
 msgid "General"
 msgstr "General"
 
-msgctxt "#32001"
-msgid "Providers"
-msgstr "Proveedores"
-
-msgctxt "#32002"
-msgid "Resolutions"
-msgstr "Resoluciones"
-
-msgctxt "#32003"
-msgid "Release types"
-msgstr "Tipos de versiones"
-
 msgctxt "#32004"
 msgid "Advanced"
 msgstr "Avanzado"
@@ -42,10 +30,6 @@ msgctxt "#32006"
 msgid "Movies"
 msgstr "Películas"
 
-msgctxt "#32007"
-msgid "TV Shows"
-msgstr "Programas de TV"
-
 msgctxt "#32008"
 msgid "Seasons"
 msgstr "Temporadas"
@@ -53,14 +37,6 @@ msgstr "Temporadas"
 msgctxt "#32009"
 msgid "Episodes"
 msgstr "Episodios"
-
-msgctxt "#32012"
-msgid "Public trackers"
-msgstr "Trackers públicos"
-
-msgctxt "#32014"
-msgid "Private trackers"
-msgstr "Trackers privados"
 
 msgctxt "#32015"
 msgid "Username"
@@ -110,10 +86,6 @@ msgctxt "#32040"
 msgid "Maximum results per provider"
 msgstr "Número máximo de resultados por proveedor"
 
-msgctxt "#32041"
-msgid "Use CloudHole"
-msgstr "Utilizar CloudHole"
-
 msgctxt "#32050"
 msgid "Exceptions"
 msgstr "Exceptiones"
@@ -150,10 +122,6 @@ msgctxt "#32071"
 msgid "Timeout setting must be lower than Elementum's"
 msgstr "El ajuste de tiempo de espera debe de ser inferior al de Elementum"
 
-msgctxt "#32075"
-msgid "No torrents found"
-msgstr "No se encontraron torrents"
-
 msgctxt "#32076"
 msgid "Passkey"
 msgstr "Clave de acceso"
@@ -165,10 +133,6 @@ msgstr "Alias de dominio [opcional]"
 msgctxt "#32078"
 msgid "Allow results without seeds"
 msgstr "Permitir resultados sin semillas"
-
-msgctxt "#32079"
-msgid "E-mail"
-msgstr "E-mail"
 
 msgctxt "#32080"
 msgid "Contains only"
@@ -279,16 +243,12 @@ msgid "Use proxy settings"
 msgstr "Usar configuración"
 
 msgctxt "#32107"
-msgid "Proxy from Elementum settings"
+msgid "From Elementum settings"
 msgstr "Elementum"
 
 msgctxt "#32108"
 msgid "Custom settings"
 msgstr "Personalizada"
-
-msgctxt "#32109"
-msgid "Antizapret proxy"
-msgstr "Proxy Antizapret"
 
 msgctxt "#32110"
 msgid "International"
@@ -390,6 +350,30 @@ msgctxt "#32134"
 msgid "Video quality"
 msgstr "Calidad de vídeo"
 
-#~ msgctxt "#32040"
-#~ msgid "Maximum torrents"
-#~ msgstr "Número máximo de torrents"
+msgctxt "#32135"
+msgid "Belarusian"
+msgstr ""
+
+msgctxt "#32136"
+msgid "SOCKS4a"
+msgstr ""
+
+msgctxt "#32137"
+msgid "SOCKS5h"
+msgstr ""
+
+msgctxt "#32138"
+msgid "From Elementum settings (resolve hosts by proxy)"
+msgstr ""
+
+msgctxt "#32139"
+msgid "First enable built-in HTTP proxy in Elementum"
+msgstr ""
+
+msgctxt "#32140"
+msgid "Use Tor domain alias"
+msgstr ""
+
+msgctxt "#32141"
+msgid "First set SOCKS both in Burst&Elementum or proxy http via Elementum"
+msgstr ""

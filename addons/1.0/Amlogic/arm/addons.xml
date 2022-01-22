@@ -12166,7 +12166,6 @@ Supported files: .pak</description>
 
 <addon id="slyguy.dependencies" name="SlyGuy Dependencies" provider-name="SlyGuy" version="0.0.1">
   <requires>
-    <import addon="repository.slyguy"/>
   </requires>
   <extension point="xbmc.python.module" library="resources/modules" />
   <extension point="xbmc.addon.metadata">

@@ -9,9 +9,11 @@ from future.utils import PY3, iteritems
 import os
 import re
 import json
+import time
 import urllib
 from .client import Client
 from elementum.provider import log, get_setting, set_setting
+from .filtering import cleanup_results
 from .providers.definitions import definitions, longest
 from .utils import ADDON_PATH, get_int, clean_size, get_alias
 from kodi_six import xbmc, xbmcaddon, py2_encode
@@ -40,7 +42,7 @@ def generate_payload(provider, generator, filtering, verify_name=True, verify_si
     definition = definitions[provider]
     definition = get_alias(definition, get_setting("%s_alias" % provider))
 
-    for name, info_hash, uri, size, seeds, peers in generator:
+    for id, name, info_hash, uri, size, seeds, peers in generator:
         size = clean_size(size)
         # uri, info_hash = clean_magnet(uri, info_hash)
         v_name = name if verify_name else filtering.title
@@ -48,9 +50,10 @@ def generate_payload(provider, generator, filtering, verify_name=True, verify_si
         if filtering.verify(provider, v_name, v_size):
             sort_seeds = get_int(seeds)
             sort_resolution = filtering.determine_resolution(v_name)[1]+1
-            sort_balance = sort_seeds * 3 * sort_resolution
+            sort_balance = (sort_seeds + 1) * 3 * sort_resolution
 
             results.append({
+                "id": id,
                 "name": name,
                 "uri": uri,
                 "info_hash": info_hash,
@@ -67,11 +70,13 @@ def generate_payload(provider, generator, filtering, verify_name=True, verify_si
             log.debug(filtering.reason)
 
     log.debug('[%s] >>>>>> %s would send %d torrents to Elementum <<<<<<<' % (provider, provider, len(results)))
+    results = cleanup_results(results)
+    log.debug('[%s] >>>>>> %s would send %d torrents to Elementum after cleanup <<<<<<<' % (provider, provider, len(results)))
 
     return results
 
 
-def process(provider, generator, filtering, has_special, verify_name=True, verify_size=True, skip_auth=False):
+def process(provider, generator, filtering, has_special, verify_name=True, verify_size=True, skip_auth=False, start_time=None, timeout=None):
     """ Method for processing provider results using its generator and Filtering class instance
 
     Args:
@@ -86,10 +91,11 @@ def process(provider, generator, filtering, has_special, verify_name=True, verif
     definition = definitions[provider]
     definition = get_alias(definition, get_setting("%s_alias" % provider))
 
-    client = Client(info=filtering.info, request_charset=definition['charset'], response_charset=definition['response_charset'])
+    client = Client(info=filtering.info, request_charset=definition['charset'], response_charset=definition['response_charset'], is_api='is_api' in definition and definition['is_api'])
     token = None
     logged_in = False
     token_auth = False
+    used_queries = set()
 
     if get_setting('kodi_language', bool):
         kodi_language = xbmc.getLanguage(xbmc.ISO_639_1)
@@ -102,17 +108,31 @@ def process(provider, generator, filtering, has_special, verify_name=True, verif
     log.debug("[%s] Queries: %s" % (provider, filtering.queries))
     log.debug("[%s] Extras:  %s" % (provider, filtering.extras))
 
-    for query, extra in zip(filtering.queries, filtering.extras):
+    last_priority = 1
+    for query, extra, priority in zip(filtering.queries, filtering.extras, filtering.queries_priorities):
         log.debug("[%s] Before keywords - Query: %s - Extra: %s" % (provider, repr(query), repr(extra)))
         if has_special:
             # Removing quotes, surrounding {title*} keywords, when title contains special chars
             query = re.sub("[\"']({title.*?})[\"']", '\\1', query)
 
-        query = filtering.process_keywords(provider, query)
-        extra = filtering.process_keywords(provider, extra)
+        query = filtering.process_keywords(provider, query, definition)
+        extra = filtering.process_keywords(provider, extra, definition)
 
-        if extra == '-' and filtering.results:
+        if not query:
             continue
+        elif query+extra in used_queries:
+            # Make sure we don't run same query for this provider
+            continue
+        elif priority > last_priority and filtering.results:
+            # Skip fallbacks if there are results
+            log.debug("[%s] Skip fallback as there are already results" % provider)
+            continue
+        elif start_time and timeout and time.time() - start_time + 3 >= timeout:
+            # Stop doing requests if there is 3 seconds left for the overall task
+            continue
+
+        used_queries.add(query+extra)
+        last_priority = priority
 
         try:
             if 'charset' in definition and definition['charset'] and 'utf' not in definition['charset'].lower():
@@ -130,7 +150,7 @@ def process(provider, generator, filtering, has_special, verify_name=True, verif
             return filtering.results
 
         url_search = filtering.url.replace('QUERY', query)
-        if extra and extra != '-':
+        if extra:
             url_search = url_search.replace('EXTRA', extra)
         else:
             url_search = url_search.replace('EXTRA', '')
@@ -290,6 +310,7 @@ def process(provider, generator, filtering, has_special, verify_name=True, verif
                         client.open(definition['root_url'] + '/torrents.php')
                         csrf_token = re.search(r'name="csrfToken" value="(.*?)"', client.content)
                         url_search = url_search.replace("CSRF_TOKEN", csrf_token.group(1))
+                    client.save_cookies()
 
         log.info("[%s] >  %s search URL: %s" % (provider, definition['name'].rjust(longest), url_search))
 

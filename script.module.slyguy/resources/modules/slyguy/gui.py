@@ -25,6 +25,9 @@ def refresh():
 def redirect(location):
     xbmc.executebuiltin('Container.Update({},replace)'.format(location))
 
+def get_view_id():
+    return xbmcgui.Window(xbmcgui.getCurrentWindowId()).getFocusId()
+
 def exception(heading=None):
     if not heading:
         heading = _(_.PLUGIN_EXCEPTION, addon=ADDON_NAME, version=ADDON_VERSION)
@@ -258,35 +261,36 @@ class Item(object):
                 self.info['title'] = self.label
 
         if self.info:
-            if self.info.get('mediatype') in ('tvshow','season') and settings.common_settings.getBool('show_series_folders', False):
-                self.info.pop('mediatype')
+            info = self.info.copy()
+            if info.get('mediatype') in ('tvshow','season') and settings.common_settings.getBool('show_series_folders', False):
+                info.pop('mediatype')
 
-            if self.info.get('mediatype') == 'movie':
-                self.info.pop('season', None)
-                self.info.pop('episode', None)
-                self.info.pop('tvshowtitle', None)
+            if info.get('mediatype') == 'movie':
+                info.pop('season', None)
+                info.pop('episode', None)
+                info.pop('tvshowtitle', None)
 
-            year = self.info.get('year') or ''
-            aired = self.info.get('aired') or ''
-            premiered = self.info.get('premiered') or ''
-            date_added = self.info.get('dateadded') or ''
+            year = info.get('year') or ''
+            aired = info.get('aired') or ''
+            premiered = info.get('premiered') or ''
+            date_added = info.get('dateadded') or ''
 
             if not aired and premiered:
-                self.info['aired'] = aired = premiered
+                info['aired'] = aired = premiered
 
             if year and not aired:
-                self.info['aired'] = aired = '{}-01-01'.format(year)
+                info['aired'] = aired = '{}-01-01'.format(year)
 
             if not premiered and aired:
-                self.info['premiered'] = premiered = aired
+                info['premiered'] = premiered = aired
 
             if not year and len(aired) >= 4:
-                self.info['year'] = year = aired[0:4]
+                info['year'] = year = aired[0:4]
 
             if not date_added and aired:
-                self.info['dateadded'] = date_added = '{} 12:00:00'.format(aired)
+                info['dateadded'] = date_added = '{} 12:00:00'.format(aired)
 
-            li.setInfo('video', self.info)
+            li.setInfo('video', info)
 
         if self.specialsort:
             li.setProperty('specialsort', self.specialsort)
@@ -359,6 +363,12 @@ class Item(object):
             if self.inputstream.license_type:
                 li.setProperty('{}.license_type'.format(self.inputstream.addon_id), self.inputstream.license_type)
 
+            if self.inputstream.flags:
+                li.setProperty('{}.license_flags'.format(self.inputstream.addon_id), self.inputstream.flags)
+
+            if self.inputstream.server_certificate:
+                li.setProperty('{}.server_certificate'.format(self.inputstream.addon_id), self.inputstream.server_certificate)
+
             if headers:
                 li.setProperty('{}.stream_headers'.format(self.inputstream.addon_id), headers)
 
@@ -389,7 +399,7 @@ class Item(object):
             self.inputstream = None
 
         def make_sub(url, language='unk', mimetype='', forced=False, impaired=False):
-            if not url.lower().startswith('http') and not url.lower().startswith('plugin://'):
+            if os.path.exists(xbmc.translatePath(url)):
                 return url
 
             ## using dash, we can embed subs
@@ -435,6 +445,7 @@ class Item(object):
                 'audio_description': settings.getBool('audio_description', True),
                 'subs_forced': settings.getBool('subs_forced', True),
                 'subs_non_forced': settings.getBool('subs_non_forced', True),
+                'remove_framerate': False,
                 'subtitles': [],
                 'path_subs': {},
                 'addon_id': ADDON_ID,
@@ -459,7 +470,9 @@ class Item(object):
             if self.subtitles:
                 subs = []
                 for sub in self.subtitles:
-                    if type(sub) == list:
+                    if type(sub) == str:
+                        sub = make_sub(sub)
+                    elif type(sub) == list:
                         sub = make_sub(*sub)
                     else:
                         sub = make_sub(**sub)

@@ -10,11 +10,11 @@ from future.utils import PY3
 import re
 import hashlib
 from elementum.provider import log, get_setting
-from .normalize import normalize_string
+from .normalize import normalize_string, remove_accents
 from .providers.definitions import definitions
 from .utils import Magnet, get_int, get_float, clean_number, size_int, get_alias
 if PY3:
-    from html.parser import HTMLParser
+    import html
     unicode = str
 else:
     from .parser.HTMLParser import HTMLParser
@@ -26,6 +26,18 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
+use_require_resolution = get_setting('require_resolution', bool)
+use_additional_filters = get_setting('additional_filters', bool)
+use_require_keywords = get_setting('require_keywords', bool)
+use_require_release_type = get_setting('require_release_type', bool)
+use_require_size = get_setting('require_size', bool)
+use_accept = get_setting('accept', unicode).strip().lower()
+use_block = get_setting('block', unicode).strip().lower()
+use_require = get_setting('require', unicode).strip().lower()
+use_min_size = get_setting('min_size')
+use_max_size = get_setting('max_size')
+use_filter_quotes = get_setting("filter_quotes", bool)
+use_allow_noseeds = get_setting('allow_noseeds', bool)
 
 class Filtering:
     """
@@ -45,6 +57,7 @@ class Filtering:
             engine when no results are found (ie. TorLock and TorrentZ)
         queries (list): List of queries to be filtered
         extras (list): List of extras to be filtered
+        queries_priorities (list): Priorities of the queries
         info (dict): Payload from Elementum
         kodi_language (str): Language code from Kodi if kodi_language setting is enabled
         language_exceptions (list): List of providers for which not to apply ``kodi_language`` setting
@@ -137,38 +150,41 @@ class Filtering:
                 releases_allow.extend(self.release_types[release_type])
             else:
                 releases_deny.extend(self.release_types[release_type])
-        self.releases_allow = releases_allow
-        self.releases_deny = releases_deny
 
-        if get_setting('additional_filters', bool):
-            accept = get_setting('accept', unicode).strip().lower()
+        if use_additional_filters:
+            accept = use_accept
             if accept:
                 accept = re.split(r',\s?', accept)
                 releases_allow.extend(accept)
 
-            block = get_setting('block', unicode).strip().lower()
+            block = use_block
             if block:
                 block = re.split(r',\s?', block)
                 releases_deny.extend(block)
 
-            require = get_setting('require', unicode).strip().lower()
+            require = use_require
             if require:
                 require = re.split(r',\s?', require)
 
+        self.releases_allow = releases_allow
+        self.releases_deny = releases_deny
+
         self.require_keywords = require
 
-        self.min_size = get_float(get_setting('min_size'))
-        self.max_size = get_float(get_setting('max_size'))
+        self.min_size = get_float(use_min_size)
+        self.max_size = get_float(use_max_size)
         self.check_sizes()
 
         self.filter_title = False
 
         self.queries = []
         self.extras = []
+        self.queries_priorities = []
 
         self.info = dict(title="", proxy_url="", internal_proxy_url="", elementum_url="", titles=[])
         self.kodi_language = ''
         self.language_exceptions = []
+        self.provider_languages = []
         self.get_data = {}
         self.post_data = {}
         self.url = ''
@@ -187,17 +203,15 @@ class Filtering:
         definition = get_alias(definition, get_setting("%s_alias" % provider))
         if get_setting("use_public_dns", bool) and "public_dns_alias" in definition:
             definition = get_alias(definition, definition["public_dns_alias"])
+        if get_setting("use_tor_dns", bool) and "tor_dns_alias" in definition:
+            definition = get_alias(definition, definition["tor_dns_alias"])
 
-        general_query = definition['general_query'] if definition['general_query'] else ''
+        general_query = definition['general_query'] if 'general_query' in definition and definition['general_query'] else ''
         log.debug("[%s] General URL: %s%s" % (provider, definition['base_url'], general_query))
         self.info = payload
         self.url = u"%s%s" % (definition['base_url'], general_query)
-        if definition['general_keywords']:
-            self.queries = [definition['general_keywords']]
-            self.extras = [definition['general_extra']]
-        if 'general_keywords_fallback' in definition and definition['general_keywords_fallback']:
-            self.queries.append(definition['general_keywords_fallback'])
-            self.extras.append('-')
+
+        self.collect_queries('general', definition)
 
     def use_movie(self, provider, payload):
         """ Setup method to define movie search parameters
@@ -210,8 +224,10 @@ class Filtering:
         definition = get_alias(definition, get_setting("%s_alias" % provider))
         if get_setting("use_public_dns", bool) and "public_dns_alias" in definition:
             definition = get_alias(definition, definition["public_dns_alias"])
+        if get_setting("use_tor_dns", bool) and "tor_dns_alias" in definition:
+            definition = get_alias(definition, definition["tor_dns_alias"])
 
-        movie_query = definition['movie_query'] if definition['movie_query'] else ''
+        movie_query = definition['movie_query'] if 'movie_query' in definition and definition['movie_query'] else ''
         log.debug("[%s] Movies URL: %s%s" % (provider, definition['base_url'], movie_query))
         if get_setting('separate_sizes', bool):
             self.min_size = get_float(get_setting('min_size_movies'))
@@ -219,15 +235,8 @@ class Filtering:
             self.check_sizes()
         self.info = payload
         self.url = u"%s%s" % (definition['base_url'], movie_query)
-        if definition['movie_keywords']:
-            self.queries = ["%s" % definition['movie_keywords']]
-            self.extras = ["%s" % definition['movie_extra']]
-        if 'movie_keywords2' in definition and definition['movie_keywords2']:
-            self.queries.append("%s" % definition['movie_keywords2'])
-            self.extras.append("%s" % definition['movie_extra2'] if 'movie_extra2' in definition and definition['movie_extra2'] else '')
-        if 'movie_keywords_fallback' in definition and definition['movie_keywords_fallback']:
-            self.queries.append(definition['movie_keywords_fallback'])
-            self.extras.append('-')
+
+        self.collect_queries('movie', definition)
 
     def use_episode(self, provider, payload):
         """ Setup method to define episode search parameters
@@ -240,8 +249,10 @@ class Filtering:
         definition = get_alias(definition, get_setting("%s_alias" % provider))
         if get_setting("use_public_dns", bool) and "public_dns_alias" in definition:
             definition = get_alias(definition, definition["public_dns_alias"])
+        if get_setting("use_tor_dns", bool) and "tor_dns_alias" in definition:
+            definition = get_alias(definition, definition["tor_dns_alias"])
 
-        show_query = definition['show_query'] if definition['show_query'] else ''
+        show_query = definition['show_query'] if 'show_query' in definition and definition['show_query'] else ''
         log.debug("[%s] Episode URL: %s%s" % (provider, definition['base_url'], show_query))
         if get_setting('separate_sizes', bool):
             self.min_size = get_float(get_setting('min_size_episodes'))
@@ -249,16 +260,8 @@ class Filtering:
             self.check_sizes()
         self.info = payload
         self.url = u"%s%s" % (definition['base_url'], show_query)
-        if definition['tv_keywords']:
-            self.queries = ["%s" % definition['tv_keywords']]
-            self.extras = ["%s" % definition['tv_extra'] if 'tv_extra' in definition and definition['tv_extra'] else '']
-            # TODO this sucks, tv_keywords should be a list from the start..
-        if 'tv_keywords2' in definition and definition['tv_keywords2']:
-            self.queries.append(definition['tv_keywords2'])
-            self.extras.append(definition['tv_extra2'] if 'tv_extra2' in definition and definition['tv_extra2'] else '')
-        if 'tv_keywords_fallback' in definition and definition['tv_keywords_fallback']:
-            self.queries.append(definition['tv_keywords_fallback'])
-            self.extras.append('-')
+
+        self.collect_queries('tv', definition)
 
     def use_season(self, provider, info):
         """ Setup method to define season search parameters
@@ -271,8 +274,10 @@ class Filtering:
         definition = get_alias(definition, get_setting("%s_alias" % provider))
         if get_setting("use_public_dns", bool) and "public_dns_alias" in definition:
             definition = get_alias(definition, definition["public_dns_alias"])
+        if get_setting("use_tor_dns", bool) and "tor_dns_alias" in definition:
+            definition = get_alias(definition, definition["tor_dns_alias"])
 
-        season_query = definition['season_query'] if definition['season_query'] else ''
+        season_query = definition['season_query'] if 'season_query' in definition and definition['season_query'] else ''
         log.debug("[%s] Season URL: %s%s" % (provider, definition['base_url'], season_query))
         if get_setting('separate_sizes', bool):
             self.min_size = get_float(get_setting('min_size_seasons'))
@@ -280,15 +285,8 @@ class Filtering:
             self.check_sizes()
         self.info = info
         self.url = u"%s%s" % (definition['base_url'], season_query)
-        if definition['season_keywords']:
-            self.queries = ["%s" % definition['season_keywords']]
-            self.extras = ["%s" % definition['season_extra'] if definition['season_extra'] else '']
-        if definition['season_keywords2']:
-            self.queries.append("%s" % definition['season_keywords2'])
-            self.extras.append("%s" % definition['season_extra2'] if definition['season_extra2'] else '')
-        if 'season_keywords_fallback' in definition and definition['season_keywords_fallback']:
-            self.queries.append(definition['season_keywords_fallback'])
-            self.extras.append('-')
+
+        self.collect_queries('season', definition)
 
     def use_anime(self, provider, info):
         """ Setup method to define anime search parameters
@@ -301,8 +299,10 @@ class Filtering:
         definition = get_alias(definition, get_setting("%s_alias" % provider))
         if get_setting("use_public_dns", bool) and "public_dns_alias" in definition:
             definition = get_alias(definition, definition["public_dns_alias"])
+        if get_setting("use_tor_dns", bool) and "tor_dns_alias" in definition:
+            definition = get_alias(definition, definition["tor_dns_alias"])
 
-        anime_query = definition['anime_query'] if definition['anime_query'] else ''
+        anime_query = definition['anime_query'] if 'anime_query' in definition and definition['anime_query'] else ''
         log.debug("[%s] Anime URL: %s%s" % (provider, definition['base_url'], anime_query))
         if get_setting('separate_sizes', bool):
             self.min_size = get_float(get_setting('min_size_episodes'))
@@ -310,14 +310,64 @@ class Filtering:
             self.check_sizes()
         self.info = info
         self.url = u"%s%s" % (definition['base_url'], anime_query)
-        if self.info['absolute_number']:
-            self.info['episode'] = self.info['absolute_number']
-        if definition['anime_keywords']:
-            self.queries = ["%s" % definition['anime_keywords']]
-            self.extras = ["%s" % definition['anime_extra'] if definition['anime_extra'] else '']
-        if 'anime_keywords_fallback' in definition and definition['anime_keywords_fallback']:
-            self.queries.append(definition['anime_keywords_fallback'])
-            self.extras.append('-')
+
+        self.collect_queries('anime', definition)
+
+    def split_title_per_languages(self, text, item_type):
+        """Splitting {title:lang:lang:...} into separate queries with same
+        """
+        result = []
+        modified = False
+
+        keywords = self.read_keywords(text)
+
+        for keyword in keywords:
+            keyword = keyword.lower()
+            if 'title' in keyword and ':' in keyword:
+                # For general queries we should not process language settings.
+                if item_type == 'general':
+                    result.append(text.replace("{%s}" % keyword, "{title}"))
+                    return result
+
+                langs = keyword.lower().split(':')[1:]
+                if len(langs) < 2:
+                    continue
+
+                modified = True
+                for lang in langs:
+                    result.append(text.replace("{%s}" % keyword, "{title:%s}" % lang))
+
+        if not modified:
+            return [text]
+        else:
+            return result
+
+    def collect_queries(self, item_type, definition):
+        # Collecting keywords
+        priority = 1
+        for item in ['', '2', '3', '4']:
+            key = item_type + '_keywords' + item
+            extra = item_type + '_extra' + item
+            if key in definition and definition[key]:
+                qlist = self.split_title_per_languages(definition[key], item_type)
+                self.queries.extend(qlist)
+                eitem = definition[extra] if extra in definition and definition[extra] else ''
+                for _ in qlist:
+                    self.extras.append(eitem)
+                    self.queries_priorities.append(priority)
+
+        # Collecting fallback keywords, they will come in play if having no results at all
+        for item in ['', '2', '3', '4']:
+            key = item_type + '_keywords_fallback' + item
+            extra = item_type + '_extra_fallback' + item
+            if key in definition and definition[key]:
+                qlist = self.split_title_per_languages(definition[key], item_type)
+                self.queries.extend(qlist)
+                eitem = definition[extra] if extra in definition and definition[extra] else ''
+                for _ in qlist:
+                    priority += 1
+                    self.extras.append(eitem)
+                    self.queries_priorities.append(priority)
 
     def information(self, provider):
         """ Debugging method to print keywords and file sizes
@@ -350,7 +400,7 @@ class Filtering:
                 results.append(value)
         return results
 
-    def process_keywords(self, provider, text):
+    def process_keywords(self, provider, text, definition):
         """ Processes the query payload from a provider's keyword definitions
 
         Args:
@@ -361,7 +411,7 @@ class Filtering:
             str: Processed query keywords
         """
         keywords = self.read_keywords(text)
-        replacing = get_setting("filter_quotes", bool)
+        replacing = use_filter_quotes
 
         for keyword in keywords:
             keyword = keyword.lower()
@@ -375,18 +425,29 @@ class Filtering:
                    (use_language or self.kodi_language) and \
                    'titles' in self.info and self.info['titles']:
                     try:
-                        if self.kodi_language and self.kodi_language in self.info['titles']:
+                        if not use_language and self.kodi_language and self.kodi_language in self.info['titles']:
                             use_language = self.kodi_language
-                        if use_language not in self.info['titles']:
+                        if not use_language and language and language in self.info['titles']:
                             use_language = language
-                            if 'original' in self.info['titles']:
-                                title = self.info['titles']['original']
+
                         if use_language in self.info['titles'] and self.info['titles'][use_language]:
                             title = self.info['titles'][use_language]
                             title = normalize_string(title)
+                            # For all non-original titles, that are not base languages of a tracker OR english language, try to remove accents from the title.
+                            if use_language != 'original' and (self.convert_language(use_language) not in self.provider_languages or self.convert_language(use_language) == 'en'):
+                                title = remove_accents(title)
+                            # Remove characters, filled in 'remove_special_characters' field definition.
+                            if 'remove_special_characters' in definition and definition['remove_special_characters']:
+                                for char in definition['remove_special_characters']:
+                                    title = title.replace(char, "")
+                                title = " ".join(title.split())
+
                             log.info("[%s] Using translated '%s' title %s" % (provider, use_language,
                                                                               repr(title)))
-                            log.debug("[%s] Translated titles from Elementum: %s" % (provider, repr(self.info['titles'])))
+                        else:
+                            log.debug("[%s] Skipping the query '%s' due to missing '%s' language title" % (provider, text, use_language))
+                            # If title for specific language cannot be read - cancel this query
+                            return ""
                     except Exception as e:
                         import traceback
                         log.error("%s failed with: %s" % (provider, repr(e)))
@@ -395,6 +456,30 @@ class Filtering:
 
             if 'year' in keyword:
                 text = text.replace('{%s}' % keyword, str(self.info["year"]))
+
+            if 'show_tmdb_id' in keyword:
+                if 'show_tmdb_id' not in self.info:
+                    self.info['show_tmdb_id'] = ''
+
+                text = text.replace('{%s}' % keyword, str(self.info["show_tmdb_id"]))
+
+            if 'tmdb_id' in keyword:
+                if 'tmdb_id' not in self.info:
+                    self.info['tmdb_id'] = ''
+
+                text = text.replace('{%s}' % keyword, str(self.info["tmdb_id"]))
+
+            if 'tvdb_id' in keyword:
+                if 'tvdb_id' not in self.info:
+                    self.info['tvdb_id'] = ''
+
+                text = text.replace('{%s}' % keyword, str(self.info["tvdb_id"]))
+
+            if 'imdb_id' in keyword:
+                if 'imdb_id' not in self.info:
+                    self.info['imdb_id'] = ''
+
+                text = text.replace('{%s}' % keyword, str(self.info["imdb_id"]))
 
             if 'season' in keyword:
                 if '+' in keyword:
@@ -407,7 +492,7 @@ class Filtering:
                     season = '%s' % self.info["season"]
                 text = text.replace('{%s}' % keyword, season)
 
-            if 'episode' in keyword:
+            if 'episode' in keyword and 'absolute' not in keyword:
                 if '+' in keyword:
                     keys = keyword.split('+')
                     episode = str(self.info["episode"] + get_int(keys[1]))
@@ -416,6 +501,20 @@ class Filtering:
                     episode = ('%%.%sd' % keys[1]) % self.info["episode"]
                 else:
                     episode = '%s' % self.info["episode"]
+                text = text.replace('{%s}' % keyword, episode)
+
+            if 'absolute_episode' in keyword:
+                if 'absolute_number' not in self.info or not self.info['absolute_number']:
+                    log.debug("Skipping query '%s' due to missing absolute_number" % text)
+                    return ""
+                if '+' in keyword:
+                    keys = keyword.split('+')
+                    episode = str(self.info["absolute_number"] + get_int(keys[1]))
+                elif ':' in keyword:
+                    keys = keyword.split(':')
+                    episode = ('%%.%sd' % keys[1]) % self.info["absolute_number"]
+                else:
+                    episode = '%s' % self.info["absolute_number"]
                 text = text.replace('{%s}' % keyword, episode)
 
         if replacing:
@@ -444,7 +543,7 @@ class Filtering:
 
         self.reason = "[%s] %70s ***" % (provider, name)
 
-        if self.filter_resolutions and get_setting('require_resolution', bool):
+        if self.filter_resolutions and use_require_resolution:
             resolution = self.determine_resolution(name)[0]
             if resolution not in self.resolutions_allow:
                 self.reason += " Resolution not allowed ({0})".format(resolution)
@@ -455,21 +554,21 @@ class Filtering:
                 self.reason += " Name mismatch"
                 return False
 
-        if self.require_keywords and get_setting('require_keywords', bool):
+        if self.require_keywords and use_require_keywords:
             for required in self.require_keywords:
                 if not self.included(name, keys=[required]):
                     self.reason += " Missing required keyword"
                     return False
 
-        if not self.included_rx(name, keys=self.releases_allow) and get_setting('require_release_type', bool):
+        if not self.included_rx(name, keys=self.releases_allow) and use_require_release_type:
             self.reason += " Missing release type keyword"
             return False
 
-        if self.included_rx(name, keys=self.releases_deny) and get_setting('require_release_type', bool):
+        if self.included_rx(name, keys=self.releases_deny) and use_require_release_type:
             self.reason += " Blocked by release type keyword"
             return False
 
-        if size and not self.in_size_range(size) and get_setting('require_size', bool):
+        if size and not self.in_size_range(size) and use_require_size:
             self.reason += " Size out of range ({0})".format(size)
             return False
 
@@ -570,7 +669,11 @@ class Filtering:
             str: Converted string
         """
         name = name.replace('<![CDATA[', '').replace(']]', '')
-        name = HTMLParser().unescape(name.lower())
+
+        if PY3:
+            name = html.unescape(name.lower())
+        else:
+            name = HTMLParser().unescape(name.lower())
 
         return name
 
@@ -592,6 +695,23 @@ class Filtering:
 
         return title
 
+    def add_provider_language(self, language):
+        if language not in self.provider_languages:
+            self.provider_languages.append(language)
+
+    def convert_language(self, language):
+        if language == 'ru' or language == 'ua' or language == 'by':
+            return 'cr'
+        else:
+            return language
+
+    def define_languages(self, provider):
+        definition = definitions[provider]
+        if 'language' in definition and definition['language']:
+            self.add_provider_language(self.convert_language(definition['language']))
+        if 'languages' in definition and definition['languages']:
+            for lang in definition['languages'].split(","):
+                self.add_provider_language(self.convert_language(lang))
 
 def apply_filters(results_list):
     """ Applies final result de-duplicating, hashing and sorting
@@ -603,7 +723,6 @@ def apply_filters(results_list):
         list: Filtered and sorted results
     """
     results_list = cleanup_results(results_list)
-    log.debug("Filtered results: %s" % repr(results_list))
 
     return results_list
 
@@ -622,20 +741,13 @@ def cleanup_results(results_list):
 
     hashes = []
     filtered_list = []
-    allow_noseeds = get_setting('allow_noseeds', bool)
     for result in results_list:
-        if not result['seeds'] and not allow_noseeds:
+        if not result['seeds'] and not use_allow_noseeds:
+            log.debug('[%s] Skipping due to no seeds: %s' % (result['provider'][16:-8], repr(result['name'])))
             continue
 
         if not result['uri']:
-            if not result['name']:
-                continue
-            try:
-                log.warning('[%s] No URI for %s' % (result['provider'][16:-8], repr(result['name'])))
-            except Exception as e:
-                import traceback
-                log.warning("%s logging failed with: %s" % (result['provider'], repr(e)))
-                map(log.debug, traceback.format_exc().split("\n"))
+            log.debug('[%s] Skipping due to empty uri: %s' % (result['provider'][16:-8], repr(result)))
             continue
 
         hash_ = result['info_hash'].upper()
@@ -645,7 +757,7 @@ def cleanup_results(results_list):
                 if result['uri'] and result['uri'].startswith('magnet'):
                     hash_ = Magnet(result['uri']).info_hash.upper()
                 else:
-                    hash_ = py2_encode(result['uri'])
+                    hash_ = py2_encode(result['uri'].split("|")[0])
                     try:
                         hash_ = hash_.encode()
                     except:
@@ -653,6 +765,10 @@ def cleanup_results(results_list):
                     hash_ = hashlib.md5(hash_).hexdigest()
             except:
                 pass
+
+        # Make sure all are upper-case and provider-scoped
+        hash_ = result['provider'] + hash_.upper()
+
         # try:
         #     log.debug("[%s] Hash for %s: %s" % (result['provider'][16:-8], repr(result['name']), hash_))
         # except Exception as e:
@@ -663,5 +779,7 @@ def cleanup_results(results_list):
         if not any(existing == hash_ for existing in hashes):
             filtered_list.append(result)
             hashes.append(hash_)
+        else:
+            log.debug('[%s] Skipping due to repeating hash: %s' % (result['provider'][16:-8], repr(result)))
 
     return sorted(filtered_list, key=lambda r: (get_int(r['seeds'])), reverse=True)

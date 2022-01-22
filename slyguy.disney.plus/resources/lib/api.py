@@ -172,21 +172,31 @@ class API(object):
         self._check_errors(data)
         self._set_auth(data['extensions']['sdk']['token'])
 
+    def set_imax(self, value):
+        self._set_token()
+
+        payload = {
+            'variables': {
+                'input': {
+                    'imaxEnhancedVersion': value,
+                },
+            },
+            'query': queries.SET_IMAX,
+        }
+
+        endpoint = self.get_config()['services']['orchestration']['client']['endpoints']['query']['href']
+        data = self._session.post(endpoint, json=payload).json()
+        self._check_errors(data)
+        if data['data']['updateProfileImaxEnhancedVersion']['accepted']:
+            self._set_auth(data['extensions']['sdk']['token'])
+            return True
+        else:
+            return False
+
     def _endpoint(self, href, **kwargs):
-        session = self._cache.get('session')
-        profile = self._cache.get('profile')
+        profile, session = self.profile()
 
-        if not session or not profile:
-            data = self.account()
-
-            self._cache['session'] = session = data['activeSession']
-            if data['account']['activeProfile']:
-                for row in data['account']['profiles']:
-                    if row['id'] == data['account']['activeProfile']['id']:
-                        self._cache['profile'] = profile = row
-                        break
-
-        region = session['location']['countryCode']
+        region = session['portabilityLocation']['countryCode'] if session['portabilityLocation'] else session['location']['countryCode']
         maturity = session['preferredMaturityRating']['impliedMaturityRating'] if session['preferredMaturityRating'] else 1850
         kids_mode = profile['attributes']['kidsModeEnabled'] if profile else False
         appLanguage = profile['attributes']['languagePreferences']['appLanguage'] if profile else 'en-US'
@@ -201,6 +211,22 @@ class API(object):
         _args.update(**kwargs)
 
         return href.format(**_args)
+
+    def profile(self):
+        session = self._cache.get('session')
+        profile = self._cache.get('profile')
+
+        if not session or not profile:
+            data = self.account()
+
+            self._cache['session'] = session = data['activeSession']
+            if data['account']['activeProfile']:
+                for row in data['account']['profiles']:
+                    if row['id'] == data['account']['activeProfile']['id']:
+                        self._cache['profile'] = profile = row
+                        break
+
+        return profile, session
 
     def search(self, query):
         endpoint = self._endpoint(self.get_config()['services']['content']['client']['endpoints']['getSiteSearch']['href'], query=query)

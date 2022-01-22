@@ -50,6 +50,7 @@ CODECS = [
 ]
 
 CODEC_RANKING = ['MPEG-4', 'H.264', 'H.265', 'HDR', 'H.265 Dolby Vision']
+ATTRIBUTELISTPATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
 
 PROXY_GLOBAL = {
     'last_qualities': [],
@@ -67,6 +68,11 @@ def middleware_convert_sub(response, **kwargs):
     reader = detect_format(data)
     if reader:
         data = WebVTTWriter().write(reader().read(data))
+        if ADDON_DEV:
+            path = 'special://temp/convert_sub.middleware'
+            real_path = xbmc.translatePath(path)
+            with open(real_path, 'wb') as f:
+                f.write(data.encode('utf8'))
         response.stream.content = data.encode('utf8')
         response.headers['content-type'] = 'text/vtt'
 
@@ -249,7 +255,13 @@ class RequestHandler(BaseHTTPRequestHandler):
                 elif a['bandwidth'] < b['bandwidth']:
                     return -1
 
-            # Same bandwidth - they are equal (could compare framerate)
+            # Same bandwidth - compare framerate
+            if a['frame_rate'] and b['frame_rate']:
+                if a['frame_rate'] > b['frame_rate']:
+                    return 1
+                elif a['frame_rate'] < b['frame_rate']:
+                    return -1
+
             return 0
 
         def _stream_label(stream):
@@ -361,20 +373,17 @@ class RequestHandler(BaseHTTPRequestHandler):
             mpd.removeAttribute('publishTime')
             log.debug('Dash Fix: publishTime removed')
 
+        ## NOT NEEDED
         ## Remove mediaPresentationDuration from live PR: https://github.com/xbmc/inputstream.adaptive/pull/762
-        if (mpd.getAttribute('type') == 'dynamic' or 'timeShiftBufferDepth' in mpd_attribs) and 'mediaPresentationDuration' in mpd_attribs:
-            mpd.removeAttribute('mediaPresentationDuration')
-            log.debug('Dash Fix: mediaPresentationDuration removed from live')
+        # if (mpd.getAttribute('type') == 'dynamic' or 'timeShiftBufferDepth' in mpd_attribs) and 'mediaPresentationDuration' in mpd_attribs:
+        #     mpd.removeAttribute('mediaPresentationDuration')
+        #     log.debug('Dash Fix: mediaPresentationDuration removed from live')
 
-        ## Fix mpd overalseconds bug issue: https://github.com/xbmc/inputstream.adaptive/issues/731
-        if mpd.getAttribute('type') == 'dynamic' and 'timeShiftBufferDepth' not in mpd_attribs:
-            if 'availabilityStartTime' in mpd_attribs:
-                buffer_seconds = (arrow.now() - arrow.get(mpd.getAttribute('availabilityStartTime'))).total_seconds()
-            else:
-                buffer_seconds = 60
-
-            mpd.setAttribute('timeShiftBufferDepth', 'PT{}S'.format(buffer_seconds))
-            log.debug('Dash Fix: {}S timeShiftBufferDepth added'.format(buffer_seconds))
+        ## Fix mpd overalseconds bug issue: https://github.com/xbmc/inputstream.adaptive/issues/731 / https://github.com/xbmc/inputstream.adaptive/pull/881
+        if mpd.getAttribute('type') == 'dynamic' and 'timeShiftBufferDepth' not in mpd_attribs and 'mediaPresentationDuration' not in mpd_attribs:
+            buffer_seconds = (arrow.now() - arrow.get(mpd.getAttribute('availabilityStartTime'))).total_seconds()
+            mpd.setAttribute('mediaPresentationDuration', 'PT{}S'.format(buffer_seconds))
+            log.debug('Dash Fix: {}S mediaPresentationDuration added'.format(buffer_seconds))
 
         ## SORT ADAPTION SETS BY BITRATE ##
         video_sets = []
@@ -384,21 +393,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         adap_parent = None
 
         audio_description = self._session.get('audio_description', True)
+        remove_framerate = self._session.get('remove_framerate', False)
+        original_language = self._session.get('original_language', '')
         audio_whitelist = [x.strip().lower() for x in self._session.get('audio_whitelist', '').split(',') if x]
         subs_whitelist = [x.strip().lower() for x in self._session.get('subs_whitelist', '').split(',') if x]
-        original_language = self._session.get('original_language', '')
-        default_language = self._session.get('default_language', '').lower().strip()
-        default_subtitle = self._session.get('default_subtitle', '').lower().strip()
-
-        if default_language == 'original':
-            default_language = original_language
-
-        if default_subtitle == 'original':
-            default_subtitle = original_language
+        default_languages = [x.strip().lower() for x in self._session.get('default_language', '').split(',') if x]
+        default_subtitles = [x.strip().lower() for x in self._session.get('default_subtitle', '').split(',') if x]
 
         if audio_whitelist:
             audio_whitelist.append(original_language)
-            audio_whitelist.append(default_language)
+            audio_whitelist.extend(default_languages)
+
+        if subs_whitelist:
+            subs_whitelist.extend(default_subtitles)
 
         for period_index, period in enumerate(root.getElementsByTagName('Period')):
             rep_index = 0
@@ -417,11 +424,15 @@ class RequestHandler(BaseHTTPRequestHandler):
                     adap_set.appendChild(stream)
                     #######
 
-                    for key in adap_set.attributes.keys():
+                    for key in list(adap_set.attributes.keys()):
                         attribs[key] = adap_set.getAttribute(key)
+                        if remove_framerate and key == 'frameRate':
+                            adap_set.removeAttribute(key)
 
-                    for key in stream.attributes.keys():
+                    for key in list(stream.attributes.keys()):
                         attribs[key] = stream.getAttribute(key)
+                        if remove_framerate and key == 'frameRate':
+                            stream.removeAttribute(key)
 
                     bandwidth = 0
                     if 'bandwidth' in attribs:
@@ -431,12 +442,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                         is_trick = True
 
                     if 'audio' in attribs.get('mimeType', ''):
-                        if lang_allowed(attribs.get('lang'), [default_language]):
-                            adap_set.setAttribute('default', 'true')
-
-                        if lang_allowed(attribs.get('lang'), [original_language]):
-                            adap_set.setAttribute('original', 'true')
-
                         is_atmos = False
                         atmos_channels = None
                         for supelem in stream.getElementsByTagName('SupplementalProperty'):
@@ -534,8 +539,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                 elem.setAttribute('mimeType', subtitle[0])
                 elem.setAttribute('lang', subtitle[1])
                 elem.setAttribute('id', 'caption_{}'.format(idx))
-                #elem.setAttribute('original', 'true')
-                #elem.setAttribute('default', 'true')
 
                 if subtitle[4] == 'impaired':
                     elem.setAttribute('impaired', 'true')
@@ -560,23 +563,64 @@ class RequestHandler(BaseHTTPRequestHandler):
         ##################
 
         ## Fix up languages
+        subs = []
+        audios = []
         for adap_set in root.getElementsByTagName('AdaptationSet'):
             language = adap_set.getAttribute('lang')
-            if language:
-                adap_set.setAttribute('lang', fix_language(language))
+            if not language:
+                continue
+
+            language = fix_language(language)
+            adap_set.setAttribute('lang', language)
 
             if adap_set.getAttribute('contentType') == 'audio':
                 if not lang_allowed(language, audio_whitelist):
                     adap_set.parentNode.removeChild(adap_set)
                     log.debug('Removed audio adapt set: {}'.format(adap_set.getAttribute('id')))
+                    continue
+
+                if lang_allowed(language, [original_language]):
+                    adap_set.setAttribute('original', 'true')
+
+                default = adap_set.getAttribute('default')
+                if default == 'true':
+                    default_languages.append(language)
+                    adap_set.removeAttribute('default')
+
+                audios.append([language, adap_set])
 
             if adap_set.getAttribute('contentType') == 'text':
-                if lang_allowed(language, [default_subtitle]):
-                    adap_set.setAttribute('default', 'true')
-
                 if not lang_allowed(language, subs_whitelist):
                     adap_set.parentNode.removeChild(adap_set)
                     log.debug('Removed subtitle adapt set: {}'.format(adap_set.getAttribute('id')))
+                    continue
+
+                default = adap_set.getAttribute('default')
+                if default == 'true':
+                    default_subtitles.append(language)
+                    adap_set.removeAttribute('default')
+
+                subs.append([language, adap_set])
+
+        def set_default_laguage(defaults, rows):
+            found = False
+            for default in defaults:
+                default = original_language if default == 'original' else default
+                if not default:
+                    continue
+
+                for row in rows:
+                    if lang_allowed(row[0], [default]):
+                        row[1].setAttribute('default', 'true')
+                        found = True
+
+                if found:
+                    break
+
+        #fallback to original if default languages not found
+        default_languages.append('original')
+        set_default_laguage(default_languages, audios)
+        set_default_laguage(default_subtitles, subs)
         ################
 
         ## Remove audio_description
@@ -724,11 +768,18 @@ class RequestHandler(BaseHTTPRequestHandler):
         return '\n'.join(lines)
 
     def _parse_m3u8_master(self, m3u8, manifest_url):
-        def _process_media(line):
+        def _remove_quotes(string):
+            quotes = ('"', "'")
+            if string and string[0] in quotes and string[-1] in quotes:
+                return string[1:-1]
+            return string
+
+        def _process_media(line, prefix):
             attribs = {}
 
-            for key, value in re.findall('([\w-]+)="?([^",]*)[",$]?', line):
-                attribs[key.upper()] = value.strip()
+            for row in ATTRIBUTELISTPATTERN.split(line.replace(prefix+':', ''))[1::2]:
+                name, value = row.split('=', 1)
+                attribs[name.upper()] = _remove_quotes(value.strip()) if prefix == '#EXT-X-MEDIA' else value.strip()
 
             return attribs
 
@@ -737,58 +788,53 @@ class RequestHandler(BaseHTTPRequestHandler):
         subs_forced = self._session.get('subs_forced', True)
         subs_non_forced = self._session.get('subs_non_forced', True)
         audio_description = self._session.get('audio_description', True)
+        remove_framerate = self._session.get('remove_framerate', False)
         original_language = self._session.get('original_language', '').lower().strip()
-        default_language = self._session.get('default_language', '').lower().strip()
-        default_subtitle = self._session.get('default_subtitle', '').lower().strip()
+        default_languages = [x.strip().lower() for x in self._session.get('default_language', '').split(',') if x]
+        default_subtitles = [x.strip().lower() for x in self._session.get('default_subtitle', '').split(',') if x]
 
-        if default_language == 'original':
-            default_language = original_language
+        if audio_whitelist:
+            audio_whitelist.append(original_language)
+            audio_whitelist.extend(default_languages)
 
-        if default_subtitle == 'original':
-            default_subtitle = original_language
+        if subs_whitelist:
+            subs_whitelist.extend(default_subtitles)
 
         stream_inf = None
         streams, all_streams, urls, metas = [], [], [], []
-        audio = []
-        subtitles = []
+        audios = []
+        subs = []
         video = []
         new_lines = []
-        has_default_audio = False
-        found_default_language = False
-        has_default_subs = False
-        found_default_subs = False
 
         for line in m3u8.splitlines():
             if not line.strip():
                 continue
 
             if line.startswith('#EXT-X-MEDIA'):
-                attribs = _process_media(line)
+                attribs = _process_media(line, '#EXT-X-MEDIA')
                 if not attribs:
                     continue
 
-                lang = attribs.get('LANGUAGE','').lower().strip()
-                if attribs.get('TYPE') == 'AUDIO':
-                    audio.append(attribs)
+                attribs['LANGUAGE'] = fix_language(attribs.get('LANGUAGE',''))
+
+                if attribs.get('TYPE') == 'AUDIO' and lang_allowed(attribs['LANGUAGE'], audio_whitelist):
+                    audios.append(attribs)
                     if attribs.get('DEFAULT') == 'YES':
-                        has_default_audio = True
+                        attribs['DEFAULT'] = 'NO'
+                        default_languages.append(attribs['LANGUAGE'])
 
-                    if default_language and lang.startswith(default_language):
-                        found_default_language = True
-
-                elif attribs.get('TYPE') == 'SUBTITLES':
-                    subtitles.append(attribs)
+                elif attribs.get('TYPE') == 'SUBTITLES' and lang_allowed(attribs['LANGUAGE'], subs_whitelist):
+                    subs.append(attribs)
                     if attribs.get('DEFAULT') == 'YES':
-                        has_default_subs = True
-
-                    if default_subtitle and lang.startswith(default_subtitle):
-                        found_default_subs = True
+                        attribs['DEFAULT'] = 'NO'
+                        default_subtitles.append(attribs['LANGUAGE'])
 
             elif line.startswith('#EXT-X-STREAM-INF'):
                 stream_inf = line
 
             elif stream_inf and not line.startswith('#'):
-                attribs = _process_media(stream_inf)
+                attribs = _process_media(stream_inf, '#EXT-X-STREAM-INF')
 
                 codecs = [x for x in attribs.get('CODECS', '').split(',') if x]
                 bandwidth = int(attribs.get('BANDWIDTH') or 0)
@@ -801,7 +847,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 stream = {'bandwidth': int(bandwidth), 'resolution': resolution, 'frame_rate': frame_rate, 'codecs': codecs, 'url': url, 'index': len(video)}
                 all_streams.append(stream)
-                video.append([stream_inf, line])
+                video.append([attribs, line])
 
                 if stream['url'] not in urls and stream_inf not in metas:
                     streams.append(stream)
@@ -812,27 +858,27 @@ class RequestHandler(BaseHTTPRequestHandler):
             else:
                 new_lines.append(line)
 
-        want_subs = None
-        if not found_default_language:
-            if default_language:
-                want_subs = default_language
-                default_language = None
-        else:
-            has_default_audio = False
+        def set_default_laguage(defaults, rows):
+            found = False
+            for default in defaults:
+                default = original_language if default == 'original' else default
+                if not default:
+                    continue
 
-        if not default_language and not has_default_audio:
-            default_language = original_language
+                for row in rows:
+                    if lang_allowed(row.get('LANGUAGE',''), [default]):
+                        row['DEFAULT'] = 'YES'
+                        found = True
 
-        if audio_whitelist:
-            audio_whitelist.append(original_language)
-            audio_whitelist.append(default_language)
+                if found:
+                    break
 
-        for attribs in audio:
-            lang = attribs.get('LANGUAGE','').lower().strip()
+        #fallback to original if default languages not found
+        default_languages.append('original')
+        set_default_laguage(default_languages, audios)
+        set_default_laguage(default_subtitles, subs)
 
-            if not lang_allowed(lang, audio_whitelist):
-                continue
-
+        for attribs in audios:
             if not audio_description and attribs.get('CHARACTERISTICS','').lower() == 'public.accessibility.describes-video':
                 continue
 
@@ -840,50 +886,24 @@ class RequestHandler(BaseHTTPRequestHandler):
                 attribs['NAME'] = _(_.ATMOS, name=attribs['NAME'])
                 attribs['CHANNELS'] = attribs['CHANNELS'].split('/')[0]
 
-            if default_language:
-                attribs['DEFAULT'] = 'YES' if lang.startswith(default_language) else 'NO'
-
-            attribs['LANGUAGE'] = fix_language(attribs.get('LANGUAGE',''))
-
             new_line = '#EXT-X-MEDIA:' if attribs else ''
             for key in attribs:
                 if attribs[key] is not None:
                     new_line += u'{}="{}",'.format(key, attribs[key])
-            new_lines.append(new_line)
+            new_lines.append(new_line.rstrip(','))
 
-        if not found_default_subs:
-            default_subtitle = None
-        else:
-            has_default_subs = False
-
-        if not found_default_subs and not has_default_subs:
-            default_subtitle = want_subs
-
-        if subs_whitelist:
-            subs_whitelist.append(default_subtitle)
-
-        for attribs in subtitles:
-            lang = attribs.get('LANGUAGE','').lower().strip()
-
-            if not lang_allowed(lang, subs_whitelist):
-                continue
-
+        for attribs in subs:
             if not subs_forced and attribs.get('FORCED','').upper() == 'YES':
                 continue
 
             if not subs_non_forced and attribs.get('FORCED','').upper() != 'YES':
                 continue
 
-            if default_subtitle:
-                attribs['DEFAULT'] = 'YES' if lang.startswith(default_subtitle) else 'NO'
-
-            attribs['LANGUAGE'] = fix_language(attribs.get('LANGUAGE',''))
-
             new_line = '#EXT-X-MEDIA:' if attribs else ''
             for key in attribs:
                 if attribs[key] is not None:
                     new_line += u'{}="{}",'.format(key, attribs[key])
-            new_lines.append(new_line)
+            new_lines.append(new_line.rstrip(','))
 
         selected = self._quality_select(streams)
         if selected:
@@ -894,7 +914,17 @@ class RequestHandler(BaseHTTPRequestHandler):
                     adjust += 1
 
         for stream in video:
-            new_lines.extend(stream)
+            attribs = stream[0]
+
+            if remove_framerate:
+                attribs.pop('FRAME-RATE', None)
+
+            new_line = '#EXT-X-STREAM-INF:'
+            for key in attribs:
+                if attribs[key] is not None:
+                    new_line += u'{}={},'.format(key, attribs[key])
+            new_lines.append(new_line.rstrip(','))
+            new_lines.append(stream[1])
 
         return '\n'.join(new_lines)
 
@@ -962,9 +992,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             return response
 
-        debug = self._session.get('debug_all') or self._session.get('debug_{}'.format(method.lower()))
-        if self._post_data and debug:
-            with open(xbmc.translatePath('special://temp/{}-request.txt').format(method.lower()), 'wb') as f:
+        if self._post_data and ADDON_DEV:
+            with open(xbmc.translatePath('special://temp/request.data'), 'wb') as f:
                 f.write(self._post_data)
 
         if not self._session.get('session'):
@@ -1003,10 +1032,6 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         response.headers = headers
 
-        if debug:
-            with open(xbmc.translatePath('special://temp/{}-response.txt').format(method.lower()), 'wb') as f:
-                f.write(response.stream.content)
-
         if 'location' in response.headers:
             if '://' not in response.headers['location']:
                 response.headers['location'] = urljoin(url, response.headers['location'])
@@ -1036,11 +1061,20 @@ class RequestHandler(BaseHTTPRequestHandler):
     def _output_response(self, response):
         self._output_headers(response)
 
-        for chunk in response.stream.iter_content():
-            try:
-                self.wfile.write(chunk)
-            except Exception as e:
-                break
+        if ADDON_DEV:
+            f = open(xbmc.translatePath('special://temp/response.data'), 'wb')
+        else:
+            f = None
+
+        try:
+            for chunk in response.stream.iter_content():
+                try:
+                    self.wfile.write(chunk)
+                except Exception as e:
+                    break
+                if f: f.write(chunk)
+        finally:
+            if f: f.close()
 
     def do_HEAD(self):
         url = self._get_url('HEAD')
