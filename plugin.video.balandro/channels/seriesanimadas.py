@@ -13,6 +13,9 @@ host = "https://seriesanimadas.org/"
 def mainlist(item):
     return mainlist_anime(item)
 
+def mainlist_series(item):
+    return mainlist_anime(item)
+
 
 def mainlist_anime(item):
     logger.info()

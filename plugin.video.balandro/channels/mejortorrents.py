@@ -12,7 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www.mejortorrentes.net'
+host = 'https://www.mejortorrentes.org'
 
 
 selecc_pelis = host + '/peliculas-buscador.html'
@@ -33,7 +33,7 @@ def configurar_proxies(item):
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://www.mejortorrento.com', 'https://www.mejortorrento.net', 'https://www.mejortorrento.info', 
-                 'https://www.mejortorrentes.com']
+                 'https://www.mejortorrentes.com', 'https://www.mejortorrentes.net']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

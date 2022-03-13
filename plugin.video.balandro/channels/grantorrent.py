@@ -195,10 +195,16 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    patron = '<tr class="lol">\s*<td><img ([^>]*)>.*?</td>\s*<td>([^<]+)</td>\s*<td>([^<]+)</td>\s*<td><a class="link".*?onclick="([^"]+)'
+    patron = '<tr class="lol">.*?<noscript>.*?<noscript>.*?<img src="(.*?)".*?</noscript></td><td>(.*?)</td><td>(.*?)</td>.*?href="(.*?)"'
+
     matches = re.compile(patron, re.DOTALL).findall(data)
+
     if not matches:
         patron = '<tr class="lol">\s*<td><img ([^>]*)>.*?</td>\s*<td>([^<]+)</td>\s*<td>([^<]+)</td>\s*<td><a class="link".*?href="([^"]+)'
+        matches = re.compile(patron, re.DOTALL).findall(data)
+
+    if not matches:
+        patron = '<tr class="lol">\s*<td><img ([^>]*)>.*?</td>\s*<td>([^<]+)</td>\s*<td>([^<]+)</td>\s*<td><a class="link".*?onclick="([^"]+)'
         matches = re.compile(patron, re.DOTALL).findall(data)
 
     ses = 0
@@ -206,8 +212,7 @@ def findvideos(item):
     for lang, quality, peso, onclick in matches:
         ses += 1
 
-        if onclick.startswith('http'):
-            url = onclick
+        if onclick.startswith('http'): url = onclick
         else:
             post = scrapertools.find_single_match(onclick, "u:\s*'([^']+)")
             if not post: post = scrapertools.find_single_match(onclick, "u=([^'\"&]+)")

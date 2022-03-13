@@ -243,7 +243,7 @@ def sorted_urls(url, url_base64, host_torrent):
         if url_base64.startswith('magnet') or url_base64.startswith('http'): return url_base64
 
     if scrapertools.find_single_match(data_new, patron_linkser):
-        sortened_domains[domain][0] = 'linkser=%s' % quote_plus(scrapertools.find_single_match(data_new, patron_linkser))
+        sortened_domains[domain][0] = 'linkser=%s' % unquote_plus(scrapertools.find_single_match(data_new, patron_linkser))
 
     post = sortened_domains[domain][0]
 

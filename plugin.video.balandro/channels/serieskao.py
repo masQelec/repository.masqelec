@@ -7,9 +7,17 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb, jsontools
 
 
-host = 'https://serieskao.tv/'
+host = 'https://serieskao.net/'
 
 perpage = 30
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    url = url.replace('https://serieskao.tv/', host)
+
+    data = httptools.downloadpage(url, post=post).data
+    return data
 
 
 def mainlist(item):
@@ -62,7 +70,7 @@ def list_all(item):
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     patron = '<article id="post-\d+" class="item ([^"]+)".*?><a href="([^"]+)"'
@@ -116,12 +124,10 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    if item.search_type == 'movie':
-        url_generos = host + 'pelicula/'
-    else:
-        url_generos = host + 'series/'
+    if item.search_type == 'movie': url_generos = host + 'pelicula/'
+    else: url_generos = host + 'series/'
 
-    data = httptools.downloadpage(url_generos).data
+    data = do_downloadpage(url_generos)
 
     matches = re.compile('<li class="cfilter" data-type="genre" data-value="([^"]+)">.*?<b>([^<]+)').findall(data)
 
@@ -141,10 +147,8 @@ def anios(item):
 
     tope_year = 1984
 
-    if item.search_type == 'movie':
-        url_anios = host + 'pelicula/'
-    else:
-        url_anios = host + 'series/'
+    if item.search_type == 'movie': url_anios = host + 'pelicula/'
+    else: url_anios = host + 'series/'
 
     url_anios = url_anios + '/filtro/?genre=&year='
 
@@ -161,7 +165,7 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     temporadas = re.compile('<div class="clickSeason[^"]+" data-season="(\d+)"', re.DOTALL).findall(data)
 
@@ -189,7 +193,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = scrapertools.find_single_match(data, "<div class='se-c' data-season='%d'(.*?)<\/div><\/div>" % (item.contentSeason))
@@ -236,7 +240,7 @@ def last_episodes(item):
     if not item.page: item.page = 0
     perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     patron = '<article class="item se episodes" id="post-\d+" data-id="\d+">'
     patron += '<a href="([^"]+)"><div class="poster"><img src="[^"]+" data-srcset="([^"]+)" class="lazyload" alt="([^"]+)"'
@@ -277,7 +281,7 @@ def findvideos(item):
 
     IDIOMAS = {'0': 'Lat', '1': 'Esp', '2': 'Vose'}
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     items_patron = "<li class=\"dooplay_player_option\" data-type='([^']+)' data-post='(\d+)' data-nume='(\d+)'"
@@ -291,13 +295,13 @@ def findvideos(item):
         if not datatype or not datapost or not datanume: continue
 
         post = {'action': 'doo_player_ajax', 'post': datapost, 'nume': datanume, 'type': datatype}
-        data = httptools.downloadpage("%swp-admin/admin-ajax.php" % host, post = post, headers = {'Referer': item.url}).data
+        data = do_downloadpage("%swp-admin/admin-ajax.php" % host, post = post, headers = {'Referer': item.url})
 
         url = scrapertools.find_single_match(data, "src='([^']+)")
         if not url: url = scrapertools.find_single_match(data, 'src="(.*?)"')
         if not url: continue
 
-        serversdata = httptools.downloadpage(url, headers = {"referer": item.url}).data
+        serversdata = do_downloadpage(url, headers = {"referer": item.url})
         if not serversdata: continue
 
         matches = re.compile(r'data-lang="(\d+)"\s*data-r="([^"]+)"').findall(serversdata)
@@ -308,8 +312,8 @@ def findvideos(item):
             if url:
                 other = ''
                 if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaodrive/embed.php' in url or '/playmp4/' in url: other = 'amazon'
                 elif 'kaocentro.net' in url: other = 'kplayer'
-                elif 'kaodrive/embed.php' in url: other = 'amazon'
                 elif 'hydrax.com' in url: other = 'hydrax'
                 elif '.xyz/v/' in url: other = 'fembed'
 
@@ -330,8 +334,8 @@ def findvideos(item):
             if url:
                 other = ''
                 if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaodrive/embed.php' in url or '/playmp4/' in url: other = 'amazon'
                 elif 'kaocentro.net' in url: other = 'kplayer'
-                elif 'kaodrive/embed.php' in url: other = 'amazon'
                 elif 'hydrax.com' in url: other = 'hydrax'
                 elif '.xyz/v/' in url: other = 'fembed'
 
@@ -358,7 +362,7 @@ def play(item):
 
     if '.animekao.club/embed' in url or '.kaocentro.net/embed' in url:
         from lib import jsunpack
-        sdata = httptools.downloadpage(url).data
+        sdata = do_downloadpage(url)
 
         d = scrapertools.find_single_match(sdata, '(?s)<script type="text\/javascript">(eval.*?)<\/script>')
         pack = jsunpack.unpack(d)
@@ -374,21 +378,31 @@ def play(item):
             except:
                pass
 
-    elif 'kaodrive/embed.php' in url:
-         data = httptools.downloadpage(url).data
+    elif 'kaodrive/embed.php' in url or '/playmp4/' in url:
+         data = do_downloadpage(url)
          shareId = scrapertools.find_single_match(data, 'var shareId = "([^"]+)')
+         if not shareId: shareId = scrapertools.find_single_match(data, 'config_player.link = "([^"]+)')
+
          url = 'https://www.amazon.com/drive/v1/shares/%s?resourceVersion=V2&ContentType=JSON&asset=ALL' %(shareId)
+
+    elif '/kaocentro.net/' in url:
+         try:
+            data = do_downloadpage(url)
+         except:
+            return 'Este vídeo ya no esta disponible'
+
+         url = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
 
     elif 'hydrax.com' in url:
          slug = url.split('v=')[1]
          post = "slug=%s&dataType=mp4" % slug
          try:
-            data = httptools.downloadpage("https://ping.iamcdn.net/", post=post).data
+            data = do_downloadpage("https://ping.iamcdn.net/", post=post)
          except:
             url = ''
 
     elif '.xyz/v/' in url:
-         url = url.replace('serieskao.xyz/v/', 'femax20.com/v/').replace('animekao.xyz/v/', 'femax20.com/v/').replace('sypl.xyz/v/', 'femax20.com/v/')
+         url = url.replace('serieskao.xyz/v/', 'suzihaza.com/v/').replace('animekao.xyz/v/', 'suzihaza.com/v/').replace('sypl.xyz/v/', 'suzihaza.com/v/')
          if '#' in url:
              url = url.split('#')[0]
 

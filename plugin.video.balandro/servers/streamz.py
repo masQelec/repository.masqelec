@@ -24,9 +24,11 @@ def get_video_url(page_url, url_referer=''):
         if url and url.startswith('http') and 'getlink' in url:
             lbl = scrapertools.find_single_match(unpacked, 'var (\w+)')
             url = httptools.downloadpage(url, headers={'Referer': page_url}, follow_redirects=False, only_headers=True).headers.get('location', '')
-            url += "|User-Agent=%s" % httptools.get_user_agent()
-            if url: 
+            if url:
                 if '/issue.mp4' in url: continue
+
+                url += "|User-Agent=%s" % httptools.get_user_agent()
+
                 video_urls.append(['mp4 '+ lbl, url])
 
     return video_urls

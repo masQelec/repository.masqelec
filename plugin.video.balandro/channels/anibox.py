@@ -117,10 +117,8 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    if item.search_type == 'movie':
-        url_generos = host + 'pelicula/'
-    else:
-        url_generos = host + 'series/'
+    if item.search_type == 'movie': url_generos = host + 'pelicula/'
+    else: url_generos = host + 'series/'
 
     data = httptools.downloadpage(url_generos).data
 
@@ -142,10 +140,8 @@ def anios(item):
 
     tope_year = 1985
 
-    if item.search_type == 'movie':
-        url_anios = host + 'pelicula/'
-    else:
-        url_anios = host + 'series/'
+    if item.search_type == 'movie': url_anios = host + 'pelicula/'
+    else: url_anios = host + 'series/'
 
     url_anios = url_anios + '/filtro/?genre=&year='
 
@@ -309,8 +305,8 @@ def findvideos(item):
             if url:
                 other = ''
                 if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaodrive/embed.php' in url or '/playmp4/' in url: other = 'amazon'
                 elif 'kaocentro.net' in url: other = 'kplayer'
-                elif 'kaodrive/embed.php' in url: other = 'amazon'
                 elif 'hydrax.com' in url: other = 'hydrax'
                 elif '.xyz/v/' in url: other = 'fembed'
 
@@ -333,8 +329,8 @@ def findvideos(item):
             if url:
                 other = ''
                 if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaodrive/embed.php' in url or '/playmp4/' in url: other = 'amazon'
                 elif 'kaocentro.net' in url: other = 'kplayer'
-                elif 'kaodrive/embed.php' in url: other = 'amazon'
                 elif 'hydrax.com' in url: other = 'hydrax'
                 elif '.xyz/v/' in url: other = 'fembed'
 
@@ -377,10 +373,20 @@ def play(item):
             except:
                pass
 
-    elif 'kaodrive/embed.php' in url:
-         data = httptools.downloadpage(url).data
+    elif 'kaodrive/embed.php' in url or '/playmp4/' in url:
+         data = do_downloadpage(url)
          shareId = scrapertools.find_single_match(data, 'var shareId = "([^"]+)')
+         if not shareId: shareId = scrapertools.find_single_match(data, 'config_player.link = "([^"]+)')
+
          url = 'https://www.amazon.com/drive/v1/shares/%s?resourceVersion=V2&ContentType=JSON&asset=ALL' %(shareId)
+
+    elif '/kaocentro.net/' in url:
+         try:
+            data = do_downloadpage(url)
+         except:
+            return 'Este vídeo ya no esta disponible'
+
+         url = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
 
     elif 'hydrax.com' in url:
          slug = url.split('v=')[1]
@@ -391,7 +397,7 @@ def play(item):
             url = ''
 
     elif '.xyz/v/' in url:
-         url = url.replace('serieskao.xyz/v/', 'femax20.com/v/').replace('animekao.xyz/v/', 'femax20.com/v/').replace('sypl.xyz/v/', 'femax20.com/v/')
+         url = url.replace('serieskao.xyz/v/', 'suzihaza.com/v/').replace('animekao.xyz/v/', 'suzihaza.com/v/').replace('sypl.xyz/v/', 'suzihaza.com/v/')
          if '#' in url:
              url = url.split('#')[0]
 

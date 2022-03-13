@@ -7,10 +7,20 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, jsontools, tmdb
 
 
-host = 'https://www33.doramasmp4.com/'
+host = 'https://www34.doramasmp4.com/'
+
 
 perpage = 30
 
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+
+    url = url.replace('https://www33.doramasmp4.com/', host)
+
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
 
 def mainlist(item):
     logger.info()
@@ -52,6 +62,7 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'explore?type=drama', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo variedades', action = 'list_all', url = host + 'explore?type=variety', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_episodes', url = host + 'latest-episodes', search_type = 'tvshow' ))
 
@@ -209,7 +220,7 @@ def list_all(item):
 
     if not item.page: item.page = 1
 
-    data = httptools.downloadpage(item.url + '&page=' + str(item.page)).data
+    data = do_downloadpage(item.url + '&page=' + str(item.page))
 
     matches = re.compile('<div class="col-6 sm:col-4 md:col-3 lg:col-3 xl:col-2 pb-3">(.*?)</div> </a>').findall(data)
 
@@ -247,7 +258,7 @@ def last_episodes(item):
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     patron = r'<div class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3 mb-3">.*?href="(.*?)".*?src="(.*?)".*?<div class="list-item-title">(.*?)</div>.*?<div class="list-item-subtitle">(.*?)</div>'
 
@@ -317,7 +328,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     patron = '<div data-number=".*?href="(.*?)".*?src="(.*?)".*?<span itemprop="episodeNumber">(.*?)</span>'
 
@@ -354,35 +365,38 @@ def findvideos(item):
 
     IDIOMAS = {'LAT': 'Lat', 'VOSE': 'Vose', 'VO': 'VO'}
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     links = jsontools.load(scrapertools.find_single_match(data, 'var links =([^;]+)'))
 
     ses = 0
 
-    for link in links['online']:
-        ses += 1
+    try:
+        for link in links['online']:
+            ses += 1
 
-        url = link['link'].replace("/link/", "/redirect/")
+            url = link['link'].replace("/link/", "/redirect/")
 
-        if url:
-            if link['subtitle']['value'] == 'es': lang = 'Vose'
-            else: lang = 'VO'
+            if url:
+                if link['subtitle']['value'] == 'es': lang = 'Vose'
+                else: lang = 'VO'
 
-            try:
-                qlty = link['quality']['text']
-            except:
-                qlty = ''
+                try:
+                    qlty = link['quality']['text']
+                except:
+                    qlty = ''
 
-            servidor = link['server']['name'].lower()
+                servidor = link['server']['name'].lower()
 
-            if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
-            elif servidor == 'veo': servidor = 'voe'
+                if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
+                elif servidor == 'veo': servidor = 'voe'
 
-            servidor = servertools.corregir_servidor(servidor)
+                servidor = servertools.corregir_servidor(servidor)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', other = servidor, title = '', url = url,
-                                  language = lang, quality = qlty ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', other = servidor, title = '', url = url,
+                                      language = lang, quality = qlty ))
+    except:
+        return itemlist
 
     if not itemlist:
         if not ses == 0:

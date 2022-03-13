@@ -37,30 +37,6 @@ def mainlist_pelis(item):
     return itemlist
 
 
-def generos(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(host)
-
-    bloque = scrapertools.find_single_match(data,'>English<(.*?)>Inter<')
-
-    matches = scrapertools.find_multiple_matches(bloque,'<a href="(.*?)".*?>(.*?)</a>')
-
-    for url, tit in matches:
-        if '/tv-series/' in url or '/seccion/' in url: continue
-
-        elif tit == 'Subtitles': continue
-        elif tit == 'Subtítulos': continue
-
-        if 'eng' in url:
-	        tit = tit + ' (Eng)'
-
-        itemlist.append(item.clone( title = tit, url = url, action = 'list_all' ))
-
-    return sorted(itemlist, key=lambda it: it.title)
-
-
 def categorias(item):
     logger.info()
     itemlist = []
@@ -101,6 +77,29 @@ def idiomas(item):
     return itemlist
 
 
+def generos(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(host)
+
+    bloque = scrapertools.find_single_match(data,'>English<(.*?)>Inter<')
+
+    matches = scrapertools.find_multiple_matches(bloque,'<a href="(.*?)".*?>(.*?)</a>')
+
+    for url, tit in matches:
+        if '/tv-series/' in url or '/seccion/' in url: continue
+
+        elif tit == 'Subtitles': continue
+        elif tit == 'Subtítulos': continue
+
+        if 'eng' in url: tit = tit + ' (Eng)'
+
+        itemlist.append(item.clone( title = tit, url = url, action = 'list_all' ))
+
+    return sorted(itemlist, key=lambda it: it.title)
+
+
 def list_all(item):
     logger.info()
     itemlist = []
@@ -131,16 +130,13 @@ def list_all(item):
         elif 'Portug' in lang: lang = 'Por'
 
         year = scrapertools.find_single_match(title, '-(.*?)-').strip()
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
-        if '-' in title:
-            title = scrapertools.find_single_match(title, '(.*?)-').strip()
+        if '-' in title: title = scrapertools.find_single_match(title, '(.*?)-').strip()
 
         thumb = scrapertools.find_single_match(match, 'style="background-image: url(.*?);')
         thumb = thumb.replace('(', '').replace(')', '')
-        if thumb.startswith('//'):
-            thumb = 'https:' + thumb
+        if thumb.startswith('//'): thumb = 'https:' + thumb
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb, languages = lang,
                                             contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
@@ -166,10 +162,14 @@ def findvideos(item):
 
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+            platformtools.dialog_notification(config.__addon_name, 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]')
+            return
 
-        if not url.startswith("http"):
-            url = "https:" + url
+        elif '/ronemo.com/' in url:
+            platformtools.dialog_notification(config.__addon_name, 'Servidor [COLOR tan]No Soportado[/COLOR]')
+            return
+
+        if not url.startswith("http"): url = "https:" + url
 
         lng = item.languages
 

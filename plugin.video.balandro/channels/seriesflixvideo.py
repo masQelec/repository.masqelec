@@ -233,7 +233,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, '<li data-typ="episode"(.*?)</li>')
 
+    ses = 0
+
     for match in matches:
+        ses += 1
+
         ref = scrapertools.find_single_match(match, '<div class="Optntl">Opción <span>(.*?)</span></div>').strip()
 
         servidor = scrapertools.find_single_match(match, '<p class="AAIco-dns">(.*?)</p>').strip().lower()
@@ -250,6 +254,8 @@ def findvideos(item):
         d_key = scrapertools.find_single_match(match, ' data-key="(.*?)"')
         d_id = scrapertools.find_single_match(match, ' data-id="(.*?)"')
 
+        if not d_key or not d_id: continue
+
         url = host + '?trembed=' + d_key + '&trid=' + d_id + '&trtype=2'
 
         servidor = servertools.corregir_servidor(servidor)
@@ -260,6 +266,11 @@ def findvideos(item):
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = qlty,
                               language = IDIOMAS.get(lang, lang), other = ref ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

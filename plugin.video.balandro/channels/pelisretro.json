@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["lat"],
 
-  "clusters": ["temporary", "classic", "kids"],
+  "clusters": ["classic", "kids"],
 
   "notes": "Películas clásicas, por géneros."
 }

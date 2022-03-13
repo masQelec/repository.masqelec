@@ -123,7 +123,15 @@ def findvideos(item):
                other = 'streamcrypt' + '-' + str(ses)
            else:
               if not servidor == 'streamz':
-                 other = srv.lower() + '-' + str(ses)
+                  if 'waaw' in servidor: continue
+                  elif 'hqq' in servidor: continue
+                  elif 'netu' in servidor: continue
+
+                  other = srv.lower() + '-' + str(ses)
+
+                  if 'waaw' in other: continue
+                  elif 'hqq' in other: continue
+                  elif 'netu' in other: continue
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = other, language = idioma ))
 

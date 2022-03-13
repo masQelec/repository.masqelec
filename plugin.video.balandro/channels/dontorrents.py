@@ -12,7 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://dontorrent.li/'
+host = 'https://dontorrent.eu/'
 
 
 def item_configurar_proxies(item):
@@ -31,7 +31,9 @@ def do_downloadpage(url, post=None, headers=None):
                  'https://dontorrent.app/', 'https://dontorrent.lol/', 'https://dontorrent.nz/', 'https://dontorrent.rip/',
                  'https://dontorrent.vip/', 'https://dontorrent.ws/', 'https://dontorrent.win/', 'https://dontorrent.rs/',
                  'https://dontorrent.bz/', 'https://dontorrent.men/', 'https://dontorrent.fit/', 'https://dontorrent.art/',
-                 'https://dontorrent.fun/', 'https://dontorrent.se/', 'https://dontorrent.pw/']
+                 'https://dontorrent.fun/', 'https://dontorrent.se/', 'https://dontorrent.pw/', 'https://dontorrent.li/',
+                 'https://dontorrent.it/', 'https://dontorrent.red/', 'https://dontorrent.nu/', 'https://dontorrent.si/',
+                 'https://dontorrent.sk/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -68,9 +70,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'peliculas/4K/page/1', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas/hd/page/1', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie', tipo = 'genero' ))
 
@@ -113,6 +113,16 @@ def mainlist_documentary(item):
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = host + 'documentales', search_type = 'documentary' ))
+
+    return itemlist
+
+
+def calidades(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'peliculas/4K/page/1', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas/hd/page/1', search_type = 'movie' ))
 
     return itemlist
 

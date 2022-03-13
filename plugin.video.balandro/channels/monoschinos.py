@@ -2,10 +2,8 @@
 
 import sys
 
-if sys.version_info[0] >= 3:
-    import urllib.parse as urllib
-else:
-    import urllib
+if sys.version_info[0] >= 3: import urllib.parse as urllib
+else: import urllib
 
 
 import re, base64
@@ -21,6 +19,9 @@ host = 'https://monoschinos2.com'
 def mainlist(item):
     return mainlist_anime(item)
 
+def mainlist_series(item):
+    return mainlist_anime(item)
+
 
 def mainlist_anime(item):
     logger.info()
@@ -32,8 +33,7 @@ def mainlist_anime(item):
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return itemlist
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
@@ -157,12 +157,14 @@ def list_epis(item):
 
     bloque = scrapertools.find_single_match(data, '<h1>Capítulos Recientes(.*?)</section>')
 
-    patron = '<div class="col .*?<a href="(.*?)">.*?src="(.*?)".*?<h5>(.*?)</h5>.*?class="animetitles">(.*?)</p>'
+    patron = '<div class="col col-md-6.*?alt="(.*?)".*?href="(.*?)".*?data-src="(.*?)".*?<h5>(.*?)</h5>.*?</div></div>'
 
     matches = re.compile(patron, re.DOTALL).findall(bloque)
 
-    for url, thumb, epis, title in matches:
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
+    for title, url, thumb, epis in matches:
+        titulo = title + ' [COLOR springgreen]Epis. ' + epis +'[/COLOR]'
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb,
                                     contentSerieName=title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
     tmdb.set_infoLabels(itemlist)
@@ -227,6 +229,8 @@ def findvideos(item):
         servidor = servidor.lower()
 
         if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
+
+        if servidor == 'ok': servidor = 'okru'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose' ))
 

@@ -8,8 +8,6 @@ from core import httptools, scrapertools, servertools, tmdb
 
 host = "https://www.gnula24.xyz/"
 
-IDIOMAS = {'Latino': 'Lat', 'Español': 'Esp', 'Subtitulado': 'Vose', 'Ingles': 'VO', 'mx': 'Lat', 'es': 'Esp', 'en': 'Vose', 'jp': 'Vose'}
-
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if not headers: headers = {'Referer': host}
@@ -35,6 +33,7 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Novelas', action = 'list_all', url = host + 'genero/novelas/' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
+    itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -53,6 +52,37 @@ def generos(item):
         if title == 'Novelas': continue
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+
+    return itemlist
+
+
+def plataformas(item):
+    logger.info()
+    itemlist = []
+
+    productoras = [
+        ('amazon', 'Amazon'),
+        ('apple-tv', 'Apple TV'),
+        ('atresplayer-premium', 'Atresplayer Premium'),
+        ('caracol-tv', 'Caracol TV'),
+        ('disney', 'Disney+'),
+        ('fox', 'FOX'),
+        ('hbo', 'HBO'),
+        ('jtbc', 'Jtbc'),
+        ('kanal-d', 'Kanal D'),
+        ('las-estrellas', 'Las Estrellas'),
+        ('netflix', 'Netflix'),
+        ('novelastv', 'Novelas TV'),
+        ('rcn', 'Rcn'),
+        ('rtbf-be', 'Rtbf BE'),
+        ('tf1', 'TF1'),
+        ('tv-globo', 'TV Globo')
+        ]
+
+    for opc, tit in productoras:
+        url = host + 'network/' + opc + '/'
+
+        itemlist.append(item.clone( title = tit, action = 'list_all', url = url ))
 
     return itemlist
 
@@ -79,10 +109,8 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="imdb".*?</span>.*?<span>(.*?)</span>')
-        if year:
-            title = title.replace('(' + year + ')', '').strip()
-        else:
-            year = '-'
+        if year: title = title.replace('(' + year + ')', '').strip()
+        else: year = '-'
 
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
                                     contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
@@ -126,9 +154,12 @@ def last_episodes(item):
         if not temp_epis: continue
 
         season = scrapertools.find_single_match(temp_epis, '(.*?)x')
-        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)')
+        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$')
 
-        titulo = temp_epis +'  ' + title
+        title = title.replace('( ' + str(season) + ' x ' + str(episode) + ' )', '').strip()
+
+        titulo = temp_epis + '  ' + title
+
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=title,
                                    contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
 
@@ -264,11 +295,11 @@ def findvideos(item):
     for match in matches:
         ses += 1
 
-        servidor = scrapertools.find_single_match(match, "<span class='title'>(.*?)</span>")
+        servidor = scrapertools.find_single_match(match, "<span class='title'>(.*?)</span>").lower()
 
         if not servidor: continue
 
-        if 'Trailer' in servidor: continue
+        if 'trailer' in servidor: continue
 
         elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
         elif 'openload' in servidor: continue
@@ -373,10 +404,8 @@ def list_search(item):
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 
         year = scrapertools.find_single_match(article, '<span class="year">(\d{4})</span>')
-        if year:
-            title = title.replace('(' + year + ')', '').strip()
-        else:
-            year = '-'
+        if year: title = title.replace('(' + year + ')', '').strip()
+        else: year = '-'
 
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<div class="contenido"><p>(.*?)</p>'))
 

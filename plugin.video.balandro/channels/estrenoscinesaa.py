@@ -78,8 +78,6 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    logger.info("check-00-data: %s" % data)
-
     hasta_data = '<div class="pagination">' if '<div class="pagination">' in data else '<nav class="genres">'
 
     bloque = scrapertools.find_single_match(data, '</h1>(.*?)' + hasta_data)
@@ -170,14 +168,22 @@ def play(item):
     if host in item.url:
         data = do_downloadpage(item.url)
         url = scrapertools.find_single_match(data, '<a id="link".*?href="([^"]+)')
+
         if url:
             servidor = servertools.get_server_from_url(url)
             if servidor and servidor != 'directo':
+                servidor = servertools.corregir_servidor(servidor)
                 url = servertools.normalize_url(servidor, url)
+
                 itemlist.append(item.clone( url=url, server=servidor ))
 
     else:
-        itemlist.append(item.clone())
+        servidor = servertools.get_server_from_url(item.url)
+        if servidor and servidor != 'directo':
+            servidor = servertools.corregir_servidor(servidor)
+            url = servertools.normalize_url(servidor, item.url)
+
+            itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
 

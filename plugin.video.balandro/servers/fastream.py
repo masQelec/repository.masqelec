@@ -47,11 +47,17 @@ def get_video_url(page_url, url_referer=''):
         packed = scrapertools.find_single_match(data, "text/javascript'>(eval.*?)\s*</script>")
         unpacked = jsunpack.unpack(packed)
     except:
-        return video_urls
+        unpacked = ''
 
-    data = scrapertools.find_single_match(unpacked, "(?is)var player\s?=.+?sources.+?\[(.+?)\]")
+    if unpacked:
+        data = scrapertools.find_single_match(unpacked, "(?is)var player\s?=.+?sources.+?\[(.+?)\]")
+        matches = scrapertools.find_multiple_matches(data, "src:\s?[\"'](.+?)[\"']")
+    else:
+        data_var = scrapertools.find_single_match(data, "(?is)var player\s?=.+?sources.+?\[(.+?)\]")
+        matches = scrapertools.find_multiple_matches(data_var, "src:\s?[\"'](.+?)[\"']")
 
-    matches = scrapertools.find_multiple_matches(data, "src:\s?[\"'](.+?)[\"']")
+    if not matches:
+        matches = scrapertools.find_multiple_matches(data, 'sources:.*?"(.*?)"')
 
     for url in matches:
         if 'referer' in locals():

@@ -56,6 +56,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host_catalogue+'?status=0' ))
     itemlist.append(item.clone( title = 'Finalizadas', action = 'list_all', url = host_catalogue+'?status=1' ))
 
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host_catalogue + '?genre[]=pelicula', group ='pelis' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios' ))
     itemlist.append(item.clone( title = 'Por país', action = 'paises' ))
@@ -75,6 +77,9 @@ def generos(item):
     patron += '\s*<label class="custom-control-label" for="[^"]+">([^<]+)</label>'
     matches = re.compile(patron, re.DOTALL).findall(data)
     for valor, titulo in matches:
+        if titulo == 'Libros': continue
+        elif titulo == 'Pelicula': continue
+
         itemlist.append(item.clone( title=titulo.strip(), url=host_catalogue+'?genre[]='+valor, action='list_all' ))
 
     if not descartar_xxx:
@@ -185,14 +190,18 @@ def list_all(item):
 
         if descartar_xxx and ('/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url): continue
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
+        title_alt = ''
+        if item.group == 'pelis': title_alt = title
+
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year}, contentTitleAlt = title_alt))
 
     tmdb.set_infoLabels(itemlist)
 
     next_page_link = scrapertools.find_single_match(data, '<li class="page-item"><a href="([^"]+)" aria-label="(?:Netx|Next)"')
     if next_page_link:
-        itemlist.append(item.clone( title='Siguientes ...', url=host_catalogue + next_page_link, action='list_all', text_color='coral' ))
+        itemlist.append(item.clone( title='Siguientes ...', url = host_catalogue + next_page_link, action='list_all',
+                                    group = item.group, text_color='coral' ))
 
     return itemlist
 
@@ -221,7 +230,9 @@ def temporadas(item):
         numtempo = tempo['number']
 
         if tot_temp == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if not item.group == 'pelis':
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.id = item_id
             item.contentType = 'season'
             item.contentSeason = numtempo
@@ -252,6 +263,10 @@ def episodios(item):
     post = 'item_id=%s&season_number=%s' % (item.item_id, item.contentSeason)
     data = jsontools.load(do_downloadpage(url, post=post))
 
+    title_peli = ''
+    if item.group == 'pelis':
+        if len(data) == 1: title_peli = item.contentSerieName
+
     if item.page == 0:
         sum_parts = len(data)
         if sum_parts > 250:
@@ -265,6 +280,8 @@ def episodios(item):
         langs = re.findall('languajes/([^.]+).png', epi['audio'])
         if langs: titulo += ' [COLOR %s][%s][/COLOR]' % (color_lang, ','.join([IDIOMAS.get(lang, lang) for lang in langs]))
         thumb = '' if 'picture' not in epi or not epi['picture'] else 'https://cdn.dilo.nu/resize/episode/220x125@' + epi['picture']
+
+        if title_peli: titulo = title_peli
 
         itemlist.append(item.clone( action='findvideos', url=host+epi['permalink']+'/', title=titulo, plot=plot, thumbnail=thumb,
                                     contentType='episode', contentSeason=epi['season_number'], contentEpisodeNumber=epi['number'] ))

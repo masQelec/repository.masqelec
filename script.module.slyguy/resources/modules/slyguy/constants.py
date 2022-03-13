@@ -17,10 +17,8 @@ ADDON_DEV      = bool(int(os.environ.get('SLYGUY_DEV', '0')))
 COMMON_ADDON_ID = 'script.module.slyguy'
 COMMON_ADDON    = xbmcaddon.Addon(COMMON_ADDON_ID)
 
-try:
-    KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split('.')[0])
-except:
-    KODI_VERSION = 16
+try: KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split('.')[0])
+except: KODI_VERSION = 18
 
 #### DATABASE #####
 DB_PATH         = os.path.join(ADDON_PROFILE, 'data.db')
@@ -122,6 +120,17 @@ DEFAULT_WORKERS = 5
 
 #### BOOKMARKS #####
 BOOKMARK_FILE = os.path.join(ADDON_PROFILE, 'bookmarks.json')
+
+#### PROXY #####
+REMOVE_IN_HEADERS = ['upgrade', 'host', 'accept-encoding']
+REMOVE_OUT_HEADERS = ['date', 'server', 'transfer-encoding', 'keep-alive', 'connection']
+
+DEFAULT_PORT = 52103
+HOST = '127.0.0.1'
+ERROR_URL = 'error.m3u8'
+STOP_URL = 'stop.m3u8'
+EMPTY_TS = 'empty.ts' if KODI_VERSION < 19 else ''
+#################
 
 CHUNK_SIZE = 64 * 1024
 LIVE_HEAD = 12*60*60

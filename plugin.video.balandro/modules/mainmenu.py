@@ -46,7 +46,7 @@ def mainlist(item):
     if config.get_setting('developer_mode', default=False):
         if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developer.py')):
             itemlist.append(Item( channel='developer', action='mainlist', title='Gestión opción géneros',
-                                  thumbnail=config.get_thumb('genres'), text_color='goldenrod' ))
+                                  thumbnail=config.get_thumb('genres'), text_color='crimson' ))
 
         if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'test.py')):
             itemlist.append(Item( channel='test', action='mainlist', title='Tests canales y servidores',
@@ -95,7 +95,7 @@ def mainlist(item):
 
         if config.get_setting('mnu_sugeridos', default=True):
             itemlist.append(item.clone( action='channels', extra='suggested', title='Sugeridos', context=context, thumbnail=config.get_thumb('stack'),
-                                       text_color='moccasin' ))
+                                       text_color='aquamarine' ))
 
         if config.get_setting('channels_link_main', default=True):
             itemlist.append(item.clone( action='channels', extra='all', title='Canales', context=context, thumbnail=config.get_thumb('stack'),
@@ -107,12 +107,12 @@ def mainlist(item):
 
         if config.get_setting('mnu_grupos', default=True):
             itemlist.append(Item( channel='groups', action='mainlist', extra='groups', title='Grupos', thumbnail=config.get_thumb('bookshelf'),
-                                  text_color='yellowgreen' ))
+                                  text_color='magenta' ))
 
     else:
        if config.get_setting('mnu_sugeridos', default=True):
            itemlist.append(item.clone( action='channels', extra='suggested', title='Sugeridos', context=context, thumbnail=config.get_thumb('stack'),
-                                       text_color='moccasin' ))
+                                       text_color='aquamarine' ))
 
        if config.get_setting('channels_link_main', default=True):
            itemlist.append(item.clone( action='channels', extra='all', title='Canales', context=context, thumbnail=config.get_thumb('stack'),
@@ -124,7 +124,7 @@ def mainlist(item):
 
        if config.get_setting('mnu_grupos', default=True):
            itemlist.append(Item( channel='groups', action='mainlist', extra='groups', title='Grupos', thumbnail=config.get_thumb('bookshelf'),
-                                  text_color='yellowgreen' ))
+                                  text_color='magenta' ))
 
        if config.get_setting('mnu_pelis', default=True):
            itemlist.append(item.clone( action='channels', extra='movies', title='Películas', thumbnail=config.get_thumb('movie'),
@@ -136,11 +136,11 @@ def mainlist(item):
 
        if config.get_setting('channels_link_pyse', default=False):
           itemlist.append(item.clone( action='channels', extra='mixed', title='Películas y Series', context=context, thumbnail=config.get_thumb('booklet'),
-                                  text_color='yellow' ))
+                                  text_color='teal' ))
 
        if config.get_setting('mnu_generos', default=True):
           itemlist.append(item.clone( action='submnu_genres', title= 'Géneros', thumbnail=config.get_thumb('genres'),
-                                  text_color='teal' ))
+                                  text_color='thistle' ))
 
        if config.get_setting('mnu_documentales', default=True):
            itemlist.append(item.clone( action='channels', extra='documentaries', title='Documentales', thumbnail=config.get_thumb('documentary'),
@@ -187,7 +187,7 @@ def mainlist(item):
            context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
            itemlist.append(Item( channel='tracking', action='mainlist', title='Preferidos', context=context, thumbnail=config.get_thumb('videolibrary'),
-                                           text_color='tomato' ))
+                                           text_color='wheat' ))
 
        if config.get_setting('mnu_desargas', default=True):
            context = []
@@ -195,7 +195,7 @@ def mainlist(item):
            context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
            itemlist.append(Item( channel='downloads', action='mainlist', title='Descargas', context=context, thumbnail=config.get_thumb('downloads'),
-                                           text_color='green' ))
+                                           text_color='seagreen' ))
 
     context = []
     tit = '[COLOR %s]Información versión[/COLOR]' % color_infor
@@ -217,10 +217,8 @@ def mainlist(item):
         last_ver = updater.check_addon_version()
     except: last_ver = True
 
-    if not last_ver:
-        last_ver = '[I][COLOR %s](desfasada)[/COLOR][/I]' % color_adver
-    else:
-        last_ver = ''
+    if not last_ver: last_ver = '[I][COLOR %s](desfasada)[/COLOR][/I]' % color_adver
+    else: last_ver = ''
 
     title = 'Ayuda (%s)  %s' % (config.get_addon_version(), last_ver)
 
@@ -339,7 +337,7 @@ def channels(item):
         itemlist.append(item.clone( action='submnu_search', title='Personalizar búsquedas',
                                     extra = 'torrents', thumbnail=config.get_thumb('settings'), text_color='moccasin' ))
 
-        itemlist.append(Item( channel='search', action='search', search_type='all', title='Buscar Torrent película y/o Serie ...',
+        itemlist.append(Item( channel='search', action='search', search_type='all', title='[COLOR blue]Buscar Torrent[/COLOR] película y/o Serie ...',
                               extra = 'only_torrents', context=context, thumbnail=config.get_thumb('search'), text_color='yellow' ))
 
         if config.get_setting('sub_mnu_special', default=True):
@@ -525,14 +523,11 @@ def channels(item):
 
         if ch['status'] == -1:
             titulo += '[I][COLOR %s] (desactivado)[/COLOR][/I]' % color_list_inactive
-            if config.get_setting(cfg_proxies_channel, default=''):
-                titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
+            if config.get_setting(cfg_proxies_channel, default=''): titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
         else:
             if config.get_setting(cfg_proxies_channel, default=''):
-                if ch['status'] == 1:
-                    titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
-                else:
-                   color = color_list_proxies
+                if ch['status'] == 1: titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
+                else: color = color_list_proxies
 
         if 'register' in ch['clusters']:
             cfg_user_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_username'
@@ -541,11 +536,9 @@ def channels(item):
                titulo += '[I][COLOR teal] (cuenta)[/COLOR][/I]'
             else:
                cfg_login_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_login'
-               if not config.get_setting(cfg_login_channel, default=False):
-                  titulo += '[I][COLOR teal] (sesion)[/COLOR][/I]'
+               if not config.get_setting(cfg_login_channel, default=False): titulo += '[I][COLOR teal] (sesion)[/COLOR][/I]'
 
-        if 'inestable' in ch['clusters']:
-            titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
+        if 'inestable' in ch['clusters']: titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
 
         i =+ 1
 
@@ -588,7 +581,11 @@ def submnu_search(item):
     itemlist.append(item.clone( channel='proxysearch', title=' - Configurar proxies a usar [COLOR plum](en los canales que los necesiten)[/COLOR]',
                                 action='proxysearch_all', thumbnail=config.get_thumb('flame') ))
 
-    itemlist.append(item.clone( channel='actions', title= ' - Quitar los proxies en los canales que los tengan memorizados',
+    if config.get_setting('memorize_channels_proxies', default=True):
+        itemlist.append(item.clone( channel='filters', title=  ' - Qué [COLOR red]canales[/COLOR] tiene con proxies memorizados', action='with_proxies',
+                                    thumbnail=config.get_thumb('stack'), new_proxies=True, memo_proxies=True, test_proxies=True, folder=False ))
+
+    itemlist.append(item.clone( channel='actions', title= ' - Quitar los proxies en los canales [COLOR red](que los tengan memorizados)[/COLOR]',
                                 action = 'manto_proxies', folder=False, thumbnail=config.get_thumb('flame') ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_proxies', title= ' - [COLOR green]Información uso de proxies[/COLOR]', folder=False ))
@@ -677,6 +674,12 @@ def submnu_special(item):
         itemlist.append(Item( channel='clubcine', action='_bestcinenegro', title=' - Las mejores del cine negro', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
 
         itemlist.append(Item( channel='clubcine', action='_bestcinedesiempre', title=' - Las mejores del cine de siempre', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
+
+        itemlist.append(Item( channel='adnstream', action='_ayer_y_siempre', title=' - Las mejores del cine de ayer y siempre', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
+
+        itemlist.append(Item( channel='zoowomaniacos', action='_culto', title=' - Las mejores del cine de culto', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
+
+        itemlist.append(Item( channel='zoowomaniacos', action='_las1001', title=' - Las 1001 que hay que ver', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
 
         itemlist.append(item.clone( title='[COLOR deepskyblue]Películas[/COLOR] búsquedas a través de listas', thumbnail=config.get_thumb('movie'), action = '', text_color='pink' ))
 

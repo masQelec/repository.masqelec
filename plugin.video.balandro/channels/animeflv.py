@@ -23,6 +23,9 @@ def do_downloadpage(url, post=None, headers=None):
 def mainlist(item):
     return mainlist_anime(item)
 
+def mainlist_series(item):
+    return mainlist_anime(item)
+
 
 def mainlist_anime(item):
     logger.info()

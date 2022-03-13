@@ -396,16 +396,17 @@ def corregir_servidor(servidor):
     elif servidor in ['powvideo', 'povwideo', 'powvldeo', 'powv1deo', 'povw1deo']: return 'powvideo'
     elif servidor in ['streamplay', 'steamplay', 'streamp1ay']: return 'streamplay'
 
-    elif servidor in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem']: return 'fembed'
+    elif servidor in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza']: return 'fembed'
     elif servidor in ['evoplay']: return 'evoload'
-    elif servidor in ['streamta.pe', 'strtapeadblock', 'adblockstrtech', 'adblockstrtape', 'playstp', 'strcloud', 'strtpe']: return 'streamtape'
+    elif servidor in ['streamta.pe', 'strtapeadblock', 'adblockstrtech', 'adblockstrtape', 'playstp', 'strcloud', 'strtpe', 'stape']: return 'streamtape'
     elif servidor in ['sbembed2', 'sbvideo']: return 'sbembed'
     elif servidor in ['streams1', 'streams2']: return 'streams3'
-    elif servidor in ['sbplay', 'sbplay1', 'sbplay2', 'pelistop', 'cloudemb', 'tubesb', 'sbembed', 'embedsb' ,'sbembed.com', 'playersb', 'sbcloud1', 'watchsb']: return 'streamsb'
+    elif servidor in ['sbplay', 'sbplay1', 'sbplay2', 'pelistop', 'cloudemb', 'tubesb', 'sbembed', 'embedsb' ,'sbembed.com', 'playersb', 'sbcloud1', 'watchsb', 'viewsb']: return 'streamsb'
 
     elif servidor in ['highload', 'streamon']: return 'highload'
     elif servidor in ['vupload']: return 'vup'
     elif servidor in ['hdvid', 'vidhdthe']: return 'vidhd'
+    elif servidor in ['vtube', 'vidhdthe']: return 'playtube'
 
     elif servidor in ['chouhaa']: return 'youwatch'
     elif servidor in ['mega.nz']: return 'mega'

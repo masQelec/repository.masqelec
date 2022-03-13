@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    from urllib.parse import quote
-else:
-    from urllib import quote
-
 import re
 
 from platformcode import config, logger
@@ -17,8 +10,6 @@ from core import httptools, scrapertools, jsontools
 host = 'https://beeg.com/'
 
 url_api = 'https://store.externulls.com/'
-
-perpage = 50
 
 
 def mainlist(item):
@@ -56,17 +47,17 @@ def list_all(item):
     jdata = jsontools.load(data)
 
     for video in jdata:
-        id = video['fc_file_id']
-        th2 = video["fc_facts"][0]['fc_thumbs']
+        try:
+            id = video['fc_file_id']
+            th = video["fc_facts"][0]['fc_thumbs']
 
-        stuff = video["file"]["stuff"]
+            stuff = video["file"]["stuff"]
 
-        if stuff.get("sf_name", ""):
             title = stuff["sf_name"]
+        except:
+            continue
 
-        title = str(id)
-
-        thumb = "https://thumbs-015.externulls.com/videos/%s/%s.jpg" % (id, th2[0])
+        thumb = "https://thumbs-015.externulls.com/videos/%s/%s.jpg" % (id, th[0])
 
         url = url_api + 'facts/file/' + str(id)
 
@@ -74,8 +65,10 @@ def list_all(item):
 
     page = int(scrapertools.find_single_match(item.url, '&offset=([0-9]+)'))
     next_page = (page + 48)
+
     if next_page:
         next_page = re.sub(r"&offset=\d+", "&offset={0}".format(next_page), item.url)
+
         itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
@@ -91,13 +84,17 @@ def categorias(item):
     for tag in jdata:
         thumb = ''
 
-        id = tag["id"]
-        title = tag["tg_name"]
-        slug = tag["tg_slug"]
+        try:
+            id = tag["id"]
+            title = tag["tg_name"]
+            slug = tag["tg_slug"]
 
-        if tag.get("thumbs", ""):
-            th2 = tag["thumbs"]
-            thumb = "https://thumbs-015.externulls.com/tags/%s" % th2[0]
+            if tag.get("thumbs", ""):
+                th = tag["thumbs"]
+                thumb = "https://thumbs-015.externulls.com/tags/%s" % th[0]
+
+        except:
+            continue
 
         url = url_api + 'facts/tag?slug=%s&limit=48&offset=0' % slug
 
@@ -110,7 +107,7 @@ def categorias(item):
 
         itemlist.append(item.clone( action = 'list_all', url = url, title = title, thumbnail = thumb ))
 
-    return sorted(itemlist,key=lambda x: x.title)
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def findvideos(item):
@@ -120,6 +117,7 @@ def findvideos(item):
     data = httptools.downloadpage(item.url).data
 
     matches = re.compile('"fl_cdn_(\d+)": "([^"]+)"', re.DOTALL).findall(data)
+
     for qlty, url in matches:
         url = 'https://video.beeg.com/' + url
 
@@ -137,7 +135,7 @@ def list_search(item):
 
     for tag in jdata:
         title = tag['tg_name']
-        url= url_api + 'facts/tag?slug=' + tag['tg_slug'] + '&get_original=true'
+        url = url_api + 'facts/tag?slug=' + tag['tg_slug'] + '&get_original=true'
 
         itemlist.append(item.clone( action = 'list_all', url = url, thumbnail='', title = title ))
 

@@ -76,7 +76,7 @@ def show_help(item):
     txt += '[CR]Si al buscar por persona se obtiene una sola coincidencia, se listan directamente sus películas y series (Ej: Stanley Kubrick).'
     txt += ' Si puede haber varios resultados se muestra una lista de personas para seleccionar la que corresponda (Ej: Kubrick).'
 
-    platformtools.dialog_textviewer('Información / Ayuda', txt)
+    platformtools.dialog_textviewer('Información búsquedas y listas en TMDB', txt)
     return True
 
 

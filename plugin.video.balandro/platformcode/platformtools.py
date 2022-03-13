@@ -6,16 +6,20 @@ import xbmc, xbmcgui, xbmcplugin, xbmcvfs
 from platformcode import config, logger
 from core.item import Item
 
-PY3 = False
-
 if sys.version_info[0] >= 3:
+    PY3 = True
+
     translatePath = xbmcvfs.translatePath
     basestring = str
+
     from urllib.parse import quote_plus
-    PY3 = True
 else:
-    translatePath = xbmc.translatePath   
+    PY3 = False
+
+    translatePath = xbmc.translatePath
+	
     from urllib import quote_plus
+
 
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
@@ -58,18 +62,15 @@ def dialog_yesno(heading, line1, line2="", line3="", nolabel="No", yeslabel="Sí
     dialog = xbmcgui.Dialog()
     if PY3:
         if autoclose > 0:
-            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, 
+            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel,
                             yeslabel=yeslabel, customlabel=customlabel, autoclose=autoclose)
         else:
-            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, 
-                            yeslabel=yeslabel)
+            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, yeslabel=yeslabel)
     else:
         if autoclose > 0:
-            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, 
-                            yeslabel=yeslabel, autoclose=autoclose)
+            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, yeslabel=yeslabel, autoclose=autoclose)
         else:
-            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, 
-                            yeslabel=yeslabel)
+            return dialog.yesno(heading, compat(line1=line1, line2=line2, line3=line3), nolabel=nolabel, yeslabel=yeslabel)
 
 
 def dialog_select(heading, _list, autoclose=0, preselect=-1, useDetails=False):
@@ -89,6 +90,7 @@ def dialog_progress(heading, line1, line2="", line3=""):
         if line3:
             message += '\n' + line3
         return message
+
     dialog.create(heading, compat(line1, line2, line3))
     return dialog
 
@@ -454,16 +456,16 @@ def formatear_enlace_play(item, colorear=False, colores={}):
 
     if not colorear:
         titulo = nombre
-        if item.quality != '': titulo += ' [%s]' % item.quality
-        if item.language != '': titulo += ' [%s]' % item.language
-        if item.age != '': titulo += ' [%s]' % item.age
-        if item.other != '': titulo += ' [%s]' % item.other
+        if item.quality != '': titulo += ' %s' % item.quality
+        if item.language != '': titulo += ' %s' % item.language
+        if item.age != '': titulo += ' %s' % item.age
+        if item.other != '': titulo += ' %s' % item.other
     else:
         titulo = '[COLOR %s]%s[/COLOR]' % (colores['server'], nombre)
-        if item.quality != '': titulo += ' [COLOR %s][%s][/COLOR]' % (colores['quality'], item.quality)
-        if item.language != '': titulo += ' [COLOR %s][%s][/COLOR]' % (colores['language'], item.language)
-        if item.age != '': titulo += ' [COLOR %s][%s][/COLOR]' % (colores['age'], item.age)
-        if item.other != '': titulo += ' [COLOR %s][%s][/COLOR]' % (colores['other'], item.other)
+        if item.quality != '': titulo += ' [COLOR %s]%s[/COLOR]' % (colores['quality'], item.quality)
+        if item.language != '': titulo += ' [COLOR %s]%s[/COLOR]' % (colores['language'], item.language)
+        if item.age != '': titulo += ' [COLOR %s]%s[/COLOR]' % (colores['age'], item.age)
+        if item.other != '': titulo += ' [COLOR %s]%s[/COLOR]' % (colores['other'], item.other)
 
     return titulo
 
@@ -500,16 +502,16 @@ def formatear_titulo_peli_serie(item, colores={}, formato={}):
 
     if formato['info_order'] > 0:
         if formato['info_order'] in [1,3] and item.languages:
-            titulo += ' [COLOR %s][%s][/COLOR]' % (colores['languages'], item.languages)
+            titulo += ' [COLOR %s]%s[/COLOR]' % (colores['languages'], item.languages)
         if formato['info_order'] in [2,3,4] and item.qualities:
-            titulo += ' [COLOR %s][%s][/COLOR]' % (colores['qualities'], item.qualities)
+            titulo += ' [COLOR %s]%s[/COLOR]' % (colores['qualities'], item.qualities)
         if formato['info_order'] == 4 and item.languages:
-            titulo += ' [COLOR %s][%s][/COLOR]' % (colores['languages'], item.languages)
+            titulo += ' [COLOR %s]%s[/COLOR]' % (colores['languages'], item.languages)
 
     if item.fmt_sufijo != '':
         if item.fmt_sufijo in ['movie', 'tvshow']: # diferenciar pelis/series en búsquedas mixtas
-            opciones = { 'movie': ['deepskyblue', 'película'], 'tvshow': ['hotpink', 'serie'] }
-            titulo += ' [COLOR %s](%s)[/COLOR]' % (opciones[item.fmt_sufijo][0], opciones[item.fmt_sufijo][1])
+            opciones = { 'movie': ['deepskyblue', 'Película'], 'tvshow': ['hotpink', 'Serie'] }
+            titulo += ' [COLOR %s]%s[/COLOR]' % (opciones[item.fmt_sufijo][0], opciones[item.fmt_sufijo][1])
         else:
             titulo += ' ' + item.fmt_sufijo
 
@@ -693,7 +695,7 @@ def play_from_itemlist(itemlist, parent_item):
         p_dialog.close()
         if not ok_play:
             if esperar_seleccion: # si se ha llegado al límite de enlaces a intentar y todavía quedan, se muestra diálogo para selección del usuario
-                dialog_notification('Autoplay sin éxito', 'Han fallado los %d primeros enlaces' % autoplay_max_links, time=3000)
+                dialog_notification('Autoplay sin éxito', 'Fallaron los %d primeros enlaces' % autoplay_max_links, time=3000)
             else:
                 play_fake()
                 txt = 'el enlace' if len(itemlist) == 1 else 'ningún enlace'
@@ -716,7 +718,7 @@ def play_from_itemlist(itemlist, parent_item):
                 else:
                     opciones.append(it.title)
 
-            seleccion = dialog_select('Enlaces disponibles en %s' % itemlist[0].channel, opciones)
+            seleccion = dialog_select('Enlaces disponibles en %s' % itemlist[0].channel.capitalize(), opciones)
             if seleccion == -1:
                 play_fake()
                 break
@@ -780,11 +782,17 @@ def play_video(item, parent_item, autoplay=False):
         video_urls, puedes, motivo = servertools.resolve_video_urls_for_playing(item.server, item.url, url_referer=url_referer)
 
     if not puedes:
-        if not autoplay: dialog_ok("No puedes ver el vídeo porque...", motivo, item.url)
+        if not autoplay:
+            if '[' in motivo:
+                motivo = '[COLOR darkorange][B]' + motivo + '[/B][/COLOR]'
+            else:
+                motivo = '[COLOR crimson][B]' + motivo + '[/B][/COLOR]'
+
+            dialog_ok("No puedes ver el vídeo porque ...", motivo, item.url)
         return False
 
     if len(video_urls) == 1 and '.rar' in video_urls[0][0]:
-        if not autoplay: dialog_ok("No puedes ver el vídeo porque...", 'Está comprimido en formato rar', item.url)
+        if not autoplay: dialog_ok("No puedes ver el vídeo porque ...", '[COLOR crimson][B]Está comprimido en formato rar[/B][/COLOR]', item.url)
         return False
 
     opciones = []
@@ -814,7 +822,7 @@ def play_video(item, parent_item, autoplay=False):
             return False
 
         if mpd and not is_mpd_enabled():
-            if not autoplay: dialog_ok(config.__addon_name, 'Para ver el formato MPD se require el addon inputstream.adaptive')
+            if not autoplay: dialog_ok(config.__addon_name, '[COLOR moccasin][B]Para ver el formato MPD se require el addon inputstream.adaptive[/B][/COLOR]')
             return False
 
         if item.server == 'torrent':
@@ -894,7 +902,7 @@ def handle_wait(time_to_wait, title, text):
         secs += 1
         percent = increment * secs
         secs_left = str((time_to_wait - secs))
-        remaining_display = "Espera " + secs_left + " segundos para que comience el vídeo..."
+        remaining_display = "Espera " + secs_left + " segundos para iniciar el vídeo..."
         espera.update(percent, ' ' + text, remaining_display)
         xbmc.sleep(1000)
         if espera.iscanceled():
@@ -931,7 +939,7 @@ def play_torrent(mediaurl, parent_item):
                config.set_setting('cliente_torrent', cliente_torrent.capitalize())
 
     if cliente_torrent == 'Ninguno':
-        dialog_ok(config.__addon_name, 'Necesitas tener instalado un cliente Torrent e indicarlo en la configuración')
+        dialog_ok(config.__addon_name, '[COLOR moccasin][B]Necesitas tener instalado un cliente Torrent e indicarlo en la configuración[/B][/COLOR]')
         return False
     cliente_torrent = cliente_torrent.lower()
 
@@ -942,7 +950,7 @@ def play_torrent(mediaurl, parent_item):
                 # ~ plugin_url = client['url']
                 plugin_url = client['url_magnet'] if 'url_magnet' in client and mediaurl.startswith('magnet:') else client['url']
             else:
-                dialog_ok(config.__addon_name, 'Necesitas instalar el cliente Torrent: ' + client['name'], client['id'])
+                dialog_ok(config.__addon_name, '[COLOR moccasin][B]Necesitas instalar el cliente Torrent:[/B][/COLOR] ' + client['name'], client['id'])
                 return False
 
     if plugin_url == '':

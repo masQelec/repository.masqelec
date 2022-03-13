@@ -67,6 +67,14 @@
       {
         "pattern": "(?:watchsb.com)/([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:viewsb.com)/(?:embed-|d/|e/)([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:viewsb.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
       }
     ]
   }

@@ -9,7 +9,7 @@ from core import httptools, scrapertools, jsontools, servertools, tmdb
 from lib import balandroresolver
 
 
-host = "https://hdfull.fm"
+host = 'https://hdfull.cm'
 
 perpage = 20
 
@@ -26,8 +26,10 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post = None, referer = None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/hdfull.se', '/hdfull.fm')
-    url = url.replace('/hdfull.so', '/hdfull.fm')
+    ant_hosts = ['https://hdfull.se/', 'https://hdfull.so/', "https://hdfull.fm/"]
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
 
     if not referer: referer = host
     headers = {'Referer': referer}
@@ -202,7 +204,7 @@ def temporadas(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
- 
+
     patron = 'itemprop="season".*?'
     patron += "<a href='(.*?)'.*?"
     patron += '<img class=.*?original-title="(.*?)".*?'
@@ -366,8 +368,7 @@ def findvideos(item):
         ses += 1
 
         if embed == 'd' and 'uptobox' not in url: continue
-        elif 'onlystream.tv' in url:
-              url = url.replace('onlystream.tv', 'upstream.to')
+        elif 'onlystream.tv' in url: url = url.replace('onlystream.tv', 'upstream.to')
 
         try:
             calidad = unicode(calidad, 'utf8').upper().encode('utf8')

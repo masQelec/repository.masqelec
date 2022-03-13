@@ -248,13 +248,14 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(data, '<div id="options-' + option + '.*?<iframe.*?src="(.*?)"')
 
+        if url == 'about:blank': url = scrapertools.find_single_match(data, '<div id="options-' + option + '.*?data-lazy-src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, '<div id="options-' + option + '.*?<iframe src="(.*?)"')
+
         if url:
            url = url.replace('&#038;', '&').replace('&amp;', '&')
 
-           if '&lt;IFRAME SRC=&quot;' in url:
-               url = scrapertools.find_single_match(url, '&lt;IFRAME SRC=&quot;(.*?)&quot;')
-           elif '/cinemaupload.com/' in url:
-               url = scrapertools.find_single_match(url, 'src=&quot;(.*?)&quot;')
+           if '&lt;IFRAME SRC=&quot;' in url: url = scrapertools.find_single_match(url, '&lt;IFRAME SRC=&quot;(.*?)&quot;')
+           elif '/cinemaupload.com/' in url: url = scrapertools.find_single_match(url, 'src=&quot;(.*?)&quot;')
 
            servidor = servertools.get_server_from_url(url)
            servidor = servertools.corregir_servidor(servidor)

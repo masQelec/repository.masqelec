@@ -398,11 +398,10 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    if not item.group:
+    if item.group == 'anime': url_generos = host + 'animes/'
+    else:
         if item.search_type == 'movie': url_generos = host + 'peliculas/'
         else: url_generos = host + 'series/'
-    else:
-        url_generos = host + 'animes/'
 
     data = do_downloadpage(url_generos)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -419,7 +418,7 @@ def generos(item):
         itemlist.append(item.clone( title = 'Fantasía', action = 'list_all', genre = '?genre=fantasia' ))
         itemlist.append(item.clone( title = 'Historia', action = 'list_all', genre = '?genre=historia' ))
 
-    if not item.group:
+    if not item.group == 'anime':
         itemlist.append(item.clone( title = 'Documental', action = 'list_all', genre = '?genre=documental' ))
 
     return sorted(itemlist,key=lambda x: x.title)
@@ -462,6 +461,12 @@ def list_all(item):
     itemlist = []
 
     if not item.page: item.page = 0
+
+    # ~ Si venimos de Grupos
+    if not item.slug:
+       if item.search_type == 'movie': item.slug = 'peliculas'
+       elif item.search_type == 'tvshow': item.slug = 'series'
+       if not item.nro_pagina: item.nro_pagina = 1
 
     if not item.post:
         post = {'_method': 'items', 'page': item.nro_pagina, 'AjaxName': 'main', 'slug': item.slug}

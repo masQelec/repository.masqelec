@@ -61,7 +61,11 @@ def mainlist(item):
     itemlist.append(item.clone( channel='proxysearch', title =  ' - Configurar proxies a usar [COLOR plum](en los canales que los necesiten)[/COLOR]',
                                 action = 'proxysearch_all', thumbnail=config.get_thumb('flame') ))
 
-    itemlist.append(item.clone( channel='actions', title= ' - Quitar los proxies en los canales que los tengan memorizados',
+    if config.get_setting('memorize_channels_proxies', default=True):
+        itemlist.append(item.clone( channel='filters', title=  ' - Qué [COLOR red]canales[/COLOR] tiene con proxies memorizados', action='with_proxies',
+                                    thumbnail=config.get_thumb('stack'), new_proxies=True, memo_proxies=True, test_proxies=True, folder=False ))
+
+    itemlist.append(item.clone( channel='actions', title= ' - Quitar los proxies en los canales [COLOR red](que los tengan memorizados)[/COLOR]',
                                 action = 'manto_proxies', folder=False, thumbnail=config.get_thumb('flame') ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_proxies', title= ' - [COLOR green]Información uso de proxies[/COLOR]', folder=False ))
@@ -72,7 +76,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='', title= 'Personalizacion búsquedas:', text_color='moccasin', folder=False ))
 
-    itemlist.append(item.clone( action='show_help_parameters', title='[COLOR chocolate] - Qué ajustes tiene configurados para las búsquedas[/COLOR]',
+    itemlist.append(item.clone( action='show_help_parameters', title=' - Qué [COLOR chocolate]Ajustes[/COLOR] tiene configurados para las búsquedas',
                                 thumbnail=config.get_thumb('help'), folder=False ))
 
     itemlist.append(item.clone( channel='filters', action='no_actives', title= ' - Qué canales no intervienen en las búsquedas (están desactivados)',
@@ -99,12 +103,12 @@ def mainlist(item):
 
 
 def show_help_parameters(item):
-    txt = 'Los canales que tenga marcados como [B][COLOR gray]Desactivados[/COLOR][/B] nunca intervendrán en las búsquedas'
+    txt = 'Los canales que tenga marcados como [B][COLOR cyan]Desactivados[/COLOR][/B] nunca intervendrán en las búsquedas'
     txt += '[CR][CR]'
 
     txt += ' - [B][COLOR gold]Canales[/COLOR][/B] que nunca intervienen en las busquedas:'
     txt += '[CR]'
-    txt += '[COLOR gold]    CineDeAntes, CineLibreOnline, SigloXX, TvSeries [/COLOR]'
+    txt += '[COLOR gold]    CineDeAntes, CineLibreOnline, SigloXX, SeoDiv, TvSeries [/COLOR]'
 
     if config.get_setting('mnu_doramas', default=True):
         txt += '[CR][CR]'

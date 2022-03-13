@@ -94,9 +94,13 @@ def mainlist(item):
             itemlist.append(item.clone( title = ' - Canales con Épocas', action = 'ch_groups', group = 'epochs', extra = 'movies' ))
             itemlist.append(item.clone( title = ' - Canales con Calidades', action = 'ch_groups', group = 'qualityes', extra = 'movies' ))
 
-        if config.get_setting('mnu_generos', default=True):
+        if config.get_setting('mnu_series', default=True):
             itemlist.append(item.clone( title = 'Series:', action = '', thumbnail=config.get_thumb('tvshow'), text_color='hotpink' ))
-            itemlist.append(item.clone( title = ' - Canales con Géneros', action = 'ch_groups', group = 'genres', extra = 'tvshows' ))
+
+            if config.get_setting('mnu_generos', default=True):
+                itemlist.append(item.clone( title = ' - Canales con Géneros', action = 'ch_groups', group = 'genres', extra = 'tvshows' ))
+
+            itemlist.append(item.clone( title = ' - Canales con Novelas', action = 'ch_groups', group = 'tales', extra = 'tvshows' ))
 
         presentar = True
         if not config.get_setting('mnu_pelis', default=True): presentar = False
@@ -224,7 +228,7 @@ def ch_groups(item):
            continue
 
         if item.group == 'genres' or item.group == 'generos':
-            if not 'géneros' in ch['notes'].lower(): continue
+            if not 'géneros' in ch['notes']: continue
 
             if item.group == 'generos':
                 if not 'proxies' in ch['notes'].lower(): continue
@@ -237,8 +241,12 @@ def ch_groups(item):
             search_types = ch['search_types']
 
             accion = 'generos'
+
             if item.group == 'generos': accion = 'mainlist'
-            elif 'all' in search_types: accion = 'mainlist'
+            elif 'all' in search_types:
+               if search_type == 'tvshow':
+                   if not 'Géneros' in ch['notes']: continue
+               elif not 'géneros' in ch['notes']: accion = 'mainlist'
 
         elif item.group == 'cast':
             audios = ch['language']
@@ -304,16 +312,12 @@ def ch_groups(item):
 
         action = accion
         if item.group == 'anime':
-            if 'anime' in ch['notes'].lower():
-                 action = 'mainlist_anime'
+            if 'anime' in ch['notes'].lower(): action = 'mainlist_anime'
             else:
-                 if ch['name'].startswith('Series'):
-                     action = 'mainlist_series'
+                 if ch['name'].startswith('Series'): action = 'mainlist_series'
                  else:
-                     if ch['name'] == 'Tekilaz':
-                         action = 'mainlist_series'
-                     else:
-                         action = 'mainlist_pelis'
+                     if ch['name'] == 'Tekilaz': action = 'mainlist_series'
+                     else: action = 'mainlist_pelis'
 
         context = []
 
@@ -376,14 +380,11 @@ def ch_groups(item):
 
         if ch['status'] == -1:
             titulo += '[I][COLOR %s] (desactivado)[/COLOR][/I]' % color_list_inactive
-            if config.get_setting(cfg_proxies_channel, default=''):
-                titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
+            if config.get_setting(cfg_proxies_channel, default=''): titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
         else:
             if config.get_setting(cfg_proxies_channel, default=''):
-                if ch['status'] == 1:
-                    titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
-                else:
-                   color = color_list_proxies
+                if ch['status'] == 1: titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
+                else: color = color_list_proxies
 
         if 'register' in ch['clusters']:
             cfg_user_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_username'
@@ -392,11 +393,9 @@ def ch_groups(item):
                titulo += '[I][COLOR teal] (cuenta)[/COLOR][/I]'
             else:
                cfg_login_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_login'
-               if not config.get_setting(cfg_login_channel, default=False):
-                  titulo += '[I][COLOR teal] (sesion)[/COLOR][/I]'
+               if not config.get_setting(cfg_login_channel, default=False): titulo += '[I][COLOR teal] (sesion)[/COLOR][/I]'
 
-        if 'inestable' in ch['clusters']:
-            titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
+        if 'inestable' in ch['clusters']: titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
 
         i =+ 1
 
@@ -454,7 +453,11 @@ def submnu_search(item):
     itemlist.append(item.clone( channel='proxysearch', title=' - Configurar proxies a usar [COLOR plum](en los canales que los necesiten)[/COLOR]',
                                 action='proxysearch_all', thumbnail=config.get_thumb('flame') ))
 
-    itemlist.append(item.clone( channel='actions', title= ' - Quitar los proxies en los canales que los tengan memorizados',
+    if config.get_setting('memorize_channels_proxies', default=True):
+        itemlist.append(item.clone( channel='filters', title=  ' - Qué [COLOR red]canales[/COLOR] tiene con proxies memorizados', action='with_proxies',
+                                    thumbnail=config.get_thumb('stack'), new_proxies=True, memo_proxies=True, test_proxies=True, folder=False ))
+
+    itemlist.append(item.clone( channel='actions', title= ' - Quitar los proxies en los canales [COLOR red](que los tengan memorizados)[/COLOR]',
                                 action = 'manto_proxies', folder=False, thumbnail=config.get_thumb('flame') ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_proxies', title= ' - [COLOR green]Información uso de proxies[/COLOR]', folder=False ))

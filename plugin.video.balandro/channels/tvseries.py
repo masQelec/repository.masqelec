@@ -45,13 +45,13 @@ def menu_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', url = item.url, search_type = 'tvshow', text_color = 'hotpink' ))
+
     itemlist.append(item.clone( title = 'Catálogo', action = 'series', url = item.url ))
 
     itemlist.append(item.clone( title = 'Catálogo series con temporadas', action = 'series', url = item.url, grupo = 'seasons' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = item.url ))
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', url = item.url, search_type = 'tvshow' ))
 
     return itemlist
 

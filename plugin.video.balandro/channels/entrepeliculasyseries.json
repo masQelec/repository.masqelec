@@ -13,5 +13,5 @@
 
   "clusters": ["suggested", "producers", "years", "lasts", "kids", "docs", "vos"],
 
-  "notes": "Peliculas por géneros y año. También Series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Peliculas por géneros y año. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

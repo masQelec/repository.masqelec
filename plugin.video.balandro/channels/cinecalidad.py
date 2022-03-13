@@ -289,7 +289,9 @@ def episodios(item):
 
     post = {'action': 'action_change_episode', 'season': str(item.contentSeason), 'serie': str(item.data_serie)}
 
-    data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post= post)
+    headers = {'Referer': item.url}
+
+    data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
 
     matches = scrapertools.find_multiple_matches(data, '<img(.*?)alt=.*?"episode":"(.*?)".*?"url":"(.*?)"')
 

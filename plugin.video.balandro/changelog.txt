@@ -2,6 +2,67 @@
 
 [COLOR yellow]2022[/COLOR]
 
+2.2.4:   [COLOR darkorange]Marzo 2022[/COLOR]
+    Correcciones bugs de la version anterior
+
+    Configuracion:
+        Sin novedades
+    Menus:
+        Generos: Re-configurados
+
+    Canales modificados:
+        Revision generalizada
+    Canales anulados
+        Sin novedades
+    Canales nuevos:
+        Sin novedades
+    Servidores modificados:
+        Revision generalizada
+    Servidores nuevos:
+        Sin novedades
+
+2.2.3:   [COLOR darkorange]Febrero 2022[/COLOR]
+    Correcciones bugs de la version anterior
+
+    Configuracion:
+        Proxies - Nuevas Opciones
+
+    Proxies:
+        Busqueda Global Optimizada
+
+    Menus:
+        Generos: Re-configurados
+
+    Canales modificados:
+        Revision generalizada
+    Canales anulados
+        PeliculasFlix, SeriesFlixIo
+    Canales nuevos:
+        Sin novedades
+    Servidores modificados:
+        Revision generalizada
+    Servidores nuevos:
+        Sin novedades
+
+2.2.2:   [COLOR darkorange]Febrero 2022[/COLOR]
+    Correcciones bugs de la version anterior
+
+    Configuracion:
+        Sin novedades
+    Menus:
+        Generos: Re-configurados
+
+    Canales modificados:
+        Revision generalizada
+    Canales anulados
+        Sin novedades
+    Canales nuevos:
+        Sin novedades
+    Servidores modificados:
+        Revision generalizada
+    Servidores nuevos:
+        Sin novedades
+
 2.2.1:   [COLOR darkorange]Enero 2022[/COLOR]
     Correcciones bugs de la version anterior
 

@@ -1,7 +1,7 @@
 {
   "id": "monoschinos",
   "name": "MonosChinos",
-  "thumbnail": "monoschinos.png",
+  "thumbnail": "monoschinos.jpg",
 
   "active": true,
 
@@ -9,7 +9,7 @@
   "search_types": ["tvshow"],
 
   "categories": ["tvshow"],
-  "language": ["vose"],
+  "language": ["vose", "vo"],
 
   "clusters": ["anime"],
 

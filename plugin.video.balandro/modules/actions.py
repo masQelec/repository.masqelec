@@ -219,7 +219,7 @@ def manto_proxies(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales de este tipo[/B][/COLOR]' % color_adver)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los Proxies memorizados en Todos los canales ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los Proxies memorizados en Todos los canales que los tengan?[/COLOR]'):
        for ch in ch_list:
            if not 'proxies' in ch['notes'].lower():
                continue
@@ -249,6 +249,8 @@ def manto_proxies(item):
            if config.get_setting(cfg_proxies_channel, default=''): config.set_setting(cfg_proxies_channel, '')
            if config.get_setting(cfg_proxytools_max_channel, default=''): config.set_setting(cfg_proxytools_max_channel, '')
            if config.get_setting(cfg_proxytools_provider, default=''): config.set_setting(cfg_proxytools_provider, '')
+
+       config.set_setting('channels_proxies_memorized', '')
 
        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Proxies eliminados[/B][/COLOR]' % color_infor)
 
@@ -353,6 +355,8 @@ def manto_params(item):
         config.set_setting('channel_playdede_playdede_password', '')
         config.set_setting('channel_playdede_playdede_username', '')
 
+        config.set_setting('channels_proxies_memorized', '')
+
         config.set_setting('search_excludes_movies', '')
         config.set_setting('search_excludes_tvshows', '')
         config.set_setting('search_excludes_documentaries', '')
@@ -363,7 +367,7 @@ def manto_params(item):
 
         # ~ config.set_setting('downloadpath', '')  No funciona
 
-        config.set_setting('chrome_last_version', '96.0.4664.110')
+        config.set_setting('chrome_last_version', '98.0.4758.80')
 
         config.set_setting('debug', '0')
 

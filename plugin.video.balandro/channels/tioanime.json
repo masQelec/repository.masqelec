@@ -6,10 +6,10 @@
   "active": true,
 
   "searchable": false,
-  "search_types": ["movie", "tvshow"],
+  "search_types": ["tvshow"],
 
-  "categories": ["movie", "tvshow"],
-  "language": ["vose"],
+  "categories": ["tvshow"],
+  "language": ["vose", "vo"],
 
   "clusters": ["anime"],
 

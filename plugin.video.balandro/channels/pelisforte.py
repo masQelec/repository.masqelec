@@ -42,11 +42,12 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host)
+    data = do_downloadpage(host + 'ultimas-peliculas/')
 
     bloque = scrapertools.find_single_match(data, '>Géneros<(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<a href=(.*?)>(.*?)</a>')
 
     for url, title in matches:
         itemlist.append(item.clone( action='list_all', title=title, url=url ))
@@ -92,6 +93,8 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        if not url: url = scrapertools.find_single_match(match, '<a href=(.*?) ').strip()
+
         title = scrapertools.find_single_match(match, 'class="entry-title">(.*?)</')
 
         if not url or not title: continue
@@ -99,8 +102,7 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="Year">(.*?)</span>')
-        if not year:
-            year ='-'
+        if not year:  year ='-'
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                     contentType='movie', contentTitle=title, infoLabels={'year': year} ))
@@ -108,11 +110,14 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if '>SIGUIENTE' in data:
-        next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?<a class="page-link" .*?href="(.*?)"')
-        if next_page:
-            next_page = next_page.replace('&#038;', '&')
-            if '/page/' in next_page:
-                itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral'))
+        if itemlist:
+            next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?<a class="page-link" .*?href="(.*?)"')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?<a class=page-link.*?href=(.*?)>')
+
+            if next_page:
+                next_page = next_page.replace('&#038;', '&')
+                if '/page/' in next_page:
+                    itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral'))
 
     return itemlist
 
@@ -126,6 +131,7 @@ def findvideos(item):
     bloque = scrapertools.find_single_match(data, '>OPCIONES<(.*?)</section>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'href="#options-(.*?)">.*?<span class="server">(.*?)-(.*?)</span>')
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, 'href=#options-(.*?)>.*?<span class=server>(.*?)-(.*?)</span>')
 
     ses = 0
 
@@ -137,22 +143,24 @@ def findvideos(item):
         if not srv: continue
         elif srv == 'trailer': continue
 
+        if '+ veloz' in srv: continue
+
         idioma = idioma.strip()
-       
+
         if 'Latino' in idioma: lang = 'Lat'
         elif 'Castellano' in idioma: lang = 'Esp'
         elif 'Subtitulado' in idioma: lang = 'Vose'
-        else:
-           lang = idioma
+        else: lang = idioma
 
         url = scrapertools.find_single_match(data, '<div id="options-' + opt + '".*?src="([^"]+)"')
+        if not url: url = scrapertools.find_single_match(data, '<div id=options-' + opt + '.*?<iframe data-src="(.*?)"')
 
         if url:
             servidor = 'directo'
             other = srv
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other,
-                                  language = lang ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                  other = other.capitalize(), language = lang ))
 
     # ~ descargas recaptcha
 
@@ -177,9 +185,8 @@ def play(item):
 
         url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, '<IFRAME SRC="(.*?)"')
-
-        if not url:
-            url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, 'src=(.*?) ').strip()
 
         if 'trhide' in url:
             try:
@@ -196,7 +203,10 @@ def play(item):
             except:
                pass
 
-        if '/rehd.net/' in url:
+        if '//wtfsb.' in url:
+             return 'Servidor [COLOR tan]No soportado[/COLOR]'
+
+        elif '/rehd.net/' in url:
             data = do_downloadpage(url)
 
             url = scrapertools.find_single_match(data, '"url": "(.*?)"')

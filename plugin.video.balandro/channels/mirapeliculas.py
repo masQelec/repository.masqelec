@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'http://mirapeliculas.net/'
+host = 'https://mirapeliculasde.com/'
 
 perpage = 20
 

@@ -13,5 +13,5 @@
 
   "clusters": ["countries", "producers", "kids", "docs", "vos"],
 
-  "notes": "Series, por género, productora y paises."
+  "notes": "Series por Géneros, productora y paises."
 }

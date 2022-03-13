@@ -3,8 +3,7 @@
 import sys
 
 PY3 = sys.version_info[0] >= 3
-if PY3:
-    unicode = str
+if PY3: unicode = str
 
 import re, base64, xbmcgui
 
@@ -15,7 +14,12 @@ from core import httptools, scrapertools, jsontools, servertools, tmdb
 from lib import balandroresolver
 
 
-dominios = ['https://hdfull.click/', 'https://new.hdfull.one/', 'https://hdfull.one/', 'https://hdfull.stream/', 'https://hdfull.vip/']
+dominios = ['https://hdfull.link/',
+            'https://hdfull.click/',
+            'https://new.hdfull.one/',
+            'https://hdfull.one/',
+            'https://hdfull.stream/',
+            'https://hdfull.vip/']
 
 host = config.get_setting('dominio', 'hdfull', default=dominios[0])
 
@@ -123,8 +127,8 @@ def login(item):
                     data = do_make_login_logout(domain)
                     if not data: return False
         else:
-            platformtools.dialog_notification(config.__addon_name, '[COLOR yellowgreen]HdFull Falta configurar Dominio[/COLOR]')
-            return False
+            platformtools.dialog_notification(config.__addon_name, '[COLOR yellowgreen]HdFull comprobar Dominio [COLOR moccasin]' + domain + '[/COLOR]')
+            # ~ return False
 
     user = scrapertools.find_single_match(data, '<a href="[^"]+" class="tour-join2 join">([^<]+)<\/a>')
 
@@ -385,7 +389,7 @@ def mainlist_series(item):
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url= dominio + 'series/imdb_rating', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( action='series_abc', title='Por letra (A - Z)', search_type = 'tvshow' ))
-        itemlist.append(item.clone( action='generos', title='Por género', search_type='tvshow' ))
+        itemlist.append(item.clone( action='generos', title='Por género', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', target_action = 'top', search_type = 'all' ))
 
@@ -443,6 +447,9 @@ def generos(item):
 
     matches = re.compile('<li><a href="([^"]+)">([^<]+)', re.DOTALL).findall(bloque)
     for url, title in matches:
+        if item.search_type == 'movie':
+            if title == 'Novela': continue
+
         if url.startswith('/'): url = dominio + url[1:]
 
         itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))

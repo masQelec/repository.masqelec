@@ -3,7 +3,7 @@
   "name": "SeriesFlixIo",
   "thumbnail": "seriesflixio.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["countries", "producers", "kids", "docs", "vos"],
 
-  "notes": "Series, por géneros, productora y paises."
+  "notes": "Web CERRADA. Series, por géneros, productora y paises."
 }

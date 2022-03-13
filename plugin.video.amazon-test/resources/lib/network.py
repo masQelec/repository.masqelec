@@ -11,6 +11,8 @@ import pyxbmct
 import re
 import requests
 import ssl
+import sys
+
 from timeit import default_timer as timer
 from urllib3.poolmanager import PoolManager
 from requests.adapters import HTTPAdapter
@@ -93,7 +95,7 @@ def getTerritory(user):
         user.update(area)
     else:
         Log('Retrieve territoral config')
-        data = getURL('https://na.api.amazonvideo.com/cdp/usage/v2/GetAppStartupConfig?deviceTypeID=A28RQHJKHM2A2W&deviceID=%s&firmware=1&version=1&format=json'
+        data = getURL('https://atv-ps.amazon.com/cdp/usage/v2/GetAppStartupConfig?deviceTypeID=A28RQHJKHM2A2W&deviceID=%s&firmware=1&version=1&format=json'
                       % g.deviceID)
         if not hasattr(data, 'keys'):
             return user, False
@@ -105,7 +107,6 @@ def getTerritory(user):
             user['baseurl'] = data['territoryConfig']['primeSignupBaseUrl']
             user['mid'] = data['territoryConfig']['avMarketplace']
             user['pv'] = 'primevideo' in host
-
     return user, True
 
 
@@ -482,9 +483,9 @@ def LogIn():
             except ImportError:
                 from urllib.parse import urlparse, parse_qs
 
-            msg = soup.find('span', attrs={'class': 'a-size-medium transaction-approval-word-break a-text-bold'}).get_text(strip=True)
+            msg = soup.find('span', attrs={'class': 'transaction-approval-word-break'}).get_text(strip=True)
             msg += '\n'
-            rows = soup.find('div', attrs={'id': 'channelDetails'})
+            rows = soup.find('div', attrs={'id': re.compile('.*channelDetails.*')})
             for row in rows.find_all('div', attrs={'class': 'a-row'}):
                 msg += re.sub('\\s{2,}', ': ', row.get_text())
             pd = _ProgressDialog(msg)
@@ -580,7 +581,7 @@ def LogIn():
             while caperr:
                 Log('Connect to SignIn Page %s attempts left' % -caperr)
                 br.session.headers.update({'User-Agent': getConfig('UserAgent')})
-                br.open(user['baseurl'] + ('/gp/aw/si.html' if not user['pv'] else '/auth-redirect/'))
+                br.open(user['baseurl'] + ('/gp/flex/sign-out.html' if not user['pv'] else '/auth-redirect/'))
                 try:
                     form = br.select_form('form[name="signIn"]')
                 except mechanicalsoup.LinkNotFoundError:
@@ -1026,6 +1027,8 @@ class MyTLS1Adapter(HTTPAdapter):
         Log('TLSv1 Adapter', Log.DEBUG)
         if ssl.OPENSSL_VERSION_INFO[:4] >= (1, 1, 1, 6):  # openssl 1.1.1f
             context = ssl.create_default_context()
+            if sys.version_info >= (3, 7):
+                context.minimum_version = ssl.TLSVersion.TLSv1
             context.set_ciphers('DEFAULT@SECLEVEL=1')
             kwargs['ssl_context'] = context
         self.poolmanager = PoolManager(num_pools=connections, maxsize=maxsize, block=block, ssl_version=ssl.PROTOCOL_TLSv1, *args, **kwargs)

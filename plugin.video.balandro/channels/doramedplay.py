@@ -276,7 +276,9 @@ def list_search(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall('>Resultados encontrados(.*?)>DoramedPlay.com<')
+    bloque = scrapertools.find_single_match(data, '>Resultados encontrados(.*?)>DoramedPlay.com<')
+
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
     for match in matches:
         url = scrapertools.find_single_match(match, ' href="(.*?)"')

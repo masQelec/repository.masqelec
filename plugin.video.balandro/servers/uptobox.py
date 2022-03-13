@@ -62,6 +62,7 @@ def get_video_url(page_url, url_referer=''):
             import traceback
             logger.error(traceback.format_exc())
             platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+            return video_urls
 
     try:
        video_urls = balandroresolver.resolve_uptobox().getLink(vid, video_urls)

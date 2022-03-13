@@ -16,6 +16,9 @@ perpage = 25
 def mainlist(item):
     return mainlist_anime(item)
 
+def mainlist_series(item):
+    return mainlist_anime(item)
+
 
 def mainlist_anime(item):
     logger.info()
@@ -291,6 +294,9 @@ def play(item):
         data = httptools.downloadpage(item.url).data
 
         url_play = scrapertools.find_single_match(data, '<source src="(.*?)"')
+        if not url_play:
+            url_play = scrapertools.find_single_match(data, "video: {.*?url:.*?'(.*?)'")
+
         if host in url_play:
             url_play = httptools.downloadpage(url_play, follow_redirects=False, only_headers=True).headers.get("location", "")
 

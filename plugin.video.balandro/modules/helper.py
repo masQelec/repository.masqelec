@@ -71,7 +71,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales requieren cuenta', cta_register = True, folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales tiene varios dominios', var_domains = True, folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='channels_with_proxies', title= '    - Qué canales pueden necesitar proxies', new_proxies=True, folder=False, text_color='red', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_with_proxies', title= '    - Qué canales pueden necesitar proxies', new_proxies=True, folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están inestables', no_stable = True, folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están temporalmente inactivos', temp_no_active = True, folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están inactivos', no_active = True, folder=False, thumbnail=config.get_thumb('stack') ))
@@ -100,9 +100,14 @@ def mainlist(item):
     itemlist.append(item.clone( action='', title= 'Proxies:', text_color='red', thumbnail=config.get_thumb('flame'), folder=False ))
 
     itemlist.append(item.clone( action='channels_with_proxies', title= ' - Qué canales pueden usar proxies', folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( channel='proxysearch', title = ' - Configurar proxies a usar en los canales que los necesiten', action = 'proxysearch_all', thumbnail=config.get_thumb('flame') ))
-    itemlist.append(item.clone( channel='actions', title= ' - Quitar los proxies en los canales que los tengan memorizados', action = 'manto_proxies', folder=False, thumbnail=config.get_thumb('flame') ))
+    itemlist.append(item.clone( channel='proxysearch', title = ' - Configurar proxies a usar [COLOR plum](en los canales que los necesiten)[/COLOR]', action = 'proxysearch_all', thumbnail=config.get_thumb('flame') ))
+
+    if config.get_setting('memorize_channels_proxies', default=True):
+        itemlist.append(item.clone( action='channels_with_proxies_memorized', title= ' - Qué [COLOR red]canales[/COLOR] tiene con proxies memorizados', folder=False, thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( channel='actions', title= ' - Quitar los proxies en los canales [COLOR red](que los tengan memorizados)[/COLOR]', action = 'manto_proxies', folder=False, thumbnail=config.get_thumb('flame') ))
     itemlist.append(item.clone( action='show_help_proxies', title= ' - [COLOR green]Información[/COLOR] uso de proxies', folder=False ))
+    itemlist.append(item.clone( action='show_help_providers', title= ' - [COLOR green]Información[/COLOR] proveedores de proxies', folder=False ))
     itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR red]Proxies[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( action='', title= 'Torrents:', text_color='blue', thumbnail=config.get_thumb('torrents'), folder=False ))
@@ -114,7 +119,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='', title='Buscar:', text_color='yellow', thumbnail=config.get_thumb('magnifyingglass'), folder=False ))
 
-    itemlist.append(item.clone( channel='search', action='show_help_parameters', title='[COLOR chocolate] - Qué ajustes tiene configurados para las búsquedas[/COLOR]', thumbnail=config.get_thumb('help'), folder=False ))
+    itemlist.append(item.clone( channel='search', action='show_help_parameters', title=' - Qué [COLOR chocolate]Ajustes[/COLOR] tiene configurados para las búsquedas', thumbnail=config.get_thumb('help'), folder=False ))
     itemlist.append(item.clone( action='channels_no_searchables', title= ' - Qué canales nunca intervendrán en las búsquedas', folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='channels_no_actives', title= ' - Qué canales no intervienen en las búsquedas (desactivados)', folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( channel='proxysearch', title = ' - Configurar proxies a usar [COLOR plum](en los canales que los necesiten)[/COLOR]', action = 'proxysearch_all', thumbnail=config.get_thumb('flame') ))
@@ -136,12 +141,14 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='', title='Actualizar:', text_color='cyan', thumbnail=config.get_thumb('tools'), folder=False ))
 
+    itemlist.append(item.clone( action='show_help_fixes', title= ' - ¿ Qué son los fixes ?', folder=False ))
     itemlist.append(item.clone( channel='actions', title= ' - Comprobar últimas actualizaciones tipo Fix', action = 'check_addon_updates', folder=False, thumbnail=config.get_thumb('download') ))
     itemlist.append(item.clone( channel='actions', title= ' - Forzar todas las actualizaciones tipo Fix', action = 'check_addon_updates_force', folder=False, thumbnail=config.get_thumb('download') ))
     itemlist.append(item.clone( action='show_last_fix', title= ' - [COLOR green]Información[/COLOR] último fix instalado', folder=False, thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR cyan]Actualizar[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( action='', title='Servidores:', text_color='fuchsia', thumbnail=config.get_thumb('bolt'), folder=False ))
+
     if config.get_setting('developer_mode', default=False):
         itemlist.append(item.clone( action='show_servers_list', title= ' - Todos los servidores', tipo = 'all', folder=False, thumbnail=config.get_thumb('bolt') ))
 
@@ -149,6 +156,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores tienen vías alternativas', tipo = 'alternativos', folder=False, thumbnail=config.get_thumb('bolt') ))
     itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores se detectan pero no están soportados', tipo = 'sinsoporte', folder=False, thumbnail=config.get_thumb('bolt') ))
     itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores están inactivos', tipo = 'inactivos', folder=False, thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( action='show_help_recaptcha', title= ' - ¿ Qué significa Requiere verificación [COLOR red]reCAPTCHA[/COLOR]?', folder=False ))
 
     itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR fuchsia]Play[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
 
@@ -210,6 +218,15 @@ def channels_with_proxies(item):
 
     filters.with_proxies(item)
 
+def channels_with_proxies_memorized(item):
+    logger.info()
+
+    # por si venimos de config
+    if config.get_setting('memorize_channels_proxies', default=True):
+        item.memo_proxies = True
+
+        filters.with_proxies(item)
+
 def channels_no_actives(item):
     logger.info()
 
@@ -254,8 +271,8 @@ def show_clients_torrent(item):
 def show_servers_list(item):
     logger.info()
 
-    if not item.tipo: # por si venimos de config
-        item.tipo = 'activos'
+    # por si venimos de config
+    if not item.tipo: item.tipo = 'activos'
 
     filters.show_servers_list(item)
 
@@ -263,7 +280,7 @@ def show_servers_list(item):
 def show_help_register(item):
     logger.info()
 
-    txt = '*) Determinadas webs obligan a registrase para permitir su acceso.'
+    txt = '*) Determinadas webs obligan a registrarse para permitir su acceso.'
 
     txt += '[CR][CR]'
     txt += ' Es importante usar [B][COLOR gold]cuentas secundarias[/COLOR][/B] para registrarse, nunca useis las vuestras personales.'
@@ -299,7 +316,7 @@ def show_help_register(item):
     txt += '[CR][CR]'
     txt += '*) Mientras mantengais las sesiones abiertas via navegador en estos dominios, no tendreis q volver a informar vuestras credenciales.'
 
-    platformtools.dialog_textviewer('Información dominios que requieren registrase', txt)
+    platformtools.dialog_textviewer('Información dominios que requieren registrarse', txt)
 
 
 def show_help_settings(item):
@@ -445,7 +462,7 @@ def show_help_faq(item):
     txt += ' Estos gestores externos torrents no estan incluidos en Balandro y deben Instalarse por separado.'
     txt += ' Además, debe indicarse Obligatoriamente en la configuración de Balandro cual va a ser su gestor de torrents habitual.'
 
-    platformtools.dialog_textviewer('FAQ - Preguntas y respuestas', txt)
+    platformtools.dialog_textviewer('FAQS - Preguntas y respuestas', txt)
 
 
 def show_help_tracking(item):
@@ -490,8 +507,8 @@ def show_help_tracking(item):
     txt += ' tu preferencia quedará guardada para esa temporada.'
 
     txt += '[CR][CR][COLOR gold]¿ Hay alguna límitación en los episodios a guardar por cada temporada ?[/COLOR][CR]'
-    txt += 'Si, no se almacenarán más de 50 episodios por temporada, si fuera necesario, debe gestionar esa serie y/o temporada'
-    txt += ' a través de los "favoritos/videoteca genérica" de su Media Center.'
+    txt += 'Si, no se almacenarán más de [COLOR red]50 episodios por temporada [/COLOR], si fuera necesario, debe gestionar esa serie y/o temporada'
+    txt += ' a través de los [COLOR gold]"favoritos/videoteca genérica"[/COLOR] de su Media Center.'
 
     txt += '[CR][CR][COLOR gold]¿ Cómo integrar los Preferidos en la Videoteca de su Media Center? ?[/COLOR][CR]'
     txt += 'Una alternativa es añadir los Preferidos de Balandro a los "favoritos/videoteca genérica" de su Media center.'
@@ -572,6 +589,87 @@ def show_help_proxies(item):
     platformtools.dialog_textviewer('Utilización de proxies', txt)
 
 
+def show_help_providers(item):
+    logger.info()
+
+    txt = ''
+
+    providers_preferred = config.get_setting('providers_preferred', default='')
+    if providers_preferred:
+        txt = '[COLOR violet]Proveedores preferidos:[/COLOR][CR]'
+
+        txt += '    [COLOR pink]' + str(providers_preferred) + '[/COLOR]'
+        txt += '[CR][CR]'
+
+    txt += '[COLOR aquamarine]Proveedores habituales:[/COLOR][CR]'
+
+    txt += ' - [COLOR yellow]clarketm[/COLOR][CR]'
+    txt += ' - [COLOR yellow]dailyproxylists.com[/COLOR][CR]'
+    txt += ' - [COLOR yellow]free-proxy-list[/COLOR][CR]'
+    txt += ' - [COLOR yellow]google-proxy.net[/COLOR][CR]'
+    txt += ' - [COLOR yellow]hidemy.name[/COLOR][CR]'
+    txt += ' - [COLOR yellow]httptunnel.ge[/COLOR][CR]'
+    txt += ' - [COLOR yellow]ip-adress.com[/COLOR][CR]'
+    txt += ' - [COLOR yellow]proxy-list.download[/COLOR][CR]'
+    txt += ' - [COLOR yellow]proxydb.net[/COLOR][CR]'
+    txt += ' - [COLOR yellow]proxynova.com[/COLOR][CR]'
+    txt += ' - [COLOR yellow]proxyscrape.com[/COLOR][CR]'
+    txt += ' - [COLOR yellow]proxyservers.pro[/COLOR][CR]'
+    txt += ' - [COLOR yellow]proxysource.org[/COLOR][CR]'
+    txt += ' - [COLOR yellow]silverproxy.xyz[/COLOR][CR]'
+    txt += ' - [COLOR yellow]spys.me[/COLOR][CR]'
+    txt += ' - [COLOR yellow]spys.one[/COLOR][CR]'
+    txt += ' - [COLOR yellow]sslproxies.org[/COLOR][CR]'
+    txt += ' - [COLOR yellow]us-proxy.org[/COLOR][CR]'
+
+    txt += '[CR][COLOR cyan]Lista ampliada de proveedores:[/COLOR][CR]'
+
+    txt += ' - [COLOR gold]coderduck[/COLOR][CR]'
+    txt += ' - [COLOR gold]echolink[/COLOR][CR]'
+    txt += ' - [COLOR gold]free-proxy-list.anon[/COLOR][CR]'
+    txt += ' - [COLOR gold]free-proxy-list.com[/COLOR][CR]'
+    txt += ' - [COLOR gold]free-proxy-list.uk[/COLOR][CR]'
+    txt += ' - [COLOR gold]opsxcq[/COLOR][CR]'
+    txt += ' - [COLOR gold]proxy-daily[/COLOR][CR]'
+    txt += ' - [COLOR gold]proxyhub[/COLOR][CR]'
+    txt += ' - [COLOR gold]proxyranker[/COLOR][CR]'
+    txt += ' - [COLOR gold]xroxy[/COLOR][CR]'
+    txt += ' - [COLOR gold]socks[/COLOR][CR]'
+    txt += ' - [COLOR gold]squidproxyserver[/COLOR][CR]'
+
+    platformtools.dialog_textviewer('Proveedores de proxies', txt)
+
+
+def show_help_fixes(item):
+    logger.info()
+
+    txt = '[CR] Son correcciones del Addon:[CR]'
+
+    txt += ' - [COLOR yellow]Por bugs (errores)[/COLOR][CR]'
+
+    txt += ' - [COLOR yellow]Por cambios menores (nuevos dominios, estructuras, etc.)[/COLOR][CR]'
+
+    txt += '[CR] Y que no tienen la embergadura suficiente como para confeccionar y publicar una nueva versión.[CR]'
+
+    txt += '[CR][COLOR gold] Los Fixes siempre se actualizan automáticamente al iniciar sesión en su Media Center.[/COLOR]'
+
+    platformtools.dialog_textviewer('Información ¿ Qué son los fixes ?', txt)
+
+
+def show_help_recaptcha(item):
+    logger.info()
+
+    txt = '[CR]Son avisos de porqué no se puede reproducir ese enlace en cuestion.[CR]'
+
+    txt += '[CR] Para reproducir ese enlace el servidor exige resolver que no eres un [COLOR gold]Boot[/COLOR], para ello'
+
+    txt += '[CR] presenta un proceso para [COLOR yellow]seleccionar imágenes[/COLOR] (bicicletas, barcos, semáforos, etc.)'
+
+    txt += '[CR][CR]Dada su dificultad [COLOR gold]NO[/COLOR] está contemplado en el Addon esta situación.'
+
+    platformtools.dialog_textviewer('Información ¿ Qué significa Requiere verificación [COLOR red]reCAPTCHA[/COLOR] ?', txt)
+
+
 def show_version(item):
     logger.info()
 
@@ -579,8 +677,7 @@ def show_version(item):
     try:
        with open(os.path.join(config.get_runtime_path(), 'version.txt'), 'r') as f: txt=f.read(); f.close()
     except:
-        try:
-            txt = open(os.path.join(config.get_runtime_path(), 'version.txt'), encoding="utf8").read()
+        try: txt = open(os.path.join(config.get_runtime_path(), 'version.txt'), encoding="utf8").read()
         except: pass
 
     if txt:
@@ -593,8 +690,7 @@ def show_changelog(item):
     try:
        with open(os.path.join(config.get_runtime_path(), 'changelog.txt'), 'r') as f: txt=f.read(); f.close()
     except:
-        try:
-            txt = open(os.path.join(config.get_runtime_path(), 'changelog.txt'), encoding="utf8").read()
+        try: txt = open(os.path.join(config.get_runtime_path(), 'changelog.txt'), encoding="utf8").read()
         except: pass
 
     if txt:
@@ -607,8 +703,7 @@ def show_dev_notes(item):
     try:
        with open(os.path.join(config.get_runtime_path(), 'dev-notes.txt'), 'r') as f: txt=f.read(); f.close()
     except:
-        try:
-            txt = open(os.path.join(config.get_runtime_path(), 'dev-notes.txt'), encoding="utf8").read()
+        try: txt = open(os.path.join(config.get_runtime_path(), 'dev-notes.txt'), encoding="utf8").read()
         except: pass
 
     if txt:
@@ -643,19 +738,16 @@ def show_log(item):
         return
 
     size = filetools.getsize(file)
-    if size > 999999:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Cargando fichero log[/COLOR][/B]' % color_infor)
+    if size > 999999: platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Cargando fichero log[/COLOR][/B]' % color_infor)
 
     txt = ''
     try:
         with open(os.path.join(path, file_log), 'r') as f: txt=f.read(); f.close()
     except:
-        try:
-            txt = open(os.path.join(path, file_log), encoding="utf8").read()
+        try: txt = open(os.path.join(path, file_log), encoding="utf8").read()
         except: pass
 
-    if txt:
-        platformtools.dialog_textviewer('Fichero LOG de su Media Center', txt)
+    if txt: platformtools.dialog_textviewer('Fichero LOG de su Media Center', txt)
 
 
 def copy_log(item):
@@ -723,12 +815,10 @@ def show_advs(item):
     try:
        with open(os.path.join(path, file_advs), 'r') as f: txt=f.read(); f.close()
     except:
-        try:
-            txt = open(os.path.join(path, file_advs), encoding="utf8").read()
+        try: txt = open(os.path.join(path, file_advs), encoding="utf8").read()
         except: pass
 
-    if txt:
-       platformtools.dialog_textviewer('Su fichero Advancedsettings de su Media Center', txt)
+    if txt: platformtools.dialog_textviewer('Su fichero Advancedsettings de su Media Center', txt)
 
 
 def show_help_adults(item):
@@ -762,7 +852,7 @@ def show_help_torrents(item):
     txt += '    - plugin.video.xbmctorrent'
 
     txt += '[CR][CR]'
-    txt += '*) A modo de ejemplo para [COLOR gold]Elementum[/COLOR] puede acceder a su web oficial en "elementum.surge.sh"'
+    txt += '*) A modo de ejemplo para [COLOR gold]Elementum[/COLOR] puede acceder a su web oficial en [COLOR gold]elementum.surge.sh[/COLOR]'
 
     txt += '[CR][CR]'
     txt += '*) Existen múltiples sitios webs en donde puede localizar estos add-ons, entre estos sitios le recomendamos'
@@ -800,12 +890,10 @@ def show_license(item):
     try:
        with open(os.path.join(config.get_runtime_path(), 'LICENSE'), 'r') as f: txt=f.read(); f.close()
     except:
-        try:
-            txt = open(os.path.join(config.get_runtime_path(), 'LICENSE'), encoding="utf8").read()
+        try: txt = open(os.path.join(config.get_runtime_path(), 'LICENSE'), encoding="utf8").read()
         except: pass
 
-    if txt:
-       platformtools.dialog_textviewer('Licencia (Gnu Gpl v3)', txt)
+    if txt: platformtools.dialog_textviewer('Licencia (Gnu Gpl v3)', txt)
 
 
 def show_test(item):
@@ -824,16 +912,12 @@ def show_test(item):
        pass
 
     if not your_ip:
-        try:
-           your_ip = httptools.downloadpage('http://ipinfo.io/ip').data
-        except:
-           pass
+        try: your_ip = httptools.downloadpage('http://ipinfo.io/ip').data
+        except: pass
 
     if not your_ip:
-        try:
-           your_ip = httptools.downloadpage('http://www.icanhazip.com/').data
-        except:
-           pass
+        try: your_ip = httptools.downloadpage('http://www.icanhazip.com/').data
+        except: pass
 
     if not your_ip:
 	    platformtools.dialog_ok(config.__addon_name, '[COLOR red]Parece que NO hay conexión con internet.[/COLOR]', 'Compruebelo realizando cualquier Búsqueda, desde un Navegador Web ')
@@ -847,8 +931,7 @@ def show_test(item):
         try:
            data = httptools.downloadpage(ADDON_REPO_ADDONS).data
            if data: access_repo = True
-        except:
-           tex_access_repo = '[COLOR lightblue][B]No se pudo comprobar[/B][/COLOR]'
+        except: tex_access_repo = '[COLOR lightblue][B]No se pudo comprobar[/B][/COLOR]'
 
     ult_ver = ''
 
@@ -856,10 +939,8 @@ def show_test(item):
 
     if hay_repo:
         if access_repo:
-            try:
-                ult_ver = updater.check_addon_version()
-            except:
-                pass
+            try: ult_ver = updater.check_addon_version()
+            except: pass
 
             if ult_ver: access_last_ver = True
 
@@ -871,16 +952,13 @@ def show_test(item):
                data = httptools.downloadpage(ADDON_UPDATES_JSON).data
                if data:
                    access_fixes = True
-                   if 'addon_version' not in data or 'fix_version' not in data:
-                       access_fixes = None
-            except:
-               tex_access_fixes = '[COLOR lightblue][B]No se pudo comprobar[/B][/COLOR]'
+                   if 'addon_version' not in data or 'fix_version' not in data: access_fixes = None
+            except: tex_access_fixes = '[COLOR lightblue][B]No se pudo comprobar[/B][/COLOR]'
 
 
     txt = '[CR][CR][COLOR fuchsia]BALANDRO[/COLOR][CR]'
 
-    if not your_ip:
-        your_ip = '[COLOR red][B] Sin Conexión [/B][/COLOR]'
+    if not your_ip: your_ip = '[COLOR red][B] Sin Conexión [/B][/COLOR]'
 
     txt += ' - [COLOR gold]Conexión internet:[/COLOR]  %s ' % your_ip
     txt += '[CR][CR]'
@@ -893,22 +971,17 @@ def show_test(item):
     txt += '[CR][CR]'
     tex_access_repo = ' Accesible'
     if access_repo == False:
-        if tex_access_repo == '':
-            tex_access_repo = '[COLOR red][B] Sin conexión, No accesible [/B][/COLOR]'
+        if tex_access_repo == '': tex_access_repo = '[COLOR red][B] Sin conexión, No accesible [/B][/COLOR]'
 
     txt += ' - [COLOR gold]Conexión con repositorio:[/COLOR]  %s ' % tex_access_repo
     txt += '[CR][CR]'
 
-    if access_last_ver:
-        tex_access_last_ver = ' Versión correcta '
+    if access_last_ver: tex_access_last_ver = ' Versión correcta '
     else:
         if not ult_ver:
-            if not access_repo:
-                tex_access_last_ver = '[I][B][COLOR %s] No accesible [/COLOR][/B][/I]' % color_adver
-            else:
-                tex_access_last_ver = '[I][B][COLOR %s] Accesible desde Repositorio [/COLOR][/B][/I]' % color_adver
-        else:
-            tex_access_last_ver = '[I][B][COLOR %s] (desfasada)[/COLOR][/B][/I]' % color_adver
+            if not access_repo: tex_access_last_ver = '[I][B][COLOR %s] No accesible [/COLOR][/B][/I]' % color_adver
+            else: tex_access_last_ver = '[I][B][COLOR %s] Accesible desde Repositorio [/COLOR][/B][/I]' % color_adver
+        else: tex_access_last_ver = '[I][B][COLOR %s] (desfasada)[/COLOR][/B][/I]' % color_adver
 
     txt += ' - [COLOR gold]Última versión:[/COLOR]  %s ' % tex_access_last_ver
     txt += '[CR][CR]'
@@ -923,10 +996,8 @@ def show_test(item):
 
     txt += ' - [COLOR gold]Versión instalada:[/COLOR]  [COLOR yellow][B]%s[/B][/COLOR]' % config.get_addon_version()
     if not ult_ver:
-        if not access_repo:
-            txt = txt + '[I][COLOR %s] (Sin repositorio)[/COLOR][/I]' % color_adver
-        else:
-            txt = txt + '[I][COLOR %s] (desfasada)[/COLOR][/I]' % color_adver
+        if not access_repo: txt = txt + '[I][COLOR %s] (Sin repositorio)[/COLOR][/I]' % color_adver
+        else: txt = txt + '[I][COLOR %s] (desfasada)[/COLOR][/I]' % color_adver
 
     txt += '[CR][CR]'
 
@@ -959,8 +1030,7 @@ def show_test(item):
            cfg_proxytools_max_channel = 'channel_' + ch['id'] + '_proxytools_max'
 
            if not config.get_setting(cfg_proxies_channel, default=''):
-               if not config.get_setting(cfg_proxytools_max_channel, default=''):
-                   continue
+               if not config.get_setting(cfg_proxytools_max_channel, default=''): continue
 
            txt_ch += '[COLOR red]%s[/COLOR]  ' % ch['name']
 
@@ -973,24 +1043,18 @@ def show_test(item):
     else:
       tex_tor = cliente_torrent
       cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
-      if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-          tex_tor += '  Instalado'
-      else:
-          tex_tor += '  [COLOR red][B]No instalado[/B][/COLOR]'
+      if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent): tex_tor += '  Instalado'
+      else: tex_tor += '  [COLOR red][B]No instalado[/B][/COLOR]'
 
     txt += '[CR][CR] - [COLOR gold]Motor torrent:[/COLOR]  %s' % tex_tor
 
-    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-        tex_yt = '  Instalado'
-    else:
-        tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
+    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'): tex_yt = '  Instalado'
+    else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
 
     txt += '[CR][CR] - [COLOR gold]YouTube addon:[/COLOR]  %s' % tex_yt
 
-    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        tex_yt = '  Instalado'
-    else:
-        tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
+    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'): tex_yt = '  Instalado'
+    else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
 
     txt += '[CR][CR] - [COLOR gold]ResolveUrl script:[/COLOR]  %s' % tex_yt
 
@@ -1034,11 +1098,11 @@ def show_last_fix(item):
         return
 
     txt = ''
+
     try:
        with open(path, 'r') as f: txt=f.read(); f.close()
     except:
-        try:
-            txt = open(path, encoding="utf8").read()
+        try: txt = open(path, encoding="utf8").read()
         except: pass
 
     if txt:
@@ -1061,12 +1125,10 @@ def show_sets(item):
     try:
        with open(os.path.join(file_sets), 'r') as f: txt=f.read(); f.close()
     except:
-        try:
-            txt = open(os.path.join(file_sets), encoding="utf8").read()
+        try: txt = open(os.path.join(file_sets), encoding="utf8").read()
         except: pass
 
-    if txt:
-       platformtools.dialog_textviewer('Su fichero de Ajustes personalizados', txt)
+    if txt: platformtools.dialog_textviewer('Su fichero de Ajustes personalizados', txt)
 
 def show_cook(item):
     logger.info()
@@ -1080,12 +1142,11 @@ def show_cook(item):
         return
 
     txt = ''
+
     try:
        with open(os.path.join(file_cook), 'r') as f: txt=f.read(); f.close()
     except:
-        try:
-            txt = open(os.path.join(file_cook), encoding="utf8").read()
+        try: txt = open(os.path.join(file_cook), encoding="utf8").read()
         except: pass
 
-    if txt:
-       platformtools.dialog_textviewer('Su fichero de Cookies', txt)
+    if txt: platformtools.dialog_textviewer('Su fichero de Cookies', txt)

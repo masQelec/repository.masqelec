@@ -21,6 +21,8 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    headers = {'Referer': host}
+
     if '/release/' in url: raise_weberror = False
 
     # ~ timeout
@@ -29,6 +31,17 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     data = httptools.downloadpage_proxy('pelispedia2', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if '<title>Redirigiendo</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                data = httptools.downloadpage_proxy('pelispedia2', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        except:
+            pass
 
     return data
 

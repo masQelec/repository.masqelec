@@ -4,25 +4,24 @@ from core import httptools, scrapertools
 from platformcode import logger
 
 
-def normalizar_url(page_url):
-    vid = scrapertools.find_single_match(page_url, "(?:vimeo.com/|player.vimeo.com/video/)([0-9]+)")
-    return 'https://player.vimeo.com/video/%s' % vid
-
 def get_video_url(page_url, url_referer=''):
     logger.info("url=" + page_url)
     video_urls = []
-    
-    page_url = normalizar_url(page_url)
 
-    data = httptools.downloadpage(page_url).data
-    # ~ logger.debug(data)
-    
-    patron = '"width":(\d+),"mime":"([^"]+)","fps":\d+,"url":"([^"]+)","cdn":"[^"]+","quality":"([^"]+)","id":\d+,"origin":"[^"]+","height":(\d+)'
+    headers = [['User-Agent', 'Mozilla/5.0']]
 
-    matches = scrapertools.find_multiple_matches(data, patron)
-    # ~ for width, mime, url, quality, height in matches:
-    for width, mime, url, quality, height in sorted(matches, key=lambda x: int(x[4])):
+    if '|' in page_url:
+        page_url, referer = page_url.split('|', 1)
+        headers.append(['Referer', referer])
 
-        video_urls.append(['%s %s' % (mime, quality), url])
+    if not page_url.endswith('/config'): page_url = scrapertools.find_single_match(page_url, '.*?video/[0-9]+')
+
+    data = httptools.downloadpage(page_url, headers=headers).data
+
+    matches = scrapertools.find_multiple_matches(data, 'mime":"([^"]+)".*?url":"([^"]+)".*?quality":"([^"]+)"')
+
+    for mime, url, qlty in matches:
+        video_urls.append(['%s %s' % (mime, qlty), url])
 
     return video_urls
+

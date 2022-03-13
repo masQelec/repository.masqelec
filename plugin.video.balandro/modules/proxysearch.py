@@ -52,10 +52,8 @@ def proxysearch_all(item):
     proxies_auto = config.get_setting('proxies_auto', default=True)
 
     proxies_provider = config.get_setting('proxies_provider', default='10')
-    if proxies_provider == 10:
-        proxies_todos = True
-    else:
-        proxies_todos = False
+    if proxies_provider == 10: proxies_todos = True
+    else: proxies_todos = False
 
     if proxies_todos:
         if proxies_auto:
@@ -78,82 +76,86 @@ def proxysearch_all(item):
     ch_list = channeltools.get_channels_list(filtros=filtros)
 
     if ch_list:
-        txt_avis = '¿ Desea Quitar previamente los Proxies memorizados en TODOS los canales ?'
-        if item.extra:
-            txt_avis = '¿ Desea Quitar previamente los Proxies memorizados en los canales ?'
+        if config.get_setting('memorize_channels_proxies', default=True):
+            channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
+            if channels_proxies_memorized:
+                if not platformtools.dialog_yesno(config.__addon_name, '[COLOR cyan]¿ Desea SOLO buscar en los canales conn proxies memorizados actualmente ?[/COLOR]'):
+                    config.set_setting('channels_proxies_memorized', '')
+                else:
+                    proceso_seleccionar = False
 
-        if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]' + txt_avis + '[/COLOR]'):
-           for ch in ch_list:
-               if not 'proxies' in ch['notes'].lower():
-                   continue
+        if proceso_seleccionar:
+            txt_avis = '¿ Desea Quitar previamente los Proxies memorizados en TODOS los canales ?'
+            if item.extra: txt_avis = '¿ Desea Quitar previamente los Proxies memorizados en los canales ?'
 
-               if item.extra:
-                   if item.extra == 'movies':
-                       if not 'movie' in ch['search_types']:
-                           continue
+            if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]' + txt_avis + '[/COLOR]'):
+               for ch in ch_list:
+                   if not 'proxies' in ch['notes'].lower(): continue
 
-                   elif item.extra == 'tvshows':
-                         if not 'tvshow' in ch['search_types']:
-                             continue
+                   if item.extra:
+                       if item.extra == 'movies':
+                           if not 'movie' in ch['search_types']: continue
 
-                   elif item.extra == 'mixed':
-                         if not 'all' in ch['search_types']:
-                             continue
+                       elif item.extra == 'tvshows':
+                             if not 'tvshow' in ch['search_types']: continue
 
-                   elif item.extra == 'documentaries':
-                         if not 'documentary' in ch['search_types']:
-                             continue
+                       elif item.extra == 'mixed':
+                             if not 'all' in ch['search_types']: continue
 
-                   elif item.extra == 'torrents':
-                         if not 'torrent' in ch['categories']:
-                             continue
+                       elif item.extra == 'documentaries':
+                             if not 'documentary' in ch['search_types']: continue
 
-                   else:
-                        if 'movie' in ch['search_types']: pass
-                        elif 'tvshow' in ch['search_types']: pass
-                        elif 'documentary' in ch['search_types']: pass
-                        elif 'torrent' in ch['categories']: pass
-                        elif 'all' in ch['search_types']: pass
-                        else:
-                            continue
+                       elif item.extra == 'torrents':
+                             if not 'torrent' in ch['categories']: continue
 
-               # por NAME vensiones anteriores a 2.0
-               cfg_proxies_channel = 'channel_' + ch['name'] + '_proxies'
+                       else:
+                            if 'movie' in ch['search_types']: pass
+                            elif 'tvshow' in ch['search_types']: pass
+                            elif 'documentary' in ch['search_types']: pass
+                            elif 'torrent' in ch['categories']: pass
+                            elif 'all' in ch['search_types']: pass
+                            else: continue
 
-               if config.get_setting(cfg_proxies_channel, default=''):
-                   config.set_setting(cfg_proxies_channel, '')
+                   # por NAME vensiones anteriores a 2.0
+                   cfg_proxies_channel = 'channel_' + ch['name'] + '_proxies'
 
-                   cfg_proxytools_max_channel = 'channel_' + ch['name'] + '_proxytools_max'
+                   if config.get_setting(cfg_proxies_channel, default=''):
+                       config.set_setting(cfg_proxies_channel, '')
+
+                       cfg_proxytools_max_channel = 'channel_' + ch['name'] + '_proxytools_max'
+                       if config.get_setting(cfg_proxytools_max_channel, default=''): config.set_setting(cfg_proxytools_max_channel, '')
+
+                       cfg_proxytools_provider = 'channel_' + ch['name'] + '_proxytools_provider'
+                       if config.get_setting(cfg_proxytools_provider, default=''): config.set_setting(cfg_proxytools_provider, '')
+
+                   # por ID
+                   cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
+                   cfg_proxytools_max_channel = 'channel_' + ch['id'] + '_proxytools_max'
+                   cfg_proxytools_provider = 'channel_' + ch['id'] + '_proxytools_provider'
+
+                   if not config.get_setting(cfg_proxies_channel, default=''):
+                       if not config.get_setting(cfg_proxytools_max_channel, default=''):
+                           if not config.get_setting(cfg_proxytools_provider, default=''): continue
+
+                   if config.get_setting(cfg_proxies_channel, default=''): config.set_setting(cfg_proxies_channel, '')
                    if config.get_setting(cfg_proxytools_max_channel, default=''): config.set_setting(cfg_proxytools_max_channel, '')
-
-                   cfg_proxytools_provider = 'channel_' + ch['name'] + '_proxytools_provider'
                    if config.get_setting(cfg_proxytools_provider, default=''): config.set_setting(cfg_proxytools_provider, '')
 
-               # por ID
-               cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
-               cfg_proxytools_max_channel = 'channel_' + ch['id'] + '_proxytools_max'
-               cfg_proxytools_provider = 'channel_' + ch['id'] + '_proxytools_provider'
 
-               if not config.get_setting(cfg_proxies_channel, default=''):
-                   if not config.get_setting(cfg_proxytools_max_channel, default=''):
-                       if not config.get_setting(cfg_proxytools_provider, default=''):
-                           continue
+               proceso_seleccionar = False
 
-               if config.get_setting(cfg_proxies_channel, default=''): config.set_setting(cfg_proxies_channel, '')
-               if config.get_setting(cfg_proxytools_max_channel, default=''): config.set_setting(cfg_proxytools_max_channel, '')
-               if config.get_setting(cfg_proxytools_provider, default=''): config.set_setting(cfg_proxytools_provider, '')
+               if channels_excludes:
+                   config.set_setting(cfg_excludes, '')
+                   platformtools.dialog_ok(config.__addon_name, '[B][COLOR %s]Proxies y sus canales excluidos eliminados[/B][/COLOR]' % color_infor)
+               else:
+                   platformtools.dialog_ok(config.__addon_name, '[B][COLOR %s]Proxies eliminados[/B][/COLOR]' % color_infor)
 
-           proceso_seleccionar = False
+               config.set_setting('channels_proxies_memorized', '')
 
-           if channels_excludes:
-               config.set_setting(cfg_excludes, '')
-               platformtools.dialog_ok(config.__addon_name, '[B][COLOR %s]Proxies y sus canales excluidos eliminados[/B][/COLOR]' % color_infor)
-           else:
-               platformtools.dialog_ok(config.__addon_name, '[B][COLOR %s]Proxies eliminados[/B][/COLOR]' % color_infor)
 
     if proceso_seleccionar:
         if not channels_excludes:
-            if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum]¿ Quiere excluir canales en la búsqueda Global de Configurar proxies a usar en los canales que los necesiten ?[/COLOR]'):
+            if not platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow]¿ Quiere excluir canales en la búsqueda Global de Configurar proxies a usar en los canales que los necesiten ?[/COLOR]'):
                 proceso_seleccionar = False
 
     filtros = { 'searchable': True, 'status': 0}
@@ -167,8 +169,7 @@ def proxysearch_all(item):
 
        i = 0
        for ch in ch_list:
-           if not 'proxies' in ch['notes'].lower():
-               continue
+           if not 'proxies' in ch['notes'].lower(): continue
 
            i =+1
 
@@ -202,16 +203,14 @@ def proxysearch_all(item):
 
        i = 0
        for ch in ch_list:
-           if not 'proxies' in ch['notes'].lower():
-               continue
+           if not 'proxies' in ch['notes'].lower(): continue
 
            if not channels_excludes: preselect.append(i)
            channels_ids.append(ch['id'])
            i += 1
 
        for ch in ch_list:
-           if not 'proxies' in ch['notes'].lower():
-               continue
+           if not 'proxies' in ch['notes'].lower(): continue
 
            cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
            cfg_proxytools_max_channel = 'channel_' + ch['id'] + '_proxytools_max'
@@ -219,20 +218,16 @@ def proxysearch_all(item):
 
            if not config.get_setting(cfg_proxies_channel, default=''):
                if not config.get_setting(cfg_proxytools_max_channel, default=''):
-                   if not config.get_setting(cfg_proxytools_provider, default=''):
-                       continue
+                   if not config.get_setting(cfg_proxytools_provider, default=''): continue
 
            info = ''
 
            if channels_excludes:
                channels_preselct = str(channels_excludes).replace('[', '').replace(']', ',')
-               if ("'" + ch['id'] + "'") in str(channels_preselct):
-                   info = info + '[COLOR moccasin][B]EXCLUIDO [/B][/COLOR]'
+               if ("'" + ch['id'] + "'") in str(channels_preselct): info = info + '[COLOR moccasin][B]EXCLUIDO [/B][/COLOR]'
 
-           if ch['status'] == 1:
-               info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
-           elif ch['status'] == -1:
-               info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+           if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
+           elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
 
            if 'dominios' in ch['notes'].lower():
                dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
@@ -240,12 +235,9 @@ def proxysearch_all(item):
                    dominio = dominio.replace('https://', '').replace('/', '')
                    info = info + '[B][COLOR cyan] %s [/B][/COLOR]' % dominio
 
-           if config.get_setting(cfg_proxies_channel, default=''):
-               info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
-           elif config.get_setting(cfg_proxytools_provider, default=''):
-               info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
-           elif config.get_setting(cfg_proxytools_max_channel, default=''):
-               info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
+           if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+           elif config.get_setting(cfg_proxytools_provider, default=''): info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
+           elif config.get_setting(cfg_proxytools_max_channel, default=''): info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
 
            tipos = ch['search_types']
            tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
@@ -279,8 +271,7 @@ def proxysearch_all(item):
     channels_excludes = config.get_setting(cfg_excludes, default='')
 
     for ch in ch_list:
-        if not 'proxies' in ch['notes'].lower():
-            continue
+        if not 'proxies' in ch['notes'].lower(): continue
 
         if channels_excludes:
             channels_preselct = str(channels_excludes).replace('[', '').replace(']', ',')
@@ -290,35 +281,32 @@ def proxysearch_all(item):
 
         if item.extra:
            if item.extra == 'movies':
-               if not 'movie' in ch['search_types']:
-                   continue
+               if not 'movie' in ch['search_types']: continue
 
            elif item.extra == 'tvshows':
-               if not 'tvshow' in ch['search_types']:
-                   continue
+               if not 'tvshow' in ch['search_types']: continue
 
            elif item.extra == 'mixed':
-               if not 'all' in ch['search_types']:
-                   continue
+               if not 'all' in ch['search_types']: continue
 
            elif item.extra == 'documentaries':
-               if not 'documentary' in ch['search_types']:
-                   continue
+               if not 'documentary' in ch['search_types']: continue
 
            elif item.extra == 'torrents':
-               if not 'torrent' in ch['categories']:
-                   continue
+               if not 'torrent' in ch['categories']: continue
 
            else:
-               if not 'all' in ch['search_types']:
-                   continue
+               if not 'all' in ch['search_types']: continue
 
         proxysearch_channel(item, ch['id'], ch['name'])
 
-    txt = 'Revise los canales, porque podria ser que algún canal no los necesite ó viceversa. '
-    if not item.extra:
-        txt += 'Para ello bastará con entrar al canal y ver si se presentan listas en cualquiera de sus opciones, '
-        txt += 'si procede deberá eliminar los proxies memorizados ó configurarlos de nuevo dentro del canal.'
+    if config.get_setting('memorize_channels_proxies', default=True):
+       txt = 'Revise los canales Memorizados, porque podria ser que algún canal no los necesite ó viceversa. '
+    else:
+       txt = 'Revise los canales, porque podria ser que algún canal no los necesite ó viceversa. '
+       if not item.extra:
+           txt += 'Para ello bastará con entrar al canal y ver si se presentan listas en cualquiera de sus opciones, '
+           txt += 'si procede deberá eliminar los proxies memorizados ó configurarlos de nuevo dentro del canal.'
 
     platformtools.dialog_ok(config.__addon_name, 'Proceso configurar proxies a usar y su memorización Finalizado.', '[COLOR yellow][B]' + txt + '[/COLOR][/B]')
 
@@ -359,6 +347,23 @@ def channels_excluded_list(ret, channels_ids, channels_excludes):
 def proxysearch_channel(item, channel_id, channel_name):
     logger.info()
 
+    channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
+
+    if config.get_setting('memorize_channels_proxies', default=True):
+        if channels_proxies_memorized:
+            el_memorizado = "'" + channel_id + "'"
+            if not el_memorizado in str(channels_proxies_memorized): return
+
+            cfg_proxies_channel = 'channel_' + channel_id + '_proxies'
+
+            config.set_setting(cfg_proxies_channel, '')
+
+            cfg_proxytools_max_channel = 'channel_' + channel_id + '_proxytools_max'
+            cfg_proxytools_provider = 'channel_' + channel_id + '_proxytools_provider'
+
+            if config.get_setting(cfg_proxytools_max_channel, default=''): config.set_setting(cfg_proxytools_max_channel, '')
+            if config.get_setting(cfg_proxytools_provider, default=''): config.set_setting(cfg_proxytools_provider, '')
+
     el_canal = '[B][COLOR %s]' % color_exec
     el_canal += channel_name
     el_canal += '[COLOR %s] procesando ...[/COLOR][/B]' % color_avis
@@ -383,8 +388,7 @@ def proxysearch_channel(item, channel_id, channel_name):
                break
 
     if not esta_en_poe:
-       if dominio:
-           host = dominio
+       if dominio: host = dominio
        else:
            try:
               data = filetools.read(filename_py)
@@ -407,14 +411,12 @@ def proxysearch_channel(item, channel_id, channel_name):
            bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
 
            host = scrapertools.find_single_match(bloc, '.*?host.*?"(.*?)"')
-           if not host:
-               host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
+           if not host: host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
 
     host = host.strip()
 
     if not host:
-        if dominio:
-            host = dominio
+        if dominio: host = dominio
 
     if not host or not '//' in host:
         if channel_name == 'DocumaniaTv':
@@ -431,12 +433,55 @@ def proxysearch_channel(item, channel_id, channel_name):
 
     if not config.get_setting(cfg_proxies_channel, default=''):
         response = httptools.downloadpage(host, raise_weberror=False)
+
         if response.sucess == True:
             if len(response.data) > 999:
-                 el_canal = ('[B][COLOR %s]No necesita proxies ') % color_infor
-                 el_canal += ('[COLOR %s]' + channel_name + '[/COLOR][/B]') % color_exec
-                 platformtools.dialog_notification(config.__addon_name, el_canal)
-                 return
+
+                if config.get_setting('memorize_channels_proxies', default=True):
+                   el_memorizado = "'" + channel_id + "'"
+                   if el_memorizado in str(channels_proxies_memorized):
+                       channels_proxies_memorized = str(channels_proxies_memorized).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                       config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
+
+                el_canal = ('[B][COLOR %s]No necesita proxies ') % color_infor
+                el_canal += ('[COLOR %s]' + channel_name + '[/COLOR][/B]') % color_exec
+                platformtools.dialog_notification(config.__addon_name, el_canal)
+                return
+    else:
+        response = httptools.downloadpage(host, raise_weberror=False)
+
+        if response.sucess == True:
+            if len(response.data) > 999:
+                if config.get_setting('memorize_channels_proxies', default=True):
+                   el_memorizado = "'" + channel_id + "'"
+                   if el_memorizado in str(channels_proxies_memorized):
+                       channels_proxies_memorized = str(channels_proxies_memorized).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                       config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
+
+                el_canal = ('[B][COLOR %s]Proxies quitados ') % color_alert
+                el_canal += ('[COLOR %s]' + channel_name + '[/COLOR][/B]') % color_exec
+                platformtools.dialog_notification(config.__addon_name, el_canal)
+
+                config.set_setting(cfg_proxies_channel, '')
+
+                cfg_proxytools_max_channel = 'channel_' + channel_id + '_proxytools_max'
+                cfg_proxytools_provider = 'channel_' + channel_id + '_proxytools_provider'
+
+                if config.get_setting(cfg_proxytools_max_channel, default=''): config.set_setting(cfg_proxytools_max_channel, '')
+                if config.get_setting(cfg_proxytools_provider, default=''): config.set_setting(cfg_proxytools_provider, '')
+                return
+
+    if config.get_setting('memorize_channels_proxies', default=True):
+        el_memorizado = "'" + channel_id + "'"
+
+        if not channels_proxies_memorized: channels_proxies_memorized = el_memorizado
+        else: channels_proxies_memorized = channels_proxies_memorized + ', ' + el_memorizado
+
+        if not el_memorizado in str(channels_proxies_memorized):
+            config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
+
+        if el_memorizado in str(channels_proxies_memorized):
+            return proxytools.configurar_proxies_canal(channel_name, host)
 
     return proxytools.configurar_proxies_canal(channel_name, host)
 

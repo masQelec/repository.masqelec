@@ -5,7 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import re
+import re, os
 
 from platformcode import logger, platformtools
 from core.item import Item
@@ -84,9 +84,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Estrenos subtitulado', action = 'list_all',
                                url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino', search_type = 'movie', ))
 
-    itemlist.append(item.clone( title = 'En DVD', action = 'list_search', url = host + 'calidad/dvd-full/', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'En 3D', action = 'list_search', url = host + 'peliculas-3d/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'movie' ))
 
@@ -104,6 +102,16 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_series', url = host + 'series-2/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def calidades(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'En DVD', action = 'list_search', url = host + 'calidad/dvd-full/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En 3D', action = 'list_search', url = host + 'peliculas-3d/', search_type = 'movie' ))
 
     return itemlist
 
@@ -225,18 +233,32 @@ def episodios(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<td\s*class="capitulonombre">\s*<img\s*src="([^"]+)[^>]+>(?:<a\s*href="[^>]+>)(.*?)<\/a>\s*<\/td>\s*<td\s*class="capitulodescarga">\s*<a\s*href="([^"]+)[^>]+>.*?(?:<td\s*class="capitulofecha">.*?(\d{4})?.*?<\/td>)?(?:<td\s*class="capitulosubtitulo">\s*<a\s*href="([^"]+)[^>]+>.*?<\/td>)?'
+    patron = '<td\s*class="capitulonombre">\s*<img\s*src="([^"]+)"[^>]+><a[^>]*title="[^"]+"'
+    patron += '>\s*([^<]*)<\/a>\s*<\/td>\s*<td\s*class="capitulodescarga">\s*<a[^>]*href="([^"]+)"()()()'
 
     if not scrapertools.find_single_match(data, patron):
-        patron = '<td\s*class="capitulonombre">\s*<img\s*src="([^"]+)[^>]+><a\s*(?:target="[^"]*"\s*)?href="[^>]*title="([^"]+)">[^<]*<\/a>\s*<\/td>\s*<td\s*class="capitulodescarga">\s*<a\s*(?:target="[^"]*"\s*)?href="([^"]+)"[^>]+>.*?(?:<td\s*class="capitulofecha">.*?(\d{4})?.*?<\/td>)?.*?(?:<td\s*class="capitulosubtitulo">\s*<a\s*href="([^"]+)[^>]+>.*?<\/td>)?.*?(?:<td\s*class="capitulodescarga">\s*<a\s*(?:target="[^"]*"\s*)?href="([^"]+)")?'
+        patron = '<td\s*class="capitulonombre">\s*<img\s*src="([^"]+)[^>]+>(?:<a\s*href="[^>]+>)?'
+        patron += '(.*?)<\/a>\s*<\/td>\s*<td\s*class="capitulodescarga">\s*<a\s*href="([^"]+)[^>]+>'
+        patron += '.*?(?:<td\s*class="capitulofecha">.*?(\d{4})?.*?<\/td>)?'
+        patron += '(?:<td\s*class="capitulosubtitulo">\s*<a\s*href="([^"]+)[^>]+>.*?<\/td>)?'
+
+        if not scrapertools.find_single_match(data, patron):
+            patron = '<td\s*class="capitulonombre">\s*<img\s*src="([^"]+)[^>]+><a\s*'
+            patron += '(?:target="[^"]*"\s*)?href="[^>]*title="([^"]+)">[^<]*<\/a>\s*<\/td>'
+            patron += '\s*<td\s*class="capitulodescarga">\s*<a\s*(?:target="[^"]*"\s*)?'
+            patron += 'href="([^"]+)"[^>]+>.*?(?:<td\s*class="capitulofecha">.*?(\d{4})?.*?<\/td>)?'
+            patron += '.*?(?:<td\s*class="capitulosubtitulo">\s*<a\s*href="([^"]+)[^>]+>.*?<\/td>)?'
+            patron += '.*?(?:<td\s*class="capitulodescarga">\s*<a\s*(?:target="[^"]*"\s*)?href="([^"]+)")?'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    for lang, title, url, year, sub, urll2 in matches:
+    for lang, title, url, year, sub_tit, url_2 in matches:
+        if not title: continue
+
         s_e = scrapertools.get_season_and_episode(title)
+
         season = int(s_e.split("x")[0])
         episode = s_e.split("x")[1]
 
@@ -254,8 +276,7 @@ def findvideos(item):
 
     if item.contentType == "movie":
         data = do_downloadpage(item.url)
-
-        url_torrent = scrapertools.find_single_match(data, '<a target="_blank" href="(.*?)"')
+        url_torrent = scrapertools.find_single_match(data, '<a target="_blank".*?href="(.*?)"')
     else:
         url_torrent = item.url
 
@@ -286,12 +307,13 @@ def play(item):
             else:
                 data = do_downloadpage(item.url)
 
-            if 'Página no encontrada</title>' in data:
-                 platformtools.dialog_ok('Subtorrents', '[COLOR yellow]Archivo no encontrado[/COLOR]')
-                 return itemlist
-
             if data:
-                import os
+                try:
+                   if 'Página no encontrada</title>' in str(data):
+                       platformtools.dialog_ok('Subtorrents', '[COLOR yellow]Archivo no encontrado[/COLOR]')
+                       return itemlist
+                except:
+                   pass
 
                 file_local = os.path.join(config.get_data_path(), "temp.torrent")
                 with open(file_local, 'wb') as f: f.write(data); f.close()

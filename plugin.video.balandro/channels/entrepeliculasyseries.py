@@ -24,8 +24,11 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    url = url.replace('https://entrepeliculasyseries.com/', host)
-    url = url.replace('https://entrepeliculasyseries.io/', host)
+    ant_hosts = ['https://entrepeliculasyseries.com/',
+                 'https://entrepeliculasyseries.io/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
 
     if '/peliculas-del' in url: raise_weberror = False
 

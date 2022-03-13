@@ -18,6 +18,8 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('/fembed.com/', '/www.fembed.com/')
     elif 'fembed.live' in page_url:
         page_url = page_url.replace('/www.fembed.live/', '/diasfem.com/').replace('/fembed.live/', '/diasfem.com/')
+    elif 'fembed.net' in page_url:
+        page_url = page_url.replace('/www.fembed.net/', '/diasfem.com/').replace('/fembed.net/', '/diasfem.com/')
     elif 'feurl.com' in page_url:
         page_url = page_url.replace('/www.feurl.com/', '/diasfem.com/').replace('/feurl.com/', '/diasfem.com/')
     elif 'femax20.com' in page_url:
@@ -32,9 +34,9 @@ def get_video_url(page_url, url_referer=''):
     vid = scrapertools.find_single_match(page_url, "/(?:v|f)/([A-z0-9_-]+)")
     if not vid or not dom: return video_urls
 
-    post = {'r':'', 'd': dom.replace('https://', '')}
+    post = "r=&d=feurl.com"
 
-    data = httptools.downloadpage(dom + '/api/source/' + vid, post=post).data
+    data = httptools.downloadpage('https://www.fembed.com/api/source/' + vid, post=post).data
 
     try:
         data = jsontools.load(data)

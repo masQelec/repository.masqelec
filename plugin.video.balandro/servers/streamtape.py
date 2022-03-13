@@ -7,11 +7,13 @@ from platformcode import logger
 def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
 
-    page_url = page_url.replace('/v/', '/e/')
+    page_url = page_url.replace('/v/', '/e/').strip()
+    if page_url.endswith('?') == True: page_url = page_url.replace('?', '')
+
     video_urls = get_aux(page_url)
 
     if len(video_urls) == 0:
-        page_url = page_url.replace('/e/', '/v/')
+        page_url = page_url.replace('/e/', '/v/').strip()
         video_urls = get_aux(page_url)
 
     return video_urls
@@ -36,8 +38,8 @@ def get_aux(page_url):
         platformtools.dialog_notification('Cargando Streamtape', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
 
-        referer = {"Referer": page_url}
-        data = httptools.downloadpage(page_url, headers=referer).data
+        data = httptools.downloadpage(page_url, headers={"Referer": page_url}).data
+
         url_data = scrapertools.find_single_match(data, """getElementById\('\w+link'\).innerHTML = "[^"]+" .* \('.+?/([^']+)'\)""")
 
     if url_data:

@@ -3,7 +3,7 @@
   "name": "DocumaniaTv",
   "thumbnail": "documaniatv.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["documentary"],
@@ -11,7 +11,7 @@
   "categories": ["documentary"],
   "language": ["cast"],
 
-  "clusters": ["suggested", "rankings", "categories", "adults", "docs"],
+  "clusters": ["temporary", "suggested", "rankings", "categories", "adults", "docs"],
 
   "notes": "Documentales en castellano por categorías, series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

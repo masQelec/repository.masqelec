@@ -15,9 +15,6 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     url = url.replace('seriesmetro.com', 'seriesmetro.net')
 
-    # ~ canal inestable 2021-11-07 (solo 10 elementos)
-    if '/ver/' in url or '/series' in url: raise_weberror = False
-
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     return data
 
@@ -141,7 +138,7 @@ def last_epis(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Últimos Capítulos<(.*?)>Series populares<')
+    bloque = scrapertools.find_single_match(data, '>Últimos Capítulos<(.*?)>Series Recomendadas<')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article (.*?)</article>')
 
@@ -167,7 +164,9 @@ def last_epis(item):
 
         title = title.replace(season + 'x' + episode, '').strip()
 
-        thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
+        thumb = scrapertools.find_single_match(article, '<noscript>.*?<img src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(article, 'data-lazy-src="(.*?)"')
+
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
         titulo = '%sx%s %s' % (season, episode, title)
@@ -233,17 +232,15 @@ def episodios(item):
     post = {'action': 'action_select_season', 'post': item.dpost, 'object': item.dobject, 'season': item.contentSeason}
     data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post)
 
-    tot_pages = scrapertools.find_single_match(data, '<span class="page-numbers dots">.*?href=.*?>(.*?)</a>')
+    tot_pages = scrapertools.find_single_match(data, '<a class="page-numbers" href=".*?>(.*?)</a>')
 
     if not tot_pages: pages = 12
     else:
         try:
            pages = int(tot_pages)
+           platformtools.dialog_notification('SeriesMetro', '[COLOR blue]Cargando episodios[/COLOR]')
         except:
            pages = 12
-
-    if pages > 1:
-        platformtools.dialog_notification('SeriesMetro', '[COLOR blue]Cargando episodios[/COLOR]')
 
     for i in range(pages):
         matches = scrapertools.find_multiple_matches(data, '<li><a href="([^"]+)"[^>]*>([^<]+)')

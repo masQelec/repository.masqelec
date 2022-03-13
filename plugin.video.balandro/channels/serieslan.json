@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["lat"],
 
-  "clusters": ["classic", "rankings", "kids"],
+  "clusters": ["suggested", "classic", "rankings", "kids"],
 
   "notes": "Series infantiles clásicas en idioma orignal de emisión."
 }

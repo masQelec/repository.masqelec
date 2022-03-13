@@ -38,10 +38,26 @@ def categorias(item):
         title = url.capitalize()
         title = title.replace('-blog', '').replace('-', '')
 
-        url = host + '/category/blog/' + url + '/'
+        if title == 'Altosecreto': title = 'Alto secreto'
+        elif title == 'Amosenlasombra': title = 'Amos en la sombra'
+        elif title == 'Elsecreto': title = 'El secreto'
+        elif title == 'Grandesincertidumbres': title = 'Grandes incertidumbres'
+        elif title == 'Humanosbajocontrol': title = 'Humanos bajo control'
+        elif title == 'Lagranjahumana': title = 'La granja humana'
+        elif title == 'Laluna': title = 'La luna'
+        elif title == 'Lamatriz': title = 'La matriz'
+        elif title == 'Mensajesocultosenlogos': title = 'Mensajes ocultos en logos'
+        elif title == 'Nadaesloqueparece': title = 'Nada es lo que parece'
+        elif title == 'Ordenimpuesto': title = 'Orden impuesto'
+        elif title == 'Reptileseneleden': title = 'Reptiles en el eden'
+        elif title == 'Rutasmagicas': title = 'Rutas magicas'
+        elif title == 'Saludhumana': title = 'Salud humana'
+        elif title == 'Videoprogramas': title = 'Video programas'
 
         if title in str(cats):
             continue
+
+        url = host + '/category/blog/' + url + '/'
 
         cats.append(title)
 
@@ -62,9 +78,11 @@ def list_all(item):
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
                                     contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
-    next_page_link = scrapertools.find_single_match(data, "<a class='page-numbers' href='(.*?)'")
-    if next_page_link != '':
-        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page_link, text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, 'class="page-numbers current">.*?href="(.*?)"')
+        if next_page:
+            if '/page/' in next_page:
+                itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 

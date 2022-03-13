@@ -13,14 +13,17 @@ host = "https://tioanime.com"
 def mainlist(item):
     return mainlist_anime(item)
 
+def mainlist_series(item):
+    return mainlist_anime(item)
+
 
 def mainlist_anime(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
+    descartar_anime = config.get_setting('descartar_anime', default=False)
 
-    if descartar_xxx: return itemlist
+    if descartar_anime: return itemlist
 
     if config.get_setting('adults_password'):
         from modules import actions
@@ -36,7 +39,7 @@ def mainlist_anime(item):
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all',
                                 url = host + '/directorio?type%5B%5D=0&year=1950%2C' + str(current_year) +'&status=1&sort=recent', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host, group = 'last_epis', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + '/directorio?type%5B%5D=2', search_type = 'tvshow' ))
 
@@ -108,8 +111,12 @@ def list_all(item):
         url = host + url
         thumb = host + thumb
 
-        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
+        if item.group == 'last_epis':
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
+        else:
+            itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
     next_page = scrapertools.find_single_match(data,'<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
     if next_page:

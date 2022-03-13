@@ -13,5 +13,5 @@
 
   "clusters": ["torrents", "news", "lists", "vos", "3d"],
 
-  "notes": "Películas y Series con enlaces torrent y streaming. Clones: Atomix y Descargas2020. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Canal con enlaces Streaming y Torrent. Clones: Atomix y Descargas2020. Películas y Series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

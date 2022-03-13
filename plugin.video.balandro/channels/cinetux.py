@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
@@ -135,12 +134,10 @@ def peliculas(item):
         if 'class="espanol"' in article: langs.append('Esp')
         if 'class="latino"' in article: langs.append('Lat')
         if 'class="subtitulado"' in article: langs.append('Vose')
-        
+
         quality = scrapertools.find_single_match(article, '/beta/([^\.]+)\.png')
-        if 'calidad' in quality:
-            quality = quality.replace('-', ' ').replace('calidad', '').strip().capitalize()
-        else:
-            quality = ''
+        if 'calidad' in quality: quality = quality.replace('-', ' ').replace('calidad', '').strip().capitalize()
+        else: quality = ''
 
         show, showalt = extraer_show_showalt(title)
 
@@ -188,21 +185,27 @@ def findvideos(item):
         url = scrapertools.find_single_match(enlace, " href='([^']+)")
         servidor = scrapertools.find_single_match(enlace, " alt='([^'.]+)")
         if not servidor: servidor = scrapertools.find_single_match(enlace, "domain=([^'.]+)")
+
         servidor = corregir_servidor(servidor.strip().lower())
+
+        if not servidor: continue
+        if 'Descargar</a>' in enlace and servidor not in ['mega', 'gvideo', 'uptobox']: continue
+
         uploader = scrapertools.find_single_match(enlace, "author/[^/]+/'>([^<]+)</a>")
 
         enlace = enlace.replace('https://static.cinetux.to/', '/').replace('https://cdn.cinetux.nu/', '/')
         tds = scrapertools.find_multiple_matches(enlace, 'data-lazy-src="/assets/img/([^\.]*)')
 
-        if tds:
-            quality = tds[1]
-            lang = tds[2]
-        else:
-            quality = scrapertools.find_single_match(enlace, "<strong class='quality'>([^<]+)")
-            lang = scrapertools.find_single_match(enlace, "<td>([^<]+)")
-
-        if not servidor: continue
-        if 'Descargar</a>' in enlace and servidor not in ['mega', 'gvideo', 'uptobox']: continue
+        try:
+            if tds:
+                quality = tds[1]
+                lang = tds[2]
+            else:
+                quality = scrapertools.find_single_match(enlace, "<strong class='quality'>([^<]+)")
+                lang = scrapertools.find_single_match(enlace, "<td>([^<]+)")
+        except:
+            quality = ''
+            lang = ''
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                               language = IDIOMAS.get(lang,lang), quality = quality, quality_num = puntuar_calidad(quality), other = uploader ))

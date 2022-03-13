@@ -13,5 +13,5 @@
 
   "clusters": ["torrents", "news", "qualityes", "vos", "3d"],
 
-  "notes": "Películas y Series con enlaces torrent exclusivamente. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Canal con enlaces Torrent exclusivamente. Películas y Series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }
