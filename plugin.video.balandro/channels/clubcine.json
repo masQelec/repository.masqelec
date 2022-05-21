@@ -3,7 +3,7 @@
   "name": "ClubCine",
   "thumbnail": "clubcine.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["suggested", "classic", "categories", "epochs", "countries", "stars", "directors", "rankings", "docs", "vos"],
 
-  "notes": "Cine clásico, moderno y mas historias. Por géneros, etc."
+  "notes": "Web CERRADA. Cine clásico, moderno y mas historias. Por géneros, etc."
 }

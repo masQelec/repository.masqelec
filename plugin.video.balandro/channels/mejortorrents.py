@@ -461,6 +461,9 @@ def play(item):
                 data = do_downloadpage(item.url)
 
             if data:
+                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
                 import os
 
                 file_local = os.path.join(config.get_data_path(), "temp.torrent")
@@ -480,15 +483,11 @@ def list_search(item):
     if not item.page: item.page = 0
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = r"href='([^']+)'.*?>(.*?)<"
+    bloque = scrapertools.find_single_match(data, r'Has realizado una búsqueda(.*?)<footer>')
 
-    data = scrapertools.find_single_match(data, r'Has realizado una búsqueda(.*?)<footer>')
-    patron = r"href='([^']+)'.*?>(.*?)</a>.*?'>(.*?)<.*?<td.*?>(.*?)<"
-
-    matches = scrapertools.find_multiple_matches(data, patron)
+    matches = scrapertools.find_multiple_matches(bloque, r"href='([^']+)'.*?>(.*?)</a>.*?'>(.*?)<.*?<td.*?>(.*?)<")
     num_matches = len(matches)
 
     for url, title, qlty, type in matches[item.page * perpage:]:

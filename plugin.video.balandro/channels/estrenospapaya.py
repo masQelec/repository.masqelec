@@ -2,10 +2,8 @@
 
 import sys
 
-if sys.version_info[0] < 3:
-    import urlparse
-else:
-    import urllib.parse as urlparse
+if sys.version_info[0] < 3: import urlparse
+else: import urllib.parse as urlparse
 
 
 import re, string
@@ -14,7 +12,11 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, jsontools, tmdb
 
+
 host = "https://www.estrenospapaya.com/"
+
+
+perpage = 15
 
 IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'in': 'Eng', 'ca': 'Cat', 'sub': 'Vose',
            'Español Latino': 'Lat', 'Español Castellano': 'Esp', 'Sub Español': 'Vose'}
@@ -55,6 +57,7 @@ def mainlist_series(item):
 def list_all(item):
     logger.info()
     itemlist = []
+
     data = do_downloadpage(item.url)
 
     patron = '<div class="esimagen">\s*<img style="width:60px" src="([^"]+)'
@@ -65,6 +68,7 @@ def list_all(item):
 
     for img, url, name, year, plot in matches:
         url = urlparse.urljoin(host, url)
+
         thumb = httptools.get_url_headers(urlparse.urljoin(host, img))
 
         itemlist.append(item.clone( action='temporadas', url=url, title=name, thumbnail=thumb,
@@ -108,7 +112,6 @@ def series_por_letra(item):
     post_request = {"group_no": item.page, "letra": item.letter}
 
     data = do_downloadpage(url, post=post_request)
-
     data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     patron = '<div class=list_imagen><img src=(.*?) \/>.*?<div class=list_titulo><a href=(.*?) style=.*?inherit;>(.*?)<.*?justify>(.*?)<.*?Año:<\/b>.*?(\d{4})<'
@@ -117,6 +120,7 @@ def series_por_letra(item):
 
     for img, url, name, plot, year in matches:
         url = urlparse.urljoin(host, url)
+
         thumb = httptools.get_url_headers(urlparse.urljoin(host, img))
 
         new_item = item.clone( action='temporadas', url=url, title=name, thumbnail=thumb,
@@ -139,7 +143,6 @@ def estrenos(item):
     language = 'Esp' if 'castellano' in item.url else 'Lat' if 'latino' in item.url else 'Vose'
 
     if item.page == '': item.page = 0
-    perpage = 10
 
     data = do_downloadpage(item.url)
 
@@ -163,8 +166,7 @@ def estrenos(item):
         # Menú contextual acceso a temporada / serie
         slug_serie = scrapertools.find_single_match(url, '/ver/([^/]*)/')
         url_serie = urlparse.urljoin(host, 'serie/%s.html' % slug_serie)
-        if not url.startswith(host):
-            url = urlparse.urljoin(host, url)
+        if not url.startswith(host): url = urlparse.urljoin(host, url)
 
         context = []
         context.append({ 'title': '[COLOR pink]Listar temporada %s[/COLOR]' % season, 
@@ -231,7 +233,6 @@ def episodios(item):
     if not item.perpage: item.perpage = 100
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     patron = '<a class=visco.*?href=(.*?)>.*?>(.*?)-(.*?)</a>.*?<div class=ucapaudio>(.*?)</div>'
@@ -264,21 +265,17 @@ def episodios(item):
             if not str(item.contentSeason) == season: continue
 
         languages = ', '.join([IDIOMAS.get(lang, lang) for lang in re.findall('images/s-([^\.]+)', langs)])
-        titulo = '%s [COLOR %s][%s][/COLOR]' % (title, color_lang, languages)
+        titulo = '%s [COLOR %s]%s[/COLOR]' % (title, color_lang, languages)
 
         url = urlparse.urljoin(host, url)
 
         ord_epis = str(episode)
 
-        if len(str(ord_epis)) == 1:
-            ord_epis = '0000' + ord_epis
-        elif len(str(ord_epis)) == 2:
-            ord_epis = '000' + ord_epis
-        elif len(str(ord_epis)) == 3:
-            ord_epis = '00' + ord_epis
+        if len(str(ord_epis)) == 1: ord_epis = '0000' + ord_epis
+        elif len(str(ord_epis)) == 2: ord_epis = '000' + ord_epis
+        elif len(str(ord_epis)) == 3: ord_epis = '00' + ord_epis
         else:
-            if total_epis > 50:
-                ord_epis = '0' + ord_epis
+            if total_epis > 50: ord_epis = '0' + ord_epis
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, contentType = 'episode',
                                     orden = ord_epis, contentSeason = season, contentEpisodeNumber = episode ))
@@ -291,7 +288,7 @@ def episodios(item):
     if itemlist:
         if total_epis > ((item.page + 1) * item.perpage):
             itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage,
-                            orden = '10000', text_color='coral' ))
+                                        orden = '10000', text_color='coral' ))
 
     return sorted(itemlist, key=lambda i: i.orden)
 
@@ -313,8 +310,7 @@ def findvideos(item):
              '<div[^>]+>\s+(?P<date>[^\s<]+)' + '.+?' + \
              '<div.+?img.+?>\s*(?P<server>.+?)</div>' + '.+?' + \
              '<div.+?href="(?P<url>[^"]+).+?images/(?P<type>[^\.]+)' + '.+?' + \
-             '<div[^>]+>\s*(?P<quality>.*?)</div>' + '.+?' + \
-             '<div.+?<a.+?>(?P<uploader>.*?)</a>'
+             '<div[^>]+>\s*(?P<quality>.*?)</div>'
 
     links = re.findall(patron, data, re.MULTILINE | re.DOTALL)
 
@@ -322,7 +318,7 @@ def findvideos(item):
 
     ses = 0
 
-    for lang, date, server, url, linkType, quality, uploader in links:
+    for lang, date, server, url, linkType, quality in links:
         linkTypeNum = 0 if linkType == "descargar" else 1
         if linkTypeNum != 1 and server != 'Clicknupload' and server != 'Uptobox': continue
 
@@ -334,7 +330,8 @@ def findvideos(item):
         url = urlparse.urljoin(host, url)
 
         itemlist.append(Item(channel = item.channel, action = 'play', server=server, referer=item.url, title = '', url = url,
-                             language = IDIOMAS.get(lang,lang), quality = quality, quality_num = puntuar_calidad(quality), age = date, other = uploader ))
+                                                     language = IDIOMAS.get(lang,lang), quality = quality, quality_num = puntuar_calidad(quality),
+                                                     age = date ))
 
     if not itemlist:
         if not ses == 0:
@@ -372,6 +369,7 @@ def search_post(item, texto):
         name = name.strip()
         url = httptools.get_url_headers(urlparse.urljoin(host, img))
         thumb = urlparse.urljoin(host, img)
+
         itemlist.append(item.clone( action='temporadas', url=url, title=name, contentType = 'tvshow', contentSerieName = name, thumbnail=thumb ))
 
     tmdb.set_infoLabels(itemlist)
@@ -394,9 +392,8 @@ def search(item, texto):
             url = urlparse.urljoin(host, show["urla"])
             thumb = httptools.get_url_headers(urlparse.urljoin(host, show["img"]))
 
-            itemlist.append(item.clone( action='temporadas', url=url,
-                                        contentType='tvshow', contentSerieName=show["titulo"],
-                                        title=show["titulo"], thumbnail=thumb ))
+            itemlist.append(item.clone( action='temporadas', url=url, title=show["titulo"], thumbnail=thumb,
+                                        contentType='tvshow', contentSerieName=show["titulo"] ))
 
         tmdb.set_infoLabels(itemlist)
         return itemlist

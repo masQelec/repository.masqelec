@@ -7,17 +7,26 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = "https://seriesanimadas.org/"
+host = 'https://animedesho.com/'
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://seriesanimadas.org/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
 
 
 def mainlist(item):
-    return mainlist_anime(item)
-
-def mainlist_series(item):
-    return mainlist_anime(item)
+    return mainlist_animes(item)
 
 
-def mainlist_anime(item):
+def mainlist_animes(item):
     logger.info()
     itemlist = []
 
@@ -52,7 +61,7 @@ def generos(item):
 
     url_genre = host + '/tvgenero/'
 
-    data = httptools.downloadpage(host + 'series').data
+    data = do_downloadpage(host + 'series')
 
     matches = scrapertools.find_multiple_matches(data, '/tvgenero/(.*?)".*?>(.*?)</a>')
 
@@ -68,7 +77,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
 
@@ -99,7 +108,7 @@ def list_epis(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     patron = '<div class="card-episodie shadow-sm">.*?<a href="(.*?)".*?title="(.*?)".*?src="(.*?)".*?</div>'
 
@@ -124,7 +133,7 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     matches = re.compile('<div id="season-(.*?)"', re.DOTALL).findall(data)
@@ -155,7 +164,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     if not item.contentSeason:
@@ -199,7 +208,7 @@ def findvideos(item):
 
     IDIOMAS = {'latino': 'Lat', 'audio latino': 'Lat', 'español': 'Esp', 'audio español': 'Esp', 'sub español': 'Vose', 'subtitulado': 'Vose'}
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = re.compile('video\[(\d+)\] = .*?src="([^"]+)".*?;', re.DOTALL).findall(data)
 

@@ -201,9 +201,10 @@ def search_trailers(item):
 def global_proxies(item):
     logger.info()
 
-    from modules import proxysearch
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow]¿ Confirma Obtener Proxies en los canales que los necesiten ?[/COLOR]'):
+        from modules import proxysearch
 
-    proxysearch.proxysearch_all(item)
+        proxysearch.proxysearch_all(item)
 
 
 def manto_proxies(item):
@@ -282,17 +283,57 @@ def last_domain_hdfull(item):
         return
 
     try:
-       data = httptools.downloadpage('https://hdfullcdn.cc/login').data
+       host_domain = 'https://hdfullcdn.cc/login'
+
+       if item.desde_el_canal:
+           if item.dominios_ret: host_domain = item.dominios_ret + 'login'
+
+       data = httptools.downloadpage(host_domain).data
+
        last_domain = scrapertools.find_single_match(data, 'location.replace.*?"(.*?)"')
+       if not last_domain: last_domain = scrapertools.find_single_match(data, '<link rel="canonical".*?href="(.*?)"')
+
+       if not last_domain:
+           if config.get_setting('channel_hdfull_proxies', default=''):
+               data = httptools.downloadpage_proxy('hdfull', host_domain).data
+               last_domain = scrapertools.find_single_match(data, 'location.replace.*?"(.*?)"')
+               if not last_domain: last_domain = scrapertools.find_single_match(data, '<link rel="canonical".*?href="(.*?)"')
+
        if last_domain:
            last_domain = last_domain.replace('login', '')
-           if not last_domain.endswith('/'):
-               last_domain = last_domain + '/'
+           if not last_domain.endswith('/'): last_domain = last_domain + '/'
     except:
-      last_domain = ''
+       last_domain = ''
+
+    if not last_domain:
+        try:
+           host_domain = 'https://new.hdfull.one/login'
+
+           if item.desde_el_canal:
+               if item.dominios_ret: host_domain = item.dominios_ret + 'login'
+
+           data = httptools.downloadpage(host_domain).data
+
+           last_domain = scrapertools.find_single_match(data, 'location.replace.*?"(.*?)"')
+           if not last_domain: last_domain = scrapertools.find_single_match(data, '<link rel="canonical".*?href="(.*?)"')
+
+           if not last_domain:
+               if config.get_setting('channel_hdfull_proxies', default=''):
+                   data = httptools.downloadpage_proxy('hdfull', host_domain).data
+                   last_domain = scrapertools.find_single_match(data, 'location.replace.*?"(.*?)"')
+                   if not last_domain: last_domain = scrapertools.find_single_match(data, '<link rel="canonical".*?href="(.*?)"')
+
+           if last_domain:
+               last_domain = last_domain.replace('login', '')
+               if not last_domain.endswith('/'): last_domain = last_domain + '/'
+        except:
+           last_domain = ''
 
     if not last_domain:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
+
+        xbmc.sleep(1000)
+        platformtools.dialog_ok(config.__addon_name + ' - HdFull', '[COLOR yellow]Para conocer el último dominio vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://twitter.com/hdfulloficial[/B][/COLOR]')
         return
 
     domain = config.get_setting('dominio', 'hdfull', default='')
@@ -306,7 +347,7 @@ def last_domain_hdfull(item):
 
         if not item.desde_el_canal:
             if not item.from_action == 'mainlist':
-                platformtools.dialog_ok(config.__addon_name + ' - HdFull', '[COLOR yellow]Ultimo dominio vigente memorizado, pero aún NO guardado.', '[COLOR cyan][B]Recuerde, que para que el cambio surta efecto deberá abandonar la configuración/ajustes de Balandro a través de su correspondiente botón --> OK[/B][/COLOR]')
+                platformtools.dialog_ok(config.__addon_name + ' - HdFull', '[COLOR yellow]Último dominio vigente memorizado, pero aún NO guardado.', '[COLOR cyan][B]Recuerde, que para que el cambio surta efecto deberá abandonar la configuración/ajustes de Balandro a través de su correspondiente botón --> OK[/B][/COLOR]')
 
 def del_datos_hdfull(item):
     logger.info()
@@ -338,6 +379,108 @@ def del_datos_playdede(item):
         config.set_setting('channel_playdede_playdede_username', '')
 
 
+def last_domain_dontorrents(item):
+    logger.info()
+
+    from core import httptools, scrapertools, jsontools
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando dominio[/B][/COLOR]' % color_exec)
+
+    channel_json = 'dontorrents.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] DonTorrents') % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    last_domain = ''
+
+    try:
+       data = httptools.downloadpage('https://t.me/s/DonTorrent').data
+
+       dominios = scrapertools.find_multiple_matches(data, '>Dominio Oficial.*?<a href="(.*?)"')
+
+       if dominios:
+           for dominio in dominios:
+               last_domain = dominio
+    except:
+       pass
+
+    if not last_domain:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
+
+        xbmc.sleep(1000)
+        platformtools.dialog_ok(config.__addon_name + ' - DonTorrents', '[COLOR yellow]Para conocer el último dominio vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://t.me/s/DonTorrent[/B][/COLOR]')
+        return
+
+    domain = config.get_setting('dominio', 'dontorrents', default='')
+
+    if domain == last_domain:
+        platformtools.dialog_ok(config.__addon_name + ' - DonTorrents', '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name + ' - DonTorrents', '¿ [COLOR red] Último dominio memorizado incorrecto. [/COLOR] Desea cambiarlo  ?','Memorizado:  [COLOR yellow][B]' + domain + '[/B][/COLOR]', 'Vigente:           [COLOR cyan][B]' + last_domain + '[/B][/COLOR]'): 
+        config.set_setting('dominio', last_domain, 'dontorrents')
+
+
+def manto_domain_hdfull(item):
+    logger.info()
+
+    from core import jsontools
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando HdFull[/B][/COLOR]' % color_exec)
+
+    channel_json = 'hdfull.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] HdFull') % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    domain = config.get_setting('dominio', 'hdfull', default='')
+
+    new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio HdFull  -->  https://hdfull.???/')
+
+    if new_domain is None: return
+
+    logger.info("check-01-new_domain: %s" % new_domain)
+
+    if new_domain:
+        if not new_domain.startswith('https://'): new_domain = 'https://' + new_domain
+        if not new_domain.endswith('/'): new_domain = new_domain + '/'
+
+        if platformtools.dialog_yesno(config.__addon_name + ' - HdFull', '¿ [COLOR yellow] Confirma el dominio informado ?[/COLOR]', '[COLOR cyan][B] ' + new_domain + ' [/B][/COLOR]'): 
+            config.set_setting('dominio', new_domain, 'hdfull')
+
+            platformtools.dialog_ok(config.__addon_name + ' - HdFull', '[COLOR yellow]Dominio memorizado, pero aún NO guardado.', '[COLOR cyan][B]Recuerde, que para que el cambio surta efecto deberá abandonar la configuración/ajustes de Balandro a través de su correspondiente botón --> OK[/B][/COLOR]')
+
+    return
+
+
 def manto_params(item):
     logger.info()
 
@@ -345,6 +488,8 @@ def manto_params(item):
         config.set_setting('adults_password', '')
 
         config.set_setting('channel_documaniatv_rua', '')
+
+        config.set_setting('channel_hdfull_dontorrents', '')
 
         config.set_setting('channel_hdfull_dominio', '')
         config.set_setting('channel_hdfull_hdfull_login', False)
@@ -367,7 +512,7 @@ def manto_params(item):
 
         # ~ config.set_setting('downloadpath', '')  No funciona
 
-        config.set_setting('chrome_last_version', '98.0.4758.80')
+        config.set_setting('chrome_last_version', '101.0.4951.41')
 
         config.set_setting('debug', '0')
 

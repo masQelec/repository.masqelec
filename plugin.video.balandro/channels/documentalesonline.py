@@ -90,8 +90,13 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
 
     for article in matches:
-        url, title = scrapertools.find_single_match(article, '<h2 class="entry-title"><a href="([^"]+)".*?>(.*?)</a>')
-        thumb = scrapertools.find_single_match(article, ' src="([^"]+)')
+        url = scrapertools.find_single_match(article, '<a href="([^"]+)"')
+
+        title = scrapertools.find_single_match(article, 'rel="bookmark">(.*?)</a>')
+
+        if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(article, 'itemprop="image".*?data-src="(.*?)"')
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<p>(.*?)</p>'))
 
         if '/series-temas/' in url: continue

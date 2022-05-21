@@ -7,7 +7,7 @@ from platformcode import logger
 def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
 
-    page_url = page_url.replace('/v/', '/e/').strip()
+    page_url = page_url.replace('/e/e/', '/e/').replace('/v/v/', '/e/').replace('/e/v/', '/e/').replace('/v/e/', '/e/').replace('/v/', '/e/').strip()
     if page_url.endswith('?') == True: page_url = page_url.replace('?', '')
 
     video_urls = get_aux(page_url)

@@ -5,15 +5,14 @@ import sys
 if sys.version_info[0] < 3: PY3 = False
 else: PY3 = True
 
-
 import os, re
 
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://atomixhq.art/'
+host = 'https://nucleohd.com/'
 
 clon_name = 'Atomix'
 
@@ -49,10 +48,10 @@ def configurar_proxies(item):
 
 def do_downloadpage(item, url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://pctmix.com/', 'https://pctmix1.com/', 
+    ant_hosts = ['https://pctmix.com/', 'https://pctmix1.com/',
                  'https://pctreload.com/', 'https://pctreload1.com/',
                  'https://maxitorrent.com/',
-                 'https://atomixhq.com/', 'https://atomixhq.one/', 'https://atomixhq.net/', 'https://atomixhq.top/']
+                 'https://atomixhq.com/', 'https://atomixhq.one/', 'https://atomixhq.net/', 'https://atomixhq.top/', 'https://atomixhq.art/', 'https://atomixhq.link/', 'https://atomixhq.club/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -62,13 +61,15 @@ def do_downloadpage(item, url, post=None, headers=None):
 
     if not headers: headers = {'Referer': url}
 
+    # ~ 2022/03/19 atomix en k17 y k18 (HTTP Error 403: Forbidden, salta >Attention Required! | Cloudflare)
     try:
        data = httptools.downloadpage(url, post=post, headers=headers).data
     except:
        pass
 
-    if config.get_setting('proxies', item.channel, default=''):
-        if not data: data = httptools.downloadpage_proxy('newpct1', url, post=post, headers=headers).data
+    if not data:
+        if config.get_setting('proxies', item.channel, default=''):
+            data = httptools.downloadpage_proxy('newpct1', url, post=post, headers=headers).data
 
     return data
 
@@ -511,6 +512,7 @@ def findvideos(item):
            if not url: continue
 
         if url.startswith("<a href='javascript:"): continue
+        elif url.startswith("javascript:"): continue
 
         url = url.replace("'", '').strip()
 
@@ -526,8 +528,9 @@ def findvideos(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = servidor,
-                                                     language = extrae_idioma(idioma), quality = calidad ))
+        if not servidor == 'directo':
+            itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = servidor,
+                                                         language = extrae_idioma(idioma), quality = calidad ))
 
     if not itemlist:
         if not ses == 0:
@@ -576,9 +579,6 @@ def play(item):
 
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
-        elif '/ul.to/' in url or '/rapidgator.net/' in url or '/katfile.com/' in url:
-            return '[COLOR tan]Servidor NO soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

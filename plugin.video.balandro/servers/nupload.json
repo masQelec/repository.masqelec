@@ -10,6 +10,10 @@
       {
         "pattern": "(https://nupload.me/watch/[A-z0-9\\?=]+)",
         "url": "\\1"
+      },
+      {
+        "pattern": "(https://nupload.xyz/watch/[A-z0-9\\?=]+)",
+        "url": "\\1"
       }
     ]
   }

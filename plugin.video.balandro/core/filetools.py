@@ -796,8 +796,11 @@ def listdir(path):
     path = encode(path)
     try:
         if PY3:
-            dirs, files = xbmcvfs.listdir(path)
+            if isinstance(path, bytes) and "special://" in path:
+                path = translatePath(path)
+            dirs, files = xbmcvfs.listdir(dirname(path))
             res = sorted(dirs) + sorted(files)
+            return res
         elif path.lower().startswith("smb://"):
             return decode(samba.listdir(path))
         else:

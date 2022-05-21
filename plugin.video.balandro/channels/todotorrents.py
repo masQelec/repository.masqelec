@@ -187,12 +187,12 @@ def list_last(item):
     for url, title in matches:
         if "(" in title: title = title.split("(")[0]
 
-        if item.search_type== 'tvshow':
-            itemlist.append(item.clone( action='episodios', url=host + url, title=title, 
-                                        contentType=item.search_type, contentSerieName=title, infoLabels={'year':"-"} ))
-        else:
+        if item.search_type== 'movie':
             itemlist.append(item.clone( action='findvideos', url=host + url, title=title,
                                         contentType=item.search_type, contentTitle=title, infoLabels={'year': "-"} ))
+        else:
+            itemlist.append(item.clone( action='episodios', url=host + url, title=title, 
+                                        contentType=item.search_type, contentSerieName=title, infoLabels={'year':"-"} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -219,6 +219,7 @@ def call_post(item):
         else:
             if item.search_type == "tvshow": tipo = "series"
             else: tipo = "documentales"
+
             item.url = host + "%s/letra-%s" %(tipo, item.letra.lower())
             return list_all(item)
  
@@ -331,8 +332,7 @@ def findvideos(item):
            other = ''
 
            if url.endswith(".torrent"): pass
-           elif url.startswith('magnet:'):
-              other = 'magnet'
+           elif url.startswith('magnet:'): other = 'magnet'
            else:
               servidor = 'directo'
               if '/ttlinks.live/' in url: other = 'ttlinks'
@@ -387,24 +387,21 @@ def list_search(item):
 
         if not url or not title: continue
 
-        if "pelicula" in url:
-            contentType = "movie"
-        elif "documental" in url:
-            contentType = "documentary"
-        else:            
-            contentType = "tvshow"
+        if "pelicula" in url: contentType = "movie"
+        elif "documental" in url: contentType = "documentary"
+        else: contentType = "tvshow"
 
         if item.search_type not in ['all', contentType]: continue
 
         sufijo = ''
         if item.search_type == 'all': 
             sufijo = contentType
-            if sufijo == "documentary":
-                sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
+            if sufijo == "documentary": sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
 
         if contentType == 'tvshow':
             if not item.search_type == 'all':
                 if item.search_type == "movie": continue
+
             itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, fmt_sufijo=sufijo, 
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year':"-"} ))
         else:

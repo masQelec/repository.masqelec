@@ -438,7 +438,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         default_subtitles = [x.strip().lower() for x in self._session.get('default_subtitle', '').split(',') if x]
 
         if audio_whitelist:
-            audio_whitelist.append(original_language)
             audio_whitelist.extend(default_languages)
 
         if subs_whitelist:
@@ -607,8 +606,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             if not language:
                 continue
 
-            language = fix_language(language)
-            adap_set.setAttribute('lang', language)
+            adap_set.setAttribute('lang', fix_language(language))
 
             if adap_set.getAttribute('contentType') == 'audio':
                 if not lang_allowed(language, audio_whitelist):
@@ -831,7 +829,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         default_subtitles = [x.strip().lower() for x in self._session.get('default_subtitle', '').split(',') if x]
 
         if audio_whitelist:
-            audio_whitelist.append(original_language)
             audio_whitelist.extend(default_languages)
 
         if subs_whitelist:
@@ -853,19 +850,20 @@ class RequestHandler(BaseHTTPRequestHandler):
                 if not attribs:
                     continue
 
-                attribs['LANGUAGE'] = fix_language(attribs.get('LANGUAGE',''))
+                language = attribs.get('LANGUAGE','')
+                attribs['LANGUAGE'] = fix_language(language)
 
-                if attribs.get('TYPE') == 'AUDIO' and lang_allowed(attribs['LANGUAGE'], audio_whitelist):
+                if attribs.get('TYPE') == 'AUDIO' and lang_allowed(language, audio_whitelist):
                     audios.append(attribs)
                     if attribs.get('DEFAULT') == 'YES':
                         attribs['DEFAULT'] = 'NO'
-                        default_languages.append(attribs['LANGUAGE'])
+                        default_languages.append(language)
 
-                elif attribs.get('TYPE') == 'SUBTITLES' and lang_allowed(attribs['LANGUAGE'], subs_whitelist):
+                elif attribs.get('TYPE') == 'SUBTITLES' and lang_allowed(language, subs_whitelist):
                     subs.append(attribs)
                     if attribs.get('DEFAULT') == 'YES':
                         attribs['DEFAULT'] = 'NO'
-                        default_subtitles.append(attribs['LANGUAGE'])
+                        default_subtitles.append(language)
 
             elif line.startswith('#EXT-X-STREAM-INF'):
                 stream_inf = line
@@ -1032,8 +1030,9 @@ class RequestHandler(BaseHTTPRequestHandler):
                 f.write(self._post_data)
 
         if not self._session.get('session'):
-            self._session['session'] = RawSession()
+            self._session['session'] = RawSession(verify=self._session.get('verify'), timeout=self._session.get('timeout'))
             self._session['session'].set_dns_rewrites(self._session.get('dns_rewrites', []))
+            self._session['session'].set_proxy(self._session.get('proxy_server'))
         else:
             self._session['session'].headers.clear()
             #self._session['session'].cookies.clear() #lets handle cookies in session

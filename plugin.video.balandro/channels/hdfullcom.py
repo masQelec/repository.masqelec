@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.hdfull-v1.com/'
+host = 'https://www.fullhd.wtf/'
 
 
 def item_configurar_proxies(item):
@@ -22,16 +22,16 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    url = url.replace('https://www.hd-full.com/', host)
+    ant_hosts = ['https://www.hd-full.com/',
+                 'https://www.hdfull-v1.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
 
     if 'release/' in url: raise_weberror = False
 
-    # ~ timeout
-    timeout = 30
-    if '/?s=' in url: timeout = 50
-
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-    data = httptools.downloadpage_proxy('hdfullcom', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('hdfullcom', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -361,6 +361,7 @@ def findvideos(item):
         other = srv.lower() + '-' + str(ses)
 
         if 'hqq' in other or 'waaw' in other or 'netu' in other: continue
+
         elif 'openload' in other: continue
         elif 'powvideo' in other: continue
         elif 'streamplay' in other: continue
@@ -370,7 +371,35 @@ def findvideos(item):
         elif 'vidtodo' in other: continue
 
         if url:
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, other = other, language = idioma ))
+            url = url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
+
+            if not '24embed' in other:
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, other = other, language = idioma ))
+            else:
+                data_vid = do_downloadpage(url)
+
+                url_vid = scrapertools.find_single_match(data_vid, '<div class="Video">.*?src="(.*?)"')
+
+                if url_vid:
+                    data_embed = do_downloadpage(url_vid)
+
+                    matches_embed = scrapertools.find_multiple_matches(data_embed, "go_to_player.*?'(.*?)'.*?<span>(.*?)</span>")
+
+                    for url_embed, srv_embed in matches_embed:
+                        lnk_embed = url_embed.replace('/mostrarEnlace/', '/validaEnlace/')
+                        url_final = httptools.downloadpage_proxy('hdfullcom', lnk_embed, headers={'Referer': url_vid}, follow_redirects=False).headers.get('location', '')
+
+                        srv_embed = srv_embed.lower().strip()
+                        if 'hqq' in srv_embed or 'waaw' in srv_embed or 'netu' in srv_embed: url_final = ''
+
+                        if url_final:
+                            servidor = servertools.get_server_from_url(url_final)
+                            servidor = servertools.corregir_servidor(servidor)
+
+                            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url_final, language = idioma ))
+                else:
+                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url,
+                                          other = other, language = idioma ))
 
     # ~ Download
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -393,6 +422,8 @@ def findvideos(item):
             servidor = 'directo'
 
         if url:
+            url = url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
+
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = other,
                                   language = idioma, quality = qlty ))
 
@@ -407,6 +438,11 @@ def findvideos(item):
 def play(item):
     logger.info()
     itemlist = []
+
+    if item.server:
+        itemlist.append(item.clone( url=item.url, server=item.server))
+
+        return itemlist
 
     item.url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
@@ -432,7 +468,7 @@ def play(item):
         if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
 
         if '/validaEnlace' in url:
-            url = httptools.downloadpage(url, headers=headers, timeout = 30, follow_redirects=False).headers.get('location', '')
+            url = httptools.downloadpage(url, headers=headers, follow_redirects=False).headers.get('location', '')
             if url == 'https://streamplusvip.xyz': url = ''
 
         if '/hqq.' in url or '/waaw.' in url or '/netu' in url:
@@ -441,6 +477,7 @@ def play(item):
         if url:
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
+
             itemlist.append(item.clone( url=url, server=servidor))
 
         return itemlist
@@ -471,7 +508,7 @@ def play(item):
 
     elif '/mostrarEnlace' in url or '/validaEnlace' in url:
         url = url.replace('/mostrarEnlace', '/validaEnlace')
-        url = httptools.downloadpage(url, headers=headers, timeout = 30, follow_redirects=False).headers.get('location', '')
+        url = httptools.downloadpage(url, headers=headers, follow_redirects=False).headers.get('location', '')
 
         if url == 'https://streamplusvip.xyz': url = ''
 
@@ -483,6 +520,7 @@ def play(item):
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
         itemlist.append(item.clone( url=url, server=servidor))
 
     return itemlist

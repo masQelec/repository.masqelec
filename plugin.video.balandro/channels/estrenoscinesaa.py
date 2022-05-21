@@ -34,7 +34,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
@@ -43,7 +43,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'D.C.', action = 'list_all', url = host + 'genre/d-c/', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Star wars', action = 'list_all', url = host + 'genre/starwars/', search_type = 'movie' ))
 
-    itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     return itemlist
 
@@ -60,10 +60,10 @@ def generos(item):
 
     for url, title, count in matches:
         if '/genre/d-c/' in url: continue
-        if '/genre/marvel/' in url: continue
-        if '/genre/netflix/' in url: continue
-        if '/genre/starwars/' in url: continue
-        if '/sci-fi-fantasy/' in url: continue # son series
+        elif '/genre/marvel/' in url: continue
+        elif '/genre/netflix/' in url: continue
+        elif '/genre/starwars/' in url: continue
+        elif '/sci-fi-fantasy/' in url: continue # son series
 
         if count: title = title + ' (' + count + ')'
 
@@ -80,8 +80,8 @@ def list_all(item):
 
     hasta_data = '<div class="pagination">' if '<div class="pagination">' in data else '<nav class="genres">'
 
-    bloque = scrapertools.find_single_match(data, '</h1>(.*?)' + hasta_data)
-    if not bloque: bloque = scrapertools.find_single_match(data, '</h1>(.*)')
+    bloque = scrapertools.find_single_match(data, '<h2>Añadido recientemente(.*?)' + hasta_data)
+    if not bloque: bloque = scrapertools.find_single_match(data, '<h2>Añadido recientemente(.*?)$')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article id="post-(.*?)</article>')
 
@@ -104,7 +104,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if '<div class="pagination">' in data:
-        next_page = scrapertools.find_single_match(data, '<span class="current".*?<a href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, '<span class="current".*?' + "<a href='(.*?)'")
 
         if next_page:
             if '/page/' in next_page:
@@ -215,7 +215,7 @@ def list_search(item):
     tmdb.set_infoLabels(itemlist)
 
     if '<div class="pagination">' in data:
-        next_page = scrapertools.find_single_match(data, '<span class="current".*?<a href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, '<span class="current".*?' + "<a href='(.*?)'")
 
         if next_page:
             if '/page/' in next_page:

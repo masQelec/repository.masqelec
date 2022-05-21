@@ -35,16 +35,12 @@ def proxysearch_all(item):
        pass
 
     if not your_ip:
-        try:
-           your_ip = httptools.downloadpage('http://ipinfo.io/ip').data
-        except:
-           pass
+        try: your_ip = httptools.downloadpage('http://ipinfo.io/ip').data
+        except: pass
 
     if not your_ip:
-        try:
-           your_ip = httptools.downloadpage('http://www.icanhazip.com/').data
-        except:
-           pass
+        try: your_ip = httptools.downloadpage('http://www.icanhazip.com/').data
+        except: pass
 
     if not your_ip:
         platformtools.dialog_ok(config.__addon_name, '[COLOR red][B]Parece que NO hay conexión con internet.[/B][/COLOR]', 'Compruebelo realizando cualquier Búsqueda, desde un Navegador Web ')
@@ -79,10 +75,9 @@ def proxysearch_all(item):
         if config.get_setting('memorize_channels_proxies', default=True):
             channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
             if channels_proxies_memorized:
-                if not platformtools.dialog_yesno(config.__addon_name, '[COLOR cyan]¿ Desea SOLO buscar en los canales conn proxies memorizados actualmente ?[/COLOR]'):
+                if not platformtools.dialog_yesno(config.__addon_name, '[COLOR cyan]¿ Desea SOLO buscar en los canales con proxies memorizados actualmente ?[/COLOR]', '[COLOR yellow]En el caso de NO contestar afirmativamente se Eliminaran los proxies memorizados en la actualidad de estos canales ?[/COLOR]'):
                     config.set_setting('channels_proxies_memorized', '')
-                else:
-                    proceso_seleccionar = False
+                else: proceso_seleccionar = False
 
         if proceso_seleccionar:
             txt_avis = '¿ Desea Quitar previamente los Proxies memorizados en TODOS los canales ?'
@@ -436,7 +431,6 @@ def proxysearch_channel(item, channel_id, channel_name):
 
         if response.sucess == True:
             if len(response.data) > 999:
-
                 if config.get_setting('memorize_channels_proxies', default=True):
                    el_memorizado = "'" + channel_id + "'"
                    if el_memorizado in str(channels_proxies_memorized):
@@ -474,14 +468,18 @@ def proxysearch_channel(item, channel_id, channel_name):
     if config.get_setting('memorize_channels_proxies', default=True):
         el_memorizado = "'" + channel_id + "'"
 
-        if not channels_proxies_memorized: channels_proxies_memorized = el_memorizado
-        else: channels_proxies_memorized = channels_proxies_memorized + ', ' + el_memorizado
-
-        if not el_memorizado in str(channels_proxies_memorized):
+        if not channels_proxies_memorized:
+            channels_proxies_memorized = el_memorizado
             config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
+        else:
+           if not el_memorizado in str(channels_proxies_memorized):
+               channels_proxies_memorized = channels_proxies_memorized + ', ' + el_memorizado
+               config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
         if el_memorizado in str(channels_proxies_memorized):
             return proxytools.configurar_proxies_canal(channel_name, host)
+
+        return
 
     return proxytools.configurar_proxies_canal(channel_name, host)
 

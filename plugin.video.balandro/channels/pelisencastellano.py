@@ -7,12 +7,15 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'http://pelisencastellano.com/'
+host = 'https://pelisencastellano.com/'
 
 perpage = 20
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    url = url.replace('http://pelisencastellano.com/', host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data

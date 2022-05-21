@@ -8,7 +8,7 @@ from time import time
 
 from .. import config
 from ..kodiutils import addon_profile, exists, get_setting_int, listdir, localize, log, mkdirs, ok_dialog, open_file, set_setting, translate_path, yesno_dialog
-from ..utils import arch, cmd_exists, hardlink, http_download, http_get, http_head, remove_tree, run_cmd, store, system_os
+from ..utils import arch, cmd_exists, hardlink, http_download, http_get, http_head, parse_version, remove_tree, run_cmd, store, system_os
 from ..unicodes import compat_path, to_unicode
 
 
@@ -160,13 +160,9 @@ def latest_widevine_version(eula=False):
         versions = http_get(url)
         return versions.split()[-1]
 
-    from .arm import chromeos_config, hardcoded_chromeos_image, select_best_chromeos_image, supports_widevine_arm64tls
-    # Return hardcoded Chrome OS version for systems not supporting newer Widevine CDM's
-    if not supports_widevine_arm64tls():
-        arm_device = hardcoded_chromeos_image()
-    else:
-        devices = chromeos_config()
-        arm_device = select_best_chromeos_image(devices)
+    from .arm import chromeos_config, select_best_chromeos_image
+    devices = chromeos_config()
+    arm_device = select_best_chromeos_image(devices)
     if arm_device is None:
         log(4, 'We could not find an ARM device in the Chrome OS recovery.json')
         ok_dialog(localize(30004), localize(30005))
@@ -190,20 +186,22 @@ def latest_available_widevine_from_repo():
 
 def remove_old_backups(bpath):
     """Removes old Widevine backups, if number of allowed backups is exceeded"""
-    from distutils.version import LooseVersion  # pylint: disable=import-error,no-name-in-module,useless-suppression
-
     max_backups = get_setting_int('backups', 4)
-    versions = sorted([LooseVersion(version) for version in listdir(bpath)])
+    versions = sorted([parse_version(version) for version in listdir(bpath)])
 
     if len(versions) < 2:
         return
 
-    installed_version = load_widevine_config()['version']
+    try:
+        installed_version = load_widevine_config()['version']
+    except TypeError:
+        log(2, "could not determine installed version. Aborting cleanup of old versions.")
+        return
 
     while len(versions) > max_backups + 1:
-        remove_version = str(versions[1] if versions[0] == LooseVersion(installed_version) else versions[0])
+        remove_version = str(versions[1] if versions[0] == parse_version(installed_version) else versions[0])
         log(0, 'Removing oldest backup which is not installed: {version}', version=remove_version)
         remove_tree(os.path.join(bpath, remove_version))
-        versions = sorted([LooseVersion(version) for version in listdir(bpath)])
+        versions = sorted([parse_version(version) for version in listdir(bpath)])
 
     return

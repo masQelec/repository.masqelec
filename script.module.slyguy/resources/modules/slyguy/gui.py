@@ -9,11 +9,10 @@ from kodi_six import xbmcgui, xbmc
 
 from . import settings
 from .constants import *
-from .exceptions import GUIError
-from .router import add_url_args, url_for
+from .router import add_url_args
 from .language import _
 from .dns import get_dns_rewrites
-from .util import url_sub, fix_url, set_kodi_string, hash_6
+from .util import fix_url, set_kodi_string, hash_6
 
 def _make_heading(heading=None):
     return heading if heading else ADDON_NAME
@@ -435,7 +434,6 @@ class Item(object):
                 elif parse.path.endswith('.ism'):
                     mimetype = 'application/vnd.ms-sstr+xml'
 
-            self.path = url_sub(self.path)
             self.path = fix_url(self.path)
 
             proxy_data = {
@@ -455,7 +453,10 @@ class Item(object):
                 'quality': QUALITY_DISABLED,
                 'middleware': {},
                 'type': None,
+                'verify': settings.common_settings.getBool('verify_ssl', True),
+                'timeout': settings.common_settings.getInt('http_timeout', 30),
                 'dns_rewrites': get_dns_rewrites(self.dns_rewrites),
+                'proxy_server': settings.get('proxy_server') or settings.common_settings.get('proxy_server'),
             }
 
             if mimetype == 'application/vnd.apple.mpegurl':

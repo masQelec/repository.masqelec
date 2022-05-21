@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast"],
 
-  "clusters": ["temporary", "adults", "news", "rankings", "years", "countries", "lasts", "kids", "docs", "vos"],
+  "clusters": ["adults", "news", "rankings", "years", "countries", "lasts", "kids", "docs", "vos"],
 
   "notes": "Películas y Series por géneros. Esta web intercala películas/series para adultos en algunas secciones, pero puedes desactivarlas en la configuración del addon."
 }

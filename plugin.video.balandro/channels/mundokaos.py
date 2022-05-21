@@ -9,12 +9,12 @@ from core import httptools, scrapertools, servertools, tmdb
 from lib import jsunpack
 
 
-host = 'https://mundokaos.tv/'
+host = 'https://mundokaos.net/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    url = url.replace('https://mundokaos.net/', host)
+    url = url.replace('https://mundokaos.tv/', host)
 
     headers = {'Referer': host}
 

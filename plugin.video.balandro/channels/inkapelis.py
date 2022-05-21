@@ -10,6 +10,9 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://inkapelis.in/'
 
 
+descartar_anime = config.get_setting('descartar_anime', default=False)
+
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     url = url.replace('https://inkapelis.me/', host)
@@ -48,6 +51,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Infantiles', action = 'list_all', url = host + 'seccion/infantil/', search_type = 'movie' ))
 
+    if not descartar_anime:
+        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'seccion/animes/', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -67,6 +73,9 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Últimas temporadas', action = 'last_seasons', url = host + 'temporada/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Infantiles', action = 'list_all', url = host + 'seccion/infantil/', search_type = 'tvshow' ))
+
+    if not descartar_anime:
+        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'seccion/animes/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -432,10 +441,12 @@ def findvideos(item):
         dnume = scrapertools.find_single_match(enlace, "data-nume='(.*?)'")
 
         if dnume == 'trailer': continue
-
         elif not dtype or not dpost or not dnume: continue
 
-        enbed_url = do_downloadpage(host + 'wp-json/dooplayer/v2/' + dpost + '/movie/meplayembed', headers={'Referer': item.url})
+        if dtype == 'tv': link_final = '/tv/meplayembed'
+        else: link_final = '/movie/meplayembed'
+
+        enbed_url = do_downloadpage(host + 'wp-json/dooplayer/v2/' + dpost + link_final, headers={'Referer': item.url})
         if not enbed_url: continue
 
         new_embed_url = scrapertools.find_single_match(enbed_url, '"embed_url":"(.*?)"')
@@ -445,6 +456,7 @@ def findvideos(item):
 
         data2 = do_downloadpage(new_embed_url, headers={'Referer': item.url})
 
+        # ~  "Server1" tienen RecaptCha
         url = scrapertools.find_single_match(data2, '"Server0":"(.*?)"')
         if not url: continue
 

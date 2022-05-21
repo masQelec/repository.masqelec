@@ -9,9 +9,11 @@ from core import httptools, scrapertools, servertools, tmdb, jsontools
 
 host = 'https://playdede.com/'
 
-elepage = 72
 
-perpage = 30
+elepage = 40
+
+perpage = 20
+
 
 class login_dialog(xbmcgui.WindowDialog):
     def __init__(self):
@@ -75,9 +77,10 @@ class login_dialog(xbmcgui.WindowDialog):
         control = control.getId()
         if control in range(3000, 30010): self.close()
 
+
 def do_make_login_logout(url, post=None, headers=None):
     add_referer = True
-    if '/user/' in url: add_referer=False
+    if '/user/' in url: add_referer = False
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False).data
     data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False).data
@@ -143,7 +146,7 @@ def login(item):
 
            platformtools.itemlist_refresh()
            return True
-       elif bool(jdata['reload']):
+       elif jdata['reload']:
            platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
            config.set_setting('playdede_login', True, 'playdede')
 
@@ -249,15 +252,15 @@ def mainlist(item):
         platformtools.itemlist_refresh()
 
     if config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR] [COLOR plum](si no hay resultados)[/COLOR]', action = 'logout' ))
+
+        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+
         itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
         itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
         itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
         itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
-
-        itemlist.append(item.clone( title = 'Listas', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
-
-        itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR]', action = 'logout' ))
 
     return itemlist
 
@@ -276,19 +279,21 @@ def mainlist_pelis(item):
         platformtools.itemlist_refresh()
 
     if config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR] [COLOR plum](si no hay resultados)[/COLOR]', action = 'logout' ))
+
+        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
-        itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas/estrenos/', slug = 'peliculas/estrenos', nro_pagina = 1, search_type = 'movie' ))
-        itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'peliculas/mejor-valoradas/', slug = 'peliculas/mejor-valoradas', nro_pagina = 1, search_type = 'movie' ))
+
+        itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, _type = 'movies', nro_pagina = 1, search_type = 'movie' ))
+
+        itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'peliculas?orderBy=item_date', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'peliculas?orderBy=score', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
 
         itemlist.append(item.clone( title = 'Por género', action = 'generos', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
         itemlist.append(item.clone( title = 'Por año', action = 'anios', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
-        itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
-
-        itemlist.append(item.clone( title = 'Listas', action = 'list_listas', search_type = 'all' ))
-
-        itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR]', action = 'logout' ))
 
     return itemlist
 
@@ -307,21 +312,25 @@ def mainlist_series(item):
         platformtools.itemlist_refresh()
 
     if config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR] [COLOR plum](si no hay resultados)[/COLOR]', action = 'logout' ))
+
+        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
-        itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'series/novedades/', slug = 'series/novedades', nro_pagina = 1, search_type = 'tvshow' ))
-        itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series/mejor-valoradas/', slug = 'series/mejor-valoradas', nro_pagina = 1, search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( title = 'Nuevos episodios', action = 'list_last', url = host, _type = 'episodes', nro_pagina = 1, search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, _type = 'series', nro_pagina = 1, search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'series?orderBy=last_update', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series?orderBy=score', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', slug = 'series', nro_pagina = 1, search_type='tvshow'))
 
         itemlist.append(item.clone( title = 'Por género', action = 'generos', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por año', action = 'anios', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
-        itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
-
-        itemlist.append(item.clone( title = 'Listas', action = 'list_listas', search_type = 'all' ))
-
-        itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR]', action = 'logout' ))
 
     return itemlist
 
@@ -340,19 +349,19 @@ def mainlist_animes(item):
         platformtools.itemlist_refresh()
 
     if config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR] [COLOR plum](si no hay resultados)[/COLOR]', action = 'logout' ))
+
+        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+
         itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes/', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
-        itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'animes/novedades/', slug = 'animes/novedades', nro_pagina = 1, search_type = 'tvshow' ))
-        itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'animes/mejor-valoradas/', slug = 'animes/mejor-valoradas', nro_pagina = 1, search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'animes?orderBy=last_update', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'animes?orderBy=score', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
-        itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
-
-        itemlist.append(item.clone( title = 'Listas', action = 'list_listas', search_type = 'all' ))
-
-        itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR]', action = 'logout' ))
 
     return itemlist
 
@@ -366,11 +375,11 @@ def plataformas(item):
     data = do_downloadpage(url)
     data = re.sub('\\n|\\r|\\t|\\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<div class="single-network" data-network="(\\d+)"><img src="(/assets/image/network/([^\\.]+).{4})').findall(data)
+    matches = re.compile('<li class="cfilter single-network.*?data-value="(.*?)".*?<img src="(.*?)"').findall(data)
 
-    for id_network, thumb, title in matches:
+    for id_network, thumb in matches:
+        title = scrapertools.find_single_match(thumb, '/network/(.*?).png')
         title = title.capitalize()
-        thumb = host[:-1] + thumb
 
         itemlist.append(item.clone(title = title, action = 'list_plataforma', thumbnail = thumb, url = url, id_network = id_network))
 
@@ -388,8 +397,14 @@ def list_plataforma(item):
 
     for url, title in matches:
         title = title.capitalize()
-	
-        itemlist.append(item.clone(title = title, action = 'list_network', url = url ))
+
+        url = url.replace('?orderBy=last_update', '?network=' + item.id_network + '&orderBy=last_update')
+        url = url.replace('?orderBy=score', '?network=' + item.id_network + '&orderBy=score')
+
+        if '=score' in url: order = 'score'
+        else: order = 'last_update'
+
+        itemlist.append(item.clone(title = title, action = 'list_network', url = url, slug = 'series', order = order ))
 
     return sorted(itemlist, key=(lambda x: x.title))
 
@@ -442,38 +457,27 @@ def anios(item):
     return itemlist
 
 
-def alfabetico(item):
-    logger.info()
-    itemlist = []
-
-    for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-        title = letra
-
-        letter = '?letter=' + letra
-
-        itemlist.append(item.clone( action = "list_all", title = title, letter = letter))
-
-    return itemlist
-
-
 def list_all(item):
     logger.info()
     itemlist = []
 
     if not item.page: item.page = 0
 
-    # ~ Si venimos de Grupos
+    # ~ Si venimos del menu pral. Grupos o Generos
     if not item.slug:
        if item.search_type == 'movie': item.slug = 'peliculas'
        elif item.search_type == 'tvshow': item.slug = 'series'
+
+       if not item.genre:
+          genre = scrapertools.find_single_match(item.url, '/?genre=(.*?)&')
+          if genre: item.genre = '?genre=' + genre
+
        if not item.nro_pagina: item.nro_pagina = 1
 
-    if not item.post:
-        post = {'_method': 'items', 'page': item.nro_pagina, 'AjaxName': 'main', 'slug': item.slug}
-    else:
-        post = item.post
+    if not item.post: post = {'_method': 'items', 'page': item.nro_pagina, 'ajaxName': 'main', 'slug': item.slug}
+    else: post = item.post
 
-    data = do_downloadpage(host + 'ajax.php' + item.genre + item.year + item.letter, post=post)
+    data = do_downloadpage(host + 'ajax.php' + item.genre + item.year, post=post)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = data.replace('\\/', '/')
@@ -485,12 +489,17 @@ def list_all(item):
     for match in matches[item.page * perpage:]:
         match = match.replace('=\\', '=').replace('\\"', '/"')
 
-        url = scrapertools.find_single_match(str(match), '<a href="(.*?)"')
-        title = scrapertools.find_single_match(match, '<h3>(.*?)</h3')
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        title = scrapertools.find_single_match(match, '<h3>(.*?)</h3>')
 
         if not url or not title: continue
 
+        if url.startswith('/'): url = host[:-1] + url
+        elif not url.startswith('http'): url = host + url
+
         title = clean_title(title, url)
+
+        if 'Tu directorio de' in title: continue
 
         id = scrapertools.find_single_match(match, 'data-id="(.*?)"')
 
@@ -517,17 +526,95 @@ def list_all(item):
             itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
             buscar_next = False
 
-    if num_matches < elepage:
-        buscar_next = False
+    if num_matches < elepage: buscar_next = False
 
     if buscar_next:
         if itemlist:
              item.nro_pagina = item.nro_pagina + 1
 
-             post = {'_method': 'items', 'page': item.nro_pagina, 'AjaxName': 'main', 'slug': item.slug}
+             post = {'_method': 'items', 'page': item.nro_pagina, 'ajaxName': 'main', 'slug': item.slug}
 
              itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all',
                                          nro_pagina = item.nro_pagina, post = post, page = 0, text_color = 'coral' ))
+
+    return itemlist
+
+
+def list_last(item):
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+
+    if not item.post: post = {'_method': 'items', 'type': item._type, 'async': 'true', 'page': item.nro_pagina, 'ajaxName': 'main', 'slug': ''}
+    else: post = item.post
+
+    data = do_downloadpage(host + 'ajax.php', post=post)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    data = data.replace('\\/', '/')
+
+    matches = re.compile('<article(.*?)</article>').findall(data)
+
+    num_matches = len(matches)
+
+    for match in matches[item.page * perpage:]:
+        match = match.replace('=\\', '=').replace('\\"', '/"')
+
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        title = scrapertools.find_single_match(match, '<h3>(.*?)</h3>')
+
+        if item._type == 'episodes': title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+
+        if not url or not title: continue
+
+        if url.startswith('/'): url = host[:-1] + url
+        elif not url.startswith('http'): url = host + url
+
+        title = clean_title(title, url)
+
+        if 'Tu directorio de' in title: continue
+
+        id = scrapertools.find_single_match(match, 'data-id="(.*?)"')
+
+        thumb = scrapertools.find_single_match(match, '<img src=(.*?)"')
+
+        year = scrapertools.find_single_match(match, '<p>(.*?)</p>')
+        if not year: year = '-'
+
+        if '/pelicula/' in url:
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'movie', contentTitle = title, infoLabels={'year': year} ))
+
+        elif '/serie/' in url:
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+
+        else:
+            titulo = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+            titulo = titulo.replace('/episodios/', '').replace('_1', '').replace('_', ' ').replace('-', ' ').strip()
+            titulo = titulo.replace('//', '')
+
+            titulo = titulo.capitalize()
+
+            thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+            thumb = thumb.replace('http:', 'https:')
+
+            season = scrapertools.find_single_match(match, '<span>(.*?)-').strip()
+            epis = scrapertools.find_single_match(match, '<span>.*?-(.*?)</span>').strip()
+
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
+                                        contentSerieName = titulo, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+
+        if len(itemlist) >= perpage: break
+
+    tmdb.set_infoLabels(itemlist)
+
+    if num_matches > perpage:
+        hasta = (item.page * perpage) + perpage
+        if hasta < num_matches:
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_last', text_color = 'coral' ))
 
     return itemlist
 
@@ -536,10 +623,8 @@ def list_listas(item):
     logger.info()
     itemlist = []
 
-    if not item.url:
-        url = host + 'listas/'
-    else:
-        url = item.url
+    if not item.url: url = host + 'listas/'
+    else: url = item.url
 
     data = do_downloadpage(url)
     data = re.sub('\\n|\\r|\\t|\\s{2}|&nbsp;', '', data)
@@ -547,14 +632,15 @@ def list_listas(item):
     matches = re.compile('<article>.*?<a href="([^"]+)"[^<]+<h2>([^<]+)</h2>').findall(data)
 
     for url, title in matches:
+        if url.startswith('/'): url = host[:-1] + url
+        elif not url.startswith('http'): url = host + url
+
         itemlist.append(item.clone( action = 'list_search', title = title, url = url ))
 
     if itemlist:
         if '<div class="pagPlaydede">' in data:
-            if 'Pagina Anterior' in data:
-                patron = '<div class="pagPlaydede">.*?Pagina Anterior.*?<a href="([^"]+)'
-            else:
-                patron = '<div class="pagPlaydede"><a href="([^"]+)'
+            if 'Pagina Anterior' in data: patron = '<div class="pagPlaydede">.*?Pagina Anterior.*?<a href="([^"]+)'
+            else: patron = '<div class="pagPlaydede"><a href="([^"]+)'
 
             next_url = scrapertools.find_single_match(data, patron)
             if next_url:
@@ -570,11 +656,13 @@ def list_network(item):
     if not item.page: item.page = 0
 
     if not item.post:
-        post = {'_method': 'items', 'page': item.nro_pagina, 'networks': item.id_network, 'AjaxName': 'main', 'slug': item.slug}
+        post = {'_method': 'items', 'page': item.nro_pagina, 'networks': item.id_network, 'ajaxName': 'main', 'slug': item.slug, 'orderBy=': item.order}
     else:
         post = item.post
 
-    data = do_downloadpage(host + 'ajax.php', post=post)
+    url_post = item.url.replace('/series', '/ajax.php')
+
+    data = do_downloadpage(url_post, post=post, referer=item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = data.replace('\\/', '/')
@@ -586,10 +674,15 @@ def list_network(item):
     for match in matches[item.page * perpage:]:
         match = match.replace('=\\', '=').replace('\\"', '/"')
 
-        url = scrapertools.find_single_match(str(match), '<a href="(.*?)"')
-        title = scrapertools.find_single_match(match, '<h3>(.*?)</h3')
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        title = scrapertools.find_single_match(match, '<h3>(.*?)</h3>')
 
         if not url or not title: continue
+
+        if 'Tu directorio de' in title: continue
+
+        if url.startswith('/'): url = host[:-1] + url
+        elif not url.startswith('http'): url = host + url
 
         title = clean_title(title, url)
 
@@ -614,16 +707,15 @@ def list_network(item):
             itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_network', text_color = 'coral' ))
             buscar_next = False
 
-    if num_matches < elepage:
-        buscar_next = False
+    if num_matches < elepage: buscar_next = False
 
     if buscar_next:
         if itemlist:
              item.nro_pagina = item.nro_pagina + 1
 
-             post = {'_method': 'items', 'page': item.nro_pagina, 'networks': item.id_network, 'AjaxName': 'main', 'slug': item.slug}
+             post = {'_method': 'items', 'page': item.nro_pagina, 'networks': item.id_network, 'ajaxName': 'main', 'slug': item.slug, 'orderBy=': item.order}
 
-             itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_network',
+             itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_network', url = item.url,
                                          nro_pagina = item.nro_pagina, post = post, page = 0, text_color = 'coral' ))
 
     return itemlist
@@ -757,6 +849,10 @@ def findvideos(item):
 
         if not url or not server: continue
 
+        if '/ul.' in url: continue
+        elif '/1fichier.' in url: continue
+        elif '/ddownload.' in url: continue
+
         if 'https://netload.cc/st?' in url:
              url = scrapertools.find_single_match(url, '&url=(.*?)$')
              if not url: continue
@@ -764,6 +860,7 @@ def findvideos(item):
         if lang.lower() == 'espsub': lang = 'Vose'
 
         lang = lang.capitalize()
+
         server = servertools.corregir_servidor(server)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = lang, quality = qlty, other = 'D' ))
@@ -816,8 +913,7 @@ def clean_title(title, url):
         titulo = scrapertools.find_single_match(data, "<title>(.*?)</title>")
         titulo = titulo.replace('Ver película:', '').replace('Ver serie:', '').replace('Ver anime:', '').strip()
 
-        if titulo:
-            title = titulo
+        if titulo: title = titulo
 
     return title
 
@@ -831,18 +927,29 @@ def list_search(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<article id="([^"]+)".*?<a href="([^"]+)">.*?<img src="([^"]+).*?<p>(\d+)</p>\s*<h3>([^<]+)').findall(data)
+    matches = re.compile('<article(.*?)</article>').findall(data)
 
     num_matches = len(matches)
 
-    for id, url, thumb, year, title in matches[item.page * perpage:]:
+    for match in matches[item.page * perpage:]:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        title = scrapertools.find_single_match(match, '<h3>(.*?)</h3>')
+
         if not url or not title: continue
+
+        if url.startswith('/'): url = host[:-1] + url
+        elif not url.startswith('http'): url = host + url
 
         if not item.search_type == "all":
             if item.search_type == "movie":
                 if '/serie/' in url: continue
             else:
                 if '/pelicula/' in url: continue
+
+        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+
+        year = scrapertools.find_single_match(match, '<p>, (\d+)</p>')
+        if not year: year = '-'
 
         if '/pelicula/' in url:
             sufijo = '' if item.search_type != 'all' else 'movie'
@@ -869,10 +976,8 @@ def list_search(item):
     if buscar_next:
         if itemlist:
             if '<div class="pagPlaydede">' in data:
-                if 'Pagina Anterior' in data:
-                    patron = '<div class="pagPlaydede">.*?Pagina Anterior.*?<a href="([^"]+)'
-                else:
-                    patron = '<div class="pagPlaydede"><a href="([^"]+)'
+                if 'Pagina Anterior' in data: patron = '<div class="pagPlaydede">.*?Pagina Anterior.*?<a href="([^"]+)'
+                else: patron = '<div class="pagPlaydede"><a href="([^"]+)'
 
                 next_url = scrapertools.find_single_match(data, patron)
                 if next_url:

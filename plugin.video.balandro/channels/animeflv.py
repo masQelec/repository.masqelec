@@ -7,27 +7,27 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www3.animeflv.cc/'
+host = 'https://ww3.animeflv.cc/'
 
 perpage = 30
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/www10.animeflv.cc/', '/www3.animeflv.net/')
+    ant_hosts = ['https://www10.animeflv.cc/', 'https://www3.animeflv.net/', 'https://www3.animeflv.cc/'] 
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post).data
     return data
 
 
 def mainlist(item):
-    return mainlist_anime(item)
-
-def mainlist_series(item):
-    return mainlist_anime(item)
+    return mainlist_animes(item)
 
 
-def mainlist_anime(item):
+def mainlist_animes(item):
     logger.info()
     itemlist = []
 

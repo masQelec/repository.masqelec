@@ -7,12 +7,30 @@ if sys.version_info[0] >= 3: PY3 = True
 
 import re, os, string
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://dontorrent.eu/'
+host = 'https://dontorrent.cx/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://dontorrent.one/',
+             'https://dontorrent.app/', 'https://dontorrent.lol/', 'https://dontorrent.nz/', 'https://dontorrent.rip/',
+             'https://dontorrent.vip/', 'https://dontorrent.ws/', 'https://dontorrent.win/', 'https://dontorrent.rs/',
+             'https://dontorrent.bz/', 'https://dontorrent.men/', 'https://dontorrent.fit/', 'https://dontorrent.art/',
+             'https://dontorrent.fun/', 'https://dontorrent.se/', 'https://dontorrent.pw/', 'https://dontorrent.li/',
+             'https://dontorrent.it/', 'https://dontorrent.red/', 'https://dontorrent.nu/', 'https://dontorrent.si/',
+             'https://dontorrent.sk/', 'https://dontorrent.eu/', 'https://dontorrent.top/', 'https://dontorrent.pm/',
+             'https://dontorrent.re/', 'https://dontorrent.wf/', 'https://dontorrent.run/', 'https://dontorrent.cat/'
+             'https://dontorrent.pl/', 'https://dontorrent.tel/', 'https://dontorrent.nl/']
+
+domain = config.get_setting('dominio', 'dontorrents', default='')
+
+if domain:
+    if domain in str(ant_hosts): config.set_setting('dominio', '', 'dontorrents')
+    else: host = domain
 
 
 def item_configurar_proxies(item):
@@ -27,14 +45,6 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://dontorrent.one/', 
-                 'https://dontorrent.app/', 'https://dontorrent.lol/', 'https://dontorrent.nz/', 'https://dontorrent.rip/',
-                 'https://dontorrent.vip/', 'https://dontorrent.ws/', 'https://dontorrent.win/', 'https://dontorrent.rs/',
-                 'https://dontorrent.bz/', 'https://dontorrent.men/', 'https://dontorrent.fit/', 'https://dontorrent.art/',
-                 'https://dontorrent.fun/', 'https://dontorrent.se/', 'https://dontorrent.pw/', 'https://dontorrent.li/',
-                 'https://dontorrent.it/', 'https://dontorrent.red/', 'https://dontorrent.nu/', 'https://dontorrent.si/',
-                 'https://dontorrent.sk/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -46,6 +56,9 @@ def do_downloadpage(url, post=None, headers=None):
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(Item( channel='actions', action='last_domain_dontorrents', title='Comprobar último dominio vigente [COLOR plum](si no hay resultados)[/COLOR]',
+                          thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
     itemlist.append(item_configurar_proxies(item))
 
@@ -61,6 +74,9 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(Item( channel='actions', action='last_domain_dontorrents', title='Comprobar último dominio vigente [COLOR plum](si no hay resultados)[/COLOR]',
+                          thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
     itemlist.append(item_configurar_proxies(item))
 
@@ -85,6 +101,9 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(Item( channel='actions', action='last_domain_dontorrents', title='Comprobar último dominio vigente [COLOR plum](si no hay resultados)[/COLOR]',
+                          thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
+
     itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
@@ -103,6 +122,9 @@ def mainlist_series(item):
 def mainlist_documentary(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(Item( channel='actions', action='last_domain_dontorrents', title='Comprobar último dominio vigente [COLOR plum](si no hay resultados)[/COLOR]',
+                          thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
     itemlist.append(item_configurar_proxies(item))
 
@@ -229,12 +251,12 @@ def list_last(item):
     for url, title in matches:
         if "(" in title: title = title.split("(")[0]
 
-        if item.search_type== 'tvshow':
-            itemlist.append(item.clone( action='episodios', url=host + url, title=title, 
-                                        contentType=item.search_type, contentSerieName=title, infoLabels={'year': "-"} ))
-        else:
+        if item.search_type== 'movie':
             itemlist.append(item.clone( action='findvideos', url=host + url, title=title,
                                         contentType=item.search_type, contentTitle=title, infoLabels={'year': "-"} ))
+        else:
+            itemlist.append(item.clone( action='episodios', url=host + url, title=title, 
+                                        contentType=item.search_type, contentSerieName=title, infoLabels={'year': "-"} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -379,8 +401,6 @@ def play(item):
     itemlist = []
 
     if item.url.endswith('.torrent'):
-        from platformcode import config
-
         if config.get_setting('proxies', item.channel, default=''):
             if PY3:
                 from core import requeststools
@@ -389,6 +409,9 @@ def play(item):
                 data = do_downloadpage(item.url)
 
             if data:
+                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
                 file_local = os.path.join(config.get_data_path(), "temp.torrent")
                 with open(file_local, 'wb') as f: f.write(data); f.close()
 

@@ -7,6 +7,11 @@ from platformcode import config, logger, platformtools
 from lib import jsunpack
 
 
+color_exec = config.get_setting('notification_exec_color', default='cyan')
+el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
+el_srv += ('ResolveUrl[/B][/COLOR]')
+
+
 def import_libs(module):
     import os, sys, xbmcaddon
     from core import filetools
@@ -43,6 +48,10 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('//watchsb.com/e/', '//streamsb.net/play/').replace('//watchsb.com/d/', '//streamsb.net/play/')
     elif '//viewsb.com/' in page_url:
         page_url = page_url.replace('//viewsb.com/e/', '//streamsb.net/play/').replace('//viewsb.com/d/', '//streamsb.net/play/')
+    elif '//sbfast.com/' in page_url:
+        page_url = page_url.replace('//sbfast.com/e/', '//streamsb.net/play/').replace('//sbfast.com/d/', '//streamsb.net/play/')
+    elif '//sbfull.com/' in page_url:
+        page_url = page_url.replace('//sbfull.com/e/', '//streamsb.net/play/').replace('//sbfull.com/d/', '//streamsb.net/play/')
 
     data = httptools.downloadpage(page_url).data
 
@@ -104,14 +113,13 @@ def get_video_url(page_url, url_referer=''):
                     video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
                     return video_urls
 
-                color_exec = config.get_setting('notification_exec_color', default='cyan')
-                el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
-                el_srv += ('ResolveUrl[/B][/COLOR]')
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 
             except:
                 import traceback
                 logger.error(traceback.format_exc())
+                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
         else:
            return 'Acceso Denegado'
 

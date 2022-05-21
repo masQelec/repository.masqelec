@@ -8,6 +8,9 @@ from core import httptools, scrapertools, tmdb
 host = "https://vimeo.com/"
 
 
+unicode = str
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -89,10 +92,8 @@ def list_search(item):
     matches = scrapertools.find_multiple_matches(str(data), '"type":"clip","clip":.*?"uri":"(.*?)".*?"name":"(.*?)".*?"pictures".*?"link":"(.*?)"')
 
     for url, title, thumb in matches:
-        if '\u' in title: continue
-        elif 'Tr\u00e1iler' in title: continue
-        elif 'Trailer' in title.lower(): continue
- 
+        title = unicode(title, 'utf8').encode('utf8')
+
         title = title.replace('\\/', '').strip()
 
         url = url.replace('\\/', '/')

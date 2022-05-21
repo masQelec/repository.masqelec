@@ -9,8 +9,9 @@ from core import httptools, scrapertools, servertools, tmdb
 
 host = 'https://gnula.nu/'
 
-url_estrenos = host + 'peliculas-online/lista-de-peliculas-online-parte-1/'
-url_recomendadas = host + 'peliculas-online/lista-de-peliculas-recomendadas/'
+url_estrenos = host + 'peliculas-de-estreno/lista-de-peliculas-online-parte-1/'
+
+url_recomendadas = host + 'peliculas/lista-de-peliculas-recomendadas/'
 
 IDIOMAS = {'VC': 'Esp', 'VL': 'Lat', 'VS': 'Vose', 'castellano': 'Esp', 'latino': 'Lat', 'vose': 'Vose'}
 
@@ -31,12 +32,15 @@ def do_downloadpage(url, post=None):
     url = url.replace('http://gnula.nu/', host)
 
     # ~ timeout
-    timeout = 40
+    timeout = 15
 
-    if '/generos/' in url: timeout = 50
+    if '/lista-' in url: timeout = 30
+    elif '/ver-' in url: timeout = 45
+    elif '/generos/' in url: timeout = 50
 
     # ~ data = httptools.downloadpage(url, post=post, timeout=timeout).data
     data = httptools.downloadpage_proxy('gnula', url, post=post, timeout=timeout).data
+
     return data
 
 
@@ -91,6 +95,7 @@ def idiomas(item):
 
     for lg, num in prefs:
         if num == 0: continue
+
         itemlist.append(item.clone( title = '%s estrenos' % idio[lg][0], action = 'list_all', url = url_estrenos, filtro_lang = idio[lg][1] ))
         itemlist.append(item.clone( title = '%s recomendadas' % idio[lg][0], action = 'list_all', url = url_recomendadas, filtro_lang = idio[lg][1] ))
 
@@ -177,6 +182,7 @@ def findvideos(item):
 
         links = re.compile('<iframe width="[^"]+" height="[^"]+" src="([^"]+)', re.DOTALL).findall(iframes)
         if not links: links = re.compile('<iframe src="([^"]+)', re.DOTALL).findall(iframes)
+
         for url in links:
             if url.endswith('/soon') or url.startswith('http://soon.'): continue
 

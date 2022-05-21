@@ -9,7 +9,7 @@ from core import httptools, scrapertools, jsontools, servertools, tmdb
 from lib import balandroresolver
 
 
-host = 'https://hdfull.cm'
+host = 'https://hdfull.be'
 
 perpage = 20
 
@@ -26,7 +26,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post = None, referer = None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://hdfull.se/', 'https://hdfull.so/', "https://hdfull.fm/"]
+    ant_hosts = ['https://hdfull.se', 'https://hdfull.so', 'https://hdfull.fm', 'https://hdfull.cm', 'https://hdfull.gg']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -54,10 +54,10 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='plum' ))
 
     itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'star', search_type = 'person', 
-                       plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
+                                plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
 
     itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
-                       plot = 'Debe indicarse el nombre y apellido/s del director.'))
+                                plot = 'Debe indicarse el nombre y apellido/s del director.'))
 
     return itemlist
 
@@ -77,8 +77,8 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( action = 'list_all', title = 'Más valoradas', url = host + '/movies/imdb_rating', search_type = 'movie' ))
 
     itemlist.append(item.clone( action = 'list_all', title = 'Por alfabético', url = host + '/movies/abc', search_type = 'movie' ))
-    itemlist.append(item.clone( action ='generos', title = 'Por género', search_type = 'movie' ))
-    itemlist.append(item.clone( action ='anios', title = 'Por año', search_type = 'movie' ))
+    itemlist.append(item.clone( action = 'generos', title = 'Por género', search_type = 'movie' ))
+    itemlist.append(item.clone( action = 'anios', title = 'Por año', search_type = 'movie' ))
 
     return itemlist
 
@@ -94,6 +94,10 @@ def mainlist_series(item):
     itemlist.append(item.clone( action = 'list_all', title = 'Catálogo', url= host + '/tv-shows', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( action = 'list_all', title = 'Más valoradas', url= host + '/tv-shows/imdb_rating', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( action = 'list_all', title = 'Animes', url = host + '/tv-tags/anime', search_type = 'tvshow' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Novelas', url = host + '/tv-tags/soap', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( action = 'list_all', title = 'Por alfabético', url = host + '/tv-shows/abc', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( action = 'generos', title = 'Por género', search_type = 'tvshow' ))
@@ -113,6 +117,8 @@ def generos(item):
     matches = re.compile('<li><a href="([^"]+)">([^<]+)', re.DOTALL).findall(bloque)
 
     for url, title in matches:
+        if title == 'All': continue
+
         itemlist.append(item.clone( title = title, url = host + url, action = 'list_all' ))
 
     return sorted(itemlist, key = lambda it: it.title)
@@ -225,6 +231,9 @@ def temporadas(item):
         titulo = titulo.replace('Season', 'Temporada').replace('Temporadas', 'Temporada')
 
         url = host + url
+
+        if '/episode-' in url: url = scrapertools.find_single_match(url, '(.*?)/episode-')
+
         thumb = host + thumb
 
         if len(matches) == 1:
@@ -234,7 +243,6 @@ def temporadas(item):
             item.referer = item.url
             item.url = url
             item.thumbnail = thumb
-
             item.contentType = 'season'
             item.contentSeason = numtempo
             itemlist = episodios(item)
@@ -290,7 +298,7 @@ def episodios(item):
 
         langs = scrapertools.find_multiple_matches(idio, 'item-flag-(.*?)">')
         if str(langs) == "['']": langs = ''
-        if langs: titulo += ' [COLOR %s][%s][/COLOR]' % (color_lang, ', '.join(langs))
+        if langs: titulo += ' [COLOR %s]%s[/COLOR]' % (color_lang, ', '.join(langs))
 
         thumb = host + thumb
         url = host + url

@@ -3,7 +3,7 @@
   "name": "SeriesKao",
   "thumbnail": "serieskao.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["lat", "cast", "vose"],
 
-  "clusters": ["news", "rankings", "years", "kids", "docs", "vos", "anime"],
+  "clusters": ["temporary", "news", "rankings", "years", "kids", "docs", "vos", "anime"],
 
   "notes": "Películas por géneros, año. Series por Géneros."
 }

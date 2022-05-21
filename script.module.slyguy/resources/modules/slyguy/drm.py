@@ -18,6 +18,9 @@ HDCP_2_2 = 22
 HDCP_3_0 = 30
 HDCP_LEVELS = [AUTO, HDCP_NONE, HDCP_1, HDCP_2_2, HDCP_3_0]
 
+# List of system ids that use fake L1
+FAKE_L1 = ['7011',]
+
 def is_wv_secure():
     return widevine_level() == WV_L1
 
@@ -28,10 +31,18 @@ def req_hdcp_level(level):
     return hdcp_level() >= level
 
 def widevine_level():
-    return int(get_kodi_string('wv_level', WV_L3))
+    wv_level = settings.common_settings.getEnum('wv_level', WV_LEVELS, default=AUTO)
+    if wv_level == AUTO:
+        return int(get_kodi_string('wv_level', WV_L3))
+    else:
+        return wv_level
 
 def hdcp_level():
-    return int(get_kodi_string('hdcp_level', HDCP_NONE))
+    hdcp_level = settings.common_settings.getEnum('hdcp_level', HDCP_LEVELS, default=AUTO)
+    if hdcp_level == AUTO:
+        return int(get_kodi_string('hdcp_level', HDCP_NONE))
+    else:
+        return hdcp_level
 
 def set_drm_level():
     wv_level = settings.common_settings.getEnum('wv_level', WV_LEVELS, default=AUTO)
@@ -58,6 +69,15 @@ def set_drm_level():
                     wv_level = crypto.GetPropertyString('securityLevel')
                     if wv_level:
                         wv_level = int(wv_level.lower().lstrip('l'))
+
+                        try:
+                            if wv_level == WV_L1:
+                                system_id = crypto.GetPropertyString('systemId')
+                                if system_id in FAKE_L1:
+                                    log.debug('Detected fake L1 systemID {}. Downgrading to L3'.format(system_id))
+                                    wv_level = WV_L3
+                        except:
+                            pass
 
                 if not hdcp_level:
                     hdcp_level = crypto.GetPropertyString('hdcpLevel')

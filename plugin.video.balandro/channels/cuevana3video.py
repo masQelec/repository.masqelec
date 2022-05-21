@@ -15,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www1.cuevana3.cx'
+host = 'https://www1.cuevana3.pe/'
 
 perpage = 22
 
@@ -33,10 +33,9 @@ def configurar_proxies(item):
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://www1.cuevana3.video', 'https://www2.cuevana3.video',
-                 'https://cuevana3.so',
-                 'https://www1.cuevana3.so', 'https://www2.cuevana3.so',
-                 'https://cuevana3.cx'
-                 ]
+                 'https://cuevana3.so', 'https://www1.cuevana3.so', 'https://www2.cuevana3.so',
+                 'https://cuevana3.cx', 'https://www1.cuevana3.cx', 'https://www2.cuevana3.cx',
+                 'https://cuevana3.pe/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -445,7 +444,13 @@ def play(item):
     elif item.other == 'plus':
         data = do_downloadpage(item.url)
 
-        if item.url.startswith('https://pelisplus.icu/download'):
+        if item.url.startswith('https://pelisplus.icu/play'):
+            url = scrapertools.find_single_match(data, "sources:.*?'(.*?)'")
+            if url:
+                itemlist.append(item.clone(url=url , server='directo'))
+                return itemlist
+
+        elif item.url.startswith('https://pelisplus.icu/download'):
             matches = scrapertools.find_multiple_matches(data, '<div class="dowload".*?href="(.*?)"')
 
             for url in matches:

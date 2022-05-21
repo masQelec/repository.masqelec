@@ -385,6 +385,7 @@ def findvideos(item):
         elif servidor == 'feurl': servidor = 'fembed'
         elif servidor == 'dood': servidor = 'doodstream'
         elif servidor == 'uptostream': servidor = 'uptobox'
+        elif servidor == 'archive.org': servidor = 'archiveorg'
         elif servidor == 'utorrent':
             servidor = 'torrent'
             size = scrapertools.find_single_match(match, "</strong>.*?</td><td>.*?</td><td>(.*?)</td>")

@@ -13,7 +13,7 @@ host = 'https://www.cinelibreonline.com/'
 results = 14
 
 perpage = 20
-perpage_lis = 50
+perpage_lis = 30
 
 
 def do_downloadpage(url, post=None, headers=None):
@@ -289,9 +289,11 @@ def listas(item):
             action = item.exec_action
             contentTitle = ''
 
-        itemlist.append(item.clone( action = action, url = url, title = title, contentType = 'movie', contentTitle = contentTitle ))
+        itemlist.append(item.clone( action = action, url = url, title = title, contentType = 'movie', contentTitle = contentTitle, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage_lis: break
+
+    tmdb.set_infoLabels(itemlist)
 
     if num_matches > perpage_lis:
         hasta = (item.page * perpage_lis) + perpage_lis

@@ -13,6 +13,7 @@ perpage = 25
 def mainlist(item):
     return mainlist_pelis(item)
 
+
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
@@ -23,10 +24,11 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
-    itemlist.append(item.clone ( title = 'Por actor', action = 'listas', url = host + 'actores/' ))
-    itemlist.append(item.clone ( title = 'Por actriz', action = 'listas', url = host + 'actrices/' ))
-    itemlist.append(item.clone ( title = 'Por dirección, guionistas, productores', action = 'listas', url = host + 'directores/' ))
-    itemlist.append(item.clone ( title = 'Por compositores, escritores, novelistas', action = 'listas', url = host + 'otras-biografias/' ))
+    itemlist.append(item.clone ( title = 'Por actor', action = 'listas', url = host + 'actores/', group = 'Actores' ))
+    itemlist.append(item.clone ( title = 'Por actriz', action = 'listas', url = host + 'actrices/', group = 'Actrices' ))
+    itemlist.append(item.clone ( title = 'Por dirección, guionistas, productores', action = 'listas', url = host + 'directores/', group = 'Directores' ))
+    itemlist.append(item.clone ( title = 'Por compositores, escritores, novelistas', action = 'listas', url = host + 'otras-biografias/',
+                                 group = 'Otras biografías' ))
 
     return itemlist
 
@@ -37,14 +39,21 @@ def sagas(item):
 
     data = httptools.downloadpage(item.url).data
 
-    bloque = scrapertools.find_single_match(data, '>Sagas</h2>(.*?)</main>')
+    bloque = scrapertools.find_single_match(data, '>Sagas<(.*?)</main>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '.*?<a href="(.*?)".*?title="(.*?)"')
+    matches = scrapertools.find_multiple_matches(bloque, 'data-src="(.*?)".*?alt="(.*?)".*?href="(.*?)"')
 
-    for url, title in matches:
-        if not title: continue
+    for thumb, title, url in matches:
+        if not title or not url: continue
 
-        itemlist.append(item.clone( action = 'list_films', title = title, url = url ))
+        itemlist.append(item.clone( action = 'list_films', title = title, url = url, thumbnail = thumb ))
+
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
+
+        if next_page:
+            if '-pag' in next_page:
+                itemlist.append(item.clone( title='Siguientes ...', url = next_page, action = 'sagas', text_color='coral' ))
 
     return itemlist
 
@@ -75,22 +84,34 @@ def listas(item):
 
     data = httptools.downloadpage(item.url).data
 
+    bloque = scrapertools.find_single_match(data, '>' + item.group + '<(.*?)</main>')
+
     if '/otras-biografias' in item.url:
-        matches = scrapertools.find_multiple_matches(data, '<li><a href="([^"]+)".*?rel="noopener noreferrer">(.*?)</a>')
+        matches = scrapertools.find_multiple_matches(bloque, '<li><a href="([^"]+)".*?rel="noopener noreferrer">(.*?)</a>')
 
         for url, title in matches:
             if not url or not title: continue
 
             itemlist.append(item.clone( action= 'list_films', title = title, url = url ))
     else:
-       matches = scrapertools.find_multiple_matches(data, '<figure.*?<a href="([^"]+)".*?src="([^"]+)".*?alt="(.*?)".*?</figure>')
+       matches = scrapertools.find_multiple_matches(bloque, 'data-src="(.*?)".*?alt="(.*?)".*?href="(.*?)"')
 
-       for url, thumb, title in matches:
+       for thumb, title, url in matches:
            if not url or not title: continue
 
            itemlist.append(item.clone( action = 'list_films', title = title, url = url, thumbnail = thumb ))
 
-    return sorted(itemlist, key = lambda it: it.title)
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
+
+        if next_page:
+            if '-pag' in next_page:
+                itemlist.append(item.clone( title='Siguientes ...', url = next_page, action = 'listas', text_color='coral' ))
+
+    if not item.group == 'Directores':
+       return sorted(itemlist, key = lambda it: it.title)
+    else:
+       return itemlist
 
 
 def list_films(item):
@@ -150,8 +171,7 @@ def findvideos(item):
     data = httptools.downloadpage(item.url).data
 
     url = scrapertools.find_single_match(data, '<source src="(.*?)"')
-    if not url:
-       url = scrapertools.find_single_match(data, '<source type="video/mp4".*?src="(.*?)"')
+    if not url: url = scrapertools.find_single_match(data, '<source type="video/mp4".*?src="(.*?)"')
 
     url = url.replace('https://www.adf.ly/6680622/banner/', '').replace('&amp;', '&')
 
@@ -163,13 +183,17 @@ def findvideos(item):
             return itemlist
 
     if url:
-           servidor = servertools.get_server_from_url(url)
-           servidor = servertools.corregir_servidor(servidor)
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
 
-           if servidor and servidor != 'directo':
-               url = servertools.normalize_url(servidor, url)
+        other = ''
+        if servidor == 'directo':
+            if url.startswith('https://odysee.com'): other = 'Odysee'
 
-               itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, language = 'Esp', url = url ))
+        if servidor:
+            url = servertools.normalize_url(servidor, url)
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, language = 'Esp', url = url, other = other ))
 
     return itemlist
 
@@ -188,8 +212,7 @@ def list_search(item):
 
         if not url or not title: continue
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title,
-                                    contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
 
     return itemlist
 

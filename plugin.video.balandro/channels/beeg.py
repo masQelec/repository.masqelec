@@ -61,7 +61,8 @@ def list_all(item):
 
         url = url_api + 'facts/file/' + str(id)
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                              contentType = 'movie', contentTitle = title ))
 
     page = int(scrapertools.find_single_match(item.url, '&offset=([0-9]+)'))
     next_page = (page + 48)

@@ -3,7 +3,7 @@
   "name": "SeriesFlixId",
   "thumbnail": "seriesflixid.png",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["producers", "vos"],
 
-  "notes": "Series por Géneros, productora."
+  "notes": "WEB CERRADA. Series por Géneros, productora."
 }

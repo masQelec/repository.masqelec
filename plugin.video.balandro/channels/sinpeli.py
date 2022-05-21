@@ -111,6 +111,7 @@ def list_all(item):
 
         langs = []
         lngs = scrapertools.find_multiple_matches(match, 'bold;"><img src="(.*?)"')
+
         if 'castellano' in str(lngs): langs.append('Esp')
         if 'latino' in str(lngs): langs.append('Lat')
         if 'subtitulado' in str(lngs): langs.append('Vose')
@@ -164,7 +165,31 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(match, 'data-player="(.*?)"')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = lang, quality=qlty ))
+        if not servidor == 'cuevana3':
+            itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = lang, quality=qlty ))
+
+        else:
+            new_url = base64.b64decode(url)
+
+            new_url = scrapertools.find_single_match(new_url, "src='(.*?)'")
+
+            if new_url:
+                data2 = do_downloadpage(new_url)
+
+                links = scrapertools.find_multiple_matches(data2, "go_to_player.*?'(.*?)'")
+
+                other = 'cuevana3'
+
+                for link in links:
+                    if '/hqq.' in link or '/waaw.' in link or '/netu.' in link: continue
+
+                    servidor = servertools.get_server_from_url(link)
+                    servidor = servertools.corregir_servidor(servidor)
+
+                    url = servertools.normalize_url(servidor, link)
+
+                    itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '',
+                                          language = lang, quality=qlty, other = other ))
 
     # Descargas recaptcha y comprimidos por partes
     # patron = 'class="Button STPb  toggle_links">Download.*?">(.*?)</span>.*?href="(.*?)".*?alt=.*?">(.*?)</span>.*?class=.*?">(.*?)</span>'
@@ -183,9 +208,19 @@ def play(item):
 
     url = item.url
 
+    if item.other == 'cuevana3':
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        itemlist.append(item.clone(server = servidor, url = url))
+
+        return itemlist
+
     url = base64.b64decode(url)
 
-    if url: url = scrapertools.find_single_match(url, "<iframe src='(.*?)'")
+    if url: url = scrapertools.find_single_match(str(url), "<iframe src='(.*?)'")
 
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:

@@ -307,7 +307,7 @@ def list_episodes(item):
         if not s_e: continue
 
         titulo = '%s - %s' % (show, title)
-        if langs: titulo += ' [COLOR %s][%s][/COLOR]' % (color_lang, ', '.join(langs))
+        if langs: titulo += ' [COLOR %s]%s[/COLOR]' % (color_lang, ', '.join(langs))
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
                                     contentType='episode', contentSerieName=show, contentSeason = s_e[0], contentEpisodeNumber = s_e[1] ))

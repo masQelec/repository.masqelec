@@ -159,7 +159,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    _id = scrapertools.find_single_match(data, '<div class="movieplay">.*?data-lazy-src="(.*?)"')
+    _id = scrapertools.find_single_match(data, '<div class="movieplay">.*?src="(.*?)"')
 
     if not _id: return itemlist
 

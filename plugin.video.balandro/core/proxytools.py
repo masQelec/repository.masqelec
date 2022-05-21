@@ -1142,20 +1142,19 @@ def _silverproxy_xyz(url, tipo_proxy, pais_proxy, max_proxies):
 
     proxies = []
 
-    el_provider = '[B][COLOR %s] Proxyscan[/B][/COLOR]' % color_exec
+    el_provider = '[B][COLOR %s] Rootjazz[/B][/COLOR]' % color_exec
     platformtools.dialog_notification('Silverproxy', 'Vía' + el_provider)
 
-    url_provider = 'https://www.proxyscan.io/'
+    url_provider = 'http://rootjazz.com/proxies/proxies.txt'
     resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
 
-    enlaces = scrapertools.find_multiple_matches(resp.data, '<th scope="row">(.*?)</th>.*?<td>(.*?)</td>')
+    enlaces = scrapertools.find_multiple_matches(resp.data, '(.*?)\n')
 
-    for prox, port in enlaces:
-        if not prox or not port: continue
-
-        proxies.append(prox + ':' + port)
+    for prox in enlaces:
+        proxies.append(prox)
 
     return proxies
+
 
 def _proxyscrape_com(url, tipo_proxy, pais_proxy, max_proxies):
     logger.info()

@@ -26,6 +26,8 @@ patron_domain = '(?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?(?:[^\.]+\.)?([\w|\-]+\.\w+)
 patron_host = '((?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?(?:[^\.]+\.)?[\w|\-]+\.\w+)(?:\/|\?|$)'
 patron_linkser = 'name="linkser"\s*value="([^"]*)"'
 
+key_safe = 'fee631d2cffda38a78b96ee6d2dfb43a'
+
 
 def decrypt_dcs(code):
     left = ''
@@ -41,13 +43,11 @@ def decrypt_dcs(code):
     numbers = ((i, n) for i, n in enumerate(encoded_uri) if str.isdigit(n))
     for first, second in zip(numbers, numbers):
         xor = int(first[1]) ^ int(second[1])
-        if xor < 10:
-            encoded_uri[first[0]] = str(xor)
+        if xor < 10: encoded_uri[first[0]] = str(xor)
 
     decoded_uri = base64.b64decode("".join(encoded_uri).encode())[16:-16].decode()
 
-    if re.search(r'go\.php\?u\=', decoded_uri):
-        decoded_uri = base64.b64decode(re.sub(r'(.*?)u=', '', decoded_uri)).decode()
+    if re.search(r'go\.php\?u\=', decoded_uri): decoded_uri = base64.b64decode(re.sub(r'(.*?)u=', '', decoded_uri)).decode()
 
     data = unquote_plus(unquote_plus(decoded_uri))
 
@@ -63,21 +63,19 @@ def decode_adfly(url, unquoted=True):
         zeros = ''
         ones = ''
         for n,letter in enumerate(code):
-            if n % 2 == 0:
-                zeros += code[n]
-            else:
-                ones = code[n] + ones
+            if n % 2 == 0: zeros += code[n]
+            else: ones = code[n] + ones
 
         key = zeros + ones
         key = list(key)
         i = 0
+
         while i < len(key):
             if key[i].isdigit():
                 for j in range(i + 1, len(key)):
                     if key[j].isdigit():
                         u = int(key[i])^int(key[j])
-                        if u < 10: 
-                            key[i] = str(u)
+                        if u < 10: key[i] = str(u)
                         i = j                   
                         break
             i +=1
@@ -87,7 +85,7 @@ def decode_adfly(url, unquoted=True):
         return base64.b64decode(key)[16:-16].decode('utf-8')
 
     data = httptools.downloadpage(url).data
-    ysmm = find_single_match(data, "var ysmm = '([^']+)';")
+    ysmm = scrapertools.find_single_match(data, "var ysmm = '([^']+)';")
     if not ysmm: 
         logger.debug('Adfly no detectado en: %s' % url)
         # ~ logger.debug(data)
@@ -96,11 +94,12 @@ def decode_adfly(url, unquoted=True):
     newurl = resolve(ysmm)
     if unquoted:
         newurl = urllib.unquote(urllib.unquote(newurl))
-        if 'dest=' in newurl: newurl = find_single_match(newurl, 'dest=([^&]+)')
-        elif 'href=' in newurl: newurl = find_single_match(newurl, 'href=([^&]+)')
+        if 'dest=' in newurl: newurl = scrapertools.find_single_match(newurl, 'dest=([^&]+)')
+        elif 'href=' in newurl: newurl = scrapertools.find_single_match(newurl, 'href=([^&]+)')
         else: logger.debug('Adfly redirección no contemplada: %s => %s' % (url, newurl))
 
     if not newurl.startswith('http'): return ''
+
     return newurl
 
 
@@ -135,27 +134,20 @@ def decode_streamcrypt(url):
 def decode_url_base64(url, host_torrent):
     logger.info()
 
-    host_list = [
-       #'acortalink.me',
-       #'acortaenlace.com',
-       #'short-link.one',
-       #'ddtorrent.live',
-       #'ttlinks.live',
-       #'sub-short.link',
-       'mediafire.com'
-       #'divxto.site'
-       ]
+    host_list = ['mediafire.com']
 
     domain = scrapertools.find_single_match(url, patron_domain)
 
     url_base64 = url
 
-    if '=http' in url_base64: url_base64 = scrapertools.find_single_match(url_base64, '=(http.*?$)')
+    if '=http' in url_base64 and not 'magnet:' in url_base64: url_base64 = scrapertools.find_single_match(url_base64, '=(http.*?$)')
 
     if len(url_base64) > 1 and not 'magnet:' in url_base64 and not '.torrent' in url_base64:
         patron_php = 'php(?:#|\?\w=)(.*?$)'
 
-        if scrapertools.find_single_match(url_base64, patron_php): url_base64 = scrapertools.find_single_match(url_base64, patron_php)
+        if not scrapertools.find_single_match(url_base64, patron_php): patron_php = '\?type=(?:anonym&)?(?:urlb64)?=(.*?$)'
+
+        url_base64 = scrapertools.find_single_match(url_base64, patron_php)
 
         try:
             for x in range(20):
@@ -165,7 +157,7 @@ def decode_url_base64(url, host_torrent):
 
             if not url_base64: url_base64 = url
 
-            if url_base64.startswith('magnet'): return url_base64
+            if url_base64.startswith('magnet') or url_base64.endswith('.torrent'): return url_base64
 
             if domain and domain in str(host_list): url_base64_bis = sorted_urls(url_base64, url_base64, host_torrent)
             else: url_base64_bis = sorted_urls(url, url_base64, host_torrent)
@@ -175,6 +167,10 @@ def decode_url_base64(url, host_torrent):
             if domain_bis: domain = domain_bis
 
             if url_base64_bis != url_base64: url_base64 = url_base64_bis
+
+            if '//cdn.pizza/' in url_base64:
+                if url_base64.startswith('//cdn.pizza/'): url_base64 = 'https:' + url_base64
+                return url_base64
 
     if not domain: domain = 'default'
 
@@ -196,19 +192,25 @@ def sorted_urls(url, url_base64, host_torrent):
     sortened_domains = {
             'acortalink.me': ['linkser=uggcf%3A%2F%2Flrfgbeerag.arg', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
             'acortaenlace.com': ['linkser=uggcf%3A%2F%2Fzntargcryvf.pbz', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
+            'acorta-enlace.com': ['linkser=ngbzgg.pbz', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
             'short-link.one': ['linkser=uggcf%3A%2F%2Fpvargbeerag.pb', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
-            'ddtorrent.live': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
-            'ttlinks.live': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
-            'sub-short.link': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
+            'acorta-link.com': ['linkser=uggcf%3A%2F%2Fgbqbgbeeragf.arg', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
             'mediafire.com': [None, '(?i)=\s*"Download file"\s*href="([^"]+)"\s*id\s*=\s*"downloadButton"', 0, 0, False],
-            'divxto.site': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False]
+            'sub-short.link': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
+            'divxto.site': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
+            'ddtorrent.live': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
+            'short-info.link': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
+            'desbloqueador.site': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
+            'ttlinks.live': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
             }
+
+    if not url_base64 or url_base64.startswith('magnet') or url_base64.endswith('.torrent'): return url_base64
 
     domain = scrapertools.find_single_match(url, patron_domain)
 
     if sortened_domains.get(domain, False) == False or not url_base64 or url_base64.startswith('magnet'): return url_base64
 
-    if '://' in url_base64 and not (url_base64.startswith('magnet') or url_base64.startswith('http')):
+    if '//' in url_base64 and not (url_base64.startswith('magnet') or url_base64.startswith('http')):
         try:
             chers = []
 
@@ -226,6 +228,7 @@ def sorted_urls(url, url_base64, host_torrent):
 
             url_base64 = "".join([chr(x) for x in chers])
         except:
+            import traceback
             logger.error('Error translation: %s' % url_base64)
             logger.error(traceback.format_exc())
 
@@ -234,6 +237,9 @@ def sorted_urls(url, url_base64, host_torrent):
     host_name = scrapertools.find_single_match(url, patron_host)
 
     if host_name and not host_name.endswith('/'): host_name += '/'
+
+    resp = httptools.downloadpage(url_base64, only_headers=True)
+    if resp.sucess: return url_base64
 
     data_new = httptools.downloadpage(url, headers={'Referer': host_torrent}, raise_weberror=False).data
     data_new = re.sub(r'\n|\r|\t', '', data_new)
@@ -247,7 +253,7 @@ def sorted_urls(url, url_base64, host_torrent):
 
     post = sortened_domains[domain][0]
 
-    headers = {'Content-type': 'application/x-www-form-urlencoded'}
+    headers = {'Referer': url, 'Content-type': 'application/x-www-form-urlencoded'}
 
     data_new = httptools.downloadpage(host_name, post=post, headers=headers, raise_weberror=False).data
     data_new = re.sub(r'\n|\r|\t', '', data_new)
@@ -256,17 +262,29 @@ def sorted_urls(url, url_base64, host_torrent):
 
     if data_new :
         key = scrapertools.find_single_match(data_new, sortened_domains[domain][1])
-        if not key or not sortened_domains[domain][1]: return url_base64
+        if not key or not sortened_domains[domain][1]: key = key_safe
 
     try:
-        url_base64_bis = GibberishAES(string=url_base64, pass_=key,  Nr=sortened_domains[domain][2], Nk=sortened_domains[domain][3], Decrypt=sortened_domains[domain][4])
-        if url_base64_bis.result and (url_base64_bis.result.startswith('magnet') or url_base64_bis.result.startswith('http')):
-            url_base64 = url_base64_bis.result
+        url_base64_bis = None
+
+        if not key: key = key_safe
+
+        url_base64_bis = GibberishAES(string=url_base64, pass_=key, Nr=sortened_domains[domain][2], Nk=sortened_domains[domain][3], Decrypt=sortened_domains[domain][4])
+
+        if url_base64_bis.result and (url_base64_bis.result.startswith('magnet') or url_base64_bis.result.startswith('http') or url_base64_bis.result.startswith('//')):
+            if url_base64_bis.result.startswith('//'): url_base64 = 'https:' + url_base64_bis.result
+            else: url_base64 = url_base64_bis.result
         else:
+            if url_base64_bis.result.startswith('//cdn.pizza/'):
+                url_base64 = 'https:' + url_base64_bis.result
+                return url_base64
+
             logger.error('Error Result: %s' % url_base64_bis.result)
     except:
+        import traceback
         logger.error('Error Key: %s' % key)
         logger.error(traceback.format_exc())
+        return url_base64
 
     if not (url_base64.startswith('magnet') or url_base64.startswith('http')): key = ''
 

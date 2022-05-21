@@ -16,7 +16,9 @@ def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     url = url.replace('https://serieskao.tv/', host)
 
-    data = httptools.downloadpage(url, post=post).data
+    if '/?s=' in url: headers = {'Referer': host}
+
+    data = httptools.downloadpage(url, post=post, headers=headers).data
     return data
 
 
@@ -385,6 +387,11 @@ def play(item):
 
          url = 'https://www.amazon.com/drive/v1/shares/%s?resourceVersion=V2&ContentType=JSON&asset=ALL' %(shareId)
 
+    elif '.xyz/v/' in url:
+         url = url.replace('serieskao.xyz/v/', 'suzihaza.com/v/').replace('animekao.xyz/v/', 'suzihaza.com/v/').replace('sypl.xyz/v/', 'suzihaza.com/v/')
+         if '#' in url:
+             url = url.split('#')[0]
+
     elif '/kaocentro.net/' in url:
          try:
             data = do_downloadpage(url)
@@ -393,6 +400,8 @@ def play(item):
 
          url = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
 
+         if not url: url = item.url
+
     elif 'hydrax.com' in url:
          slug = url.split('v=')[1]
          post = "slug=%s&dataType=mp4" % slug
@@ -400,11 +409,6 @@ def play(item):
             data = do_downloadpage("https://ping.iamcdn.net/", post=post)
          except:
             url = ''
-
-    elif '.xyz/v/' in url:
-         url = url.replace('serieskao.xyz/v/', 'suzihaza.com/v/').replace('animekao.xyz/v/', 'suzihaza.com/v/').replace('sypl.xyz/v/', 'suzihaza.com/v/')
-         if '#' in url:
-             url = url.split('#')[0]
 
     if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'

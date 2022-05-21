@@ -5,7 +5,7 @@ import xbmc, random, time
 from platformcode import config, logger, platformtools
 from core import httptools, scrapertools
 
-host = 'https://dood.ws'
+host = 'https://doodstream.com'
 
 
 color_exec = config.get_setting('notification_exec_color', default='cyan')
@@ -42,14 +42,14 @@ def get_video_url(page_url, url_referer=''):
 
     video_urls = []
 
-    page_url = page_url.replace('/dood.cx/', '/dood.ws/').replace('/dood.to/', '/dood.ws/')
+    page_url = page_url.replace('/dood.cx/', '/dood.so/')
 
     page_url = page_url.replace('/d/', '/e/')
 
     data = httptools.downloadpage(page_url, headers={"Referer": host}).data
     # ~ logger.debug(data)
 
-    if '<title>Access denied' in data:
+    if '<title>Access denied' in data or '<title>Attention Required! | Cloudflare</title>' in data:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
             try:
                 import_libs('script.module.resolveurl')
@@ -75,7 +75,7 @@ def get_video_url(page_url, url_referer=''):
         data2 = httptools.downloadpage(host + url, headers={'Referer': page_url}).data
         if not data2: return 'Vídeo sin resolver'
 
-        if '<title>Access denied' in data2:
+        if '<title>Access denied' in data2 or '<title>Attention Required! | Cloudflare</title>' in data2:
             if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
                 try:
                     import_libs('script.module.resolveurl')
@@ -94,7 +94,7 @@ def get_video_url(page_url, url_referer=''):
                    logger.error(traceback.format_exc())
                    platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
             else:
-               return 'Segundo Acceso Denegado' # ~ Cloudflare recaptcha
+               return 'Acceso Denegado (2do.)' # ~ Cloudflare recaptcha
 
         token = scrapertools.find_single_match(data, '"?token=([^"&]+)')
         if not token: return video_urls

@@ -6,10 +6,16 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
-host = "https://www.gnula24.xyz/"
+host = 'https://www3.gnula24.xyz/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.gnula24.xyz/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not headers: headers = {'Referer': host}
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -309,6 +315,9 @@ def findvideos(item):
         elif 'streamango' in servidor: continue
         elif 'verystream' in servidor: continue
         elif 'vidtodo' in servidor: continue
+        elif 'vidia' in servidor: continue
+
+        servidor = servidor.replace('.tv', '').strip()
 
         lang = scrapertools.find_single_match(match, " src='.*?/flags/(.*?).png'")
 
@@ -336,10 +345,13 @@ def findvideos(item):
         elif 'streamango' in url: continue
         elif 'verystream' in url: continue
         elif 'vidtodo' in url: continue
+        elif 'vidia' in url: continue
 
         elif 'ul.to' in url: continue
-        elif 'katfile.com' in url: continue
-        elif 'rapidgator.net' in url: continue
+        elif 'katfile' in url: continue
+        elif 'rapidgator' in url: continue
+        elif 'rockfile' in url: continue
+        elif 'nitroflare' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -410,7 +422,7 @@ def list_search(item):
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<div class="contenido"><p>(.*?)</p>'))
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
+                                    contentType='movie', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 

@@ -9,7 +9,7 @@
   "search_types": ["movie"],
 
   "categories": ["movie", "torrent"],
-  "language": ["cast", "lat"],
+  "language": ["cast", "lat", "vose"],
 
   "clusters": ["torrents", "rankings", "years", "kids", "docs"],
 

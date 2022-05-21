@@ -14,13 +14,10 @@ perpage = 25
 
 
 def mainlist(item):
-    return mainlist_anime(item)
-
-def mainlist_series(item):
-    return mainlist_anime(item)
+    return mainlist_animes(item)
 
 
-def mainlist_anime(item):
+def mainlist_animes(item):
     logger.info()
     itemlist = []
 

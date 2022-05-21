@@ -10,10 +10,16 @@ from core import httptools, scrapertools, servertools, tmdb
 from lib import decrypters
 
 
-host = 'https://mejortorrent.la/'
+host = 'https://www10.mejortorrent.ma/'
 
 
 def do_downloadpage(url, post=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://mejortorrent.la/', 'https://mejortorrent.si/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/years/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, raise_weberror=raise_weberror).data
@@ -371,13 +377,13 @@ def play(item):
             host_torrent = host[:-1]
             url_base64 = decrypters.decode_url_base64(url, host_torrent)
 
-            #if not url_base64.startswith('https://files.'): url_base64 = url_base64.replace(host, 'https://files.mejortorrent.la/' )
+            # ~ if not url_base64.startswith('https://files.'): url_base64 = url_base64.replace(host, 'https://files.mejortorrent.la/' )
 
             if url_base64.startswith('magnet:'):
-               itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+                itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
             elif url_base64.endswith(".torrent"):
-               itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+                itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
     return itemlist
 

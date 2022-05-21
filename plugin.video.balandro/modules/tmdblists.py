@@ -11,7 +11,7 @@ def mainlist(item):
 
     item.category = 'TMDB'
 
-    itemlist.append(item.clone( action='', title= 'Búsquedas a través de [COLOR pink]Personas[/COLOR]', text_color='yellowgreen', folder=False ))
+    itemlist.append(item.clone( action='', title= 'Búsquedas a través de [COLOR pink]Personas[/COLOR]', text_color='yellowgreen' ))
 
     itemlist.append(item.clone( action='personas', search_type='cast', title=' - Buscar intérprete ...',
                                 plot = 'Escribir el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
@@ -19,7 +19,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='personas', search_type='crew', title=' - Buscar dirección ...',
                                 plot = 'Escribir el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
 
-    itemlist.append(item.clone( action='', title= 'Búsquedas a través de [COLOR pink]Listas[/COLOR]', text_color='yellowgreen', folder=False ))
+    itemlist.append(item.clone( action='', title= 'Búsquedas a través de [COLOR pink]Listas[/COLOR]', text_color='yellowgreen' ))
 
     itemlist.append(item.clone( action='listado_personas', search_type='person', extra = 'popular', title=' - Personas con Mayor popularidad' ))
 
@@ -56,7 +56,7 @@ def mainlist(item):
         itemlist.append(item.clone( action='generos', search_type='tvshow', title='   - Por Género' ))
         itemlist.append(item.clone( action='anios', search_type='tvshow', title='   - Por Año' ))
 
-    itemlist.append(item.clone( action='show_help', title='Información y ayuda', folder=False, thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( action='show_help', title='Información TMDB', folder=False, thumbnail=config.get_thumb('help'), text_color='green' ))
 
     return itemlist
 
@@ -86,6 +86,7 @@ def texto_busqueda(txt):
 
 def lista(item, elementos):
     itemlist = []
+
     if not item.page: item.page = 1
 
     for elemento in elementos:
@@ -103,7 +104,7 @@ def lista(item, elementos):
     tmdb.set_infoLabels(itemlist)
 
     if len(itemlist) > 0:
-        itemlist.append(item.clone( title='Página siguiente >>', page = item.page + 1, text_color='coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, text_color='coral' ))
 
     return itemlist
 
@@ -218,8 +219,8 @@ def personas(item):
     if not item.person_id:
         last_search = config.get_setting('search_last_person', default='')
         tecleado = platformtools.dialog_input(last_search, 'Nombre de la persona a buscar')
-        if tecleado is None or tecleado == '':
-            return itemlist
+
+        if tecleado is None or tecleado == '': return itemlist
 
         config.set_setting('search_last_person', tecleado)
 
@@ -242,16 +243,13 @@ def personas(item):
                     if info != '': info += ', '
                     if 'title' in detalle:
                         info += detalle['title']
-                        if 'release_date' in detalle:
-                            info += ' (%s)' % detalle['release_date'][:4]
+                        if 'release_date' in detalle: info += ' (%s)' % detalle['release_date'][:4]
                     else:
                         info += detalle['name']
-                        if 'first_air_date' in detalle:
-                            info += ' (TV %s)' % detalle['first_air_date'][:4]
+                        if 'first_air_date' in detalle:info += ' (TV %s)' % detalle['first_air_date'][:4]
 
                 thumb = ''
-                if elemento['profile_path']:
-                    thumb = 'https://image.tmdb.org/t/p/w235_and_h235_face%s' % elemento['profile_path']
+                if elemento['profile_path']: thumb = 'https://image.tmdb.org/t/p/w235_and_h235_face%s' % elemento['profile_path']
 
                 opciones.append(platformtools.listitem_to_select(elemento['name'], info, thumb))
                 opciones_ids.append(elemento['id'])
@@ -297,7 +295,7 @@ def personas(item):
     tmdb.set_infoLabels(itemlist)
 
     if desde + perpage < num_elementos:
-        itemlist.append(item.clone( title='Página siguiente >>', page = item.page + 1, text_color='coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, text_color='coral' ))
 
     return itemlist
 
@@ -315,19 +313,16 @@ def listado_personas(item):
 
         for detalle in elemento['known_for']:
             if info != '': info += ', '
-            if 'title' in detalle:
-                info += '%s (%s)' % (detalle['title'], detalle['release_date'][:4])
-            else:
-                info += '%s (TV %s)' % (detalle['name'], detalle['first_air_date'][:4])
+            if 'title' in detalle: info += '%s (%s)' % (detalle['title'], detalle['release_date'][:4])
+            else: info += '%s (TV %s)' % (detalle['name'], detalle['first_air_date'][:4])
 
         thumb = ''
-        if elemento['profile_path']:
-            thumb = 'https://image.tmdb.org/t/p/w235_and_h235_face%s' % elemento['profile_path']
+        if elemento['profile_path']: thumb = 'https://image.tmdb.org/t/p/w235_and_h235_face%s' % elemento['profile_path']
 
         itemlist.append(item.clone( action = 'personas', person_id = elemento['id'], search_type = 'cast', page = 1, 
                                     title = elemento['name'], thumbnail = thumb, plot = info, category = elemento['name'] ))
 
     if len(itemlist) > 0:
-        itemlist.append(item.clone( title='Página siguiente >>', page = item.page + 1, text_color='coral' ))
+        itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, text_color='coral' ))
 
     return itemlist

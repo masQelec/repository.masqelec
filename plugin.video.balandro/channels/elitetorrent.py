@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://elitetorrent.app/'
+host = 'https://www.elitetorrent.dev/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://elitetorrent.app/', 'https://elitetorrent.la/', 'https://www.elitetorrent.wtf/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post).data
     return data
 
@@ -105,7 +111,12 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
+    if '/?s=' in item.url:
+        if '<h1>No se han encontrado resultados para' in data: return itemlist
+
     matches = scrapertools.find_multiple_matches(data, '<div class="imagen">(.*?)<div class="meta">')
+
+    i = 0
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
@@ -114,7 +125,10 @@ def list_all(item):
 
         if not url or not title: continue
 
-        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        title = title.replace('(720)', '').replace('(720p)', '').replace('(1080)', '').replace('(1080p)', '').replace('(microHD)', '').replace('(BR-Line)', '').strip()
+        title = title.replace('(HDR)', '').replace('(HDRip)', '').replace('(DVDRip)', '').replace('(BR-SCREENER)', '').replace('(TS-SCREENER)', '').strip()
+
+        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
@@ -138,20 +152,24 @@ def list_all(item):
                    lngs.append(lng)
 
         if '/peliculas/' in url:
-            if item.search_type == 'tvshow': continue
+            if not item.search_type == 'all':
+                if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                     qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
                                     contentType='movie', contentTitle=title, infoLabels={'year': "-"} ))
 
-        else:
-            if item.search_type == 'movie': continue
+        if '/series/' in url:
+            if not item.search_type == 'all':
+                if item.search_type == 'movie': continue
 
             if '-la-serie-s' in url: temp_epis = scrapertools.find_single_match(url, "-la-serie-s(.*?)$")
             elif '-serie-s' in url: temp_epis = scrapertools.find_single_match(url, "-serie-s(.*?)$")
             else: temp_epis = scrapertools.find_single_match(url, "-s(.*?)$")
 
-            if not temp_epis: continue
+            if not temp_epis:
+               i +=1
+               temp_epis = '99e' + str (i)
 
             SerieName = url
 
@@ -163,7 +181,7 @@ def list_all(item):
             season = scrapertools.find_single_match(temp_epis, "(.*?)e")
             episode = scrapertools.find_single_match(temp_epis, ".*?e(.*?)$")
 
-            if not season or  not episode: continue
+            if not season or not episode: continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                         qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,

@@ -21,9 +21,13 @@ def get_video_url(page_url, url_referer=''):
     data = resp.data
 
     data_m = httptools.downloadpage("https://highload.to/assets/js/master.js").data
-    dec_m = hunterdecode.decode(data_m)
-    head_ch = scrapertools.find_single_match(data, '<head>(.*?)<\/head>')
-    decoded_m = hunterdecode.decode(head_ch)
+
+    try:
+       dec_m = hunterdecode.decode(data_m)
+       head_ch = scrapertools.find_single_match(data, '<head>(.*?)<\/head>')
+       decoded_m = hunterdecode.decode(head_ch)
+    except:
+       return video_urls
 
     var_res = scrapertools.find_single_match(dec_m, 'var\s*res\s*=\s*([^\.]+)')
     obf_link = scrapertools.find_single_match(decoded_m, '%s="([^"]+)"' % var_res)

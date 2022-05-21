@@ -30,9 +30,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='plum' ))
 
     itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'stars', search_type = 'person',
-                       plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
+                                plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
     itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
-                       plot = 'Debe indicarse el nombre y apellido/s del director.'))
+                                plot = 'Debe indicarse el nombre y apellido/s del director.'))
 
     return itemlist
 
@@ -430,8 +430,7 @@ def list_episodes(item):
         titulo = title
 
         fecha = scrapertools.find_single_match(info, '<span class="ep_airdate">(.*?)</span>').strip()
-        if fecha:
-           titulo = titulo + '  (' + fecha + ')'
+        if fecha: titulo = titulo + '  (' + fecha + ')'
 
         itemlist.append(item.clone( action='findvideos', title = titulo, url = url, thumbnail = thumb,
                                     contentType = 'episode', contentSerieName=serie_name, contentSeason = season, contentEpisodeNumber = episode ))
@@ -528,7 +527,9 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<div id="tab(\d+)".*?(?i)<iframe.*?src="([^"]+)"', re.DOTALL).findall(data)
+    matches = re.compile('<div id="tab(.*?)".*?data-lazy-src="(.*?)"', re.DOTALL).findall(data)
+    if not matches: matches = re.compile('<div id="tab(\d+)".*?(?i)<iframe.*?src="([^"]+)"', re.DOTALL).findall(data)
+    if not matches: matches = re.compile('<div id="tab(\d+)".*?(?i)<IFRAME.*?SRC="([^"]+)"', re.DOTALL).findall(data)
 
     for option, url in matches:
         info = scrapertools.find_single_match(data, '<a href="#tab%s">(.*?)<' % option)

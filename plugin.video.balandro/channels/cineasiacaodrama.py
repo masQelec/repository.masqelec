@@ -120,7 +120,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     if item.page == 0: episode = 1
     else: episode = (item.page * item.perpage) + 1

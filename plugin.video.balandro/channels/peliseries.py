@@ -6,18 +6,23 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+from core import requeststools
+
 
 host = 'https://peliculasyserieslatino.me'
+
 
 lnks_host = 'https://peliseries.live'
 
 perpage = 30
 
 
-def do_downloadpage(url, post=None, headers=None):
+def do_downloadpage(url, post=None, headers=None, referer=None):
     headers = {'Referer': host}
 
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    if referer: headers = {'Referer': referer}
+
+    data = httptools.downloadpage(url, post=post, headers=headers, bypass_cloudflare=False).data
 
     return data
 
@@ -134,14 +139,14 @@ def list_all(item):
             elif "<div class='ln'>Anime</div>" in match: tv_tipo = 'Anime'
             elif "<div class='ln'>Novela</div>" in match: tv_tipo = 'Novela'
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, tv_tipo = tv_tipo, fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, referer=item.url, tv_tipo = tv_tipo, fmt_sufijo=sufijo,
                                         languages = ', '.join(langs), contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
         else:
             if item.search_type != 'all':
                  if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, referer=item.url, fmt_sufijo=sufijo,
                                         languages = ', '.join(langs), contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
         if len(itemlist) >= perpage: break
@@ -259,11 +264,30 @@ def findvideos(item):
     itemlist = []
 
     if not item.pid:
-        data = do_downloadpage(item.url)
+        referer = scrapertools.find_single_match(item.referer, '(.*?)page')
+        referer = referer.replace('?', '').strip()
+
+        data = do_downloadpage(item.url, referer=referer)
         data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
         pid = scrapertools.find_single_match(data, '<iframe class="iplayer".*?pid=(.*?)&token')
         if not pid: pid = scrapertools.find_single_match(data, '<div class="" style="overflow: hidden">.*?pid=(.*?)&token')
+        if not pid: pid = scrapertools.find_single_match(data, '<input id="copyLink" type="text" value=".*?/ver/(.*?)/')
+
+        if not pid:
+            data = data.replace('<b>[P', '<b>"PID=').replace('] Vistas:</b>', '"')
+            pid = scrapertools.find_single_match(data, '<b>"PID=(.*?)"')
+
+        if not pid:
+            data = requeststools.read(item.url, '')
+
+            pid = scrapertools.find_single_match(data, '<iframe class="iplayer".*?pid=(.*?)&token')
+            if not pid: pid = scrapertools.find_single_match(data, '<div class="" style="overflow: hidden">.*?pid=(.*?)&token')
+            if not pid: pid = scrapertools.find_single_match(data, '<input id="copyLink" type="text" value=".*?/ver/(.*?)/')
+
+            if not pid:
+                data = data.replace('<b>[P', '<b>"PID=').replace('] Vistas:</b>', '"')
+                pid = scrapertools.find_single_match(data, '<b>"PID=(.*?)"')
 
         if not pid:
             if config.get_setting('developer_mode', default=False): platformtools.dialog_notification('PeliSeries', '[COLOR red]Pid Inexistente[/COLOR]')
@@ -273,7 +297,7 @@ def findvideos(item):
     else:
         post = 'pid=%s&tipo=Serie&temp=%s&cap=%s' %(str(item.pid), str(item.contentSeason), str(item.contentEpisodeNumber))
 
-    data = do_downloadpage(lnks_host + '/?v=Opciones', post = post)
+    data = do_downloadpage(lnks_host + '/?v=Opciones', post = post, headers={'Referer': item.url})
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, 'onclick="OpenPlayer(.*?)</a></div>')

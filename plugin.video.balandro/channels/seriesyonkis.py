@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://seriesyonkis.cc/'
+host = 'https://seriesyonkis.io/'
 
 
 def item_configurar_proxies(item):
@@ -21,6 +21,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://seriesyonkis.cc/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('seriesyonkis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 

@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://pelisplus.so/'
+host = 'https://pelisplus.sh/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://pelisplus.so/', 'https://www1.pelisplus.so/', 'https://www2.pelisplus.so/'] 
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/peliculas-' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -101,8 +107,7 @@ def list_all(item):
     data = data.replace('\n','')
 
     bloque = scrapertools.find_single_match(data, '<div class="main-peliculas movie-refresh">(.*?)<div class="butmore"')
-    if not bloque:
-        bloque = scrapertools.find_single_match(data, '<h2 class="pull-left">(.*?)<div class="footer">')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<h2 class="pull-left">(.*?)<div class="footer">')
 
     matches = scrapertools.find_multiple_matches(bloque, '<div class="item-pelicula(.*?)</figure>')
 
@@ -119,10 +124,8 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year text-center">(.*?)</span>')
-        if year:
-            title = title.replace('(' + year + ')', '').strip()
-        else:
-            year = '-'
+        if year: title = title.replace('(' + year + ')', '').strip()
+        else: year = '-'
 
         if '/serie/' in url:
             if item.search_type == 'movie': continue
@@ -216,15 +219,11 @@ def episodios(item):
 
         ord_epis = str(episode)
 
-        if len(str(ord_epis)) == 1:
-            ord_epis = '0000' + ord_epis
-        elif len(str(ord_epis)) == 2:
-            ord_epis = '000' + ord_epis
-        elif len(str(ord_epis)) == 3:
-            ord_epis = '00' + ord_epis
+        if len(str(ord_epis)) == 1: ord_epis = '0000' + ord_epis
+        elif len(str(ord_epis)) == 2: ord_epis = '000' + ord_epis
+        elif len(str(ord_epis)) == 3: ord_epis = '00' + ord_epis
         else:
-            if num_matches > 50:
-                ord_epis = '0' + ord_epis
+            if num_matches > 50: ord_epis = '0' + ord_epis
 
         titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title
 
@@ -283,8 +282,7 @@ def findvideos(item):
 
             url = servertools.normalize_url(servidor, url)
 
-            if servidor == 'directo':
-                link_other = normalize_other(url)
+            if servidor == 'directo': link_other = normalize_other(url)
             else: link_other = ''
 
             lang = idioma
@@ -345,6 +343,8 @@ def play(item):
 
         for url in urls:
             if not 'error' in url:
+                if '/pelisloadtop.com/' in url: continue
+
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 

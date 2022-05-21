@@ -15,7 +15,7 @@ def get_video_url(page_url, url_referer=''):
 
     if resp.code == 404:
         return "El archivo no existe o ha sido borrado"
-    elif 'We can't find the video' in resp.data:
+    elif "We can't find the video" in resp.data:
         return "El archivo no existe o ha sido borrado"
 
     data = resp.data

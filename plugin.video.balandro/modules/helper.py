@@ -40,44 +40,45 @@ def mainlist(item):
     descartar_xxx = config.get_setting('descartar_xxx', default=False)
     descartar_anime = config.get_setting('descartar_anime', default=False)
 
-    itemlist.append(item.clone( action='', title= 'Contacto:', text_color='limegreen', thumbnail=config.get_thumb('pencil'), folder=False ))
+    itemlist.append(item.clone( action='', title= 'CONTACTO:', text_color='limegreen', folder=False, thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(item.clone( action='', title= ' - Foro ' + _foro + ' Instalaciones, Novedades, Sugerencias, etc.', folder=False, thumbnail=config.get_thumb('foro') ))
-    itemlist.append(item.clone( action='', title= ' - Fuente ' + _source + ' Repositorio, Add-On, etc.', folder=False, thumbnail=config.get_thumb('pencil') ))
-    itemlist.append(item.clone( action='', title= ' - Telegram ' + _telegram + ' Asesoramiento, Dudas, Consultas, etc.', folder=False, thumbnail=config.get_thumb('telegram') ))
+    itemlist.append(item.clone( action='', title= ' - Foro ' + _foro + ' Instalaciones, Novedades, Sugerencias, etc.', thumbnail=config.get_thumb('foro'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Fuente ' + _source + ' Repositorio, Add-On, etc.', thumbnail=config.get_thumb('pencil'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Telegram ' + _telegram + ' Asesoramiento, Dudas, Consultas, etc.', thumbnail=config.get_thumb('telegram'), folder=False ))
 
-    itemlist.append(item.clone( action='', title= 'Uso:', text_color='chartreuse', thumbnail=config.get_thumb('dev'), folder=False ))
+    itemlist.append(item.clone( action='', title= 'USO:', text_color='chartreuse', folder=False, thumbnail=config.get_thumb('dev') ))
 
-    itemlist.append(item.clone( action='show_help_tips', title= ' - Trucos y consejos varios', folder=False ))
-    itemlist.append(item.clone( action='show_help_use', title= ' - Ejemplos de niveles de uso', folder=False ))
-    itemlist.append(item.clone( action='show_help_faq', title= ' - FAQS: Preguntas y respuestas', folder=False ))
-    itemlist.append(item.clone( action='show_help_settings', title= ' - Notas sobre algunos parámetros de la configuración', folder=False ))
+    itemlist.append(item.clone( action='show_help_tips', title= ' - Trucos y Consejos' ))
+    itemlist.append(item.clone( action='show_help_use', title= ' - Ejemplos de Uso' ))
+    itemlist.append(item.clone( action='show_help_faq', title= ' - FAQS: Preguntas y Respuestas' ))
+    itemlist.append(item.clone( action='show_help_settings', title= ' - Notas sobre ciertos parámetros de la configuración' ))
 
-    itemlist.append(item.clone( action='', title= 'Canales:', text_color='gold', thumbnail=config.get_thumb('stack'), folder=False ))
+    itemlist.append(item.clone( action='', title= 'CANALES:', text_color='gold', folder=False, thumbnail=config.get_thumb('stack') ))
+
     if config.get_setting('developer_mode', default=False):
-        itemlist.append(item.clone( action='show_channels_list', title= ' - Todos los canales', tipo = 'all', folder=False, thumbnail=config.get_thumb('stack') ))
+        itemlist.append(item.clone( action='show_channels_list', title= ' - Todos los Canales', tipo = 'all', thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están disponibles', folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están sugeridos', suggesteds = True, folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están Disponibles', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están Sugeridos', suggesteds = True, thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='', title= ' - Canales personalización:', text_color='goldenrod', thumbnail=config.get_thumb('stack'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Canales personalización:', text_color='goldenrod', folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_status', title= '    - Personalizar canales Preferidos (Marcar ó Des-marcar)', des_rea = False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_status', title= '    - Personalizar canales (Desactivar ó Re-activar)', des_rea = True, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_prefered', title= '    - Qué canales tiene marcados como Preferidos', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_no_actives', title= '    - Qué canales tiene marcados como Desactivados', thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='channels_status', title= '    - Personalizar canales Preferidos (Marcar ó Des-marcar)', des_rea = False, folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='channels_status', title= '    - Personalizar canales (Desactivar ó Re-activar)', des_rea = True, folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='channels_prefered', title= '    - Qué canales tiene marcados como preferidos', folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='channels_no_actives', title= '    - Qué canales tiene marcados como desactivados', folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='', title= ' - Canales con cuentas y/ó dominios:', text_color='goldenrod', folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_help_register', title= '    - [COLOR green]Información[/COLOR] webs que requieren registrarse (Cuenta)', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales requieren Cuenta', cta_register = True, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales tiene varios Dominios', var_domains = True, thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='', title= ' - Canales situación:', text_color='goldenrod', thumbnail=config.get_thumb('stack'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Canales situación:', text_color='goldenrod', folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_with_proxies', title= '    - Qué canales pueden necesitar Proxies', new_proxies=True, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están Inestables', no_stable = True, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están Temporalmente inactivos', temp_no_active = True, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están Inactivos', no_active = True, thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales requieren cuenta', cta_register = True, folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales tiene varios dominios', var_domains = True, folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='channels_with_proxies', title= '    - Qué canales pueden necesitar proxies', new_proxies=True, folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están inestables', no_stable = True, folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están temporalmente inactivos', temp_no_active = True, folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están inactivos', no_active = True, folder=False, thumbnail=config.get_thumb('stack') ))
-
-    itemlist.append(item.clone( action='show_help_register', title= ' - [COLOR green]Información[/COLOR] dominios que requieren registrarse', folder=False, thumbnail=config.get_thumb('news') ))
-    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR gold]Canales[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR gold]Canales y Cuentas[/COLOR])', thumbnail=config.get_thumb('settings') ))
 
     presentar = True
     if config.get_setting('mnu_simple', default=False): presentar = False
@@ -86,102 +87,111 @@ def mainlist(item):
            if descartar_anime: presentar = False
 
     if presentar:
-        itemlist.append(item.clone( action='', title= 'Parental:', text_color='orange', thumbnail=config.get_thumb('roadblock'), folder=False ))
-
-        if not descartar_anime:
-            itemlist.append(item.clone( action='channels_only_animes', title= ' - Qué canales pueden tener contenido de animes', folder=False, thumbnail=config.get_thumb('anime') ))
+        itemlist.append(item.clone( action='', title= 'PARENTAL:', text_color='orange', folder=False, thumbnail=config.get_thumb('roadblock') ))
 
         if not descartar_xxx:
-            itemlist.append(item.clone( action='channels_only_adults', title= ' - Qué canales pueden tener contenido para adultos', folder=False, thumbnail=config.get_thumb('adults') ))
-            itemlist.append(item.clone( action='show_help_adults', title= ' - [COLOR green]Información[/COLOR] Control parental (+18)', folder=False ))
+            itemlist.append(item.clone( action='show_help_adults', title= ' - [COLOR green]Información[/COLOR] Control parental (+18)' ))
 
-        itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR orange]Parental[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
+        if not descartar_anime:
+            itemlist.append(item.clone( action='channels_only_animes', title= ' - Qué canales pueden tener contenido de Animes', thumbnail=config.get_thumb('anime') ))
 
-    itemlist.append(item.clone( action='', title= 'Proxies:', text_color='red', thumbnail=config.get_thumb('flame'), folder=False ))
+        if not descartar_xxx:
+            itemlist.append(item.clone( action='channels_only_adults', title= ' - Qué canales pueden tener contenido para Adultos', thumbnail=config.get_thumb('adults') ))
 
-    itemlist.append(item.clone( action='channels_with_proxies', title= ' - Qué canales pueden usar proxies', folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( channel='proxysearch', title = ' - Configurar proxies a usar [COLOR plum](en los canales que los necesiten)[/COLOR]', action = 'proxysearch_all', thumbnail=config.get_thumb('flame') ))
+        itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR orange]Parental[/COLOR])', thumbnail=config.get_thumb('settings') ))
 
-    if config.get_setting('memorize_channels_proxies', default=True):
-        itemlist.append(item.clone( action='channels_with_proxies_memorized', title= ' - Qué [COLOR red]canales[/COLOR] tiene con proxies memorizados', folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='', title='PLAY (Servidores):', folder=False, text_color='fuchsia', thumbnail=config.get_thumb('bolt') ))
 
-    itemlist.append(item.clone( channel='actions', title= ' - Quitar los proxies en los canales [COLOR red](que los tengan memorizados)[/COLOR]', action = 'manto_proxies', folder=False, thumbnail=config.get_thumb('flame') ))
-    itemlist.append(item.clone( action='show_help_proxies', title= ' - [COLOR green]Información[/COLOR] uso de proxies', folder=False ))
-    itemlist.append(item.clone( action='show_help_providers', title= ' - [COLOR green]Información[/COLOR] proveedores de proxies', folder=False ))
-    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR red]Proxies[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
-
-    itemlist.append(item.clone( action='', title= 'Torrents:', text_color='blue', thumbnail=config.get_thumb('torrents'), folder=False ))
-
-    itemlist.append(item.clone( action='show_clients_torrent', title= ' - Clientes externos torrent soportados', folder=False, thumbnail=config.get_thumb('cloud') ))
-    itemlist.append(item.clone( action='channels_only_torrents', title= ' - Qué canales pueden contener archivos torrent', folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='show_help_torrents', title= ' - ¿ Dónde obtener los add-ons para torrents ?', folder=False ))
-    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR blue]Torrents[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
-
-    itemlist.append(item.clone( action='', title='Buscar:', text_color='yellow', thumbnail=config.get_thumb('magnifyingglass'), folder=False ))
-
-    itemlist.append(item.clone( channel='search', action='show_help_parameters', title=' - Qué [COLOR chocolate]Ajustes[/COLOR] tiene configurados para las búsquedas', thumbnail=config.get_thumb('help'), folder=False ))
-    itemlist.append(item.clone( action='channels_no_searchables', title= ' - Qué canales nunca intervendrán en las búsquedas', folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='channels_no_actives', title= ' - Qué canales no intervienen en las búsquedas (desactivados)', folder=False, thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( channel='proxysearch', title = ' - Configurar proxies a usar [COLOR plum](en los canales que los necesiten)[/COLOR]', action = 'proxysearch_all', thumbnail=config.get_thumb('flame') ))
-    itemlist.append(item.clone( channel='filters', title = ' - Excluir canales en las búsquedas', action = 'mainlist', thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( channel='search', action='show_help', title = ' - [COLOR green]Información[/COLOR] sobre búsquedas', folder=False ))
-    itemlist.append(item.clone( channel='tmdblists', action='show_help', title= ' - [COLOR green]Información[/COLOR] búsquedas y listas en TMDB', folder=False ))
-    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR yellow]Buscar[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
-
-    itemlist.append(item.clone( action='', title='Preferidos:', text_color='tomato', thumbnail=config.get_thumb('videolibrary'), folder=False ))
-
-    itemlist.append(item.clone( action='show_help_tracking_update', title= ' - Búsqueda automática de nuevos episodios', folder=False, thumbnail=config.get_thumb('videolibrary') ))
-    itemlist.append(item.clone( action='show_help_tracking', title= ' - [COLOR green]Información[/COLOR] cómo funciona', folder=False ))
-    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR tomato]Preferidos[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
-
-    itemlist.append(item.clone( action='', title='Descargas:', text_color='green', thumbnail=config.get_thumb('download'), folder=False ))
-
-    itemlist.append(item.clone( channel='actions', action='show_ubicacion', title= ' - ¿ Donde se ubican las descargas ?', folder=False, thumbnail=config.get_thumb('tools') ))
-    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR green]Descargas[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
-
-    itemlist.append(item.clone( action='', title='Actualizar:', text_color='cyan', thumbnail=config.get_thumb('tools'), folder=False ))
-
-    itemlist.append(item.clone( action='show_help_fixes', title= ' - ¿ Qué son los fixes ?', folder=False ))
-    itemlist.append(item.clone( channel='actions', title= ' - Comprobar últimas actualizaciones tipo Fix', action = 'check_addon_updates', folder=False, thumbnail=config.get_thumb('download') ))
-    itemlist.append(item.clone( channel='actions', title= ' - Forzar todas las actualizaciones tipo Fix', action = 'check_addon_updates_force', folder=False, thumbnail=config.get_thumb('download') ))
-    itemlist.append(item.clone( action='show_last_fix', title= ' - [COLOR green]Información[/COLOR] último fix instalado', folder=False, thumbnail=config.get_thumb('news') ))
-    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR cyan]Actualizar[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
-
-    itemlist.append(item.clone( action='', title='Servidores:', text_color='fuchsia', thumbnail=config.get_thumb('bolt'), folder=False ))
+    itemlist.append(item.clone( action='show_help_recaptcha', title= ' - ¿ Qué significa Requiere verificación [COLOR red]reCAPTCHA[/COLOR]?' ))
+    itemlist.append(item.clone( action='show_help_uptobox', title= ' - [COLOR green]Información[/COLOR] servidor [COLOR goldenrod]Uptobox[/COLOR]', thumbnail=config.get_thumb('news') ))
 
     if config.get_setting('developer_mode', default=False):
-        itemlist.append(item.clone( action='show_servers_list', title= ' - Todos los servidores', tipo = 'all', folder=False, thumbnail=config.get_thumb('bolt') ))
+        itemlist.append(item.clone( action='show_servers_list', title= ' - Todos los Servidores', tipo = 'all', thumbnail=config.get_thumb('bolt') ))
 
-    itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores están disponibles', tipo = 'activos', folder=False, thumbnail=config.get_thumb('bolt') ))
-    itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores tienen vías alternativas', tipo = 'alternativos', folder=False, thumbnail=config.get_thumb('bolt') ))
-    itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores se detectan pero no están soportados', tipo = 'sinsoporte', folder=False, thumbnail=config.get_thumb('bolt') ))
-    itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores están inactivos', tipo = 'inactivos', folder=False, thumbnail=config.get_thumb('bolt') ))
-    itemlist.append(item.clone( action='show_help_recaptcha', title= ' - ¿ Qué significa Requiere verificación [COLOR red]reCAPTCHA[/COLOR]?', folder=False ))
+    itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores están Disponibles', tipo = 'activos', thumbnail=config.get_thumb('bolt') ))
 
-    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR fuchsia]Play[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
+    itemlist.append(item.clone( action='', title= ' - Servidores situación:', folder=False, text_color='orchid', thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( action='show_servers_list', title= '    - Qué servidores tienen Vías Alternativas', tipo = 'alternativos', thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( action='show_servers_list', title= '    - Qué servidores se detectan pero No están Soportados', tipo = 'sinsoporte', thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( action='show_servers_list', title= '    - Qué servidores están inactivos', tipo = 'inactivos', thumbnail=config.get_thumb('bolt') ))
 
-    itemlist.append(item.clone( action='', title= 'Media Center:', text_color='pink', thumbnail=config.get_thumb('computer'), folder=False ))
-    itemlist.append(item.clone( action='show_log', title= ' - Visualizar el fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('computer') ))
-    itemlist.append(item.clone( action='copy_log', title= ' - Obtener una copia del fichero log de su Media Center', folder=False, thumbnail=config.get_thumb('folder') ))
-    itemlist.append(item.clone( action='show_advs', title= ' - Visualizar el fichero advancedsettings de su Media Center', folder=False, thumbnail=config.get_thumb('keyboard') ))
-    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR pink]Sistema[/COLOR])', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR fuchsia]Play[/COLOR])', thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title= 'Sistema:', text_color='teal', thumbnail=config.get_thumb('tools'), folder=False ))
-    itemlist.append(item.clone( action='show_test', title= ' - Test status del sistema', folder=False, thumbnail=config.get_thumb('computer') ))
-    itemlist.append(item.clone( channel='actions', title= ' - Comprobar el estado de su internet', action = 'test_internet', folder=False, thumbnail=config.get_thumb('crossroads') ))
-    itemlist.append(item.clone( action='show_sets', title= ' - Visualizar sus ajustes personalizados', folder=False, thumbnail=config.get_thumb('settings') ))
-    itemlist.append(item.clone( action='show_cook', title= ' - Visualizar su fichero de cookies', folder=False, thumbnail=config.get_thumb('folder') ))
-    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] Configuración', action = 'open_settings', folder=False, thumbnail=config.get_thumb('settings') ))
+    itemlist.append(item.clone( action='', title= 'PROXIES:', folder=False, text_color='red', thumbnail=config.get_thumb('flame') ))
 
-    itemlist.append(item.clone( action='', title='Versión:', text_color='violet', thumbnail=config.get_thumb('quote'), folder=False ))
-    itemlist.append(item.clone( action='show_version', title= ' - [COLOR green]Información[/COLOR] versión', folder=False, thumbnail=config.get_thumb('news') ))
-    itemlist.append(item.clone( action='show_changelog', title= ' - Historial de versiones', folder=False, thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='show_help_proxies', title= ' - [COLOR green]Información[/COLOR] uso de proxies' ))
+    itemlist.append(item.clone( action='show_help_providers', title= ' - [COLOR green]Información[/COLOR] Proveedores de proxies' ))
+    itemlist.append(item.clone( action='channels_with_proxies', title= ' - Qué canales pueden usar Proxies', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='actions', action = 'global_proxies', title = ' - Configurar proxies a usar [COLOR plum](en los canales que los necesiten)[/COLOR]', thumbnail=config.get_thumb('flame') ))
 
-    itemlist.append(item.clone( action='', title='Desarrollo:', text_color='firebrick', thumbnail=config.get_thumb('quote'), folder=False ))
+    if config.get_setting('memorize_channels_proxies', default=True):
+        itemlist.append(item.clone( action='channels_with_proxies_memorized', title= ' - Qué [COLOR red]canales[/COLOR] tiene con proxies Memorizados', thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( channel='actions', action = 'manto_proxies', title= ' - Quitar los proxies en los canales [COLOR red](que los tengan Memorizados)[/COLOR]', thumbnail=config.get_thumb('flame') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR red]Proxies[/COLOR])', thumbnail=config.get_thumb('settings') ))
+
+    itemlist.append(item.clone( action='', title= 'TORRENTS:', folder=False, text_color='blue', thumbnail=config.get_thumb('torrents') ))
+
+    itemlist.append(item.clone( action='show_help_torrents', title= ' - ¿ Dónde obtener los Clientes/Motores para torrents (Add-Ons) ?' ))
+    itemlist.append(item.clone( action='show_clients_torrent', title= ' - Clientes/Motores externos torrent soportados', thumbnail=config.get_thumb('cloud') ))
+    itemlist.append(item.clone( action='channels_only_torrents', title= ' - Qué canales pueden contener archivos Torrent', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_exclusively_torrents', title= ' - Qué canales tienen enlaces Torrent Exclusivamente', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR blue]Torrents[/COLOR])', thumbnail=config.get_thumb('settings') ))
+
+    itemlist.append(item.clone( action='', title='BUSCAR:', folder=False, text_color='yellow', thumbnail=config.get_thumb('magnifyingglass') ))
+
+    itemlist.append(item.clone( channel='search', action='show_help', title = ' - [COLOR green]Información[/COLOR] sobre búsquedas' ))
+    itemlist.append(item.clone( channel='tmdblists', action='show_help', title= ' - [COLOR green]Información[/COLOR] búsquedas y listas en TMDB' ))
+    itemlist.append(item.clone( channel='search', action='show_help_parameters', title=' - Qué [COLOR chocolate]Ajustes[/COLOR] tiene configurados para las búsquedas', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='channels_no_searchables', title= ' - Qué canales Nunca intervendrán en las búsquedas', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='channels_no_actives', title= ' - Qué canales no intervienen en las búsquedas (Desactivados)', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='actions', action = 'global_proxies', title = ' - Configurar Proxies a usar [COLOR plum](en los canales que los necesiten)[/COLOR]', thumbnail=config.get_thumb('flame') ))
+    itemlist.append(item.clone( channel='filters', action = 'mainlist', title = ' - Excluir canales en las búsquedas', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR yellow]Buscar[/COLOR])', thumbnail=config.get_thumb('settings') ))
+
+    itemlist.append(item.clone( action='', title='PREFERIDOS:', folder=False, text_color='tomato', thumbnail=config.get_thumb('videolibrary') ))
+
+    itemlist.append(item.clone( action='show_help_tracking', title= ' - [COLOR green]Información[/COLOR] ¿ Cómo funciona ?' ))
+    itemlist.append(item.clone( action='show_help_tracking_update', title= ' - Búsqueda automática de Nuevos Episodios', thumbnail=config.get_thumb('videolibrary') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR tomato]Preferidos[/COLOR])', thumbnail=config.get_thumb('settings') ))
+
+    itemlist.append(item.clone( action='', title='DESCARGAS:', folder=False, text_color='green', thumbnail=config.get_thumb('download') ))
+
+    itemlist.append(item.clone( channel='actions', action='show_ubicacion', title= ' - ¿ Donde se ubican las descargas ?', thumbnail=config.get_thumb('tools') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR green]Descargas[/COLOR])', thumbnail=config.get_thumb('settings') ))
+
+    itemlist.append(item.clone( action='', title='ACTUALIZAR:', folder=False, text_color='cyan', thumbnail=config.get_thumb('tools') ))
+
+    itemlist.append(item.clone( action='show_help_fixes', title= ' - ¿ Qué son los Fix ?' ))
+    itemlist.append(item.clone( action='show_last_fix', title= ' - [COLOR green]Información[/COLOR] último Fix instalado', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( channel='actions', action = 'check_addon_updates', title= ' - Comprobar últimas actualizaciones tipo Fix', thumbnail=config.get_thumb('download') ))
+    itemlist.append(item.clone( channel='actions', action = 'check_addon_updates_force', title= ' - Forzar Todas las actualizaciones tipo Fix', thumbnail=config.get_thumb('download') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR cyan]Actualizar[/COLOR])', thumbnail=config.get_thumb('settings') ))
+
+    itemlist.append(item.clone( action='', title= 'MEDIA CENTER:', folder=False, text_color='pink', thumbnail=config.get_thumb('computer') ))
+    itemlist.append(item.clone( action='show_log', title= ' - Visualizar el fichero LOG de su Media Center', thumbnail=config.get_thumb('computer') ))
+    itemlist.append(item.clone( action='copy_log', title= ' - Obtener una copia del fichero LOG de su Media Center', thumbnail=config.get_thumb('folder') ))
+    itemlist.append(item.clone( action='show_advs', title= ' - Visualizar su fichero Advanced Settings de su Media Center', thumbnail=config.get_thumb('keyboard') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] configuración (categoría [COLOR pink]Sistema[/COLOR])', thumbnail=config.get_thumb('settings') ))
+
+    itemlist.append(item.clone( action='', title= 'SISTEMA:', folder=False, text_color='teal', thumbnail=config.get_thumb('tools') ))
+    itemlist.append(item.clone( action='show_test', title= ' - Test Status del sistema', thumbnail=config.get_thumb('computer') ))
+    itemlist.append(item.clone( channel='actions', title= ' - Comprobar el estado de su Internet', action = 'test_internet', thumbnail=config.get_thumb('crossroads') ))
+    itemlist.append(item.clone( action='show_sets', title= ' - Visualizar sus Ajustes Personalizados de la configuración', thumbnail=config.get_thumb('settings') ))
+    itemlist.append(item.clone( action='show_cook', title= ' - Visualizar su fichero de cookies', thumbnail=config.get_thumb('folder') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= ' - [COLOR chocolate]Ajustes[/COLOR] Configuración', thumbnail=config.get_thumb('settings') ))
+
+    itemlist.append(item.clone( action='', title='VERSION:', folder=False, text_color='violet', thumbnail=config.get_thumb('quote') ))
+    itemlist.append(item.clone( action='show_version', title= ' - [COLOR green]Información[/COLOR] Versión', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='show_changelog', title= ' - Historial de Versiones', thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( action='', title='DESARROLLO:', folder=False, text_color='firebrick', thumbnail=config.get_thumb('quote') ))
     itemlist.append(item.clone( action='', title= ' - Team ' + _team + ' Unirse al Equipo de Desarrollo', folder=False, thumbnail=config.get_thumb('team') ))
-    itemlist.append(item.clone( action='show_dev_notes', title= ' - Notas para developers', folder=False, thumbnail=config.get_thumb('tools') ))
-    itemlist.append(item.clone( action='show_license', title= ' - Licencia (Gnu Gpl v3)', folder=False, thumbnail=config.get_thumb('megaphone') ))
-    itemlist.append(item.clone( action='show_legalidad', title= ' - Legalidad', folder=False, thumbnail=config.get_thumb('megaphone') ))
+    itemlist.append(item.clone( action='show_dev_notes', title= ' - Notas para Developers (desarrolladores)', thumbnail=config.get_thumb('tools') ))
+
+    itemlist.append(item.clone( action='', title='LEGALIDAD:', folder=False, text_color='crimson', thumbnail=config.get_thumb('quote') ))
+    itemlist.append(item.clone( action='show_license', title= ' - Licencia (Gnu Gpl v3)', thumbnail=config.get_thumb('megaphone') ))
+    itemlist.append(item.clone( action='show_legalidad', title= ' - Cuestiones Legales', thumbnail=config.get_thumb('megaphone') ))
 
     return itemlist
 
@@ -263,8 +273,17 @@ def channels_only_torrents(item):
 
     filters.only_torrents(item)
 
+def channels_exclusively_torrents(item):
+    logger.info()
+
+    item.exclusively_torrents = True
+
+    filters.only_torrents(item)
+
 def show_clients_torrent(item):
     logger.info()
+
+    if not item.title: item.title = 'soportados'
 
     filters.show_clients_torrent(item)
 
@@ -292,7 +311,7 @@ def show_help_register(item):
     txt += ' Si desconoceis el dominio actual de esa web, mediante un navegador localizar su [B][COLOR gold]twitter[/COLOR][/B]'
 
     txt += '[CR][CR]'
-    txt += ' Por ejemplo [B][COLOR gold]hdfull twitter oficial[/COLOR][/B]'
+    txt += ' Por ejemplo [B][COLOR gold]HdFull[/COLOR][/B] twitter oficial o [B][COLOR gold]PlayDede[/COLOR][/B] twitter oficial'
 
     txt += '[CR][CR]'
     txt += '*) Imprescindible tomar buena nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para cada web.'
@@ -301,10 +320,36 @@ def show_help_register(item):
     txt += '*) Una vez tengais vuestros datos, podeis informarlos en la configuración, o bien se os solicitará al acceder a ese canal determinado.'
 
     txt += '[CR][CR]'
-    txt += '*) Para el caso concreto del servidor [B][COLOR gold]Uptobox[/COLOR][/B]'
+    txt += '*) Mientras mantengais las sesiones abiertas via navegador en estos dominios, no tendreis q volver a informar vuestras credenciales.'
+
+    platformtools.dialog_textviewer('Información dominios que requieren registrarse', txt)
+
+
+def show_help_uptobox(item):
+    logger.info()
+
+    txt = '*) Determinados servidores obligan a registrarse para permitir su acceso.'
 
     txt += '[CR][CR]'
-    txt += ' Acceder desde otro equipo a [B][COLOR gold]uptobox.com/pin[/COLOR][/B]'
+    txt += ' Es importante usar [B][COLOR gold]cuentas secundarias[/COLOR][/B] para registrarse, nunca useis las vuestras personales.'
+
+    txt += '[CR][CR]'
+    txt += '*) Para ello desde otro equipo debeis accecder a la web en cuestión y registraros (darse de alta)'
+
+    txt += '[CR][CR]'
+    txt += ' Si desconoceis el dominio actual de ese servidor, mediante un navegador localizar su [B][COLOR gold]twitter[/COLOR][/B]'
+
+    txt += '[CR][CR]'
+    txt += ' Por ejemplo [B][COLOR gold]Uptobox[/COLOR][/B] twitter oficial'
+
+    txt += '[CR][CR]'
+    txt += '*) Imprescindible tomar buena nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para ese servidor.'
+
+    txt += '[CR][CR]'
+    txt += '*) Una vez tengais vuestros datos, se os solicitará al acceder a ese servidor determinado.'
+
+    txt += '[CR][CR]'
+    txt += '*) Acceder desde otro equipo via navegador a [B][COLOR gold]uptobox.com/pin[/COLOR][/B], solo se gestionan las cuentas [B][COLOR gold]Free[/COLOR][/B]'
 
     txt += '[CR][CR]'
     txt += '*) En el caso de no estar registrados proceder a ello (darse de alta)'
@@ -314,9 +359,12 @@ def show_help_register(item):
     txt += ' e introducir el [B][COLOR gold]PIN[/COLOR][/B] que se os mostró en la ventana al intentar reproducir, para tener vinculada vuestra cuenta.'
 
     txt += '[CR][CR]'
-    txt += '*) Mientras mantengais las sesiones abiertas via navegador en estos dominios, no tendreis q volver a informar vuestras credenciales.'
+    txt += '*) Mientras mantengais las sesiones abiertas via navegador en ese servidor, no tendreis q volver a informar vuestras credenciales.'
 
-    platformtools.dialog_textviewer('Información dominios que requieren registrarse', txt)
+    txt += '[CR][CR]'
+    txt += '*) Hay servidores que limitan el [B][COLOR gold]tiempo máximo de visionado diario[/COLOR][/B] (aprox. 150 minutos).'
+
+    platformtools.dialog_textviewer('Información servidor Uptobox', txt)
 
 
 def show_help_settings(item):
@@ -363,7 +411,7 @@ def show_help_settings(item):
 
     txt += '[CR][CR]'
     txt += '*) Exiten más parámetros en la [COLOR gold]Configuracion[/COLOR] de Balandro,  para tener personalizada su ejecución.'
-    txt += ' Divididos en agruaciones [COLOR gold]Canales, Play, Proxies, Torrents, Buscar, Preferidos, Descargas, Actualizar, etc.[/COLOR].'
+    txt += ' Divididos en agruaciones [COLOR gold]Menú, Canales, Parental, Cuentas, Play, Proxies, Torrents, Buscar, etc.[/COLOR].'
 
     platformtools.dialog_textviewer('Notas sobre algunos parámetros de la configuración', txt)
 
@@ -436,31 +484,52 @@ def show_help_use(item):
 def show_help_faq(item):
     logger.info()
 
-    txt = '[COLOR gold]¿ De dónde viene Balandro ?[/COLOR][CR]'
+    txt = '[COLOR gold][B]¿ De dónde viene Balandro ?[/B][/COLOR][CR]'
     txt += 'Balandro es un addon derivado de Pelisalacarta y Alfa, simplificado a nivel interno de código y a nivel funcional para el usuario.'
     txt += ' Puede ser útil en dispositivos poco potentes como las Raspberry Pi u otros TvBox y para usuarios que no se quieran complicar mucho.'
     txt += ' Al ser un addon de tipo navegador, tiene el nombre de un velero ya que balandro era una embarcación ligera y maniobrable, muy apreciada por los piratas.'
 
-    txt += '[CR][CR][COLOR gold]¿ Qué características tiene Balandro ?[/COLOR][CR]'
+    txt += '[CR][CR][COLOR gold][B]¿ Qué características tiene Balandro ?[/B][/COLOR][CR]'
     txt += 'Principalmente permite acceder a los contenidos de webs con vídeos de películas y series para reproducirlos y/o guardarlos, y'
     txt += ' dispone de unos Preferidos propios dónde poder apuntar todas las Películas y Series que interesen al usuario.'
     txt += ' Se pueden configurar múltiples opciones, por ejemplo la preferencia de idioma, la reproducción automática, los colores para los listados, los servidores preferidos, excluir canales en las búsquedas, etc.'
 
-    txt += '[CR][CR][COLOR gold]¿ Cómo funciona el Autoplay ?[/COLOR][CR]'
+    txt += '[CR][CR][COLOR gold][B]¿ Cómo funciona el Autoplay ?[/B][/COLOR][CR]'
     txt += 'Se puede activar la función de reproducción automática desde la configuración del addon.'
     txt += ' Si se activa, al ver una película o episodio se intenta reproducir el primero de los enlaces que funcione, sin mostrarse el diálogo de selección de servidor.'
     txt += ' Los enlaces se intentan secuencialmente en el mismo orden que se vería en el diálogo, por lo que es importante haber establecido las preferencias de idioma, servidores y calidades.'
 
-    txt += '[CR][CR][COLOR gold]¿ En qué orden se muestran los enlaces de servidores ?[/COLOR][CR]'
+    txt += '[CR][CR][COLOR gold][B]¿ En qué orden se muestran los enlaces de servidores ?[/B][/COLOR][CR]'
     txt += 'El orden inicial es por la fecha de los enlaces, para tener al principio los últimos actualizados ya que es más probable que sigan vigentes, aunque en los canales que no lo informan es según el orden que devuelve la web.'
     txt += ' Desde la configuración se puede activar el ordenar por calidades, pero su utilidad va a depender de lo que muestre cada canal y la fiabilidad que tenga.'
     txt += ' A partir de aquí, si hay preferencias de servidores en la configuración, se cambia el orden para mostrar al principio los servidores preferentes y al final los de última opción.'
     txt += ' Y finalmente se agrupan en función de las preferencias de idiomas del usuario.'
 
-    txt += '[CR][CR][COLOR gold]¿ Funcionan los enlaces Torrent ?[/COLOR][CR]'
-    txt += 'El addon está preparado para tratarlos usando un gestor de torrents externo, tipo Quasar, Elementum, etc.'
-    txt += ' Estos gestores externos torrents no estan incluidos en Balandro y deben Instalarse por separado.'
-    txt += ' Además, debe indicarse Obligatoriamente en la configuración de Balandro cual va a ser su gestor de torrents habitual.'
+    txt += '[CR][CR][COLOR gold][B]¿ Funcionan los enlaces Torrent ?[/B][/COLOR][CR]'
+    txt += 'El addon está preparado para tratarlos usando un Motor/Cliente de torrents externo, tipo [COLOR gold]Elementum, etc.[/COLOR]'
+    txt += ' Estos Motores/Clientes externos (addons) torrents no estan incluidos en Balandro y deben Instalarse por separado.'
+    txt += ' Además, debe indicarse Obligatoriamente en la configuración de Balandro cual va a ser su Motor/Cliente habitual de torrents.'
+
+    txt += '[CR][CR]Si algun otro addon tiene activado [COLOR gold]"Borrar caché de kodi en el inicio"[/COLOR], se elimina una carpeta temporal que [COLOR gold]Elementum[/COLOR] necesita'
+    txt += ' [COLOR gold][ruta]/.kodi/temp/elementum/[/COLOR], en consecuencia puede fallar la descarga/reproducción del torrent.'
+    txt += ' Cuando a [COLOR gold]Elementum[/COLOR] se le pasa un enlace .torrent lo intenta descargar en esa carpeta, pero no podrá hacerlo si esta carpeta se ha eliminado.'
+    txt += ' Si esto sucede, en el Log de su Media Center se observa el mensaje [COLOR gold]"Error adding torrent: &os.PathError"[/COLOR].'
+    txt += ' Este error no se produce si el enlace es de tipo [COLOR gold]magnet:?[/COLOR], por lo tanto, pueden haber enlaces en Balandro que funcionen y otros que No.'
+
+    txt += '[CR][CR][COLOR yellow]Este problema se resuelve:[/COLOR] si se accede a la Configuración de [COLOR gold]Elementum[/COLOR] y se guarda nuevamente, se regenera su carpeta de caché y funcionará correctamente la descarga/reproducción del torrent.'
+    txt += ' Pero si se mantiene activado el borrado por ejemplo en Indigo, al reiniciar su Media Center Kodi dejará de funcionar de nuevo.'
+
+    txt += '[CR][CR][COLOR gold][B]¿ Porqué la opción Buscar entra em modo bucle (vuelve a solicitar el texto a localizar) ?[/B][/COLOR][CR]'
+    txt += 'Addons de limpieza que pueden afectar al funcionamiento de Balandro, [COLOR gold]LimpiaTuKodi, Indigo y similares.[/COLOR]'
+
+    txt += '[CR][CR]Cuando desde estos addons se ejecuta la función [COLOR gold]"Limpiar Cache y Rom"[/COLOR],'
+    txt += ' se elimina la carpeta interna de la caché de su Media Center Kodi [COLOR gold][ruta]/.kodi/temp/archive_cache/[/COLOR]'
+    txt += ' y ello provoca que este no pueda cachear. Al no poder usar esta caché, puede influir en el rendimiento en general de todos los addons,'
+    txt += ' pero dónde resulta una molestia dentro de Balandro (y demás addons) es al buscar, ya que después de hacer una búsqueda y entrar en alguno de los resultados,'
+    txt += ' al volver atrás, vuelve a solicitar de nuevo la introducción de texto, cuando debería volver a mostrar la lista de resultados previa.'
+
+    txt += '[CR][CR][COLOR yellow]Este problema se resuelve:[/COLOR] Re-iniciando su Media center Kodi, ya que Kodi vuelve a generar la carpeta de caché al iniciarse.'
+    txt += ' Cualquier addon que en lugar de eliminar el contenido del caché para limpiar, elimine la propia carpeta provocará este mismo efecto.'
 
     platformtools.dialog_textviewer('FAQS - Preguntas y respuestas', txt)
 
@@ -842,11 +911,11 @@ def show_help_torrents(item):
 
     txt += '[CR][CR]'
     txt += '*) Add-Ons:[CR]'
-    txt += '    - plugin.video.quasar[CR]'
     txt += '    - plugin.video.elementum[CR]'
+    txt += '    - plugin.video.torrest[CR]'
     txt += '    - plugin.video.torrenter[CR]'
     txt += '    - plugin.video.torrentin[CR]'
-    txt += '    - plugin.video.torrest[CR]'
+    txt += '    - plugin.video.quasar[CR]'
     txt += '    - plugin.video.pulsar[CR]'
     txt += '    - plugin.video.stream[CR]'
     txt += '    - plugin.video.xbmctorrent'
@@ -1046,7 +1115,7 @@ def show_test(item):
       if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent): tex_tor += '  Instalado'
       else: tex_tor += '  [COLOR red][B]No instalado[/B][/COLOR]'
 
-    txt += '[CR][CR] - [COLOR gold]Motor torrent:[/COLOR]  %s' % tex_tor
+    txt += '[CR][CR] - [COLOR gold]Cliente/Motor torrent:[/COLOR]  %s' % tex_tor
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'): tex_yt = '  Instalado'
     else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'

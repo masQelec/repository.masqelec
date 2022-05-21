@@ -7,10 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://movidy.mobi/'
+host = 'https://www.movidy.mobi/'
+
+
+perpage = 22
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://movidy.mobi/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/fecha/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -19,6 +28,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
 
 def mainlist(item):
+    # ~ las series estructura diferente  '/browse?type=series'
     return mainlist_pelis(item)
 
 
@@ -28,9 +38,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', page = 1, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'pelis/peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host, group = 'masd', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'pelis/', group = 'masd', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -58,9 +68,9 @@ def generos(item):
        ]
 
     for genero in generos:
-        url = host + 'category/' + genero + '/'
+        url = host + 'pelis/category/' + genero + '/'
 
-        itemlist.append(item.clone( action = 'list_all', title = genero.capitalize(), url = url, page = 1 ))
+        itemlist.append(item.clone( action = 'list_all', title = genero.capitalize(), url = url ))
 
     return itemlist
 
@@ -73,16 +83,18 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1979, -1):
-        url = host + 'peliculas/fecha/' + str(x) + '/'
+        url = host + 'pelis/peliculas/fecha/' + str(x) + '/'
 
-        itemlist.append(item.clone( title = str(x), url = url, action='list_all', page = 1 ))
+        itemlist.append(item.clone( title = str(x), url = url, action='list_all' ))
 
     return itemlist
 
 
 def list_all(item):
     logger.info()
-    itemlist=[]
+    itemlist = []
+
+    if not item.page: item.page = 0
 
     if item.post:
         data = do_downloadpage(item.url, item.post)
@@ -90,13 +102,18 @@ def list_all(item):
         data = do_downloadpage(item.url)
 
     if not item.group:
-        bloque = data
+        if '</h3>' in data: bloque = scrapertools.find_single_match(data, '</h3>(.*?)</section>')
+        elif '</h1>' in data: bloque = scrapertools.find_single_match(data, '</h1>(.*?)</main>')
+        else: bloque = data
+
     else:
         bloque = scrapertools.find_single_match(data, '<div class="grid popular">(.*?)</section>')
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
-    for article in matches:
+    num_matches = len(matches)
+
+    for article in matches[item.page * perpage:]:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
         title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>').strip()
 
@@ -107,16 +124,31 @@ def list_all(item):
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
                                     contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
 
+        if len(itemlist) >= perpage: break
+
     tmdb.set_infoLabels(itemlist)
 
-    if not item.group:
-        if itemlist:
-            if '"load-more-ajax"' in data:
-               url = host + 'wp-admin/admin-ajax.php'
-               next_page = item.page + 1
-               post = {'action': 'action_load_pagination_home', 'number': 20, 'paged': next_page, 'postype': 'movie'}
+    buscar_next = True
+    if num_matches > perpage:
+        hasta = (item.page * perpage) + perpage
+        if hasta < num_matches:
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
+            buscar_next = False
 
-               itemlist.append(item.clone( title = 'Siguientes ...', url = url, post = post, action = 'list_all', page = next_page, text_color='coral' ))
+    if buscar_next:
+        if itemlist:
+            url = host + 'pelis/wp-admin/admin-ajax.php'
+
+            if not item.next_page:
+                if not '"load-more-ajax"' in data: return itemlist
+                item.next_page = 1
+
+            item.next_page = item.next_page + 1
+
+            post = {'action': 'action_sorting_post', 'number': 22, 'page': item.next_page, 'types': 'movie'}
+
+            itemlist.append(item.clone( title = 'Siguientes ...', url = url, post = post, action = 'list_all',
+                                        page = 0, next = item.next_page, text_color='coral' ))
 
     return itemlist
 
@@ -165,7 +197,7 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
-        item.url = host + '?s=' + texto.replace(" ", "+")
+        item.url = host + 'pelis/?s=' + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

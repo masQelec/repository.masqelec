@@ -9,6 +9,7 @@ from core import httptools, scrapertools, tmdb, servertools, jsontools
 
 host = 'https://www.cinematte.com.es/'
 
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     url = url.replace('/www.cinematteflix.com/', '/www.cinematte.com.es/')
@@ -25,11 +26,19 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/videoclub/' ))
 
     itemlist.append(item.clone( title = 'Magazine', action = 'list_all', url = host, group = 'magazine', page = 1))
+
+    itemlist.append(item.clone( title = 'Video club', action = 'list_all', url = host + 'tag/cinematte-videoclub/' ))
+
+    itemlist.append(item.clone( title = 'Obras maestras', action = 'list_all', url = host + 'tag/cinematte-obras-maestras/' ))
+
+    itemlist.append(item.clone( title = 'Cine de culto', action = 'list_all', url = host + 'tag/cinematte-culto/' ))
+
+    itemlist.append(item.clone( title = 'Los 80', action = 'list_all', url = host + 'tag/cinematte-80/' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -40,6 +49,8 @@ def generos(item):
     logger.info()
     itemlist = []
 
+    descartar_xxx = config.get_setting('descartar_xxx', default=False)
+
     data = do_downloadpage(host)
 
     matches = scrapertools.find_multiple_matches(data, '<a href="' + host + 'tag/(.*?)">(.*?)</a>')
@@ -47,10 +58,18 @@ def generos(item):
     for url, title in matches:
         url = host + 'tag/' + url
 
+        if '/tag/cinematte-80/' in url: continue
+        elif '/tag/cinematte-videoclub/' in url: continue
+        elif '/tag/cinematte-obras-maestras/' in url: continue
+        elif '/tag/cinematte-culto/' in url: continue
+
         title = title.replace('Cinematte', '').strip()
 
         title = title.lower()
         title = title.capitalize()
+
+        if descartar_xxx:
+            if title == 'Erótico': continue
 
         itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
 

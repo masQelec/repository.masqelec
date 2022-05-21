@@ -24,17 +24,16 @@ def get_video_url(page_url, url_referer=''):
     subtitle = ''
 
     try:
-       sub_es = sub_data.get('es') or sub_data.get('en')
-       subtitle = sub_es.get('urls', [])[0]
+        sub_es = sub_data.get('es') or sub_data.get('en')
+        subtitle = sub_es.get('urls', [])[0]
     except:
-       pass
+        pass
 
     stream_url = data['qualities']['auto'][0]['url']
 
-    data_m3u8 = httptools.downloadpage(stream_url).data.decode('utf-8')
+    data_m3u8 = httptools.downloadpage(stream_url).data
 
-    patron = 'NAME="([^"]+)",PROGRESSIVE-URI="([^"]+)"'
-    matches = scrapertools.find_multiple_matches(data_m3u8, patron)
+    matches = scrapertools.find_multiple_matches(data_m3u8, 'NAME="([^"]+)",PROGRESSIVE-URI="([^"]+)"')
 
     for calidad, url in sorted(matches, key=lambda x: int(x[0])):
         calidad = calidad.replace('@60','')

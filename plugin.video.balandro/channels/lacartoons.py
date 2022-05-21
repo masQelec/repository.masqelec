@@ -5,7 +5,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'http://www.lacartoons.com/'
+host = 'https://www.lacartoons.com/'
 
 
 def mainlist(item):

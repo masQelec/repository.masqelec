@@ -14,7 +14,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www.subtorrents.li/'
+host = 'https://www.subtorrents.do/'
 
 
 def item_configurar_proxies(item):
@@ -30,7 +30,7 @@ def configurar_proxies(item):
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://www.subtorrents.nl/', 'https://www.subtorrents.ch/', 'https://www.subtorrents.nz/', 
-                 'https://www.subtorrents.in/']
+                 'https://www.subtorrents.in/', 'https://www.subtorrents.li/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

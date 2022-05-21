@@ -5,7 +5,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-# ~ links_genres_series = 'https://cinedeantes2.weebly.com'
+# ~ links_genres_series host = "https://cinedeantes2.weebly.com"
 
 host = 'https://seriestvdeantes'
 
@@ -22,21 +22,21 @@ def mainlist_series(item):
 
     # ~ itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Ciencia Ficción', action = 'menu_series', url = host + '-2.weebly.com' ))
+    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Ciencia Ficción', action = 'menu_series', url = host + '-02.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Comedias', action = 'menu_series', url = host + '5.weebly.com' ))
+    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Comedias', action = 'menu_series', url = host + '-05.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Dibujos Animados', action = 'menu_series', url = host + '-6.weebly.com' ))
+    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Dibujos Animados', action = 'menu_series', url = host + '-06.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Detectives-Espionaje', action = 'menu_series', url = host + '-4.weebly.com' ))
+    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Detectives-Espionaje', action = 'menu_series', url = host + '-04.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Policiacas', action = 'menu_series', url = host + '-3.weebly.com' ))
+    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Policiacas', action = 'menu_series', url = host + '-03.weebly.com' ))
 
     itemlist.append(item.clone( title = 'TV-SeriesDeAntes TVE, Mini Series y en Vose', action = 'menu_series', url = host + '-07.weebly.com' ))
 
     itemlist.append(item.clone( title = 'TV-SeriesDeAntes Variadas', action = 'menu_series', url = host + '-08.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Westerns', action = 'menu_series', url = host + '1.weebly.com' ))
+    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Westerns', action = 'menu_series', url = host + '-01.weebly.com' ))
 
     return itemlist
 

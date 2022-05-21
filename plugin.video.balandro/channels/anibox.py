@@ -380,6 +380,11 @@ def play(item):
 
          url = 'https://www.amazon.com/drive/v1/shares/%s?resourceVersion=V2&ContentType=JSON&asset=ALL' %(shareId)
 
+    elif '.xyz/v/' in url:
+         url = url.replace('serieskao.xyz/v/', 'suzihaza.com/v/').replace('animekao.xyz/v/', 'suzihaza.com/v/').replace('sypl.xyz/v/', 'suzihaza.com/v/')
+         if '#' in url:
+             url = url.split('#')[0]
+
     elif '/kaocentro.net/' in url:
          try:
             data = do_downloadpage(url)
@@ -387,6 +392,8 @@ def play(item):
             return 'Este vídeo ya no esta disponible'
 
          url = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
+
+         if not url: url = item.url
 
     elif 'hydrax.com' in url:
          slug = url.split('v=')[1]
@@ -396,17 +403,13 @@ def play(item):
          except:
             url = ''
 
-    elif '.xyz/v/' in url:
-         url = url.replace('serieskao.xyz/v/', 'suzihaza.com/v/').replace('animekao.xyz/v/', 'suzihaza.com/v/').replace('sypl.xyz/v/', 'suzihaza.com/v/')
-         if '#' in url:
-             url = url.split('#')[0]
-
     if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
         itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist

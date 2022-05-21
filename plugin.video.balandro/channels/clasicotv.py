@@ -321,12 +321,13 @@ def temporadas(item):
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.contentType = 'season'
             item.contentSeason = numtempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = numtempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = numtempo, page = 0 ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -342,9 +343,9 @@ def episodios(item):
 
     data = httptools.downloadpage(item.url).data
 
-    tempo = scrapertools.find_single_match(data, "<span class='se-t.*?'>" + str(item.contentSeason) + "(.*?)</ul></div>")
+    bloque = scrapertools.find_single_match(data, "<span class='se-t.*?'>" + str(item.contentSeason) + "(.*?)</ul></div>")
 
-    matches = scrapertools.find_multiple_matches(tempo, "<li class='mark-(.*?)</li>")
+    matches = scrapertools.find_multiple_matches(bloque, "<li class='mark-(.*?)</li>")
 
     if item.page == 0:
         sum_parts = len(matches)

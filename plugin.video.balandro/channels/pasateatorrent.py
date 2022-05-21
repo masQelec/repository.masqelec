@@ -2,15 +2,24 @@
 
 import re
 
-from platformcode import logger
+from platformcode import logger, config
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://pasateatorrent.net/'
+host = 'https://pasateatorrent.org/'
+
+# ~  03/2022 algunas series No hay enlaces
+# ~  04/2022 algunas pelis salta Recaptcha
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://pasateatorrent.net/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not headers: headers = {'Referer': host}
 
     if '/categoria/' in url: raise_weberror = False
@@ -127,48 +136,34 @@ def list_all(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '</h1>(.*?)$')
-
-    matches = scrapertools.find_multiple_matches(bloque, 'data-id="(.*?)<div class="footer"')
+    matches = scrapertools.find_multiple_matches(data, '<div class="imagen-post">(.*?)<div class="bloque-date">')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, " href='(.*?)'")
-        if not url:
-            url = scrapertools.find_single_match(match, ' href="(.*?)"')
+        url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, "alt='(.*?)'")
-        if not title:
-            title = scrapertools.find_single_match(match, '<div class="title">(.*?)</div>')
-            title = title.replace('<h2 style="font-size:20px;">', '').replace('</h2>', '').strip()
+        title = scrapertools.find_single_match(match, '<div class="bloque-inferior">(.*?)</div>').strip()
 
         if not url or not title: continue
 
         tipo = 'tvshow' if '/series/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        thumb = scrapertools.find_single_match(match, " src='(.*?)'")
-
-        if not thumb:
-            thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         if not '/?s=' in item.url:
             year = scrapertools.find_single_match(match, '<div class="releaseDate".*?title=".*? .*? (.*?)</span>').strip()
-            if not year:
-               year = scrapertools.find_single_match(match, '<div class="releaseDate".*?title=".*? .*? (.*?)">').strip()
-        else:
-            year = scrapertools.find_single_match(match, '<div class="genres">(.*?), </div>').strip()
+            if not year: year = scrapertools.find_single_match(match, '<div class="releaseDate".*?title=".*? .*? (.*?)">').strip()
+        else: year = scrapertools.find_single_match(match, '<div class="genres">(.*?), </div>').strip()
 
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         lang = scrapertools.find_single_match(match, '<div class="language".*?title="(.*?)">')
-        if lang == 'Spanish':
-            lang = 'Esp'
+        if lang == 'Spanish': lang = 'Esp'
 
         qlty = scrapertools.find_single_match(match, '<div class="quality yellow".*?">(.*?)</div>')
-        if not qlty:
-            qlty = scrapertools.find_single_match(match, '<div class="hdAudio"></div><div class="(.*?)">')
+        if not qlty: qlty = scrapertools.find_single_match(match, '<div class="hdAudio"></div><div class="(.*?)">')
 
         if '/series/' in url:
             if item.search_type != 'all':
@@ -186,7 +181,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, "<div class='pagination'>.*?<span class='current'>.*?href='(.*?)'")
+        next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination".*?class="page-numbers current">.*?href="(.*?)"')
 
         if next_page:
             if '/page/' in next_page:
@@ -202,33 +197,39 @@ def findvideos(item):
     lang = 'Esp'
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<a class="link torrent".*?href="(.*?)".*?<div class="title">(.*?)</div>.*?<div class="info">.*?</div>(.*?)</div>'
+    patron = '<tbody>.*?</td>.*?</td>.*?<td>(.*?)</td>.*?href="(.*?)"'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    for url, title, peso in matches:
-        if not url.startswith('http'):
-            url = host[:-1] + url
+    for peso, url in matches:
+        if not url.startswith('http'): url = host[:-1] + url
 
-        episodio = ''
-        password = ''
-
-        if 'temporada' in title.lower():
-            episodio = scrapertools.find_single_match(title.lower(), 'temporada .*? (.*?)$').strip()
-
-        elif 'contraseña:' in title.lower():
-            password = scrapertools.find_single_match(title.lower(), 'contraseña:.*?&nbsp;(.*?)</font>')
-            if password:
-                password = 'pass: ' + password
-
-        title = title.strip()
-        peso = peso.strip()
-
-        other = peso + ' ' + episodio + ' ' + password
-        other = other.strip()
+        other = peso.strip()
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, other = other ))
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    if data:
+        if '<meta name="captcha-bypass" id="captcha-bypass"' in data:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+        if not '<!DOCTYPE html>' in str(data):
+            import os
+
+            file_local = os.path.join(config.get_data_path(), "temp.torrent")
+            with open(file_local, 'wb') as f: f.write(data); f.close()
+
+            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
 
     return itemlist
 

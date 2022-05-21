@@ -7,12 +7,15 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://grantorrents.pro/'
+host = 'https://grantorrent.co/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    url = url.replace('https://grantorrents.org/', host)
+    ant_hosts = ['https://grantorrents.org/', 'https://grantorrents.pro/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
 
     if '/fecha/' in url: raise_weberror = False
 
@@ -42,6 +45,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'pelis/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
@@ -55,6 +60,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -99,7 +106,8 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '<h2>(.*?)>Año de lanzamiento<')
+    bloque = scrapertools.find_single_match(data, '<h2>(.*?)>Más Descargadas</h2>')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<h1>(.*?)>Más Descargadas</h2>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
@@ -242,6 +250,8 @@ def play(item):
         if 'url=' in url:
             url = scrapertools.find_single_match(str(url), 'url=(.*?)$')
             if not url.endswith('.torrent'): return itemlist
+
+        url = url.replace('https://vk.com/away.php?to=', '').strip()
 
         itemlist.append(item.clone( url = url, server = 'torrent' ))
 

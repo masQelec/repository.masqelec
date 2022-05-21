@@ -218,12 +218,12 @@ def list_last(item):
     for url, title in matches:
         if "(" in title: title = title.split("(")[0]
 
-        if item.search_type== 'tvshow':
-            itemlist.append(item.clone( action='episodios', url=host + url, title=title, 
-                                        contentType=item.search_type, contentSerieName=title, infoLabels={'year': "-"} ))
-        else:
+        if item.search_type== 'movie':
             itemlist.append(item.clone( action='findvideos', url=host + url, title=title,
                                         contentType=item.search_type, contentTitle=title, infoLabels={'year': "-"} ))
+        else:
+            itemlist.append(item.clone( action='episodios', url=host + url, title=title, 
+                                        contentType=item.search_type, contentSerieName=title, infoLabels={'year': "-"} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -378,6 +378,9 @@ def play(item):
                 data = do_downloadpage(item.url)
 
             if data:
+                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
                 file_local = os.path.join(config.get_data_path(), "temp.torrent")
                 with open(file_local, 'wb') as f: f.write(data); f.close()
 

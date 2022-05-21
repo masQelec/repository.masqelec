@@ -21,8 +21,7 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if '/release/' in url:
-        raise_weberror = False
+    if '/release/' in url: raise_weberror = False
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('megaserie', url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -130,10 +129,8 @@ def generos(item):
 
     for opc, tit in opciones:
         url = host + opc
-        if item.search_type == 'movie': 
-            url += '/?type=movies'
-        else:
-            url += '/?type=series'
+        if item.search_type == 'movie': url += '/?type=movies'
+        else: url += '/?type=series'
 
         itemlist.append(item.clone( title = tit, url = url, action = 'list_all' ))
 
@@ -147,10 +144,8 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    if item.search_type == 'movie': 
-        top_year = 1955
-    else:
-        top_year = 1998
+    if item.search_type == 'movie': top_year = 1955
+    else: top_year = 1998
 
     for x in range(current_year, top_year, -1):
         itemlist.append(item.clone( title = str(x), url = host + 'release/' + str(x) + '/', action = 'list_all' ))
@@ -164,9 +159,7 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque =  scrapertools.find_single_match(data, '</h1>(.*?)>Por Año<')
-
-    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
 
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
@@ -245,10 +238,10 @@ def episodios(item):
     data = do_downloadpage(item.url)
 
     postid = scrapertools.find_single_match(data, 'data-post="(.*?)"')
-    if not postid:
-        postid = scrapertools.find_single_match(data, 'postid-(.*?) ')
+    if not postid: postid = scrapertools.find_single_match(data, 'postid-(.*?) ')
 
     post = {'action': 'action_select_season', 'season': str(item.contentSeason), 'post': postid}
+
     headers = {'Referer': item.url}
 
     data = do_downloadpage(host + 'wp-admin/admin-ajax.php',  post = post, headers = headers)
@@ -298,7 +291,9 @@ def findvideos(item):
 
         servidor = servertools.corregir_servidor(servidor)
 
-        if servidor == 'netutv': continue
+        if 'netu' in servidor: continue
+        elif 'waaw' in servidor: continue
+        elif 'hqq' in servidor: continue
 
         lang = lang.strip()
 
@@ -323,7 +318,7 @@ def play(item):
     item.url = item.url.replace('&#038;', '&')
 
     data = do_downloadpage(item.url)
-    url = scrapertools.find_single_match(data, '<iframe.*? src="([^"]+)')
+    url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
 
     if url:
         if url.startswith('//'): url = 'https:' + url

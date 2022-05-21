@@ -264,12 +264,6 @@ def episodios(item):
     return itemlist
 
 
-def puntuar_calidad(txt):
-    orden = ['360P', '480P', '720P', '1080P']
-    if txt not in orden: return 0
-    else: return orden.index(txt) + 1
-
-
 def findvideos(item):
     logger.info()
     itemlist = []
@@ -404,7 +398,7 @@ def list_search(item):
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<div class="contenido"><p>(.*?)</p>'))
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
+                                    contentType='tvshow', contentSerieName = title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 

@@ -145,6 +145,8 @@ def episodios(item):
 
     cargar_todas = False
 
+    tot_pages = 0
+
     if item.page == 0 and not item.dialog:
         if '<div class="pages-numbers">' in data:
             tot_pages = scrapertools.find_single_match(data, '<div class="pages-numbers">.*?<span class="nav_ext">.*?">(.*?)</a>')

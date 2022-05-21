@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, jsontools, tmdb
 
 
-host = 'https://kindor.io/'
+host = 'https://kindor.me/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://kindor.io/'] 
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -59,6 +65,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'destacadas/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más recomendadas', action = 'list_all', url = host + 'recomendadas/', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+
     return itemlist
 
 
@@ -66,12 +74,14 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host + 'peliculas/')
+    if item.search_type == 'movie': url_gen = host + 'peliculas/'
+    else: url_gen = host + 'series/'
+
+    data = do_downloadpage(url_gen)
 
     bloque = scrapertools.find_single_match(data, '>Géneros<(.*?)</ul>')
 
-    patron = '<a href="(.*?)">(.*?)</a>'
-    matches = re.compile(patron).findall(bloque)
+    matches = re.compile('<a href="(.*?)">(.*?)</a>').findall(bloque)
 
     for url, title in matches:
         itemlist.append(item.clone( title = title.capitalize(), action = 'list_all', url = url ))
@@ -88,6 +98,7 @@ def list_all(item):
     bloque = scrapertools.find_single_match(data, '<h1(.*?)</section>')
 
     patron = '<div class="pogd">.*?href="(.*?)".*?data-src="(.*?)".*?<h3 class="pogd_tit"><a.*?>(.*?)</a>'
+
     matches = scrapertools.find_multiple_matches(bloque, patron)
 
     for url, thumb, title in matches:
@@ -153,8 +164,7 @@ def temporadas(item):
 
         season = str(elem)
         if i > 9:
-            if len(str(season)) == 1:
-                season = '0' + season 
+            if len(str(season)) == 1: season = '0' + season 
 
         titulo = 'Temporada ' + season
 
@@ -188,27 +198,21 @@ def episodios(item):
                 item.perpage = 250
 
     season = str(item.contentSeason)
-    if season.startswith('0'):
-        season = season.replace('0', '')
+    if season.startswith('0'): season = season.replace('0', '')
 
     for episode, info in matches:
         ord_epis = str(episode)
 
-        if len(str(ord_epis)) == 1:
-            ord_epis = '0000' + ord_epis
-        elif len(str(ord_epis)) == 2:
-            ord_epis = '000' + ord_epis
-        elif len(str(ord_epis)) == 3:
-            ord_epis = '00' + ord_epis
+        if len(str(ord_epis)) == 1: ord_epis = '0000' + ord_epis
+        elif len(str(ord_epis)) == 2: ord_epis = '000' + ord_epis
+        elif len(str(ord_epis)) == 3: ord_epis = '00' + ord_epis
         else:
-            if num_matches > 50:
-                ord_epis = '0' + ord_epis
+            if num_matches > 50: ord_epis = '0' + ord_epis
 
         titulo = '%sx%s %s' % (season, episode, info['name'])
 
         thumb = info['img']
-        if thumb:
-            thumb = 'https:' + thumb
+        if thumb: thumb = 'https:' + thumb
 
         json_data = info['all']
 

@@ -278,7 +278,7 @@ def episodios(item):
         titulo = '%sx%s %s' % (epi['season_number'], epi['number'], epi['name'])
         plot = epi['description']
         langs = re.findall('languajes/([^.]+).png', epi['audio'])
-        if langs: titulo += ' [COLOR %s][%s][/COLOR]' % (color_lang, ','.join([IDIOMAS.get(lang, lang) for lang in langs]))
+        if langs: titulo += ' [COLOR %s]%s[/COLOR]' % (color_lang, ','.join([IDIOMAS.get(lang, lang) for lang in langs]))
         thumb = '' if 'picture' not in epi or not epi['picture'] else 'https://cdn.dilo.nu/resize/episode/220x125@' + epi['picture']
 
         if title_peli: titulo = title_peli

@@ -7,7 +7,8 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cuevana3.io/'
+host = 'https://ww3.cuevana3.me/'
+
 
 IDIOMAS = {'Latino': 'Lat', 'Español': 'Esp', 'Subtitulado': 'Vose'}
 
@@ -24,8 +25,10 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False):
     # ~ por si viene de enlaces guardados
-    url = url.replace('http://www.cuevana3.co/', host)
-    url = url.replace('https://cuevana3.co/', host)
+    ant_hosts = ['http://www.cuevana3.co/', 'https://cuevana3.co/', 'https://cuevana3.io/', 'https://cuevana3.me/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
 
     # ~ resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers)
     resp = httptools.downloadpage_proxy('cuevana3', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers)
@@ -323,7 +326,7 @@ def play(item):
     if '//api.cuevana3' in item.url or '//apialfa' in item.url:
         if 'file=' in item.url:
             fid = scrapertools.find_single_match(item.url, "file=([^&]+)").replace('\\/', '/')
-            url = 'https://api.cuevana3.io/stream/plugins/gkpluginsphp.php'
+            url = 'https://api.cuevana3.me/stream/plugins/gkpluginsphp.php'
             data = do_downloadpage(url, post={'link': fid})
 
             enlaces = scrapertools.find_multiple_matches(data, '"link":"([^"]+)"([^}]*)')
@@ -351,14 +354,14 @@ def play(item):
 
         elif 'h=' in item.url:
             fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
-            if 'https://api.cuevana3.io/sc/index.php?h=' in item.url:
-                api_url = 'https://api.cuevana3.io/sc/r.php'
+            if 'https://api.cuevana3.me/sc/index.php?h=' in item.url:
+                api_url = 'https://api.cuevana3.me/sc/r.php'
                 api_post = 'h=' + fid
-            elif 'https://api.cuevana3.io/ir/goto_ddh.php' in item.url:
-                api_url = 'https://api.cuevana3.io/ir/redirect_ddh.php'
+            elif 'https://api.cuevana3.me/ir/goto_ddh.php' in item.url:
+                api_url = 'https://api.cuevana3.me/ir/redirect_ddh.php'
                 api_post = 'url=' + fid
             else:
-                api_url = 'https://api.cuevana3.io/ir/rd.php'
+                api_url = 'https://api.cuevana3.me/ir/rd.php'
                 api_post = 'url=' + fid
 
             url = do_downloadpage(api_url, post=api_post, headers={'Referer': item.url}, follow_redirects=False, only_headers=True).get('location', '')
@@ -367,14 +370,14 @@ def play(item):
  
             if 'h=' in url:
                 fid = scrapertools.find_single_match(url, "h=([^&]+)")
-                if 'https://api.cuevana3.io/sc/index.php?h=' in url:
-                    api_url = 'https://api.cuevana3.io/sc/r.php'
+                if 'https://api.cuevana3.me/sc/index.php?h=' in url:
+                    api_url = 'https://api.cuevana3.me/sc/r.php'
                     api_post = 'h=' + fid
-                elif 'https://api.cuevana3.io/ir/goto_ddh.php' in url:
-                    api_url = 'https://api.cuevana3.io/ir/redirect_ddh.php'
+                elif 'https://api.cuevana3.me/ir/goto_ddh.php' in url:
+                    api_url = 'https://api.cuevana3.me/ir/redirect_ddh.php'
                     api_post = 'url=' + fid
                 else:
-                    api_url = 'https://api.cuevana3.io/ir/rd.php'
+                    api_url = 'https://api.cuevana3.me/ir/rd.php'
                     api_post = 'url=' + fid
 
                 url = do_downloadpage(api_url, post=api_post, headers={'Referer': item.url}, follow_redirects=False, only_headers=True).get('location', '')

@@ -465,6 +465,8 @@ def only_torrents(item):
     logger.info()
 
     cabecera = 'Canales que pueden contener archivos Torrents'
+    if item.exclusively_torrents: cabecera = 'Canales con enlaces Torrent exclusivamente'
+
     filtros = {'categories': 'torrent' ,'searchable': True}
 
     opciones_channels = []
@@ -477,6 +479,9 @@ def only_torrents(item):
         return
 
     for ch in ch_list:
+        if item.exclusively_torrents:
+            if not 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+
         info = ''
 
         if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
@@ -929,6 +934,7 @@ def show_servers_list(item):
             if not "Alternative" in notes: continue
 
             add_on = scrapertools.find_single_match(notes, 'vía:(.*?)$').strip().lower()
+            if ' (' in add_on: add_on = scrapertools.find_single_match(add_on, '(.*?) ').strip().lower()
 
             if xbmc.getCondVisibility('System.HasAddon("%s")' % add_on): exists_addon = ' [COLOR tan][B] Instalada [/B]'
             else: exists_addon = ' [COLOR red][B] No instalada [/B]'
@@ -1104,12 +1110,16 @@ def show_clients_torrent(item):
 
         torrents.append((client_name, client_id + exists_torrent))
 
-    ret = platformtools.dialog_select('Clientes externos para [COLOR yellow]Torrents[/COLOR]', opciones_torrent, useDetails=True)
+    ret = platformtools.dialog_select('Clientes/Motores externos para [COLOR yellow]Torrents[/COLOR]', opciones_torrent, useDetails=True)
 
     if not ret == -1:
-        if 'soportados' in item.title:
+         if 'soportados' in item.title:
             torrent = torrents[ret]
-            platformtools.dialog_ok(torrent[0], torrent[1] + '[/COLOR]')
+
+            if 'Instalado' in str(torrent[1]):
+                platformtools.dialog_ok(torrent[0], torrent[1] + '[/COLOR]', 'Por favor, asignelo como [COLOR coral]Cliente/Motor Torrent Habitual[/COLOR]')
+            else:
+                platformtools.dialog_ok(torrent[0], torrent[1] + '[/COLOR]', '[COLOR crimson]No lo puede Asignar[/COLOR]')
 
     return ret
 

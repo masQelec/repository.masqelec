@@ -45,38 +45,6 @@ def fix_url(url):
     parse = parse._replace(path=re.sub('/{2,}','/',parse.path))
     return urlunparse(parse)
 
-def url_sub(url):
-    file_path = os.path.join(ADDON_PROFILE, 'url_subs.txt')
-    if not os.path.exists(file_path):
-        return url
-
-    try:
-        with open(file_path, 'r') as f:
-            while True:
-                pattern = f.readline()
-                if not pattern: # end of file
-                    break
-
-                pattern = pattern.rstrip()
-                if not pattern: # blank line
-                    continue
-
-                replace = f.readline().rstrip()
-                if not replace: # no replace after pattern
-                    continue
-
-                _url = re.sub(pattern, replace, url)
-                if _url != url:
-                    log.debug('URL sub match: {} > {}'.format(url, _url))
-                    url = _url
-                    break
-
-    except Exception as e:
-        log.debug('failed to parse urls.txt')
-        log.exception(e)
-
-    return url
-
 def check_port(port=0, default=False):
     try:
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
@@ -708,12 +676,12 @@ def lang_allowed(lang, lang_list):
     if not lang_list:
         return True
 
-    lang = fix_language(lang)
+    lang = lang.lower().strip()
     if not lang:
         return False
 
     for _lang in lang_list:
-        _lang = fix_language(_lang)
+        _lang = _lang.lower().strip()
         if not _lang:
             continue
 
@@ -728,11 +696,47 @@ def fix_language(language=None):
 
     language = language.lower().strip()
     split = language.split('-')
+
     if len(split) > 1 and split[1].lower() == split[0].lower():
         return split[0]
 
-    ## Kodi or IA doesnt seem to match on en-US
-    if split[0] in ('en',):
+    # Kodi only supports 2 letter codes before the -
+    # https://github.com/xbmc/xbmc/blob/master/xbmc/utils/LangCodeExpander.cpp
+    if len(split[0]) == 2:
         return split[0]
 
     return language
+
+
+def get_kodi_proxy():
+    usehttpproxy = get_kodi_setting('network.usehttpproxy')
+    if usehttpproxy is not True:
+        return None
+
+    try:
+        httpproxytype = int(get_kodi_setting('network.httpproxytype'))
+    except ValueError:
+        httpproxytype = 0
+
+    proxy_types = ['http', 'socks4', 'socks4a', 'socks5', 'socks5h']
+
+    proxy = dict(
+        scheme = proxy_types[httpproxytype] if 0 <= httpproxytype < 5 else 'http',
+        server = get_kodi_setting('network.httpproxyserver'),
+        port = get_kodi_setting('network.httpproxyport'),
+        username = get_kodi_setting('network.httpproxyusername'),
+        password = get_kodi_setting('network.httpproxypassword'),
+    )
+
+    if proxy.get('username') and proxy.get('password') and proxy.get('server') and proxy.get('port'):
+        proxy_address = '{scheme}://{username}:{password}@{server}:{port}'.format(**proxy)
+    elif proxy.get('username') and proxy.get('server') and proxy.get('port'):
+        proxy_address = '{scheme}://{username}@{server}:{port}'.format(**proxy)
+    elif proxy.get('server') and proxy.get('port'):
+        proxy_address = '{scheme}://{server}:{port}'.format(**proxy)
+    elif proxy.get('server'):
+        proxy_address = '{scheme}://{server}'.format(**proxy)
+    else:
+        return None
+
+    return proxy_address

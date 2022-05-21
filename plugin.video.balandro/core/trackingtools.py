@@ -569,7 +569,6 @@ def scrap_and_save_tvshow(item, op='add', tvdbinfo=False):
             return False, 'El canal %s ya no existe' % item.channel
 
         for it in itemlist:
-            # ~ logger.debug(it)
             if it.contentType != 'season': continue
             if it.infoLabels['tmdb_id'] != tmdb_id: continue
             
@@ -609,7 +608,6 @@ def scrap_and_save_tvshow(item, op='add', tvdbinfo=False):
     elif itemlist[0].contentType == 'episode':
         ant_season = -1 # para no repetir llamadas mientras sea la misma temporada
         for it_epi in itemlist:
-            # ~ logger.debug(it_epi)
             if it_epi.contentType != 'episode': continue
             if not it_epi.contentSeason: continue
             if it_epi.infoLabels['tmdb_id'] != tmdb_id: continue
@@ -774,7 +772,6 @@ def check_and_scrap_new_episodes(notification=True):
     db.cur.execute('SELECT tmdb_id, periodicity, tvdbinfo, lastscrap FROM tracking_shows')
     series = db.cur.fetchall()
     db.close()
-    logger.debug(series)
 
     n_series = 0; n_cambios = 0
     for tmdb_id, periodicity, tvdbinfo, lastscrap in series:
@@ -839,9 +836,9 @@ def update_infolabels_show(tmdb_id, with_tvdb=False):
     # Serie
     infolabels = db.get_show(tmdb_id)
     it = Item(infoLabels = infolabels)
-    # ~ logger.debug(it)
+
     scrapper.set_infoLabels_item(it)
-    # ~ logger.debug(it)
+
     if base64.b64encode(jsontools.dump(infolabels)) != base64.b64encode(jsontools.dump(it.infoLabels)):
         db.save_show(tmdb_id, it.infoLabels)
         cambios.append('Serie')
@@ -852,9 +849,9 @@ def update_infolabels_show(tmdb_id, with_tvdb=False):
     n = 0
     for season, infolabels in rows:
         it = Item(infoLabels = infolabels)
-        # ~ logger.debug(it)
+
         scrapper.set_infoLabels_item(it)
-        # ~ logger.debug(it)
+
         if base64.b64encode(jsontools.dump(infolabels)) != base64.b64encode(jsontools.dump(it.infoLabels)):
             db.save_season(tmdb_id, season, it.infoLabels)
             cambios.append('T%d' % int(season))

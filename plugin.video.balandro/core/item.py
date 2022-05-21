@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# --------------------------------------------------------------------------------
+# -----------------------------------------------
 # Item is the object we use for representing data 
-# --------------------------------------------------------------------------------
+# -----------------------------------------------
 
 import base64
 import copy
@@ -16,11 +16,13 @@ if sys.version_info[0] >= 3:
     PY3 = True
     unicode = str
     from urllib.parse import quote, unquote_plus, unquote
-    from html.parser import HTMLParser
+    from html.parser import unescape
 else:
     PY2 = True
     from urllib import quote, unquote_plus, unquote
     from HTMLParser import HTMLParser
+    unescape = HTMLParser().unescape
+
 
 class InfoLabels(dict):
     def __str__(self):
@@ -452,12 +454,11 @@ class Item(object):
         """
         try:
             unicode_title = unicode(value, "utf8", "ignore")
-            return HTMLParser().unescape(unicode_title).encode("utf8")
+            return unescape(unicode_title).encode("utf8")
         except:
             if PY3:
                 if isinstance(value, bytes):
                     value = value.decode("utf8")
-                value = HTMLParser().unescape(value)
             return value
 
     def toutf8(self, *args):

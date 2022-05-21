@@ -4,15 +4,20 @@ import re
 from gzip import GzipFile
 
 import requests
+import urllib3
 from six import BytesIO
+from six.moves.urllib_parse import urlparse
 from kodi_six import xbmc
 
 from . import userdata, settings
+from .util import get_kodi_proxy
 from .dns import get_dns_rewrites
 from .log import log
 from .language import _
 from .exceptions import SessionError
 from .constants import DEFAULT_USERAGENT, CHUNK_SIZE
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 DEFAULT_HEADERS = {
     'User-Agent': DEFAULT_USERAGENT,
@@ -29,44 +34,138 @@ orig_getaddrinfo = socket.getaddrinfo
 class RawSession(requests.Session):
     def __init__(self, verify=None, timeout=None):
         super(RawSession, self).__init__()
-        self._timeout = settings.common_settings.getInt('http_timeout', 30) if timeout is None else timeout
-        self._verify = settings.common_settings.getBool('verify_ssl', True) if verify is None else verify
-        self._dns_rewrites = []
-        self._rewrite_cache = {}
-        socket.getaddrinfo = lambda *args, **kwargs: self._getaddrinfoPreferIPv4(*args, **kwargs)
+        self._verify = verify
+        self._timeout = timeout
+        self._dns_cache = {}
+        self._session_cache = {}
+        self._rewrites = []
+        self._proxy = None
 
     def set_dns_rewrites(self, rewrites):
-        self._dns_rewrites = rewrites
-        self._rewrite_cache = {}
+        for entries in rewrites:
+            pattern = entries.pop()
+            pattern = re.escape(pattern).replace('\*', '.*')
+            pattern = re.compile(pattern, flags=re.IGNORECASE)
 
-    def _getaddrinfoPreferIPv4(self, host, port, family=0, _type=0, proto=0, flags=0):
-        if host in self._rewrite_cache:
-            host = self._rewrite_cache[host]
-        elif self._dns_rewrites:
-            for ip in self._dns_rewrites:
-                pattern = ip[0].replace('.', '\.').replace('*', '.*')
-                if re.match(pattern, host, flags=re.IGNORECASE):
-                    log.debug("DNS Rewrite: {}: {} -> {}".format(ip[0], host, ip[1]))
-                    self._rewrite_cache[host] = ip[1]
-                    host = ip[1]
-                    break
+            new_entries = []
+            for entry in entries:
+                _type = 'skip'
+                if entry.lower().startswith('_http'):
+                    _type = 'url_sub'
+                    entry = entry[1:]
+                elif '://' in entry:
+                    _type = 'proxy'
+                elif entry[0].isdigit():
+                    _type = 'dns'
+                new_entries.append([_type, entry])
 
-        try:
-            return orig_getaddrinfo(host, port, socket.AF_INET, _type, proto, flags)
-        except socket.gaierror:
-            log.debug('Fallback to ipv6 addrinfo')
-            return orig_getaddrinfo(host, port, socket.AF_INET6, _type, proto, flags)
+            # Make sure dns is done last
+            self._rewrites.append([pattern, sorted(new_entries, key=lambda x: x[0] == 'dns')])
+
+    def set_proxy(self, proxy):
+        proxy = proxy or ''
+        if proxy.lower().strip() == 'kodi':
+            proxy = get_kodi_proxy()
+        self._proxy = proxy
 
     def request(self, method, url, **kwargs):
+        req = requests.Request(method, url, params=kwargs.pop('params', None))
+        url = req.prepare().url
+
+        session_data = {
+            'proxy': None,
+            'rewrite': None,
+            'url': url,
+        }
+
+        if url in self._session_cache:
+            session_data = self._session_cache[url]
+        elif self._rewrites:
+            for row in self._rewrites:
+                if not row[0].search(url):
+                    continue
+
+                for entry in row[1]:
+                    if entry[0] == 'skip':
+                        continue
+                    if entry[0] == 'url_sub':
+                        session_data['url'] = re.sub(row[0], entry[1], url, count=1)
+                    elif entry[0] == 'proxy':
+                        session_data['proxy'] = entry[1]
+                    elif entry[0] == 'dns':
+                        session_data['rewrite'] = [urlparse(session_data['url']).netloc.lower(), entry[1]]
+                break
+
+            self._session_cache[url] = session_data
+
+        def connection_from_pool_key(self, pool_key, request_context=None):
+            # ensure we get a unique pool (socket) for different rewrite ips
+            if session_data['rewrite'][0] == request_context['host']:
+                pool_key = pool_key._replace(key_server_hostname=session_data['rewrite'][1])
+            return orig_connection_from_pool_key(self, pool_key, request_context)
+
+        def getaddrinfo(host, port, family=0, _type=0, proto=0, flags=0):
+            if session_data['rewrite'][0] == host:
+                log.debug("DNS Rewrite: {} -> {}".format(host, session_data['rewrite'][1]))
+                host = session_data['rewrite'][1]
+
+            if host in self._dns_cache:
+                return self._dns_cache[host]
+
+            try:
+                addresses = orig_getaddrinfo(host, port, socket.AF_INET, _type, proto, flags)
+            except socket.gaierror:
+                addresses = orig_getaddrinfo(host, port, socket.AF_INET6, _type, proto, flags)
+
+            self._dns_cache[host] = addresses
+            return addresses
+
+        if session_data['url'] != url:
+            log.debug("URL Changed: {}".format(session_data['url']))
+
+        if session_data['proxy'] is None:
+            session_data['proxy'] = self._proxy
+
+        if session_data['proxy']:
+            # remove username, password from proxy for logging
+            parsed = urlparse(session_data['proxy'])
+            replaced = parsed._replace(netloc="{}:{}@{}".format('username', 'password', parsed.hostname) if parsed.username else parsed.hostname)
+            log.debug("Proxy: {}".format(replaced.geturl()))
+
+            kwargs['proxies'] = {
+                'http': session_data['proxy'],
+                'https': session_data['proxy'],
+            }
+
         if 'verify' not in kwargs:
             kwargs['verify'] = self._verify
+
         if 'timeout' not in kwargs:
             kwargs['timeout'] = self._timeout
-        return super(RawSession, self).request(method, url, **kwargs)
+
+        # Save pointers to original functions
+        orig_getaddrinfo = socket.getaddrinfo
+        orig_connection_from_pool_key = urllib3.PoolManager.connection_from_pool_key
+
+        try:
+            if session_data['rewrite']:
+                # Override functions
+                socket.getaddrinfo = getaddrinfo
+                urllib3.PoolManager.connection_from_pool_key = connection_from_pool_key
+
+            # Do request
+            result = super(RawSession, self).request(method, session_data['url'], **kwargs)
+        finally:
+            # Revert functions to original
+            socket.getaddrinfo = orig_getaddrinfo
+            urllib3.PoolManager.connection_from_pool_key = orig_connection_from_pool_key
+
+        return result
 
 class Session(RawSession):
     def __init__(self, headers=None, cookies_key=None, base_url='{}', timeout=None, attempts=None, verify=None, dns_rewrites=None):
-        super(Session, self).__init__(verify, timeout)
+        super(Session, self).__init__(verify=settings.common_settings.getBool('verify_ssl', True) if verify is None else verify,
+            timeout=settings.common_settings.getInt('http_timeout', 30) if timeout is None else timeout)
 
         self._headers = headers or {}
         self._cookies_key = cookies_key
@@ -76,6 +175,7 @@ class Session(RawSession):
         self.after_request = None
 
         self.set_dns_rewrites(get_dns_rewrites() if dns_rewrites is None else dns_rewrites)
+        self.set_proxy(settings.get('proxy_server') or settings.common_settings.get('proxy_server'))
 
         self.headers.update(DEFAULT_HEADERS)
         self.headers.update(self._headers)

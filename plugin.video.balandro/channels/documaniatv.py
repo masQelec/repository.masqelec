@@ -319,21 +319,19 @@ def top_100(item):
     itemlist = []
 
     url = 'top-documentales.html'
-    
-    referer = host + url
-    
-    itemlist.append(item.clone( title = 'Top 100 documentales', action = 'list_all', url = host + url, page = 0, referer = referer))
-    itemlist.append(item.clone( title = 'Top 100 más Populares', action = 'list_all', url = host + url + '?do=rating', page = 0 , referer = referer))
-    itemlist.append(item.clone( title = 'Top 100 más Recientes', action = 'list_all', url = host + url +'?do=recent', page = 0 , referer = referer))
-    itemlist.append(item.clone( title = 'Top 100 de Arte y Cine', action = 'list_all', url = host + url + '?c=arte-y-cine', page = 0 , referer = referer))
-    itemlist.append(item.clone( title = 'Top 100 de Biografías', action = 'list_all', url = host + url + '?c=biografias' , referer = referer))
-    itemlist.append(item.clone( title = 'Top 100 de Ciencia y Tecnología', action = 'list_all', url = host + url + '?c=ciencia-y-tecnologia', page = 0, referer = referer ))
-    itemlist.append(item.clone( title = 'Top 100 de Deporte', action = 'list_all', url = host + url + '?c=deporte', page = 0 , referer = referer))
-    itemlist.append(item.clone( title = 'Top 100 de Historia', action = 'list_all', url = host + url + '?c=historia', page = 0, referer = referer ))
-    itemlist.append(item.clone( title = 'Top 100 de Naturaleza', action = 'list_all', url = host + url + '?c=naturaleza', page = 0, referer = referer ))
-    itemlist.append(item.clone( title = 'Top 100 de Política', action = 'list_all', url = host + url + '?c=politica', page = 0 , referer = referer))
-    itemlist.append(item.clone( title = 'Top 100 de Social', action = 'list_all', url = host + url + '?c=social', page = 0 , referer = referer))
-    itemlist.append(item.clone( title = 'Top 100 de Viajes', action = 'list_all', url = host + url + '?c=viajes', page = 0 , referer = referer))
+
+    itemlist.append(item.clone( title = 'Top 100 documentales', action = 'list_all', url = host + url, page = 0))
+    itemlist.append(item.clone( title = 'Top 100 más Populares', action = 'list_all', url = host + url + '?do=rating', page = 0 ))
+    itemlist.append(item.clone( title = 'Top 100 más Recientes', action = 'list_all', url = host + url +'?do=recent', page = 0 ))
+    itemlist.append(item.clone( title = 'Top 100 de Arte y Cine', action = 'list_all', url = host + url + '?c=arte-y-cine', page = 0 ))
+    itemlist.append(item.clone( title = 'Top 100 de Biografías', action = 'list_all', url = host + url + '?c=biografias' ))
+    itemlist.append(item.clone( title = 'Top 100 de Ciencia y Tecnología', action = 'list_all', url = host + url + '?c=ciencia-y-tecnologia', page = 0 ))
+    itemlist.append(item.clone( title = 'Top 100 de Deporte', action = 'list_all', url = host + url + '?c=deporte', page = 0 ))
+    itemlist.append(item.clone( title = 'Top 100 de Historia', action = 'list_all', url = host + url + '?c=historia', page = 0 ))
+    itemlist.append(item.clone( title = 'Top 100 de Naturaleza', action = 'list_all', url = host + url + '?c=naturaleza', page = 0 ))
+    itemlist.append(item.clone( title = 'Top 100 de Política', action = 'list_all', url = host + url + '?c=politica', page = 0 ))
+    itemlist.append(item.clone( title = 'Top 100 de Social', action = 'list_all', url = host + url + '?c=social', page = 0 ))
+    itemlist.append(item.clone( title = 'Top 100 de Viajes', action = 'list_all', url = host + url + '?c=viajes', page = 0 ))
 
     return itemlist
 
@@ -368,16 +366,13 @@ def categorias(item):
     itemlist = []
 
     documaniatv_proxies = config.get_setting('channel_documaniatv_proxies', default='')
-    
+
     if documaniatv_proxies == '':
         platformtools.dialog_notification(cnomv, '[COLOR red]No hay proxies configurados[/COLOR]')
         return
 
-    #data = do_downloadpage(host, headers = custom_headers)
-    item.url=host
-    
-    data=get_data(item)
-    
+    data = do_downloadpage(host, headers = custom_headers)
+
     bloque = scrapertools.find_single_match(data, '<ul class="dropdown-menu">(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)".*?class="">([^<]+)')
@@ -403,8 +398,8 @@ def series(item):
     acces_headers = custom_headers
     if item.referer: acces_headers['Referer'] = item.referer
 
-    #data = do_downloadpage(item.url, headers = acces_headers)
-    data=get_data(item)
+    data = do_downloadpage(item.url, headers = acces_headers)
+
     matches = scrapertools.find_multiple_matches(data, '<div class="pm-li-category">.*?<a href="([^"]+)".*?title="(.*?)".*?<img src="(.*?)"')
 
     for url, title, thumb in matches:
@@ -430,16 +425,18 @@ def series(item):
 def list_all(item):
     logger.info()
     itemlist = []
-    
-        
+
     documaniatv_proxies = config.get_setting('channel_documaniatv_proxies', default='')
 
     if documaniatv_proxies == '':
         platformtools.dialog_notification(cnomv, '[COLOR red]No hay proxies configurados[/COLOR]')
         return
-    else:
-        data=get_data(item)
-    
+
+    acces_headers = custom_headers
+    if item.referer: acces_headers['Referer'] = item.referer
+
+    data = do_downloadpage(item.url, headers = acces_headers)
+
     matches = scrapertools.find_multiple_matches(data, '<li class="col-xs-6 col-sm-6 col-md-4">(.*?)</li>')
     if not matches: matches = scrapertools.find_multiple_matches(data, '<li class="col-xs-6 col-sm-6 col-md-3">(.*?)</li>')
     if not matches: matches = scrapertools.find_multiple_matches(data, '<li class="col-xs-6 col-sm-4 col-md-3">(.*?)</li>')
@@ -479,42 +476,7 @@ def list_all(item):
 
     return itemlist
 
-def get_data(item):
-    import requests
-    data=''
-    
-    documaniatv_proxies = config.get_setting('channel_documaniatv_proxies', default='')
-    
-    cookies={}
-    proxies={}
-    
-    for proxy in documaniatv_proxies.split(','):
-        proxies['http']= proxy
-        # En el momento que forzamos proxies por https, nos salta por browser-sin-javascript
-        #proxies['https']= proxy
 
-        headers={'referer': item.referer, 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'}
-        
-        if item.url.startswith('/'): 
-            url=host+item.url 
-        else: 
-            url=item.url
-        
-        #data = do_downloadpage(item.url, headers = acces_headers)
-        
-        session=requests.Session()
-        session = requests.get(url, headers = headers, proxies=proxies,verify=False)
-        cookies=session.cookies.get_dict() 
-        if cookies=={}:
-            cookies={'__HOST-PHPSESSID':'Sc9hd6V%2CLDHr9OYYz0QgNbmJgyLWokKyVeeZsbHsyQ9B1tN0','docu-token':        'TW9uZGF5TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzk2LjAuNDY2NC4xMTAgU2FmYXJpLzUzNy4zNg%3D%3D'}
-        
-        data=session.text.replace('\n','')
-
-        if data=='': data = requests.get(item.url, headers = headers,cookies=cookies,proxies=proxies,veryfy=False).text.replace('\n','')
-        if data!='': break 
-    
-    return data
-    
 def findvideos(item):
     logger.info()
     itemlist = []
@@ -524,9 +486,8 @@ def findvideos(item):
     acces_headers = custom_headers
     acces_headers['Referer'] = item.url
 
-    #data = do_downloadpage(item.url, headers = acces_headers)
-    data=get_data(item)
-        
+    data = do_downloadpage(item.url, headers = acces_headers)
+
     if len(data) == 0:
         import time
         espera = 5
@@ -534,8 +495,8 @@ def findvideos(item):
         platformtools.dialog_notification('Re-Cargando vídeo', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
 
-        #data = do_downloadpage(item.url, headers = acces_headers)
-        data=get_data(item)
+        data = do_downloadpage(item.url, headers = acces_headers)
+
     if 'lo sentimos este documental ha sido eliminado' in data.lower():
         platformtools.dialog_notification(cnomv, '[COLOR red]Documental eliminado[/COLOR]')
         return

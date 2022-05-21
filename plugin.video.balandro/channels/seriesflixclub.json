@@ -3,7 +3,7 @@
   "name": "SeriesFlixClub",
   "thumbnail": "seriesflixclub.png",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["producers", "kids", "docs", "vos"],
 
-  "notes": "Series por Géneros y productoras."
+  "notes": "WEB CERRADA. Series por Géneros y productoras."
 }

@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast"],
 
-  "clusters": ["news", "kids", "docs"],
+  "clusters": ["suggested", "kids", "docs"],
 
   "notes": "Películas en español, por géneros."
 }

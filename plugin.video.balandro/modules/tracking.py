@@ -555,7 +555,10 @@ def acciones_peli(item):
             db.cur.execute('DELETE FROM movies WHERE tmdb_id=?', (tmdb_id,))
             db.cur.execute('DELETE FROM channels_movies WHERE tmdb_id=?', (tmdb_id,))
 
-        db.cur.execute('DETACH DATABASE db_destino')
+        try:
+            db.cur.execute('DETACH DATABASE db_destino')
+        except:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Database destino Locked[/B][/COLOR]')
 
         platformtools.dialog_notification(acciones[ret], '[COLOR gold]%s[/COLOR] %s a lista [COLOR blue][B]%s[/B][/COLOR]' % (item.contentTitle, operacion, dbname_destino) )
         if operacion == 'copiada':
@@ -828,7 +831,10 @@ def acciones_serie(item):
             db.cur.execute('DELETE FROM episodes WHERE tmdb_id=?', (tmdb_id,))
             db.cur.execute('DELETE FROM channels_episodes WHERE tmdb_id=?', (tmdb_id,))
 
-        db.cur.execute('DETACH DATABASE db_destino')
+        try:
+            db.cur.execute('DETACH DATABASE db_destino')
+        except:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Database destino Locked[/B][/COLOR]')
 
         platformtools.dialog_notification(acciones[ret], '[COLOR gold]%s[/COLOR] %s a lista [COLOR blue][B]%s[/B][/COLOR]' % (item.contentSerieName, operacion, dbname_destino) )
         if operacion == 'copiada':

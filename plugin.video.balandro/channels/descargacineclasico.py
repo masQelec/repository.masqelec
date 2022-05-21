@@ -99,22 +99,20 @@ def list_all(item):
         title = title.replace(' Descargar y ver Online', '')
 
         year = scrapertools.find_single_match(title, '\((\d{4})\)')
-        if year:
-            title = title.replace('(%s)' % year, '').strip()
-        else:
-            year = '-'
+        if year: title = title.replace('(%s)' % year, '').strip()
+        else: year = '-'
 
         plot = scrapertools.decodeHtmlentities(plot)
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, 
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, name = title, any = year,
                                     contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page_link = scrapertools.find_single_match(data, ' rel=next href=([^ >]+)')
-    if not next_page_link: next_page_link = scrapertools.find_single_match(data, ' rel="next" href="([^"]+)"')
-    if next_page_link:
-        itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, action='list_all', text_color='coral' ))
+    next_page = scrapertools.find_single_match(data, ' rel=next href=([^ >]+)')
+    if not next_page: next_page = scrapertools.find_single_match(data, ' rel="next" href="([^"]+)"')
+    if next_page:
+        itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -172,12 +170,12 @@ def findvideos(item):
         servidor = servidor.lower()
         if servidor == 'clip': servidor = 'clipwatching'
 
-        elif '/fumacrom.com/' in url or 'tmearn.com/' in url or '/tinyurl.com/' in url:
+        elif '/fumacrom.com/' in url or 'tmearn.com/' in url or '/tinyurl.com/' in url or '/ouo.io/'in url:
             other = servidor.capitalize()
             servidor = 'directo'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url,
-                              language = lang, quality = qlty , other = other))
+                              language = lang, quality = qlty , other = other, name = item.name, any = item.any ))
 
     if not itemlist:
         if not ses == 0:
@@ -209,7 +207,12 @@ def play(item):
             itemlist.append(item.clone(server = servidor, url = url))
     
     elif item.server == 'directo':
-        new_url = httptools.downloadpage(item.url, follow_redirects=False).headers.get('location', '')
+        if '/ouo.io/' in item.url:
+            if item.any:
+                item.name = item.name.replace(' ', '-')
+                new_url = 'https://odysee.com/@CineClasico:a/' + str(item.name) + '-' + str(item.any) + ':b'
+        else:
+            new_url = httptools.downloadpage(item.url, follow_redirects=False).headers.get('location', '')
 
         if new_url:
             if new_url.startswith('https://odysee.com'):

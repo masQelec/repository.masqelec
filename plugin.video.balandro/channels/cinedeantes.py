@@ -23,18 +23,18 @@ def mainlist_pelis(item):
     itemlist.append(item.clone ( title = ' - Buscar película ...', action = 'search', grupo = 'alfab', search_type = 'movie', text_color = 'deepskyblue' ))
     itemlist.append(item.clone ( title = ' - Buscar agrupación ...', action = 'search', grupo = 'agrupa', search_type = 'movie', text_color='salmon' ))
 
-    itemlist.append(item.clone ( title = 'Novedades', action = 'news', url = host ))
+    itemlist.append(item.clone ( title = 'Novedades', action = 'news' ))
 
     itemlist.append(item.clone ( title = 'Joyas del cine', action = 'list_all', url = host + '/joyas-del-cine.html' ))
 
-    itemlist.append(item.clone ( title = 'Por saga', action = 'pelis', url = host, grupo = 'sagas' ))
+    itemlist.append(item.clone ( title = 'Por saga', action = 'pelis', grupo = 'sagas' ))
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
-    itemlist.append(item.clone ( title = 'Por categoría', action = 'pelis', url = host, grupo = 'temas' ))
-    itemlist.append(item.clone ( title = 'Por interés', action = 'pelis', url = host, grupo = 'desta' ))
+    itemlist.append(item.clone ( title = 'Por categoría', action = 'pelis', grupo = 'temas' ))
+    itemlist.append(item.clone ( title = 'Por interés', action = 'pelis',  grupo = 'desta' ))
 
-    itemlist.append(item.clone ( title = 'Por actor', action = 'pelis', url = host, grupo = 'actor' ))
-    itemlist.append(item.clone ( title = 'Por actriz', action = 'pelis', url = host, grupo = 'actri' ))
-    itemlist.append(item.clone ( title = 'Por dirección', action = 'pelis', url = host, grupo = 'direc' ))
+    itemlist.append(item.clone ( title = 'Por actor', action = 'pelis', grupo = 'actor' ))
+    itemlist.append(item.clone ( title = 'Por actriz', action = 'pelis', grupo = 'actri' ))
+    itemlist.append(item.clone ( title = 'Por dirección', action = 'pelis', grupo = 'direc' ))
 
     itemlist.append(item.clone ( title = 'Por letra (A - Z)', action = 'alfab' ))
     itemlist.append(item.clone ( title = 'Por agrupación (A - Z)', action = 'agrupa' ))
@@ -47,7 +47,7 @@ def generos(item):
     itemlist = []
 
     itemlist.append(item.clone ( title = 'Artes marciales', action = 'list_all', url = host + '/artes-marciales.html' ))
-    itemlist.append(item.clone ( title = 'Aventuras', action = 'pelis', url = host, filtro_search = 'AVENTURAS' ))
+    itemlist.append(item.clone ( title = 'Aventuras', action = 'pelis', filtro_search = 'AVENTURAS' ))
 
     itemlist.append(item.clone ( title = 'Bélicas (primera guerra)', action = 'list_all', url = host + '/primera-guerra.html' ))
     itemlist.append(item.clone ( title = 'Bélicas (guerra de corea)', action = 'list_all', url = host + '/guerra-corea.html' ))
@@ -57,31 +57,31 @@ def generos(item):
     itemlist.append(item.clone ( title = 'Cine alemán', action = 'list_all', url = host + '/cine-alemaacuten.html' ))
     itemlist.append(item.clone ( title = 'Cine argentino', action = 'list_all', url = host + '/cine-argentino.html' ))
     itemlist.append(item.clone ( title = 'Cine asiático', action = 'list_all', url = host + '/cine-asiaacutetico.html' ))
-    itemlist.append(item.clone ( title = 'Cine británico', action = 'pelis', url = host, filtro_search = 'CINE BRIT&Aacute;NICO' ))
-    itemlist.append(item.clone ( title = 'Cine clásico', action = 'pelis', url = host, filtro_search = 'CL&Aacute;SICO' ))
-    itemlist.append(item.clone ( title = 'Cine de acción', action = 'pelis', url = host, filtro_search = 'CINE DE ACCI&Oacute;N' ))
+    itemlist.append(item.clone ( title = 'Cine británico', action = 'pelis', filtro_search = 'CINE BRIT&Aacute;NICO' ))
+    itemlist.append(item.clone ( title = 'Cine clásico', action = 'pelis', filtro_search = 'CL&Aacute;SICO' ))
+    itemlist.append(item.clone ( title = 'Cine de acción', action = 'pelis', filtro_search = 'CINE DE ACCI&Oacute;N' ))
     itemlist.append(item.clone ( title = 'Cine de romanos', action = 'list_all', url = host + '/cine-romanos.html' ))
-    itemlist.append(item.clone ( title = 'Cine de terror', action = 'pelis', url = host, filtro_search = 'CINE DE TERROR' ))
-    itemlist.append(item.clone ( title = 'Cine español', action = 'pelis', url = host, filtro_search = 'CINE ESPA&Ntilde;OL' ))
+    itemlist.append(item.clone ( title = 'Cine de terror', action = 'pelis', filtro_search = 'CINE DE TERROR' ))
+    itemlist.append(item.clone ( title = 'Cine español', action = 'pelis', filtro_search = 'CINE ESPA&Ntilde;OL' ))
     itemlist.append(item.clone ( title = 'Cine europeo oriental', action = 'list_all', url = host + '/cine-europa-oriental.html' ))
-    itemlist.append(item.clone ( title = 'Cine francés', action = 'pelis', url = host, filtro_search = 'CINE FRANC&Eacute;S' ))
-    itemlist.append(item.clone ( title = 'Cine infantil', action = 'pelis', url = host, filtro_search = 'CINE INFANTIL' ))
-    itemlist.append(item.clone ( title = 'Cine italiano', action = 'pelis', url = host, filtro_search = 'CINE ITALIANO' ))
+    itemlist.append(item.clone ( title = 'Cine francés', action = 'pelis', filtro_search = 'CINE FRANC&Eacute;S' ))
+    itemlist.append(item.clone ( title = 'Cine infantil', action = 'pelis', filtro_search = 'CINE INFANTIL' ))
+    itemlist.append(item.clone ( title = 'Cine italiano', action = 'pelis', filtro_search = 'CINE ITALIANO' ))
     itemlist.append(item.clone ( title = 'Cine latino', action = 'list_all', url = host + '/cine-latino.html' ))
     itemlist.append(item.clone ( title = 'Cine mexicano', action = 'list_all', url = host + '/cine-mejicano.html' ))
-    itemlist.append(item.clone ( title = 'Cine mudo', action = 'pelis', url = host, filtro_search = 'CINE MUDO' ))
-    itemlist.append(item.clone ( title = 'Cine musical', action = 'pelis', url = host, filtro_search = 'MUSICAL' ))
-    itemlist.append(item.clone ( title = 'Cine negro', action = 'pelis', url = host, filtro_search = 'CINE NEGRO' ))
+    itemlist.append(item.clone ( title = 'Cine mudo', action = 'pelis', filtro_search = 'CINE MUDO' ))
+    itemlist.append(item.clone ( title = 'Cine musical', action = 'pelis', filtro_search = 'MUSICAL' ))
+    itemlist.append(item.clone ( title = 'Cine negro', action = 'pelis', filtro_search = 'CINE NEGRO' ))
     itemlist.append(item.clone ( title = 'Cine religioso', action = 'list_all', url = host + '/cine-religioso.html' ))
     itemlist.append(item.clone ( title = 'Cien ruso', action = 'list_all', url = host + '/cine-ruso.html' ))
 
-    itemlist.append(item.clone ( title = 'Comedias', action = 'pelis', url = host, filtro_search = 'COMEDIAS' ))
-    itemlist.append(item.clone ( title = 'Ciencia ficción', action = 'pelis', url = host, filtro_search = 'CIENCIA-FICCI&Oacute;N' ))
-    itemlist.append(item.clone ( title = 'Espionaje', action = 'pelis', url = host, filtro_search = 'ESPIONAJE' ))
-    itemlist.append(item.clone ( title = 'Intriga', action = 'pelis', url = host, filtro_search = 'INTRIGA' ))
-    itemlist.append(item.clone ( title = 'Peliculas Vose', action = 'pelis', url = host, filtro_search = 'PEL&Iacute;CULAS V.O.S.E.' ))
-    itemlist.append(item.clone ( title = 'Peplum', action = 'pelis', url = host, filtro_search = 'PEPLUM' ))
-    itemlist.append(item.clone ( title = 'Westerns', action = 'pelis', url = host, filtro_search = 'WESTERN' ))
+    itemlist.append(item.clone ( title = 'Comedias', action = 'pelis', filtro_search = 'COMEDIAS' ))
+    itemlist.append(item.clone ( title = 'Ciencia ficción', action = 'pelis', filtro_search = 'CIENCIA-FICCI&Oacute;N' ))
+    itemlist.append(item.clone ( title = 'Espionaje', action = 'pelis', filtro_search = 'ESPIONAJE' ))
+    itemlist.append(item.clone ( title = 'Intriga', action = 'pelis', filtro_search = 'INTRIGA' ))
+    itemlist.append(item.clone ( title = 'Peliculas Vose', action = 'pelis', filtro_search = 'PEL&Iacute;CULAS V.O.S.E.' ))
+    itemlist.append(item.clone ( title = 'Peplum', action = 'pelis', filtro_search = 'PEPLUM' ))
+    itemlist.append(item.clone ( title = 'Westerns', action = 'pelis', filtro_search = 'WESTERN' ))
 
     return itemlist
 
@@ -91,10 +91,8 @@ def alfab(item):
     itemlist = []
 
     for letra in '#abcdefghijklmnopqrstuvwxyz':
-        if letra in '#abcdefghijk':
-            url = host + '/iacutendice-de-peliacuteculas-a---k.html'
-        else:
-            url = host + '/iacutendice-de-peliacuteculas-l---z.html'
+        if letra in '#abcdefghijk': url = host + '/iacutendice-de-peliacuteculas-a---k.html'
+        else: url = host + '/iacutendice-de-peliacuteculas-l---z.html'
 
         itemlist.append(item.clone ( title = letra.upper(), url = url, action = 'list_letra', filtro_search = letra ))
 
@@ -106,7 +104,7 @@ def agrupa(item):
     itemlist = []
 
     for letra in 'abcdefghijklmnopqrstuvwxyz#':
-        itemlist.append(item.clone ( title = letra.upper(), url = host, action = 'pelis', filtro_search = letra ))
+        itemlist.append(item.clone ( title = letra.upper(), action = 'pelis', filtro_search = letra ))
 
     return itemlist
 
@@ -121,8 +119,8 @@ def news(item):
 
     data = httptools.downloadpage(host).data
 
-    block_esp = scrapertools.find_single_match(data, '<h2 class="wsite-content-title"><font color=".*?especial(.*?)>NOVEDADES DE')
-    block_nov = scrapertools.find_single_match(data, '>NOVEDADES DE(.*?)>ENLACE AL GRUPO LA TAQUILLA EN FACEBOOK')
+    block_esp = scrapertools.find_single_match(data, '<h2 class="wsite-content-title"><font color=".*?especial(.*?)>NOVEDADES')
+    block_nov = scrapertools.find_single_match(data, '>NOVEDADES(.*?)>ENLACE AL GRUPO LA TAQUILLA EN FACEBOOK')
 
     bloque = block_esp + block_nov
 
@@ -182,8 +180,7 @@ def news(item):
            title = title.replace('º', 'ª').replace(' - ', ' ').replace(' -', ' ')
 
            if ' -' in name:
-               if not name.endswith('º'):
-                   name = name + 'º'
+               if not name.endswith('º'): name = name + 'º'
 
                name = name.replace(' - ', ' ').replace(' -', ' ')
 
@@ -227,9 +224,9 @@ def news(item):
            itemlist.append(item.clone( action = accion, title = title, url = url, thumbnail = thumb, grupo = grupo, filtro_search = name, page = 0 ))
 
        if i > perpage:
-          if num_matches > hasta:
-             next_page = item.page + 1
-             itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'news', text_color='coral' ))
+           if num_matches > hasta:
+              next_page = item.page + 1
+              itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'news', text_color='coral' ))
 
     return itemlist
 
@@ -304,9 +301,9 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if matches:
-       if num_matches > hasta:
-           next_page = item.page + 1
-           itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'list_all', text_color='coral' ))
+        if num_matches > hasta:
+            next_page = item.page + 1
+            itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -335,10 +332,8 @@ def list_letra(item):
 
             title = scrapertools.find_single_match(match, '.*?<a href=.*?>(.*?)<')
 
-            if '<em style="">' in title:
-                title = scrapertools.find_single_match(title, '<em style="">(.*?)<')
-            elif '<em>' in title:
-                title = scrapertools.find_single_match(title, '<em>(.*?)<')
+            if '<em style="">' in title: title = scrapertools.find_single_match(title, '<em style="">(.*?)<')
+            elif '<em>' in title: title = scrapertools.find_single_match(title, '<em>(.*?)<')
 
             title = title.replace('&Aacute;', 'A').replace('&Eacute;', 'E').replace('&Iacute;', 'I').replace('&Oacute;', 'O').replace('&Uacute;', 'U')
             title = title.replace('&iquest;', '').replace('&iexcl;', '').replace('&#8203;', '').replace('&nbsp;', '').strip()
@@ -371,12 +366,9 @@ def list_letra(item):
 
         title = scrapertools.find_single_match(match, '.*?<a href=.*?>(.*?)<')
 
-        if '<em style="">' in title:
-            title = scrapertools.find_single_match(title, '<em style="">(.*?)<')
-        elif '<em>' in title:
-            title = scrapertools.find_single_match(title, '<em>(.*?)<')
-        elif '<font size="4">' in title:
-            title = scrapertools.find_single_match(title, '<font size="4">(.*?)<')
+        if '<em style="">' in title: title = scrapertools.find_single_match(title, '<em style="">(.*?)<')
+        elif '<em>' in title: title = scrapertools.find_single_match(title, '<em>(.*?)<')
+        elif '<font size="4">' in title: title = scrapertools.find_single_match(title, '<font size="4">(.*?)<')
 
         title = title.replace('&Aacute;', 'A').replace('&Eacute;', 'E').replace('&Iacute;', 'I').replace('&Oacute;', 'O').replace('&Uacute;', 'U')
         title = title.replace('&iquest;', '').replace('&iexcl;', '').replace('&#8203;', '').replace('&nbsp;', '').strip()
@@ -599,11 +591,11 @@ def pelis(item):
            itemlist.append(item.clone( action = 'list_all', title = title, url = url, page = 0 ))
 
        if itemlist:
-          if i > perpage:
-             if num_matches > hasta:
-                next_page = item.page + 1
-                itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, filtro_search = item.filtro_search,
-                                            action = 'pelis', text_color='coral' ))
+           if i > perpage:
+               if num_matches > hasta:
+                   next_page = item.page + 1
+                   itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, filtro_search = item.filtro_search,
+                                               action = 'pelis', text_color='coral' ))
 
     return itemlist
 
@@ -612,7 +604,6 @@ def pelis(item):
 def categorias(item):
     logger.info()
 
-    item.url = host
     item.grupo = 'temas'
     return pelis(item)
 
@@ -656,12 +647,9 @@ def list_search(item):
 
         title = scrapertools.find_single_match(match, '.*?<a href=.*?>(.*?)<')
 
-        if '<em style="">' in title:
-            title = scrapertools.find_single_match(title, '<em style="">(.*?)<')
-        elif '<em>' in title:
-            title = scrapertools.find_single_match(title, '<em>(.*?)<')
-        elif '<font size="4">' in title:
-            title = scrapertools.find_single_match(title, '<font size="4">(.*?)<')
+        if '<em style="">' in title: title = scrapertools.find_single_match(title, '<em style="">(.*?)<')
+        elif '<em>' in title: title = scrapertools.find_single_match(title, '<em>(.*?)<')
+        elif '<font size="4">' in title: title = scrapertools.find_single_match(title, '<font size="4">(.*?)<')
 
         title = title.replace('&Aacute;', 'A').replace('&Eacute;', 'E').replace('&Iacute;', 'I').replace('&Oacute;', 'O').replace('&Uacute;', 'U')
         title = title.replace('&iquest;', '').replace('&iexcl;', '').replace('&#8203;', '').replace('&nbsp;', '').strip()
@@ -671,8 +659,7 @@ def list_search(item):
 
         titulo = title.lower().strip()
 
-        if not item.title_search.lower() in titulo:
-            continue
+        if not item.title_search.lower() in titulo: continue
 
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 

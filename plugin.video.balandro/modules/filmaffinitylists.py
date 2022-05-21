@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import re
 
 from datetime import datetime
@@ -7,6 +8,7 @@ from platformcode import config, logger
 from core.item import Item
 from modules import search
 from core import httptools, scrapertools, tmdb
+
 
 host = "https://www.filmaffinity.com/es/"
 
@@ -156,7 +158,7 @@ def list_all(item):
 
     if itemlist:
         if num_matches > hasta:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_all', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -234,6 +236,7 @@ def anios(item):
 
     for x in range(current_year, 1899, -1):
         anyo = str(x)
+
         itemlist.append(item.clone( title = anyo, action='list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', fromyear = anyo, toyear = anyo  ))
 
     return itemlist
@@ -274,7 +277,7 @@ def temas(item):
 
     if itemlist:
         if num_matches > hasta:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'temas', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'temas', text_color='coral' ))
 
     return itemlist
 
@@ -284,14 +287,15 @@ def list_temas(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
+
     patron = '<div class="movie-card.*?movie-card-0" data-movie-id=".*?src="(.*?)".*?title="(.*?)">.*?</a>[^\d+]+(\d+)[^<]+'
+
     matches = scrapertools.find_multiple_matches(data, patron)
 
     for thumb, title, year in matches:
         if year:
             if year > str(current_year): continue
-
-        if not year: year = '-'
+        else: year = '-'
 
         title = title.strip()
 
@@ -327,7 +331,7 @@ def list_temas(item):
                url = url.replace(prev_page, '')
 
                next_page = item.page + 1
-               itemlist.append(item.clone( title = '>> Página siguiente', url = url + '&p=' + str(next_page), action = 'list_temas',
+               itemlist.append(item.clone( title = 'Siguientes ...', url = url + '&p=' + str(next_page), action = 'list_temas',
                                            page = next_page, text_color='coral' ))
 
     return itemlist
@@ -368,6 +372,8 @@ def oscars_ediciones(item):
 
     for url, title, anyo in matches:
         title = title.strip()
+        if not title: title = anyo
+
         itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo ))
 
     return sorted(itemlist, key = lambda it: it.anyo, reverse = True)
@@ -385,6 +391,8 @@ def list_premios_anyo(item):
 
     for thumb, url, title in matches:
         title = title.strip()
+
+        if 'Edición de los Oscar' in title: continue
 
         thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
 
@@ -447,7 +455,7 @@ def sagas(item):
             url = url.replace(prev_page, '')
 
             next_page = item.page + 1
-            itemlist.append(item.clone( title = '>> Página siguiente', url = url + '?p=' + str(next_page), action = 'sagas',
+            itemlist.append(item.clone( title = 'Siguientes ...', url = url + '?p=' + str(next_page), action = 'sagas',
                                         page = next_page, text_color='coral' ))
 
     return itemlist
@@ -460,6 +468,7 @@ def list_sagas(item):
     data = httptools.downloadpage(item.url).data
 
     patron = '<div class="movie-card.*?movie-card-0" data-movie-id=".*?src="(.*?)".*?title="(.*?)">.*?</a>[^\d+]+(\d+)[^<]+'
+
     matches = scrapertools.find_multiple_matches(data, patron)
 
     num_matches = len(matches)
@@ -467,13 +476,11 @@ def list_sagas(item):
     hasta = desde + perpage
 
     for thumb, title, year in matches[desde:hasta]:
-
         if year:
             if year > str(current_year):
                 num_matches = num_matches - 1
                 continue
-
-        if not year: year = '-'
+        else: year = '-'
 
         title = title.strip()
 
@@ -492,7 +499,7 @@ def list_sagas(item):
 
     if itemlist:
         if num_matches > hasta:
-            itemlist.append(item.clone( title = '>> Página siguiente', page = item.page + 1, action = 'list_sagas', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_sagas', text_color='coral' ))
 
     return itemlist
 
@@ -523,20 +530,15 @@ def list_sel(item):
 
     url = url % (cod_country, cod_genre, fromyear, toyear)
 
-    if item.cod_genre == 'TV_SE':
-        url = url + '&chv=1&orderby=avg&movietype=serie%7C&ratingcount=3&runtimemin=0&runtimemax=4'
-    elif item.cod_genre == 'DO':
-        url = url + '&chv=1&orderby=avg&movietype=documentary%7C&ratingcount=3&runtimemin=0&runtimemax=8'
-    else:
-        url = url + '&chv=1&orderby=avg&movietype=movie%7C&ratingcount=3&runtimemin=0&runtimemax=4'
+    if item.cod_genre == 'TV_SE': url = url + '&chv=1&orderby=avg&movietype=serie%7C&ratingcount=3&runtimemin=0&runtimemax=4'
+    elif item.cod_genre == 'DO': url = url + '&chv=1&orderby=avg&movietype=documentary%7C&ratingcount=3&runtimemin=0&runtimemax=8'
+    else: url = url + '&chv=1&orderby=avg&movietype=movie%7C&ratingcount=3&runtimemin=0&runtimemax=4'
 
     post = {'from': item.page}
     data = httptools.downloadpage(url, post = post).data
 
     matches = scrapertools.find_multiple_matches(data, '<li class="position">(.*?)</ul>')
-
-    if not matches:
-        matches = scrapertools.find_multiple_matches(data, '<li>(.*?)</li>')
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<li>(.*?)</li>')
 
     for match in matches:
         title = scrapertools.find_single_match(match, ' title="(.*?)"').strip()
@@ -568,7 +570,7 @@ def list_sel(item):
 
         if num_matches >= 30:
             next_page = item.page + 30
-            itemlist.append(item.clone( title = '>> Página siguiente', url = item.url, page = next_page, action = 'list_sel', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', url = item.url, page = next_page, action = 'list_sel', text_color='coral' ))
 
     return itemlist
 
@@ -596,30 +598,28 @@ def _oscars_categories(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque_patron = '(<div class="full-content"><div class="header" id="%s">.*?</div></div></li></ul></div></div>)' % (item.oscars_id)
+    patron = '(<div class="full-content"><div class="header" id="%s">.*?</div></div></li></ul></div></div>)' % (item.oscars_id)
 
-    bloque = scrapertools.find_single_match(data, bloque_patron)
+    bloque = scrapertools.find_single_match(data, patron)
 
     matches = scrapertools.find_multiple_matches(bloque, '<li class="(fa-shadow.*?)">(.*?)</li>')
 
     for info, match in matches:
         titulo = ''
+
         title = scrapertools.find_single_match(match, '<a class="movie-title-link" href="[^"]+" title="([^"]+)\W+"')
         titulo += title
 
         nominated = scrapertools.find_single_match(match, '<div class="nom-text">([^<]+)</div>')
-        if nominated:
-            titulo += ' - ' + nominated
+        if nominated: titulo += ' - ' + nominated
 
         nominations = scrapertools.find_single_match(match, '<b>(.*?)</a>')
         if nominations:
             nominations = re.sub('<.*?>', '', nominations) if scrapertools.find_single_match(nominations, '(<.*?>)') else nominations
             titulo += ' - ' + nominations
-        else:
-            nominations = '1 nominación'
+        else: nominations = '1 nominación'
 
-        if 'win' in info:
-            titulo = ''.join(("[COLOR pink]", titulo, "[/COLOR]"))
+        if 'win' in info: titulo = ''.join(("[COLOR pink]", titulo, "[/COLOR]"))
 
         itemlist.append(item.clone( action = 'find_search', title = titulo, search_type = 'movie', name = title, contentTitle = title, infoLabels={'year': '-'} ))
         
@@ -632,6 +632,7 @@ def _emmys(item):
     logger.info()
 
     item.url = host + 'awards.php?award_id=emmy&year='
+
     if item.origen == 'mnu_esp':
         return emmy_ediciones(item)
 

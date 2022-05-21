@@ -9,7 +9,7 @@
   "search_types": ["movie"],
 
   "categories": ["movie", "torrent"],
-  "language": ["cast", "vose"],
+  "language": ["cast"],
 
   "clusters": ["torrents", "qualityes", "kids", "docs", "vos"],
 

@@ -48,8 +48,9 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36"
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.100 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.41 Safari/537.36"
+
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
 if ver_stable_chrome:
@@ -240,26 +241,26 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
 
     # Si existe el fichero en la caché y no ha caducado, se devuelve su contenido sin hacer ninguna petición.
     if use_cache:
-            from hashlib import md5
+        from hashlib import md5
 
-            cache_path = os.path.join(config.get_data_path(), 'cache')
-            if not os.path.exists(cache_path): os.makedirs(cache_path)
-            cache_md5url = md5(str(url).encode('utf-8')).hexdigest()
-            cache_file = os.path.join(cache_path, cache_md5url)
+        cache_path = os.path.join(config.get_data_path(), 'cache')
+        if not os.path.exists(cache_path): os.makedirs(cache_path)
+        cache_md5url = md5(str(url).encode('utf-8')).hexdigest()
+        cache_file = os.path.join(cache_path, cache_md5url)
 
-            if os.path.isfile(cache_file):
-                time_file = os.stat(cache_file).st_mtime
-                time_now = time.time()
-                if time_file + cache_duration >= time_now:
-                    response["sucess"] = True
-                    response["code"] = 200
-                    response["error"] = None
-                    response["headers"] = {}
-                    response["url"] = url
-                    with open(cache_file, 'r') as f: response["data"] = f.read()
-                    response["time"] = time.time() - time_now
-                    logger.info("Recuperado de caché %s la url %s" % (cache_md5url, url))
-                    return type('HTTPResponse', (), response)
+        if os.path.isfile(cache_file):
+            time_file = os.stat(cache_file).st_mtime
+            time_now = time.time()
+            if time_file + cache_duration >= time_now:
+                response["sucess"] = True
+                response["code"] = 200
+                response["error"] = None
+                response["headers"] = {}
+                response["url"] = url
+                with open(cache_file, 'r') as f: response["data"] = f.read()
+                response["time"] = time.time() - time_now
+                logger.info("Recuperado de caché %s la url %s" % (cache_md5url, url))
+                return type('HTTPResponse', (), response)
 
     # Headers por defecto, si no se especifica nada
     request_headers = default_headers.copy()

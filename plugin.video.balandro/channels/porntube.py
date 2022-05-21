@@ -48,45 +48,6 @@ def mainlist_pelis(item):
     return itemlist
 
 
-def list_all(item):
-    logger.info()
-    itemlist = []
-
-    threads = list()
-
-    data = httptools.downloadpage(item.url).data
-
-    i = 0
-
-    matches = scrapertools.find_multiple_matches(data, '<div class="video-item"><a title="([^"]+)" href="([^"]+)">')
-
-    for title, url in matches:
-        if url.startswith('/'): url = host + url[1:]
-
-        new_item = item.clone( action = 'findvideos', title = title, url = url, pos = i )
-
-        t = Thread(target = get_embed, args = [new_item, itemlist])
-
-        t.setDaemon(True)
-        t.start()
-        threads.append(t)
-        i += 1
-
-    while [t for t in threads if t.isAlive()]:
-        time.sleep(0.5)
-
-    itemlist = sorted(itemlist, key=lambda x: x.pos)
-
-    next_page = scrapertools.find_single_match(data, '<li class="pagination-item next"><a href="([^"]+)"')
-    if itemlist:
-        if next_page:
-            if next_page.startswith('/'): next_page = host + next_page[1:]
-
-            itemlist.append(item.clone( title='Siguientes ...', url = next_page, action='list_all', text_color='coral' ))
-
-    return itemlist
-
-
 def canales(item):
     logger.info()
     itemlist = []
@@ -149,6 +110,45 @@ def pornstars(item):
         itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all' ))
 
     return sorted(itemlist, key=lambda it: it.title)
+
+
+def list_all(item):
+    logger.info()
+    itemlist = []
+
+    threads = list()
+
+    data = httptools.downloadpage(item.url).data
+
+    i = 0
+
+    matches = scrapertools.find_multiple_matches(data, '<div class="video-item"><a title="([^"]+)" href="([^"]+)">')
+
+    for title, url in matches:
+        if url.startswith('/'): url = host + url[1:]
+
+        new_item = item.clone( action = 'findvideos', title = title, url = url, contentType = 'movie', contentTitle = title, pos = i )
+
+        t = Thread(target = get_embed, args = [new_item, itemlist])
+
+        t.setDaemon(True)
+        t.start()
+        threads.append(t)
+        i += 1
+
+    while [t for t in threads if t.isAlive()]:
+        time.sleep(0.5)
+
+    itemlist = sorted(itemlist, key=lambda x: x.pos)
+
+    next_page = scrapertools.find_single_match(data, '<li class="pagination-item next"><a href="([^"]+)"')
+    if itemlist:
+        if next_page:
+            if next_page.startswith('/'): next_page = host + next_page[1:]
+
+            itemlist.append(item.clone( title='Siguientes ...', url = next_page, action='list_all', text_color='coral' ))
+
+    return itemlist
 
 
 def get_embed(item, itemlist):

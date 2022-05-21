@@ -136,6 +136,11 @@ def _proxies(item):
         item.channel = 'dilo'
         dilo.configurar_proxies(item)
 
+    elif item.from_channel == 'divxtotal':
+        from channels import divxtotal
+        item.channel = 'divxtotal'
+        divxtotal.configurar_proxies(item)
+
     elif item.from_channel == 'documaniatv':
         from channels import documaniatv
         item.channel = 'documaniatv'
@@ -186,11 +191,6 @@ def _proxies(item):
         item.channel = 'hdfullse'
         hdfullse.configurar_proxies(item)
 
-    elif item.from_channel == 'megadede2':
-        from channels import megadede2
-        item.channel = 'megadede2'
-        megadede2.configurar_proxies(item)
-
     elif item.from_channel == 'megaserie':
         from channels import megaserie
         item.channel = 'megaserie'
@@ -200,6 +200,11 @@ def _proxies(item):
         from channels import mejortorrents
         item.channel = 'mejortorrents'
         mejortorrents.configurar_proxies(item)
+
+    elif item.from_channel == 'mejortorrentnz':
+        from channels import mejortorrentnz
+        item.channel = 'mejortorrentnz'
+        mejortorrentnz.configurar_proxies(item)
 
     elif item.from_channel == 'movidytv':
         from channels import movidytv
@@ -254,6 +259,11 @@ def _proxies(item):
         item.channel = 'playview'
         playview.configurar_proxies(item)
 
+    elif item.from_channel == 'pornhub':
+        from channels import pornhub
+        item.channel = 'pornhub'
+        pornhub.configurar_proxies(item)
+
     elif item.from_channel == 'ppeliculas':
         from channels import ppeliculas
         item.channel = 'ppeliculas'
@@ -279,10 +289,28 @@ def _proxies(item):
         item.channel = 'torrentdivx'
         torrentdivx.configurar_proxies(item)
 
+    elif item.from_channel == 'verdetorrent':
+        from channels import verdetorrent
+        item.channel = 'verdetorrent'
+        verdetorrent.configurar_proxies(item)
+
+    elif item.from_channel == 'xvideos':
+        from channels import xvideos
+        item.channel = 'xvideos'
+        xvideos.configurar_proxies(item)
+
 def _quitar_proxies(item):
     el_canal = ('Quitando proxies [B][COLOR %s]' + item.from_channel.capitalize() + '[/COLOR][/B]') % color_avis
     platformtools.dialog_notification(config.__addon_name, el_canal)
 
     config.set_setting('proxies', '', item.from_channel)
     platformtools.itemlist_refresh()
+
+
+def _test_webs(item):
+    el_canal = ('Test web canal [B][COLOR %s]' + item.from_channel.capitalize() + '[/COLOR][/B]') % color_adver
+    platformtools.dialog_notification(config.__addon_name, el_canal)
+
+    from modules import tester
+    tester.test_channel(item.from_channel)
 

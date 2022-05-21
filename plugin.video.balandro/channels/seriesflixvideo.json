@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["countries", "producers", "kids", "docs", "vos"],
+  "clusters": ["countries", "producers", "kids", "docs", "vos", "dorama", "anime"],
 
   "notes": "Series por Géneros, productora y paises."
 }

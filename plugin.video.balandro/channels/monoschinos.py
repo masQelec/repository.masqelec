@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3: import urllib.parse as urllib
-else: import urllib
-
-
 import re, base64
 
 from platformcode import config, logger, platformtools
@@ -17,13 +11,10 @@ host = 'https://monoschinos2.com'
 
 
 def mainlist(item):
-    return mainlist_anime(item)
-
-def mainlist_series(item):
-    return mainlist_anime(item)
+    return mainlist_animes(item)
 
 
-def mainlist_anime(item):
+def mainlist_animes(item):
     logger.info()
     itemlist = []
 
@@ -231,6 +222,7 @@ def findvideos(item):
         if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
 
         if servidor == 'ok': servidor = 'okru'
+        elif servidor == 'zeus': servidor = 'directo'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose' ))
 

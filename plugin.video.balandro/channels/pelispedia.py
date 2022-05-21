@@ -164,7 +164,12 @@ def list_all(item):
         title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
         if not title: title = scrapertools.find_single_match(article, '<h4>(.*?)</h4>')
         if not title: title = scrapertools.find_single_match(article, ' alt="([^"]+)"')
+
         if not url or not title: continue
+
+        if '|' in title:
+            title = title.split('|')[0]
+            title = title.strip()
 
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)')
         if not thumb: thumb = scrapertools.find_single_match(article, ' src=([^ >]+)')
@@ -305,6 +310,7 @@ def findvideos(item):
        'en': 'Vose',
        'spanish': 'Esp',
        'español': 'Esp',
+       'castellano': 'Esp',
        'latino': 'Lat',
        'subtitulado': 'Vose',
        'inglés': 'VO',

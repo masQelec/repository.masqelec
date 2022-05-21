@@ -23,7 +23,9 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if not headers: headers = {'Referer': host}
 
     if '&estreno[]=' in url: raise_weberror = False
-    elif '/?s=' in url: raise_weberror = False
+    elif '/?s=' in url:
+        headers = {'Referer': url}
+        raise_weberror = False
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('movidytv', url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -45,9 +47,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='plum' ))
 
     itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'actor', search_type = 'person',
-                       plot = 'Debe indicarse el nombre y apellido/s del intérprete. Separando estos por un guión'))
+                                plot = 'Debe indicarse el nombre y apellido/s del intérprete. Separando estos por un guión'))
     itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
-                       plot = 'Debe indicarse el nombre y apellido/s del director. Separando estos por un guión'))
+                                plot = 'Debe indicarse el nombre y apellido/s del director. Separando estos por un guión'))
 
     return itemlist
 
@@ -60,7 +62,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas-2/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas-2', search_type = 'movie' ))
 
     # ~ itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas-2/?estrenos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'peliculas-2/?mejor-valoradas', search_type = 'movie' ))
@@ -169,7 +171,7 @@ def list_all(item):
 
     # ~ 14/1/2022
     if '/?s=' in item.url:
-        if '<title>Please Wait... | Cloudflare</title>' in data:
+        if not data or '<title>Please Wait... | Cloudflare</title>' in data:
             platformtools.dialog_notification('MovidyTv', '[COLOR yellow]Requiere verificación [COLOR red]reCAPTCHA[/COLOR]')
             return itemlist
 

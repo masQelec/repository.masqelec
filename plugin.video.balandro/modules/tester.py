@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, re
+import os, re, time
 
 from platformcode import config, logger, platformtools
 from core import httptools, scrapertools, filetools, jsontools
@@ -56,10 +56,8 @@ def test_channel(channel_name):
     txt += 'categories: ' + str(params['categories']) + '[CR]'
     txt += 'language: ' + str(params['language']) + '[CR]'
 
-    try:
-       txt += 'clusters: ' + str(params['clusters']) + '[CR]'
-    except:
-       pass
+    try: txt += 'clusters: ' + str(params['clusters']) + '[CR]'
+    except: pass
 
     txt += 'notes: ' + str(params['notes'])
 
@@ -84,38 +82,35 @@ def test_channel(channel_name):
     if not esta_en_poe:
        channel_poe = ''
 
-       if dominio:
-           host = dominio
+       if dominio: host = dominio
        else:
-           try:
-              data = filetools.read(filename_py)
-           except:
-              el_canal = ('Falta [B][COLOR %s]' + channel_py) % color_alert
-              platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-              return
+          try:
+             data = filetools.read(filename_py)
+          except:
+             el_canal = ('Falta [B][COLOR %s]' + channel_py) % color_alert
+             platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+             return
 
-           part_py = 'def mainlist'
-           if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
-           elif 'CLASS' in data or 'class ' in data: part_py = 'class '
+          part_py = 'def mainlist'
+          if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
+          elif 'CLASS' in data or 'class ' in data: part_py = 'class '
 
-           elif 'documaniatv_rua' in data: part_py = 'documaniatv_rua'
+          elif 'documaniatv_rua' in data: part_py = 'documaniatv_rua'
 
-           elif 'def login' in data: part_py = 'def login'
-           elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
-           elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
+          elif 'def login' in data: part_py = 'def login'
+          elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
+          elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
 
-           bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
-           bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
+          bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
+          bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
 
-           host = scrapertools.find_single_match(bloc, '.*?host.*?"(.*?)"')
-           if not host:
-               host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
+          host = scrapertools.find_single_match(bloc, '.*?host.*?"(.*?)"')
+          if not host: host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
 
     host = host.strip()
 
     if not host:
-        if dominio:
-            host = dominio
+        if dominio: host = dominio
 
     if not host or not '//' in host:
         el_canal = ('Falta Dominio/Host/Clon/Metodo en [B][COLOR %s]' + channel_py) % color_alert
@@ -124,7 +119,7 @@ def test_channel(channel_name):
 
     txt = info_channel(channel_name, channel_poe, host, dominio, txt)
 
-    platformtools.dialog_textviewer(channel_name, txt)
+    platformtools.dialog_textviewer(channel_name.capitalize(), txt)
 
 
 def info_channel(channel_name, channel_poe, host, dominio, txt):
@@ -133,23 +128,22 @@ def info_channel(channel_name, channel_poe, host, dominio, txt):
 
     channel_id = channel_name.lower()
 
-    if dominio:
-       txt_dominio = 'dominio'
-    else:
-       txt_dominio = ''
+    if dominio: txt_dominio = 'dominio'
+    else: txt_dominio = ''
 
     response, txt = acces_channel(channel_name, host, txt_dominio, txt, follow_redirects=False)
 
-    if channel_id == channel_poe:
-        return txt
+    if channel_id == channel_poe: return txt
 
     if response.sucess == False:
-        response, txt = acces_channel(channel_name, host, '', txt, follow_redirects=True)
+        if not '<urlopen error timed out>' in txt:
+            if not 'Cloudflare' in txt:
+               if not 'Invisible Captcha' in txt:
+                   response, txt = acces_channel(channel_name, host, '', txt, follow_redirects=True)
 
     if not dominio:
         dominio = config.get_setting('dominio', channel_id, default='')
-        if dominio:
-            response, txt = acces_channel(channel_name, dominio, 'dominio', txt, follow_redirects=False)
+        if dominio: response, txt = acces_channel(channel_name, dominio, 'dominio', txt, follow_redirects=False)
 
     return txt
 
@@ -160,40 +154,89 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
 
     channel_id = channel_name.lower()
 
+    proxies = ''
     text_with_proxies = ''
 
     cfg_proxies_channel = 'channel_' + channel_id + '_proxies'
     if not config.get_setting(cfg_proxies_channel, default=''):
-        response = httptools.downloadpage(host, follow_redirects=follow_redirects, raise_weberror=False)
+        response = httptools.downloadpage(host, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
     else:
-        response = httptools.downloadpage_proxy(channel_id, host, follow_redirects=follow_redirects, raise_weberror=False)
+        proxies = config.get_setting(cfg_proxies_channel, default='')
+
+        if proxies:
+            proxies = proxies.replace(' ', '')
+
+            if ';' in proxies:  proxies = proxies.replace(',', ';').split(';')
+            else: proxies = proxies.split(',')
+
+            platformtools.dialog_notification(config.__addon_name + '[COLOR red][B] con proxies[/B][/COLOR]', el_canal + '[/COLOR][/B]')
+
+            if len(proxies) > 1:
+                platformtools.dialog_notification(el_canal + '[/COLOR][/B]', '[COLOR orangered]Test con [B]' + str(len(proxies)) + '[/B] proxies ...[/COLOR]')
+                time.sleep(1)
+
+        response = httptools.downloadpage_proxy(channel_id, host, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
         text_with_proxies = '[COLOR red] con proxies [/COLOR]'
 
-    if dominio:
-        dominio = '[COLOR coral]' + dominio + '[/COLOR]'
+    if proxies:
+        if follow_redirects == False:
+            txt += '[CR][CR]'
+            txt += '[COLOR crimson][B]Proxies: [/B][/COLOR][CR]'
+            txt += 'actuales: ' + str(proxies)
+    else:
+        if 'requerir el uso de proxies' in txt:
+            txt += '[CR][CR]'
+            txt += '[COLOR crimson][B]Proxies: [/B][/COLOR][CR]'
+            txt += 'actuales: [COLOR cyan][B]Sin proxies[/B][/COLOR]'
+	
+    if dominio: dominio = '[COLOR coral]' + dominio + '[/COLOR]'
 
     if follow_redirects == False:
         txt += '[CR][CR]'
         txt += '[COLOR moccasin][B]Acceso: ' + dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
-        txt += 'host: ' + host + '[CR]'
+        txt += 'host: [COLOR pink][B]' + host + '[/B][/COLOR][CR]'
     else:
         txt += '[CR][CR]'
         txt += '[COLOR moccasin][B]Acceso Redirect: ' + dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
-        txt += 'host: ' + host + '[CR]'
+        txt += 'host: [COLOR pink][B]' + host + '[/B][/COLOR][CR]'
 
-    if response.sucess == True:
-        color_sucess = '[COLOR yellow][B]'
-    else:
-        color_sucess = '[COLOR red][B]'
+    if response.sucess == True: color_sucess = '[COLOR yellow][B]'
+    else: color_sucess = '[COLOR red][B]'
 
     txt += 'sucess: ' + color_sucess + str(response.sucess) + '[/B][/COLOR][CR]'
 
-    txt += 'code: ' + str(response.code) + '[CR]'
+    txt += 'code: [COLOR springgreen][B]' + str(response.code) + '[/B][/COLOR][CR]'
     txt += 'error: ' + str(response.error) + '[CR]'
-    txt += 'data length: ' + str(len(response.data))
+    txt += 'length: ' + str(len(response.data))
 
-    if response.sucess == True:
+    if response.sucess == False:
+        if '<urlopen error timed out>' in str(response.code): txt += '[CR]proxies: [COLOR orangered][B]Obtenga nuevos proxies[/B][/COLOR]'
+        else:
+           if '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
+           elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
+           else:
+              if len(response.data) > 0:
+                  txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR]'
+
+                  txt += '[CR][CR]'
+                  txt += '[COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
+                  txt += str(response.headers) + '[CR]'
+
+                  if len(response.data) < 1000:
+                      txt += '[CR][CR]'
+                      txt += '[COLOR moccasin][B]Data:[/B][/COLOR][CR]'
+                      txt += str(response.data) + '[CR]'
+    else:
         if len(response.data) < 1000:
+            if len(response.data) == 0:
+                new_web = scrapertools.find_single_match(str(response.headers), "'location':.*?'(.*?)'")
+
+                if response.sucess == 301 or response.sucess == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente (ver Headers 'location':)[/B][/COLOR]"
+                elif response.sucess == 302 or response.sucess == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal (ver Headers) 'location':[/B][/COLOR]"
+                else: txt += "[CR][CR][COLOR orangered][B]Comprobar Dominio (ver Headers 'location':)[/B][/COLOR]"
+
+                if new_web: txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
+
             txt += '[CR][CR]'
             txt += '[COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
             txt += str(response.headers) + '[CR]'
@@ -214,7 +257,6 @@ def test_server(server_name):
     server_json = server_id + '.json'
     filename_json = os.path.join(config.get_runtime_path(), 'servers', server_json)
 
-
     try:
        data = filetools.read(filename_json)
        dict_server = jsontools.load(data)
@@ -228,8 +270,7 @@ def test_server(server_name):
         platformtools.dialog_notification(config.__addon_name, el_server + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
-    if 'find_videos' in dict_server:
-        dict_server['find_videos']['patterns'] = dict_server['find_videos'].get('patterns', list())
+    if 'find_videos' in dict_server: dict_server['find_videos']['patterns'] = dict_server['find_videos'].get('patterns', list())
     else:
         el_server = ('[B][COLOR %s]' + server_name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_server + 'Falta [COLOR %s] find_videos [/COLOR][/B]' % color_alert)
@@ -240,8 +281,7 @@ def test_server(server_name):
     bloc = str(dict_server['find_videos']['patterns'])
 
     servers = scrapertools.find_multiple_matches(str(bloc), '.*?"url".*?"(.*?)"')
-    if not servers:
-        servers = scrapertools.find_multiple_matches(str(bloc), ".*?'url'.*?'(.*?)'")
+    if not servers: servers = scrapertools.find_multiple_matches(str(bloc), ".*?'url'.*?'(.*?)'")
 
     if not servers:
         el_server = ('Falta url [B][COLOR %s]' + server_name) % color_alert
@@ -270,8 +310,7 @@ def test_server(server_name):
               servidor = url.split('/')[2].strip()
 
               if type:
-                  if servidor:
-                      url_servidor = type + '//' + servidor + '/'
+                  if servidor: url_servidor = type + '//' + servidor + '/'
            except:
               url_servidor = url
 
@@ -280,18 +319,15 @@ def test_server(server_name):
     txt += '[COLOR moccasin][B]Parámetros:[/B][/COLOR][CR]'
     txt += 'patterns: ' + str(bloc) + '[CR][CR]'
 
-    if url_servidor == '':
-        url_servidor = 'Indefinido'
-    elif '\\' in url_servidor:
-        url_servidor = 'Variable'
+    if url_servidor == '': url_servidor = 'Indefinido'
+    elif '\\' in url_servidor: url_servidor = 'Variable'
 
-    if not url_servidor:
-       txt += 'url: [COLOR red][B] Falta [/B][/COLOR][CR]'
+    if not url_servidor: txt += 'url: [COLOR red][B] Falta [/B][/COLOR][CR]'
     else:
        txt += 'url: ' + url_servidor
        txt = info_server(server_name, server_poe, url_servidor, txt)
 
-    platformtools.dialog_textviewer(server_name, txt)
+    platformtools.dialog_textviewer(server_name.capitalize(), txt)
 
 
 def info_server(server_name, server_poe, url, txt):
@@ -300,17 +336,13 @@ def info_server(server_name, server_poe, url, txt):
 
     server_id = server_name.lower()
 
-    if server_id == server_poe:
-        return txt
-    elif url == 'Indefinido':
-        return txt
-    elif url == 'Variable':
-        return txt
+    if server_id == server_poe: return txt
+    elif url == 'Indefinido': return txt
+    elif url == 'Variable': return txt
 
     response, txt = acces_server(server_name, url, txt, follow_redirects=False)
 
-    if response.sucess == False:
-        response, txt = acces_server(server_name, url, txt, follow_redirects=True)
+    if response.sucess == False: response, txt = acces_server(server_name, url, txt, follow_redirects=True)
 
     return txt
 
@@ -322,30 +354,52 @@ def acces_server(server_name, url, txt, follow_redirects=None):
 
     text_with_proxies = ''
 
-    response = httptools.downloadpage(url, follow_redirects=follow_redirects, raise_weberror=False)
+    response = httptools.downloadpage(url, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
 
     if follow_redirects == False:
         txt += '[CR][CR]'
         txt += '[COLOR moccasin][B]Acceso: [/B][/COLOR][CR]'
-        txt += 'host: ' + url + '[CR]'
+        txt += 'host: [COLOR pink][B]' + url + '[/B][/COLOR][CR]'
     else:
         txt += '[CR][CR]'
         txt += '[COLOR moccasin][B]Acceso Redirect: [/B][/COLOR][CR]'
-        txt += 'host: ' + url + '[CR]'
+        txt += 'host: [COLOR pink][B]' + url + '[/B][/COLOR][CR]'
 
-    if response.sucess == True:
-        color_sucess = '[COLOR yellow][B]'
-    else:
-        color_sucess = '[COLOR red][B]'
+    if response.sucess == True: color_sucess = '[COLOR yellow][B]'
+    else: color_sucess = '[COLOR red][B]'
 
     txt += 'sucess: ' + color_sucess + str(response.sucess) + '[/B][/COLOR][CR]'
 
-    txt += 'code: ' + str(response.code) + '[CR]'
+    txt += 'code: [COLOR springgreen][B]' + str(response.code) + '[/B][/COLOR][CR]'
     txt += 'error: ' + str(response.error) + '[CR]'
-    txt += 'data length: ' + str(len(response.data))
+    txt += 'length: ' + str(len(response.data))
 
-    if response.sucess == True:
+    if response.sucess == False:
+        if '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
+        elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
+        else:
+           if len(response.data) > 0:
+               txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR]'
+
+               txt += '[CR][CR]'
+               txt += '[COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
+               txt += str(response.headers) + '[CR]'
+
+               if len(response.data) < 1000:
+                   txt += '[CR][CR]'
+                   txt += '[COLOR moccasin][B]Data:[/B][/COLOR][CR]'
+                   txt += str(response.data) + '[CR]'
+    else:
         if len(response.data) < 100:
+            if len(response.data) == 0:
+                new_web = scrapertools.find_single_match(str(response.headers), "'location':.*?'(.*?)'")
+
+                if response.sucess == 301 or response.sucess == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente (ver Headers 'location':)[/B][/COLOR]"
+                elif response.sucess == 302 or response.sucess == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal (ver Headers) 'location':[/B][/COLOR]"
+                else: txt += "[CR][CR][COLOR orangered][B]Comprobar Dominio (ver Headers 'location':)[/B][/COLOR]"
+
+                if new_web: txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
+
             txt += '[CR][CR]'
             txt += '[COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
             txt += str(response.headers) + '[CR]'
@@ -371,19 +425,14 @@ def test_internet():
        pass
 
     if not your_ip:
-        try:
-           your_ip = httptools.downloadpage('http://ipinfo.io/ip').data
-        except:
-           pass
+        try: your_ip = httptools.downloadpage('http://ipinfo.io/ip').data
+        except: pass
 
     if not your_ip:
-        try:
-           your_ip = httptools.downloadpage('http://www.icanhazip.com/').data
-        except:
-           pass
+        try: your_ip = httptools.downloadpage('http://www.icanhazip.com/').data
+        except: pass
 
-    if not your_ip:
-        your_ip = '[COLOR red] Sin Conexión [/COLOR]'
+    if not your_ip: your_ip = '[COLOR red] Sin Conexión [/COLOR]'
 
     txt = '[COLOR moccasin][B]Internet:[/B][/COLOR]  %s ' % your_ip
     txt += '[CR][CR]'
