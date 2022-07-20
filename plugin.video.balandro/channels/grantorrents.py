@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://grantorrent.co/'
+host = 'https://grantorrent.plus/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://grantorrents.org/', 'https://grantorrents.pro/']
+    ant_hosts = ['https://grantorrents.org/', 'https://grantorrents.pro/', 'https://grantorrent.co/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -43,7 +43,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'pelis/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'pelicula/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'movie' ))
 
@@ -252,6 +252,8 @@ def play(item):
             if not url.endswith('.torrent'): return itemlist
 
         url = url.replace('https://vk.com/away.php?to=', '').strip()
+
+        if '/grantorrents.pro/' in url: url = url.replace('https://grantorrents.pro/', host)
 
         itemlist.append(item.clone( url = url, server = 'torrent' ))
 

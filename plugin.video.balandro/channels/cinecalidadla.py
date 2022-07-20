@@ -7,12 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cinecalidad.fo/'
+host = 'https://cinecalidad.llc/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://cinecalidad.la/']
+    ant_hosts = ['https://cinecalidad.la/', 'https://cinecalidad.fo/', 'https://ww22.cinecalidad.fo/',
+                 'https://ww3.cinecalidad.do/', 'https://ww4.cinecalidad.do/', 'https://cinecalidad.do/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -93,6 +94,7 @@ def list_all(item):
     for match in matches:
         title = scrapertools.find_single_match(match, '<h2>.*?">(.*?)</h2>')
         if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+        if not title: title = scrapertools.find_single_match(match, '<div class="in_title">(.*?)</div>')
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 

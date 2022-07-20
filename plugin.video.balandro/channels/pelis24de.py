@@ -7,13 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://pelis24.de/'
+host = 'https://www1.pelis24.de/'
 
 
 perpage = 30
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://pelis24.de/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/peliculas/fecha/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -108,11 +114,11 @@ def list_all(item):
     for article in matches[item.page * perpage:]:
         url = scrapertools.find_single_match(article, '<a href="(.*?)"')
 
-        title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
+        title = scrapertools.find_single_match(article, '<div class="entry-title">(.*?)</div>')
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(article, 'src="(.*?)"')
+        thumb = scrapertools.find_single_match(article, '-src="(.*?)"')
 
         itemlist.append(item.clone( action='findvideos', url=url, title = title, thumbnail = thumb,
                                     contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
@@ -143,7 +149,7 @@ def list_all(item):
 
                next_pagina = int(next_pagina)
                next_pagina +=1
-			   
+
            next_page = current_url + '/page/' + str(next_pagina) + '/' 
 
            itemlist.append(item.clone( title='Siguientes ...', url = next_page, action='list_all', page=0, text_color='coral' ))
@@ -156,13 +162,13 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Castellano': 'Esp', 'Latino': 'Lat', 'Sub Español': 'Vose'}
-
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, '<li data-playerid="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, '<li data-playerid=(.*?)</a></li>')
 
-    for url in matches:
+    for match in matches:
+        url = scrapertools.find_single_match(match, '"(.*?)"')
+
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
         elif 'embed.' in url: continue
 
@@ -171,18 +177,37 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        lang = 'Lat'
+        if 'Castellano' in match: lang = 'Esp'
+        elif 'Latino"' in match: lang = 'Lat'
+        elif 'Subtitulado' in match:  lang = 'Vose'
+        else: lang = 'Lat'
+
+        qlty = 'HD'
 
         other = ''
         if servidor == 'directo':
-         if '//pelistop' in url: other = 'Pelistop'
-         elif '/dood.' in url: other = 'Dood'
-        
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = lang, other = other ))
+            if '//pelistop' in url: other = 'Pelistop'
+            elif '/fembed/?h=' in url: other = 'Fembed'
+            elif '/dood.' in url: other = 'Dood'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url,
+                              language = lang, quality = qlty, other = other ))
 
     # ~ downloads recatpcha
 
     return itemlist
+
+
+def resuelve_dame_toma(dame_url):
+    data = do_downloadpage(dame_url)
+
+    url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
+    if not url:
+        checkUrl = dame_url.replace('embed.html#', 'details.php?v=')
+        data = do_downloadpage(checkUrl, headers={'Referer': dame_url})
+        url = scrapertools.find_single_match(data, '"file":\s*"([^"]+)').replace('\\/', '/')
+
+    return url
 
 
 def play(item):
@@ -195,12 +220,39 @@ def play(item):
     url = item.url
 
     if item.other == 'Pelistop':
-        data = do_downloadpage(item.url)
+        data = do_downloadpage(item.url, headers={'Referer': host})
 
         url = scrapertools.find_single_match(data, '>Ver ahora<.*?src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
+
         url = url.replace('//pelistop.co/', '//streamsb.net/')
 
+        if '//damedamehoy.' in url or '//tomatomatela.' in url: url = resuelve_dame_toma(url)
+
+        if not url:
+            if 'url=' in item.url:
+                fid = scrapertools.find_single_match(item.url, "url=(.*?)$")
+                api_url = 'https://api.cuevana3.me/ir/redirect_ddh.php'
+                api_post = 'url=' + fid
+
+                url = ''
+
+                resp = httptools.downloadpage(api_url, post=api_post, headers={'Referer': item.url}, follow_redirects=False, only_headers=True)
+
+                if 'location' in resp.headers: url = resp.headers['location']
+
+                if url.startswith('//'): url = 'https:' + url
+
+    elif item.other == 'Fembed':
+        hash = scrapertools.find_single_match(item.url, "h=(.*?)$")
+
+        data = do_downloadpage('https://api.cuevana3.me/fembed/api.php', post={'h': hash})
+
+        url = scrapertools.find_single_match(data, '"url":"(.*?)"')
+
     if url:
+        url = url.replace('\\/', '/')
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

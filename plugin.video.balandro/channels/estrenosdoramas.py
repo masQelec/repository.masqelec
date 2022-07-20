@@ -7,10 +7,21 @@ from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 
 
-host = 'https://www23.estrenosdoramas.net/'
+host = 'https://www24.estrenosdoramas.net/'
 
 
 GLBPLAYER = 'TEST'
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www23.estrenosdoramas.net/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+    return data
 
 
 def mainlist(item):
@@ -86,7 +97,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '>Resultados<(.*?)>AVISO LEGAL<')
@@ -149,7 +160,7 @@ def last_episodes(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '>Resultados<(.*?)>AVISO LEGAL<')
@@ -215,7 +226,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '>Lista de capítulos!<(.*?)</ul></div>')
@@ -259,7 +270,7 @@ def findvideos(item):
 
     IDIOMAS = {'Latino': 'Lat', 'Vose': 'Vose', 'VO': 'VO'}
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = re.compile('<div id="tab(.*?)"(.*?)</div>', re.DOTALL).findall(data)
@@ -308,9 +319,13 @@ def play(item):
             headers = dict()
             headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
             headers['X-Requested-With'] = 'XMLHttpRequest'
-            headers['Origin'] = 'https://repro3.estrenosdoramas.us'
 
-            data = httptools.downloadpage(item.url).data
+            resp = httptools.downloadpage(item.url, raise_weberror=False)
+
+            if 'File not found' in resp.data:
+               return '[COLOR red]Archivo inexistente[/COLOR]'
+
+            data = resp.data
 
             if 'pi76823.php' in item.url:
                 matches = re.compile('post\( "(.*?)", { key: \'(.*?)\'', re.DOTALL).findall(data)
@@ -323,13 +338,14 @@ def play(item):
                     token_get = str(int(round(time.time())))
                     _token = base64.b64encode(token_get.encode("utf-8"))
 
-                    _result = httptools.downloadpage(_url, post = 'key=' + _key + '&token=' + str(_token), headers = headers).data
+                    _result = do_downloadpage(_url, post = 'key=' + _key + '&token=' + str(_token), headers = headers)
+
                     _json = jsontools.load(_result)
 
                     if _json["link"]:
                         url = base64.b64decode(_json['link'])
 
-                        if url.startswith('//') == True: url = 'https:' + url
+                        if not 'https:' in str(url): url = 'https:' + str(url)
 
                         servidor = servertools.get_server_from_url(url)
                         servidor = servertools.corregir_servidor(servidor)
@@ -358,13 +374,14 @@ def play(item):
                         token_get = str(int(round(time.time())))
                         _token = base64.b64encode(token_get.encode("utf-8"))
 
-                        _result = httptools.downloadpage(_url, post = 'key=' + _key + '&token=' + str(_token), headers = headers).data
+                        _result = do_downloadpage(_url, post = 'key=' + _key + '&token=' + str(_token), headers = headers)
+
                         _json = jsontools.load(_result)
 
                         if _json["link"]:
                             url = base64.b64decode(_json["link"])
 
-                            if url.startswith('//') == True: url = 'https:' + url
+                            if not 'https:' in str(url): url = 'https:' + str(url)
 
                             servidor = servertools.get_server_from_url(url)
                             servidor = servertools.corregir_servidor(servidor)
@@ -384,7 +401,7 @@ def play(item):
                 for _page, _acc in matches:
                     _url = item.url[0:item.url.find("reproducir120.php")] + _page
 
-                    _result = httptools.downloadpage(_url, post = 'acc=' + _acc + '&id=' + _id + '&tk=' + _token, headers = headers)
+                    _result = do_downloadpage(_url, post = 'acc=' + _acc + '&id=' + _id + '&tk=' + _token, headers = headers)
 
                     if _result.code == 200:
                         _json = jsontools.load(_result.data)
@@ -394,7 +411,7 @@ def play(item):
                         if len(urlremoto_matches) == 1:
                             url = urlremoto_matches[0]
 
-                            if url.startswith('//') == True: url = 'https:' + url
+                            if not 'https:' in str(url): url = 'https:' + str(url)
 
                             servidor = servertools.get_server_from_url(url)
                             servidor = servertools.corregir_servidor(servidor)
@@ -424,7 +441,7 @@ def play(item):
                         if _json['urlremoto']:
                             url = _json['urlremoto']
 
-                            if url.startswith('//') == True: url = 'https:' + url
+                            if not 'https:' in str(url): url = 'https:' + str(url)
 
                             servidor = servertools.get_server_from_url(url)
                             servidor = servertools.corregir_servidor(servidor)
@@ -439,7 +456,7 @@ def play(item):
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-        if url.startswith('//') == True: url = 'https:' + url
+        if not 'https:' in str(url): url = 'https:' + str(url)
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -462,9 +479,6 @@ def search(item, texto):
             logger.error("%s" % line)
         return []
 
-
-# ~ Tools for player
-# -*- By the BDamian (Based on channels from Alfa Develop Group) -*-
 
 def set_player(secret):
     global GLBPLAYER

@@ -3029,7 +3029,7 @@ Boblight(478) is an opensource AmbiLight implementation.
   </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="2.3.2" provider-name="Balandro Team">
+<addon id="plugin.video.balandro" name="Balandro" version="2.3.6" provider-name="Balandro Team">
   <requires>
      <import addon="script.module.requests"/>
   </requires>

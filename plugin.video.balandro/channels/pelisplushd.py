@@ -7,13 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www3.pelisplushd.to/'
+host = 'https://www4.pelisplushd.to/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://pelisplushd.net/', 'https://pelisplushd.to/',
-                'https://www1.pelisplushd.to/']
+                'https://www1.pelisplushd.to/', 'https://www3.pelisplushd.to/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -334,6 +334,7 @@ def findvideos(item):
         elif 'https://pelisplushd.me' in url: url = url.replace('pelisplushd.me', 'feurl.com')
         elif 'https://pelisplushd.net/fembed.php' in url: url= url.replace('pelisplushd.net/fembed.php?url=', 'https://feurl.com/v/')
         elif (host + 'fembed.php') in url: url = url.replace(host + 'fembed.php?url=', 'https://feurl.com/v/')
+        elif 'plusto.link' in url: url = url.replace('plusto.link', 'feurl.com')
 
         if url.startswith('/'): url = host[:-1] + url
 

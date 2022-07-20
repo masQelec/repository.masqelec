@@ -84,7 +84,7 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
-        title = scrapertools.find_single_match(match, ' <h3 class="Title">(.*?)</h3>')
+        title = scrapertools.find_single_match(match, '<h3 class="Title">(.*?)</h3>')
 
         if not url or not title: continue
 
@@ -250,7 +250,12 @@ def play(item):
 
     url = item.url
 
-    if '/?trdownload=' in url: url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+    if '/?trdownload=' in url:
+        try:
+           url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+        except:
+           url = ''
+
     else:
         data = httptools.downloadpage(url).data
 

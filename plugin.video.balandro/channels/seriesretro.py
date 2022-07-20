@@ -23,6 +23,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista-series/' ))
 
+    itemlist.append(item.clone( title = 'Animación', action = 'list_all', url = host + 'category/animacion/' ))
+
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
@@ -309,6 +311,9 @@ def findvideos(item):
         elif servidor == 'anavids':
             link_other = servidor
             servidor = 'directo'
+        elif servidor == 'analu':
+            link_other = servidor
+            servidor = 'directo'
         else: link_other = ''
 
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = link_other ))
@@ -360,6 +365,9 @@ def play(item):
 
     if url:
         if url.startswith('//') == True: url = 'https:' + url
+
+        if '/www.analu.xyz/' in url:
+            return 'Servidor [COLOR plum]NO soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

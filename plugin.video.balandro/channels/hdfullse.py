@@ -9,7 +9,7 @@ from core import httptools, scrapertools, jsontools, servertools, tmdb
 from lib import balandroresolver
 
 
-host = 'https://hdfull.be'
+host = 'https://www.hdfull.app'
 
 perpage = 20
 
@@ -26,7 +26,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post = None, referer = None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://hdfull.se', 'https://hdfull.so', 'https://hdfull.fm', 'https://hdfull.cm', 'https://hdfull.gg']
+    ant_hosts = ['https://hdfull.se', 'https://hdfull.so', 'https://hdfull.fm', 'https://hdfull.cm', 'https://hdfull.gg', 'https://hdfull.be']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -51,7 +51,7 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='plum' ))
+    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'star', search_type = 'person', 
                                 plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
