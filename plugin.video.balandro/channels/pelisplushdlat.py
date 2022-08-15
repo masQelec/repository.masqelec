@@ -26,8 +26,8 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
-    itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
+    itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
     itemlist.append(item.clone( title = 'Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
 
     return itemlist
@@ -63,7 +63,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series/populares?page=', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'generos/dorama?page=', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'generos/dorama/series?page=', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -307,7 +309,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'latino': 'Lat'}
+    IDIOMAS = {'latino': 'Lat', 'subtitulado': 'Vose'}
 
     lang = 'Lat'
 
@@ -318,14 +320,16 @@ def findvideos(item):
     ses = 0
 
     for opt, url in matches:
+        if not url: continue
+
         ses += 1
 
         if '/player.moovies.in/' in url: continue
         elif 'mystream.to' in url: continue
 
         if url.startswith('/fembed.php?url='): url = url.replace('/fembed.php?url=', 'https://feurl.com/v/')
-        elif 'https://pelisplushd.me' in url: url = url.replace('pelisplushd.me', 'feurl.com')
-        elif 'https://pelisplushd.net/fembed.php' in url: url= url.replace('pelisplushd.net/fembed.php?url=', 'https://feurl.com/v/')
+        elif 'pelisplushd.lat' in url: url = url.replace('pelisplushd.lat', 'feurl.com')
+        elif 'pelisplushd.lat/fembed.php' in url: url= url.replace('pelisplushd.lat/fembed.php?url=', 'https://feurl.com/v/')
         elif (host + 'fembed.php') in url: url = url.replace(host + 'fembed.php?url=', 'https://feurl.com/v/')
         elif 'plusto.link' in url: url = url.replace('plusto.link', 'feurl.com')
 
@@ -341,7 +345,7 @@ def findvideos(item):
         if servidor == 'directo':
             link_other = scrapertools.find_single_match(data, '<a href="#option' + opt + '">(.*?)</a>')
 
-            if link_other == 'Netu' or link_other == 'Waaw' or link_other == 'Hqq': continue
+            if link_other == 'Netu' or link_other == 'NETU' or link_other == 'Waaw' or link_other == 'WAAW' or link_other == 'Hqq' or link_other == 'HQQ': continue
 
             link_other = normalize_other(link_other)
 

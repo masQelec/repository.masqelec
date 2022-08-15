@@ -105,8 +105,7 @@ def list_all(item):
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if thumb.startswith('//'):
-            thumb = 'https:' + thumb
+        if thumb.startswith('//'): thumb = 'https:' + thumb
 
         if '/serie/' in url:
             if item.search_type != 'all':
@@ -198,6 +197,7 @@ def episodios(item):
                 item.perpage = 250
 
     season = str(item.contentSeason)
+
     if season.startswith('0'): season = season.replace('0', '')
 
     for episode, info in matches:
@@ -227,7 +227,7 @@ def episodios(item):
 
         for orden, url, tit, cov, jdat, epi in tab_epis[item.page * item.perpage:]:
             itemlist.append(item.clone( action = 'findvideos', url = url, title = tit, thumbnail=cov, json_data = jdat, hash = item.hash,
-                                    orden = orden, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
+                                        orden = orden, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
 
             if len(itemlist) >= item.perpage:
                 break
@@ -264,6 +264,9 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         url = str(servertools.normalize_url(servidor, url))
+
+        url = url.replace("b'", "")
+
         url = "%s?h=%s" % (url, hash)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, title = '', language = IDIOMAS.get(lang, lang) ))

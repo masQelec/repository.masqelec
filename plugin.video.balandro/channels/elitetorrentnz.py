@@ -168,6 +168,8 @@ def list_all(item):
             if not item.search_type == 'all':
                if item.search_type == 'movie': continue
 
+            title = title.replace('&#8211;', '').replace('&#215;', ' ')
+
             if '-la-serie-s' in url: temp_epis = scrapertools.find_single_match(url, "-la-serie-s(.*?)$")
             elif '-serie-s' in url: temp_epis = scrapertools.find_single_match(url, "-serie-s(.*?)$")
             else: temp_epis = scrapertools.find_single_match(url, "-t(.*?)$")
@@ -230,12 +232,22 @@ def play(item):
     logger.info()
     itemlist = []
 
+    if item.url.startswith('/'): item.url = host[:-1] + item.url
+
     url = item.url
 
     if url.startswith('magnet:'):
         itemlist.append(item.clone( url = url, server = 'torrent' ))
 
     elif url.endswith(".torrent"):
+        data = do_downloadpage(url)
+
+        if not data:
+            return 'Archivo [COLOR red]Corrupto[/COLOR]'
+
+        if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+            return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
         itemlist.append(item.clone( url = url, server = 'torrent' ))
 
     else:

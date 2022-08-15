@@ -161,32 +161,36 @@ context_descargas.append({'title': tit, 'channel': 'actions', 'action': 'open_se
 
 def mainlist(item):
     logger.info()
-    item.category = config.__addon_name
-
     itemlist = []
+
+    item.category = config.__addon_name
 
     if config.get_setting('developer_mode', default=False):
         itemlist.append(item.clone( channel='submnuctext', action='submnu_developer', title = '[B]Desarrollo[/B]', context=context_desarrollo,
                                     thumbnail=config.get_thumb('team'), text_color='darkorange' ))
 
     if config.get_setting('mnu_search_proxy_channels', default=False):
-        itemlist.append(item.clone( channel='submnuctext', action='submnu_search', title='Buscar Nuevos Proxies', context=context_proxy_channels,
+        itemlist.append(item.clone( channel='submnuctext', action='submnu_search', title='[B]Buscar Nuevos Proxies[/B]', context=context_proxy_channels,
                                     only_options_proxies = True, thumbnail=config.get_thumb('flame'), text_color='red' ))
 
+    if config.get_setting('sub_mnu_favoritos', default=False):
+        itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search,
+                                    thumbnail=config.get_thumb('star'), text_color='plum' ))
+
     if current_month == 4:
-        itemlist.append(item.clone( channel='filmaffinitylists', action='_oscars', title='Premios Oscar ' + str(current_year), text_color='orchid',
+        itemlist.append(item.clone( channel='filmaffinitylists', action='_oscars', title='[B]Premios Oscar ' + str(current_year) + '[/B]', text_color='orchid',
                                     thumbnail=config.get_thumb('oscars'), plot = 'Las películas nominadas a los premios Oscars' ))
 
     elif current_month == 10:
-        itemlist.append(item.clone( channel='filmaffinitylists', action='_emmys', title='Premios Emmy ' + str(current_year), text_color='orchid',
+        itemlist.append(item.clone( channel='filmaffinitylists', action='_emmys', title='[B]Premios Emmy ' + str(current_year) + '[/B]', text_color='orchid',
                                     thumbnail=config.get_thumb('emmys'), plot = 'Las Series nominadas a los premios Emmy' ))
 
     elif current_month == 11:
-         itemlist.append(item.clone( channel='tmdblists', action='descubre', title='Halloween', text_color='orchid', extra = 27, search_type = 'movie',
+         itemlist.append(item.clone( channel='tmdblists', action='descubre', title='[B]Halloween[/B]', text_color='orchid', extra = 27, search_type = 'movie',
                                      thumbnail=config.get_thumb('halloween'), plot = 'Películas del género Terror' ))
 
     if config.get_setting('sub_mnu_special', default=True):
-        itemlist.append(item.clone( channel='submnuctext', action='submnu_special', title='Especiales', context=context_cfg_search,
+        itemlist.append(item.clone( channel='submnuctext', action='submnu_special', title='[B]Especiales[/B]', context=context_cfg_search,
                                     extra='all', thumbnail=config.get_thumb('heart'), text_color='pink' ))
 
     itemlist.append(Item( channel='search', action='mainlist', title='Buscar', context=context_buscar,

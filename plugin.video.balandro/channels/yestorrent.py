@@ -8,12 +8,12 @@ from core import httptools, scrapertools, servertools, tmdb
 
 from lib import decrypters
 
-host = 'http://yestorrent.org/'
+host = 'https://yestorrent.org/'
 
 
 def do_downloadpage(url, post=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://yestorrent.cx/']
+    ant_hosts = ['https://yestorrent.cx/', 'http://yestorrent.org/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

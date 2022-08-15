@@ -13,5 +13,5 @@
 
   "clusters": ["news", "rankings", "years", "countries", "lasts", "stars", "directors", "kids", "docs", "vos"],
 
-  "notes": "Peliculas por géneros, años y países. Series por Géneros."
+  "notes": "Peliculas por géneros, años y países. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

@@ -685,6 +685,28 @@ def manto_params(item):
 
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Parámetros restablecidos[/B][/COLOR]' % color_infor)
 
+def manto_textos(item):
+    logger.info()
+
+    hay_lastest = False
+
+    if config.get_setting('search_last_all', default=''): hay_lastest = True
+    elif config.get_setting('search_last_movie', default=''): hay_lastest = True
+    elif config.get_setting('search_last_tvshow', default=''): hay_lastest = True
+    elif config.get_setting('search_last_documentary', default=''): hay_lastest = True
+    elif config.get_setting('search_last_person', default=''): hay_lastest = True
+
+    if not hay_lastest:
+         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay Textos Memorizados[/COLOR][/B]' % color_alert)
+         return
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los Textos Memorizados ?[/COLOR]'):
+        config.set_setting('search_last_all', '')
+        config.set_setting('search_last_movie', '')
+        config.set_setting('search_last_tvshow', '')
+        config.set_setting('search_last_documentary', '')
+        config.set_setting('search_last_person', '')
+
 def manto_cookies(item):
     logger.info()
 
@@ -692,8 +714,8 @@ def manto_cookies(item):
 
     existe = filetools.exists(path)
     if existe == False:
-         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero de Cookies[/COLOR][/B]' % color_alert)
-         return
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero de Cookies[/COLOR][/B]' % color_alert)
+        return
 
     if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar el fichero de Cookies ?[/COLOR]'):
         filetools.remove(path)
@@ -766,8 +788,8 @@ def manto_temporales(item):
     if existe: hay_temporales = True
 
     if hay_temporales == False:
-         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros Temporales[/COLOR][/B]' % color_alert)
-         return
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros Temporales[/COLOR][/B]' % color_alert)
+        return
 
     if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los ficheros Temporales ?[/COLOR]'):
         path = os.path.join(config.get_data_path(), 'servers_todo.log')
@@ -808,8 +830,8 @@ def manto_addons_packages(item):
     if existe: hay_temporales = True
 
     if hay_temporales == False:
-         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros en Addons/Packages[/COLOR][/B]' % color_alert)
-         return
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros en Addons/Packages[/COLOR][/B]' % color_alert)
+        return
 
     if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los ficheros de Addons/Packages ?[/COLOR]'):
         filetools.rmdirtree(path)
@@ -828,8 +850,8 @@ def manto_addons_temp(item):
     if existe: hay_temporales = True
 
     if hay_temporales == False:
-         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros en Addons/Temp[/COLOR][/B]' % color_alert)
-         return
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros en Addons/Temp[/COLOR][/B]' % color_alert)
+        return
 
     if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los ficheros de Addons/Temp ?[/COLOR]'):
         filetools.rmdirtree(path)
@@ -897,7 +919,7 @@ def manto_folder_addon(item):
 
                 existe = filetools.exists(path)
                 if existe:
-                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]settings.xml[/B][/COLOR]', '[COLOR red][B][I]Imposible Eliminar su fichero de Configuración/Ajustes. Está Bloqueado por su Sistema Media Center[/I][/B][/COLOR]', '[COLOR cyan][B]Por favor, Eliminelo manualmente en la ruta [/B][/COLOR][COLOR yellow][B].../.kodi/userdata/plugin.video.balandro[/B][/COLOR]')
+                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]settings.xml[/B][/COLOR]', '[COLOR red][B][I]Imposible Eliminar su fichero de Configuración/Ajustes. Está Bloqueado por su Sistema Media Center[/I][/B][/COLOR]', '[COLOR cyan][B]Por favor, Eliminelo manualmente en la ruta [/B][/COLOR][COLOR yellow][B].../.kodi/userdata/plugin.video.balandro[/B][/COLOR]')
             except:
                 pass
 

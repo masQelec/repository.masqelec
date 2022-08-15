@@ -13,5 +13,5 @@
 
   "clusters": ["rankings"],
 
-  "notes": "Películas en español."
+  "notes": "Películas en español. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

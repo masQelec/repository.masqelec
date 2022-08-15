@@ -9,13 +9,13 @@ from core import httptools, scrapertools, servertools, tmdb
 from lib import decrypters
 
 
-host = 'https://ww22.mejortorrent.ma/'
+host = 'https://mejortorrent.ma/'
 
 
 def do_downloadpage(url, post=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://mejortorrent.la/', 'https://mejortorrent.si/',
-                 'https://www10.mejortorrent.ma/']
+                 'https://www10.mejortorrent.ma/', 'https://ww22.mejortorrent.ma/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -179,9 +179,11 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
-    if next_page_link:
-        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page_link, text_color='coral' ))
+    if itemlist:
+        next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
+
+        if next_page_link:
+            itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page_link, text_color='coral' ))
 
     return itemlist
 
@@ -253,6 +255,8 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not item.url: return itemlist
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)

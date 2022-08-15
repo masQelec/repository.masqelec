@@ -3,7 +3,7 @@
   "name": "PelisFlix",
   "thumbnail": "pelisflix.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["years", "producers", "vos"],
+  "clusters": ["producers", "vos"],
 
-  "notes": "WEB CERRADA. Películas por géneros, año y tambien Series"
+  "notes": "Películas por géneros. También Series"
 }

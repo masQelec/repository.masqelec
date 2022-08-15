@@ -56,8 +56,8 @@ def list_all(item):
 
     for video_id, thumb, title in matches:
         url = 'https://daftsex.com/watch/%s' % (video_id)
-        itemlist.append(item.clone( action = 'findvideos', url = url,
-                                    title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<li><a href="([^"]+)" title="Next page"')

@@ -27,13 +27,6 @@ from slyguy.router import add_url_args
 
 from .language import _
 
-PORT = check_port(DEFAULT_PORT)
-if not PORT:
-    PORT = check_port()
-
-PROXY_PATH = 'http://{}:{}/'.format(HOST, PORT)
-settings.set('_proxy_path', PROXY_PATH)
-
 CODECS = [
     ['avc', 'H.264'],
     ['hvc', 'H.265'],
@@ -119,15 +112,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         url = self.path.lstrip('/').strip('\\')
         log.debug('{} IN: {}'.format(method, url))
 
-        self._headers = {}
-        for header in self.headers:
-            if header.lower() not in REMOVE_IN_HEADERS:
-                self._headers[header.lower()] = self.headers[header]
-
-        length = int(self._headers.get('content-length', 0))
-        self._post_data = self.rfile.read(length) if length else None
-
         self._session = PROXY_GLOBAL['session']
+        self.proxy_path = 'http://{}/'.format(self.headers.get('Host'))
 
         try:
             proxy_data = json.loads(get_kodi_string('_slyguy_quality'))
@@ -140,6 +126,22 @@ class RequestHandler(BaseHTTPRequestHandler):
             pass
 
         PROXY_GLOBAL['session'] = self._session
+
+        self._headers = {}
+        for header in self.headers:
+            if header.lower() == 'referer':
+                # Remove referer header from redirects (fixed in Kodi 19+)
+                if self._session.get('redirecting'):
+                    continue
+                # Remove proxy path from start of referer header
+                elif self.headers[header].startswith(self.proxy_path):
+                    self.headers[header] = self.headers[header][len(self.proxy_path):]
+
+            if header.lower() not in REMOVE_IN_HEADERS:
+                self._headers[header.lower()] = self.headers[header]
+
+        length = int(self._headers.get('content-length', 0))
+        self._post_data = self.rfile.read(length) if length else None
 
         url = self._session.get('path_subs', {}).get(url) or url
 
@@ -219,13 +221,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         try:
             response = self._proxy_request('GET', url)
 
+            if not self._session.get('type') and url == manifest:
+                if response.headers.get('content-type') == 'application/x-mpegURL':
+                    self._session['type'] = 'm3u8'
+                elif response.headers.get('content-type') == 'application/dash+xml':
+                    self._session['type'] = 'mpd'
+
             if self._session.get('redirecting') or not self._session.get('type') or not manifest or int(response.headers.get('content-length', 0)) > 1000000:
                 self._output_response(response)
                 return
 
             parse = urlparse(self.path.lower())
 
-            if self._session.get('type') == 'm3u8' and (url == manifest or parse.path.endswith('.m3u') or parse.path.endswith('.m3u8')):
+            if self._session.get('type') == 'm3u8' and (url == manifest or parse.path.endswith('.m3u') or parse.path.endswith('.m3u8') or response.headers.get('content-type') == 'application/x-mpegURL'):
                 self._parse_m3u8(response)
 
             elif self._session.get('type') == 'mpd' and url == manifest:
@@ -237,19 +245,18 @@ class RequestHandler(BaseHTTPRequestHandler):
             def output_error(url):
                 response.status_code = 200
                 if self._session.get('type') == 'm3u8':
-                    response.stream.content = '#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-INDEPENDENT-SEGMENTS\n#EXT-X-STREAM-INF:BANDWIDTH=1\n{}'.format(
-                        PROXY_PATH+url).encode('utf8')
+                    response.stream.content = '#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-INDEPENDENT-SEGMENTS\n#EXT-X-STREAM-INF:BANDWIDTH=1\n{}'.format(url).encode('utf8')
 
                 elif self._session.get('type') == 'mpd':
                     response.stream.content = '<MPD><Period><AdaptationSet id="1" contentType="video" mimeType="video/mp4"><SegmentTemplate initialization="{}" media="{}" startNumber="1"><SegmentTimeline><S d="540000" r="1" t="263007000000"/></SegmentTimeline></SegmentTemplate><Representation bandwidth="300000" codecs="avc1.42001e" frameRate="25" height="224" id="videosd-400x224" sar="224:225" scanType="progressive" width="400"></Representation></AdaptationSet></Period></MPD>'.format(
-                        PROXY_PATH+url, PROXY_PATH).encode('utf8')
+                        url, self.proxy_path).encode('utf8')
 
             if self._session.get('type') in ('m3u8', 'mpd'):
                 if type(e) == Exit:
-                    output_error(PROXY_PATH+STOP_URL)
+                    output_error(self.proxy_path+STOP_URL)
 
                 elif url == manifest:
-                    output_error(PROXY_PATH+ERROR_URL)
+                    output_error(self.proxy_path+ERROR_URL)
         else:
             if url == manifest:
                 PROXY_GLOBAL['error_count'] = 0
@@ -314,6 +321,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             return _(_.QUALITY_BITRATE, bandwidth=int((stream['bandwidth']/10000.0))/100.00, resolution=stream['resolution'], fps=fps, codecs=codec_string.strip()).replace('  ', ' ')
 
         if self._session.get('selected_quality') is not None:
+            if self._session['selected_quality'] == QUALITY_EXIT:
+                raise Exit('Cancelled quality select')
+
             if self._session['selected_quality'] in (QUALITY_DISABLED, QUALITY_SKIP):
                 return None
             else:
@@ -352,6 +362,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             index = gui.select(_.PLAYBACK_QUALITY, labels, preselect=default, autoclose=5000)
             if index < 0:
+                self._session['selected_quality'] = QUALITY_EXIT
                 raise Exit('Cancelled quality select')
 
             quality = values[index]
@@ -490,6 +501,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                             adap_set.removeChild(stream)
                             new_set = adap_set.cloneNode(deep=True)
 
+                            new_set.setAttribute('name', 'ATMOS')
                             new_set.setAttribute('id', '{}-atmos'.format(attribs.get('id','')))
                             new_set.setAttribute('lang', _(_.ATMOS, name=attribs.get('lang','')))
 
@@ -561,11 +573,17 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         overwrite_subs = self._session.get('subtitles') or []
 
+        def is_subs(adap_set):
+            return adap_set.getAttribute('contentType').lower() == 'text' or adap_set.getAttribute('mimeType').lower().startswith('text/')
+
+        def is_audio(adap_set):
+            return adap_set.getAttribute('contentType').lower() == 'audio' or adap_set.getAttribute('mimeType').lower().startswith('audio/')
+
         ## Insert subtitles
         if overwrite_subs and adap_parent:
             # remove all built-in subs
             for adap_set in root.getElementsByTagName('AdaptationSet'):
-                if adap_set.getAttribute('contentType') == 'text':
+                if is_subs(adap_set):
                     adap_set.parentNode.removeChild(adap_set)
 
             # add our subs
@@ -608,7 +626,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             adap_set.setAttribute('lang', fix_language(language))
 
-            if adap_set.getAttribute('contentType') == 'audio':
+            if is_audio(adap_set):
                 if not lang_allowed(language, audio_whitelist):
                     adap_set.parentNode.removeChild(adap_set)
                     log.debug('Removed audio adapt set: {}'.format(adap_set.getAttribute('id')))
@@ -622,13 +640,26 @@ class RequestHandler(BaseHTTPRequestHandler):
                     default_languages.append(language)
                     adap_set.removeAttribute('default')
 
+                is_audio_description = any([elem for elem in adap_set.getElementsByTagName('Accessibility') if elem.getAttribute('schemeIdUri') == 'urn:tva:metadata:cs:AudioPurposeCS:2007'])
+                #any([elem for elem in adap_set.getElementsByTagName('Role') if elem.getAttribute('schemeIdUri') == 'urn:mpeg:dash:role:2011' and elem.getAttribute('value') == 'description'])
+                if is_audio_description:
+                    if not audio_description:
+                        log.debug('Removed audio description adapt set: {}'.format(adap_set.getAttribute('id')))
+                        adap_set.parentNode.removeChild(adap_set)
+                        continue
+                    else:
+                        adap_set.setAttribute('impaired', 'true')
+
                 audios.append([language, adap_set])
 
-            if adap_set.getAttribute('contentType') == 'text':
+            elif is_subs(adap_set):
                 if not lang_allowed(language, subs_whitelist):
                     adap_set.parentNode.removeChild(adap_set)
                     log.debug('Removed subtitle adapt set: {}'.format(adap_set.getAttribute('id')))
                     continue
+
+                if lang_allowed(language, [original_language]):
+                    adap_set.setAttribute('original', 'true')
 
                 default = adap_set.getAttribute('default')
                 if default == 'true':
@@ -658,16 +689,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         set_default_laguage(default_subtitles, subs)
         ################
 
-        ## Remove audio_description
-        if not audio_description:
-            for row in audio_sets:
-                for elem in row[1].getElementsByTagName('Accessibility'):
-                    if elem.getAttribute('schemeIdUri') == 'urn:tva:metadata:cs:AudioPurposeCS:2007':
-                        row[2].removeChild(row[1])
-                        log.debug('Removed audio description adapt set: {}'.format(row[1].getAttribute('id')))
-                        break
-        ############
-
         ## Convert BaseURLS
         base_url_parents = []
         for elem in root.getElementsByTagName('BaseURL'):
@@ -682,7 +703,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 url = urljoin(response.url, url)
 
             if '://' in url:
-                elem.firstChild.nodeValue = PROXY_PATH + url
+                elem.firstChild.nodeValue = self.proxy_path + url
 
             base_url_parents.append(elem.parentNode)
         ################
@@ -708,7 +729,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 url = e.getAttribute(attrib)
                 if '://' in url:
-                    e.setAttribute(attrib, PROXY_PATH + url)
+                    e.setAttribute(attrib, self.proxy_path + url)
                 else:
                     ## Fixed with https://github.com/xbmc/inputstream.adaptive/pull/606
                     base_url = get_parent_node(e, 'BaseURL')
@@ -780,25 +801,13 @@ class RequestHandler(BaseHTTPRequestHandler):
                             line = params[key]
                             log.debug('M3U8 Fix: Beacon removed')
 
+            # Remove sample-aes apple streaming
+            # See https://github.com/xbmc/inputstream.adaptive/issues/1007
+            elif 'com.apple.streamingkeydelivery' in line and 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed' in m3u8:
+                log.debug('Removed com.apple.streamingkeydelivery EXT-X-KEY')
+                continue
+
             lines.append(line)
-
-        # # bad playlist test
-        # if ADDON_DEV:
-        #     error_every = 5
-        #     error_repeat = 2
-
-        #     self._session['count'] = self._session.get('count', 0) + 1
-        #     print(self._session['count'])
-        #     if self._session['count'] >= error_every:
-        #         if self._session['count'] == error_every + error_repeat - 1:
-        #             self._session['count'] = 0
-        #         segments = segments[:int(len(segments)/2)]
-
-        self._session['m3u8_last_lines'] = self._session.get('m3u8_last_lines', {})
-        if url in self._session['m3u8_last_lines'] and self._session['m3u8_last_lines'][url] not in segments:
-            raise Exception('Invalid M3U8 refresh. Could not find previous segment in playlist')
-
-        self._session['m3u8_last_lines'][url] = segments[-1]
 
         return '\n'.join(lines)
 
@@ -851,9 +860,12 @@ class RequestHandler(BaseHTTPRequestHandler):
                     continue
 
                 language = attribs.get('LANGUAGE','')
-                attribs['LANGUAGE'] = fix_language(language)
 
                 if attribs.get('TYPE') == 'AUDIO' and lang_allowed(language, audio_whitelist):
+                    # not yet supported (https://github.com/xbmc/inputstream.adaptive/issues/1021)
+                    # if lang_allowed(language, [original_language]):
+                    #     attribs['ORIGINAL'] = 'YES'
+
                     audios.append(attribs)
                     if attribs.get('DEFAULT') == 'YES':
                         attribs['DEFAULT'] = 'NO'
@@ -923,6 +935,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             new_line = '#EXT-X-MEDIA:' if attribs else ''
             for key in attribs:
+                if key == 'LANGUAGE':
+                    attribs[key] = fix_language(attribs[key])
                 if attribs[key] is not None:
                     new_line += u'{}="{}",'.format(key, attribs[key])
             new_lines.append(new_line.rstrip(','))
@@ -936,6 +950,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             new_line = '#EXT-X-MEDIA:' if attribs else ''
             for key in attribs:
+                if key == 'LANGUAGE':
+                    attribs[key] = fix_language(attribs[key])
                 if attribs[key] is not None:
                     new_line += u'{}="{}",'.format(key, attribs[key])
             new_lines.append(new_line.rstrip(','))
@@ -994,7 +1010,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         m3u8 = re.sub(r'URI="/', r'URI="{}'.format(base_url), m3u8, flags=re.I|re.M)
 
         ## Convert to proxy paths
-        m3u8 = re.sub(r'(https?)://', r'{}\1://'.format(PROXY_PATH), m3u8, flags=re.I)
+        m3u8 = re.sub(r'(https?)://', r'{}\1://'.format(self.proxy_path), m3u8, flags=re.I)
 
         m3u8 = m3u8.encode('utf8')
 
@@ -1033,6 +1049,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._session['session'] = RawSession(verify=self._session.get('verify'), timeout=self._session.get('timeout'))
             self._session['session'].set_dns_rewrites(self._session.get('dns_rewrites', []))
             self._session['session'].set_proxy(self._session.get('proxy_server'))
+            self._session['session'].set_cert(self._session.get('cert'))
         else:
             self._session['session'].headers.clear()
             #self._session['session'].cookies.clear() #lets handle cookies in session
@@ -1072,7 +1089,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             self._session['redirecting'] = True
             self._update_urls(url, response.headers['location'])
-            response.headers['location'] = PROXY_PATH + response.headers['location']
+            response.headers['location'] = self.proxy_path + response.headers['location']
             response.stream.content = b''
 
         if 'set-cookie' in response.headers:
@@ -1175,12 +1192,21 @@ class Proxy(object):
         if self.started:
             return
 
-        self._server = ThreadedHTTPServer((HOST, PORT), RequestHandler)
+        settings.set('_proxy_path', '')
+
+        port = check_port(DEFAULT_PORT)
+        if not port:
+            port = check_port()
+
+        self._server = ThreadedHTTPServer((HOST, port), RequestHandler)
         self._server.allow_reuse_address = True
         self._httpd_thread = threading.Thread(target=self._server.serve_forever)
         self._httpd_thread.start()
         self.started = True
-        log.info("Proxy Started: {}:{}".format(HOST, PORT))
+
+        proxy_path = 'http://{}:{}/'.format(HOST, port)
+        settings.set('_proxy_path', proxy_path)
+        log.info("Proxy Started: {}".format(proxy_path))
 
     def stop(self):
         if not self.started:
@@ -1191,4 +1217,5 @@ class Proxy(object):
         self._server.socket.close()
         self._httpd_thread.join()
         self.started = False
+        settings.set('_proxy_path', '')
         log.debug("Proxy: Stopped")

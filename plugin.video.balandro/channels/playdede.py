@@ -412,7 +412,7 @@ def plataformas(item):
     data = do_downloadpage(url)
     data = re.sub('\\n|\\r|\\t|\\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<li class="cfilter single-network.*?data-value="(.*?)".*?<img src="(.*?)"').findall(data)
+    matches = re.compile('data-network="(.*?)".*?<img src="(.*?)"').findall(data)
 
     for id_network, thumb in matches:
         title = scrapertools.find_single_match(thumb, '/network/(.*?).png')
@@ -841,7 +841,7 @@ def findvideos(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     # ~ Reproductor
-    patron = '<div class="playerItem.*?data-lang="(.*?)" data-loadPlayer="(.*?)".*?<h3>(.*?)</h3>.*?">Calidad:.*?">(.*?)</span>'
+    patron = '<div class="playerItem.*?data-lang="(.*?)".*?data-loadPlayer="(.*?)".*?<h3>(.*?)</h3>.*?">Calidad:.*?">(.*?)</span>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
@@ -849,6 +849,8 @@ def findvideos(item):
 
     for lang, sid, server, qlty in matches:
         ses += 1
+
+        if server == 'alternativo': continue
 
         if not server or not sid: continue
 
@@ -862,10 +864,12 @@ def findvideos(item):
     # ~ Enlaces
     bloque = scrapertools.find_single_match(data, '<div class="linkSorter">(.*?)<div class="contEP contepID_3">')
 
-    matches = re.compile('data-quality="(.*?)" data-lang="(.*?)".*?href="(.*?)".*?<span>.*?">(.*?)</b>', re.DOTALL).findall(bloque)
+    matches = re.compile('data-quality="(.*?)".*?data-lang="(.*?)".*?href="(.*?)".*?<span>.*?">(.*?)</b>', re.DOTALL).findall(bloque)
 
     for qlty, lang, url, server in matches:
         ses += 1
+
+        if server == 'alternativo': continue
 
         if not url or not server: continue
 
@@ -879,7 +883,7 @@ def findvideos(item):
     # ~ Descargas
     bloque = scrapertools.find_single_match(data, '<div class="contEP contepID_3">(.*?)$')
 
-    matches = re.compile('data-quality="(.*?)" data-lang="(.*?)".*?href="(.*?)".*?<span>.*?">(.*?)</b>', re.DOTALL).findall(bloque)
+    matches = re.compile('data-quality="(.*?)"data-lang="(.*?)".*?href="(.*?)".*?<span>.*?">(.*?)</b>', re.DOTALL).findall(bloque)
 
     for qlty, lang, url, server in matches:
         ses += 1

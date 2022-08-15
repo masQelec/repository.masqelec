@@ -8,7 +8,7 @@ if PY3: unicode = str
 
 import re
 
-from platformcode import config, logger, platformtools
+from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 

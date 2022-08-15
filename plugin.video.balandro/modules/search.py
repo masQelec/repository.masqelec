@@ -87,6 +87,10 @@ def mainlist(item):
     itemlist.append(item.clone( action='show_help_parameters', title=' - Qué [COLOR chocolate]Ajustes[/COLOR] tiene configurados para las búsquedas',
                                 thumbnail=config.get_thumb('help') ))
 
+    if config.get_setting('search_show_last', default=True):
+        itemlist.append(item.clone( channel='actions', action = 'manto_textos', title= ' - Quitar los [COLOR red]Textos Memorizados[/COLOR] de las búsquedas',
+                                    thumbnail=config.get_thumb('settings') ))
+
     itemlist.append(item.clone( channel='filters', action='no_actives', title= ' - Qué canales no intervienen en las búsquedas (están desactivados)',
                                 thumbnail=config.get_thumb('stack') ))
 

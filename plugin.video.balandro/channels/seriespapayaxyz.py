@@ -23,6 +23,16 @@ notification_d_ok = config.get_setting('notification_d_ok', default=True)
 color_adver = config.get_setting('notification_adver_color', default='violet')
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://seriespapaya.xyz/']
@@ -32,7 +42,8 @@ def do_downloadpage(url, post=None, headers=None):
 
     headers = {'Referer': host}
 
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
@@ -40,7 +51,8 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                data = httptools.downloadpage(url, post=post, headers=headers).data
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+                data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers).data
         except:
             pass
 
@@ -50,6 +62,8 @@ def do_downloadpage(url, post=None, headers=None):
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -63,9 +77,11 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item_configurar_proxies(item))
+
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title='Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -79,9 +95,11 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item_configurar_proxies(item))
+
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title='Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -458,13 +476,15 @@ def play(item):
 
         url = ''
 
-        resp = httptools.downloadpage(item.url, follow_redirects=False, headers=headers)
+        # ~ resp = httptools.downloadpage(item.url, follow_redirects=False, headers=headers)
+        resp = httptools.downloadpage_proxy('seriespapayaxyz', item.url, follow_redirects=False, headers=headers)
         if 'location' in resp.headers: 
             url = resp.headers['location']
 
         if not url:
             headers = {'Referer': host, 'Connection': 'keep-alive'}
-            data = httptools.downloadpage(item.url, headers=headers).data
+            # ~ data = httptools.downloadpage(item.url, headers=headers).data
+            data = httptools.downloadpage_proxy('seriespapayaxyz', item.url, headers=headers).data
 
             url = scrapertools.find_single_match(data, 'src="(.*?)"')
             if not url: url = scrapertools.find_single_match(data, 'SRC="(.*?)"')

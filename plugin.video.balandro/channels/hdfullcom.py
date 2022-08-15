@@ -12,7 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.fullhd.wtf/'
+host = 'https://www.hdfull.bio/'
 
 
 # ~ 23/5/2022 Solo funciona en k19 el resto salta CloudFlare
@@ -34,7 +34,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.hd-full.com/', 'https://www.hdfull-v1.com/']
+    ant_hosts = ['https://www.hd-full.com/', 'https://www.hdfull-v1.com/', 'https://www.fullhd.wtf/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

@@ -8,6 +8,8 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
+    dom = scrapertools.find_single_match(page_url, "(https://[^/]+)")
+
     page_url = page_url.replace('/api/source/', '/f/')
 
     page_url = page_url.replace('/fembeder.com/', '/www.fembed.com/').replace('/divload.com/', '/www.fembed.com/').replace('/ilovefembed.best/', '/www.fembed.com/').replace('/myurlshort.live/', '/www.fembed.com/')
@@ -29,15 +31,16 @@ def get_video_url(page_url, url_referer=''):
     elif 'fembad.org' in page_url:
         page_url = page_url.replace('/www.fembad.org/', '/diasfem.com/').replace('/fembad.org/', '/diasfem.com/')
 
+    elif 'owodeuwu.xyz' in page_url:
+        page_url = page_url.replace('/www.owodeuwu.xyz/', '/diasfem.com/').replace('/owodeuwu.xyz/', '/diasfem.com/')
+
     elif 'hlshd.xyz' in page_url:
         page_url = page_url.replace('/www.hlshd.xyz/', '/diasfem.com/').replace('/hlshd.xyz/', '/diasfem.com/')
 
-    dom = scrapertools.find_single_match(page_url, "(https://[^/]+)")
-
     vid = scrapertools.find_single_match(page_url, "/(?:v|f)/([A-z0-9_-]+)")
-    if not vid or not dom: return video_urls
+    if not vid: return video_urls
 
-    post = "r=&d=feurl.com"
+    post = 'r=&d=feurl.com'
 
     data = httptools.downloadpage('https://www.fembed.com/api/source/' + vid, post=post).data
 
@@ -45,7 +48,21 @@ def get_video_url(page_url, url_referer=''):
         data = jsontools.load(data)
 
         if 'data' not in data or 'success' not in data: return 'Vídeo no encontrado'
-        if not data['success']: return 'Vídeo no encontrado o eliminado'
+
+        if not data['success']:
+            if not dom: return 'Vídeo no encontrado o eliminado'
+
+            post = {'r': '', 'd': dom.replace('https://', '')}
+            data = httptools.downloadpage(dom +'/api/source/'+ vid, post=post).data
+
+            try:
+                data = jsontools.load(data)
+
+                if 'data' not in data or 'success' not in data: return 'Vídeo no encontrado'
+
+                if not data['success']: return 'Vídeo no encontrado o eliminado'
+            except:
+                return video_urls
 
         for videos in data['data']:
             if 'file' in videos:

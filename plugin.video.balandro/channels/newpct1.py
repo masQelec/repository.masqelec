@@ -12,7 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://atomohd.pl/'
+host = 'https://atomohd.cc/'
 
 
 clon_name = 'Atomix'
@@ -54,7 +54,8 @@ def do_downloadpage(item, url, post=None, headers=None):
                  'https://maxitorrent.com/',
                  'https://atomixhq.com/', 'https://atomixhq.one/', 'https://atomixhq.net/', 'https://atomixhq.top/', 'https://atomixhq.art/', 'https://atomixhq.link/', 'https://atomixhq.club/',
                  'https://nucleohd.com/', 'https://atomixhq.tel/', 'https://atomixhq.xyz/',
-                 'https://atomohd.com/', 'https://atomohd.net/', 'https://atomohd.org/', 'https://atomohd.xyz/', 'https://atomohd.life/', 'https://atomohd.art/', 'https://atomohd.top/', 'https://atomohd.one/', 'https://atomohd.tel/']
+                 'https://atomohd.com/', 'https://atomohd.net/', 'https://atomohd.org/', 'https://atomohd.xyz/', 'https://atomohd.life/', 'https://atomohd.art/', 'https://atomohd.top/',
+                 'https://atomohd.one/', 'https://atomohd.tel/', 'https://atomohd.pl/', 'https://atomohd.link/', 'https://atomohd.in/', 'https://atomohd.re/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -440,6 +441,9 @@ def findvideos(item):
     url = scrapertools.find_single_match(data, 'window.location.href.*?"(.*?)"')
 
     if not 'descargas2020' in item.url:
+        if url:
+            if url.startswith('//'): url = 'https:' + url
+
         uri = 'https://atomtt.com/to.php'
         tid = scrapertools.find_single_match(url, 'atomtt.com/t_download/([^/]+)/.*?')
         # ~ logger.info("check-NewPct1-Tid: %s" % tid)
@@ -449,6 +453,7 @@ def findvideos(item):
 
             # ~ HTTP Error 403: Forbidden
             dat2 = do_downloadpage(item, uri, post={'t': tid}, headers={'Referer': item.url})
+
             if len(dat2) > 1000: dat2 = ''
             # ~ logger.info("check-NewPct1-Dat2: %s" % dat2)
 

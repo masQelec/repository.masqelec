@@ -40,7 +40,7 @@ def get_video_url(page_url, url_referer=''):
 
     video_urls = []
 
-    page_url = page_url.replace('/uptobox/', '/uptobox.com/')
+    page_url = page_url.replace('/uptobox/', '/uptobox.com/').replace('/uptostream/', '/uptostream.com/')
 
     vid = scrapertools.find_single_match(page_url, "(?:uptobox.com/|uptostream.com/)(?:iframe/|)([A-z0-9]+)")
     if not vid: return video_urls

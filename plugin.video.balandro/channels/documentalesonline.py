@@ -96,6 +96,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title = title.replace('&#8230;', '').replace('&#8211;', '')
+
         thumb = scrapertools.find_single_match(article, 'itemprop="image".*?data-src="(.*?)"')
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<p>(.*?)</p>'))
 
@@ -128,6 +130,8 @@ def list_top(item):
 
     for url, title in matches[item.page * perpage:]:
         title = title.split("<")[0]
+
+        title = title.replace('&#8230;', '').replace('&#8211;', '')
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
@@ -169,7 +173,7 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(http[^"]+)')
+    matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
     ses = 0
 

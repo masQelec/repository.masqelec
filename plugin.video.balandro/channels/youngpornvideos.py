@@ -7,7 +7,18 @@ from core.item import Item
 from core import httptools, scrapertools
 
 
-host = 'https://www.youngpornvideos.com/'
+host = 'https://www.teenpornvideos.com/'
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.youngpornvideos.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+    return data
 
 
 def mainlist(item):
@@ -49,7 +60,7 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
     if item.group == 'canales':
@@ -74,7 +85,7 @@ def pornstars(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
     data = scrapertools.find_single_match(data, '<div id="straightcat" class="thumb-list ac"(.*?)<!-- alphabetical -->')
@@ -91,7 +102,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
     patron = '<div class="thumb-ratio">.*?<a href="(.*?)".*?src="(.*?)".*?alt="(.*?)"'
@@ -99,7 +110,8 @@ def list_all(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
 
     for url, thumb, title in matches:
-        itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title) )
+        itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie',
+                                    contentTitle = title, contentExtra='adults') )
 
     if itemlist:
         bloque = scrapertools.find_single_match(data,'<div class="pagination _767p">(.*?)<div class="pagination _768plus">')
@@ -121,12 +133,12 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     m3u = scrapertools.find_single_match(data, 'file: "([^"]+)"')
 
     if m3u:
-        data = httptools.downloadpage(m3u).data
+        data = do_downloadpage(m3u)
 
         matches = re.compile('RESOLUTION=\d+x(\d+),.*?(index-.*?).m3u8', re.DOTALL).findall(data)
 

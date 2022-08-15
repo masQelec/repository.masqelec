@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["movie"],
-  "language": ["lat", "vose"],
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
 
-  "clusters": ["news", "years", "kids", "docs", "vos"],
+  "clusters": ["lists", "kids", "docs", "vos"],
 
-  "notes": "Películas por géneros, año."
+  "notes": "Películas por géneros, año. También Series"
 }

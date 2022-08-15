@@ -20,9 +20,11 @@ def get_video_url(page_url, url_referer=''):
 
     data = resp.data
 
-    sub_server = scrapertools.find_single_match(data, 'file:\s?"([^"]+)"')
+    sub_server = scrapertools.find_single_match(data, 'file.*?"(.*?)"')
+	
     if sub_server:
-        vid_id = scrapertools.find_single_match(data, 'var session\s?=\s?"([^"]+)"')
+        vid_id = scrapertools.find_single_match(data, 'var sesz=.*?"(.*?)"')
+		
         if vid_id:
             media_url = sub_server + vid_id
 

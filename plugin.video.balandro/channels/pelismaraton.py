@@ -9,6 +9,16 @@ from core import httptools, scrapertools, servertools, tmdb
 host = "https://pelismaraton.me/"
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://pelismaraton.com/']
@@ -23,7 +33,8 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     if '/pelicula-año/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('pelismaraton', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -31,6 +42,8 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -43,6 +56,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -57,6 +72,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -295,7 +312,8 @@ def play(item):
         url = scrapertools.find_single_match(data, '<a id="DownloadScript".*?href="(.*?)"')
 
     elif item.url.startswith(host):
-        url = httptools.downloadpage(item.url, follow_redirects=False).headers['location']
+        # ~ url = httptools.downloadpage(item.url, follow_redirects=False).headers['location']
+        url = httptools.downloadpage_proxy('pelismaraton', item.url, follow_redirects=False).headers['location']
 
     if url:
        servidor = servertools.get_server_from_url(url)

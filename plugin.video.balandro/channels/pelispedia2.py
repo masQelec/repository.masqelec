@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www3.pelispedia.wtf/'
+host = 'https://www.pelispedia.bio/'
 
 
 def item_configurar_proxies(item):
@@ -22,7 +22,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.pelispedia-v1.wtf/', 'https://www.pelispedia-v2.wtf/']
+    ant_hosts = ['https://www.pelispedia-v1.wtf/', 'https://www.pelispedia-v2.wtf/', 'https://www3.pelispedia.wtf/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -72,11 +72,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-pelicula-2/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_new', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'category/cartelera/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'category/destacadas/', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Sagas', action = 'list_sag', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'category/cartelera/destacados/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -94,9 +92,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie-2/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Episodios recientes', action = 'list_epis', url = host + 'ver-episodios-online/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Episodios recientes', action = 'list_epis', url = host + 'ver-episodios/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'category/destacadas/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'category/cartelera/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'category/cartelera/series-en-emision/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'category/cartelera/destacados/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -115,13 +117,14 @@ def generos(item):
 
     for url, title in matches:
         if title == 'Destacadas': continue
+        elif title == 'Cartelera': continue
 
         if title == 'Reality':
             if item.search_type == 'movie': continue
 
         itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda it: it.title)
 
 
 def anios(item):
@@ -133,44 +136,6 @@ def anios(item):
 
     for x in range(current_year, 1932, -1):
         itemlist.append(item.clone( title = str(x), url = host + 'release/' + str(x) + '/', action = 'list_all' ))
-
-    return itemlist
-
-
-def list_new(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(host)
-
-    bloque = scrapertools.find_single_match(data, '>Peliculas<(.*?)</ul>')
-
-    matches = scrapertools.find_multiple_matches(bloque, '<a title="(.*?)".*?href="(.*?)"')
-
-    for title, url in matches:
-        title = title.capitalize()
-
-        if not url.startswith("http"): url = host + url[1:]
-
-        itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
-
-    return itemlist
-
-
-def list_sag(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(host)
-
-    bloque = scrapertools.find_single_match(data, '>Sagas<(.*?)</ul>')
-
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
-
-    for url, title in matches:
-        if not url.startswith("http"): url = host + url[1:]
-
-        itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
 
     return itemlist
 
@@ -196,12 +161,16 @@ def list_epis(item):
 
         title = scrapertools.find_single_match(match, '<h2 class="entry-title">(.*?)</h2>')
 
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+
+        if thumb.startswith('//'): thumb = 'https:' + thumb
+
         temp_epis = scrapertools.find_single_match(match, '<span class="num-epi">(.*?)</span>')
 
         season = scrapertools.find_single_match(temp_epis, '(.*?)x')
         episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, contentSerieName=title,
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail = thumb, contentSerieName=title,
                                     contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
 
         if len(itemlist) >= perpage:

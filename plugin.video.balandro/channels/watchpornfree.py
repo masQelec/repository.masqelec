@@ -86,18 +86,17 @@ def list_all(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    patron = '<article class="TPost B">.*?<a href="(.*?)">.*?src="(.*?)".*?<div class="Title">(.*?)</div>'
+    patron = '<article class="TPost B">.*?<a href="(.*?)">.*?data-lazy-src="(.*?)".*?<div class="Title">(.*?)</div>'
 
     matches = re.compile(patron,re.DOTALL).findall(data)
 
     num_matches = len(matches)
 
     for url, thumb, title in matches[item.page * perpage:]:
-        thumb = thumb + '|User-Agent=Mozilla/5.0'
-
         if len(itemlist) >= perpage: break
 
-        itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title) )
+        itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie',
+                                    contentTitle = title, contentExtra='adults') )
 
     buscar_next = True
     if num_matches > perpage:

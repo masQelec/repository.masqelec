@@ -9,7 +9,11 @@
     "patterns": [
       {
         "pattern": "gamovideo.com/(?:embed-|)([a-z0-9]+)",
-        "url": "http://gamovideo.com/\\1"
+        "url": "https://gamovideo.net/\\1"
+      },
+      {
+        "pattern": "gamovideo.net/(?:embed-|)([a-z0-9]+)",
+        "url": "https://gamovideo.net/\\1"
       }
     ]
   }

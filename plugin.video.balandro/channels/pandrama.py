@@ -163,8 +163,8 @@ def episodios(item):
     if item.page == 0: episode = 0
     else: episode = (item.page * item.perpage) + 1
 
-    bloque_color1 = scrapertools.find_single_match(data, '<div class="play_list_box hide show">.*?<div class="player_infotip">.*?Servidor.*?<div id="playlistbox"(.*?)</ul>')
-    bloque_color2 = scrapertools.find_single_match(data, '<div class="play_list_box hide ">.*?<div class="player_infotip">.*?Servidor.*?<div id="playlistbox"(.*?)</ul>')
+    bloque_color1 = scrapertools.find_single_match(data, '<div class="play_list_box hide show">.*?<div class="player_infotip">.*?Servidor(.*?)</ul>')
+    bloque_color2 = scrapertools.find_single_match(data, '<div class="play_list_box hide ">.*?<div class="player_infotip">.*?Servidor(.*?)</ul>')
 
     bloques = bloque_color1 + bloque_color2
 
@@ -250,6 +250,8 @@ def play(item):
             return itemlist
 
         item.url = item.url.replace('https://v.pandrama.com/video/', 'https://v.pandrama.com/player/index.php?data=')
+
+        if not 'https://v.pandrama.com/player/index.php?data=' in item.url: item.url = 'https://v.pandrama.com/player/index.php?data=' + item.url
 
         data = httptools.downloadpage(item.url, headers = {'Referer': item.ref}).data
 

@@ -7,10 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www.newpct.net/'
+from lib import decrypters
+
+
+host = 'https://www1.newpct.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.newpct.net/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not headers: headers = {'Referer': host}
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
@@ -119,6 +128,8 @@ def list_all(item):
 
         title = title.replace('torrent', '').strip()
 
+        title = title.replace('(Español)', '').replace('(Latino)', '').replace('(Subtitulado)', '').strip()
+
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         year = '-'
@@ -139,6 +150,8 @@ def list_all(item):
         if '/series/' in url:
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
+
+            title = title.replace('&#8211;', '').replace('&#215;', ' ')
 
             titulo = title
             if 'temporada' in titulo: titulo = scrapertools.find_single_match(titulo, '(.*?)temporada').strip()
@@ -203,6 +216,41 @@ def findvideos(item):
 
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url2, server = 'torrent',
                                   language = item.languages, quality = item.qualities, other = other ))
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    if item.url.startswith('/'): item.url = host[:-1] + item.url
+
+    url = item.url
+
+    if url.startswith('magnet:'):
+        itemlist.append(item.clone( url = url, server = 'torrent' ))
+
+    elif url.endswith(".torrent"):
+        data = do_downloadpage(url)
+
+        if not data:
+            return 'Archivo [COLOR red]Corrupto[/COLOR]'
+
+        if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+            return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+        itemlist.append(item.clone( url = url, server = 'torrent' ))
+
+    else:
+        host_torrent = host[:-1]
+        url_base64 = decrypters.decode_url_base64(url, host_torrent)
+
+        if url_base64.startswith('magnet:'):
+            itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+
+        elif url_base64.endswith(".torrent"):
+            itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
     return itemlist
 

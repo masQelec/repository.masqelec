@@ -15,12 +15,12 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
         url = url.replace('/year/', '/')
         raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     return data
 
 
 def mainlist(item):
-    # ~ Pelis 4K y las Series todos los links NO so validos
+    # ~ Pelis 4K y las Series todos los links NO son validos
     return mainlist_pelis(item)
 
 

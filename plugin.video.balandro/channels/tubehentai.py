@@ -65,7 +65,8 @@ def list_all(item):
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (duration, title)
                              
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'movie', contentTitle = title ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'movie',
+                                    contentTitle = title, contentExtra='adults' ))
 
     next_page = scrapertools.find_single_match(data,'<a href=\'([^\']+)\' class="next"')
 

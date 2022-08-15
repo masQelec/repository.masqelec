@@ -12,7 +12,14 @@ def get_video_url(page_url, url_referer=''):
 
     video_urls = []
 
-    if '|' in page_url: page_url, referer = page_url.split('|', 1)
+    if '/emb.html?' in page_url:
+        _embed = scrapertools.find_single_match(page_url, "(.*?)=")
+
+        if _embed:
+            _embed = _embed.replace('/emb.html?', '/embed-')
+            _embed = _embed + '.html'
+
+            page_url = _embed
 
     data = httptools.downloadpage(page_url).data
 

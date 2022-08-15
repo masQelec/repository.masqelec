@@ -12,8 +12,19 @@ host = 'https://seriesflix.video/'
 perpage = 24
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None, follow_redirects=False):
-    data = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects).data
+    data = httptools.downloadpage_proxy('seriesflixvideo', url, post=post, headers=headers, follow_redirects=follow_redirects).data
 
     return data
 
@@ -24,6 +35,8 @@ def mainlist(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 

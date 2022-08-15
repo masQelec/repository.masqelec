@@ -10,6 +10,14 @@
       {
         "pattern": "voe.sx/(?:e/|)([A-z0-9]+)",
         "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "reputationsheriffkennethsand.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "fittingcentermondaysunday.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
       }
     ]
   }

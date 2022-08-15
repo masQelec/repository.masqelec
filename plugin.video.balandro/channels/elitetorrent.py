@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import re
-
 from platformcode import logger
 from core.item import Item
 from core import httptools, scrapertools, tmdb
+
+from lib import decrypters
 
 
 host = 'https://www.elitetorrent.com/'
@@ -12,12 +12,13 @@ host = 'https://www.elitetorrent.com/'
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://elitetorrent.app/', 'https://elitetorrent.la/', 'https://www.elitetorrent.wtf/' 'https://www.elitetorrent.dev/']
+    ant_hosts = ['https://elitetorrent.app/', 'https://elitetorrent.la/', 'https://www.elitetorrent.wtf/', 'https://www.elitetorrent.dev/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post).data
+
     return data
 
 
@@ -163,6 +164,8 @@ def list_all(item):
             if not item.search_type == 'all':
                 if item.search_type == 'movie': continue
 
+            title = title.replace('&#8211;', '').replace('&#215;', ' ')
+
             if '-la-serie-s' in url: temp_epis = scrapertools.find_single_match(url, "-la-serie-s(.*?)$")
             elif '-serie-s' in url: temp_epis = scrapertools.find_single_match(url, "-serie-s(.*?)$")
             else: temp_epis = scrapertools.find_single_match(url, "-s(.*?)$")
@@ -187,7 +190,7 @@ def list_all(item):
                                         qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
                                         contentSerieName = SerieName,
                                         contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode,
-                                       infoLabels={'year': "-"} ))
+                                        infoLabels={'year': "-"} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -227,14 +230,31 @@ def play(item):
 
     if item.url.startswith('/'): item.url = host[:-1] + item.url
 
-    if item.url.endswith('.torrent'):
-        data = do_downloadpage(item.url)
+    url = item.url
 
-        if data:
-            if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
-               return 'Archivo [COLOR red]Inexistente[/COLOR]'
+    if url.startswith('magnet:'):
+        itemlist.append(item.clone( url = url, server = 'torrent' ))
 
-    itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+    elif url.endswith('.torrent'):
+        data = do_downloadpage(url)
+
+        if not data:
+            return 'Archivo [COLOR red]Corrupto[/COLOR]'
+
+        if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+            return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+        itemlist.append(item.clone( url = url, server = 'torrent' ))
+
+    else:
+        host_torrent = host[:-1]
+        url_base64 = decrypters.decode_url_base64(url, host_torrent)
+
+        if url_base64.startswith('magnet:'):
+            itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+
+        elif url_base64.endswith(".torrent"):
+            itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
     return itemlist
 

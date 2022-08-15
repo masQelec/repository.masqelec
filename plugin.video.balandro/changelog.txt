@@ -2,6 +2,45 @@
 
 [COLOR yellow][B]2022[/B][/COLOR]
 
+2.3.9  [COLOR darkorange]13 de Agosto 2022[/COLOR]
+    Correcciones: Bugs de la version anterior
+
+    Generos: Re-configurados
+
+    Canales:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+    Servidores:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+2.3.8  [COLOR darkorange]8 de Agosto 2022[/COLOR]
+    Correcciones: Bugs de la version anterior
+
+    Generos: Re-configurados
+
+    Canales:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+    Servidores:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+2.3.7  [COLOR darkorange]1 de Agosto 2022[/COLOR]
+    Correcciones: Bugs de la version anterior
+
+    Generos: Re-configurados
+
+    Canales:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+    Servidores:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
 2.3.6  [COLOR darkorange]14 de Julio 2022[/COLOR]
     Correcciones: Bugs de la version anterior
 

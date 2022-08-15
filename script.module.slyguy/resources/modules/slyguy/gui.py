@@ -344,6 +344,8 @@ class Item(object):
 
         headers = self.get_url_headers(self.headers, self.cookies)
         mimetype = self.mimetype
+        if not mimetype and self.inputstream:
+            mimetype = self.inputstream.mimetype
 
         def get_url(url):
             _url = url.lower()
@@ -376,10 +378,11 @@ class Item(object):
 
             if self.inputstream.license_key:
                 license_url = self.inputstream.license_key
-                li.setProperty('{}.license_key'.format(self.inputstream.addon_id), u'{url}|Content-Type={content_type}&{headers}|{challenge}|{response}'.format(
+                license_headers = self.get_url_headers(self.inputstream.license_headers) if self.inputstream.license_headers else headers
+                li.setProperty('{}.license_key'.format(self.inputstream.addon_id), u'{url}|Content-Type={content_type}{headers}|{challenge}|{response}'.format(
                     url = get_url(self.inputstream.license_key),
-                    headers = self.get_url_headers(self.inputstream.license_headers) if self.inputstream.license_headers else headers,
                     content_type = self.inputstream.content_type,
+                    headers = '&' + license_headers if license_headers else '',
                     challenge = self.inputstream.challenge,
                     response = self.inputstream.response,
                 ))
@@ -391,9 +394,6 @@ class Item(object):
 
             if self.inputstream.license_data:
                 li.setProperty('{}.license_data'.format(self.inputstream.addon_id), self.inputstream.license_data)
-
-            if self.inputstream.mimetype and not mimetype:
-                mimetype = self.inputstream.mimetype
 
             for key in self.inputstream.properties:
                 li.setProperty(self.inputstream.addon_id+'.'+key, self.inputstream.properties[key])

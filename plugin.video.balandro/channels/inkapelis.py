@@ -13,6 +13,16 @@ host = 'https://inkapelis.in/'
 descartar_anime = config.get_setting('descartar_anime', default=False)
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://inkapelis.me/']
@@ -22,13 +32,17 @@ def do_downloadpage(url, post=None, headers=None):
 
     raise_weberror = False if '/fecha/' in url else True
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('inkapelis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
     return data
 
 
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -41,6 +55,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -66,6 +82,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -617,7 +635,8 @@ def play(item):
         item.url = item.url.replace('inkapelis.in/fplayer?url=', 'inkapelis.in/redirector.php?url=')
 
     if 'playerd.xyz/' in item.url or 'inkapelis.in/' in item.url:
-        resp = httptools.downloadpage(item.url, headers={'Referer': item.referer if item.referer else item.url}, follow_redirects=False)
+        # ~ resp = httptools.downloadpage(item.url, headers={'Referer': item.referer if item.referer else item.url}, follow_redirects=False)
+        resp = httptools.downloadpage_proxy('inkapelis', item.url, headers={'Referer': item.referer if item.referer else item.url}, follow_redirects=False)
 
         if 'refresh' in resp.headers: vurl = scrapertools.find_single_match(resp.headers['refresh'], ';\s*(.*)')
         elif 'location' in resp.headers: vurl = resp.headers['location']
@@ -629,7 +648,8 @@ def play(item):
 
             if 'playerd.xyz/' in url or 'inkapelis.in/' in url:
                 url = url.replace('iframe?url=', 'redirect?url=')
-                resp = httptools.downloadpage(url, headers={'Referer': item.url}, follow_redirects=False)
+                # ~ resp = httptools.downloadpage(url, headers={'Referer': item.url}, follow_redirects=False)
+                resp = httptools.downloadpage_proxy('inkapelis', url, headers={'Referer': item.url}, follow_redirects=False)
 
                 if 'refresh' in resp.headers: vurl = scrapertools.find_single_match(resp.headers['refresh'], ';\s*(.*)')
                 elif 'location' in resp.headers: vurl = resp.headers['location']
@@ -664,11 +684,13 @@ def play(item):
                                 post = {'h': hash}
                                 _player = 'https://gcs.megaplay.cc/'
 
-                                url = httptools.downloadpage(_player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                                # ~ url = httptools.downloadpage(_player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                                url = httptools.downloadpage_proxy('inkapelis', _player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
 
                         if not url:
                             try:
-                               url = httptools.downloadpage(url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
+                               # ~ url = httptools.downloadpage(url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
+                               url = httptools.downloadpage_proxy('inkapelis', url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
                             except:
                                url = ''
 
@@ -695,14 +717,18 @@ def play(item):
         vurl = item.url
 
     if vurl and '/playdir' in vurl:
-        resp = httptools.downloadpage(vurl, headers={'Referer': item.url}, follow_redirects=False)
+        # ~ resp = httptools.downloadpage(vurl, headers={'Referer': item.url}, follow_redirects=False)
+        resp = httptools.downloadpage_proxy('inkapelis', vurl, headers={'Referer': item.url}, follow_redirects=False)
+
         if 'refresh' in resp.headers: vurl = scrapertools.find_single_match(resp.headers['refresh'], ';\s*(.*)')
         elif 'location' in resp.headers: vurl = resp.headers['location']
         else: vurl = None
 
     if vurl:
         if 'player.php?id=' in vurl:
-            resp = httptools.downloadpage(vurl, headers={'Referer': item.url}, follow_redirects=False)
+            # ~ resp = httptools.downloadpage(vurl, headers={'Referer': item.url}, follow_redirects=False)
+            resp = httptools.downloadpage_proxy('inkapelis', vurl, headers={'Referer': item.url}, follow_redirects=False)
+
             dom = '/'.join(vurl.split('/')[:3])
             links = get_sources(resp.data)
 

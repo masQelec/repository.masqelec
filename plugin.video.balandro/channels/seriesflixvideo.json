@@ -13,5 +13,5 @@
 
   "clusters": ["countries", "producers", "kids", "docs", "vos", "dorama", "anime"],
 
-  "notes": "Series por Géneros, productora y paises."
+  "notes": "Series por Géneros, productora y paises. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

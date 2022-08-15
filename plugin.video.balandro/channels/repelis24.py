@@ -234,7 +234,7 @@ def list_all(item):
     matches = re.compile('<article(.*?)</article>').findall(bloque)
 
     for article in matches:
-        url = scrapertools.find_single_match(article, ' href="(.*?)"')
+        url = scrapertools.find_single_match(article, ' href=(.*?)>')
 
         title = scrapertools.find_single_match(article, '<div class=title><h4>(.*?)</h4>')
         if not title: title = scrapertools.find_single_match(article, 'alt="(.*?)"')
@@ -271,7 +271,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<span class="current">.*?' + "<a href='(.*?)'").strip()
+        next_page = scrapertools.find_single_match(data, '<span class=current>.*?<a href=(.*?) ').strip()
 
         if next_page:
             if '/page/' in next_page:
@@ -326,7 +326,7 @@ def episodios(item):
 
     bloque = scrapertools.find_single_match(data, "<span class=.*?se-t.*?>" + str(season) + "</span>(.*?)</ul></div></div>")
 
-    matches = re.compile("<li class='mark-(.*?)</div></li>").findall(bloque)
+    matches = re.compile("<li class=mark-(.*?)</div></li>").findall(bloque)
 
     if item.page == 0:
         sum_parts = len(matches)
@@ -336,15 +336,15 @@ def episodios(item):
                 item.perpage = 250
 
     for datos in matches[item.page * item.perpage:]:
-        thumb = scrapertools.find_single_match(datos, "src='(.*?)'")
+        thumb = scrapertools.find_single_match(datos, "data-src=(.*?)>")
         if thumb.startswith('//'): thumd = 'https:' + thumb
 
-        url = scrapertools.find_single_match(datos, " href='(.*?)'")
+        url = scrapertools.find_single_match(datos, " href=(.*?)>")
         title = scrapertools.find_single_match(datos, " href=.*?>(.*?)</a>")
 
         if not url or not title: continue
 
-        epis = scrapertools.find_single_match(datos, "<div class='numerando'>(.*?)</div>")
+        epis = scrapertools.find_single_match(datos, "<div class=numerando>(.*?)</div>")
 
         if not epis: continue
 
@@ -383,7 +383,7 @@ def corregir_servidor(servidor):
     elif servidor in ['meplay', 'megaplay']: return 'netutv'
     elif servidor == 'playerv': return 'directo' # storage.googleapis
     elif servidor == 'stream': return 'mystream'
-    elif servidor == 'evoplay': return 'evoload'
+    elif servidor in ['evoplay', 'evo']: return 'evoload'
     elif servidor == 'zplay': return 'zplayer'
     else: return servidor
 
@@ -397,16 +397,16 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub('\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = scrapertools.find_multiple_matches(data, "<li id='player-option-(.*?)</span>")
+    matches = scrapertools.find_multiple_matches(data, "<li id=player-option-(.*?)</span>")
 
     ses = 0
 
     for options in matches:
         ses += 1
 
-        dtype = scrapertools.find_single_match(data, "data-type='(.*?)'").strip()
-        dpost = scrapertools.find_single_match(data, "data-post='(.*?)'").strip()
-        dnume = scrapertools.find_single_match(data, "data-nume='(.*?)'").strip()
+        dtype = scrapertools.find_single_match(data, "data-type=(.*?) ").strip()
+        dpost = scrapertools.find_single_match(data, "data-post=(.*?) ").strip()
+        dnume = scrapertools.find_single_match(data, "data-nume=(.*?) ").strip()
 
         if dnume == 'trailer': continue
         elif not dtype or not dpost or not dnume: continue

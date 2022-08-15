@@ -44,7 +44,7 @@ msgstr "Dostępne aktualizacje: {count}\n\n"
 
 msgctxt "#30004"
 msgid "{name} [Atmos]"
-msgstr ""
+msgstr "{name} [Atmos]"
 
 msgctxt "#30005"
 msgid "SlyProxy Enabled (Required for some addons and features)"
@@ -194,7 +194,7 @@ msgstr „Nie można znaleźć źródła multimediów z Brightcove\n”
 msgctxt "#32014"
 msgid "Downloading required file\n"
 "{url}"
-msgstr "Pobieranie wymaganych plików\w"
+msgstr "Pobieranie wymaganych plików\n"
 "{url}"
 
 msgctxt "#32015"
@@ -332,7 +332,7 @@ msgstr "Ponowienie HTTP"
 
 msgctxt "#32046"
 msgid "Chunksize"
-msgstr ""
+msgstr "Rozmiar fragmentu"
 
 
 
@@ -434,11 +434,11 @@ msgstr "Odtwarzaj z?"
 
 msgctxt "#32068"
 msgid "{bandwidth:.2f} Mbit/s {resolution} {fps} {codecs}"
-msgstr ""
+msgstr "{bandwidth:.2f} Mbit/s {resolution} {fps} {codecs}"
 
 msgctxt "#32069"
 msgid "{fps:.2f} FPS"
-msgstr ""
+msgstr "{fps:.2f} FPS"
 
 msgctxt "#32070"
 msgid "Available Widevine CDM Versions"
@@ -606,7 +606,7 @@ msgstr "iOS nie obsługuje odtwarzania Widevine w Kodi"
 
 msgctxt "#32108"
 msgid "Next Page ({page})"
-msgstr "Następna strona ({strona})"
+msgstr "Następna strona ({page})"
 
 msgctxt "#32109"
 msgid "Failed to fetch JSON data\n"
@@ -772,7 +772,7 @@ msgstr "Do odtwarzania wymagany jest dodatek Inputstream Adaptive\n"
 
 msgctxt "#32143"
 msgid "Pagination Multiplier"
-msgstr "Mnożnik stronicowania"
+msgstr "Wielokrotność strony"
 
 msgctxt "#32144"
 msgid "Check log for more info"

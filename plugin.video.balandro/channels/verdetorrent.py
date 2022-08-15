@@ -373,7 +373,9 @@ def play(item):
         host_torrent = host[:-1]
         url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
 
-        if url_base64.endswith('.torrent'): item.url = url_base64
+        if url_base64.endswith('.torrent'):
+            url_base64 = url_base64.replace('/verdetorrent.com/', '/ec1-eu-VerdeTorrent-compute-1.cdnbeta.in/')
+            item.url = url_base64
 
     if item.url.endswith('.torrent'):
         from platformcode import config

@@ -23,9 +23,10 @@ def get_video_url(page_url, url_referer=''):
     try:
         media_url = jdata["result"]["file"]
     except:
-        media_url = scrapertools.find_single_match(str(jdata), ".*?'file': '(.*?)'")
+        media_url = scrapertools.find_single_match(str(jdata), ".*?'file':.*?'(.*?)'")
 
     if media_url:
+        media_url += "|User-Agent=%s" %(httptools.get_user_agent())
         video_urls.append(["m3u", media_url])
 
     return video_urls

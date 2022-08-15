@@ -360,6 +360,8 @@ def play(item):
             host_torrent = host[:-1]
             url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
 
+            url_base64 = url_base64.replace('/naranjatorrent.com/', '/ec1-eu-NaranjaTorrent-compute-1.cdnbeta.in/')
+
             if url_base64.startswith('magnet:'):
                itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 

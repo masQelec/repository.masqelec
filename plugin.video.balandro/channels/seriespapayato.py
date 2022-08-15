@@ -6,6 +6,7 @@ from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+
 host = 'https://papayaseries.net/'
 
 
@@ -39,18 +40,54 @@ def mainlist_series(item):
     return itemlist
 
 
+def generos(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(host)
+
+    matches = scrapertools.find_multiple_matches(data, '<li id="menu-item-.*?<a href="(.*?)">(.*?)</a>')
+
+    for url, title in matches:
+        if title == 'Inicio': continue
+        elif title == 'Generos': continue
+
+        title = title.replace('&amp;', '&').strip()
+
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+
+    return sorted(itemlist, key=lambda it: it.title)
+
+
+def alfabetico(item):
+    logger.info()
+    itemlist = []
+
+    for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        letras = letra.lower()
+
+        url = host + 'letra/' + letras + '/'
+
+        itemlist.append(item.clone( action = 'list_letra', title = letra, url = url ))
+
+    itemlist.append(item.clone(action = "list_letra", url = host + 'letra/0-9/', title = '0-9'))
+
+    return itemlist
+
+
 def list_all(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, '<article class="(.*?)</article>')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, ' <a href="([^"]+)"')
+        url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
 
-        title = scrapertools.find_single_match(match, ' <h2 class="Title">(.*?)</h2>')
+        title = scrapertools.find_single_match(match, '<h2 class="Title">(.*?)</h2>')
 
         if not url or not title: continue
 
@@ -68,39 +105,6 @@ def list_all(item):
         next_page = scrapertools.find_single_match(data, '<a class="page-link" href="(.*?)">')
         if next_page:
             itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
-
-    return itemlist
-
-
-def generos(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(host)
-
-    matches = scrapertools.find_multiple_matches(data, '<li id="menu-item-.*?<a href="(.*?)">(.*?)</a>')
-
-    for url, title in matches:
-        if title == 'Inicio': continue
-        elif title == 'Generos': continue
-
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
-
-    return itemlist
-
-
-def alfabetico(item):
-    logger.info()
-    itemlist = []
-
-    for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-        letras = letra.lower()
-
-        url = host + 'letra/' + letras + '/'
-
-        itemlist.append(item.clone( action = 'list_letra', title = letra, url = url ))
-
-    itemlist.append(item.clone(action = "list_letra", url = host + 'letra/0-9/', title = '0-9'))
 
     return itemlist
 

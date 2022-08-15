@@ -13,5 +13,5 @@
 
   "clusters": ["years", "kids", "docs", "vos", "anime"],
 
-  "notes": "Películas por gèneros y año. También Series"
+  "notes": "Películas por gèneros y año. También Series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

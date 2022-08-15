@@ -3,7 +3,7 @@
   "name": "PelisGratis",
   "thumbnail": "pelisgratis.png",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["news", "languages", "qualityes", "years", "kids", "docs", "vos"],
 
-  "notes": "Películas por idioma, géneros, año y calidad. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "WEB CERRADA. Películas por idioma, géneros, año y calidad. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

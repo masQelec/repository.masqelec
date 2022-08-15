@@ -5,10 +5,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = "https://caricaturashd.net/"
+host = 'https://gnulaseries.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://caricaturashd.net/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     headers = {'Referer': host}
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
@@ -47,7 +53,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ultimas-caricaturas/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -63,12 +69,11 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(data, 'menu-item-object-category.*?<a href="(.*?)".*?>(.*?)</a>')
 
     for url, title in matches:
+        title = title.replace('&#038;', '&').strip()
+
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, genre = title ))
 
-    itemlist.append(item.clone( action = 'list_all', title = 'Terror', url = host + 'terror/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Western', url = host + 'western/' ))
-
-    return itemlist
+    return sorted(itemlist,key=lambda x: x.title)
 
 
 def list_all(item):
@@ -84,10 +89,10 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, '<article class="post dfx fcl movies">(.*?)</article>')
+    matches = scrapertools.find_multiple_matches(data, '<article class=(.*?)</article>')
 
     for match in matches:
-        title =  scrapertools.find_single_match(match, '<h2 class="entry-title text-center">(.*?)</h2>')
+        title =  scrapertools.find_single_match(match, '<h2 class="Title">(.*?)</h2>')
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
         if not title or not url: continue
@@ -108,10 +113,10 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '>NEXT<' in data:
-        next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?<a class="page-link".*?href="([^"]+)')
+    next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="(.*?)"')
 
-        if next_page:
+    if next_page:
+        if '/page/' in next_page:
             itemlist.append(item.clone( title = 'Siguientes ...', action='list_all', url = next_page, genre = item.genre, text_color='coral' ))
 
     return itemlist
@@ -132,7 +137,7 @@ def temporadas(item):
     if not id_obj or not id_post:
         return itemlist
 
-    matches = scrapertools.find_multiple_matches(data, '<li class="sel-temp"><a data-post=".*?data-season="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, '<section class="Season.*?<a href=.*?<span>(.*?)</span>')
 
     for season in matches:
         title = 'Temporada ' + season
@@ -200,15 +205,11 @@ def episodios(item):
 
         ord_epis = str(epis)
 
-        if len(str(ord_epis)) == 1:
-            ord_epis = '0000' + ord_epis
-        elif len(str(ord_epis)) == 2:
-            ord_epis = '000' + ord_epis
-        elif len(str(ord_epis)) == 3:
-            ord_epis = '00' + ord_epis
+        if len(str(ord_epis)) == 1: ord_epis = '0000' + ord_epis
+        elif len(str(ord_epis)) == 2: ord_epis = '000' + ord_epis
+        elif len(str(ord_epis)) == 3: ord_epis = '00' + ord_epis
         else:
-            if item.perpage > 50:
-                ord_epis = '0' + ord_epis
+            if item.perpage > 50: ord_epis = '0' + ord_epis
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 

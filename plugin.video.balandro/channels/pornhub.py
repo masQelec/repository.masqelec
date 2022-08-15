@@ -97,7 +97,7 @@ def list_all(item):
 
     for url, title, thumb, thumb2 in matches:
         itemlist.append(item.clone( action = 'findvideos', url = url if url.startswith('http') else host[:-1] + url, title = title,
-                                    thumbnail = thumb if not 'base64' else thumb2, contentType = 'movie', contentTitle = title ))
+                                    thumbnail = thumb if not 'base64' else thumb2, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<li class="page_next"><a href="([^"]+)')
@@ -303,7 +303,8 @@ def list_videos(item):
 
     for url, title, thumb, thumb2 in matches:
         itemlist.append(item.clone( action = 'findvideos', url = url if url.startswith('http') else host[:-1] + url,
-                                    title = title, thumbnail = thumb if not 'base64' else thumb2, contentType = 'movie', contentTitle = title ))
+                                    title = title, thumbnail = thumb if not 'base64' else thumb2,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<li class="page_next"><a href="([^"]+)')
@@ -331,7 +332,8 @@ def list_pornstars(item):
 
     for url, title, thumb, thumb2 in matches:
         itemlist.append(item.clone( action = 'findvideos', url = url if url.startswith('http') else host[:-1] + url, title = title,
-                                    thumbnail = thumb if not 'base64' else thumb2, contentType = 'movie', contentTitle = title ))
+                                    thumbnail = thumb if not 'base64' else thumb2,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<li class="page_next"><a href="([^"]+)')

@@ -127,7 +127,8 @@ def list_all(item):
     for title, url in matches:
         if url.startswith('/'): url = host + url[1:]
 
-        new_item = item.clone( action = 'findvideos', title = title, url = url, contentType = 'movie', contentTitle = title, pos = i )
+        new_item = item.clone( action = 'findvideos', title = title, url = url, contentType = 'movie',
+                               contentTitle = title, contentExtra='adults', pos = i )
 
         t = Thread(target = get_embed, args = [new_item, itemlist])
 

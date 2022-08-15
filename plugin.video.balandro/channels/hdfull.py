@@ -13,6 +13,7 @@ from core import httptools, scrapertools, jsontools, servertools, tmdb
 
 from lib import balandroresolver
 
+
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
 # ~ webs  1)-'https://hdfullcdn.cc/'  2)-'https://new.hdfull.one/'  3)-'https://dominioshdfull.com/'  4)-'https://hdfull.vip/'
 
@@ -411,20 +412,21 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-        itemlist.append(item.clone( action='list_all', title='Catálogo', url = dominio + 'peliculas', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_all', title='Catálogo', url = dominio + 'series', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( action='list_all', title='Últimas', url = dominio + 'series/date', search_type='tvshow' ))
 
         itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='plum' ))
 
-        itemlist.append(item.clone( action='list_episodes', title=' - Estreno', opcion = 'premiere' ))
-        itemlist.append(item.clone( action='list_episodes', title=' - Anime ', opcion = 'anime' ))
-        itemlist.append(item.clone( action='list_episodes', title=' - Últimos', opcion = 'latest' ))
-        itemlist.append(item.clone( action='list_episodes', title=' - Actualizados', opcion = 'updated' ))
+        itemlist.append(item.clone( action='list_episodes', title=' - Estreno', opcion = 'premiere', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_episodes', title=' - Anime ', opcion = 'anime', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_episodes', title=' - Últimos', opcion = 'latest', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_episodes', title=' - Actualizados', opcion = 'updated', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url= dominio + 'series/imdb_rating', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_all', title='Doramas', url= dominio + 'tags-tv/dorama', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_all', title='Novelas', url= dominio + 'tags-tv/soap', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( action='series_abc', title='Por letra (A - Z)', search_type = 'tvshow' ))
@@ -800,22 +802,24 @@ def findvideos(item):
 
     data_js = do_downloadpage(dominio + 'js/providers.js')
 
-    # ~ 31/12/2021
+    # ~ 31/7/2022
+    # ~      "22": {"t": "d", "d": "https://mexa.sh/%s"},
+
     provs = {
              "4": {"t": "s", "d": "https://upstream.to/embed-%s.html"}, 
              "5": {"t": "s", "d": "https://cloudvideo.tv/embed-%s.html"},
              "6": {"t": "s", "d": "https://streamtape.com/e/%s"},
-             "8": {"t": "d", "d": "http://www.filefactory.com/file/%s"},
-             "9": {"t": "d", "d": "http://uploaded.net/f/%s"},
+             "7": {"t": "s", "d": "https://watchsb.com/%s.html"}, 
+             "8": {"t": "d", "d": "https://www.filefactory.com/file/%s"},
+             "9": {"t": "d", "d": "https://uploaded.net/f/%s"},
              "10": {"t": "d", "d": "https://rapidgator.net/file/%s.html"},
-             "12": {"t": "s", "d": "http://gamovideo.com/embed-%s.html"},
+             "12": {"t": "s", "d": "https://gamovideo.net/embed-%s.html"},
              "14": {"t": "s", "d": "https://vidlox.me/embed-%s.html"},
              "15": {"t": "s", "d": "https://mixdrop.co/e/%s"},
              "16": {"t": "s", "d": "https://videobin.co/embed-%s.html"},
-             "22": {"t": "d", "d": "https://mexa.sh/%s"},
              "23": {"t": "d", "d": "https://1fichier.com/?%s"},
              "24": {"t": "d", "d": "https://katfile.com/%s"},
-             "27": {"t": "d", "d": "http://nitroflare.com/%s"},
+             "27": {"t": "d", "d": "https://nitroflare.com/%s"},
              "31": {"t": "s", "d": "https://vidoza.net/embed-%s.html"},
              "35": {"t": "d", "d": "https://uptobox.com/%s"},
              "38": {"t": "d", "d": "https://clicknupload.cc/%s"}
@@ -928,12 +932,12 @@ def list_user_subsections(item):
         if item.tipo_list == 'movies':
             url = '%spelicula/%s' % (domain, perma)
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, page = 0,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
         else:
             url = '%sserie/%s' % (domain, perma)
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, page = 0,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)

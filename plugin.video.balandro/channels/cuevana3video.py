@@ -15,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www1.cuevana3.vc/'
+host = 'https://cuevana3.fm/'
 
 perpage = 22
 
@@ -36,7 +36,7 @@ def do_downloadpage(url, post=None, headers=None):
                  'https://cuevana3.so', 'https://www1.cuevana3.so', 'https://www2.cuevana3.so',
                  'https://cuevana3.cx', 'https://www1.cuevana3.cx', 'https://www2.cuevana3.cx',
                  'https://cuevana3.pe/', 'https://www1.cuevana3.pe/', 'https://www2.cuevana3.pe/'
-                 'https://cuevana3.vc/']
+                 'https://cuevana3.vc/', 'https://www1.cuevana3.vc/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -455,10 +455,6 @@ def play(item):
             matches = scrapertools.find_multiple_matches(data, '<div class="dowload".*?href="(.*?)"')
 
             for url in matches:
-                if not 'https://xstreamcdn.com/f/' in url: continue
-
-                url = url.replace('https://xstreamcdn.com/f/', '')
-
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 

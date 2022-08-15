@@ -1,8 +1,23 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+if sys.version_info[0] >= 3:
+    PY3 = True
+
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    PY3 = False
+
+    import xbmc
+    translatePath = xbmc.translatePath
+
+
 import os
 
 from platformcode import logger, config, platformtools
+from core import filetools
 from core.item import Item
 
 from datetime import datetime
@@ -96,7 +111,12 @@ def submnu_developer(item):
 
         itemlist.append(item.clone( channel='actions', action='manto_temporales', title=' - Eliminar Temporales', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
-    if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developer.py')) or os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'test.py')):
+    presentar = False
+
+    if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developer.py')): presentar = True
+    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'test.py')): presentar = True
+
+    if presentar:
         itemlist.append(item.clone( action='', title='[B]Gestionar:[/B]', thumbnail=config.get_thumb('tools'), text_color='teal' ))
 
         if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developer.py')):
@@ -111,11 +131,37 @@ def submnu_developer(item):
 
     itemlist.append(item.clone( channel='helper', action='show_advs', title=' - AdvancedSettings', thumbnail=config.get_thumb('quote') ))
 
-    itemlist.append(item.clone( action='', title='[B]Addons:[/B]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
+    presentar = False
 
-    itemlist.append(item.clone( channel='actions', action='manto_addons_packages', title=' - Eliminar Packages', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+    path_packages = translatePath(os.path.join('special://home/addons/packages', ''))
+    existe_packages = filetools.exists(path_packages)
 
-    itemlist.append(item.clone( channel='actions', action='manto_addons_temp', title=' - Eliminar Temp', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+    packages = []
+    if existe_packages: packages = os.listdir(path_packages)
+	
+    path_temp = translatePath(os.path.join('special://home/addons/temp', ''))
+    existe_temp = filetools.exists(path_temp)
+
+    temps = []
+    if existe_temp: temps = os.listdir(path_temp)
+
+    if packages: presentar = True
+    elif temps: presentar = True
+
+    if presentar:
+        itemlist.append(item.clone( action='', title='[B]Addons:[/B]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
+
+        if packages:
+            itemlist.append(item.clone( action='show_addons', title=' - Ver Packages', addons = packages, tipo = 'Packages',
+                                        thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+
+            itemlist.append(item.clone( channel='actions', action='manto_addons_packages', title=' - Eliminar Packages', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+
+        if temps:
+            itemlist.append(item.clone( action='show_addons', title=' - Ver Temp', addons = temps, tipo = 'Temp',
+                                        thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+
+            itemlist.append(item.clone( channel='actions', action='manto_addons_temp', title=' - Eliminar Temp', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title= 'Configuración', thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
@@ -365,7 +411,7 @@ def _dominios(item):
 def _credenciales_hdfull(item):
     logger.info()
 
-    from core import filetools, jsontools
+    from core import jsontools
 
     channel_json = 'hdfull.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -399,7 +445,7 @@ def _credenciales_hdfull(item):
 def _credenciales_playdede(item):
     logger.info()
 
-    from core import filetools, jsontools
+    from core import jsontools
 
     channel_json = 'playdede.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -443,15 +489,15 @@ def _proxies(item):
         item.channel = 'cinetux'
         cinetux.configurar_proxies(item)
 
-    elif item.from_channel == 'cliver':
-        from channels import cliver
-        item.channel = 'cliver'
-        cliver.configurar_proxies(item)
-
     elif item.from_channel == 'cliversite':
         from channels import cliversite
         item.channel = 'cliversite'
         cliversite.configurar_proxies(item)
+
+    elif item.from_channel == 'cuevana2esp':
+        from channels import cuevana2esp
+        item.channel = 'cuevana2esp'
+        cuevana2esp.configurar_proxies(item)
 
     elif item.from_channel == 'cuevana3':
         from channels import cuevana3
@@ -493,6 +539,11 @@ def _proxies(item):
         item.channel = 'entrepeliculasyseries'
         entrepeliculasyseries.configurar_proxies(item)
 
+    elif item.from_channel == 'espapelis':
+        from channels import espapelis
+        item.channel = 'espapelis'
+        espapelis.configurar_proxies(item)
+
     elif item.from_channel == 'estrenoscinesaa':
         from channels import estrenoscinesaa
         item.channel = 'estrenoscinesaa'
@@ -523,6 +574,16 @@ def _proxies(item):
         item.channel = 'hdfullse'
         hdfullse.configurar_proxies(item)
 
+    elif item.from_channel == 'homecine':
+        from channels import homecine
+        item.channel = 'homecine'
+        homecine.configurar_proxies(item)
+
+    elif item.from_channel == 'inkapelis':
+        from channels import inkapelis
+        item.channel = 'inkapelis'
+        inkapelis.configurar_proxies(item)
+
     elif item.from_channel == 'lilatorrent':
         from channels import lilatorrent
         item.channel = 'lilatorrent'
@@ -551,6 +612,11 @@ def _proxies(item):
         item.channel = 'pelis28'
         pelis28.configurar_proxies(item)
 
+    elif item.from_channel == 'pelisforte':
+        from channels import pelisforte
+        item.channel = 'pelisforte'
+        pelisforte.configurar_proxies(item)
+
     elif item.from_channel == 'pelisgratis':
         from channels import pelisgratis
         item.channel = 'pelisgratis'
@@ -560,6 +626,11 @@ def _proxies(item):
         from channels import pelishouse
         item.channel = 'pelishouse'
         pelishouse.configurar_proxies(item)
+
+    elif item.from_channel == 'pelismaraton':
+        from channels import pelismaraton
+        item.channel = 'pelismaraton'
+        pelismaraton.configurar_proxies(item)
 
     elif item.from_channel == 'pelispedia':
         from channels import pelispedia
@@ -616,10 +687,20 @@ def _proxies(item):
         item.channel = 'rojotorrent'
         rojotorrent.configurar_proxies(item)
 
+    elif item.from_channel == 'seriesflixvideo':
+        from channels import seriesflixvideo
+        item.channel = 'seriesflixvideo'
+        seriesflixvideo.configurar_proxies(item)
+
+    elif item.from_channel == 'seriespapayaxyz':
+        from channels import seriespapayaxyz
+        item.channel = 'seriespapayaxyz'
+        seriespapayaxyz.configurar_proxies(item)
+
     elif item.from_channel == 'seriesyonkis':
         from channels import seriesyonkis
         item.channel = 'seriesyonkis'
-        subtorrents.configurar_proxies(item)
+        seriesyonkis.configurar_proxies(item)
 
     elif item.from_channel == 'subtorrents':
         from channels import subtorrents
@@ -706,7 +787,7 @@ def test_all_srvs(item):
 
     if item.unsatisfactory: config.set_setting('developer_test_servers', 'unsatisfactory')
 
-    from core import filetools, jsontools
+    from core import jsontools
 
     from modules import tester
 
@@ -735,3 +816,14 @@ def test_all_srvs(item):
     if i > 0: platformtools.dialog_ok(config.__addon_name, 'Servidores Testeados ' + str(i))
 
     config.set_setting('developer_test_servers', '')
+
+
+def show_addons(item):
+    logger.info()
+
+    txt = '[COLOR gold][B]' + item.tipo + ':[/B][/COLOR][CR]'
+
+    for addons in item.addons:
+        txt += '  ' + str(addons) + '[CR][CR]'
+
+    platformtools.dialog_textviewer('Información Addons ' + item.tipo , txt)

@@ -454,7 +454,7 @@ def play(item):
             data = do_downloadpage(url)
 
             url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
-            if not url: url = scrapertools.find_single_match(data, 'id="btn_enlace">.*?<a href="(.*?)"')
+            if not url: url = scrapertools.find_single_match(data, 'id="btn_enlace">.*?href="(.*?)"')
             if not url: url = scrapertools.find_single_match(data, '<a id="some_link">.*?value="(.*?)"')
 
             url = url.replace('&amp;', '&')

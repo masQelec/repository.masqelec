@@ -10,10 +10,21 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://pelisforte.co/'
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if '/release/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('pelisforte', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -24,6 +35,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -197,6 +210,8 @@ def play(item):
                 if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or 'gounlimited' in url:
                     return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
                 elif '/guayhd.me/' in url:
+                    return 'Servidor [COLOR plum]No Soportado[/COLOR]'
+                elif '/playpf.link/' in url:
                     return 'Servidor [COLOR plum]No Soportado[/COLOR]'
 
                 if '/wtfsb.link/' in url:

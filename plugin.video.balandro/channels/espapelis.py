@@ -13,22 +13,44 @@ host = 'https://www.espapelis.com/'
 perpage = 27
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if '/fecha/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('espapelis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
 
 def mainlist(item):
-    # ~ las series estructura diferente  'series/browse?type=series'
-    return mainlist_pelis(item)
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
+
+    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+
+    return itemlist
 
 
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -38,6 +60,19 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
+
+    return itemlist
+
+
+def mainlist_series(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-series/', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -101,10 +136,24 @@ def list_all(item):
 
         if not url or not title: continue
 
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                    contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
+        if '/pelicula/' in url:
+            if item.search_type != 'all':
+                if item.search_type == 'tvshow': continue
+
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
+                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
+
+        if '/serie/' in url:
+            if item.search_type != 'all':
+                if item.search_type == 'movie': continue
+
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -133,6 +182,79 @@ def list_all(item):
 
             itemlist.append(item.clone( title = 'Siguientes ...', url = url, post = post, action = 'list_all',
                                         page = 0, next = item.next_page, text_color='coral' ))
+
+    return itemlist
+
+
+def temporadas(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    temporadas = re.compile('data-temporada="(.*?)"', re.DOTALL).findall(data)
+
+    for tempo in temporadas:
+        title = 'Temporada ' + tempo
+
+        if len(temporadas) == 1:
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.contentType = 'season'
+            item.contentSeason = tempo
+            itemlist = episodios(item)
+            return itemlist
+
+        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+def episodios(item):
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+    if not item.perpage: item.perpage = 50
+
+    data = do_downloadpage(item.url)
+
+    serie_id = scrapertools.find_single_match(data, 'data-id="(.*?)"')
+
+    if not serie_id: return itemlist
+
+    post = {'action': 'action_change_episode', 'season': str(item.contentSeason), 'serie_id': serie_id}
+
+    headers = {'Referer': item.url}
+
+    data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
+
+    matches = scrapertools.find_multiple_matches(data, ' src="(.*?)".*?<div class="num">(.*?)</div>.*?<h2 class="entry-title">(.*?)</h2>.*?<a href="(.*?)"')
+
+    if item.page == 0:
+        sum_parts = len(matches)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('EspaPelis', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
+
+    for thumb, s_e, title, url in matches[item.page * item.perpage:]:
+        if not thumb.startswith('http'): thumb = 'https:' + thumb
+
+        episode = scrapertools.find_single_match(s_e, ".*?- E(.*?)$")
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=episode ))
+
+        if len(itemlist) >= item.perpage:
+            break
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if len(matches) > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
 
@@ -193,6 +315,7 @@ def findvideos(item):
 
         if lang == 'Castellano': lang = 'Esp'
         elif lang == 'Latino': lang = 'Lat'
+        elif lang == 'Subtitulado': lang = 'Vose'
 
         if srv == 'bittorrent': servidor = 'torrent'
         elif srv == 'mega':

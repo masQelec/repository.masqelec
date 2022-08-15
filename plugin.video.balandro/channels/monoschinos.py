@@ -134,7 +134,7 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                        infoLabels={'year': '-'}, contentType = 'tvshow', contentSerieName = title ))
+                                    infoLabels={'year': '-'}, contentType = 'tvshow', contentSerieName = title ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -154,7 +154,7 @@ def list_epis(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<h1>Capítulos Recientes(.*?)</section>')
+    bloque = scrapertools.find_single_match(data, 'Capítulos Recientes</h1>(.*?)</section>')
 
     matches = re.compile('<div class="col col-md-6(.*?)</a></div>', re.DOTALL).findall(bloque)
 
@@ -191,7 +191,7 @@ def episodios(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = re.compile('data-episode="(.*?)".*?href="(.*?)".*?data-src="(.*?)".*?<p class="animetitles">(.*?)<', re.DOTALL).findall(data)
+    matches = re.compile('data-episode="(.*?)".*?href="(.*?)".*?src="(.*?)".*?<p class="animetitles">(.*?)<', re.DOTALL).findall(data)
 
     if item.page == 0:
         sum_parts = len(matches)
@@ -247,13 +247,14 @@ def findvideos(item):
         elif 'senvid' in servidor: servidor = 'sendvid'
         elif 'drive' in servidor: servidor = 'gvideo'
         elif 'anonfile' in servidor: servidor = 'anonfiles'
+        elif 'zippy' in servidor: servidor = 'zippyshare'
               
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose' ))
 
     # download
     bloque = scrapertools.find_single_match(data, '<div class="downbtns">(.*?)</div>')
 
-    matches = re.compile('href="(.*?)"><button>(.*?)<', re.DOTALL).findall(bloque)
+    matches = re.compile('href="(.*?)".*?<button>(.*?)<', re.DOTALL).findall(bloque)
 
     for url, srv in matches:
         ses += 1
@@ -261,7 +262,9 @@ def findvideos(item):
         srv = srv.lower().strip()
 
         if srv == '1fichier': continue
+
         elif 'anonfile' in srv: srv = 'anonfiles'
+        elif 'zippy' in srv: srv = 'zippyshare'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url, language = 'Vose', other = 'D' ))
 

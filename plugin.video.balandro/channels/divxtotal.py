@@ -14,7 +14,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www.divxtotal.dev/'
+host = 'https://www.divxtotal.ms/'
 
 
 def item_configurar_proxies(item):
@@ -29,7 +29,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/']
+    ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://www.divxtotal.dev/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

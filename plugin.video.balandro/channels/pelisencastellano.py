@@ -7,14 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://pelisencastellano.com/'
+host = 'https://pelisencastellano.net/'
 
 perpage = 20
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['http://pelisencastellano.com/']
+    ant_hosts = ['http://pelisencastellano.com/', 'https://pelisencastellano.com/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -34,9 +34,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'total-de-peliculas/', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 

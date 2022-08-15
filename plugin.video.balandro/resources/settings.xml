@@ -35,6 +35,9 @@
         <setting id="search_extra_proxies" type="bool" label="Añadir acceso al detalle de Búsquedas en Canales con Proxies" default="true"/>
 
         <setting type="sep"/>
+        <setting id="sub_mnu_favoritos" type="bool" label="Añadir acceso al detalle de Favoritos de su Media Center" default="false"/>
+
+        <setting type="sep"/>
         <setting id="sub_mnu_special" type="bool" label="Añadir acceso al detalle de opciones Especiales" default="true"/>
         <setting id="search_extra_main" type="bool" label="Añadir acceso al detalle de Búsquedas Especiales (Listas TMDB, etc.)" default="false"/>
 
@@ -87,7 +90,7 @@
 
         <setting type="sep"/>
         <setting id="channels_exclusively_adults" type="action" label="Qué canales tienen contenido Exclusivamente para adultos" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_exclusively_adults)"/>
-        <setting id="descartar_xxx" type="bool" label="Descartar canales exclusivos adultos y listas/géneros con ese contenido" default="false"/>
+        <setting id="descartar_xxx" type="bool" label="Descartar canales exclusivos de adultos y listas/géneros con ese contenido" default="false"/>
     </category>
 
     <category label="Cuentas">
@@ -115,6 +118,7 @@
         <setting label="Información Servidores:" type="lsep"/>
         <setting id="show_servers_list" type="action" label="Qué servidores están Disponibles" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_servers_list)"/>
         <setting id="show_help_recaptcha" type="action" label="¿ Qué significa Requiere verificación reCAPTCHA ?" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_recaptcha)"/>
+        <setting id="show_help_gamovideo" type="action" label="Información servidor Gamovideo" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_gamovideo)"/>
         <setting id="show_help_mega" type="action" label="Información servidor Mega" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_mega)"/>
         <setting id="show_help_uptobox" type="action" label="Información servidor Uptobox" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_uptobox)"/>
 
@@ -122,7 +126,7 @@
         <setting id="autoplay" type="bool" label="Activar autoplay" default="false"/>
         <setting id="autoplay_max_links" type="labelenum" label="Número máximo de enlaces para intentar del autoplay" values="3|5|10|15|20|25|30" default="10" visible="eq(-1,true)"/>
         <setting id="autoplay_channels_discarded" label="Canales sin autoplay (separados por comas)" type="text" default="" visible="eq(-2,true)"/>
-        <setting id="autoplay_one_link" type="bool" label="Si solo hay un enlace para reproducir activar autoplay" default="true" visible="eq(-3,false)"/>
+        <setting id="autoplay_one_link" type="bool" label="Si solo hay un enlace para reproducir efectuar Autoplay" default="true" visible="eq(-3,false)"/>
 
         <setting label="Opciones para ordenar/filtrar los enlaces por Idioma:" type="lsep"/>
         <setting id="preferencia_idioma_esp" type="enum" label="Idioma Esp (castellano de España)" values="Descartar|Primero|Segundo|Tercero" default="1"/>
@@ -130,7 +134,7 @@
         <setting id="preferencia_idioma_vos" type="enum" label="Idioma VO (versión original y/o subtitulada)" values="Descartar|Primero|Segundo|Tercero" default="3"/>
 
         <setting label="Opciones para ordenar los enlaces por Calidad:" type="lsep"/>
-        <setting id="servers_sort_quality" type="enum" label="En cada idioma ordenar enlaces según" values="Orden de la Web|Calidad Desc|Calidad Asc" default="0"/>
+        <setting id="servers_sort_quality" type="enum" label="En cada idioma ordenar los enlaces según" values="Orden de la Web|Calidad Desc|Calidad Asc" default="0"/>
 
         <setting label="Opciones para ordenar/filtrar los enlaces por Servidores:" type="lsep"/>
         <setting id="servers_preferred" label="Servidores Preferidos (separados por comas)" type="text" default=""/>
@@ -138,7 +142,7 @@
         <setting id="servers_discarded" label="Servidores Descartados (separados por comas)" type="text" default=""/>
 
         <setting label="Opciones si Errores al reproducir los enlaces:" type="lsep"/>
-        <setting id="tracking_weberror_dialog" type="bool" label="Si la web da error, ¿ mostrar diálogo para búsqueda alternativa ?" default="true"/>
+        <setting id="tracking_weberror_dialog" type="bool" label="Si la web da error, mostrar diálogo para Búsqueda Alternativa" default="true"/>
     </category>
 
     <category label="Proxies">
@@ -187,7 +191,7 @@
         <setting id="proxies_search_extended" type="bool" label="Tratar primero en las búsquedas los Proveedores de la Lista Ampliada" default="false"/>
 
         <setting type="sep"/>
-        <setting id="proxies_totales" type="bool" label="Obtener el Máximo de proxies posibles a analizar en cada Proveedor" default="false"/>
+        <setting id="proxies_totales" type="bool" label="Obtener el Máximo de proxies posibles para analizar en cada Proveedor" default="false"/>
         <setting id="proxies_totales_limit" type="labelenum" label="Límite Máximo Total de proxies a buscar" values="100|200|300|400|500|600|700|800|900" default="500"/>
     </category>
 
@@ -203,9 +207,9 @@
         <setting id="show_clients_torrent" type="action" label="Qué Clientes/Motores externos torrent están Soportados" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_clients_torrent)"/>
 
         <setting type="sep"/>
-        <setting id="cliente_torrent" type="labelenum" label="Opciones para el Cliente/Motor Habitual para torrents" values="Ninguno|Seleccionar|Quasar|Elementum|Torrenter|Torrentin|Torrest|Pulsar|Stream|Xbmctorrent" default="Seleccionar"/>
+        <setting id="cliente_torrent" type="labelenum" label="Cliente/Motor Habitual asignado para torrents" values="Ninguno|Seleccionar|Quasar|Elementum|Torrenter|Torrentin|Torrest|Pulsar|Stream|Xbmctorrent" default="Seleccionar"/>
 
-        <setting label="Canal DonTorrents:" type="lsep"/>
+        <setting label="Dominio para el canal DonTorrents:" type="lsep"/>
         <setting id="last_domain_dontorrents" type="action" label="Pulsar para comprobar el dominio Vigente" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=last_domain_dontorrents)"/>
 		<setting id="channel_dontorrents_dominio" type="action" label="Modificar el dominio actual memorizado" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_domain_dontorrents)"/>
     </category>
@@ -217,6 +221,9 @@
 
         <setting type="sep"/>
         <setting id="search_show_last" type="bool" label="Recordar Último Texto buscado" default="true"/>
+        <setting id="manto_textos" type="action" label="Pulsar para eliminar los Textos Memorizados" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_textos)"/>
+
+        <setting type="sep"/>
         <setting id="search_limit_by_channel" type="labelenum" label="Cuantos Resultados se previsualizarán por canal" values="1|2|3|4|5|6|7|8|9|10" default="2"/>
 
         <setting label="Opciones para Personalizar las búsquedas en los canales:" type="lsep"/>
@@ -327,7 +334,7 @@
         <setting id="addon_update_doitforce" type="action" label="Pulsar para 'Forzar' actualizaciones Fix" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=check_addon_updates_force)"/>
 
         <setting label="Opciones para buscar y actualizar Nuevos Episodios en Preferidos:" type="lsep"/>
-        <setting id="addon_tracking_atstart" type="bool" label="Activar Servicio al Iniciar su Media Center (Re-iniciar si se Activa)" default="false"/>
+        <setting id="addon_tracking_atstart" type="bool" label="Activar Servicio al Iniciar su Media Center (deberá Re-iniciar si se Activa)" default="false"/>
         <setting id="addon_tracking_interval" type="labelenum" label="Opciones para Ejecutar el Servicio (intervalo de horas)" values="6|8|12|24" default="12" visible="eq(-1,true)"/>
         <setting id="addon_tracking_verbose" type="bool" label="Notificar aviso del resultado final de la búsqueda" default="false" visible="eq(-2,true)"/>
         <setting id="addon_tracking_lastscrap" label="Last scrap" type="text" default="" visible="false"/>

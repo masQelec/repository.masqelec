@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww3.pelis28.app/'
+host = 'https://ww1.pelis28.app/'
 
 
 def item_configurar_proxies(item):
@@ -23,7 +23,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://pelis28.vip/', 'https://pelis28.lol/', 'https://pelis28.app/']
+    ant_hosts = ['https://pelis28.vip/', 'https://pelis28.lol/', 'https://pelis28.app/', 'https://ww3.pelis28.app/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -152,6 +152,8 @@ def list_all(item):
         title = scrapertools.find_single_match(match, 'title="(.*?)"')
 
         if not url or not title: continue
+
+        if title.startswith('Ver '): title = title.replace('Ver ', '').strip()
 
         if '[' in title:
             title = title.replace('[', '{').replace(']', '}')

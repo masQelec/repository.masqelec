@@ -55,7 +55,9 @@ def get_video_url(page_url, url_referer=''):
 
     page_url = page_url.replace('/embed#!', '/embed#')
     page_url = page_url.replace('/embed/', '/embed#')
-    page_url = page_url.replace('/file/', '/embed#')
+
+    page_url = page_url.replace('/file/', '/embed#!')
+
     page_url = page_url.replace('/embed#', '/#')
 
     try:
@@ -70,11 +72,11 @@ def get_video_url(page_url, url_referer=''):
 
     if len(files) > 5:
         media_url = c.get_play_list()
-        video_urls.append([scrapertools.get_filename_from_url(media_url)[-4:] + " [mega]", media_url])
+        video_urls.append([scrapertools.get_filename_from_url(media_url)[-4:], media_url])
     else:
         for f in files:
             media_url = f["url"]
-            video_urls.append([scrapertools.get_filename_from_url(media_url)[-4:] + " [mega]", media_url])
+            video_urls.append([scrapertools.get_filename_from_url(media_url)[-4:], media_url])
 
     if len(video_urls) == 1:
         if '.zip ' in str(video_urls):

@@ -9,9 +9,9 @@
   "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["movie", "tvshow"],
-  "language": ["lat"],
+  "language": ["lat", "vose"],
 
-  "clusters": ["news", "rankings", "years", "lasts", "docs", "anime", "dorama"],
+  "clusters": ["news", "rankings", "years", "lasts", "docs", "anime", "dorama", "vos"],
 
   "notes": "Películas por géneros y años. También series, animes y doramas"
 }

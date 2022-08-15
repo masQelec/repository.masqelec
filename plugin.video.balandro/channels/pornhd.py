@@ -114,7 +114,8 @@ def list_all(item):
 
             if thumb.startswith('//') == True: thumb = 'https:' + thumb
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie',
+                                        contentTitle = title, contentExtra='adults' ))
 
             if len(itemlist) >= perpage: break
 

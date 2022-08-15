@@ -85,7 +85,7 @@ def list_all(item):
             title = title.capitalize()
 
         itemlist.append(item.clone( action = 'findvideos', url = url if url.startswith('http') else host[:-1] + url,
-                                    title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title ))
+                                    title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if not itemlist:
         if ses == 0:

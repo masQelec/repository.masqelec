@@ -484,7 +484,8 @@ def findvideos(item):
 
         url = urlparse.urljoin(item.url, url)
 
-        if '/hqq.' in url or '/waaw.' in url or '/www.jplayer.' in url: continue
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/www.jplayer.' in url: continue
+        elif 'rapidvideo.' in url: continue
         elif '/streamango.' in url: continue
         elif '/streamplay.' in url: continue
         elif '/powvideo.' in url: continue
@@ -520,6 +521,7 @@ def findvideos(item):
             elif servidor == 's5': continue
 
             if servidor == 'utorrent': servidor = 'torrent'
+            elif servidor == 'uptostream': servidor = 'uptobox'
 
             servidor = servertools.corregir_servidor(servidor)
 
@@ -594,7 +596,12 @@ def play(item):
         try:
            url = httptools.downloadpage(item.url, follow_redirects=False).headers['location']
         except:
-           url = ''
+           data = do_downloadpage(item.url)
+           url = scrapertools.find_single_match(data, 'href="(.*?)"')
+
+           if url.startswith('magnet:'): pass
+           elif url.endswith(".torrent"): pass
+           else: url = ''
 
         if url:
             itemlist.append(item.clone( url=url, server='torrent'))
@@ -605,7 +612,8 @@ def play(item):
                 try:
                    url = httptools.downloadpage(item.url, follow_redirects=False).headers['location']
                 except:
-                   url = ''
+                   data = do_downloadpage(item.url)
+                   url = scrapertools.find_single_match(data, 'href="(.*?)"')
 
                 if url:
                     servidor = servertools.get_server_from_url(url)

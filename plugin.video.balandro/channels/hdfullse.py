@@ -96,6 +96,7 @@ def mainlist_series(item):
     itemlist.append(item.clone( action = 'list_all', title = 'Más valoradas', url= host + '/tv-shows/imdb_rating', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( action = 'list_all', title = 'Animes', url = host + '/tv-tags/anime', search_type = 'tvshow' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Doramas', url = host + '/tv-tags/dorama', search_type = 'tvshow' ))
     itemlist.append(item.clone( action = 'list_all', title = 'Novelas', url = host + '/tv-tags/soap', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( action = 'list_all', title = 'Por alfabético', url = host + '/tv-shows/abc', search_type = 'tvshow' ))

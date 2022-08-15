@@ -10,7 +10,7 @@
     "patterns": [
       {
         "pattern": "(rapidgator.net/file/\\w+(?:\\.html|))",
-        "url": "http://\\1"
+        "url": "https://\\1"
       }
     ]
   }

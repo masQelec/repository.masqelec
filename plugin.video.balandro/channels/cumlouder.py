@@ -194,7 +194,7 @@ def list_all(item):
         thumb = thumb.replace('ep1.jpg', 'ep.jpg')
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, quality = qlty,
-                                    contentType = 'movie', contentTitle = title ))
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
