@@ -210,7 +210,7 @@ Supported files: .a26, .bin</description>
   </extension>
 </addon>
 
-<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="1.0.110" provider-name="masQelec">
+<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="1.0.111" provider-name="masQelec">
   <requires><import addon="xbmc.python" version="2.1.0"/>
 
   </requires>
