@@ -75,7 +75,8 @@ def generos(item):
 
         itemlist.append(item.clone( title = title.capitalize(), action = 'list_all', url = url ))
 
-    itemlist.append(item.clone( title = 'Western', action = 'list_all', url = host + 'genero/western/' ))
+    if itemlist:
+        itemlist.append(item.clone( title = 'Western', action = 'list_all', url = host + 'genero/western/' ))
 
     return itemlist
 

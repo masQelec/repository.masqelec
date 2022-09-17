@@ -9,6 +9,7 @@ from core import httptools, scrapertools, tmdb, jsontools, servertools
 
 host = 'https://www.dilo.nu/'
 
+
 host_catalogue = host + 'catalogue'
 
 IDIOMAS = {'la': 'Lat', 'es': 'Esp', 'en_es': 'Vose', 'en': 'VO'}
@@ -281,7 +282,9 @@ def episodios(item):
         if langs: titulo += ' [COLOR %s]%s[/COLOR]' % (color_lang, ','.join([IDIOMAS.get(lang, lang) for lang in langs]))
         thumb = '' if 'picture' not in epi or not epi['picture'] else 'https://cdn.dilo.nu/resize/episode/220x125@' + epi['picture']
 
-        if title_peli: titulo = title_peli
+        if title_peli:
+            titulo = title_peli
+            thumb = item.thumbnail
 
         itemlist.append(item.clone( action='findvideos', url=host+epi['permalink']+'/', title=titulo, plot=plot, thumbnail=thumb,
                                     contentType='episode', contentSeason=epi['season_number'], contentEpisodeNumber=epi['number'] ))

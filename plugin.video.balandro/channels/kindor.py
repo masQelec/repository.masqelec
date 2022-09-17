@@ -257,6 +257,9 @@ def findvideos(item):
         json_data = jsontools.load(scrapertools.find_single_match(data, "fom:(\{.*?})"))
         hash = scrapertools.find_single_match(data, "hash:'([^']+)'")
 
+    if not hash:
+        return itemlist
+
     for lang in json_data:
         url = base64.b64decode(json_data[lang])
 
@@ -269,7 +272,8 @@ def findvideos(item):
 
         url = "%s?h=%s" % (url, hash)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, title = '', language = IDIOMAS.get(lang, lang) ))
+        if not servidor == 'directo':
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, title = '', language = IDIOMAS.get(lang, lang) ))
 
     return itemlist
 

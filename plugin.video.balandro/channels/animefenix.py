@@ -260,12 +260,14 @@ def findvideos(item):
         serv = ''
         for srv, vid in srvs:
             vid = vid.replace('#vid', '')
+
             if not vid == str(ses): continue
 
             serv = srv.lower()
             break
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = serv ))
+        if not serv == 'fireload':
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = serv ))
 
     if not itemlist:
         if not ses == 0:

@@ -55,8 +55,9 @@ def generos(item):
 
         itemlist.append(item.clone( action='list_all', title=title, url=url ))
 
-    itemlist.append(item.clone( action = 'list_all', title = 'Bélica', url=host + 'genero/belica/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Western', url=host + 'genero/western/' ))
+    if itemlist:
+        itemlist.append(item.clone( action = 'list_all', title = 'Bélica', url=host + 'genero/belica/' ))
+        itemlist.append(item.clone( action = 'list_all', title = 'Western', url=host + 'genero/western/' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -156,6 +157,7 @@ def findvideos(item):
 
         if 'fireload' in server: continue
         elif 'megaupload' in server: continue
+        elif server == 'soon': continue
 
         if url.startswith('//'): url = 'https:' + url
 

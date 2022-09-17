@@ -85,6 +85,7 @@ def test_channel(channel_name):
 
     if 'suggested' in clusters: clusters = clusters.replace('suggested,', '').strip()
     if 'inestable' in clusters: clusters = clusters.replace('inestable,', '').strip()
+    if 'problematic' in clusters: clusters = clusters.replace('problematic,', '').strip()
     if 'temporary' in clusters: clusters = clusters.replace('temporary,', '').strip()
     if 'mismatched' in clusters: clusters = clusters.replace('mismatched,', '').strip()
     if 'clons' in clusters: clusters = clusters.replace('clons,', '').strip()
@@ -127,6 +128,10 @@ def test_channel(channel_name):
     if 'inestable' in str(params['clusters']):
         if txt_diag: txt_diag += '[CR]'
         txt_diag  += 'estado: ' + '[COLOR plum][B]Inestable[/B][/COLOR]'
+
+    if 'problematic' in str(params['clusters']):
+        if txt_diag: txt_diag += '[CR]'
+        txt_diag  += 'servidores: ' + '[COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR]'
 
     if 'mismatched' in str(params['clusters']):
         if not PY3:
@@ -444,14 +449,16 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
            elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
            else:
               if len(response.data) > 0:
-                  txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR]'
+                  txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR][CR]'
 
-                  txt += '[CR][CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
+                  txt += '[CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
                   txt += str(response.headers) + '[CR]'
 
                   if len(response.data) < 1000:
-                      txt += '[CR][CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
-                      txt += str(response.data) + '[CR]'
+                      response.data = str(response.data).strip()
+                      if len(response.data) > 0:
+                          txt += '[CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
+                          txt += str(response.data).strip() + '[CR]'
     else:
         if len(response.data) >= 1000:
             if new_web:
@@ -476,7 +483,17 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
                     if response.code == 301 or response.code == 302 or response.code == 307 or response.code == 308:
                         if 'dominios:' in txt: txt += "[CR]obtener: [COLOR yellow][B]Puede Obtener Otro Dominio desde Configurar Dominio a usar ...[/B][/COLOR]"
 
-                        txt += "[CR]comprobar: [COLOR springgreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
+                        txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
+
+                elif new_web == host + 'inicio/':
+                    if 'Diagnosis:' in txt:
+                        if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Diagnosis:[/B][/COLOR]'
+
+                    txt += '[CR]login: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
+                    new_web = ''
+
+                    if response.code == 301 or response.code == 302 or response.code == 307 or response.code == 308:
+                        txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]"
 
                 else:
                    if new_web:
@@ -505,7 +522,7 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
             if len(response.data) > 0:
                 if not '/cgi-sys/suspendedpage.cgi' or not '/wp-admin/install.php' in new_web:
                     txt += '[CR][CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
-                    txt += str(response.data) + '[CR]'
+                    txt += str(response.data).strip() + '[CR]'
 
     if 'active: True' in txt:
         if not 'Sugerencias:' in txt:
@@ -795,14 +812,16 @@ def acces_server(server_name, url, txt, follow_redirects=None):
         elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
         else:
            if len(response.data) > 0:
-               txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR]'
+               txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR][CR]'
 
-               txt += '[CR][CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
+               txt += '[CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
                txt += str(response.headers) + '[CR]'
 
                if len(response.data) < 1000:
-                   txt += '[CR][CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
-                   txt += str(response.data) + '[CR]'
+                   response.data = str(response.data).strip()
+                   if len(response.data) > 0:
+                       txt += '[CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
+                       txt += str(response.data).strip() + '[CR]'
     else:
         if len(response.data) >= 1000:
             if new_web:
@@ -840,7 +859,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
             if len(response.data) > 0:
                 if not '/cgi-sys/suspendedpage.cgi' in new_web or not '/wp-admin/install.php' in new_web:
                     txt += '[CR][CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
-                    txt += str(response.data) + '[CR]'
+                    txt += str(response.data).strip() + '[CR]'
 
     if not 'Sugerencias:' in txt:
         if 'Invisible Captcha' in txt:

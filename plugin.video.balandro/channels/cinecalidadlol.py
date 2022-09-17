@@ -402,6 +402,7 @@ def play(item):
 
         url = scrapertools.find_single_match(data, 'target="_blank" href="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, 'target="_blank" value="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, '<iframe.*?data-src="(.*?)"')
 
         if url:
             url = url.replace('&amp;', '&')
@@ -431,7 +432,7 @@ def play(item):
             itemlist.append(item.clone( url = url, server = 'torrent' ))
             return itemlist
 
-        itemlist.append(item.clone(url = url, servidor = servidor))
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

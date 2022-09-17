@@ -10,6 +10,13 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
+    msg_error = scrapertools.find_single_match(data, "<li class='no-side-margin'>([^<]+)</li>")
+
+    if "no longer available!" in msg_error:
+        return "El fichero no existe o ha sido borrado"
+    elif msg_error:
+        return msg_error
+
     url = scrapertools.find_single_match(data, "href='([^']+)'>download now</a>")
 
     if url:

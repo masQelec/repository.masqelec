@@ -4,6 +4,7 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+
 host = 'https://www.pepeliculas.org/'
 
 
@@ -357,11 +358,11 @@ def findvideos(item):
 
         if 'youtube' in other: continue
 
-        elif 'waaw' in other: continue
-        elif 'hqq' in other: continue
-        elif 'netu' in other: continue
+        elif 'waaw' in other or 'hqq' in other or 'netu' in other: continue
+
+        elif 'powvideo' in other or 'pomvideo' in other: continue
+
         elif 'openload' in other: continue
-        elif 'powvideo' in other: continue
         elif 'streamplay' in other: continue
         elif 'rapidvideo' in other: continue
         elif 'streamango' in other: continue
@@ -370,11 +371,15 @@ def findvideos(item):
         elif 'stormo' in other: continue
 
         elif 'uploaded' in other: continue
+        elif 'earn4files' in other: continue
+        elif 'uploadrive' in other: continue
+        elif 'uploadbuzz' in other: continue
+        elif 'mediafire' in other: continue
+        elif 'drive.google' in other: continue
 
-        if other == qlty:
-            qlty = ''
+        if other == qlty: qlty = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, other = other,
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, other = other.capitalize(),
                               language = lang, quality = qlty ))
 
     # ~ Ver
@@ -396,11 +401,11 @@ def findvideos(item):
 
             servidor = servertools.corregir_servidor(servidor)
 
-            if 'waaw' in servidor: continue
-            elif 'hqq' in servidor: continue
-            elif 'netu' in servidor: continue
+            if 'waaw' in servidor or  'hqq' in servidor or 'netu' in servidor: continue
+
+            elif 'powvideo' in servidor or 'pomvideo' in servidor: continue
+
             elif 'openload' in servidor: continue
-            elif 'powvideo' in servidor: continue
             elif 'streamplay' in servidor: continue
             elif 'rapidvideo' in servidor: continue
             elif 'streamango' in servidor: continue
@@ -408,14 +413,17 @@ def findvideos(item):
             elif 'vidtodo' in servidor: continue
             elif 'stormo' in servidor: continue
 
-            if lang == 'Latino':
-                lang = 'Lat'
-            elif lang == 'Castellano' or lang == 'Español':
-                lang = 'Esp'
-            elif lang == 'Subtitulado' or lang == 'VOSE':
-                lang = 'Vose'
-            else:
-                lang = '?'
+            elif 'uploaded' in servidor: continue
+            elif 'earn4files' in servidor: continue
+            elif 'uploadrive' in servidor: continue
+            elif 'uploadbuzz' in servidor: continue
+            elif 'mediafire' in servidor: continue
+            elif 'drive.google' in servidor: continue
+
+            if lang == 'Latino': lang = 'Lat'
+            elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
+            elif lang == 'Subtitulado' or lang == 'VOSE': lang = 'Vose'
+            else: lang = '?'
 
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'v',
                                   language = lang, quality = qlty ))
@@ -439,27 +447,34 @@ def findvideos(item):
 
             servidor = servertools.corregir_servidor(servidor)
 
-            if 'waaw' in servidor: continue
-            elif 'hqq' in servidor: continue
-            elif 'netu' in servidor: continue
+            if 'waaw' in servidor or 'hqq' in servidor or 'netu' in servidor: continue
+
+            elif 'powvideo' in servidor or 'pomvideo' in servidor: continue
+
             elif 'openload' in servidor: continue
-            elif 'powvideo' in servidor: continue
             elif 'streamplay' in servidor: continue
             elif 'rapidvideo' in servidor: continue
             elif 'streamango' in servidor: continue
             elif 'verystream' in servidor: continue
             elif 'vidtodo' in servidor: continue
             elif 'stormo' in servidor: continue
-            elif 'uploaded' in servidor: continue
 
-            if lang == 'Latino':
-                lang = 'Lat'
-            elif lang == 'Castellano' or lang == 'Español':
-                lang = 'Esp'
-            elif lang == 'Subtitulado' or lang == 'VOSE':
-                lang = 'Vose'
-            else:
-                lang = '?'
+            elif 'uploaded' in servidor: continue
+            elif 'earn4files' in servidor: continue
+            elif 'uploadrive' in servidor: continue
+            elif 'uploadbuzz' in servidor: continue
+            elif 'mediafire' in servidor: continue
+            elif 'drive.google' in servidor: continue
+
+            elif '1fichier' in servidor: continue
+            elif 'ddownload' in servidor: continue
+            elif 'fastclick' in servidor: continue
+            elif 'nitro.download' in servidor: continue
+
+            if lang == 'Latino': lang = 'Lat'
+            elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
+            elif lang == 'Subtitulado' or lang == 'VOSE': lang = 'Vose'
+            else: lang = '?'
 
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'd',
                                   language = lang, quality = qlty ))
@@ -501,7 +516,6 @@ def play(item):
 
         itemlist.append(item.clone( url=url, server=servidor))
 
-
     return itemlist
 
 
@@ -526,8 +540,7 @@ def list_search(item):
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         plot = scrapertools.htmlclean(scrapertools.find_single_match(match, '<p>(.*?)</p>'))
 

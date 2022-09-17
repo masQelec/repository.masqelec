@@ -92,8 +92,10 @@ def generos(item):
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, grupo = grupo ))
 
-    if item.search_type == 'movie':
-        itemlist.append(item.clone(action = 'list_all', title = 'Peliculas Marvel', url = host + 'category/peliculas-marvel/?type=movies', grupo = 'Peliculas Marvel'))
+    if itemlist:
+        if item.search_type == 'movie':
+            itemlist.append(item.clone(action = 'list_all', title = 'Peliculas Marvel', url = host + 'category/peliculas-marvel/?type=movies',
+                                       grupo = 'Peliculas Marvel'))
 
     return sorted(itemlist, key = lambda it: it.title)
 

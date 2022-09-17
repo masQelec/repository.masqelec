@@ -158,6 +158,9 @@ def show_help_parameters(item):
     if config.get_setting('search_no_inestables', default=False):
         txt += '[CR][CR] - Tiene activado descartar búsquedas en los canales con [B][COLOR plum]Inestables[/COLOR][/B]'
 
+    if config.get_setting('search_no_problematicos', default=False):
+        txt += '[CR][CR] - Tiene activado descartar búsquedas en los canales que sean [B][COLOR darkgoldenrod]Problemáticos[/COLOR][/B]'
+
     if config.get_setting('search_no_channels', default=False):
         txt += '[CR][CR] - Tiene activado notificar en las búsquedas los canales [B][COLOR yellowgreen]Ignorados[/COLOR][/B]'
 
@@ -299,6 +302,8 @@ def do_search(item, tecleado):
     no_inestables = config.get_setting('search_no_inestables', default=False)
     no_proxies = config.get_setting('search_no_proxies', default=False)
 
+    no_problematicos = config.get_setting('search_no_problematicos', default=False)
+
     no_channels = config.get_setting('search_no_channels', default=False)
 
     if item.search_type == 'movie':
@@ -352,6 +357,11 @@ def do_search(item, tecleado):
                 
         if no_inestables:
             if 'inestable' in ch['clusters']:
+                num_canales = num_canales - 1
+                continue
+
+        if no_problematicos:
+            if 'problematic' in ch['clusters']:
                 num_canales = num_canales - 1
                 continue
 
@@ -475,7 +485,13 @@ def do_search(item, tecleado):
                 else:
                     action = 'search'
                     texto = 'resultados'
+
                     if len(ch['itemlist_search']) == 1: texto = 'resultado'
+
+                    if 'inestable' in ch['clusters']: texto += ' [I][COLOR plum] (inestable)[/COLOR][/I]'
+
+                    if 'problematic' in ch['clusters']: texto += ' [I][COLOR darkgoldenrod] (problemático)[/COLOR][/I]'
+
                     titulo = '%s [COLOR mediumspringgreen]... %d %s' % (ch['name'], len(ch['itemlist_search']), texto)
             else:
                 if progreso.iscanceled(): titulo = '%s [COLOR mediumaquamarine]búsqueda cancelada' % ch['name']
@@ -501,6 +517,9 @@ def do_search(item, tecleado):
 
                     if no_inestables:
                         if 'inestable' in ch['clusters']: continue
+
+                    if no_problematicos:
+                        if 'problematic' in ch['clusters']: continue
 
                     if no_proxies:
                         if 'proxies' in ch['notes'].lower():

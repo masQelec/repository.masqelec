@@ -91,6 +91,9 @@ def submnu_developer(item):
             itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Log de Proxies',
                                         todo = 'proxies.log', thumbnail=config.get_thumb('dev') ))
 
+        itemlist.append(item.clone( channel='actions', action='manto_temporales', title=' - Eliminar Logs', _logs = True,
+                                    thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+
     presentar = False
 
     if os.path.exists(os.path.join(config.get_data_path(), 'info_channels.csv')): presentar = True
@@ -180,10 +183,10 @@ def submnu_genres(item):
 
     itemlist.append(item.clone( action='', title= '[B]Canales que podrían necesitar Nuevamente [COLOR red]Proxies[/COLOR]:[/B]', text_color='magenta' ))
 
-    itemlist.append(item.clone( channel='groups', action='ch_generos', title=' - Canales con películas', group = 'generos', extra = 'movies',
+    itemlist.append(item.clone( channel='groups', action='ch_generos', title=' - Canales con Películas', group = 'generos', extra = 'movies',
                                 thumbnail=config.get_thumb('movie'), text_color='deepskyblue' ))
 
-    itemlist.append(item.clone( channel='groups', action='ch_generos', title=' - Canales con series', group = 'generos', extra = 'tvshows',
+    itemlist.append(item.clone( channel='groups', action='ch_generos', title=' - Canales con Series', group = 'generos', extra = 'tvshows',
                                 thumbnail=config.get_thumb('tvshow'), text_color='hotpink' ))
 
     return itemlist
@@ -574,6 +577,11 @@ def _proxies(item):
         item.channel = 'hdfullse'
         hdfullse.configurar_proxies(item)
 
+    elif item.from_channel == 'henaojara':
+        from channels import henaojara
+        item.channel = 'henaojara'
+        henaojara.configurar_proxies(item)
+
     elif item.from_channel == 'homecine':
         from channels import homecine
         item.channel = 'homecine'
@@ -743,7 +751,7 @@ def test_all_webs(item):
 
     config.set_setting('developer_test_channels', '')
 
-    if item.unsatisfactory: text = '¿ Iniciar Test Web de los Canales Insatisfactorios ?'
+    if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Canales Insatisfactorios ?'
     else: text = '¿ Iniciar Test Web de Todos los Canales ?'
 
     if not platformtools.dialog_yesno(config.__addon_name, text):
@@ -779,7 +787,7 @@ def test_all_srvs(item):
 
     config.set_setting('developer_test_servers', '')
 
-    if item.unsatisfactory: text = '¿ Iniciar Test Web de los Servidores Insatisfactorios ?'
+    if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Servidores Insatisfactorios ?'
     else: text = '¿ Iniciar Test Web de Todos los Servidores ?'
 
     if not platformtools.dialog_yesno(config.__addon_name, text):

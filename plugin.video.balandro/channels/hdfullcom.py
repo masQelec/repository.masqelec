@@ -109,9 +109,10 @@ def generos(item):
 
         itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
 
-    itemlist.append(item.clone( title = 'Historia', url = host + 'category/historia/', action = 'list_all' ))
-    itemlist.append(item.clone( title = 'Misterio', url = host + 'category/misterio/', action = 'list_all' ))
-    itemlist.append(item.clone( title = 'Música', url = host + 'category/musica/', action = 'list_all' ))
+    if itemlist:
+        itemlist.append(item.clone( title = 'Historia', url = host + 'category/historia/', action = 'list_all' ))
+        itemlist.append(item.clone( title = 'Misterio', url = host + 'category/misterio/', action = 'list_all' ))
+        itemlist.append(item.clone( title = 'Música', url = host + 'category/musica/', action = 'list_all' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

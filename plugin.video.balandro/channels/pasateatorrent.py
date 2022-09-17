@@ -212,7 +212,7 @@ def findvideos(item):
     for peso, url in matches:
         if not url.startswith('http'): url = host[:-1] + url
 
-        other = peso.strip()
+        other = peso.replace('&#8230;', '').strip()
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, other = other ))
 

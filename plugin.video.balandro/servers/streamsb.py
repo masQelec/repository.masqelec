@@ -52,6 +52,8 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('//sbfast.com/e/', '//streamsb.net/play/').replace('//sbfast.com/d/', '//streamsb.net/play/')
     elif '//sbfull.com/' in page_url:
         page_url = page_url.replace('//sbfull.com/e/', '//streamsb.net/play/').replace('//sbfull.com/d/', '//streamsb.net/play/')
+    elif '//sbspeed.com/' in page_url:
+        page_url = page_url.replace('//sbspeed.com/e/', '//streamsb.net/play/').replace('//sbspeed.com/d/', '//streamsb.net/play/')
 
     data = httptools.downloadpage(page_url).data
 

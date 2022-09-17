@@ -1,6 +1,6 @@
 {
   "id": "cinematteflix",
-  "name": "CinematteFlix",
+  "name": "CineMatteFlix",
   "thumbnail": "cinematteflix.jpg",
 
   "active": true,
@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast", "vose"],
 
-  "clusters": ["adults", "classic", "lists"],
+  "clusters": ["problematic", "adults", "classic", "lists"],
 
   "notes": "Películas clásicas, por géneros."
 }

@@ -18,6 +18,9 @@ from core import httptools, scrapertools, servertools, tmdb, jsontools
 host = 'https://ww1.pelishouse.me/'
 
 
+# ~ Series predominan  Enlaces No Soportados  (30/8/2022)
+
+
 def item_configurar_proxies(item):
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
@@ -91,7 +94,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo Series TV', action = 'list_all', url = host + 'tvshows/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Catálogo Series Animadas', action = 'list_all', url = host + 'series-animadas-online-espanol/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo Series Animadas', action = 'list_all', url = host + 'genre/series-animadas-online-espanol-latino/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_top', url = host + 'pelislatino24-tv/', search_type = 'tvshow' ))
 
@@ -174,9 +177,10 @@ def generos(item):
 
         itemlist.append(item.clone( title=tit, url= host + 'genre/' + opc + '/', action = 'list_all' ))
 
-    if item.search_type == 'movie':
-        if not descartar_xxx:
-            itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'genre/18/' ))
+    if itemlist:
+        if item.search_type == 'movie':
+            if not descartar_xxx:
+                itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'genre/18/' ))
 
     return itemlist
 
@@ -493,6 +497,7 @@ def findvideos(item):
         elif '/vidcloud.' in url: continue
         elif '/gounlimited.' in url: continue
         elif '.oceanplay.' in url: continue
+        elif '/entrepeliculasyseries.' in url: continue
 
         if url:
             servidor = servertools.get_server_from_url(url)
@@ -519,6 +524,7 @@ def findvideos(item):
 
             if servidor == 'tenvoi': continue
             elif servidor == 's5': continue
+            elif servidor == 'pelipluspeliplus': continue
 
             if servidor == 'utorrent': servidor = 'torrent'
             elif servidor == 'uptostream': servidor = 'uptobox'

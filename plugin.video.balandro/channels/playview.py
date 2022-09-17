@@ -12,7 +12,7 @@ host = 'https://playview.io/'
 
 perpage = 20
 
-# En la web: No hay acceso a serie solamente a serie+temporada
+# En la web: No hay acceso a series solamente a serie+temporada
 
 
 def item_configurar_proxies(item):
@@ -284,10 +284,9 @@ def episodios(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAM', 'TS', 'TSHQ', 'SD', 'DVDRip', 'HDTC', 'HDLine', 'HDLine 720p', 'HD 720p', 'HD 1080p']
+    orden = ['CAM', 'HC-CAM', 'TS', 'TSHQ', 'SD', 'DVDRip', 'HDTC', 'HDLine', 'HDLine 720p', 'HD 720p', 'HD 1080p']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
-
 
 
 def corregir_servidor(servidor):
@@ -313,8 +312,11 @@ def findvideos(item):
         post = 'set=LoadOptions&action=Step1&id=%s&type=%s' % (dataid, tipo)
 
     data = do_downloadpage(host + 'playview', post=post)
-    
+
     calidades = scrapertools.find_multiple_matches(data, 'data-quality="([^"]+)"')
+
+    ses = 0
+
     for calidad in calidades:
         if item.dataid:
             post = 'set=LoadOptionsEpisode&action=Step2&id=%s&type=%s&quality=%s&episode=%s' % (item.dataid, item.datatype, calidad.replace(' ', '+'), item.contentEpisodeNumber)
@@ -323,16 +325,34 @@ def findvideos(item):
         data = do_downloadpage(host + 'playview', post=post)
 
         enlaces = scrapertools.find_multiple_matches(data, 'data-id="([^"]+)">\s*<h4>([^<]+)</h4>\s*<small><img src="https://www\.google\.com/s2/favicons\?domain=([^"]*)')
+
         for linkid, lang, servidor in enlaces:
+            ses += 1
+
             servidor = servidor.replace('https://', '').replace('http://', '').replace('www.', '').lower()
             servidor = servidor.split('.', 1)[0]
             servidor = corregir_servidor(servidor)
+
+            if servidor == 'desiupload': continue
+            elif servidor == 'dropapk': continue
+            elif servidor == 'embedo': continue
+            elif servidor == 'protonvideo': continue
+            elif servidor == 'fastclick': continue
+            elif servidor == 'userload': continue
+            elif servidor == 'embedgram': continue
+
+            elif servidor == 'anonfile': servidor = 'anonfiles'
 
             calidad = calidad.replace('(', '').replace(')', '').strip()
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '',
                                   linkid = linkid, linktype = tipo, linkepi = item.contentEpisodeNumber if item.dataid else -1,
                                   language = IDIOMAS.get(lang, lang), quality = calidad, quality_num = puntuar_calidad(calidad) ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

@@ -45,6 +45,12 @@ def get_video_url(page_url, url_referer=''):
         elif 'ninjastream' in page_url: txt_server = 'Ninjastream'
         elif 'rutube' in page_url: txt_server = 'Rutube'
         elif 'videovard' in page_url: txt_server = 'Videovard'
+        elif 'filemoon' in page_url: txt_server = 'Filemoon'
+
+        elif 'yandex' in page_url: txt_server = 'Yandex'
+        elif 'yadi' in page_url:
+              page_url = page_url.replace('/yadi.sk/', '/disk.yandex.ru/')
+              txt_server = 'Yandex'
 
         platformtools.dialog_notification('Cargando ' + '[COLOR yellow]' + txt_server + '[/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
@@ -63,6 +69,8 @@ def get_video_url(page_url, url_referer=''):
             el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
             el_srv += ('ResolveUrl[/B][/COLOR]')
             platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
+            return 'Vídeo no encontrado con ResolveUrl'
 
         except:
             import traceback

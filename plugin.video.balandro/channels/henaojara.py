@@ -7,7 +7,41 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = "https://henaojara.com/"
+host = 'https://henaojara2.com/'
+
+
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://henaojara.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers).data
+
+    if '<title>You are being redirected...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+                data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers).data
+        except:
+            pass
+
+    return data
 
 
 def mainlist(item):
@@ -18,13 +52,16 @@ def mainlist_animes(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
+    descartar_anime = config.get_setting('descartar_anime', default=False)
 
-    if descartar_xxx: return itemlist
+    if descartar_anime: return itemlist
+
     if config.get_setting('adults_password'):
         from modules import actions
         if actions.adults_password(item) == False:
             return itemlist
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
@@ -51,7 +88,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(host).data
+    data = do_downloadpage(host)
 
     bloque = scrapertools.find_single_match(data, '<div id="categories-3"(.*?)</select>')
 
@@ -78,7 +115,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
 
@@ -114,7 +151,7 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     matches = re.compile('data-tab="(.*?)"', re.DOTALL).findall(data)
@@ -155,7 +192,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     bloque = scrapertools.find_single_match(data, 'data-tab="' + str(item.contentSeason) + '".*?<tbody>(.*?)</tbody>')
@@ -195,7 +232,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     lang = scrapertools.find_single_match(data, '<h1 class="Title">(.*?)<span>')
 
@@ -252,12 +289,13 @@ def play(item):
 
     if '/?trdownload=' in url:
         try:
-           url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+           # ~ url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+           url = httptools.downloadpage_proxy('henaojara', url, follow_redirects=False).headers['location']
         except:
            url = ''
 
     else:
-        data = httptools.downloadpage(url).data
+        data = do_downloadpage(url)
 
         new_url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"')
 
@@ -269,7 +307,7 @@ def play(item):
             if '/player/go.php?v=' in new_url:
                 new_url = new_url.replace('/player/go.php?v=', '/player/go_player.php?v=')
 
-                data = httptools.downloadpage(new_url).data
+                data = do_downloadpage(new_url)
 
                 url = scrapertools.find_single_match(data, 'src="(.*?)"')
                 if url.startswith('//'): url = 'https:' + url

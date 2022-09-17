@@ -335,7 +335,7 @@ def episodios(item):
     for url in matches:
         i += 1
 
-        title = str(season) + 'x' + str(i)
+        title = str(season) + 'x' + str(i) + ' ' + item.contentTitle
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title,
                                     contentType='episode', contentSeason = season, contentEpisodeNumber = i ))

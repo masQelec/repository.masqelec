@@ -164,13 +164,14 @@ def findvideos(item):
 
         if 'adshrink.it' in url: continue
         elif 'theicongenerator' in url: continue
+        elif '/rainonit.com/' in url: continue
 
         other = ''
 
         servidor = servidor.lower()
         if servidor == 'clip': servidor = 'clipwatching'
 
-        elif '/fumacrom.com/' in url or 'tmearn.com/' in url or '/tinyurl.com/' in url or '/ouo.io/'in url:
+        elif '/fumacrom.com/' in url or 'tmearn.com/' in url or 'tmearn.net/' in url or '/tinyurl.com/' in url or '/ouo.io/'in url:
             other = servidor.capitalize()
             servidor = 'directo'
 
@@ -191,7 +192,7 @@ def play(item):
 
     url = item.url
 
-    if 'tmearn.com/' in item.url:
+    if 'tmearn.com/' in item.url or 'tmearn.net/' in item.url:
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     elif item.url.startswith('https://adf.ly/'): 

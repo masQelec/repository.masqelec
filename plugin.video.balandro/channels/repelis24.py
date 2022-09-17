@@ -392,7 +392,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'castellano': 'Esp', 'español': 'Esp', 'latino': 'Lat', 'subtitulado': 'Vose', 'sub español': 'Vose'}
+    IDIOMAS = {'castellano': 'Esp', 'español': 'Esp', 'latino': 'Lat', 'subtitulado': 'Vose', 'sub español': 'Vose', 'japones': 'Vose'}
 
     data = do_downloadpage(item.url)
     data = re.sub('\n|\r|\t|\s{2}|&nbsp;', '', data)

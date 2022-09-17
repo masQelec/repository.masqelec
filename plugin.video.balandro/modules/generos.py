@@ -11,6 +11,9 @@ all_genres_64 = 'ewogICJDb21lZGlhIjogWwogICAgeyJjaGFubmVsIjogImhkZnVsbCIsICJzZWF
 all_genres = eval(base64.b64decode(all_genres_64))
 
 
+color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -20,6 +23,7 @@ def mainlist(item):
 
     for genero in sorted(all_genres.keys()):
         if descartar_xxx and genero == 'X (adultos +18)': continue
+
         itemlist.append(item.clone( action='genero', genero=genero, title=genero ))
 
     return itemlist
@@ -37,10 +41,15 @@ def genero(item):
         ch = channeltools.get_channel_parameters(enlace['channel'])
 
         if not ch['active']: continue
-        if ch['status'] == -1: continue
+        elif ch['status'] == -1: continue
+
+        if config.get_setting('mnu_problematicos', default=False):
+            if 'problematic' in ch['clusters']: continue
 
         if channels_list_status > 0:
             if not ch['status'] == 1: continue
+
+        cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
         if enlace['search_type'] == 'movie':
             txt = 'Películas'
@@ -50,6 +59,22 @@ def genero(item):
             color = 'hotpink'
 
         titulo = '[COLOR %s]%s [/COLOR][COLOR cyan]%s[/COLOR] %s' % (color, txt, enlace['title'], ch['name'])
+
+        if config.get_setting(cfg_proxies_channel, default=''): titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
+
+        if 'register' in ch['clusters']:
+            cfg_user_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_username'
+            cfg_pass_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_password'
+            if not config.get_setting(cfg_user_channel, default='') or not config.get_setting(cfg_pass_channel, default=''):
+               titulo += '[I][COLOR teal] (cuenta)[/COLOR][/I]'
+            else:
+               cfg_login_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_login'
+
+               if config.get_setting(cfg_login_channel, default=False): titulo += '[I][COLOR teal] (sesion)[/COLOR][/I]'
+
+        if 'inestable' in ch['clusters']: titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
+
+        if 'problematic' in ch['clusters']: titulo += '[I][COLOR darkgoldenrod] (problemático)[/COLOR][/I]'
 
         zoo_genre = ''
 

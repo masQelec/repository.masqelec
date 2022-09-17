@@ -22,6 +22,15 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
+    descartar_anime = config.get_setting('descartar_anime', default=False)
+
+    if descartar_anime: return itemlist
+
+    if config.get_setting('adults_password'):
+        from modules import actions
+        if actions.adults_password(item) == False:
+            return itemlist
+
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
@@ -33,6 +42,15 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    descartar_anime = config.get_setting('descartar_anime', default=False)
+
+    if descartar_anime: return itemlist
+
+    if config.get_setting('adults_password'):
+        from modules import actions
+        if actions.adults_password(item) == False:
+            return itemlist
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -49,6 +67,15 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    descartar_anime = config.get_setting('descartar_anime', default=False)
+
+    if descartar_anime: return itemlist
+
+    if config.get_setting('adults_password'):
+        from modules import actions
+        if actions.adults_password(item) == False:
+            return itemlist
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 

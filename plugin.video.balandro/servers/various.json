@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Mvidoo, Ninjastream, Rutube, Tubeload, Videovard)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Filemoon,  Mvidoo,  Ninjastream,  Rutube,  Tubeload,  Videovard,  Yandex)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -38,6 +38,22 @@
       },
       {
         "pattern": "(https://videovard.to/(?:e|f|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://filemoon.sx/(?:e|d|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://filemoon.to/(?:e|d|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://disk.yandex.(?:ru|com)/(?:d|i|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://yadi.(?:sk|disk)/(?:d|i|)/[A-z0-9]+)",
         "url": "\\1"
       }
     ]

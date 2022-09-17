@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -237,13 +237,22 @@ def findvideos(item):
         elif servidor == 'servidor vip': continue
         elif servidor == 'pelis': continue
 
+        other = ''
+
         if servidor == 'dood': servidor = 'doodstream'
         elif servidor == 'suzihaza': servidor = 'fembed'
+        elif servidor == 'vanfem': servidor = 'fembed'
         elif servidor == 'ok': servidor = 'okru'
 
-        elif 'damedamehoy' in servidor or 'tomatomatela' in servidor: servidor = 'directo'
+        elif servidor == 'app':
+             servidor = 'directo'
+             other = 'App'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = lang ))
+        elif 'damedamehoy' in servidor or 'tomatomatela' in servidor:
+             servidor = 'directo'
+             other = 'Dame'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -270,6 +279,23 @@ def play(item):
     itemlist = []
 
     url = item.url
+
+    if item.other == 'App':
+            b64_url = base64.b64decode(item.url)
+
+            if b64_url:
+                if 'https://apialfa.tomatomatela.com/ir/player.php' in str(b64_url):
+                    if "b'" in str(b64_url): b64_url = str(b64_url).replace("b'", '').replace("'", '')
+
+                    h = scrapertools.find_single_match(str(b64_url), 'h=(.*?)$')
+
+                    if h:
+                        post = {'url': h}
+
+                        resp = httptools.downloadpage('https://api.cuevana3.me/ir/redirect_ddh.php', post = post, follow_redirects=False, only_headers=True)
+
+                        try: url = resp.headers['location']
+                        except: url = ''
 
     if '?h=' in item.url:
         h =  scrapertools.find_single_match(item.url, '.*?h=(.*?)$')

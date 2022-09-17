@@ -97,7 +97,7 @@ def generos(item):
         ('action-adventure', 'Action & Adventure'),
         ('animacion', 'Animación'), 
         ('aventura', 'Aventura'),
-        ('belica', 'Belica'),
+        ('belica', 'Bélica'),
         ('ciencia-ficcion', 'Ciencia ficción'),
         ('comedia', 'Comedia'), 
         ('crimen', 'Crimen'),
@@ -163,7 +163,7 @@ def list_all(item):
 
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
-        title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
+        title = scrapertools.find_single_match(article, '<h3 class="Title">(.*?)</h3>')
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
@@ -194,8 +194,8 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        if '>SIGUIENTE<' in data:
-            next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="([^"]+)')
+        if '>Siguiente' in data:
+            next_page = scrapertools.find_single_match(data, 'class="page-numbers current">.*?href="([^"]+)')
             if next_page:
                 if '/page/' in next_page:
                     itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
@@ -209,7 +209,7 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('data-season="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('data-tab="(.*?)"', re.DOTALL).findall(data)
 
     for numtempo in matches:
         title = 'Temporada ' + numtempo
@@ -228,6 +228,10 @@ def temporadas(item):
     return itemlist
 
 
+def tracking_all_episodes(item):
+    return episodios(item)
+
+
 def episodios(item):
     logger.info()
     itemlist = []
@@ -237,18 +241,13 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
-    postid = scrapertools.find_single_match(data, 'data-post="(.*?)"')
-    if not postid: postid = scrapertools.find_single_match(data, 'postid-(.*?) ')
+    bloque = scrapertools.find_single_match(data, 'data-tab="' + str(item.contentSeason) + '"(.*?)</table>')
 
-    post = {'action': 'action_select_season', 'season': str(item.contentSeason), 'post': postid}
+    bloque = bloque.replace('&lt;img', '<img').replace('&quot;', '"')
 
-    headers = {'Referer': item.url}
+    patron = '<span class="Num">(.*?)</span>.*?<a href="(.*?)".*?<img src="(.*?)".*?<a href=".*?">(.*?)</a>'
 
-    data = do_downloadpage(host + 'wp-admin/admin-ajax.php',  post = post, headers = headers)
-
-    patron = '<span class="num-epi">(.*?)</span>.*?<h2 class="entry-title">(.*?)</h2>.*?<a href="(.*?)"'
-
-    matches = scrapertools.find_multiple_matches(data, patron)
+    matches = scrapertools.find_multiple_matches(bloque, patron)
 
     if item.page == 0:
         sum_parts = len(matches)
@@ -257,10 +256,12 @@ def episodios(item):
                 platformtools.dialog_notification('MegaSerie', '[COLOR cyan]Cargando elementos[/COLOR]')
                 item.perpage = 250
 
-    for episode, title, url in matches[item.page * item.perpage:]:
-        epis = scrapertools.find_single_match(episode, '.*?x(.*?)$')
+    for epis, url, thumb, title in matches[item.page * item.perpage:]:
+        if not 'http' in thumb: thumb = 'https:' + thumb
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType = 'episode', contentEpisodeNumber = epis ))
+        titulo = str(item.contentSeason) + 'x' + epis + ' ' + title
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'episode', contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -282,56 +283,35 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, 'href="#(.*?)">.*?<span class="server">(.*?)-(.*?)</span>')
+    matches = scrapertools.find_multiple_matches(data, 'td><span class="Num">.*?href="(.*?)".*?alt="Imagen(.*?)"')
 
     ses = 0
 
-    for opt, servidor, lang in matches:
+    for url, lang in matches:
         ses += 1
+
+        url = url.strip()
+        if not url: continue
+
+        if '/netu' in url or '/waaw' in url or '/hqq' in url: continue
+        elif '/ul' in url: continue
+        elif '/1fichier' in url: continue
+        elif '/rapidgator' in url: continue
+        elif '/mediafire' in url: continue
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
 
         servidor = servertools.corregir_servidor(servidor)
 
-        if 'netu' in servidor: continue
-        elif 'waaw' in servidor: continue
-        elif 'hqq' in servidor: continue
-
         lang = lang.strip()
 
-        url = scrapertools.find_single_match(data, '<div id="' + str(opt) + '".*?<iframe.*?src="(.*?)"')
-
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
-
-    # Descargas con recaptcha
 
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
-
-    return itemlist
-
-
-def play(item):
-    logger.info()
-    itemlist = []
-
-    item.url = item.url.replace('&#038;', '&')
-
-    data = do_downloadpage(item.url)
-    url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
-
-    if url:
-        if url.startswith('//'): url = 'https:' + url
-
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        if servidor:
-            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
-            url = servertools.normalize_url(servidor, url)
-            itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
 

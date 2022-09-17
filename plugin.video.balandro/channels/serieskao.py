@@ -89,7 +89,8 @@ def generos(item):
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
 
-    itemlist.append(item.clone( title = 'Western', action = 'list_all', url = host + 'genero/western/' ))
+    if itemlist:
+        itemlist.append(item.clone( title = 'Western', action = 'list_all', url = host + 'genero/western/' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -331,9 +332,10 @@ def findvideos(item):
                     other = servertools.get_server_from_url(url)
                     other = servertools.corregir_servidor(other)
 
-                lng = IDIOMAS.get(lang, lang)
+                if not other == 'directo':
+                    lng = IDIOMAS.get(lang, lang)
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = lng, other = other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = lng, other = other ))
 
     if not itemlist:
         if not ses == 0:

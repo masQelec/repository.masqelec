@@ -51,7 +51,7 @@ class login_dialog(xbmcgui.WindowDialog):
 
         if avis:
             self.login_result = False
-            platformtools.dialog_ok("Recomendación Balandro - HdFull", '[COLOR yellow]Sugerimos crear una nueva cuenta para registrarse en la web, no deberiais indicar ninguna de vuestras cuentas personales.[/COLOR]', 'Para más detalles al respecto, acceda a la Ayuda, apartado Canales, Información dominios que requieren registrarse.')
+            platformtools.dialog_ok("Recomendación Balandro - [B][COLOR yellow]HdFull[/B][/COLOR]", '[COLOR yellow]Sugerimos crear una nueva cuenta para registrarse en la web, no deberiais indicar ninguna de vuestras cuentas personales.[/COLOR]', 'Para más detalles al respecto, acceda a la Ayuda, apartado Canales, Información dominios que requieren registrarse.')
 
         self.background = xbmcgui.ControlImage(250, 150, 800, 355, filename=config.get_thumb('ContentPanel'))
         self.addControl(self.background)
@@ -618,7 +618,7 @@ def list_episodes(item):
         context.append({ 'title': '[COLOR pink]Listar temporada %s[/COLOR]' % epi['season'], 
                          'action': 'episodios', 'url': url_tempo, 'context': '', 'folder': True, 'link_mode': 'update' })
 
-        context.append({ 'title': '[COLOR pink]Listar temporadas[/COLOR]',
+        context.append({ 'title': '[COLOR pink][B]Listar temporadas[/B][/COLOR]',
                          'action': 'temporadas', 'url': url_serie, 'context': '', 'folder': True, 'link_mode': 'update' })
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, context = context,
@@ -645,6 +645,10 @@ def temporadas(item):
 
     data = do_downloadpage(item.url, referer = item.referer if item.referer else '%s/buscar/' % dominio)
 
+    any = scrapertools.find_single_match(data, '<a href="/buscar/year/.*?">(.*?)</a>')
+
+    poster = scrapertools.find_single_match(data, '<div class="show-poster">.*?<img src="(.*?)"')
+
     sid = scrapertools.find_single_match(data, "var sid = '([^']+)';")
 
     patron = 'itemprop="season"[^>]*>'
@@ -655,6 +659,8 @@ def temporadas(item):
 
     # ~  Temporadas ocultas pero son accesibles en la mayoria de los casos
     if matches:
+        seasons_hiden = False
+
         total_temporadas = len(matches)
 
         try:
@@ -677,6 +683,17 @@ def temporadas(item):
 
                        match_hiden_url = match_hiden_url + '/temporada-' + str(i)
                        match_hiden_tit = 'Temporada ' + str(i)
+
+                       seasons_hiden = True
+
+                       try:
+                            post = 'action=season&show=%s&season=%s' % (sid, str(i))
+                            data = jsontools.load(do_downloadpage(dominio + 'a/episodes', post=post, referer=item.url))
+
+                            if not data: break
+                       except:
+                            pass
+
                        matches = matches + [(match_hiden_url, match_hiden_tit, '', match_hiden_tit)]
 
                    i += 1
@@ -710,6 +727,33 @@ def temporadas(item):
 
         itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, sid = sid, referer = item.url,
                                     contentType = 'season', contentSeason = numtempo ))
+
+    # ~  Temporadas ocultas No detectadas
+    if not seasons_hiden:
+        if itemlist:
+            if sid:
+                if poster: thumb = poster
+                if not any: any = '-'
+
+                last_tempo = int(numtempo)
+                last_url = scrapertools.find_single_match(url, '(.*?)-')
+
+                try:
+                    while last_tempo <= 99:
+                        last_tempo = last_tempo + 1
+
+                        post = 'action=season&show=%s&season=%s' % (sid, str(last_tempo))
+                        data = jsontools.load(do_downloadpage(dominio + 'a/episodes', post=post, referer=item.url))
+
+                        if not data: break
+
+                        url = last_url + '-' + str(last_tempo)
+                        title = 'Temporada ' + str(last_tempo)
+
+                        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, sid = sid, referer = item.url,
+                                                    contentType = 'season', contentSeason = last_tempo, infoLabels={'year': any} ))
+                except:
+                    pass
 
     # Alguna serie de una sola temporada que no la tiene identificada
     if len(itemlist) == 0:

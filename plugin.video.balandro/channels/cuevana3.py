@@ -107,11 +107,13 @@ def generos(item):
     data = do_downloadpage(host)
 
     matches = re.compile('/(category/[^ >]+)>([^<]+)</a></li>', re.DOTALL).findall(data)
+
     for url, title in matches:
         itemlist.append(item.clone( title=title, url=host + url, action='list_all', search_type = item.search_type ))
 
-    itemlist.append(item.clone( title='Suspense', url=host + 'category/suspense', action='list_all', search_type = item.search_type ))
-    itemlist.append(item.clone( title='Western', url=host + 'category/western', action='list_all', search_type = item.search_type ))
+    if itemlist:
+        itemlist.append(item.clone( title='Suspense', url=host + 'category/suspense', action='list_all', search_type = item.search_type ))
+        itemlist.append(item.clone( title='Western', url=host + 'category/western', action='list_all', search_type = item.search_type ))
 
     return sorted(itemlist, key=lambda it: it.title)
 

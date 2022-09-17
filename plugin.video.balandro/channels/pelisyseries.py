@@ -374,6 +374,7 @@ def findvideos(item):
         elif 'videomega' in srv: continue
         elif 'streamto' in srv: continue
         elif 'drive.google' in srv: continue
+        elif 'viduplayer' in srv: continue
 
         srv = srv.lower()
         srv = srv.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.ru', '').replace('.tv', '').replace('.to', '').replace('.me', '').replace('.nz', '')

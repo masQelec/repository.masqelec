@@ -12,6 +12,9 @@ host = 'https://peliculaspremium.com/'
 perpage = 24
 
 
+# ~ Series Solo 2 paginas y predominan  Sin enlaces disponibles  (30/8/2022)
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     headers = {'Referer': host}
 
@@ -80,8 +83,9 @@ def generos(item):
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
 
-    if item.search_type == 'movie':
-        itemlist.append(item.clone( action = 'list_all', title = 'Accion', url = host + 'genero/accion.html' ))
+    if itemlist:
+        if item.search_type == 'movie':
+            itemlist.append(item.clone( action = 'list_all', title = 'Accion', url = host + 'genero/accion.html' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

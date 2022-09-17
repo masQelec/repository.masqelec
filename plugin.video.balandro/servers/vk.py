@@ -1,17 +1,38 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] < 3:
-    import urllib
-else:
-    import urllib.parse as urllib
-
-
-import base64, time
+import xbmc, base64, time
 
 from core import httptools, scrapertools
-from platformcode import logger
+from platformcode import config, logger, platformtools
+
+
+color_exec = config.get_setting('notification_exec_color', default='cyan')
+el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
+el_srv += ('ResolveUrl[/B][/COLOR]')
+
+
+def import_libs(module):
+    import os, sys, xbmcaddon
+    from core import filetools
+
+    path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
+    addon_xml = filetools.read(filetools.join(path, "addon.xml"))
+
+    if addon_xml:
+        require_addons = scrapertools.find_multiple_matches(addon_xml, '(<import addon="[^"]+"[^\/]+\/>)')
+        require_addons = list(filter(lambda x: not 'xbmc.python' in x and 'optional="true"' not in x, require_addons))
+
+        for addon in require_addons:
+            addon = scrapertools.find_single_match(addon, 'import addon="([^"]+)"')
+            if xbmc.getCondVisibility('System.HasAddon("%s")' % (addon)):
+                import_libs(addon)
+            else:
+                xbmc.executebuiltin('InstallAddon(%s)' % (addon))
+                import_libs(addon)
+
+        lib_path = scrapertools.find_multiple_matches(addon_xml, 'library="([^"]+)"')
+        for lib in list(filter(lambda x: not '.py' in x, lib_path)):
+            sys.path.append(os.path.join(path, lib))
 
 
 def normalizar_url(page_url):
@@ -27,7 +48,13 @@ def get_video_url(page_url, url_referer=''):
     logger.info("url=" + page_url)
     video_urls = []
 
+    pattern_page_url = page_url
+
     page_url = normalizar_url(page_url)
+
+    data = httptools.downloadpage(page_url).data
+    if 'This video has been removed from public access' in data or 'Video not found' in data or '<div class="message_page_title">Error</div>' in data:
+        return 'El archivo ya no esta disponible o ha sido borrado'
 
     url_savevk = 'https://savevk.com/' + page_url.replace('https://vk.com/', '')
 
@@ -38,19 +65,18 @@ def get_video_url(page_url, url_referer=''):
     p_id = scrapertools.find_single_match(bloque, 'id: "([^"]+)')
     p_server = scrapertools.find_single_match(bloque, 'server: "([^"]+)')
     p_token = scrapertools.find_single_match(bloque, 'token: "([^"]+)')
-    # ~ p_sig = scrapertools.find_single_match(bloque, 'sig: "([^"]+)')
     p_credentials = scrapertools.find_single_match(bloque, 'credentials: "([^"]+)')
     p_c_key = scrapertools.find_single_match(bloque, 'c_key: "([^"]+)')
     p_e_key = scrapertools.find_single_match(bloque, 'e_key: "([^"]+)')
     p_i_key = scrapertools.find_single_match(bloque, 'i_key: "([^"]+)')
-    if not p_id or not p_server or not p_token: return video_urls
 
-    # ~ url = 'https://%s/method/video.sig?callback=jQuery1_1&token=%s&videos=%s&extra_key=%s&ckey=%s&sig=%s&_=%s' % \
-        # ~ (base64.b64decode(p_server[::-1]), p_token, p_id, p_e_key, p_c_key, p_sig, int(time.time()))
+    if not p_id or not p_server or not p_token: return video_urls
 
     url = 'https://%s/method/video.get?credentials=%s&token=%s&videos=%s&extra_key=%s&ckey=%s' % \
         (base64.b64decode(p_server[::-1]), p_credentials, p_token, p_id, p_e_key, p_c_key)
 
+    if "/b'" in str(url): url = url.replace("/b'", "/").replace("'/", "/")
+          
     data = httptools.downloadpage(url, headers={'Referer': url_savevk}).data.replace('\\/', '/')
 
     bloque = scrapertools.find_single_match(data, '"files":\{(.*?)\}')
@@ -59,28 +85,26 @@ def get_video_url(page_url, url_referer=''):
     for lbl, url in matches:
         video_urls.append([lbl, url])
 
-    return video_urls
+    if not video_urls:
+        if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            try:
+                import_libs('script.module.resolveurl')
 
+                import resolveurl
+                resuelto = resolveurl.resolve(pattern_page_url)
 
-def get_video_url_ant(page_url, url_referer=''):
-    logger.info("url=" + page_url)
-    video_urls = []
+                if resuelto:
+                    video_urls.append(['mp4', resuelto + '|Referer=%s' % pattern_page_url])
+                    return video_urls
 
-    page_url = normalizar_url(page_url)
+                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 
-    data = httptools.downloadpage('https://getvideo.org/en').data
-    token = scrapertools.find_single_match(data, '<meta name="csrf-token" content="([^"]+)')
+            except:
+                import traceback
+                logger.error(traceback.format_exc())
+                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 
-    time.sleep(1)
+        else:
+           return 'Acceso Denegado'
 
-    post = {'ajax': '1', 'token': token, 'url': page_url}
-    data = httptools.downloadpage('https://getvideo.org/en/get_video', post=urllib.urlencode(post)).data
-
-    matches = scrapertools.find_multiple_matches(data, ' href="([^"]+)" class="[^"]*" data="([^"]+)')
-    for url, lbl in matches:
-        url_final = urllib.unquote(url.split('&url=')[1])
-        if url_final:
-            video_urls.append([lbl, url_final])
-
-    video_urls.reverse()
     return video_urls

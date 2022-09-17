@@ -83,8 +83,9 @@ def generos(item):
 
         itemlist.append(item.clone( action='list_all', title=title, url=url ))
 
-    if item.search_type == 'movie':
-        itemlist.append(item.clone( action = 'list_all', title = 'Cine Clásico', url = host + 'peliculas/cine-clasico/' ))
+    if itemlist:
+        if item.search_type == 'movie':
+            itemlist.append(item.clone( action = 'list_all', title = 'Cine Clásico', url = host + 'peliculas/cine-clasico/' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

@@ -160,6 +160,7 @@ def submnu_canales(item):
     itemlist.append(item.clone( action='', title= '[B] - CANALES (Situación):[/B]', text_color='goldenrod', folder=False, thumbnail=config.get_thumb('settings') ))
     itemlist.append(item.clone( action='channels_with_proxies', title= '    - Qué canales pueden necesitar [COLOR gold][B]Proxies[/B][/COLOR]', new_proxies=True, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están [COLOR gold][B]Inestables[/B][/COLOR]', no_stable = True, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales son [COLOR gold][B]Problemátios[/B][/COLOR] (Predominan Sin enlaces Disponibles/Válidos/Soportados)', problematics = True, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están [COLOR gold][B]Temporalmente[/B][/COLOR] inactivos', temp_no_active = True, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales son [COLOR gold][B]Privados[/B][/COLOR]', tipo = 'all', privates = True, thumbnail=config.get_thumb('stack') ))
 
@@ -520,6 +521,13 @@ def channels_inestables(item):
 
     filters.show_channels_list(item)
 
+def channels_problematicos(item):
+    logger.info()
+
+    item.problematics = True
+
+    filters.show_channels_list(item)
+
 def channels_only_torrents(item):
     logger.info()
 
@@ -791,6 +799,9 @@ def show_help_faq(item):
     txt += ' dispone de unos Preferidos propios donde poder apuntar todas las Películas y Series que interesen al usuario.'
     txt += ' Se pueden configurar múltiples opciones, por ejemplo la preferencia de idioma, la reproducción automática, los colores para los listados, los servidores preferidos, excluir canales en las búsquedas, etc.'
 
+    txt += '[CR][CR][COLOR gold][B]¿ Qué particularidades tienen los Canales [/COLOR][COLOR darkgoldenrod]Problemáticos[/COLOR][COLOR gold] ?[/B][/COLOR][CR]'
+    txt += 'Son aquellos canales en los que Predominan Referencias/Elementos Sin enlaces Disponibles, enlaces Inválidos y/ó enlaces a servidores No Soportados.'
+
     txt += '[CR][CR][COLOR gold][B]¿ Cómo funciona el [/COLOR][COLOR fuchsia]Autoplay[/COLOR][COLOR gold] ?[/B][/COLOR][CR]'
     txt += 'Se puede activar la función de reproducción automática desde la configuración del addon.'
     txt += ' Si se activa, al ver una película ó episodio se intenta reproducir el primero de los enlaces que funcione, sin mostrarse el diálogo de selección de servidor.'
@@ -884,15 +895,18 @@ def show_not_contemplated(item):
     txt += ' - No se pueden garantizar resultados satisfactorios:[CR]'
 
     txt += '    - Con Versiones anteriores a [COLOR darkorange][B]17.x[/B][/COLOR] en su Media Center.[CR]'
-    txt += '    - Ejecución de Balandro bajo [COLOR gold]Builds, Wizards ó Widgets[/COLOR] no se pueden garantizar resultados satisfactorios[CR]'
+    txt += '    - Ejecución de Balandro bajo [COLOR gold]Builds, Wizards ó Widgets[/COLOR] no se pueden garantizar los resultados[CR]'
     txt += '    - Intervención del fichero [COLOR gold]AdvancedSettings[/COLOR] con sentencias relativas a la memoria de su Media Center[CR][CR]'
 
     txt += ' - Integración con la [COLOR gold]Videoteca[/COLOR] de su Media Center[CR]'
     txt += ' - Motor Torrent [COLOR gold]Horus / AceStream[/COLOR][CR]'
     txt += ' - Integración con cuentas [COLOR gold]Alldebrid[/COLOR][CR][CR]'
 
+    txt += ' - Descargas:[CR]'
+    txt += '   - Descargar [COLOR gold]Todos[/COLOR] los Capítulos de una Temporada alunísono[CR]'
+    txt += '   - Descargas formatos de ficheros NO admintidos [COLOR gold]m3u8, mpd, rtmp, rar, torrent[/COLOR][CR][CR]'
+
     txt += ' - Algunos Servidores que dada su complejidad para efectuar Play [COLOR gold]No están Soportados[/COLOR][CR]'
-    txt += ' - Descargar [COLOR gold]Todos[/COLOR] los Capítulos de una Temporada alunísono[CR]'
     txt += ' - Acceder a [COLOR gold]Una Página Concreta[/COLOR] en los listados de las opciones de los canales[CR]'
     txt += ' - Incluir el [COLOR gold]Rating[/COLOR] en los listados de las opciones de los canales[CR]'
 
@@ -1086,24 +1100,34 @@ def _menu_parameters():
     txt_disableds = ''
 
     if not config.get_setting('mnu_sugeridos', default=True):
-        txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú[B][COLOR aquamarine]Sugeridos[/COLOR][/B][CR][CR]'
+        txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR aquamarine]Sugeridos[/COLOR][/B][CR][CR]'
 
     if not config.get_setting('channels_link_main', default=True):
-        txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR gold]Canales[/COLOR][/B][CR][CR]'
+        txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR gold]Canales[/COLOR][/B][CR][CR]'
 
     if not config.get_setting('mnu_idiomas', default=True):
-        txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR limegreen]Idiomas[/COLOR][/B][CR][CR]'
+        txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR limegreen]Idiomas[/COLOR][/B][CR][CR]'
+    else:
+        if config.get_setting('mnu_problematicos', default=False):
+            txt_disableds += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal [B][COLOR limegreen]Idiomas[/COLOR][/B][CR]'
+
+            txt_disableds += '   Además NO se mostrarán los canales que sean [COLOR darkgoldenrod]Problemáticos[/COLOR][CR][CR]'
 
     if not config.get_setting('mnu_grupos', default=True):
-        txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR magenta]Grupos[/COLOR][/B][CR][CR]'
+        txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR magenta]Grupos[/COLOR][/B][CR][CR]'
+    else:
+        if config.get_setting('mnu_problematicos', default=False):
+            txt_disableds += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal [B][COLOR magenta]Grupos[/COLOR][/B][CR]'
+
+            txt_disableds += '   Además NO se mostrarán los canales que sean [COLOR darkgoldenrod]Problemáticos[/COLOR][CR][CR]'
 
     if config.get_setting('mnu_simple', default=False):
         txt_disableds += ' - [B][COLOR crimson]Menú Simplificado:[/B][/COLOR][CR]'
 
-        txt_disableds += '   - No se presentará [COLOR gold]Jamás[/COLOR] la opción de [B][COLOR wheat]Preferidos[/COLOR][/B][CR]'
+        txt_disableds += '   - No se presentará [COLOR gold]Jamás[/COLOR] la opción del Menú principal [B][COLOR wheat]Preferidos[/COLOR][/B][CR]'
         txt_disableds += '     Además no se mostrará en los Menús Contextuales la opción [COLOR darkorange][B]Guardar en Preferidos[/B][/COLOR][CR][CR]'
 
-        txt_disableds += '   - No se presentará [COLOR gold]Jamás[/COLOR] la opción de [B][COLOR seagreen]Descargas[/COLOR][/B][CR]'
+        txt_disableds += '   - No se presentará [COLOR gold]Jamás[/COLOR] la opción del Menú principal [B][COLOR seagreen]Descargas[/COLOR][/B][CR]'
         txt_disableds += '     Además no se mostrará en los Menús Contextuales la opción [COLOR darkorange][B]Descargar Vídeo[/B][/COLOR][CR][CR]'
 
         txt_disableds += '   - No se presentarán [COLOR gold][B]Nunca[/B][/COLOR] las opciónes de:[CR]'
@@ -1119,81 +1143,105 @@ def _menu_parameters():
         txt_disableds += '      - [B][COLOR springgreen]Animes[/COLOR][/B][CR]'
         txt_disableds += '      - [B][COLOR orange]Adultos[/COLOR][/B][CR]'
         txt_disableds += '      - [B][COLOR red]Proxies[/COLOR][/B][CR]'
+        txt_disableds += '      - [B][COLOR darkgoldenrod]Problemáticos[/B][/COLOR][CR]'
         txt_disableds += '      - [B][COLOR gray]Desactivados[/COLOR][/B][CR][CR]'
 
     else:
         if not config.get_setting('mnu_pelis', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR deepskyblue]Películas[/COLOR][/B][CR][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR deepskyblue]Películas[/COLOR][/B][CR][CR]'
 
         if not config.get_setting('mnu_series', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR hotpink]Series[/COLOR][/B][CR][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR hotpink]Series[/COLOR][/B][CR][CR]'
 
         if config.get_setting('channels_link_pyse', default=False):
-            txt_disableds += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú [B][COLOR teal]Películas y Series[/COLOR][/B][CR][CR]'
+            txt_disableds += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal [B][COLOR teal]Películas y Series[/COLOR][/B][CR][CR]'
         else:
-            txt_disableds += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú [B][COLOR teal]Películas y Series[/COLOR][/B][CR][CR]'
+            txt_disableds += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú principal [B][COLOR teal]Películas y Series[/COLOR][/B][CR][CR]'
 
         if not config.get_setting('mnu_generos', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR thistle]Géneros[/COLOR][/B][CR][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR thistle]Géneros[/COLOR][/B][CR][CR]'
+        else:
+            if config.get_setting('mnu_problematicos', default=False):
+                txt_disableds += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal [B][COLOR thistle]Géneros[/COLOR][/B][CR]'
+
+                txt_disableds += '   Además NO se mostrarán los canales que sean [COLOR darkgoldenrod]Problemáticos[/COLOR][CR][CR]'
 
         if not config.get_setting('mnu_documentales', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR cyan]Documentales[/COLOR][/B][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR cyan]Documentales[/COLOR][/B][CR]'
 
-            txt_disableds += '   Además no se mostrarán en el resto de Menús los canales que sean [COLOR cyan]Exclusivos de Documentales[/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrarán en el resto de las opciones del Menú principal los canales que sean [COLOR cyan]Exclusivos de Documentales[/COLOR][CR][CR]'
 
         if not config.get_setting('mnu_infantiles', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR lightyellow]Infantiles[/COLOR][/B][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR lightyellow]Infantiles[/COLOR][/B][CR]'
 
-            txt_disableds += '   Además no se mostrarán en el resto de Menús los canales que sean [COLOR lightyellow]Exclusivos de Infantiles[/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrarán en el resto de las opciones del Menú principal los canales que sean [COLOR lightyellow]Exclusivos de Infantiles[/COLOR][CR][CR]'
 
         if not config.get_setting('mnu_novelas', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR limegreen]Novelas[/COLOR][/B][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR limegreen]Novelas[/COLOR][/B][CR]'
 
-            txt_disableds += '   Además no se mostrarán en el resto de Menús los canales que sean [COLOR limegreen]Exclusivos de Novelas[/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrarán en el resto de las opciones del Menú principal los canales que sean [COLOR limegreen]Exclusivos de Novelas[/COLOR][CR][CR]'
 
         if not config.get_setting('mnu_torrents', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR blue]Torrents[/COLOR][/B][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR blue]Torrents[/COLOR][/B][CR]'
 
-            txt_disableds += '   Además no se mostrarán en el resto de Menús los canales que sean [COLOR blue]Exclusivos de Torrents[/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrarán en el resto de las opciones del Menú principal los canales que sean [COLOR blue]Exclusivos de Torrents[/COLOR][CR][CR]'
 
         if not config.get_setting('mnu_doramas', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR firebrick]Doramas[/COLOR][/B][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR firebrick]Doramas[/COLOR][/B][CR]'
 
-            txt_disableds += '   Además no se mostrarán en el resto de Menús los canales que sean [COLOR firebrick]Exclusivos de Doramas[/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrarán en el resto de las opciones del Menú principal los canales que sean [COLOR firebrick]Exclusivos de Doramas[/COLOR][CR][CR]'
 
         if not config.get_setting('mnu_animes', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR springgreen]Animes[/COLOR][/B][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR springgreen]Animes[/COLOR][/B][CR]'
 
-            txt_disableds += '   Además no se mostrarán en el resto de Menús los canales que sean [COLOR springgreen]Exclusivos de Animes[/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrarán en el resto de las opciones del Menú principal los canales que sean [COLOR springgreen]Exclusivos de Animes[/COLOR][CR][CR]'
 
         if not config.get_setting('mnu_adultos', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR orange]Adultos[/COLOR][/B][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR orange]Adultos[/COLOR][/B][CR]'
 
-            txt_disableds += '   Además no se mostrarán en el resto de Menús los canales que sean [COLOR orange]Exclusivos para Adultos[/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrarán en el resto de las opciones del Menú principal los canales que sean [COLOR orange]Exclusivos para Adultos[/COLOR][CR][CR]'
 
         if config.get_setting('mnu_proxies', default=False):
-            txt_disableds += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú [B][COLOR red]Proxies[/COLOR][/B][CR]'
+            txt_disableds += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal [B][COLOR red]Proxies[/COLOR][/B][CR]'
 
-            txt_disableds += '   Además no se mostrarán en el resto de Menús los canales que tengan Memorizados [COLOR red]Proxies[/COLOR][CR][CR]'
+            txt_disableds += '   Siempre se mostrarán en la Opción del Menú principal [COLOR gold][B]Canales[/B][/COLOR][CR]'
+
+            if config.get_setting('mnu_idiomas', default=True):
+                txt_disableds += '   También se mostrarán en la Opción del Menú principal [COLOR limegreen][B]Idiomas[/B][/COLOR][CR]'
+
+            if config.get_setting('mnu_grupos', default=True):
+                txt_disableds += '   También se mostrarán en la Opción del Menú principal [COLOR magenta][B]Grupos[/B][/COLOR][CR]'
+
+            txt_disableds += '   Además NO se mostrarán en el [COLOR gold]Resto de las opciones del Menú principal[/COLOR] los canales con [COLOR red]Proxies[/COLOR] Memorizados[CR][CR]'
         else:
-            txt_disableds += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú [B][COLOR red]Proxies[/COLOR][/B][CR][CR]'
+            txt_disableds += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú principal [B][COLOR red]Proxies[/COLOR][/B][CR][CR]'
+
+        if config.get_setting('mnu_problematicos', default=False):
+            txt_disableds += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal [B][COLOR darkgoldenrod]Problemáticos[/COLOR][/B][CR]'
+
+            txt_disableds += '   Siempre se mostrarán en la Opción del Menú principal [COLOR gold][B]Canales[/B][/COLOR][CR]'
+
+            txt_disableds += '   Además NO se mostrarán en el resto de las opciones del Menú principal los canales que sean [COLOR darkgoldenrod]Problemáticos[/COLOR][CR][CR]'
+        else:
+            txt_disableds += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú principal [B][COLOR gray]Desactivados[/COLOR][/B][CR][CR]'
 
         if config.get_setting('mnu_desactivados', default=False):
-            txt_disableds += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú [B][COLOR gray]Desactivados[/COLOR][/B][CR]'
+            txt_disableds += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal [B][COLOR gray]Desactivados[/COLOR][/B][CR]'
 
-            txt_disableds += '   Además no se mostrarán en el resto de Menús los canales que esten [COLOR gray]Desactivados[/COLOR][CR][CR]'
+            txt_disableds += '   Siempre se mostrarán en la Opción del Menú principal [COLOR gold][B]Canales[/B][/COLOR][CR]'
+            txt_disableds += '   Además NO se mostrarán en el resto de las opciones del Menú principal los canales que esten [COLOR gray]Desactivados[/COLOR][CR][CR]'
         else:
-            txt_disableds += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú [B][COLOR gray]Desactivados[/COLOR][/B][CR][CR]'
+            txt_disableds += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú principal [B][COLOR gray]Desactivados[/COLOR][/B][CR][CR]'
 
         if not config.get_setting('mnu_preferidos', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR wheat]Preferidos[/COLOR][/B][CR][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR wheat]Preferidos[/COLOR][/B][CR][CR]'
 
-            txt_disableds += '   Además no se mostrará en los Menús Contextuales la opción [COLOR darkorange][B]Guardar en Preferidos[/B][/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrará en los Menús Contextuales la opción [COLOR darkorange][B]Guardar en Preferidos[/B][/COLOR][CR][CR]'
 
         if not config.get_setting('mnu_desargas', default=True):
-            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú [B][COLOR seagreen]Descargas[/COLOR][/B][CR][CR]'
+            txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR seagreen]Descargas[/COLOR][/B][CR][CR]'
 
-            txt_disableds += '   Además no se mostrará en los Menús Contextuales la opción [COLOR darkorange][B]Descargar Vídeo[/B][/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrará en los Menús Contextuales la opción [COLOR darkorange][B]Descargar Vídeo[/B][/COLOR][CR][CR]'
 
     return txt_disableds
 
@@ -1202,34 +1250,34 @@ def _menu_specials():
     txt_specials = ''
 
     if config.get_setting('mnu_search_proxy_channels', default=False):
-        txt_specials += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú y Sub-Menús [B][COLOR red]Buscar Nuevos Proxies[/COLOR][/B][CR][CR]'
+        txt_specials += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR red]Buscar Nuevos Proxies[/COLOR][/B][CR][CR]'
     else:
-        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú y Sub-Menús [B][COLOR red]Buscar Nuevos Proxies[/COLOR][/B][CR][CR]'
+        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR red]Buscar Nuevos Proxies[/COLOR][/B][CR][CR]'
 
     if config.get_setting('search_extra_proxies', default=True):
-        txt_specials += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú y Sub-Menús [B][COLOR red]Búsquedas en Canales con Proxies[/COLOR][/B][CR][CR]'
+        txt_specials += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR red]Búsquedas en Canales con Proxies[/COLOR][/B][CR][CR]'
     else:
-        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR plum]Habilitada[/COLOR] la opción del Menú y Sub-Menús [B][COLOR red]Búsquedas en Canales con Proxies[/COLOR][/B][CR][CR]'
+        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR plum]Habilitada[/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR red]Búsquedas en Canales con Proxies[/COLOR][/B][CR][CR]'
 
     if config.get_setting('sub_mnu_favoritos', default=False):
-        txt_specials += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú [B][COLOR plum]Favoritos[/COLOR][/B][CR][CR]'
+        txt_specials += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal [B][COLOR plum]Favoritos[/COLOR][/B][CR][CR]'
     else:
-        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú [B][COLOR plum]Favoritos[/COLOR][/B][CR][CR]'
+        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú principal [B][COLOR plum]Favoritos[/COLOR][/B][CR][CR]'
 
     if not config.get_setting('sub_mnu_special', default=True):
-        txt_specials += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú y Sub-Menús [B][COLOR pink]Especiales[/COLOR][/B][CR][CR]'
+        txt_specials += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR pink]Especiales[/COLOR][/B][CR][CR]'
     else:
-        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR plum]Habilitada[/COLOR] la opción del Menú y Sub-Menús [B][COLOR pink]Especiales[/COLOR][/B][CR][CR]'
+        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR plum]Habilitada[/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR pink]Especiales[/COLOR][/B][CR][CR]'
 
     if config.get_setting('search_extra_main', default=False):
-        txt_specials += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú y Sub-Menús [B][COLOR violet]Búsquedas Especiales (Listas TMDB, etc.)[/COLOR][/B][CR][CR]'
+        txt_specials += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR violet]Búsquedas Especiales (Listas TMDB, etc.)[/COLOR][/B][CR][CR]'
     else:
-        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú y Sub-Menús [B][COLOR violet]Búsquedas Especiales (Listas TMDB, etc.)[/COLOR][/B][CR][CR]'
+        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR coral]Des-Habilitada[/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR violet]Búsquedas Especiales (Listas TMDB, etc.)[/COLOR][/B][CR][CR]'
 
     if not config.get_setting('sub_mnu_cfg_search', default=True):
-        txt_specials += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú y Sub-Menús [B][COLOR moccasin]Personalizar Búsquedas[/COLOR][/B][CR][CR]'
+        txt_specials += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR moccasin]Personalizar Búsquedas[/COLOR][/B][CR][CR]'
     else:
-        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR plum]Habilitada[/COLOR] la opción del Menú y Sub-Menús [B][COLOR moccasin]Personalizar Búsquedas[/COLOR][/B][CR][CR]'
+        txt_specials += ' - [COLOR gold]Por Defecto[/COLOR] está [COLOR plum]Habilitada[/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR moccasin]Personalizar Búsquedas[/COLOR][/B][CR][CR]'
 
     return txt_specials
 
@@ -1260,7 +1308,7 @@ def show_menu_parameters(item):
     if config.get_setting('developer_mode', default=False):
         txt += 'DESARROLLO:[CR]'
 
-        txt += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú [B][COLOR darkorange]Desarrollo[/COLOR][/B] en los ajustes categoría Sistema[CR][CR]'
+        txt += ' - Tiene [COLOR plum]Habilitada[/COLOR] la opción del Menú principal [B][COLOR darkorange]Desarrollo[/COLOR][/B] en los ajustes categoría Sistema[CR][CR]'
 
     platformtools.dialog_textviewer('Información Parámetros Actuales para los Menús', txt)
 

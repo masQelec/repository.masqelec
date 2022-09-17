@@ -207,6 +207,9 @@ def temporadas(item):
     matches = scrapertools.find_multiple_matches(data, '<li class="sel-temp"><a data-post="([^"]+)" data-season="([^"]+)')
 
     for dpost, tempo in matches:
+        if len(matches) >= 10:
+            if int(tempo) <= 9: tempo = '0' + tempo
+
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
@@ -222,10 +225,13 @@ def temporadas(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    return itemlist
+    if len(matches) >= 9:
+        return sorted(itemlist, key=lambda x: x.title)
+    else:
+        return itemlist
 
 
-# limitar episodios a mostrar y no hacer paginación automàtica (menos añadiendo a videoteca) !? Ej: El señor de los cielos (74 episodios temp 1)
+# limitar episodios a mostrar y no hacer paginación automàtica (menos añadiendo a preferidos) !? Ej: El señor de los cielos (74 episodios temp 1)
 def episodios(item): 
     logger.info()
     itemlist = []
@@ -241,7 +247,7 @@ def episodios(item):
     else:
         try:
            pages = int(tot_pages)
-           platformtools.dialog_notification('SeriesMetro', '[COLOR blue]Cargando episodios[/COLOR]')
+           if pages > 2: platformtools.dialog_notification('SeriesMetro', '[COLOR blue]Cargando episodios[/COLOR]')
         except:
            pages = 12
 

@@ -415,7 +415,7 @@ def findvideos(item):
 
         if url.startswith('https://acortar24.xyz/'): continue
 
-        lang = IDIOMAS.get(lang)
+        if '</span><span>' in lang: lang = scrapertools.find_single_match(lang, '</span><span>(.*?)$')
 
         quality = qlty.lower()
         if quality == 'desconocido': quality = ''
@@ -426,7 +426,7 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                             language = IDIOMAS.get(lang,lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
+                                                     language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
 
     if 'data-tplayernv="Opt' in data:
         options = scrapertools.find_multiple_matches(data, 'data-tplayernv="Opt(.*?)"><span>(.*?)</span><span>(.*?) - (.*?)</span>')
@@ -434,7 +434,7 @@ def findvideos(item):
         for opt, servidor, lang, qlty in options:
             ses += 1
 
-            lang = IDIOMAS.get(lang)
+            if '</span><span>' in lang: lang = scrapertools.find_single_match(lang, '</span><span>(.*?)$')
 
             quality = qlty.lower()
             if quality == 'desconocido': quality = ''
@@ -444,8 +444,7 @@ def findvideos(item):
 
             servidor = servertools.corregir_servidor(servidor)
 
-            if 'src=&quot;' in data:
-                data = data.replace('src=&quot;', 'src="').replace('&quot;', '"')
+            if 'src=&quot;' in data: data = data.replace('src=&quot;', 'src="').replace('&quot;', '"')
 
             url = scrapertools.find_single_match(data, 'id="Opt' + opt + '".*?src="(.*?)"')
 
@@ -455,7 +454,7 @@ def findvideos(item):
                 url= url.replace('&amp;#038;', '&').replace('&amp;', '&')
 
                 itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                     language = IDIOMAS.get(lang,lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
+                                     language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
 
     if not itemlist:
         if not ses == 0:

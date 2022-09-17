@@ -229,7 +229,7 @@ def play(item):
 
         if '//damedamehoy.' in url or '//tomatomatela.' in url: url = resuelve_dame_toma(url)
 
-        if not url:
+        if not url or url == 'https://api.cuevana3.me/ir/redirect_ddh.php':
             if 'url=' in item.url:
                 fid = scrapertools.find_single_match(item.url, "url=(.*?)$")
                 api_url = 'https://api.cuevana3.me/ir/redirect_ddh.php'

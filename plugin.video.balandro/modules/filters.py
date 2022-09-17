@@ -1030,6 +1030,7 @@ def show_channels_list(item):
         elif item.suggesteds == True: filtros = {'clusters': 'suggested'}
         elif item.lat_domain == True: filtros = {'clusters': 'current'}
         elif item.mismatched == True: filtros = {'clusters': 'mismatched'}
+        elif item.problematics == True: filtros = {'clusters': 'problematic'}
         else: filtros = {}
 
         ch_list = channeltools.get_channels_list(filtros=filtros)
@@ -1055,6 +1056,8 @@ def show_channels_list(item):
             if not 'privates' in ch['clusters']: continue
         elif item.mismatched:
             if not 'mismatched' in ch['clusters']: continue
+        elif item.problematics:
+            if not 'problematic' in ch['clusters']: continue
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
@@ -1080,6 +1083,8 @@ def show_channels_list(item):
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
                 info = info + '[B][COLOR cyan] %s [/B][/COLOR]' % dominio
+
+        if 'problematic' in ch['clusters']: info = info + '[B][I][COLOR darkgoldenrod] Problemático [/I][/B][/COLOR]'
 
         if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
@@ -1121,6 +1126,7 @@ def show_channels_list(item):
         elif item.suggesteds == True: cabecera = 'Canales [COLOR yellow]Sugeridos[/COLOR]'
         elif item.privates == True: cabecera = 'Canales [COLOR yellow]Privados[/COLOR]'
         elif item.mismatched == True: cabecera = 'Canales [COLOR yellow]Incompatibles con su Media Center[/COLOR]'
+        elif item.problematics == True: cabecera = 'Canales [COLOR yellow]Problemáticos[/COLOR]'
         else: cabecera = 'Canales [COLOR yellow]Disponibles[/COLOR]'
 
     ret = platformtools.dialog_select(cabecera, opciones_channels, useDetails=True)

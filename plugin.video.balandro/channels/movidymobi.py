@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.movidy.mobi/'
+host = 'https://www1.movidy.mobi/'
 
 
 perpage = 22
@@ -15,7 +15,7 @@ perpage = 22
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://movidy.mobi/']
+    ant_hosts = ['https://movidy.mobi/', 'https://www.movidy.mobi/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

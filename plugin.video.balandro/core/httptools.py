@@ -48,8 +48,8 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.70 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36"
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -421,22 +421,26 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     if response["headers"].get('content-encoding') == 'gzip':
         try:
             response["data"] = gzip.GzipFile(fileobj=BytesIO(response["data"])).read()
-            logger.info("Descomprimido")
+            logger.info("Descomprimido Gzip")
         except:
             response["data"] = ""
-            logger.info("No se ha podido descomprimir")
+            logger.info("No se pudo descomprimir Gzip")
 
     elif response["headers"].get('content-encoding') == 'br':
         try:
             from lib.br import brotlidec
             response["data"] = brotlidec(response["data"], [])
+            logger.info("Descomprimido Br")
         except:
             response["data"] = ""
-            logger.info("No se pudo descomprimir")
+            logger.info("No se pudo descomprimir Br")
+    else:
+        logger.info("No se pudo descomprimir ?")
+        logger.info("Encoding: %s" % (response["headers"].get('content-encoding')))
 
     # Anti Cloudflare
     if PY3:
-       if bypass_cloudflare == True: bypass_cloudflare = False
+        if bypass_cloudflare == True: bypass_cloudflare = False
 
     if bypass_cloudflare and count_retries < 2:
         try:
@@ -481,27 +485,29 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
                     response["time"] = resp.time
                     response["url"] = resp.url
                 else:
-                    logger.info("No se ha podido autorizar")
+                    logger.info("No se pudo autorizar")
+
         except: pass
 
-    try:
-       if PY3 and isinstance(response['data'], bytes) and 'content-type' in response["headers"] \
-                  and ('text/' in response["headers"]['content-type'] or 'json' in response["headers"]['content-type'] \
-                  or 'xml' in response["headers"]['content-type']):
-                  response['data'] = response['data'].decode('utf-8', errors='replace')
-    except:
-       import traceback
-       logger.error(traceback.format_exc(1))
+    if PY3:
+        try:
+           if isinstance(response['data'], bytes) and 'content-type' in response["headers"] \
+                         and ('text/' in response["headers"]['content-type'] or 'json' in response["headers"]['content-type'] \
+                         or 'xml' in response["headers"]['content-type']):
+                         response['data'] = response['data'].decode('utf-8', errors='replace')
+        except:
+           import traceback
+           logger.error(traceback.format_exc(1))
 
-    try:
-       if PY3 and isinstance(response['data'], bytes) and 'content-type' in response["headers"] \
-                  and not ('application' in response["headers"]['content-type'] \
-                  or 'javascript' in response["headers"]['content-type'] \
-                  or 'image' in response["headers"]['content-type']):
-                  response['data'] = "".join(chr(x) for x in bytes(response['data']))
-    except:
-       import traceback
-       logger.error(traceback.format_exc(1))
+        try:
+           if isinstance(response['data'], bytes) and 'content-type' in response["headers"] \
+                         and not ('application' in response["headers"]['content-type'] \
+                         or 'javascript' in response["headers"]['content-type'] \
+                         or 'image' in response["headers"]['content-type']):
+                         response['data'] = "".join(chr(x) for x in bytes(response['data']))
+        except:
+           import traceback
+           logger.error(traceback.format_exc(1))
 
     # Guardar en caché si la respuesta parece válida (no parece not found ni bloqueado, al menos un enlace o json, al menos 1000 bytes)
     if use_cache and type(response['code']) == int and response['code'] >= 200 and response['code'] < 400 and response['data'] != '' \

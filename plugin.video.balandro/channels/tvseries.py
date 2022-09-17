@@ -22,21 +22,21 @@ def mainlist_series(item):
 
     # ~ itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Ciencia Ficción', action = 'menu_series', url = host + '-02.weebly.com' ))
+    itemlist.append(item.clone( title = 'Series de Ciencia Ficción', action = 'menu_series', url = host + '-02.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Comedias', action = 'menu_series', url = host + '-05.weebly.com' ))
+    itemlist.append(item.clone( title = 'Series de Comedias', action = 'menu_series', url = host + '-05.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Dibujos Animados', action = 'menu_series', url = host + '-06.weebly.com' ))
+    itemlist.append(item.clone( title = 'Series de Dibujos Animados', action = 'menu_series', url = host + '-06.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Detectives-Espionaje', action = 'menu_series', url = host + '-04.weebly.com' ))
+    itemlist.append(item.clone( title = 'Series de Detectives-Espionaje', action = 'menu_series', url = host + '-04.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Policiacas', action = 'menu_series', url = host + '-03.weebly.com' ))
+    itemlist.append(item.clone( title = 'Series Policiacas', action = 'menu_series', url = host + '-03.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes TVE, Mini Series y en Vose', action = 'menu_series', url = host + '-07.weebly.com' ))
+    itemlist.append(item.clone( title = 'Series de TVE, Mini Series y en Vose', action = 'menu_series', url = host + '-07.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Variadas', action = 'menu_series', url = host + '-08.weebly.com' ))
+    itemlist.append(item.clone( title = 'Series Variadas', action = 'menu_series', url = host + '-08.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'TV-SeriesDeAntes Westerns', action = 'menu_series', url = host + '-01.weebly.com' ))
+    itemlist.append(item.clone( title = 'Series de Westerns', action = 'menu_series', url = host + '-01.weebly.com' ))
 
     return itemlist
 
@@ -110,7 +110,14 @@ def series(item):
             if item.grupo == 'seasons':
                 if not '&ordm;' in title: continue
 
+        title = title.replace('&Aacute;', 'A').replace('&Eacute;', 'E').replace('&Iacute;', 'I').replace('&Oacute;', 'O').replace('&Uacute;', 'U').replace('&Ntilde;', 'Ñ')
+        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&Iicute;', 'i').replace('&oacute;', 'o').replace('&uacute;', 'u').replace('&ntilde;', 'ñ')
+        title = title.replace('&acute;', "'")
+		 
+        title = title.replace('&iquest;', '').replace('&iexcl;', '').replace('&#8203;', '').replace('&nbsp;', '').strip()
+
         title = title.replace('&ordm;', 'ª').replace('))', ')').replace('Ó', 'ó').replace('Á', 'á').replace('Í', 'í').replace('Ñ', 'ñ')
+
         if title.startswith("á") == True: title = title.replace('á', 'a')
 
         title = title.lower()
@@ -187,7 +194,7 @@ def list_all(item):
 
         data_thumb = httptools.downloadpage(url).data
 
-        thumb = scrapertools.find_single_match(data_thumb, '<img src="([^"]+)"')
+        thumb = scrapertools.find_single_match(data_thumb, '</div><img src="([^"]+)"')
         thumb = thumb.replace('&amp;', '&')
 
         if not thumb: thumb = cover

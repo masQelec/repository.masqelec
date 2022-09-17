@@ -162,23 +162,24 @@ def findvideos(item):
         else: lang = '?'
 
         qlty = scrapertools.find_single_match(match, "</span><span>.*?-(.*?)</span>").strip()
+        if 'Subtitulado -' in qlty: qlty = qlty.replace('Subtitulado -', '').strip()
 
         url = scrapertools.find_single_match(match, 'data-player="(.*?)"')
 
-        if not servidor == 'cuevana3':
+        if not servidor == 'cuevana3'and not servidor == 'ver online':
             itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = lang, quality=qlty ))
 
         else:
             new_url = base64.b64decode(url)
 
-            new_url = scrapertools.find_single_match(new_url, "src='(.*?)'")
+            if 'b"' in str(new_url): new_url = str(new_url).replace('b"', '').replace('"', '')
+
+            new_url = scrapertools.find_single_match(str(new_url), "src='(.*?)'")
 
             if new_url:
                 data2 = do_downloadpage(new_url)
 
                 links = scrapertools.find_multiple_matches(data2, "go_to_player.*?'(.*?)'")
-
-                other = 'cuevana3'
 
                 for link in links:
                     if '/hqq.' in link or '/waaw.' in link or '/netu.' in link: continue
@@ -188,8 +189,12 @@ def findvideos(item):
 
                     url = servertools.normalize_url(servidor, link)
 
+                    other = ''
+
+                    if servidor == 'directo': other = 'cuevana3'
+
                     itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '',
-                                          language = lang, quality=qlty, other = other ))
+                                                                  language = lang, quality = qlty, other = other ))
 
     # Descargas recaptcha y comprimidos por partes
     # patron = 'class="Button STPb  toggle_links">Download.*?">(.*?)</span>.*?href="(.*?)".*?alt=.*?">(.*?)</span>.*?class=.*?">(.*?)</span>'
@@ -218,9 +223,11 @@ def play(item):
 
         return itemlist
 
-    url = base64.b64decode(url)
-
-    if url: url = scrapertools.find_single_match(str(url), "<iframe src='(.*?)'")
+    try:
+        url = base64.b64decode(url)
+        if url: url = scrapertools.find_single_match(str(url), "<iframe src='(.*?)'")
+    except:
+        pass
 
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:

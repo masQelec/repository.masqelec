@@ -10,6 +10,8 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://123pelis.fun/'
 
 
+# ~ en las seris predominan los enlaces problematicos (29/8/2022)
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if '/lanzamiento/' in url: raise_weberror = False
 
@@ -276,7 +278,7 @@ def findvideos(item):
 
         other = srv.lower()
         other = other.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.ru', '').replace('.sh', '').replace('.so', '').replace('.sx', '')
-        other = other.replace('.me', '').replace('.to', '').replace('.tv', '').replace('.fun', '').replace('.site', '').strip()
+        other = other.replace('.me', '').replace('.to', '').replace('.tv', '').replace('.fun', '').replace('.site', '').replace('.wf', '').strip()
 
         if 'youtube' in other: continue
 
@@ -322,8 +324,8 @@ def play(item):
         if url:
             url = url.replace('\\/', '/')
 
-            if 'pelis123' in url: url = juicycodes(url)
-            elif 'hideload' in url: url = unhideload(url)
+            if 'pelis123' in url: url = juicy_codes(url)
+            elif 'hideload' in url: url = unhide_load(url)
 
     if url:
         if '123pelis' in url:
@@ -346,7 +348,7 @@ def play(item):
     return itemlist
 
 
-def unhideload(url):
+def unhide_load(url):
     logger.info()
 
     servers = {
@@ -376,7 +378,7 @@ def unhideload(url):
     return url
 
 
-def juicycodes(url):
+def juicy_codes(url):
     logger.info()
 
     import base64

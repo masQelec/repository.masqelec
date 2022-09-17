@@ -380,6 +380,10 @@ def findvideos(item):
             elif servidor == 'doos': servidor = 'doodstream'
             elif servidor == 'dood': servidor = 'doodstream'
 
+            elif servidor == 'ok': servidor = 'okru'
+
+            elif servidor == 'sbspeed': servidor = 'streamsb'
+
             elif 'fembedhd' in servidor: servidor = 'fembed'
             elif 'femlat' in servidor: servidor = 'fembed'
 
@@ -498,7 +502,7 @@ def play(item):
         if servidor == 'directo':
             if not url.startswith('http'): return itemlist
 
-        itemlist.append(item.clone(url = url, servidor = servidor))
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

@@ -2,8 +2,6 @@
 
 import sys
 
-from platformcode import  config, platformtools, logger
-
 if sys.version_info[0] < 3:
     import urllib2
 else:
@@ -12,8 +10,11 @@ else:
 
 import os
 
+from platformcode import config, platformtools, logger
 from core.item import Item
+
 from platformcode.config import WebErrorException
+
 
 logger.info('[COLOR blue]Starting with %s[/COLOR]' % sys.argv[1])
 
@@ -73,10 +74,10 @@ if tipo_channel != '':
 
                     search_type = ''
 
-                    if item.search_type == 'movie': search_type = 'para Películas'
-                    elif item.search_type == 'tvshow': search_type = 'para Series'
-                    elif item.search_type == 'documentary': search_type = 'para Documentales'
-                    elif item.search_type == 'person': search_type = 'para Personas'
+                    if item.search_type == 'movie': search_type = 'para [COLOR yellow]Películas[/COLOR]'
+                    elif item.search_type == 'tvshow': search_type = 'para [COLOR yellow]Series[/COLOR]'
+                    elif item.search_type == 'documentary': search_type = 'para [COLOR yellow]Documentales[/COLOR]'
+                    elif item.search_type == 'person': search_type = 'para [COLOR yellow]Personas[/COLOR]'
 
                     tecleado = platformtools.dialog_input(last_search, 'Texto a buscar ' + search_type)
 

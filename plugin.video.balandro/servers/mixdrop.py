@@ -32,6 +32,7 @@ def get_video_url(page_url, url_referer=''):
     for url in urls:
         if '/' not in url: continue
         if url.endswith('.jpg'): continue
+
         if url.startswith('//'):
             video_urls.append(["mp4", 'https:' + url])
             # ~ video_urls.append(["mp4", 'https:' + url+'|Referer=https://mixdrop.co/'])

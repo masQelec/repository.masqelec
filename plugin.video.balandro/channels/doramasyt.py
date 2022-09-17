@@ -316,6 +316,7 @@ def findvideos(item):
         srv = srv.lower()
 
         if 'hqq' in srv or 'waaw' in srv or 'netu' in srv: continue
+
         elif 'ok' in srv: srv = 'okru'
 
         if url:
@@ -337,7 +338,8 @@ def findvideos(item):
 
             srv = srv.lower()
 
-            if srv == '1fichier': continue
+            if not srv: continue
+            elif srv == '1fichier': continue
             elif srv == 'mediafire': continue
             elif srv == 'fireload': continue
 

@@ -14,7 +14,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www.divxtotal.ms/'
+host = 'https://www.divxtotal.fi/'
 
 
 def item_configurar_proxies(item):
@@ -29,7 +29,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://www.divxtotal.dev/']
+    ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://www.divxtotal.dev/', 'https://www.divxtotal.ms/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -293,9 +293,11 @@ def play(item):
 
         if data:
             try:
-               if 'Página no encontrada</title>' in str(data):
+               if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data):
                    platformtools.dialog_ok('DivxTotal', '[COLOR yellow]Archivo no encontrado[/COLOR]')
                    return itemlist
+               elif '<p>Por causas ajenas a ' in str(data):
+                   return 'Archivo [COLOR red]bloqueado[/COLOR]'
             except:
                pass
 
@@ -321,9 +323,11 @@ def play(item):
 
         if data:
             try:
-               if 'Página no encontrada</title>' in str(data):
+               if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data):
                    platformtools.dialog_ok('DivxTotal', '[COLOR yellow]Archivo no encontrado[/COLOR]')
                    return itemlist
+               elif '<p>Por causas ajenas a ' in str(data):
+                   return 'Archivo [COLOR red]bloqueado[/COLOR]'
             except:
                pass
 

@@ -160,7 +160,7 @@ def generos(item):
 
         if not url.startswith("http"): url = host[:-1] + url
 
-        itemlist.append(item.clone( action='list_all', title=title, url=url ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
 
     return itemlist
 
@@ -178,7 +178,7 @@ def anios(item):
     for x in range(current_year, limit, -1):
         url = host + 'fecha/' + str(x) + '/'
 
-        itemlist.append(item.clone( title=str(x), url= url, action='list_all' ))
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all' ))
 
     return itemlist
 
@@ -400,6 +400,7 @@ def corregir_servidor(servidor):
     elif servidor == 'stream': return 'mystream'
     elif servidor == 'evoplay': return 'evoload'
     elif servidor == 'zplay': return 'zplayer'
+    elif servidor == 'evo': return 'evoload'
     else: return servidor
 
 

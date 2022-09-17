@@ -337,8 +337,8 @@ def play(item):
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-        elif 'openload' in url or 'powvideo' in url or 'streamplay' in url or 'rapidvideo' in url or 'streamango' in url or 'verystream' in url or 'vidtodo' in url:
-            return 'Servidor [COLOR yellow]NO soportado[/COLOR]'
+        elif 'openload' in url or 'powvideo' in url or 'streamplay' in url or 'rapidvideo' in url or 'streamango' in url or 'verystream' in url or 'vidtodo' in url or 'tutumeme' in url:
+            return 'Servidor [COLOR plum]NO soportado[/COLOR]'
 
         if url.startswith('//'): url = 'https:' + url
 

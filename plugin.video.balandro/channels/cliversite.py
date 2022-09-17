@@ -128,8 +128,9 @@ def generos(item):
 
         itemlist.append(item.clone( action="list_all", title=title, url=url, pagina = 1 ))
 
-    if item.search_type == 'movie':
-        itemlist.append(item.clone( action="list_all", title='Guerra', url=host + '/peliculas/genero/guerra', pagina = 1 ))
+    if itemlist:
+        if item.search_type == 'movie':
+            itemlist.append(item.clone( action="list_all", title='Guerra', url=host + '/peliculas/genero/guerra', pagina = 1 ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -300,12 +301,16 @@ def episodios(item):
 
     for match in matches:
         season = scrapertools.find_single_match(match, 'data-season="([^"]+)')
-        if not season: continue
+        if not season:
+            num_matches = num_matches - 1
+            continue
 
         episode = scrapertools.find_single_match(match, 'data-ep="([^"]+)')
 
         if item.contentSeason:
-            if not str(item.contentSeason) == str(season): continue
+            if not str(item.contentSeason) == str(season):
+                num_matches = num_matches - 1
+                continue
 
         if len(episode) == 1: nro_epi = '0' + episode
         else: nro_epi = episode
@@ -316,18 +321,15 @@ def episodios(item):
 
         ord_epis = str(nro_epi)
 
-        if len(str(ord_epis)) == 1:
-            ord_epis = '0000' + ord_epis
-        elif len(str(ord_epis)) == 2:
-            ord_epis = '000' + ord_epis
-        elif len(str(ord_epis)) == 3:
-            ord_epis = '00' + ord_epis
+        if len(str(ord_epis)) == 1: ord_epis = '0000' + ord_epis
+        elif len(str(ord_epis)) == 2: ord_epis = '000' + ord_epis
+        elif len(str(ord_epis)) == 3: ord_epis = '00' + ord_epis
         else:
             if num_matches > 50:
                 ord_epis = '0' + ord_epis
 
         if num_matches > 50:
-            tab_epis.append([ord_epis, item.url, titulo, nro_epi])
+            tab_epis.append([ord_epis, url, titulo, nro_epi])
         else:
             itemlist.append(item.clone( action='findvideos', title = titulo, url = url,
                                         orden = ord_epis, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
@@ -362,18 +364,19 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;", "", data)
 
-    matches_idiomas = scrapertools.find_multiple_matches(data, '<img src="/static/img/bg/icon_(.*?)_.*?data-id="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, '<img src="/static/img/bg/icon_(.*?)_.*?data-id="(.*?)"')
 
     ses = 0
 
-    for lang, data_id in matches_idiomas:
+    for lang, data_id in matches:
         ses += 1
 
-        bloque_enlaces_idioma = scrapertools.find_single_match(data, 'server-item-' + data_id + '(.*?)</div></div>')
-        if not bloque_enlaces_idioma.startswith('</div>'):
-            bloque_enlaces_idioma = bloque_enlaces_idioma + '</div>'
+        bloque = scrapertools.find_single_match(data, 'server-item-' + data_id + '(.*?)</div></div>')
 
-        enlaces = scrapertools.find_multiple_matches(bloque_enlaces_idioma, 'data-video="(.*?)".*?<img.*?>(.*?)</div>')
+        if bloque:
+            if not bloque.startswith('</div>'): bloque = bloque + '</div>'
+
+        enlaces = scrapertools.find_multiple_matches(bloque, 'data-video="(.*?)".*?<img.*?>(.*?)</div>')
 
         for data_video, srv in enlaces:
             url = data_video
@@ -465,7 +468,7 @@ def play(item):
 
             matches = scrapertools.find_multiple_matches(data, 'data-video="(.*?)"')
 
-            if str(matches) == "['']":
+            if not matches:
                 url = scrapertools.find_single_match(data, "sources.*?'(.*?)'")
 
                 if url:

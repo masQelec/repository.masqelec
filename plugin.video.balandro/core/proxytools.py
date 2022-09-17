@@ -97,7 +97,7 @@ if providers_preferred:
     providers_preferred = str(providers_preferred).lower()
 
     if not str(providers_preferred) in str(list(opciones_provider)):
-        platformtools.dialog_ok(config.__addon_name, 'Actualmente tiene informados en sus ajustes [COLOR cyan]Proveedores Preferidos[/COLOR] de proxies que son [COLOR coral]Desconocidos[/COLOR].', 'No se tendran en cuenta [COLOR yellow]Ninguno[/COLOR] de ellos.', '[COLOR red]Preferidos: [COLOR cyan][B]' + str(providers_preferred + '[/B][/COLOR]'))
+        platformtools.dialog_ok(config.__addon_name, 'Actualmente tiene informados en sus ajustes [COLOR cyan]Proveedores Preferidos[/COLOR] de proxies que son [COLOR coral]Desconocidos[/COLOR].', 'No se tendrán en cuenta [COLOR yellow]Ninguno[/COLOR] de ellos.', '[COLOR red]Preferidos: [COLOR cyan][B]' + str(providers_preferred + '[/B][/COLOR]'))
         providers_preferred = ''
 
 
@@ -133,7 +133,7 @@ def configurar_proxies_canal(canal, url):
 
         if proxies_todos:
             if proxies_actuales:
-                if not platformtools.dialog_yesno(config.__addon_name, 'Actualmente existen proxies memorizados en el canal [COLOR yellow]' + canal.capitalize() + '[/COLOR]', '¿ Desea iniciar una nueva búsqueda de proxies en todos los proveedores ?'):
+                if not platformtools.dialog_yesno(config.__addon_name, 'Actualmente existen proxies memorizados en el canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea iniciar una nueva búsqueda de proxies en todos los proveedores ?[/B][/COLOR]'):
                     procesar = False
 
             if procesar:
@@ -157,7 +157,7 @@ def configurar_proxies_canal(canal, url):
                 if provider_fijo >= 0 and provider_fijo <= tot_all_providers: provider_fijo = opciones_provider[proxies_provider - 1]
 
             if proxies_actuales:
-                if not platformtools.dialog_yesno(config.__addon_name, 'Actualmente existen proxies memorizados en el canal [COLOR yellow]' + canal.capitalize() + '[/COLOR]', '¿ Desea iniciar una nueva búsqueda de proxies con el proveedor configurado en los Ajustes categoria proxies ? ' + '[COLOR red][B] ' + provider_fijo.capitalize() + '[/COLOR][/B]' ):
+                if not platformtools.dialog_yesno(config.__addon_name, 'Actualmente existen proxies memorizados en el canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea iniciar una nueva búsqueda de proxies con el proveedor configurado en los Ajustes categoria proxies ?[/B][/COLOR] ' + '[COLOR red][B] ' + provider_fijo.capitalize() + '[/COLOR][/B]' ):
                     procesar = False
 
             if procesar:
@@ -216,7 +216,7 @@ def configurar_proxies_canal(canal, url):
 
         if proxies_help: acciones.append(platformtools.listitem_to_select('[COLOR green]Ayuda[/COLOR]', 'Informacion sobre la gestión de proxies'))
 
-        ret = platformtools.dialog_select('Configuración proxies para %s' % canal.capitalize(), acciones, useDetails=True)
+        ret = platformtools.dialog_select('Configuración proxies para [COLOR darkorange][B]%s[/B][/COLOR]' % canal.capitalize(), acciones, useDetails=True)
 
         if ret == -1: break
 
@@ -246,7 +246,7 @@ def configurar_proxies_canal(canal, url):
             if not search_provider:
                 if provider == all_providers: search_provider = True
                 else:
-                    if platformtools.dialog_yesno(config.__addon_name, '¿ Desea iniciar la búsqueda de proxies en todos los proveedores ?', 'en el Canal [COLOR yellow]' + canal.capitalize() + '[/COLOR]'):
+                    if platformtools.dialog_yesno(config.__addon_name, '[COLOR cyan][B]¿ Desea iniciar la búsqueda de proxies en todos los proveedores ?[/B][/COLOR]', 'en el Canal [COLOR yellow][B]' + canal.capitalize() + '[B][/COLOR]'):
                         search_provider = True
 
             if search_provider:
@@ -279,7 +279,7 @@ def _settings_proxies_canal(canal, opciones_provider):
             provider_fijo = opciones_provider[proxies_provider]
 
             if not provider == provider_fijo:
-                if not platformtools.dialog_yesno(config.__addon_name, 'Tiene seleccionado un proveedor que no es el asignado en su configuración de proxies [COLOR cyan]' + provider.capitalize() + '[/COLOR]', '¿ Desea asignar este proveedor para este canal [COLOR yellow]' + canal.capitalize() + '[/COLOR] ?'):
+                if not platformtools.dialog_yesno(config.__addon_name, 'Tiene seleccionado un proveedor que no es el asignado en su configuración de proxies [COLOR cyan]' + provider.capitalize() + '[/COLOR]', '¿ Desea asignar este proveedor para este canal [COLOR yellow][B]' + canal.capitalize() + '[B][/COLOR] ?'):
                     provider = provider_fijo
                     config.set_setting('proxytools_provider', provider, canal)
 
@@ -862,7 +862,7 @@ def sin_news_proxies(provider, proxies_actuales, procesar):
 
     if avisar:
         texto_mensaje = ''
-        if proxies_actuales: texto_mensaje = '[COLOR yellow]Se conservan los proxies almacenados actualmente.[/COLOR]'
+        if proxies_actuales: texto_mensaje = '[COLOR yellow][B]Se conservan los proxies almacenados actualmente.[/B][/COLOR]'
         platformtools.dialog_ok('Búsqueda proxies en [COLOR blue]' + provider.capitalize() + '[/COLOR]', 'No se ha obtenido ningún proxy válido con este proveedor.', texto_mensaje, '[COLOR coral]Puede intentar obtener nuevos proxies, cambiando de proveedor, en los parámetros para buscar proxies.[/COLOR]')
 
 def top_news_proxies(provider, proxies_actuales, valor, procesar):
@@ -1624,7 +1624,7 @@ def testear_lista_proxies(provider, url, proxies=[]):
     progreso.close()
 
     if not proceso_test:
-        if platformtools.dialog_yesno('ERROR Test proxies en ' + provider.capitalize(), '[COLOR red][B]Sin disponibilidad de suficiente Memoria para este proceso.[/B][/COLOR]', '[COLOR yellow]¿ Desea anular el test automatico en TODOS los proveedores para intentar evitar este inconveniente ?[/COLOR]'):
+        if platformtools.dialog_yesno('ERROR Test proxies en ' + provider.capitalize(), '[COLOR red][B]Sin disponibilidad de suficiente Memoria para este proceso.[/B][/COLOR]', '[COLOR yellow][B]¿ Desea anular el test automatico en TODOS los proveedores para intentar evitar este inconveniente ?[/B][/COLOR]'):
             config.set_setting('proxies_auto', False)
 
     # Ordenar según proxy válido y tiempo de respuesta

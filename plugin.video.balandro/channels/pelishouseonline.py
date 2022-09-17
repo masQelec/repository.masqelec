@@ -149,9 +149,10 @@ def generos(item):
 
         itemlist.append(item.clone( title=tit, url= host + 'genre/' + opc + '/', action = 'list_all' ))
 
-    if item.search_type == 'movie':
-        if not descartar_xxx:
-            itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'genre/18/' ))
+    if itemlist:
+        if item.search_type == 'movie':
+            if not descartar_xxx:
+                itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'genre/18/' ))
 
     return itemlist
 
@@ -466,6 +467,7 @@ def findvideos(item):
         elif '/vidcloud.' in url: continue
         elif '/gounlimited.' in url: continue
         elif '.oceanplay.' in url: continue
+        elif '/entrepeliculasyseries.' in url: continue
 
         if url:
             servidor = servertools.get_server_from_url(url)
@@ -492,6 +494,7 @@ def findvideos(item):
 
             if servidor == 'tenvoi': continue
             elif servidor == 's5': continue
+            elif servidor == 'pelipluspeliplus': continue
 
             if servidor == 'utorrent': servidor = 'torrent'
             elif servidor == 'uptostream': servidor = 'uptobox'

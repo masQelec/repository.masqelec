@@ -9,7 +9,7 @@ from core import httptools, scrapertools, jsontools, servertools, tmdb
 from lib import balandroresolver
 
 
-host = 'https://www.hdfull.app'
+host = 'https://www.hdfull.tw'
 
 perpage = 20
 
@@ -26,7 +26,9 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post = None, referer = None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://hdfull.se', 'https://hdfull.so', 'https://hdfull.fm', 'https://hdfull.cm', 'https://hdfull.gg', 'https://hdfull.be']
+    ant_hosts = ['https://hdfull.se', 'https://hdfull.so', 'https://hdfull.fm',
+	             'https://hdfull.cm', 'https://hdfull.gg', 'https://hdfull.be',
+                 'https://www.hdfull.app']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

@@ -7,13 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://pelisplus.pe/'
+host = 'https://www1.pelisplus.pe/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://pelisplus.so/', 'https://www1.pelisplus.so/', 'https://www2.pelisplus.so/', 'https://pelisplus.sh/',
-                 'https://pelisplus.ac/']
+                 'https://pelisplus.ac/', 'https://pelisplus.pe/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -301,6 +301,7 @@ def findvideos(item):
 
 def normalize_other(url):
     if 'pelisplus' in url: link_other = 'plus'
+    elif 'pelisplay' in url: link_other = 'play'
     elif 'damedamehoy' in url: link_other = 'dame'
     elif 'tomatomatela' in url: link_other = 'dame'
     else:
@@ -327,6 +328,8 @@ def play(item):
     itemlist = []
 
     url = item.url
+
+    if url.startswith('//'): url = 'https:' + url
 
     if item.other == 'dame':
         url = resuelve_dame_toma(item.url)
@@ -381,6 +384,7 @@ def list_search(item):
 
     for url, title, thumbnail, year in matches:
         if url.startswith('/'): url = host + url
+
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 

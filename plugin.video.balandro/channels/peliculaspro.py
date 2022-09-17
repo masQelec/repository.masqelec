@@ -128,20 +128,20 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    temporadas = re.compile('<div class="aa-drp choose-season">.*?<a href="(.*?)".*?inline">(.*?)</dt>', re.DOTALL).findall(data)
+    temporadas = re.compile('<a data-post="(.*?)".*data-season="(.*?)"', re.DOTALL).findall(data)
 
-    for url, tempo in temporadas:
+    for dpost, tempo in temporadas:
         title = 'Temporada ' + tempo
 
         if len(temporadas) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
-            item.url = url
+            item.dpost = dpost
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, dpost = url, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -155,11 +155,11 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = do_downloadpage(item.url)
+    post = {'action': 'action_select_season', 'season': str(item.contentSeason), 'post': item.dpost}
 
-    bloque = scrapertools.find_single_match(data, 'data-tab="' + str(item.contentSeason) + ".*?</span>(.*?)</div></div>")
+    data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post)
 
-    matches = re.compile('<span class="num-epi">.*?x(.*?)</span><h2 class="entry-title">(.*?)</h2>.*?<a href="(.*?)".*?src="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<span class="num-epi">.*?x(.*?)</span>.*?<h2 class="entry-title">(.*?)</h2>.*?<a href="(.*?)"', re.DOTALL).findall(data)
 
     if item.page == 0:
         sum_parts = len(matches)
@@ -168,8 +168,8 @@ def episodios(item):
                 platformtools.dialog_notification('PeliculasPro', '[COLOR cyan]Cargando elementos[/COLOR]')
                 item.perpage = 250
 
-    for epis, title, url, thumb in matches[item.page * item.perpage:]:
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+    for epis, title, url, in matches[item.page * item.perpage:]:
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
@@ -198,6 +198,7 @@ def findvideos(item):
 
     for opt, url in matches:
         i += 1
+
         srv, lang = scrapertools.find_single_match(data, 'href="#options-' + str(opt)+ '">.*?<span class="server">(.*?)-(.*?)</span>')
 
         srv = srv.lower().strip()
@@ -212,14 +213,12 @@ def findvideos(item):
 
         other = ''
         if servidor:
-           if srv == 'streamz':
-               servidor = srv
-           elif srv == 'peliculaspro':
-               other = 'fembed' + '-' + str(i)
-           elif srv == 'streamcrypt':
-               other = srv + '-' + str(i)
-           else:
-               other = srv.lower() + '-' + str(i)
+           if 'hqq' in srv or 'waaw' in srv or 'netu' in srv: continue
+
+           elif srv == 'streamz': servidor = srv
+           elif srv == 'peliculaspro': other = 'fembed' + '-' + str(i)
+           elif srv == 'streamcrypt':  other = srv + '-' + str(i)
+           else: other = srv.lower() + '-' + str(i)
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = other, language = idioma ))
 
@@ -254,6 +253,9 @@ def play(item):
             url = scrapertools.find_single_match(data, "window.open.*?'(.*?)'")
 
     if url:
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

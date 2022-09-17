@@ -118,6 +118,8 @@ def findvideos(item):
 
         other = other.replace('-Subtitulado', '').strip()
 
+        if other == 'Hqq': continue
+
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'directo',
                               language = lang, other = other ))
 

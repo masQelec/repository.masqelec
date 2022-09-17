@@ -216,7 +216,7 @@ def episodios(item):
 
     bloque = scrapertools.find_single_match(data, patron)
 
-    matches = scrapertools.find_multiple_matches(bloque, '<img src="(.*?)".*?<a href="(.*?)".*?<span>(.*?)</span>(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, 'data-src="(.*?)".*?<a href="(.*?)".*?<span>(.*?)</span>(.*?)</a>')
 
     if item.page == 0:
         sum_parts = len(matches)
@@ -229,6 +229,8 @@ def episodios(item):
         epis = scrapertools.find_single_match(temp_epis, '.*?-E(.*?)$')
 
         if not epis: continue
+
+        title = title.strip()
 
         titulo = season + 'x%s %s' % (epis, title)
 

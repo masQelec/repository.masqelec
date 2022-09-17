@@ -675,7 +675,7 @@ def manto_params(item):
 
         config.set_setting('downloadpath', '')
 
-        config.set_setting('chrome_last_version', '103.0.5060.70')
+        config.set_setting('chrome_last_version', '103.0.5060.114')
 
         config.set_setting('debug', '0')
 
@@ -759,64 +759,103 @@ def manto_temporales(item):
 
     hay_temporales = False
 
-    path = os.path.join(config.get_data_path(), 'servers_todo.log')
-    existe = filetools.exists(path)
-    if existe: hay_temporales = True
-
-    path = os.path.join(config.get_data_path(), 'qualities_todo.log')
-    existe = filetools.exists(path)
-    if existe: hay_temporales = True
-
-    path = os.path.join(config.get_data_path(), 'proxies.log')
-    existe = filetools.exists(path)
-    if existe: hay_temporales = True
-
-    path = os.path.join(config.get_data_path(), 'info_channels.csv')
-    existe = filetools.exists(path)
-    if existe: hay_temporales = True
-
-    path = os.path.join(config.get_data_path(), 'temp.torrent')
-    existe = filetools.exists(path)
-    if existe: hay_temporales = True
-
-    path = os.path.join(config.get_data_path(), 'temp.torrent')
-    existe = filetools.exists(path)
-    if existe: hay_temporales = True
-
-    path = os.path.join(config.get_data_path(), 'm3u8hls.m3u8')
-    existe = filetools.exists(path)
-    if existe: hay_temporales = True
-
-    if hay_temporales == False:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros Temporales[/COLOR][/B]' % color_alert)
-        return
-
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los ficheros Temporales ?[/COLOR]'):
+    if item._logs:
         path = os.path.join(config.get_data_path(), 'servers_todo.log')
         existe = filetools.exists(path)
-        if existe: filetools.remove(path)
+        if existe: hay_temporales = True
 
         path = os.path.join(config.get_data_path(), 'qualities_todo.log')
         existe = filetools.exists(path)
-        if existe: filetools.remove(path)
+        if existe: hay_temporales = True
 
         path = os.path.join(config.get_data_path(), 'proxies.log')
         existe = filetools.exists(path)
-        if existe: filetools.remove(path)
+        if existe: hay_temporales = True
+
+    else:
+        path = os.path.join(config.get_data_path(), 'servers_todo.log')
+        existe = filetools.exists(path)
+        if existe: hay_temporales = True
+
+        path = os.path.join(config.get_data_path(), 'qualities_todo.log')
+        existe = filetools.exists(path)
+        if existe: hay_temporales = True
+
+        path = os.path.join(config.get_data_path(), 'proxies.log')
+        existe = filetools.exists(path)
+        if existe: hay_temporales = True
 
         path = os.path.join(config.get_data_path(), 'info_channels.csv')
         existe = filetools.exists(path)
-        if existe: filetools.remove(path)
+        if existe: hay_temporales = True
 
         path = os.path.join(config.get_data_path(), 'temp.torrent')
         existe = filetools.exists(path)
-        if existe: filetools.remove(path)
+        if existe: hay_temporales = True
+
+        path = os.path.join(config.get_data_path(), 'temp.torrent')
+        existe = filetools.exists(path)
+        if existe: hay_temporales = True
 
         path = os.path.join(config.get_data_path(), 'm3u8hls.m3u8')
         existe = filetools.exists(path)
-        if existe: filetools.remove(path)
+        if existe: hay_temporales = True
 
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Ficheros Temporales eliminados[/B][/COLOR]' % color_infor)
+    if hay_temporales == False:
+        if item._logs:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros Logs[/COLOR][/B]' % color_alert)
+        else:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros Temporales[/COLOR][/B]' % color_alert)
+        return
+
+    if item._logs:
+        texto = '[COLOR red]¿ Confirma Eliminar los ficheros Logs ?[/COLOR]'
+    else:
+        texto = '[COLOR red]¿ Confirma Eliminar los ficheros Temporales ?[/COLOR]'
+
+    if platformtools.dialog_yesno(config.__addon_name, texto):
+        if item._logs:
+            path = os.path.join(config.get_data_path(), 'servers_todo.log')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
+            path = os.path.join(config.get_data_path(), 'qualities_todo.log')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
+            path = os.path.join(config.get_data_path(), 'proxies.log')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
+        else:
+            path = os.path.join(config.get_data_path(), 'servers_todo.log')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
+            path = os.path.join(config.get_data_path(), 'qualities_todo.log')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
+            path = os.path.join(config.get_data_path(), 'proxies.log')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
+            path = os.path.join(config.get_data_path(), 'info_channels.csv')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
+            path = os.path.join(config.get_data_path(), 'temp.torrent')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
+            path = os.path.join(config.get_data_path(), 'm3u8hls.m3u8')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
+        if item._logs:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Ficheros Logs eliminados[/B][/COLOR]' % color_infor)
+        else:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Ficheros Temporales eliminados[/B][/COLOR]' % color_infor)
 
 
 def manto_addons_packages(item):

@@ -37,7 +37,7 @@ class login_dialog(xbmcgui.WindowDialog):
 
         if avis:
             self.login_result = False
-            platformtools.dialog_ok("Recomendación Balandro - PlayDede", '[COLOR yellow]Sugerimos crear una nueva cuenta para registrarse en la web, no deberiais indicar ninguna de vuestras cuentas personales.[/COLOR]', 'Para más detalles al respecto, acceda a la Ayuda, apartado Canales, Información dominios que requieren registrarse.')
+            platformtools.dialog_ok("Recomendación Balandro - [B][COLOR yellow]PlayDede[/B][/COLOR]", '[COLOR yellow]Sugerimos crear una nueva cuenta para registrarse en la web, no deberiais indicar ninguna de vuestras cuentas personales.[/COLOR]', 'Para más detalles al respecto, acceda a la Ayuda, apartado Canales, Información dominios que requieren registrarse.')
 
         self.background = xbmcgui.ControlImage(250, 150, 800, 355, filename=config.get_thumb('ContentPanel'))
         self.addControl(self.background)
@@ -287,6 +287,9 @@ def acciones(item):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
         else:
+            itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title= 'Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                        from_channel='playdede', folder=False, text_color='chartreuse' ))
+
             itemlist.append(item.clone( title = '[COLOR crimson][B]Credenciales cuenta[/B][/COLOR]', action = 'login' ))
 
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
@@ -465,13 +468,14 @@ def generos(item):
 
         itemlist.append(item.clone( title = title, action = 'list_all', genre = genre ))
 
-    if item.search_type == 'movie':
-        itemlist.append(item.clone( title = 'Aventura', action = 'list_all', genre = '?genre=aventura' ))
-        itemlist.append(item.clone( title = 'Fantasía', action = 'list_all', genre = '?genre=fantasia' ))
-        itemlist.append(item.clone( title = 'Historia', action = 'list_all', genre = '?genre=historia' ))
+    if itemlist:
+        if item.search_type == 'movie':
+            itemlist.append(item.clone( title = 'Aventura', action = 'list_all', genre = '?genre=aventura' ))
+            itemlist.append(item.clone( title = 'Fantasía', action = 'list_all', genre = '?genre=fantasia' ))
+            itemlist.append(item.clone( title = 'Historia', action = 'list_all', genre = '?genre=historia' ))
 
-    if not item.group == 'anime':
-        itemlist.append(item.clone( title = 'Documental', action = 'list_all', genre = '?genre=documental' ))
+        if not item.group == 'anime':
+            itemlist.append(item.clone( title = 'Documental', action = 'list_all', genre = '?genre=documental' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

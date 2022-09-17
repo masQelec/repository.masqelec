@@ -7,12 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://grantorrent.uk/'
+host = 'https://grantorrent.win/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://grantorrents.org/', 'https://grantorrents.pro/', 'https://grantorrent.co/', 'https://grantorrent.plus/']
+    ant_hosts = ['https://grantorrents.org/', 'https://grantorrents.pro/', 'https://grantorrent.co/', 'https://grantorrent.plus/',
+                 'https://grantorrent.uk/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -43,7 +44,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ficha/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'movie' ))
 
@@ -59,7 +60,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-tv/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'tvshow' ))
 
@@ -123,13 +124,15 @@ def list_all(item):
 
         year = scrapertools.find_single_match(match, '</h3> <span>.*? .*? (.*?)</span>').strip()
 
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         lang = 'Esp'
 
-        if '/series/' in url:
+        if '/series-tv/' in url:
             if item.search_type == 'movie': continue
+
+            if ' castellano ' in title: title = title.replace(' castellano ', '')
+            if 'HD' in title: title = title.replace('HD', '').strip()
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages = lang,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
@@ -290,9 +293,12 @@ def list_search(item):
 
         lang = 'Esp'
 
-        if '/series/' in url:
+        if '/series-tv/' in url:
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
+
+            if ' castellano ' in title: title = title.replace(' castellano ', '')
+            if 'HD' in title: title = title.replace('HD', '').strip()
 
             sufijo = '' if item.search_type != 'all' else 'tvshow'
 

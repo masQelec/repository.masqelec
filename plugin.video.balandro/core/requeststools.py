@@ -25,8 +25,8 @@ except:
 color_alert = config.get_setting('notification_alert_color', default='red')
 
 
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.70 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36"
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -134,7 +134,7 @@ def read_proxy2(url, px):
 
     try:
         headers = {'User-Agent': 'Mozilla/5.0'}
-        req = Request(url, headers=headers, proxies=px)
+        req = requests.request('GET', url, headers=headers, proxies=px)
         if PY3:
             data = urlopen(req).read().decode('utf-8')
         else:
@@ -179,7 +179,7 @@ def read_data2(url):
 
     try:
         headers={'User-Agent': 'Mozilla/5.0'}
-        req = Request(url, headers=headers)
+        req = requests.request('GET', url, headers=headers)
         if PY3:
             data = urlopen(req).read().decode('utf-8')
         else:

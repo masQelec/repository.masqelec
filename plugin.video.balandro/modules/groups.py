@@ -470,13 +470,15 @@ def ch_groups(item):
     i = 0
 
     for ch in ch_list:
+        if ch['status'] == -1: continue
+
+        if config.get_setting('mnu_problematicos', default=False):
+            if 'problematic' in ch['clusters']: continue
+
         try: agrupaciones = ch['clusters']
         except: continue
 
         if item.group == 'genres' or item.group == 'generos':
-            if item.group == 'generos':
-                if not 'proxies' in ch['notes'].lower(): continue
-
             if item.extra == 'movies':
                 if not 'movie' in ch['categories']: continue
                 if not 'géneros' in ch['notes']: continue
@@ -667,17 +669,20 @@ def ch_groups(item):
             else:
                cfg_login_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_login'
 
-               presentar = True
-               if 'dominios' in ch['notes'].lower():
-                   cfg_dominio_channel = 'channel_' + ch['id'] + '_dominio'
-                   if not config.get_setting(cfg_dominio_channel, default=''): presentar = False
+               if config.get_setting(cfg_login_channel, default=False):
+                   presentar = True
+                   if 'dominios' in ch['notes'].lower():
+                       cfg_dominio_channel = 'channel_' + ch['id'] + '_dominio'
+                       if not config.get_setting(cfg_dominio_channel, default=''): presentar = False
 
-               if presentar: titulo += '[I][COLOR teal] (sesion)[/COLOR][/I]'
+                   if presentar: titulo += '[I][COLOR teal] (sesion)[/COLOR][/I]'
 
         if not PY3:
             if 'mismatched' in ch['clusters']: titulo += '[I][COLOR coral] (Incompatible)[/COLOR][/I]'
 
         if 'inestable' in ch['clusters']: titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
+
+        if 'problematic' in ch['clusters']: titulo += '[I][COLOR darkgoldenrod] (problemático)[/COLOR][/I]'
 
         i =+ 1
 
@@ -685,13 +690,11 @@ def ch_groups(item):
                                                 text_color=color, plot = plot, thumbnail=ch['thumbnail'], category=ch['name'],
                                                 search_type = search_type, sort = 'C' ))
 
-        if ch['status'] == -1: continue
-
         canales.append(ch['id'])
 
     if len(itemlist) == 0 or i == 0:
         itemlist.append(item.clone( channel='filters', action='channels_status', title='[B]Opción Sin canales Preferidos[/B]', text_color=color_list_prefe,
-                              des_rea=False, thumbnail=config.get_thumb('stack'), sort = 'C', folder=False ))
+                                    des_rea=False, thumbnail=config.get_thumb('stack'), sort = 'C', folder=False ))
 
     if itemlist:
         buscar_only_group = True

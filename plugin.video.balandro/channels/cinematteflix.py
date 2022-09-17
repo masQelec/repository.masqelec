@@ -76,7 +76,8 @@ def generos(item):
 
         itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
 
-    itemlist.append(item.clone( title = 'Uncategorized', url = host + 'category/uncategorized/', action = 'list_all' ))
+    if itemlist:
+        itemlist.append(item.clone( title = 'Uncategorized', url = host + 'category/uncategorized/', action = 'list_all' ))
 
     return sorted(itemlist, key = lambda it: it.title)
 

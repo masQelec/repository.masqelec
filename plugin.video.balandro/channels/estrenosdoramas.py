@@ -403,8 +403,8 @@ def play(item):
 
                     _result = do_downloadpage(_url, post = 'acc=' + _acc + '&id=' + _id + '&tk=' + _token, headers = headers)
 
-                    if _result.code == 200:
-                        _json = jsontools.load(_result.data)
+                    if _result:
+                        _json = jsontools.load(_result)
 
                         urlremoto_matches = re.compile("file:'(.*?)'", re.DOTALL).findall(_json['urlremoto'])
 
@@ -433,10 +433,10 @@ def play(item):
                 for _page, _acc in matches:
                     _url = item.url[0:item.url.find("reproducir14.php")] + _page
 
-                    _result = httptools.downloadpage(_url, post='acc=' + _acc + '&id=' + _id + '&tk=' + _token, headers = headers)
+                    _result = do_downloadpage(_url, post='acc=' + _acc + '&id=' + _id + '&tk=' + _token, headers = headers)
 
-                    if _result.code == 200:
-                        _json = jsontools.load(_result.data)
+                    if _result:
+                        _json = jsontools.load(_result)
 
                         if _json['urlremoto']:
                             url = _json['urlremoto']

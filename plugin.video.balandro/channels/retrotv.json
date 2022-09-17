@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["lat"],
 
-  "clusters": ["infantil", "classic", "years", "lasts", "kids"],
+  "clusters": ["problematic", "infantil", "classic", "years", "lasts", "kids"],
 
   "notes": "Series clásicas, por Géneros. en idioma orignal de emisión."
 }

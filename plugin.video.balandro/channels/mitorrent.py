@@ -9,12 +9,12 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://mitorrent.eu/'
+host = 'https://mitorrent.me/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://mitorrent.org/']
+    ant_hosts = ['https://mitorrent.org/', 'https://mitorrent.eu/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -281,10 +281,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    host_torrent = host[:-1]
-    url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
-
-    data = do_downloadpage(url_base64)
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     patron = '<li>.*?Descargar Capitulo(.*?)<a.*?href="(.*?)"'

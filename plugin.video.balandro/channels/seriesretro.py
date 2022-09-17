@@ -329,6 +329,8 @@ def findvideos(item):
 
         if not servidor: continue
 
+        if servidor == 'mediafire': continue
+
         servidor = servertools.corregir_servidor(servidor)
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')

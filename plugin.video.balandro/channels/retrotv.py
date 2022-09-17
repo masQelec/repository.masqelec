@@ -369,21 +369,27 @@ def play(item):
                 if 'blenditall' in url:
                     data = httptools.downloadpage(url).data
 
-                    url = scrapertools.find_single_match(data, '"file".*?"(.*?)"')
-                    url = url.replace('\\/', '/')
+                    urlb = scrapertools.find_single_match(data, '"file".*?"(.*?)"')
+                    urlb = urlb.replace('\\/', '/')
 
-                    if url:
-                        if url.startswith('//') == True: url = 'https:' + url
+                    if urlb:
+                        if urlb.startswith('//') == True: urlb = 'https:' + urlb
 
-                        data = httptools.downloadpage(url).data
+                        if urlb.startswith('https://blenditall.com/playlist.m3u8?data='):
+                            itemlist.append(['m3u8', urlb])
+                            return itemlist
+
+                        data = httptools.downloadpage(urlb).data
 
                         new_url = scrapertools.find_single_match(data, '//blenditall.com/playlist.m3u8?data=(.*?)$')
 
                         if new_url:
-                            url = '//blenditall.com/playlist.m3u8?data=' + new_url
+                            url = 'https://blenditall.com/playlist.m3u8?data=' + new_url
 
                             itemlist.append(['m3u8', url])
                             return itemlist
+
+    if '/app.retrotvshows.com/' in url: url = ''
 
     if url:
         if url.startswith('//') == True: url = 'https:' + url

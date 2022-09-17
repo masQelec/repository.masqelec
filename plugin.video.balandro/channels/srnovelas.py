@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-PY3 = sys.version_info[0] >= 3
-if PY3: unicode = str
-
-
 import re
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -206,8 +200,6 @@ def findvideos(item):
         url = url.strip()
         ref = item.url
 
-        #url = url.replace('&', '').strip()
-
         lang = 'Lat'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, ref = ref, ref_serie = item.ref_serie, language = lang ))
@@ -236,18 +228,25 @@ def play(item):
 
        if new_url:
            new_url = new_url.replace("'+OLID+'", '')
-           new_url = new_url + olid #+  '&'
+           new_url = new_url + olid
 
-           resp = httptools.downloadpage(new_url, headers={'Referer': item.url}, follow_redirects=False, only_headers=True)
+           referer = item.url.replace('/?or=', '/?od=')
 
-           httptools.save_cookie('w3tc_referrer', host, 'srnovelas.com')
-
-           if 'location' in resp.headers: url = resp.headers['location']
+           # ~ req_url  devuelve  UnicodeDecodeError: 'utf-8' codec can't decode byte 0x93 in position 26: invalid start byte
+           req_url = requests_url(new_url, referer=referer)
+           if req_url:
+                url = req_url
            else:
-              return 'Archivo [COLOR plum]inexistente[/COLOR]'
+               # ~ resp  devuelve  https://ok.ru/videoembed/s#SC3CS#/  https://streamtape.com/e/sc7ôv&CÄ¶s/
 
-           if not PY3: url = unicode(url, 'utf8').encode('utf8')
-           else: url = url.encode('utf-8').strip()
+               resp = httptools.downloadpage(new_url, headers={'Referer': referer}, follow_redirects=False, only_headers=True)
+
+               httptools.save_cookie('w3tc_referrer', host, 'srnovelas.com')
+
+               if 'location' in resp.headers:
+                   url = resp.headers['location']
+               else:
+                  return 'Archivo [COLOR plum]inexistente[/COLOR]'
 
            if "b'" in str(url): url = scrapertools.find_single_match(str(url), "'(.*?)'")
 
@@ -265,6 +264,53 @@ def play(item):
     httptools.save_cookie('w3tc_referrer', host, 'srnovelas.com')
 
     return itemlist
+
+
+def requests_url(url, referer):
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context
+
+    try:
+        import requests
+        requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+        existe_script = True
+    except:
+        existe_script = False
+
+    if not existe_script:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta script.module.requests[/COLOR][/B]' % color_alert)
+        return url
+
+    # ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36"
+    useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36"
+
+    ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
+    if ver_stable_chrome:
+        cfg_last_ver_chrome = config.get_setting('chrome_last_version', default='')
+        if not cfg_last_ver_chrome == '':
+            chrome_version = cfg_last_ver_chrome
+            useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36" % chrome_version
+
+    default_headers = dict()
+    default_headers["User-Agent"] = useragent
+    default_headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
+    default_headers["Accept-Language"] = "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3"
+    default_headers["Accept-Charset"] = "UTF-8"
+    default_headers["Accept-Encoding"] = "gzip"
+    default_headers["Referer"] = referer
+
+    headers = default_headers
+
+    data = requests.Session()
+
+    try:
+        x = requests.get(url, headers=headers, verify=False, allow_redirects=False).headers
+        url = scrapertools.find_single_match(str(x), "'location':.*?'(.*?)'")
+        if url: return url
+    except:
+        url = ''
+
+    return url
 
 
 def list_search(item):
@@ -313,4 +359,5 @@ def search(item, texto):
         for line in sys.exc_info():
             logger.error("%s" % line)
         return []
+
 

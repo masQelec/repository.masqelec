@@ -83,8 +83,9 @@ def generos(item):
 
         itemlist.append(item.clone( action='peliculas', title=scrapedtitle.strip(), url=host + scrapedurl ))
 
-    if 'genero/belica/' not in bloque:
-        itemlist.append(item.clone( action='peliculas', title='Bélica', url=host + 'genero/belica/' ))
+    if itemlist:
+        if 'genero/belica/' not in bloque:
+            itemlist.append(item.clone( action='peliculas', title='Bélica', url=host + 'genero/belica/' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 

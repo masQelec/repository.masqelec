@@ -180,9 +180,12 @@ def findvideos(item):
         for data_url, servidor in matches:
             ses += 1
 
+            servidor = servidor.lower().strip()
+
             if 'netu' in servidor or 'waaw' in servidor or 'hqq' in servidor: continue
             elif 'tubesb' in servidor: continue
             elif 'youtube' in servidor: continue
+            elif servidor == 'vip': continue
 
             if servidor == 'ok': servidor = 'okru'
 
@@ -290,7 +293,7 @@ def play(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        itemlist.append(item.clone(url = url, servidor = servidor))
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

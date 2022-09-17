@@ -1,5 +1,5 @@
-[COLOR coral][B]Balandro[/COLOR][COLOR red]  13 de Agosto 2022[/B][/COLOR]
-   [COLOR yellow][B]Version 2.3.9[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR][COLOR red]  1 de Septiembre 2022[/B][/COLOR]
+   [COLOR yellow][B]Version 2.4.0[/B][/COLOR]
 
    [COLOR yellow]INCIDENCIAS CORREGIDAS:[/COLOR]
       Bugs de la version anterior
@@ -65,6 +65,9 @@
            MejorTorrentNz,  Newpct1,  RojoTorrent,  SubTorrents,  TorrentDivx,
            VerdeTorrent
 
+         - [B][COLOR springgreen]De Animes:[/B][/COLOR]
+           HenaOjara
+
          - [B][COLOR orange]De Adultos:[/B][/COLOR]
            PornHub,  XVideos
 
@@ -76,16 +79,24 @@
    [COLOR yellow]CANALES INESTABLES:[/COLOR]
       [B][COLOR plum]Que canales estan Inestables:[/COLOR][/B]
          [COLOR coral]Son los pendientes de su evolucion, para evaluar su Situacion Definitiva.[/COLOR]
-         Gnula,  NewPct1
+         Gnula
+
+   [COLOR yellow]CANALES PROBLEMATICOS:[/COLOR]
+      [B][COLOR darkgoldenrod]Que canales son Problematicos:[/COLOR][/B]
+         [COLOR coral]Son en los que Predominan Sin enlaces Disponibles/Válidos/Soportados.[/COLOR]
+         CiberDocumentales,  CineMatteFlix,  CineTux,  DescargaCineClasico,
+         NewPct1,  PelisHouseOnline,  PelisPedia,  PelisPlusHd,  PelisPlusHdLat,
+         Ppeliculas,  RetroTv,  SeriesRetro,  TuPeliculaTv
 
    [COLOR yellow]CANALES TEMPORALMENTE DESACTIVADOS:[/COLOR]
       [B][COLOR cyan]Que canales estan Temporalmente Inactivos:[/COLOR][/B]
          [COLOR coral]Son los pendientes de su situacion, para evaluar su Re-activacion o Anulacion.[/COLOR]
-         CaricaturasHd,  DocumaniaTv,  PanDrama,  PeliSeries
+         CaricaturasHd,  DocumaniaTv,  FrozenLayer,  MejorTorretNz,  PanDrama,
+         PeliSeries,  PelisPlanet, SrNovelas
 
    [COLOR yellow]SERVIDORES CON VIAS ALTERNATIVAS:[/COLOR]
       [B][COLOR tan]Servidores con Vias Alternativas:[/COLOR][/B]
-         Doodstream,  Sbembed,  Streamsb,  Uptobox,  Various,  Youtube
+         Doodstream,  Sbembed,  Streamsb,  Uptobox,  Various,  Vk,  Youtube
 
       [B][COLOR goldenrod]Que Vias Alternativas pueden necesitarse:[/COLOR][/B]
          plugin.video.youtube
@@ -93,14 +104,15 @@
 
    [COLOR yellow]RESUMEN CANALES:[/COLOR]
       Totales:
-       222 [COLOR darkorange]Canales[/COLOR]
+       223 [COLOR darkorange]Canales[/COLOR]
 
          57 [COLOR coral]Inactivos[/COLOR]
-           4 [COLOR cyan]Temporalmente Inactivos[/COLOR]
+           8 [COLOR cyan]Temporalmente Inactivos[/COLOR]
 
            3 [COLOR violet]Con probable Incompatibilidad[/COLOR]
-           2 [COLOR plum]Inestables[/COLOR]
-         48 [COLOR red]Pueden Usar Proxies[/COLOR]
+           1 [COLOR plum]Inestables[/COLOR]
+         13 [COLOR darkgoldenrod]Problematicos[/COLOR]
+         49 [COLOR red]Pueden Usar Proxies[/COLOR]
 
            2 [COLOR teal]Requieren Cuenta[/COLOR]
            1 [COLOR green]Con varios Dominios[/COLOR]
@@ -108,22 +120,22 @@
 
          33 [COLOR fuchsia]No Intervendran en busquedas[/COLOR]
 
-       162 [COLOR gold]Disponibles[/COLOR]
+       158 [COLOR gold]Disponibles[/COLOR]
 
    [COLOR yellow]DISTRIBUCION CANALES DISPONIBLES:[/COLOR]
          25 de [COLOR moccasin]Sugeridos[/COLOR]
 
-       111 de [COLOR deepskyblue]Peliculas[/COLOR]
-         81 de [COLOR hotpink]Series[/COLOR]
-         71 de [COLOR yellow]Peliculas y Series[/COLOR]
+       109 de [COLOR deepskyblue]Peliculas[/COLOR]
+         79 de [COLOR hotpink]Series[/COLOR]
+         70 de [COLOR yellow]Peliculas y Series[/COLOR]
 
          27 de [COLOR thistle]Generos[/COLOR]
            8 de [COLOR cyan]Documentales[/COLOR]
-           7 de [COLOR lightyellow]Infantiles[/COLOR]
-           5 de [COLOR limegreen]Novelas[/COLOR]
+           6 de [COLOR lightyellow]Infantiles[/COLOR]
+           4 de [COLOR limegreen]Novelas[/COLOR]
          43 de [COLOR blue]Torrents[/COLOR]
-           7 de [COLOR firebrick]Doramas[/COLOR]
-         10 de [COLOR springgreen]Animes[/COLOR]
+           6 de [COLOR firebrick]Doramas[/COLOR]
+           9 de [COLOR springgreen]Animes[/COLOR]
          11 de [COLOR orange]Adultos[/COLOR]
 
            1 de [COLOR grey]Privados[/COLOR]
@@ -134,6 +146,6 @@
 
          53 [COLOR coral]Inactivos[/COLOR]
          18 [COLOR fuchsia]Sin Soporte[/COLOR]
-           6 [COLOR green]Con Vias alternativas[/COLOR]
+           7 [COLOR green]Con Vias alternativas[/COLOR]
 
          99 [COLOR gold]Disponibles[/COLOR]
