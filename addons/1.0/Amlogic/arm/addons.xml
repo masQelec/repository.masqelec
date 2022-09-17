@@ -6677,7 +6677,7 @@ v0.5.9 (2022-03-22)
 	</extension>
 </addon>
 
-<addon id="service.cloud.masqelec" name="Cloud masQelec" version="0.0.3" provider-name="Cloud masQelec">
+<addon id="service.cloud.masqelec" name="Cloud masQelec" version="0.0.4" provider-name="Cloud masQelec">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0"/>
 	</requires>
