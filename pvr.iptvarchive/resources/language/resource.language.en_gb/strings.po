@@ -189,29 +189,69 @@ msgstr ""
 #empty strings from id 30087 to 30089
 
 msgctxt "#30090"
-msgid "1 day"
+msgid "0 days"
 msgstr ""
 
 msgctxt "#30091"
-msgid "2 days"
+msgid "1 day"
 msgstr ""
 
 msgctxt "#30092"
-msgid "3 days"
+msgid "2 days"
 msgstr ""
 
 msgctxt "#30093"
-msgid "4 days"
+msgid "3 days"
 msgstr ""
 
 msgctxt "#30094"
-msgid "5 days"
+msgid "4 days"
 msgstr ""
 
 msgctxt "#30095"
-msgid "6 days"
+msgid "5 days"
 msgstr ""
 
 msgctxt "#30096"
+msgid "6 days"
+msgstr ""
+
+msgctxt "#30097"
 msgid "7 days"
+msgstr ""
+
+msgctxt "#30100"
+msgid "Archive type"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Disabled"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Default"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Custom"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Append"
+msgstr ""
+
+msgctxt "#30105"
+msgid "Shift (SIPTV)"
+msgstr ""
+
+msgctxt "#30106"
+msgid "Flussonic"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Xtream Codes"
+msgstr ""
+
+msgctxt "#30108"
+msgid "Ezserver"
 msgstr ""

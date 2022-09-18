@@ -12129,12 +12129,12 @@ Touchscreen: addon creates new virtual input device and converts data from touch
   </extension>
 </addon>
 
-<addon id="pvr.iptvarchive" version="3.9.8.2" name="PVR IPTV Archive Client" provider-name="nightik">
+<addon id="pvr.iptvarchive" version="3.11.1.1" name="PVR IPTV Archive Client" provider-name="nightik">
   <requires>
     <import addon="kodi.binary.global.main" version="1.0.14"/>
     <import addon="kodi.binary.instance.pvr" version="5.10.3"/>
   </requires>
-  <extension point="xbmc.pvrclient" library_linux="pvr.iptvarchive.so.3.9.8"/>
+  <extension point="xbmc.pvrclient" library_linux="pvr.iptvarchive.so.3.10.1"/>
   <extension point="xbmc.addon.metadata">
     <summary lang="af_ZA">Kodi PVR byvoegsel vir IPTV ondersteuning. https://github.com/afedchin/Kodi-addon-iptvsimple/wiki/IPTV-Simple-Home</summary>
     <summary lang="az_AZ">IPTV dəstəyi üçün Kodi PVR əlavəsini yükləyin.
