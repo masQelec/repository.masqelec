@@ -333,23 +333,6 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
             <import addon="xbmc.addon" version="12.0.0"/>
         </requires>
         <extension point="xbmc.addon.repository" name="masQelec Repository">
-            <info compressed="false">https://raw.githubusercontent.com/masQelec/repository.masQelec/master/addons/1.0/Amlogic/arm/addons.xml</info>
-            <checksum>https://raw.githubusercontent.com/masQelec/repository.masQelec/master/addons/1.0/Amlogic/arm/addons.xml.md5</checksum>
-            <datadir zip="true">https://raw.githubusercontent.com/masQelec/repository.masQelec/master/addons/1.0/Amlogic/arm/</datadir>
-            <hashes>false</hashes>
-        </extension>
-        <extension point="xbmc.addon.metadata">
-            <summary>masQelec Repository</summary>
-            <description>El repositorio de complementos masQelec.</description>
-            <platform>all</platform>
-    </extension>
-</addon>
-
-    <addon id="repository.masQelec" name="masQelec Repository" version="1.0.0" provider-name="masQelec">
-        <requires>
-            <import addon="xbmc.addon" version="12.0.0"/>
-        </requires>
-        <extension point="xbmc.addon.repository" name="masQelec Repository">
             <info compressed="false">https://raw.githubusercontent.com/masQelec/repository.masQelec//addons/1.0/Amlogic/arm/addons.xml</info>
             <checksum>https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/addons.xml.md5</checksum>
             <datadir zip="true">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/</datadir>
