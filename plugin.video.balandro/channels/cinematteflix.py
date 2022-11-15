@@ -109,6 +109,8 @@ def list_all(item):
         if not year: year = '-'
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(match, ' style="background-image.*?' + "'(.*?)'")
+		
         thumb = thumb.replace('&#038;', '&').replace('&amp;', '&')
 
         capitulos = False
@@ -124,8 +126,9 @@ def list_all(item):
         else: langs = 'Esp'
 
         title = scrapertools.find_single_match(info, '<h2 class="post-title">.*?">(.*?)</a>').lower()
+        if not title: title = scrapertools.find_single_match(match, '<h2 class="entry-title">.*?">(.*?)</a>').lower()
 
-        title = title.replace('ver ', '').replace('videoclub gratuito', '').replace('videoclub ', '').strip()
+        title = title.replace('ver ', '').replace('videoclub gratuito', '').replace('videoclub ', '').replace('y descargar ', '').strip()
 
         if title.startswith('|'):
             title = title.split("|")[1]
@@ -159,6 +162,9 @@ def list_all(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<div class="previous-page">.*?href="(.*?)"')
+        if not next_page: next_page = scrapertools.find_single_match(data, '<nav class="pagination group">.*?<li class="next right">.*?href="(.*?)"')
+
+        if not next_page: next_page = scrapertools.find_single_match(data, '<nav class="pagination group">.*?href="(.*?)"')
 
         if next_page:
             if '/page/' in next_page:

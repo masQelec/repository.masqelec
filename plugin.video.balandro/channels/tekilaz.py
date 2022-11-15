@@ -187,13 +187,14 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<nav class="navigation pagination">' in data:
-        if '>PROXIMO<' in data:
-            next_page_link = scrapertools.find_single_match(data, 'class="extend">.*?<a class="page-link" href.*?<a href="([^"]+)".*?>PROXIMO</a>')
-            if not next_page_link: next_page_link = scrapertools.find_single_match(data, '<a class="page-link" href.*?<a href="([^"]+)".*?>PROXIMO</a>')
+    if itemlist:
+        if '<nav class="navigation pagination">' in data:
+            if '>PROXIMO<' in data:
+                next_page_link = scrapertools.find_single_match(data, 'class="extend">.*?<a class="page-link" href.*?<a href="([^"]+)".*?>PROXIMO</a>')
+                if not next_page_link: next_page_link = scrapertools.find_single_match(data, '<a class="page-link" href.*?<a href="([^"]+)".*?>PROXIMO</a>')
 
-            if next_page_link != '':
-                itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page_link, text_color='coral' ))
+                if next_page_link != '':
+                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page_link, text_color='coral' ))
 
     return itemlist
 
@@ -230,12 +231,13 @@ def last_episodes(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<nav class="navigation pagination">' in data:
-        if '>NEXT<' in data:
-            next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)".*?>NEXT</a>')
+    if itemlist:
+        if '<nav class="navigation pagination">' in data:
+            if '>NEXT<' in data:
+                next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)".*?>NEXT</a>')
 
-            if next_page_link != '':
-                itemlist.append(item.clone( title = 'Siguientes ...', action = 'last_episodes', url = next_page_link, text_color='coral' ))
+                if next_page_link != '':
+                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'last_episodes', url = next_page_link, text_color='coral' ))
 
     return itemlist
 

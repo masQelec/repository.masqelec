@@ -8,8 +8,6 @@ from core import httptools, scrapertools
 
 host = "https://daftsex.com/"
 
-perpage = 30
-
 
 def mainlist(item):
     return mainlist_pelis(item)

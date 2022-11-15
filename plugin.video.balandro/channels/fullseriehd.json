@@ -13,5 +13,5 @@
 
   "clusters": ["news", "years", "lasts", "producers", "docs", "kids", "vos"],
 
-  "notes": "Web CERRADA. Películas por géneros, año y también Series"
+  "notes": "Web CERRADA. Películas por géneros, año. También Series"
 }

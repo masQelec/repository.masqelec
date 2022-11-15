@@ -1,7 +1,0 @@
-<settings>
-
-	<setting id="Fontcolor" type="labelenum" label="Seleccion de color para los Titulos" default="white" values="white|gold|red||deepskyblue|skyblue|fuchsia|lime|aqua|yellow|orange|deeppink"/>
-	<setting id="MenuColor" type="labelenum" label="Seleccion de color para el Menu" default="orange" values="white|gold|red||deepskyblue|skyblue|fuchsia|lime|aqua|yellow|orange|deeppink"/>
-
-</settings>
-

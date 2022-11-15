@@ -60,11 +60,11 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, '<div class="counter">.*?<a href="(.*?)"')
-
-    if next_page:
-        if '/pagina' in next_page:
-            itemlist.append(item.clone( title='Siguientes ...', url = next_page, action='list_all', text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<div class="counter">.*?<a href="(.*?)"')
+        if next_page:
+            if '/pagina' in next_page:
+                itemlist.append(item.clone( title='Siguientes ...', url = next_page, action='list_all', text_color='coral' ))
 
     return itemlist
 

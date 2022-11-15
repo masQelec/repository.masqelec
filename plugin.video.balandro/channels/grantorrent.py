@@ -7,22 +7,69 @@ if sys.version_info[0] >= 3: PY3 = True
 
 import re, base64
 
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 from lib import decrypters
 
 
-host = 'https://grantorrent.si/'
+host = 'https://grantorrent.fi/'
 
-b64_host = 'grantorrent.si'
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['http://grantorrent.net/', 'https://grantorrent1.com/', 'https://grantorrent.one/',
+             'https://grantorrent.tv/', 'https://grantorrent.la/', 'https://grantorrent.io/',
+             'https://grantorrent.eu/', 'https://grantorrent.cc/', 'https://grantorrent.li/',
+             'https://grantorrent.online/', 'https://grantorrentt.com/', 'https://grantorrent.nl/',
+             'https://grantorrent.ch/', 'https://grantorrent.ac/', 'https://grantorrent.re/',
+             'https://grantorrent.se/,' 'https://grantorrent.si/']
+
+
+domain = config.get_setting('dominio', 'grantorrent', default='')
+
+if domain:
+    if domain in str(ant_hosts): config.set_setting('dominio', '', 'grantorrent')
+    else: host = domain
+
+
+# ~ b64_host 'grantorrent.fi'
+points = host.count('.')
+
+if points == 1:
+    b64_host = host.replace('https://', '').replace('/', '')
+else:
+    tmp_host = host.split('.')[0]
+    tmp_host = tmp_host + '.'
+    b64_host = host.replace(tmp_host, '').replace('/', '')
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_grantorrent_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -31,12 +78,6 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['http://grantorrent.net/', 'https://grantorrent1.com/', 'https://grantorrent.one/',
-                 'https://grantorrent.tv/', 'https://grantorrent.la/', 'https://grantorrent.io/', 'https://grantorrent.eu/',
-                 'https://grantorrent.cc/', 'https://grantorrent.li/', 'https://grantorrent.online/', 'https://grantorrentt.com/',
-                 'https://grantorrent.nl/', 'https://grantorrent.ch/', 'https://grantorrent.ac/', 'https://grantorrent.re/'
-                 'https://grantorrent.se/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -65,6 +106,34 @@ def do_downloadpage(url, post=None, headers=None):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'grantorrent', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_grantorrent', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='grantorrent', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_grantorrent', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     return mainlist_pelis(item)
 
@@ -73,7 +142,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -124,11 +193,8 @@ def calidades(item):
 
     data = do_downloadpage(host + 'peliculas/')
 
-    patron = '<select\s*id="quality"\s*name="quality"[^>]*>(.*?)<\/select><\/div>'
+    bloque = scrapertools.find_single_match(data, '<select\s*id="quality"\s*name="quality"[^>]*>(.*?)<\/select><\/div>')
 
-    bloque = scrapertools.find_single_match(data, patron)
-
-    patron = '<option\s*value="([^"]+)">([^<]+)<\/option>'
     matches = re.compile('<option\s*value="([^"]+)">([^<]+)<\/option>', re.DOTALL).findall(bloque)
 
     for url, title in matches:

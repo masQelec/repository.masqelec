@@ -98,20 +98,20 @@ def list_all(item):
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie',
                                     contentTitle = title, contentExtra='adults') )
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-       if itemlist:
-           next_page = scrapertools.find_single_match(data,'<a class="next page-numbers" href="([^"]+)">Next &raquo;</a>')
+        if buscar_next:
+            next_page = scrapertools.find_single_match(data,'<a class="next page-numbers" href="([^"]+)">Next &raquo;</a>')
 
-           if next_page:
-               if '/page/' in next_page:
-                   itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, page= 0, text_color = 'coral') )
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, page= 0, text_color = 'coral') )
 
     return itemlist
 

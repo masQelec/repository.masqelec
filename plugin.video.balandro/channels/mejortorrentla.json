@@ -3,7 +3,7 @@
   "name": "MejorTorrentLa",
   "thumbnail": "mejortorrentla.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["torrents", "qualityes", "languages", "years", "kids", "docs", "vos"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas por géneros, calidad, idioma y año. Tambien Series."
+  "notes": "Web CERRADA. Canal con enlaces Torrent exclusivamente. Películas por géneros, calidad, idioma y año. También Series."
 }

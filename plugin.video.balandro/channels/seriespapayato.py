@@ -32,10 +32,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action='list_all', url = host + 'serie/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action='list_all', url = host + 'serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por género', action='generos' ))
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico' ))
+    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -101,10 +102,11 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<a class="page-link current"' in data:
-        next_page = scrapertools.find_single_match(data, '<a class="page-link" href="(.*?)">')
-        if next_page:
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
+    if itemlist:
+        if '<a class="page-link current"' in data:
+            next_page = scrapertools.find_single_match(data, '<a class="page-link" href="(.*?)">')
+            if next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -134,10 +136,11 @@ def list_letra(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<a class="page-link current"' in data:
-        next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?<a class="page-link" href="(.*?)">')
-        if next_page:
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_letra', text_color='coral' ))
+    if itemlist:
+        if '<a class="page-link current"' in data:
+            next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?<a class="page-link" href="(.*?)">')
+            if next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_letra', text_color='coral' ))
 
     return itemlist
 

@@ -29,13 +29,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title='Catálogo por alfabético (A - Z)', action ='list_all', url = host + 'lista.php?or=abc' ))
-    itemlist.append(item.clone( title='Catálogo por alfabético (Z - A)', action ='list_all', url = host + 'lista.php?or=cba' ))
+    itemlist.append(item.clone( title='Catálogo por alfabético (A - Z)', action ='list_all', url = host + 'lista.php?or=abc', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Catálogo por alfabético (Z - A)', action ='list_all', url = host + 'lista.php?or=cba', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title='Más populares', action ='list_all', url = host + 'lista.php?or=mas' ))
-    itemlist.append(item.clone( title='Más antiguas', action ='list_all', url = host + 'lista.php?or=ler' ))
-    itemlist.append(item.clone( title='Más actuales', action ='list_all', url = host + 'lista.php?or=rel' ))
-    itemlist.append(item.clone( title='Más impopulares', action ='list_all', url = host + 'lista.php?or=sam' ))
+    itemlist.append(item.clone( title='Más populares', action ='list_all', url = host + 'lista.php?or=mas', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Más antiguas', action ='list_all', url = host + 'lista.php?or=ler', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Más actuales', action ='list_all', url = host + 'lista.php?or=rel', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Más impopulares', action ='list_all', url = host + 'lista.php?or=sam', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -61,8 +61,9 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > hasta:
-        itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
+    if itemlist:
+        if num_matches > hasta:
+            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
 
     return itemlist
 

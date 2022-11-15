@@ -73,10 +73,11 @@ def series(item):
 
         if len(itemlist) >= perpage: break
 
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='series', text_color='coral' ))
+    if itemlist:
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='series', text_color='coral' ))
 
     return itemlist
 
@@ -106,9 +107,10 @@ def list_all(item):
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, plot=plot,
                                     contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
-    next_page_link = scrapertools.find_single_match(data, '<span aria-current="page" class="page-numbers current">.*?href="(.*?)"')
-    if next_page_link:
-        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page_link, text_color='coral' ))
+    if itemlist:
+        next_page_link = scrapertools.find_single_match(data, '<span aria-current="page" class="page-numbers current">.*?href="(.*?)"')
+        if next_page_link:
+            itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page_link, text_color='coral' ))
 
     return itemlist
 
@@ -137,10 +139,11 @@ def list_top(item):
 
         if len(itemlist) >= perpage: break
 
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_top', text_color='coral' ))
+    if itemlist:
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_top', text_color='coral' ))
 
     return itemlist
 

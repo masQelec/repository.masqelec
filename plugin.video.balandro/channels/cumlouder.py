@@ -62,7 +62,7 @@ def repertorios(item):
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
         if next_url:
-            #next_url = host + next_url
+            next_url = host + next_url
 
             itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, page = item.page + 1, action = 'repertorios', text_color = 'coral' ))
 

@@ -12,23 +12,31 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://dontorrent.moe/'
+host = 'https://dontorrent.me/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://dontorrent.one/',
-             'https://dontorrent.app/', 'https://dontorrent.lol/', 'https://dontorrent.nz/', 'https://dontorrent.rip/',
-             'https://dontorrent.vip/', 'https://dontorrent.ws/', 'https://dontorrent.win/', 'https://dontorrent.rs/',
-             'https://dontorrent.bz/', 'https://dontorrent.men/', 'https://dontorrent.fit/', 'https://dontorrent.art/',
-             'https://dontorrent.fun/', 'https://dontorrent.se/', 'https://dontorrent.pw/', 'https://dontorrent.li/',
-             'https://dontorrent.it/', 'https://dontorrent.red/', 'https://dontorrent.nu/', 'https://dontorrent.si/',
-             'https://dontorrent.sk/', 'https://dontorrent.eu/', 'https://dontorrent.top/', 'https://dontorrent.pm/',
-             'https://dontorrent.re/', 'https://dontorrent.wf/', 'https://dontorrent.run/', 'https://dontorrent.cat/'
-             'https://dontorrent.pl/', 'https://dontorrent.tel/', 'https://dontorrent.nl/', 'https://dontorrent.cx/',
-             'https://dontorrent.bet/', 'https://dontorrent.cab/', 'https://dontorrent.wtf/', 'https://dontorrent.fi/',
-             'https://dontorrent.ink/', 'https://dontorrent.kim/', 'https://dontorrent.tw/', 'https://dontorrent.yt/',
-             'https://dontorrent.vg/', 'https://dontorrent.ch/', 'https://dontorrent.vet/', 'https://dontorrent.dog/',
-             'https://dontorrent.dev/', 'https://dontorrent.bid/', 'https://dontorrent.pet/', 'https://dontorrent.soy/']
+             'https://dontorrent.app/', 'https://dontorrent.lol/', 'https://dontorrent.nz/',
+             'https://dontorrent.rip/', 'https://dontorrent.vip/', 'https://dontorrent.ws/',
+             'https://dontorrent.win/', 'https://dontorrent.rs/', 'https://dontorrent.bz/',
+             'https://dontorrent.men/', 'https://dontorrent.fit/', 'https://dontorrent.art/',
+             'https://dontorrent.fun/', 'https://dontorrent.se/', 'https://dontorrent.pw/',
+             'https://dontorrent.li/', 'https://dontorrent.it/', 'https://dontorrent.red/',
+             'https://dontorrent.nu/', 'https://dontorrent.si/', 'https://dontorrent.sk/',
+             'https://dontorrent.eu/', 'https://dontorrent.top/', 'https://dontorrent.pm/',
+             'https://dontorrent.re/', 'https://dontorrent.wf/', 'https://dontorrent.run/',
+             'https://dontorrent.cat/', 'https://dontorrent.pl/', 'https://dontorrent.tel/',
+             'https://dontorrent.nl/', 'https://dontorrent.cx/', 'https://dontorrent.bet/',
+             'https://dontorrent.cab/', 'https://dontorrent.wtf/', 'https://dontorrent.fi/',
+             'https://dontorrent.ink/', 'https://dontorrent.kim/', 'https://dontorrent.tw/',
+             'https://dontorrent.yt/', 'https://dontorrent.vg/', 'https://dontorrent.ch/',
+             'https://dontorrent.vet/', 'https://dontorrent.dog/', 'https://dontorrent.dev/',
+             'https://dontorrent.bid/', 'https://dontorrent.pet/', 'https://dontorrent.soy/',
+             'https://dontorrent.moe/', 'https://dontorrent.pub/', 'https://dontorrent.tf/',
+             'https://dontorrent.vin/', 'https://dontorrent.ist/', 'https://dontorrent.uno/',
+             'https://dontorrent.fans/', 'https://dontorrent.ltd/']
+
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
 
@@ -38,9 +46,31 @@ if domain:
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_dontorrents_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -63,18 +93,27 @@ def acciones(item):
 
     domain_memo = config.get_setting('dominio', 'dontorrents', default='')
 
-    if domain_memo:
-        itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title= 'Test Web del canal [COLOR yellow][B] ' + domain_memo + '[/B][/COLOR]',
-                                    from_channel='dontorrents', folder=False, text_color='chartreuse' ))
+    if domain_memo: url = domain_memo
+    else: url = host
 
-    itemlist.append(Item( channel='actions', action='last_domain_dontorrents', title='[B]Comprobar último dominio vigente[/B]',
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_dontorrents', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='dontorrents', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(Item( channel='domains', action='last_domain_dontorrents', title='[B]Comprobar último dominio vigente[/B]',
                           desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
-    if domain_memo:
-        itemlist.append(item.clone( channel='actions', action='manto_domain_dontorrents', title= '[B]Modificar el dominio memorizado[/B]',
-                                    desde_el_canal = True, folder=False, text_color='darkorange' ))
+    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_dontorrents', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
 
     return itemlist
 
@@ -240,11 +279,12 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_url = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)">Siguiente')
-    if next_url:
-        next_url = host[:-1] + next_url
+    if itemlist:
+        next_url = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)">Siguiente')
+        if next_url:
+            next_url = host[:-1] + next_url
 
-        itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
 
     return itemlist
 

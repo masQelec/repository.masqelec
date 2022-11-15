@@ -96,19 +96,20 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        if '<div class="pagination">' in data:
-            next_url = scrapertools.find_single_match(data, "<span class=.*?is-.*?href='(.*?)'")
-            if next_url:
-                if '/page/' in next_url:
-                    itemlist.append(item.clone( title='Siguientes ...', url=next_url, page=0, action='list_all', text_color='coral' ))
+        if buscar_next:
+            if '<div class="pagination">' in data:
+                next_url = scrapertools.find_single_match(data, "<span class=.*?is-.*?href='(.*?)'")
+                if next_url:
+                    if '/page/' in next_url:
+                        itemlist.append(item.clone( title='Siguientes ...', url=next_url, page=0, action='list_all', text_color='coral' ))
 
     return itemlist
 

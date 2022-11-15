@@ -11,8 +11,9 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+# ~ Dominio 8/10/2022
 
-host = 'https://atomohd.wf/'
+host = 'https://atomohd.vg/'
 
 
 clon_name = 'Atomix'
@@ -27,7 +28,7 @@ CLONES = [
    ['descargas2020', 'https://descargas2020.net/', 'movie', 'descargas2020.jpg']
    ]
 
-# ~ 'descargas2020'  prescindimos de series y buscar      sin proxies
+# ~ 'descargas2020'  prescindimos de series y buscar, sin proxies,  WEB CERRADA 25/9/2022
 
 # ~ Para una misma peli/serie no siempre hay uno sólo enlace, pueden ser múltiples. La videoteca de momento no está preparada para acumular
 # ~ múltiples enlaces de un mismo canal, así que solamente se guardará el enlace del último agregado.
@@ -36,11 +37,33 @@ CLONES = [
 
 
 def item_configurar_proxies(item, clon_host):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_newpct1_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder "utilizar/reproducir" este canal en alguno de sus clones necesites configurar algún proxy,'
     plot += ' ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + clon_host + ' necesitarás un proxy.'
     title = 'Configurar proxies a usar ...  [COLOR plum](si no hay resultados)[COLOR moccasin] comunes en todos los clones[/COLOR]'
-    return item.clone( title = title, action = 'configurar_proxies', host = clon_host, folder=False, plot=plot, text_color='red' )
+    return item.clone( title = title, action = 'configurar_proxies', host = clon_host, folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -56,7 +79,7 @@ def do_downloadpage(item, url, post=None, headers=None):
                  'https://nucleohd.com/', 'https://atomixhq.tel/', 'https://atomixhq.xyz/',
                  'https://atomohd.com/', 'https://atomohd.net/', 'https://atomohd.org/', 'https://atomohd.xyz/', 'https://atomohd.life/', 'https://atomohd.art/', 'https://atomohd.top/',
                  'https://atomohd.one/', 'https://atomohd.tel/', 'https://atomohd.pl/', 'https://atomohd.link/', 'https://atomohd.in/', 'https://atomohd.re/', 'https://atomohd.cc/',
-                 'https://atomohd.click/']
+                 'https://atomohd.click/', 'https://atomohd.wf/', 'https://atomohd.pm/', 'https://atomohd.app/', 'https://atomohd.live/', 'https://atomohd.vip/', 'https://atomohd.yt/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -251,6 +274,7 @@ def list_all(item):
     patron += '\s*<h2[^>]*>[^<]+</h2>\s*<span>([^<]+)</span>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
+
     num_matches = len(matches)
 
     for url, title, thumb, quality in matches[item.page * perpage:]:
@@ -286,17 +310,18 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        next_page_link = scrapertools.find_single_match(data, '<li><a href="([^"]+)">Next</a>')
-        if next_page_link:
-            itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, page=0, text_color='coral' ))
+        if buscar_next:
+            next_page = scrapertools.find_single_match(data, '<li><a href="([^"]+)">Next</a>')
+            if next_page:
+                itemlist.append(item.clone( title='Siguientes ...', url=next_page, page=0, text_color='coral' ))
 
     return itemlist
 
@@ -381,9 +406,10 @@ def episodios(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page_link = scrapertools.find_single_match(data, '<li><a href="([^"]+)">Next</a>')
-    if next_page_link:
-        itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, text_color='coral', contentSeason=1000, contentEpisodeNumber=10000 ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<li><a href="([^"]+)">Next</a>')
+        if next_page:
+            itemlist.append(item.clone( title='Siguientes ...', url=next_page, text_color='coral', contentSeason=1000, contentEpisodeNumber=10000 ))
 
     return sorted(itemlist, key=lambda it: (int(it.contentSeason), int(it.contentEpisodeNumber)))
 
@@ -653,8 +679,9 @@ def list_search(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '"items":30,' in data:
-        itemlist.append(item.clone( title='Siguientes ...', action='busqueda', busca_pagina = item.busca_pagina + 1, text_color='coral' ))
+    if itemlist:
+        if '"items":30,' in data:
+            itemlist.append(item.clone( title='Siguientes ...', action='busqueda', busca_pagina = item.busca_pagina + 1, text_color='coral' ))
 
     return itemlist
 

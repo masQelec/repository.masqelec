@@ -47,11 +47,11 @@ def menu_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', url = item.url, search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'series', url = item.url ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'series', url = item.url, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Catálogo series con temporadas', action = 'series', url = item.url, grupo = 'seasons' ))
+    itemlist.append(item.clone( title = 'Catálogo series con temporadas', action = 'series', url = item.url, grupo = 'seasons', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = item.url ))
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = item.url, search_type = 'tvshow' ))
 
     return itemlist
 
@@ -164,11 +164,12 @@ def series(item):
 
         tmdb.set_infoLabels(itemlist)
 
-        if not item.filtro_search:
-            if i > perpage:
-                if num_matches > hasta:
-                    next_page = item.page + 1
-                    itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'series', text_color='coral' ))
+        if itemlist:
+            if not item.filtro_search:
+                if i > perpage:
+                    if num_matches > hasta:
+                        next_page = item.page + 1
+                        itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'series', text_color='coral' ))
 
     return itemlist
 

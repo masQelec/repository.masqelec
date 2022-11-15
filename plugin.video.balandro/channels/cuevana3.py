@@ -7,16 +7,57 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww1.cuevana3.me/'
+host = 'https://z3.cuevana3.me/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['http://www.cuevana3.co/', 'https://cuevana3.co/', 'https://cuevana3.io/',
+             'https://cuevana3.me/', 'https://ww1.cuevana3.me/', 'https://ww2.cuevana3.me/',
+             'https://ww3.cuevana3.me/', 'https://ww4.cuevana3.me/,' 'https://ww5.cuevana3.me/',
+             'https://c3.cuevana3.me/', 'https://s3.cuevana3.me/', 'https://es.cuevana3.me/',
+             'https://a2.cuevana3.me/', 'https://b2.cuevana3.me/', 'https://d2.cuevana3.me/',
+             'https://e2.cuevana3.me/', 'https://g2.cuevana3.me/', 'https://z2.cuevana3.me/',
+             'https://s2.cuevana3.me/', 'https://m2.cuevana3.me/', 'https://n2.cuevana3.me/',
+             'https://ver.cuevana3.me/', 'https://u2.cuevana3.me/', 'https://u3.cuevana3.me/',
+             'https://n3.cuevana3.me/', 'https://v3.cuevana3.me/', 'https://m3.cuevana3.me/']
+
+
+domain = config.get_setting('dominio', 'cuevana3', default='')
+
+if domain:
+    if domain in str(ant_hosts): config.set_setting('dominio', '', 'cuevana3')
+    else: host = domain
 
 
 IDIOMAS = {'Latino': 'Lat', 'Español': 'Esp', 'Subtitulado': 'Vose'}
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_cuevana3_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -25,9 +66,6 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['http://www.cuevana3.co/', 'https://cuevana3.co/', 'https://cuevana3.io/', 'https://cuevana3.me/'
-                 'https://ww3.cuevana3.me/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -38,11 +76,39 @@ def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_he
     return resp.data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'cuevana3', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_cuevana3', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='cuevana3', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_cuevana3', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -56,7 +122,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -76,7 +142,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -160,15 +226,17 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page_link = scrapertools.find_single_match(data, ' rel="next" href="([^"]+)"')
-    if next_page_link == '':
-        next_page_link = scrapertools.find_single_match(data, '\s*href=(?:"|)([^ >"]+) class="next')
-    if next_page_link:
-        if not item.filtro:
-            itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, action='list_all', text_color='coral' ))
-        else:
-            pagina = 2 if not item.page else item.page + 1
-            itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, action='list_all', page=pagina, text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, ' rel="next" href="([^"]+)"')
+        if not next_page: next_page = scrapertools.find_single_match(data, '\s*href=(?:"|)([^ >"]+) class="next')
+
+        if next_page:
+            if not item.filtro:
+                itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', text_color='coral' ))
+            else:
+                pagina = 2 if not item.page else item.page + 1
+
+                itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', page=pagina, text_color='coral' ))
 
     return itemlist
 
@@ -345,7 +413,7 @@ def play(item):
                         return itemlist
 
                 elif 'openloadpremium.com/embed/' in url:
-                    continue # no encontrado ningún ejemplo válido
+                    url = '' # no encontrado ningún ejemplo válido
 
                 else:
                     lbl = scrapertools.find_single_match(resto, '"label":"([^"]+)')

@@ -10,12 +10,12 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www1.newpct.net/'
+host = 'https://www2.newpct.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.newpct.net/']
+    ant_hosts = ['https://www.newpct.net/', 'https://www1.newpct.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -50,8 +50,9 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'estrenos-4/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     return itemlist
 
@@ -104,6 +105,8 @@ def generos(item):
     matches = re.compile('<a href="(.*?)".*?">(.*?)</a>').findall(bloque)
 
     for url, title in matches:
+        title = title.replace('&amp;', '&')
+
         itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
 
     return sorted(itemlist, key=lambda x: x.title)
@@ -243,6 +246,12 @@ def play(item):
         itemlist.append(item.clone( url = url, server = 'torrent' ))
 
     else:
+        if '/ouo.io/' in url:
+            url = decrypters.decode_uiiio(url)
+
+            if not url:
+                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
         host_torrent = host[:-1]
         url_base64 = decrypters.decode_url_base64(url, host_torrent)
 

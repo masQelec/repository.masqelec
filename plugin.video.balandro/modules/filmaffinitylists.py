@@ -389,9 +389,9 @@ def list_premios_anyo(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, 'class="win-label">Ganador/a</span>.*?src="(.*?)".*?href="(.*?)".*?title="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, 'class="win-label">Ganador/a</span>.*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"')
 
-    for thumb, url, title in matches:
+    for url, title, thumb in matches:
         title = title.strip()
 
         if 'Edición de los Oscar' in title: continue

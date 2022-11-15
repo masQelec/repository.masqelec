@@ -223,10 +223,11 @@ def news(item):
 
            itemlist.append(item.clone( action = accion, title = title, url = url, thumbnail = thumb, grupo = grupo, filtro_search = name, page = 0 ))
 
-       if i > perpage:
-           if num_matches > hasta:
-              next_page = item.page + 1
-              itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'news', text_color='coral' ))
+       if itemlist:
+           if i > perpage:
+               if num_matches > hasta:
+                  next_page = item.page + 1
+                  itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'news', text_color='coral' ))
 
     return itemlist
 
@@ -300,10 +301,11 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if matches:
-        if num_matches > hasta:
-            next_page = item.page + 1
-            itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'list_all', text_color='coral' ))
+    if itemlist:
+        if matches:
+            if num_matches > hasta:
+                next_page = item.page + 1
+                itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 

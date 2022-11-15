@@ -1,1 +1,0 @@
-self.Intl||(self.Intl={}),self.Intl.NumberFormat||(self.Intl.NumberFormat=function(){},self.Intl.NumberFormat.prototype.format=function(value){"use strict";return value.toString()});

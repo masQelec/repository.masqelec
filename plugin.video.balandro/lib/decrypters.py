@@ -105,18 +105,22 @@ def decode_adfly(url, unquoted=True):
 def decode_uiiio(url):
     logger.info()
 
-    # ~ data = httptools.downloadpage(url).data
-    # ~ logger.debug(data)
-    # Usa recaptcha v2 invisible
-    return ''
+    data = httptools.downloadpage(url).data
+
+    # ~ Usa recaptcha v2 invisible
+    if '/recaptcha/' in data: url = ''
+
+    return url
 
 def decode_srtam(url):
     logger.info()
 
-    # ~ data = httptools.downloadpage(url).data
-    # ~ logger.debug(data)
-    # Usa recaptcha v2 invisible
-    return ''
+    data = httptools.downloadpage(url).data
+
+    # ~ Usa recaptcha v2 invisible
+    if '/recaptcha/' in data: url = ''
+
+    return url
 
 def decode_streamcrypt(url):
     logger.info()

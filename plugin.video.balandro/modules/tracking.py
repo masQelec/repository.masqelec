@@ -129,7 +129,8 @@ def mainlist(item):
     itemlist.append(item.clone( channel='actions', title= 'Ajustes categoría preferidos', action = 'open_settings',
                                 thumbnail=config.get_thumb('settings'), text_color='yellowgreen', folder=False ))
 
-    itemlist.append(item.clone( channel='helper', title = '[B]Información preferidos[/B]', action = 'show_help_tracking', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', title = '[B]Información preferidos[/B]', action = 'show_help_tracking', thumbnail=config.get_thumb('help'),
+                                text_color='green' ))
 
     return itemlist
 
@@ -230,8 +231,7 @@ def mainlist_episodios(item):
 
         context = [ {'title': 'Temporadas de la serie', 'channel': item.channel, 'action': 'serie_temporadas', 'link_mode': 'update'} ]
 
-        itemlist.append(item.clone( action='findvideos', title=titulo, thumbnail = thumbnail, fanart = fanart,
-                                    infoLabels = infolabels, context=context ))
+        itemlist.append(item.clone( action='findvideos', title=titulo, thumbnail = thumbnail, fanart = fanart, infoLabels = infolabels, context=context ))
 
     if item.desde + tracking_perpage < count_episodes:
         itemlist.append(item.clone( title="Siguiente >>", desde=item.desde + tracking_perpage ))
@@ -264,8 +264,7 @@ def serie_temporadas(item):
 
         context = [ {'title': 'Gestionar temporada', 'channel': item.channel, 'action': 'acciones_temporada'} ]
 
-        itemlist.append(item.clone( action='serie_episodios', title=titulo, thumbnail = thumbnail, fanart = fanart,
-                                    infoLabels = infolabels, context=context ))
+        itemlist.append(item.clone( action='serie_episodios', title=titulo, thumbnail = thumbnail, fanart = fanart, infoLabels = infolabels, context=context ))
 
     db.close()
 
@@ -283,11 +282,12 @@ def serie_episodios(item):
     inverso = True if db.cur.fetchone()[0] else False
 
     rows = db.get_episodes(item.infoLabels['tmdb_id'], item.infoLabels['season'], inverso)
+
     for season, episode, infolabels in rows:
         subtitulo = valor_infolabel('episodio_titulo', infolabels)
-        if subtitulo == '': subtitulo = 'Capítulo %d' % infolabels['episode']
+        if subtitulo == '': subtitulo = 'Capítulo ' + str(infolabels['episode'])
 
-        titulo = '%dx%02d %s' % (infolabels['season'], infolabels['episode'], subtitulo)
+        titulo = str(infolabels['season']) + 'x' + str(infolabels['episode']) + ' ' + str(subtitulo)
 
         thumbnail = valor_infolabel_informado(['episodio_imagen','thumbnail'], infolabels)
         if thumbnail == '': thumbnail = item.thumbnail
@@ -297,8 +297,7 @@ def serie_episodios(item):
 
         context = [ {'title': 'Gestionar episodio', 'channel': item.channel, 'action': 'acciones_episodio'} ]
 
-        itemlist.append(item.clone( action='findvideos', title=titulo, thumbnail = thumbnail, fanart = fanart,
-                                    infoLabels = infolabels, context=context ))
+        itemlist.append(item.clone( action='findvideos', title=titulo, thumbnail = thumbnail, fanart = fanart, infoLabels = infolabels, context=context ))
 
     db.close()
 

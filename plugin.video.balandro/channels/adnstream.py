@@ -5,7 +5,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = "http://www.adnstream.com/"
+host = "https://www.adnstream.com/"
 
 
 def mainlist(item):
@@ -46,9 +46,10 @@ def list_all(item):
     if item.search_type == 'movie':
         tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, '<span class="this pagina">.*?class="pagina">.*?href="(.*?)"')
-    if next_page:
-        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<span class="this pagina">.*?class="pagina">.*?href="(.*?)"')
+        if next_page:
+            itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 

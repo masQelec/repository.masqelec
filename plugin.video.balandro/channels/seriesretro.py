@@ -12,6 +12,12 @@ host = 'https://seriesretro.com/'
 perpage = 20
 
 
+def do_downloadpage(url, post=None, headers=None):
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
+
+
 def mainlist(item):
     return mainlist_series(item)
 
@@ -21,16 +27,18 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista-series/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista-series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animación', action = 'list_all', url = host + 'category/animacion/' ))
+    itemlist.append(item.clone( title = 'Animación', action = 'list_all', url = host + 'category/animacion/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/' ))
+    itemlist.append(item.clone( title = 'Live action', action = 'list_all', url = host + 'category/liveaction/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
-    itemlist.append(item.clone( title = 'Por año', action = 'anios' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -39,13 +47,15 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(host).data
-   
+    data = do_downloadpage(host)
+
     patron = 'class="menu-item menu-item-type-taxonomy menu-item-object-category.*?<a href="(.*?)">(.*?)</a>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, title in matches:
+        title = title.replace('&amp;', '&')
+
         itemlist.append(item.clone( action = "list_all", title = title, url = url ))
 
     return sorted(itemlist, key=lambda it: it.title)
@@ -86,9 +96,10 @@ def list_all(item):
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
+
     num_matches = len(matches)
 
     for match in matches[item.page * perpage:]:
@@ -116,20 +127,21 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        if '<div class=wp-pagenavi>' in data:
-            next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
+        if buscar_next:
+            if '<div class=wp-pagenavi>' in data:
+                next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
 
-            if next_url:
-                if '/page/' in next_url:
-                    itemlist.append(item.clone( action = 'list_all', page = 0, url = next_url, title = 'Siguientes ...', text_color='coral' ))
+                if next_url:
+                    if '/page/' in next_url:
+                        itemlist.append(item.clone( action = 'list_all', page = 0, url = next_url, title = 'Siguientes ...', text_color='coral' ))
 
     return itemlist
 
@@ -138,9 +150,10 @@ def list_alfa(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, '<td><span class="Num">(.*?)</tr>')
+
     num_matches = len(matches)
 
     for match in matches:
@@ -167,7 +180,7 @@ def list_epis(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = re.compile('<article (.*?)</article>', re.DOTALL).findall(data)
 
@@ -193,12 +206,13 @@ def list_epis(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<div class="wp-pagenavi"' in data:
-        next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
+    if itemlist:
+        if '<div class="wp-pagenavi"' in data:
+            next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
 
-        if next_url:
-            if '/page/' in next_url:
-                itemlist.append(item.clone (url = next_url, title = 'Siguientes ...', action = 'list_epis', text_color='coral' ))
+            if next_url:
+                if '/page/' in next_url:
+                    itemlist.append(item.clone (url = next_url, title = 'Siguientes ...', action = 'list_epis', text_color='coral' ))
 
     return itemlist
 
@@ -207,7 +221,7 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = re.compile(' data-tab="(.*?)">Temporada', re.DOTALL).findall(data)
 
@@ -235,7 +249,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     season = str(item.contentSeason)
 
@@ -284,7 +298,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, 'data-tplayernv="Opt(.*?)"><span>(.*?)</span>')
 
@@ -355,12 +369,13 @@ def play(item):
         if item.other == 'd':
             url = httptools.downloadpage(url, follow_redirects=False, only_headers=True).headers.get('location', '')
         else:
-            data = httptools.downloadpage(url).data
+            data = do_downloadpage(url)
 
             if item.other == 'anavids':
                 url = scrapertools.find_single_match(data.lower(), '<iframe src="(.*?)"')
 
-                data = httptools.downloadpage(url).data
+                data = do_downloadpage(url)
+
                 url = scrapertools.find_single_match(str(data), 'sources.*?"(.*?)"')
             else:
                 url = scrapertools.find_single_match(data, 'src="(.*?)"')
@@ -376,6 +391,9 @@ def play(item):
 
         if servidor:
             url = servertools.normalize_url(servidor, url)
+
+            if 'zplayer' in url: url += "|referer=%s" % host
+
             itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist

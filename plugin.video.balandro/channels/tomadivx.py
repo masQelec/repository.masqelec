@@ -162,11 +162,12 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_url = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)">Siguiente')
-    if next_url:
-        next_url = host[:-1] + next_url
+    if itemlist:
+        next_url = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)">Siguiente')
+        if next_url:
+            next_url = host[:-1] + next_url
 
-        itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -253,9 +254,9 @@ def list_post(item):
                 exist_page = scrapertools.find_single_match(data, "<option value='" + str(item.page) + "'")
 
                 if exist_page:
-                     post = next_page + 'pagina=' + str(item.page)
+                    post = next_page + 'pagina=' + str(item.page)
 
-                     itemlist.append(item.clone( title='Siguientes ...', url=item.url, action='list_post', post=post, text_color='coral' ))
+                    itemlist.append(item.clone( title='Siguientes ...', url=item.url, action='list_post', post=post, text_color='coral' ))
 
     return itemlist
 
@@ -429,6 +430,7 @@ def list_search(item):
                  itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_search', text_color='coral' ))
 
     return itemlist
+
 
 def search(item, texto):
     logger.info()

@@ -64,13 +64,14 @@ def list_all(item):
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
                                               contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
-    page = int(scrapertools.find_single_match(item.url, '&offset=([0-9]+)'))
-    next_page = (page + 48)
+    if itemlist:
+         page = int(scrapertools.find_single_match(item.url, '&offset=([0-9]+)'))
+         next_page = (page + 48)
 
-    if next_page:
-        next_page = re.sub(r"&offset=\d+", "&offset={0}".format(next_page), item.url)
+         if next_page:
+             next_page = re.sub(r"&offset=\d+", "&offset={0}".format(next_page), item.url)
 
-        itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
+             itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 

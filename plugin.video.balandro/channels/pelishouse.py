@@ -22,9 +22,31 @@ host = 'https://ww1.pelishouse.me/'
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_pelishouse_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -42,6 +64,17 @@ def do_downloadpage(url, post=None, headers=None):
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     data = httptools.downloadpage_proxy('pelishouse', url, post=post, headers=headers, timeout=timeout).data
+
+    if '<title>You are being redirected...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+                data = httptools.downloadpage_proxy('pelishouse', url, post=post, headers=headers).data
+        except:
+            pass
 
     return data
 
@@ -73,7 +106,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'genre/mas-vistas/', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_top', url = host + 'pelislatino24-tv/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'genre/marvel/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'genre/peliculas-marvel-online/', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'En 3D', action = 'list_3d', url = host + 'quality/3d/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
@@ -180,7 +213,7 @@ def generos(item):
     if itemlist:
         if item.search_type == 'movie':
             if not descartar_xxx:
-                itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'genre/18/' ))
+                itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'genre/peliculas-18/' ))
 
     return itemlist
 
@@ -256,10 +289,9 @@ def list_all(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(str(data), '<h2>Añadido(.*?)alt="PELISHOUSE"')
-
-    bloque = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloque)
+    bloque = scrapertools.find_single_match(str(data), '<h2>Añadido(.*?)© DMCA Pelishouse')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
@@ -298,16 +330,15 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = ''
-    if item.search_type == 'movie':
-        next_page = scrapertools.find_single_match(data, '<a class=\'arrow_pag\' href="([^"]+)">')
-        if not next_page:
+    if itemlist:
+        if item.search_type == 'movie':
+            next_page = scrapertools.find_single_match(data, '<a class=\'arrow_pag\' href="([^"]+)">')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<span class="current">\d+</span><a href=\'([^\']+)\' class="inactive">')
+        else:
             next_page = scrapertools.find_single_match(data, '<span class="current">\d+</span><a href=\'([^\']+)\' class="inactive">')
-    else:
-        next_page = scrapertools.find_single_match(data, '<span class="current">\d+</span><a href=\'([^\']+)\' class="inactive">')
 
-    if next_page:
-        itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
+        if next_page:
+            itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
 
     return itemlist
 
@@ -317,7 +348,6 @@ def list_top(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
@@ -350,16 +380,15 @@ def list_top(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = ''
-    if item.search_type == 'movie':
-        next_page = scrapertools.find_single_match(data, '<a class=\'arrow_pag\' href="([^"]+)">')
-        if not next_page:
+    if itemlist:
+        if item.search_type == 'movie':
+            next_page = scrapertools.find_single_match(data, '<a class=\'arrow_pag\' href="([^"]+)">')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<span class="current">\d+</span><a href=\'([^\']+)\' class="inactive">')
+        else:
             next_page = scrapertools.find_single_match(data, '<span class="current">\d+</span><a href=\'([^\']+)\' class="inactive">')
-    else:
-        next_page = scrapertools.find_single_match(data, '<span class="current">\d+</span><a href=\'([^\']+)\' class="inactive">')
 
-    if next_page:
-        itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_top', text_color = 'coral'))
+        if next_page:
+            itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_top', text_color = 'coral'))
 
     return itemlist
 
@@ -369,7 +398,6 @@ def list_3d(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
@@ -543,7 +571,8 @@ def findvideos(item):
 
 
 def get_video_url(_type, post, nume):
-    data = do_downloadpage(host + 'wp-json/dooplayer/v2/%s/%s/%s' % (post, _type, nume))
+    post = {'action': 'doo_player_ajax', 'post': post, 'nume': nume, 'type': _type}
+    data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post)
 
     try:
        url = jsontools.load(data)['embed_url']
@@ -600,9 +629,10 @@ def play(item):
 
     if item.server == 'torrent':
         try:
-           url = httptools.downloadpage(item.url, follow_redirects=False).headers['location']
+           url = httptools.downloadpage_proxy('pelishouse', item.url, follow_redirects=False).headers['location']
         except:
            data = do_downloadpage(item.url)
+
            url = scrapertools.find_single_match(data, 'href="(.*?)"')
 
            if url.startswith('magnet:'): pass
@@ -616,7 +646,7 @@ def play(item):
         if item.other == 'd':
             if '/links/' in item.url:
                 try:
-                   url = httptools.downloadpage(item.url, follow_redirects=False).headers['location']
+                   url = httptools.downloadpage_proxy('pelishouse', item.url, follow_redirects=False).headers['location']
                 except:
                    data = do_downloadpage(item.url)
                    url = scrapertools.find_single_match(data, 'href="(.*?)"')

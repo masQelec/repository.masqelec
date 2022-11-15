@@ -291,6 +291,7 @@ def findvideos(item):
             url = scrapertools.find_single_match(dat_server, "to_player.*?'(.*?)'")
 
             if '/netu.' in url or '/hqq.' in url or '/waaw.' in url: continue
+            elif '/saikoudane.' in url: continue
 
             if url:
                 if url == 'undefined': continue

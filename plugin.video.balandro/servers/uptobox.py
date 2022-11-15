@@ -40,6 +40,8 @@ def get_video_url(page_url, url_referer=''):
 
     video_urls = []
 
+    ini_page_url = page_url
+
     page_url = page_url.replace('/uptobox/', '/uptobox.com/').replace('/uptostream/', '/uptostream.com/')
 
     vid = scrapertools.find_single_match(page_url, "(?:uptobox.com/|uptostream.com/)(?:iframe/|)([A-z0-9]+)")
@@ -60,6 +62,7 @@ def get_video_url(page_url, url_referer=''):
             import_libs('script.module.resolveurl')
 
             import resolveurl
+            page_url = ini_page_url
             resuelto = resolveurl.resolve(page_url)
 
             if resuelto:
@@ -90,6 +93,28 @@ def get_video_url(page_url, url_referer=''):
     except:
        import traceback
        logger.error(traceback.format_exc(1))
+
+    if not video_urls:
+        if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            try:
+                import_libs('script.module.resolveurl')
+
+                import resolveurl
+                page_url = ini_page_url
+                resuelto = resolveurl.resolve(page_url)
+
+                if resuelto:
+                    video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
+                    return video_urls
+
+                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
+            except:
+               import traceback
+               logger.error(traceback.format_exc())
+               platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+        else:
+           return 'Acceso limitado restringido (2do.)'
 
     return video_urls
 

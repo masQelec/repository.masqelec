@@ -40,16 +40,16 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title='Buscar serie ...', action='search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title='Nuevas al azar', action='list_all', url= host + 'lista-series-estrenos/' ))
+    itemlist.append(item.clone( title='Nuevas al azar', action='list_all', url= host + 'lista-series-estrenos/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title='Capítulos estreno en castellano', action='estrenos', url = host + 'estreno-serie-castellano/' ))
-    itemlist.append(item.clone( title='Capítulos estreno en latino', action='estrenos', url = host + 'estreno-serie-espanol-latino/' ))
-    itemlist.append(item.clone( title='Capítulos estreno subtitulado', action='estrenos', url = host + 'estreno-serie-sub-espanol/' ))
+    itemlist.append(item.clone( title='Capítulos estreno en castellano', action='estrenos', url = host + 'estreno-serie-castellano/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Capítulos estreno en latino', action='estrenos', url = host + 'estreno-serie-espanol-latino/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Capítulos estreno subtitulado', action='estrenos', url = host + 'estreno-serie-sub-espanol/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title='Más vistas', action='list_all', url = host + 'lista-series-populares/' ))
-    itemlist.append(item.clone( title='Recomendadas', action='list_all', url = host + 'lista-series-recomendadas/' ))
+    itemlist.append(item.clone( title='Más vistas', action='list_all', url = host + 'lista-series-populares/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Recomendadas', action='list_all', url = host + 'lista-series-recomendadas/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title='Por letra (A - Z)', action='alfabetico' ))
+    itemlist.append(item.clone( title='Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -123,15 +123,14 @@ def series_por_letra(item):
 
         thumb = httptools.get_url_headers(urlparse.urljoin(host, img))
 
-        new_item = item.clone( action='temporadas', url=url, title=name, thumbnail=thumb,
-                               contentType = 'tvshow', contentSerieName = name, infoLabels={'year': year, 'plot': plot} )
-
-        itemlist.append(new_item)
+        itemlist.append(item.clone( action ='temporadas', url = url, title = name, thumbnail = thumb,
+                                    contentType = 'tvshow', contentSerieName = name, infoLabels = {'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(matches) >= 8:
-        itemlist.append(item.clone( title = 'Siguientes ...', action = 'series_por_letra', page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(matches) >= 8:
+            itemlist.append(item.clone( title = 'Siguientes ...', action = 'series_por_letra', page=item.page + 1, text_color='coral' ))
 
     return itemlist
 
@@ -185,8 +184,9 @@ def estrenos(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(matches) > (item.page + 1) * perpage:
-        itemlist.append(item.clone( title= 'Siguientes ...', action="estrenos", page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(matches) > (item.page + 1) * perpage:
+            itemlist.append(item.clone( title= 'Siguientes ...', action="estrenos", page=item.page + 1, text_color='coral' ))
 
     return itemlist
 

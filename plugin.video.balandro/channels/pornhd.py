@@ -119,30 +119,30 @@ def list_all(item):
 
             if len(itemlist) >= perpage: break
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, pagina = item.pagina, action='list_all', text_color='coral' ))
-            buscar_next = False
+   if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, pagina = item.pagina, action='list_all', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-       if itemlist:
-          if not 'pager next disabled' in data:
-              if '<a class="pagination-next"' in data:
-                  if 'page=' in item.url:
-                      if '/?page=' in item.url: active_page = item.url.split("/?page=")[1]
-                      else: active_page = item.url.split("&page=")[1]
+        if buscar_next:
+           if not 'pager next disabled' in data:
+               if '<a class="pagination-next"' in data:
+                   if 'page=' in item.url:
+                       if '/?page=' in item.url: active_page = item.url.split("/?page=")[1]
+                       else: active_page = item.url.split("&page=")[1]
 
-                      if '/?page=' in item.url: next_url = item.url.replace('/?page=' + active_page, '')
-                      else: next_url = item.url.replace('&page=' + active_page, '')
+                       if '/?page=' in item.url: next_url = item.url.replace('/?page=' + active_page, '')
+                       else: next_url = item.url.replace('&page=' + active_page, '')
 
-                      next_page = int(active_page) + 1
+                       next_page = int(active_page) + 1
 
-                      if '/?page=' in item.url: next_url = next_url + '/?page=' + str(next_page)
-                      else: next_url = next_url + '&page=' + str(next_page)
+                       if '/?page=' in item.url: next_url = next_url + '/?page=' + str(next_page)
+                       else: next_url = next_url + '&page=' + str(next_page)
 
-                      itemlist.append(item.clone(title = "Siguientes ...", url = next_url, page = 0, action = 'list_all', text_color='coral'))
+                       itemlist.append(item.clone(title = "Siguientes ...", url = next_url, page = 0, action = 'list_all', text_color='coral'))
 
     return itemlist
 
@@ -181,6 +181,15 @@ def list_canales(item):
 
     if num_matches > hasta:
         itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_canales', text_color='coral' ))
+    else:
+        if itemlist:
+           if not 'pager next disabled' in data:
+               if '<a class="pagination-next"' in data:
+                   next_url = scrapertools.find_single_match(data, '<a class="pagination-next" href="(.*?)"')
+
+                   next_url = next_url.replace('&amp;', '&')
+
+                   itemlist.append(item.clone(title = "Siguientes ...", url = next_url, page = 0, action = 'list_canales', text_color='coral'))
 
     return itemlist
 
@@ -219,6 +228,15 @@ def list_categorias(item):
 
     if num_matches > hasta:
         itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_categorias', text_color='coral' ))
+    else:
+        if itemlist:
+           if not 'pager next disabled' in data:
+               if '<a class="pagination-next"' in data:
+                   next_url = scrapertools.find_single_match(data, '<a class="pagination-next" href="(.*?)"')
+
+                   next_url = next_url.replace('&amp;', '&')
+
+                   itemlist.append(item.clone(title = "Siguientes ...", url = next_url, page = 0, action = 'list_categorias', text_color='coral'))
 
     return itemlist
 

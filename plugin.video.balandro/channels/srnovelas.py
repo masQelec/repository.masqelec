@@ -36,9 +36,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'series/', group = 'onair' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'series/', group = 'onair', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -88,10 +88,11 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
+    if itemlist:
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -234,6 +235,7 @@ def play(item):
 
            # ~ req_url  devuelve  UnicodeDecodeError: 'utf-8' codec can't decode byte 0x93 in position 26: invalid start byte
            req_url = requests_url(new_url, referer=referer)
+
            if req_url:
                 url = req_url
            else:
@@ -281,8 +283,8 @@ def requests_url(url, referer):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta script.module.requests[/COLOR][/B]' % color_alert)
         return url
 
-    # ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36"
-    useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36"
+    # ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.5249.103 Safari/537.36"
+    useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.5249.126 Safari/537.36"
 
     ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
     if ver_stable_chrome:
@@ -304,11 +306,11 @@ def requests_url(url, referer):
     data = requests.Session()
 
     try:
-        x = requests.get(url, headers=headers, verify=False, allow_redirects=False).headers
-        url = scrapertools.find_single_match(str(x), "'location':.*?'(.*?)'")
-        if url: return url
+       x = requests.get(url, headers=headers, verify=False, allow_redirects=False).headers
+       url = scrapertools.find_single_match(str(x), "'location':.*?'(.*?)'")
+       if url: return url
     except:
-        url = ''
+       url = ''
 
     return url
 

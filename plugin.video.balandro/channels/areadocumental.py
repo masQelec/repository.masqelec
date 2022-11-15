@@ -81,15 +81,18 @@ def list_all(item):
             itemlist.append(item.clone( action='findvideos', url=host+url, title=title, thumbnail=thumb,
                                         infoLabels={"year": year, "plot": plot}, contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
-    next_page_link = scrapertools.find_single_match(data, '<li><a class="last">\d+</a></li>\s*<li>\s*<a href="([^"]+)')
-    if next_page_link != '':
-        if next_page_link.startswith('?'): 
-            if 'series.php' in item.url: next_page_link = host + 'series.php' + next_page_link
-            else: next_page_link = host + 'index.php' + next_page_link
-        else: next_page_link = host + next_page_link[1:]
+    if itemlist:
+         next_page_link = scrapertools.find_single_match(data, '<li><a class="last">\d+</a></li>\s*<li>\s*<a href="([^"]+)')
 
-        next_page_link = next_page_link.replace('&amp;', '&')
-        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page_link, text_color='coral' ))
+         if next_page_link:
+             if next_page_link.startswith('?'): 
+                 if 'series.php' in item.url: next_page_link = host + 'series.php' + next_page_link
+                 else: next_page_link = host + 'index.php' + next_page_link
+             else: next_page_link = host + next_page_link[1:]
+
+             next_page_link = next_page_link.replace('&amp;', '&')
+
+             itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page_link, text_color='coral' ))
 
     return itemlist
 

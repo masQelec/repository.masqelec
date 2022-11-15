@@ -11,6 +11,10 @@
       {
         "pattern": "(?:www.)?ok.../(?:videoembed|video)/(\\d+)",
         "url": "https://ok.ru/videoembed/\\1"
+      },
+      {
+        "pattern": "odnoklassniki.ru/(?:videoembed|video)/(\\d+)",
+        "url": "https://ok.ru/videoembed/\\1"
       }
     ]
   }

@@ -246,7 +246,7 @@ def render_items(itemlist, parent_item):
     if parent_item.channel == 'mainmenu' or (parent_item.channel == 'tracking' and parent_item.action in ['mainlist','mainlist_listas']):
         # vista con: Lista amplia, Muro de iconos
         xbmcplugin.setContent(handle, '')
-    elif parent_item.channel == 'tracking' and parent_item.action in ['mainlist_series', 'mainlist_animes', 'mainlist_episodios', 'serie_temporadas', 'serie_episodios']:
+    elif parent_item.channel == 'tracking' and parent_item.action in ['mainlist_series', 'mainlist_doramas', 'mainlist_animes', 'mainlist_episodios', 'serie_temporadas', 'serie_episodios']:
         # vista con: Lista, Cartel, Mays., Muro de información, Lista amplia, Muro, Pancarta, Fanart
         xbmcplugin.setContent(handle, 'tvshows')
     else:
@@ -271,6 +271,7 @@ def render_items(itemlist, parent_item):
     if parent_item.channel == 'tracking':
         if parent_item.action == 'mainlist_pelis': viewmode = config.get_setting('tracking_viewmode_movies', default=0)
         elif parent_item.action == 'mainlist_series': viewmode = config.get_setting('tracking_viewmode_tvshows', default=0)
+        elif parent_item.action == 'mainlist_doramas': viewmode = config.get_setting('tracking_viewmode_tvshows', default=0)
         elif parent_item.action == 'mainlist_animes': viewmode = config.get_setting('tracking_viewmode_tvshows', default=0)
         elif parent_item.action == 'serie_temporadas': viewmode = config.get_setting('tracking_viewmode_seasons', default=0)
         elif parent_item.action == 'serie_episodios': viewmode = config.get_setting('tracking_viewmode_episodes', default=0)
@@ -418,7 +419,7 @@ def set_context_commands(item, parent_item, colores):
         if config.get_setting('mnu_preferidos', default=True):
             if item.contentType in ['movie', 'tvshow', 'season', 'episode'] and item.contentExtra != '3' \
                and parent_item.channel not in ['tracking', 'downloads', 'tmdblists', 'filmaffinitylists']:
-                tipo = {'movie':'película', 'tvshow':'serie', 'season':'temporada', 'episode':'episodio',}
+                tipo = {'movie': 'película', 'tvshow': 'serie', 'season': 'temporada', 'episode': 'episodio'}
                 context_commands.append( ('[B][COLOR %s]Guardar %s en Preferidos[/COLOR][/B]' % (colores['tracking'], tipo[item.contentType]), config.build_RunPlugin(
                     item.clone(channel="tracking", action="addFavourite", from_channel=item.channel, from_action=item.action))) )
 

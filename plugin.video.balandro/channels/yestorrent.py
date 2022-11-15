@@ -180,9 +180,10 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
-    if next_page_link:
-        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page_link, text_color='coral' ))
+    if itemlist:
+        next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
+        if next_page_link:
+            itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page_link, text_color='coral' ))
 
     return itemlist
 

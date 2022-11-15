@@ -22,9 +22,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action ='list_all', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -72,8 +72,18 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, contentType='tvshow', contentSerieName=title,
-                                    infoLabels={'year': '-'} ))
+        if '-capitulo-' in url or '/main/' in url:
+            season = scrapertools.find_single_match(url, '-temporada-(.*?)-')
+            if not season: season = '1'
+
+            epis =  scrapertools.find_single_match(url, '-capitulo-(.*?).')
+            if not epis: epis = '1'
+
+            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentSerieName=title, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+        else:
+            itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
+                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -95,8 +105,10 @@ def list_alfa(item):
 
     for match in matches:
         title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
+
         if title.lower() == 'promo': continue
         elif title.lower() == 'proximamente': continue
+        elif title == '#': continue
 
         letra = item.filtro.lower().strip()
         titulo = title.lower().strip()
@@ -116,8 +128,18 @@ def list_alfa(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, contentType='tvshow', contentSerieName=title,
-                                    infoLabels={'year': '-'} ))
+        if '-capitulo-' in url or '/main/' in url:
+            season = scrapertools.find_single_match(url, '-temporada-(.*?)-')
+            if not season: season = '1'
+
+            epis =  scrapertools.find_single_match(url, '-capitulo-(.*?).')
+            if not epis: epis = '1'
+
+            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentSerieName=title, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+        else:
+            itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
+                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -203,7 +225,6 @@ def episodios(item):
 
                 matches = matches + matches_page
 
-
     i = 0
 
     for match in matches[item.page * item.perpage:]:
@@ -277,8 +298,10 @@ def list_search(item):
 
     for match in matches:
         title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
+
         if title.lower() == 'promo': continue
         elif title.lower() == 'proximamente': continue
+        elif title == '#': continue
 
         busqueda = item.title_search.lower().strip()
         titulo = title.lower().strip()
@@ -294,8 +317,18 @@ def list_search(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, contentType='tvshow', contentSerieName=title,
-                                    infoLabels={'year': '-'} ))
+        if '-capitulo-' in url or '/main/' in url:
+            season = scrapertools.find_single_match(url, '-temporada-(.*?)-')
+            if not season: season = '1'
+
+            epis =  scrapertools.find_single_match(url, '-capitulo-(.*?).')
+            if not epis: epis = '1'
+
+            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentSerieName=title, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+        else:
+            itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
+                                        contentType='tvshow', contentSerieName=title,  infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

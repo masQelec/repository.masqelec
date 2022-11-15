@@ -157,9 +157,10 @@ def list_films(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > hasta:
-        next_page = item.page + 1
-        itemlist.append(item.clone( title='Siguientes ...', page = next_page, action = 'list_films', text_color='coral' ))
+    if itemlist:
+        if num_matches > hasta:
+            next_page = item.page + 1
+            itemlist.append(item.clone( title='Siguientes ...', page = next_page, action = 'list_films', text_color='coral' ))
 
     return itemlist
 

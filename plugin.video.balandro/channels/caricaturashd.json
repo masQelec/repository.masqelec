@@ -3,15 +3,15 @@
   "name": "CaricaturasHd",
   "thumbnail": "caricaturashd.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
-  "search_types": ["all", "movie", "tvshow"],
+  "search_types": ["tvshow"],
 
-  "categories": ["movie", "tvshow"],
+  "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["temporary", "infantil", "classic", "kids", "vos"],
+  "clusters": ["infantil", "classic", "kids", "vos"],
 
-  "notes": "Películas por géneros y Series por Géneros."
+  "notes": "Series por Géneros."
 }

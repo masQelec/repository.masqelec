@@ -1,19 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    PY3 = True
-
-    import xbmcvfs
-    translatePath = xbmcvfs.translatePath
-else:
-    PY3 = False
-
-    import xbmc
-    translatePath = xbmc.translatePath
-
-
 import os
 
 from platformcode import logger, config, platformtools
@@ -56,119 +42,6 @@ context_proxy_channels.append({'title': tit, 'channel': 'helper', 'action': 'sho
 
 tit = '[COLOR %s]Ajustes categorías menú y proxies[/COLOR]' % color_exec
 context_proxy_channels.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
-
-
-def submnu_developer(item):
-    logger.info()
-    itemlist = []
-
-    itemlist.append(item.clone( action='', title='[B]Tests Canales:[/B]', thumbnail=config.get_thumb('tools'), text_color='gold' ))
-    itemlist.append(item.clone( action='test_all_webs', title=' - Todos', thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( action='test_all_webs', title=' - Insatisfactorios', thumbnail=config.get_thumb('stack'), unsatisfactory = True ))
-
-    itemlist.append(item.clone( action='', title='[B]Tests Servidores:[/B]', thumbnail=config.get_thumb('tools'), text_color='fuchsia' ))
-    itemlist.append(item.clone( action='test_all_srvs', title=' - Todos', thumbnail=config.get_thumb('flame') ))
-    itemlist.append(item.clone( action='test_all_srvs', title=' - Insatisfactorios', thumbnail=config.get_thumb('flame'), unsatisfactory = True ))
-
-    presentar = False
-
-    if os.path.exists(os.path.join(config.get_data_path(), 'servers_todo.log')): presentar = True
-    elif os.path.exists(os.path.join(config.get_data_path(), 'qualities_todo.log')): presentar = True
-    elif os.path.exists(os.path.join(config.get_data_path(), 'proxies.log')): presentar = True
-
-    if presentar:
-        itemlist.append(item.clone( action='', title='[B]Logs:[/B]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
-
-        if os.path.exists(os.path.join(config.get_data_path(), 'servers_todo.log')):
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Log de Servidores',
-                                        todo = 'servers_todo.log', thumbnail=config.get_thumb('crossroads') ))
-
-        if os.path.exists(os.path.join(config.get_data_path(), 'qualities_todo.log')):
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Log de Calidades',
-                                        todo = 'qualities_todo.log', thumbnail=config.get_thumb('quote') ))
-
-        if os.path.exists(os.path.join(config.get_data_path(), 'proxies.log')):
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Log de Proxies',
-                                        todo = 'proxies.log', thumbnail=config.get_thumb('dev') ))
-
-        itemlist.append(item.clone( channel='actions', action='manto_temporales', title=' - Eliminar Logs', _logs = True,
-                                    thumbnail=config.get_thumb('keyboard'), text_color='red' ))
-
-    presentar = False
-
-    if os.path.exists(os.path.join(config.get_data_path(), 'info_channels.csv')): presentar = True
-    elif os.path.exists(os.path.join(config.get_data_path(), 'temp.torrent')): presentar = True
-    elif os.path.exists(os.path.join(config.get_data_path(), 'm3u8hls.m3u8')): presentar = True
-
-    if presentar:
-        itemlist.append(item.clone( action='', title='[B]Temporales:[/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
-
-        if os.path.exists(os.path.join(config.get_data_path(), 'info_channels.csv')):
-            itemlist.append(item.clone( action='', title=' - Hay Info channels', thumbnail=config.get_thumb('dev'), text_color='goldenrod' ))
-
-        if os.path.exists(os.path.join(config.get_data_path(), 'temp.torrent')):
-            itemlist.append(item.clone( action='', title=' - Hay Torrent', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
-
-        if os.path.exists(os.path.join(config.get_data_path(), 'm3u8hls.m3u8')):
-            itemlist.append(item.clone( action='', title=' - Hay M3u8hls', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
-
-        itemlist.append(item.clone( channel='actions', action='manto_temporales', title=' - Eliminar Temporales', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
-
-    presentar = False
-
-    if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developer.py')): presentar = True
-    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'test.py')): presentar = True
-
-    if presentar:
-        itemlist.append(item.clone( action='', title='[B]Gestionar:[/B]', thumbnail=config.get_thumb('tools'), text_color='teal' ))
-
-        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developer.py')):
-            itemlist.append(item.clone( channel='developer', action='mainlist', title=' - Géneros', thumbnail=config.get_thumb('genres') ))
-
-        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'test.py')):
-            itemlist.append(item.clone( channel='test', action='mainlist', title=' - Canales y Servidores', thumbnail=config.get_thumb('tools') ))
-
-    itemlist.append(item.clone( action='', title='[B]Sistema:[/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
-
-    itemlist.append(item.clone( channel='helper', action='show_log', title=' - Log del Sistema', thumbnail=config.get_thumb('computer') ))
-
-    itemlist.append(item.clone( channel='helper', action='show_advs', title=' - AdvancedSettings', thumbnail=config.get_thumb('quote') ))
-
-    presentar = False
-
-    path_packages = translatePath(os.path.join('special://home/addons/packages', ''))
-    existe_packages = filetools.exists(path_packages)
-
-    packages = []
-    if existe_packages: packages = os.listdir(path_packages)
-	
-    path_temp = translatePath(os.path.join('special://home/addons/temp', ''))
-    existe_temp = filetools.exists(path_temp)
-
-    temps = []
-    if existe_temp: temps = os.listdir(path_temp)
-
-    if packages: presentar = True
-    elif temps: presentar = True
-
-    if presentar:
-        itemlist.append(item.clone( action='', title='[B]Addons:[/B]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
-
-        if packages:
-            itemlist.append(item.clone( action='show_addons', title=' - Ver Packages', addons = packages, tipo = 'Packages',
-                                        thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
-
-            itemlist.append(item.clone( channel='actions', action='manto_addons_packages', title=' - Eliminar Packages', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
-
-        if temps:
-            itemlist.append(item.clone( action='show_addons', title=' - Ver Temp', addons = temps, tipo = 'Temp',
-                                        thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
-
-            itemlist.append(item.clone( channel='actions', action='manto_addons_temp', title=' - Eliminar Temp', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
-
-    itemlist.append(item.clone( channel='actions', action = 'open_settings', title= 'Configuración', thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
-
-    return itemlist
 
 
 def submnu_genres(item):
@@ -344,6 +217,9 @@ def submnu_search(item):
     itemlist.append(item.clone( channel='filters', action='channels_status', title=' - Personalizar canales Preferidos (Marcar o Des-marcar)',
                                 des_rea=False, thumbnail=config.get_thumb('stack') ))
 
+    itemlist.append(item.clone( channel='filters', title = ' - [COLOR greenyellow][B]Efectuar las búsquedas Solo en determinados canales[/B][/COLOR]',
+                                action = 'mainlist2', thumbnail=config.get_thumb('stack') ))
+
     if item.extra == 'movies':
         itemlist.append(item.clone( channel='filters', action='channels_excluded', title=' - [COLOR tomato][B]Excluir canales en las búsquedas de [COLOR deepskyblue]Películas[/B][/COLOR]',
                                     extra='movies', thumbnail=config.get_thumb('stack') ))
@@ -394,22 +270,231 @@ def submnu_search(item):
 
     return itemlist
 
-def _marcar_canal(item):
-    config.set_setting('status', item.estado, item.from_channel)
-    platformtools.itemlist_refresh()
 
 def _refresh_menu(item):
     platformtools.dialog_notification(config.__addon_name, 'Refrescando [B][COLOR %s]caché Menú[/COLOR][/B]' % color_exec)
     platformtools.itemlist_refresh()
 
 
+def _marcar_canal(item):
+    config.set_setting('status', item.estado, item.from_channel)
+    _refresh_menu(item)
+
+
 def _dominios(item):
     logger.info()
+
+    from modules import domains
 
     if item.from_channel == 'hdfull':
         from channels import hdfull
         item.channel = 'hdfull'
         hdfull.configurar_dominio(item)
+
+    elif item.from_channel == 'animeflv':
+        domains.manto_domain_animeflv(item)
+
+    elif item.from_channel == 'cinecalidad':
+        domains.manto_domain_cinecalidad(item)
+
+    elif item.from_channel == 'cinecalidadla':
+        domains.manto_domain_cinecalidadla(item)
+
+    elif item.from_channel == 'cinecalidadlol':
+        domains.manto_domain_cinecalidadlol(item)
+
+    elif item.from_channel == 'cinetux':
+        domains.manto_domain_cinetux(item)
+
+    elif item.from_channel == 'cuevana3':
+        domains.manto_domain_cuevana3(item)
+
+    elif item.from_channel == 'cuevana3video':
+        domains.manto_domain_cuevana3video(item)
+
+    elif item.from_channel == 'divxtotal':
+        domains.manto_domain_divxtotal(item)
+
+    elif item.from_channel == 'dontorrents':
+        domains.manto_domain_dontorrents(item)
+
+    elif item.from_channel == 'elifilms':
+        domains.manto_domain_elifilms(item)
+
+    elif item.from_channel == 'elitetorrent':
+        domains.manto_domain_elitetorrent(item)
+
+    elif item.from_channel == 'entrepeliculasyseries':
+        domains.manto_domain_entrepeliculasyseries(item)
+
+    elif item.from_channel == 'grantorrent':
+        domains.manto_domain_grantorrent(item)
+
+    elif item.from_channel == 'grantorrents':
+        domains.manto_domain_grantorrents(item)
+
+    elif item.from_channel == 'hdfull':
+        domains.manto_domain_hdfull(item)
+
+    elif item.from_channel == 'hdfullse':
+        domains.manto_domain_hdfullse(item)
+
+    elif item.from_channel == 'kindor':
+        domains.manto_domain_kindor(item)
+
+    elif item.from_channel == 'pelis28':
+        domains.manto_domain_pelis28(item)
+
+    elif item.from_channel == 'pelisflix':
+        domains.manto_domain_pelisflix(item)
+
+    elif item.from_channel == 'pelisplus':
+        domains.manto_domain_pelisplus(item)
+
+    elif item.from_channel == 'pelisplushd':
+        domains.manto_domain_pelisplushd(item)
+
+    elif item.from_channel == 'pelisplushdlat':
+        domains.manto_domain_pelisplushdlat(item)
+
+    elif item.from_channel == 'playdede':
+        domains.manto_domain_playdede(item)
+
+    elif item.from_channel == 'repelis24':
+        domains.manto_domain_repelis24(item)
+
+    elif item.from_channel == 'repelishd':
+        domains.manto_domain_repelishd(item)
+
+    elif item.from_channel == 'series24':
+        domains.manto_domain_series24(item)
+
+    elif item.from_channel == 'subtorrents':
+        domains.manto_domain_subtorrents(item)
+
+    elif item.from_channel == 'torrentdivx':
+        domains.manto_domain_torrentdivx(item)
+
+    else:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Configuración No Permitida[/B][/COLOR]' % color_alert)
+
+
+def _dominio_vigente(item):
+    from modules import domains
+
+    if item.from_channel == 'hdfull':
+        item.desde_el_canal = True
+        domains.last_domain_hdfull(item)
+
+    elif item.from_channel == 'dontorrents':
+        item.desde_el_canal = True
+        domains.last_domain_dontorrents(item)
+
+    else:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobación No Permitida[/B][/COLOR]' % color_alert)
+
+
+def _dominio_memorizado(item):
+    from modules import domains
+
+    if item.from_channel == 'animeflv':
+        domains.manto_domain_animeflv(item)
+
+    elif item.from_channel == 'cinecalidad':
+        domains.manto_domain_cinecalidad(item)
+
+    elif item.from_channel == 'cinecalidadla':
+        domains.manto_domain_cinecalidadla(item)
+
+    elif item.from_channel == 'cinecalidadlol':
+        domains.manto_domain_cinecalidadlol(item)
+
+    elif item.from_channel == 'cinetux':
+        domains.manto_domain_cinetux(item)
+
+    elif item.from_channel == 'cuevana3':
+        domains.manto_domain_cuevana3(item)
+
+    elif item.from_channel == 'cuevana3video':
+        domains.manto_domain_cuevana3video(item)
+
+    elif item.from_channel == 'divxtotal':
+        domains.manto_domain_divxtotal(item)
+
+    elif item.from_channel == 'dontorrents':
+        domains.manto_domain_dontorrents(item)
+
+    elif item.from_channel == 'elifilms':
+        domains.manto_domain_elifilms(item)
+
+    elif item.from_channel == 'elitetorrent':
+        domains.manto_domain_elitetorrent(item)
+
+    elif item.from_channel == 'entrepeliculasyseries':
+        domains.manto_domain_entrepeliculasyseries(item)
+
+    elif item.from_channel == 'grantorrent':
+        domains.manto_domain_grantorrent(item)
+
+    elif item.from_channel == 'grantorrents':
+        domains.manto_domain_grantorrents(item)
+
+    elif item.from_channel == 'hdfull':
+        domains.manto_domain_hdfull(item)
+
+    elif item.from_channel == 'hdfullse':
+        domains.manto_domain_hdfullse(item)
+
+    elif item.from_channel == 'kindor':
+        domains.manto_domain_kindor(item)
+
+    elif item.from_channel == 'pelis28':
+        domains.manto_domain_pelis28(item)
+
+    elif item.from_channel == 'pelisflix':
+        domains.manto_domain_pelisflix(item)
+
+    elif item.from_channel == 'pelisplus':
+        domains.manto_domain_pelisplus(item)
+
+    elif item.from_channel == 'pelisplushd':
+        domains.manto_domain_pelisplushd(item)
+
+    elif item.from_channel == 'pelisplushdlat':
+        domains.manto_domain_pelisplushdlat(item)
+
+    elif item.from_channel == 'playdede':
+        domains.manto_domain_playdede(item)
+
+    elif item.from_channel == 'repelis24':
+        domains.manto_domain_repelis24(item)
+
+    elif item.from_channel == 'repelishd':
+        domains.manto_domain_repelishd(item)
+
+    elif item.from_channel == 'series24':
+        domains.manto_domain_series24(item)
+
+    elif item.from_channel == 'subtorrents':
+        domains.manto_domain_subtorrents(item)
+
+    elif item.from_channel == 'torrentdivx':
+        domains.manto_domain_torrentdivx(item)
+
+    else:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Domain Memorizado[/B][/COLOR]' % color_alert)
+
+
+def _credenciales(item):
+    if item.from_channel == 'hdfull':
+        _credenciales_hdfull(item)
+
+    elif item.from_channel == 'playdede':
+        _credenciales_playdede(item)
+
+    else:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Credenciales[/B][/COLOR]' % color_alert)
+
 
 def _credenciales_hdfull(item):
     logger.info()
@@ -445,6 +530,7 @@ def _credenciales_hdfull(item):
 
     _refresh_menu(item)
 
+
 def _credenciales_playdede(item):
     logger.info()
 
@@ -479,8 +565,11 @@ def _credenciales_playdede(item):
 
     _refresh_menu(item)
 
+
 def _proxies(item):
     logger.info()
+
+    refrescar = True
 
     if item.from_channel == 'cinecalidad':
         from channels import cinecalidad
@@ -522,11 +611,6 @@ def _proxies(item):
         item.channel = 'divxtotal'
         divxtotal.configurar_proxies(item)
 
-    elif item.from_channel == 'documaniatv':
-        from channels import documaniatv
-        item.channel = 'documaniatv'
-        documaniatv.configurar_proxies(item)
-
     elif item.from_channel == 'dontorrents':
         from channels import dontorrents
         item.channel = 'dontorrents'
@@ -566,6 +650,7 @@ def _proxies(item):
         from channels import hdfull
         item.channel = 'hdfull'
         hdfull.configurar_proxies(item)
+        refrescar = True
 
     elif item.from_channel == 'hdfullcom':
         from channels import hdfullcom
@@ -614,11 +699,22 @@ def _proxies(item):
 
     elif item.from_channel == 'newpct1':
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Configurar proxies desde el canal[/COLOR][/B]' % color_avis)
+        refrescar = False
+
+    elif item.from_channel == 'peliculaspro':
+        from channels import peliculaspro
+        item.channel = 'peliculaspro'
+        peliculaspro.configurar_proxies(item)
 
     elif item.from_channel == 'pelis28':
         from channels import pelis28
         item.channel = 'pelis28'
         pelis28.configurar_proxies(item)
+
+    elif item.from_channel == 'pelisflix':
+        from channels import pelisflix
+        item.channel = 'pelisflix'
+        pelisflix.configurar_proxies(item)
 
     elif item.from_channel == 'pelisforte':
         from channels import pelisforte
@@ -634,6 +730,11 @@ def _proxies(item):
         from channels import pelishouse
         item.channel = 'pelishouse'
         pelishouse.configurar_proxies(item)
+
+    elif item.from_channel == 'pelishouseonline':
+        from channels import pelishouseonline
+        item.channel = 'pelishouseonline'
+        pelishouseonline.configurar_proxies(item)
 
     elif item.from_channel == 'pelismaraton':
         from channels import pelismaraton
@@ -685,6 +786,16 @@ def _proxies(item):
         item.channel = 'ppeliculas'
         ppeliculas.configurar_proxies(item)
 
+    elif item.from_channel == 'reinventorrent':
+        from channels import reinventorrent
+        item.channel = 'reinventorrent'
+        reinventorrent.configurar_proxies(item)
+
+    elif item.from_channel == 'repelis24':
+        from channels import repelis24
+        item.channel = 'repelis24'
+        repelis24.configurar_proxies(item)
+
     elif item.from_channel == 'repelishd':
         from channels import repelishd
         item.channel = 'repelishd'
@@ -730,108 +841,28 @@ def _proxies(item):
         item.channel = 'xvideos'
         xvideos.configurar_proxies(item)
 
+    else:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Configurar Proxies[/B][/COLOR]' % color_alert)
+        refrescar = False
+
+    if refrescar: _refresh_menu(item)
+
+
 def _quitar_proxies(item):
     el_canal = ('Quitando proxies [B][COLOR %s]' + item.from_channel.capitalize() + '[/COLOR][/B]') % color_avis
     platformtools.dialog_notification(config.__addon_name, el_canal)
 
     config.set_setting('proxies', '', item.from_channel)
-    platformtools.itemlist_refresh()
+    _refresh_menu(item)
 
 
 def _test_webs(item):
     el_canal = ('Test web canal [B][COLOR %s]' + item.from_channel.capitalize() + '[/COLOR][/B]') % color_adver
     platformtools.dialog_notification(config.__addon_name, el_canal)
 
+    config.set_setting('developer_test_channels', '')
+    config.set_setting('developer_test_servers', '')
+
     from modules import tester
     tester.test_channel(item.from_channel)
 
-
-def test_all_webs(item):
-    logger.info()
-
-    config.set_setting('developer_test_channels', '')
-
-    if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Canales Insatisfactorios ?'
-    else: text = '¿ Iniciar Test Web de Todos los Canales ?'
-
-    if not platformtools.dialog_yesno(config.__addon_name, text):
-        return
-
-    if item.unsatisfactory: config.set_setting('developer_test_channels', 'unsatisfactory')
-
-    from core import channeltools
-
-    from modules import tester
-
-    filtros = {}
-
-    channels_list_status = config.get_setting('channels_list_status', default=0)
-    if channels_list_status > 0:
-        filtros['status'] = 0 if channels_list_status == 1 else 1
-
-    ch_list = channeltools.get_channels_list(filtros=filtros)
-
-    i = 0
-
-    for ch in ch_list:
-        i += 1
-        tester.test_channel(ch['name'])
-
-    if i > 0: platformtools.dialog_ok(config.__addon_name, 'Canales Testeados ' + str(i))
-
-    config.set_setting('developer_test_channels', '')
-
-
-def test_all_srvs(item):
-    logger.info()
-
-    config.set_setting('developer_test_servers', '')
-
-    if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Servidores Insatisfactorios ?'
-    else: text = '¿ Iniciar Test Web de Todos los Servidores ?'
-
-    if not platformtools.dialog_yesno(config.__addon_name, text):
-        return
-
-    if item.unsatisfactory: config.set_setting('developer_test_servers', 'unsatisfactory')
-
-    from core import jsontools
-
-    from modules import tester
-
-    path = os.path.join(config.get_runtime_path(), 'servers')
-
-    servidores = os.listdir(path)
-
-    i = 0
-
-    for server in servidores:
-        if not server.endswith('.json'): continue
-
-        path_server = os.path.join(config.get_runtime_path(), 'servers', server)
-
-        if not os.path.isfile(path_server): continue
-
-        data = filetools.read(path_server)
-        dict_server = jsontools.load(data)
-
-        if dict_server['active'] == False: continue
-
-        i += 1
-
-        tester.test_server(dict_server['name'])
-
-    if i > 0: platformtools.dialog_ok(config.__addon_name, 'Servidores Testeados ' + str(i))
-
-    config.set_setting('developer_test_servers', '')
-
-
-def show_addons(item):
-    logger.info()
-
-    txt = '[COLOR gold][B]' + item.tipo + ':[/B][/COLOR][CR]'
-
-    for addons in item.addons:
-        txt += '  ' + str(addons) + '[CR][CR]'
-
-    platformtools.dialog_textviewer('Información Addons ' + item.tipo , txt)

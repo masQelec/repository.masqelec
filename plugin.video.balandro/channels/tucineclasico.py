@@ -108,17 +108,18 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]*><span class="fas fa-chevron-right">')
-        if next_page:
-            itemlist.append(item.clone (url = next_page, page = 0, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
+        if buscar_next:
+            next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]*><span class="fas fa-chevron-right">')
+            if next_page:
+                itemlist.append(item.clone (url = next_page, page = 0, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -213,17 +214,18 @@ def list_search(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_search', text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_search', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        next_page_link = scrapertools.find_single_match(data, ' href="([^"]+)"[^>]*><span class="fas fa-chevron-right">')
-        if next_page_link:
-            itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, page = 0, action='list_search', text_color='coral' ))
+        if buscar_next:
+            next_page_link = scrapertools.find_single_match(data, ' href="([^"]+)"[^>]*><span class="fas fa-chevron-right">')
+            if next_page_link:
+                itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, page = 0, action='list_search', text_color='coral' ))
 
     return itemlist
 

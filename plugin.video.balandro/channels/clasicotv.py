@@ -174,35 +174,35 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if '/genre/' in item.url:
-        if not itemlist:
-            return itemlist
+        if not itemlist: return itemlist
 
-    if '<div class="pagination">' in data:
-       next_url = ''
+    if itemlist:
+        if '<div class="pagination">' in data:
+           next_url = ''
 
-       if item.search_type == 'movie':
-           next_url = scrapertools.find_single_match(data, '<span class="current">.*?<a href=(.*?)class="inactive">')
+           if item.search_type == 'movie':
+               next_url = scrapertools.find_single_match(data, '<span class="current">.*?<a href=(.*?)class="inactive">')
+               if next_url:
+                   next_url = next_url.replace("'", '').strip()
+                   next_page = ''
+           else:
+              if "id='nextpagination'" in data:
+                  next_url = item.url
+
+                  if not item.page == 1: next_url = next_url.split('page/')[0]
+
+                  next_url = next_url + 'page/'
+                  next_page = item.page + 1
+              else:
+                  next_url = scrapertools.find_single_match(data, '<span class="current">.*?<a href=(.*?)class="inactive">')
+                  if next_url:
+                      next_url = next_url.replace("'", '').strip()
+                      next_page = ''
+
            if next_url:
-               next_url = next_url.replace("'", '').strip()
-               next_page = ''
-       else:
-          if "id='nextpagination'" in data:
-              next_url = item.url
+               if next_page: next_url = next_url  + str(next_page) + '/'
 
-              if not item.page == 1: next_url = next_url.split('page/')[0]
-
-              next_url = next_url + 'page/'
-              next_page = item.page + 1
-          else:
-              next_url = scrapertools.find_single_match(data, '<span class="current">.*?<a href=(.*?)class="inactive">')
-              if next_url:
-                  next_url = next_url.replace("'", '').strip()
-                  next_page = ''
-
-       if next_url:
-           if next_page: next_url = next_url  + str(next_page) + '/'
-
-           itemlist.append(item.clone (url = next_url, title = 'Siguientes ...', action = 'list_all', page = next_page, text_color='coral' ))
+               itemlist.append(item.clone (url = next_url, title = 'Siguientes ...', action = 'list_all', page = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -234,26 +234,27 @@ def list_epis(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<div class="pagination">' in data:
-        next_url = ''
+    if itemlist:
+        if '<div class="pagination">' in data:
+            next_url = ''
 
-        if "id='nextpagination'" in data:
-            next_url = item.url
+            if "id='nextpagination'" in data:
+                next_url = item.url
 
-            if not item.page == 1: next_url = next_url.split('page/')[0]
+                if not item.page == 1: next_url = next_url.split('page/')[0]
 
-            next_url = next_url + 'page/'
-            next_page = item.page + 1
-        else:
-            next_url = scrapertools.find_single_match(data, '<span class="current">.*?<a href=(.*?)class="inactive">')
+                next_url = next_url + 'page/'
+                next_page = item.page + 1
+            else:
+                next_url = scrapertools.find_single_match(data, '<span class="current">.*?<a href=(.*?)class="inactive">')
+                if next_url:
+                   next_url = next_url.replace("'", '').strip()
+                   next_page = ''
+
             if next_url:
-               next_url = next_url.replace("'", '').strip()
-               next_page = ''
+                if next_page: next_url = next_url  + str(next_page) + '/'
 
-        if next_url:
-            if next_page: next_url = next_url  + str(next_page) + '/'
-
-            itemlist.append(item.clone (url = next_url, title = 'Siguientes ...', action = 'list_epis', page = next_page, text_color='coral' ))
+                itemlist.append(item.clone (url = next_url, title = 'Siguientes ...', action = 'list_epis', page = next_page, text_color='coral' ))
 
     return itemlist
 

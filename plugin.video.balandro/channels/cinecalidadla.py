@@ -10,11 +10,20 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://cinecalidad.llc/'
 
 
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://cinecalidad.la/', 'https://cinecalidad.fo/', 'https://ww22.cinecalidad.fo/',
+             'https://ww3.cinecalidad.do/', 'https://ww4.cinecalidad.do/', 'https://cinecalidad.do/']
+
+
+domain = config.get_setting('dominio', 'cinecalidadla', default='')
+
+if domain:
+    if domain in str(ant_hosts): config.set_setting('dominio', '', 'cinecalidadla')
+    else: host = domain
+
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://cinecalidad.la/', 'https://cinecalidad.fo/', 'https://ww22.cinecalidad.fo/',
-                 'https://ww3.cinecalidad.do/', 'https://ww4.cinecalidad.do/', 'https://cinecalidad.do/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -26,6 +35,32 @@ def do_downloadpage(url, post=None, headers=None):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'cinecalidadla', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_cinecalidadla', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='cinecalidadla', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_cinecalidadla', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     return mainlist_pelis(item)
 
@@ -33,6 +68,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 

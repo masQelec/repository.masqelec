@@ -79,6 +79,9 @@ if tipo_channel != '':
                     elif item.search_type == 'documentary': search_type = 'para [COLOR yellow]Documentales[/COLOR]'
                     elif item.search_type == 'person': search_type = 'para [COLOR yellow]Personas[/COLOR]'
 
+                    elif item.search_special == 'anime': search_type = 'para [COLOR yellow]Animes[/COLOR]'
+                    elif item.search_special == 'dorama': search_type = 'para [COLOR yellow]Doramas[/COLOR]'
+
                     tecleado = platformtools.dialog_input(last_search, 'Texto a buscar ' + search_type)
 
                 if tecleado is not None and tecleado != '':

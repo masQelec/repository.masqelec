@@ -162,11 +162,12 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_url = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)">Siguiente')
-    if next_url:
-        next_url = host[:-1] + next_url
+    if itemlist:
+        next_url = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)">Siguiente')
+        if next_url:
+            next_url = host[:-1] + next_url
 
-        itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
 
     return itemlist
 

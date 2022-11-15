@@ -48,7 +48,7 @@ def get_video_url(page_url, url_referer=''):
     logger.info("url=" + page_url)
     video_urls = []
 
-    pattern_page_url = page_url
+    ini_page_url = page_url
 
     page_url = normalizar_url(page_url)
 
@@ -91,10 +91,11 @@ def get_video_url(page_url, url_referer=''):
                 import_libs('script.module.resolveurl')
 
                 import resolveurl
-                resuelto = resolveurl.resolve(pattern_page_url)
+                page_url = ini_page_url
+                resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
-                    video_urls.append(['mp4', resuelto + '|Referer=%s' % pattern_page_url])
+                    video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
                     return video_urls
 
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)

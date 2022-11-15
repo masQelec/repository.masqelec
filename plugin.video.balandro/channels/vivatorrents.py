@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
@@ -170,15 +170,15 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        if itemlist:
+        if buscar_next:
             next_page = scrapertools.find_single_match(data, "<span class='pagination_act'>.*?</span>.*?href='(.*?)'")
 
             if next_page:
@@ -197,7 +197,11 @@ def findvideos(item):
     links = scrapertools.find_multiple_matches(data, '<div class="detail_torrents">.*?<a href=.*?http:(.*?)".*?<i>(.*?)</i>')
     if not links: links = scrapertools.find_multiple_matches(data, '<div class="detail_torrents">.*?<a href=.*?https:(.*?)".*?<i>(.*?)</i>')
 
+    ses = 0
+
     for url, qlty in links:
+        ses += 1
+
         url = url.replace('//www.divxtotal2.com/http:', '').strip()
 
         url = 'https:' + url
@@ -210,9 +214,17 @@ def findvideos(item):
         elif url.endswith(".torrent"): pass
         else: continue
 
+        if '.php?' in url: continue
+        elif '/www.mejortorrent.org/' in url: continue
+
         qlty = qlty.strip()
 
         itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server='torrent', language='Esp', quality=qlty ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

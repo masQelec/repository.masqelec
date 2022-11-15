@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="10.0.111" provider-name="masQelec">
-  <requires><import addon="xbmc.python" version="2.1.0"/>
+<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="19.5.105" provider-name="Team CoreELEC">
+  <requires><import addon="xbmc.python" version="3.0.0"/>
 
   </requires>
   <extension point="xbmc.service" library="default.py">
@@ -10,13 +10,18 @@
     <provides></provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en">Tvheadend: a TV streaming server for Linux</summary>
-    <description lang="en">Tvheadend (ca756e3): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T</description>
-    <summary lang="es">Tvheadend: un servidor de transmisión de TV para Linux</summary>
-    <description lang="es">Tvheadend (ca756e3): es un servidor de transmisión de TV para Linux compatible DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC y ISDB-T</description>
-    <disclaimer></disclaimer>
+    <summary>Tvheadend: a TV streaming server for Linux</summary>
+    <description>
+Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T
+    </description>
+    <disclaimer>
+
+    </disclaimer>
     <platform>all</platform>
     <news>
+105
+- tvh bump to eb59284 (master 2021.06.12)
+
 104
 - tvh bump to c66e3bc (master 2020.10.22)
 

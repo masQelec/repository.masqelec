@@ -3,7 +3,7 @@
   "name": "Pelis24De",
   "thumbnail": "pelis24de.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -13,6 +13,6 @@
 
   "clusters": ["rankings", "years", "kids", "docs", "vos"],
 
-  "notes": "Peliculas por géneros y año."
+  "notes": "Web CERRADA. Películas por géneros y año."
 
 }

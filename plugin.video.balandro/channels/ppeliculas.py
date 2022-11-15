@@ -9,17 +9,51 @@ host = 'https://www.pepeliculas.org/'
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_ppeliculas_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
 
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
     data = httptools.downloadpage_proxy('ppeliculas', url, post=post, headers=headers).data
+
+    if '<title>You are being redirected...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+                data = httptools.downloadpage_proxy('ppeliculas', url, post=post, headers=headers).data
+        except:
+            pass
 
     return data
 
@@ -125,7 +159,7 @@ def list_all(item):
     if item.group == 'destacadas':
         blk = 'destacadas</h2(.*?)recientemente</h2'
     else:
-        blk = 'recientemente</h2(.*?)</a></div></div>'
+        blk = 'recientemente</h2(.*?)<div class="pagination">'
 
     bloque = scrapertools.find_single_match(data, blk)
 
@@ -162,14 +196,14 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if not item.group == 'destacadas':
-        next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '.*?</a><a href="(.*?)".*?><span')
-        if not next_page:
-            next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '<a href="(.*?)".*?><span')
+    if itemlist:
+        if not item.group == 'destacadas':
+            next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '.*?</a><a href="(.*?)".*?><span')
+            if not next_page: next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '<a href="(.*?)".*?><span')
 
-        if next_page:
-            if '/page/' in next_page:
-                itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
 
     return itemlist
 
@@ -240,13 +274,13 @@ def last_episodes(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '.*?</a><a href="(.*?)".*?><span')
-    if not next_page:
-        next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '<a href="(.*?)".*?><span')
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '.*?</a><a href="(.*?)".*?><span')
+        if not next_page: next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '<a href="(.*?)".*?><span')
 
-    if next_page:
-        if '/page/' in next_page:
-            itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'last_episodes', text_color = 'coral'))
+        if next_page:
+            if '/page/' in next_page:
+                itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'last_episodes', text_color = 'coral'))
 
     return itemlist
 
@@ -314,8 +348,8 @@ def episodios(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-         if len(matches) > ((item.page + 1) * item.perpage):
-             itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage, text_color = 'coral' ))
+        if len(matches) > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage, text_color = 'coral' ))
 
     return itemlist
 
@@ -324,14 +358,83 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    # ~ torrents No se tratan dan error  https://www.pepeliculas.org/link/361535-zypzvbie5v/   13/10/2022
+
     data = do_downloadpage(item.url)
 
     patron = "<li id='player-option-.*?"
-    patron += "data-type='(.*?)'.*?data-post='(.*?)'.*?data-nume='(.*?)'.*?<span class='title'>(.*?)</span><span class='server'>(.*?)</span>"
+    patron += "data-post='(.*?)'.*?data-type='(.*?)'.*?data-nume='(.*?)'.*?<span class='title'>(.*?)</span>.*?<span class='server'>(.*?)</span>"
+
+    matches = scrapertools.find_multiple_matches(data, patron)
+
+    patron = "<li id='player-option-.*?"
+    patron += "data-post='(.*?)'.*?data-type='(.*?)'.*?data-nume='(.*?)'.*?<span class='title'>(.*?)</span>.*?<span class='server'>(.*?)</span>"
 
     matches = scrapertools.find_multiple_matches(data, patron)
 
     ses = 0
+
+    # ~ orden post
+
+    for _post, _type, _nume, qlty_lang, _server in matches:
+        ses += 1
+
+        url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
+
+        if 'Latino' in qlty_lang:
+            qlty = qlty_lang.replace('Latino', '').strip()
+            lang = 'Lat'
+        elif 'Castellano' in qlty_lang or 'Español' in qlty_lang:
+            qlty = qlty_lang.replace('Castellano', '').strip()
+            lang = 'Esp'
+        elif 'Subtitulado' in qlty_lang or 'VOSE' in qlty_lang:
+            qlty = qlty_lang.replace('Subtitulado', '').strip()
+            lang = 'Vose'
+        else:
+            qlty = qlty_lang
+            lang = '?'
+
+        other = _server.lower()
+        other = other.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
+        other = other.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '')
+        other = other.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
+
+        if 'youtube' in other: continue
+
+        elif 'waaw' in other or 'hqq' in other or 'netu' in other: continue
+
+        elif 'powvideo' in other or 'pomvideo' in other: continue
+
+        elif 'openload' in other: continue
+        elif 'streamplay' in other: continue
+        elif 'rapidvideo' in other: continue
+        elif 'streamango' in other: continue
+        elif 'verystream' in other: continue
+        elif 'vidtodo' in other: continue
+        elif 'stormo' in other: continue
+        elif 'streamcherry' in other: continue
+        elif 'biter' in other: continue
+
+        elif 'pepeliculas' in other: continue
+
+        elif 'uploaded' in other: continue
+        elif 'earn4files' in other: continue
+        elif 'uploadrive' in other: continue
+        elif 'uploadbuzz' in other: continue
+        elif 'mediafire' in other: continue
+        elif 'drive.google' in other: continue
+
+        if other == qlty: qlty = ''
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url,
+                              other = other.capitalize(), language = lang, quality = qlty ))
+
+    # ~ orden type
+
+    patron = "<li id='player-option-.*?"
+    patron += "data-type='(.*?)'.*?data-post='(.*?)'.*?data-nume='(.*?)'.*?<span class='title'>(.*?)</span>.*?<span class='server'>(.*?)</span>"
+
+    matches = scrapertools.find_multiple_matches(data, patron)
 
     for _type, _post, _nume, qlty_lang, _server in matches:
         ses += 1
@@ -353,7 +456,7 @@ def findvideos(item):
 
         other = _server.lower()
         other = other.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-        other = other.replace('.ru', '').replace('.tv', '').replace('my.', '')
+        other = other.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '')
         other = other.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
 
         if 'youtube' in other: continue
@@ -369,6 +472,10 @@ def findvideos(item):
         elif 'verystream' in other: continue
         elif 'vidtodo' in other: continue
         elif 'stormo' in other: continue
+        elif 'streamcherry' in other: continue
+        elif 'biter' in other: continue
+
+        elif 'pepeliculas' in other: continue
 
         elif 'uploaded' in other: continue
         elif 'earn4files' in other: continue
@@ -379,10 +486,11 @@ def findvideos(item):
 
         if other == qlty: qlty = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, other = other.capitalize(),
-                              language = lang, quality = qlty ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url,
+                              other = other.capitalize(), language = lang, quality = qlty ))
 
     # ~ Ver
+
     if 'Ver en línea' in data: 
         patron = "<tr id='link-.*?<img src=.*?"
         patron += "domain=(.*?)'>.*?<a href='(.*?)'.*?target='_blank'>(.*?)</a>.*?<strong class='quality'>(.*?)</strong>.*?</td><td>(.*?)</td>"
@@ -396,7 +504,7 @@ def findvideos(item):
 
             servidor = domain.lower()
             servidor = servidor.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '')
+            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '')
             servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
 
             servidor = servertools.corregir_servidor(servidor)
@@ -412,6 +520,10 @@ def findvideos(item):
             elif 'verystream' in servidor: continue
             elif 'vidtodo' in servidor: continue
             elif 'stormo' in servidor: continue
+            elif 'streamcherry' in servidor: continue
+            elif 'biter' in servidor: continue
+
+            elif 'pepeliculas' in servidor: continue
 
             elif 'uploaded' in servidor: continue
             elif 'earn4files' in servidor: continue
@@ -425,10 +537,11 @@ def findvideos(item):
             elif lang == 'Subtitulado' or lang == 'VOSE': lang = 'Vose'
             else: lang = '?'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'v',
-                                  language = lang, quality = qlty ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, ref = item.url,
+                                  other = 'v', language = lang, quality = qlty ))
 
     # ~ Descargas
+
     if 'Descarga' in data:
         patron = "<tr id='link-.*?<img src=.*?"
         patron += "domain=(.*?)'>.*?<a href='(.*?)'.*?target='_blank'>(.*?)</a>.*?<strong class='quality'>(.*?)</strong>.*?</td><td>(.*?)</td>"
@@ -442,7 +555,7 @@ def findvideos(item):
 
             servidor = domain.lower()
             servidor = servidor.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '')
+            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '')
             servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
 
             servidor = servertools.corregir_servidor(servidor)
@@ -458,6 +571,10 @@ def findvideos(item):
             elif 'verystream' in servidor: continue
             elif 'vidtodo' in servidor: continue
             elif 'stormo' in servidor: continue
+            elif 'streamcherry' in servidor: continue
+            elif 'biter' in servidor: continue
+
+            elif 'pepeliculas' in servidor: continue
 
             elif 'uploaded' in servidor: continue
             elif 'earn4files' in servidor: continue
@@ -470,14 +587,15 @@ def findvideos(item):
             elif 'ddownload' in servidor: continue
             elif 'fastclick' in servidor: continue
             elif 'nitro.download' in servidor: continue
+            elif 'multiup.org' in servidor: continue
 
             if lang == 'Latino': lang = 'Lat'
             elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
             elif lang == 'Subtitulado' or lang == 'VOSE': lang = 'Vose'
             else: lang = '?'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'd',
-                                  language = lang, quality = qlty ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, ref = item.url,
+                                  other = 'd', language = lang, quality = qlty ))
 
     if not itemlist:
         if not ses == 0:
@@ -495,11 +613,10 @@ def play(item):
 
     if item.other == 'v' or item.other == 'd':
         resp = httptools.downloadpage_proxy('ppeliculas', item.url, follow_redirects=False)
-        if 'location' in resp.headers:
-            url = resp.headers['location']
+        if 'location' in resp.headers: url = resp.headers['location']
 
     else:
-        data = do_downloadpage(item.url)
+        data = do_downloadpage(item.url, headers = {'Referer': item.ref})
 
         url = scrapertools.find_single_match(data, '"embed_url":"(.*?)"')
 
@@ -513,6 +630,8 @@ def play(item):
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'zplayer': url = url + '|' + host
 
         itemlist.append(item.clone( url=url, server=servidor))
 

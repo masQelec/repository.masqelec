@@ -22,13 +22,29 @@ channels_unsatisfactory = config.get_setting('developer_test_channels', default=
 servers_unsatisfactory = config.get_setting('developer_test_servers', default='')
 
 
+txt_provs = '[COLOR plum][B]Obtenga Nuevos Proxies desde[/B][/COLOR] [COLOR yellow][B]All-providers[/B][/COLOR], [COLOR yellow][B]Proxyscrape.com[/B][/COLOR] ó [COLOR yellow][B]Us-proxy.com[/B][/COLOR][CR]'
+txt_proxs = '[COLOR red][B]Configure Proxies a Usar ...[/B][/COLOR][CR]'
+txt_pnews = '[COLOR red][B]Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
+txt_routs = '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
+txt_blocs = '[COLOR darkorange][B]Parece estar Bloqueado por su Operadora de Internet[/B][/COLOR][CR]'
+txt_checs = '[COLOR tomato][B]Compruebe su Internet y/ó el Canal, a través de un Navegador Web[/B][/COLOR][CR]'
+txt_coffs = '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
+
+
 channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
+channels_despised = [
+        ['hdfullse'],
+        ['movidymobi'],
+        ['pelispluscc'],
+        ['pelisplushdlat'],
+        ['seriespapayaxyz']
+        ]
+
 servers_poe = [
         ['directo'],
-        ['gamovideo'],
         ['m3u8hls'],
         ['torrent']
         ]
@@ -115,7 +131,7 @@ def test_channel(channel_name):
     if 'Dispone de varios posibles dominios.' in notes:
         notes = notes.replace('Dispone de varios posibles dominios.', '').strip()
 
-    if 'Puede requerir el uso de proxies' in  notes:
+    if 'Puede requerir el uso de proxies' in notes:
         notes = scrapertools.find_single_match(str(notes), '(.*?)Puede requerir el uso de proxies').strip()
 
     txt += 'notes: ' + str(notes)
@@ -178,6 +194,10 @@ def test_channel(channel_name):
     if 'Web dedicada exclusivamente en Novelas' in str(params['notes']):
         if txt_diag: txt_diag += '[CR]'
         txt_diag  += 'contenido: ' + '[COLOR limegreen][B]Solo Novelas[/B][/COLOR]'
+
+    if 'Web dedicada exclusivamente a los tráilers' in str(params['notes']):
+        if txt_diag: txt_diag += '[CR]'
+        txt_diag  += 'contenido: ' + '[COLOR limegreen][B]Solo Tráilers[/B][/COLOR]'
 
     if not str(params['clusters']) == "['adults']":
         if 'adults' in str(params['clusters']):
@@ -262,6 +282,8 @@ def test_channel(channel_name):
 
     host = ''
 
+    ant_hosts = ''
+
     channel_poe = "'" + channel_id + "'"
     esta_en_poe = False
 
@@ -285,11 +307,14 @@ def test_channel(channel_name):
              platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
              return
 
+          if data == False:
+             el_canal = ('Falta [B][COLOR %s]' + channel_py) % color_alert
+             platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+             return
+
           part_py = 'def mainlist'
           if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
-          elif 'CLASS' in data or 'class ' in data: part_py = 'class '
-
-          elif 'documaniatv_rua' in data: part_py = 'documaniatv_rua'
+          elif 'CLASS ' in data or 'class ' in data: part_py = 'class '
 
           elif 'def login' in data: part_py = 'def login'
           elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
@@ -300,6 +325,9 @@ def test_channel(channel_name):
 
           host = scrapertools.find_single_match(bloc, '.*?host.*?"(.*?)"')
           if not host: host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
+
+          ant_hosts = scrapertools.find_single_match(str(bloc), 'ant_hosts.*?=.*?(.*?)]')
+          if not ant_hosts: ant_hosts = scrapertools.find_single_match(str(bloc), "ant_hosts.*?=.*?(.*?)]")
 
     host = host.strip()
 
@@ -313,6 +341,13 @@ def test_channel(channel_name):
 
     txt = info_channel(channel_name, channel_poe, host, dominio, txt)
 
+    if not 'code: [COLOR springgreen][B]200' in str(txt):
+        if ant_hosts:
+            ant_hosts = str(ant_hosts).replace('[', '').replace("'", '').replace('"', '').replace(', ', ',  ').strip()
+
+            txt += '[CR][CR][COLOR moccasin][B]Anteriores:[/B][/COLOR][CR]'
+            txt += '[COLOR mediumaquamarine][B]' + ant_hosts + '[/B][/COLOR]'
+
     avisado = False
 
     if channel_id in str(channels_poe): pass
@@ -322,7 +357,12 @@ def test_channel(channel_name):
            avisado = True
 
     if channels_unsatisfactory == 'unsatisfactory':
-        if not avisado: return
+        if not avisado:
+            if 'Falso Positivo.' in txt: return txt
+            return ''
+        else:
+            platformtools.dialog_textviewer(channel_name.capitalize(), txt)
+            return txt
 
     platformtools.dialog_textviewer(channel_name.capitalize(), txt)
 
@@ -348,9 +388,9 @@ def info_channel(channel_name, channel_poe, host, dominio, txt):
                        if not 'Parece estar Bloqueado' in txt:
                            if not '<urlopen error' in txt:
                                if not 'timed out' in txt:
-                                   platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
-
-                                   response, txt = acces_channel(channel_name, host, '', txt, follow_redirects=True)
+                                   if not 'Denegado' in txt:
+                                       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
+                                       response, txt = acces_channel(channel_name, host, '', txt, follow_redirects=True)
 
     if not dominio:
         dominio = config.get_setting('dominio', channel_id, default='')
@@ -367,11 +407,15 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
 
     proxies = ''
     text_with_proxies = ''
+    quitar_proxies = False
 
     cfg_proxies_channel = 'channel_' + channel_id + '_proxies'
     if not config.get_setting(cfg_proxies_channel, default=''):
         response = httptools.downloadpage(host, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
     else:
+        response = httptools.downloadpage(host, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+        if response.sucess == True: quitar_proxies = True
+
         proxies = config.get_setting(cfg_proxies_channel, default='')
 
         if proxies:
@@ -425,6 +469,8 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
     txt += 'error: ' + str(response.error) + '[CR]'
     txt += 'length: ' + str(len(response.data))
 
+    if quitar_proxies: txt += '[CR]quitar: [COLOR orangered][B]Se pueden Eliminar los Proxies del Canal, al parecer No se necesitan[/B][/COLOR]'
+
     new_web = scrapertools.find_single_match(str(response.headers), "'location':.*?'(.*?)'")
 
     if response.sucess == False:
@@ -432,21 +478,22 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
             if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
             if 'actuales:' in txt:
-                if 'Sin proxies' in txt: txt += '[COLOR red][B]Configure Proxies a Usar ...[/B][/COLOR][CR]'
+                if 'Sin proxies' in txt: txt += txt_proxs
                 else:
-                  if not 'Configure Nuevos Proxies a Usar' in txt: txt += '[COLOR red][B]Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
-                  txt += 'Obtenga Nuevos Proxies desde [COLOR yellow][B]All-providers[/B][/COLOR] ó [COLOR yellow][B]Proxyscrape.com[/B][/COLOR][CR]'
+                   if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                   txt += txt_provs
             else:
                if config.get_setting(cfg_proxies_channel, default=''): txt += '[COLOR red][B]Obtenga nuevos proxies[/B][/COLOR]'
 
-               txt += '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
-               txt += '[COLOR tomato][B]Compruebe su Internet y/ó el Canal, a través de un Navegador Web[/B][/COLOR][CR]'
-               txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
+               txt += txt_coffs
+               txt += txt_checs
+               txt += txt_routs
 
         else:
            if '| 502: Bad gateway</title>' in response.data:  txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
            elif '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
            elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
+           elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
            else:
               if len(response.data) > 0:
                   txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR][CR]'
@@ -460,22 +507,29 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
                           txt += '[CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
                           txt += str(response.data).strip() + '[CR]'
     else:
+        if  '<span class="error-description">Access denied</span>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
+
         if len(response.data) >= 1000:
+            if 'Estamos en mantenimiento, por favor inténtelo más tarde' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
             if new_web:
-                if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente (ver Headers 'location')[/B][/COLOR]"
-                elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal (ver Headers) 'location'[/B][/COLOR]"
+                if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
                 txt += '[CR][CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
                 txt += str(response.headers) + '[CR]'
+
         else:
             if len(response.data) < 1000:
                 if not 'Diagnosis:' in txt: txt += '[CR][CR][COLOR moccasin][B]Diagnosis:[/B][/COLOR]'
 
+                if 'The website is under maintenance' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
                 if new_web == '/login':
                     if 'Diagnosis:' in txt:
-                        if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Diagnosis:[/B][/COLOR]'
+                        if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
                     txt += '[CR]login: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
                     new_web = ''
@@ -485,9 +539,9 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/':
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/':
                     if 'Diagnosis:' in txt:
-                        if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Diagnosis:[/B][/COLOR]'
+                        if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
                     txt += '[CR]login: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
                     new_web = ''
@@ -498,9 +552,9 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
                 else:
                    if new_web:
                        if not '/cgi-sys/suspendedpage.cgi' in new_web and not '/wp-admin/install.php' in new_web:
-                           if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente (ver Headers 'location')[/B][/COLOR]"
-                           elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal (ver Headers) 'location'[/B][/COLOR]"
-                           else: txt += "[CR][CR][COLOR orangered][B]Comprobar Dominio (ver Headers 'location')[/B][/COLOR]"
+                           if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                           elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                           else: txt += "[CR][CR][COLOR orangered][B]Comprobar Dominio[/B][/COLOR]"
 
                 if new_web:
                     if '/cgi-sys/suspendedpage.cgi' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'
@@ -531,96 +585,126 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
 
                 if 'Invisible Captcha' in txt:
                     if 'actuales:' in txt:
-                        if 'Sin proxies' in txt: txt += '[COLOR red][B]Configure Proxies a Usar ...[/B][/COLOR][CR]'
+                        if 'Sin proxies' in txt: txt += txt_proxs
                         else:
-                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += '[COLOR red][B]Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
-                           txt += '[COLOR plum][B]Obtenga Nuevos Proxies desde el proveedor[/B] [/COLOR][COLOR yellow][B]All-providers[/B][/COLOR] ó [COLOR yellow][B]Proxyscrape.com[/B][/COLOR][CR]'
+                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                           txt += txt_provs
 
-                    txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
+                    txt += txt_routs
  
                 elif 'Obtenga nuevos proxies' in txt:
-                    if 'Sin proxies' in txt: txt += '[COLOR red][B]Configure Proxies a Usar ...[/B][/COLOR][CR]'
-                    else:
-                       if not 'Configure Nuevos Proxies a Usar' in txt: txt += '[COLOR red][B]Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
-                       txt += '[COLOR plum][B]Obtenga Nuevos Proxies desde el proveedor[/B] [COLOR yellow][B]All-providers[/B][/COLOR] ó [COLOR yellow][B]Proxyscrape.com[/B][/COLOR][CR]'
+                    if 'actuales:' in txt:
+                        if 'Sin proxies' in txt: txt += txt_proxs
+                        else:
+                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                           txt += txt_provs
 
-                    txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
+                    txt += txt_routs
 
                 elif 'Host error' in txt:
-                    txt += '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
+                    txt += txt_coffs
 
                     if 'actuales:' in txt:
-                        if 'Sin proxies' in txt: txt += '[COLOR red][B] Configure Proxies a Usar ...[/B][/COLOR][CR]'
+                        if 'Sin proxies' in txt: txt += txt_proxs
                         else:
-                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += '[COLOR red][B]Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
-                           txt += '[COLOR plum][B]Obtenga Nuevos Proxies desde el proveedor[/B] [COLOR yellow][B]All-providers[/B][/COLOR] ó [COLOR yellow][B]Proxyscrape.com[/B][/COLOR][CR]'
+                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                           txt += txt_provs
 
-                    txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
+                    txt += txt_routs
 
                 elif 'No se puede establecer una' in txt:
                     txt += 'conexión:[COLOR yellow][B]No se pudo establecer la conectividad[/B][/COLOR][CR]'
 
                     if 'actuales:' in txt:
-                        if 'Sin proxies' in txt: txt += '[COLOR red][B]Configure Proxies a Usar ...[/B][/COLOR][CR]'
+                        if 'Sin proxies' in txt: txt += txt_proxs
                         else:
-                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += '[COLOR red][B]Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
-                           txt += '[COLOR plum][B]Obtenga Nuevos Proxies desde el proveedor[/B] [COLOR yellow][B]All-providers[/B][/COLOR] ó [COLOR yellow][B]Proxyscrape.com[/B][/COLOR][CR]'
-                    else: txt += '[COLOR tomato][B]Compruebe su Internet y/ó el Canal, a través de un Navegador Web[/B][/COLOR][CR]'
+                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                           txt += txt_provs
+                    else: txt += txt_checs
 
-                    txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
+                    txt += txt_routs
 
                 elif 'Cloudflare' in txt:
                     if 'actuales:' in txt:
-                        if 'Sin proxies' in txt: txt += '[COLOR red][B]Configure Proxies a Usar ...[/B][/COLOR][CR]'
+                        if 'Sin proxies' in txt: txt += txt_proxs
                         else:
-                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += '[COLOR red][B]Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
-                           txt += '[COLOR plum][B]Obtenga Nuevos Proxies desde el proveedor[/B] [COLOR yellow][B]All-providers[/B][/COLOR] ó [COLOR yellow][B]Proxyscrape.com[/B][/COLOR][CR]'
-                    else: txt += '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
+                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                           txt += txt_provs
+                    else: txt += txt_coffs
 
-                    txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
+                    txt += txt_routs
 
                 elif 'Unknow' in txt:
-                    if '<p>Por causas ajenas a' in txt: txt += '[COLOR darkorange][B]Parece estar Bloqueado por su Operadora de Internet[/B][/COLOR][CR]'
+                    if '<p>Por causas ajenas a' in txt: txt += txt_blocs
                     else: txt += '[COLOR goldenrod][B]Puede estar en Mantenimiento[/B][/COLOR][CR]'
 
-                    txt += '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
+                    txt += txt_coffs
 
                     if 'actuales:' in txt:
-                        if 'Sin proxies' in txt: txt += '[COLOR red][B]Configure Proxies a Usar ...[/B][/COLOR][CR]'
+                        if 'Sin proxies' in txt: txt += txt_proxs
                         else:
-                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += '[COLOR red][B] Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
-                           txt += '[COLOR plum][B]Obtenga Nuevos Proxies desde el proveedor[/B] [COLOR yellow][B]All-providers[/B][/COLOR] ó [COLOR yellow][B]Proxyscrape.com[/B][/COLOR][CR]'
+                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                           txt += txt_provs
 
-                    txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
+                    txt += txt_routs
 
                 elif '<p>Por causas ajenas a' in txt:
-                    txt += '[COLOR darkorange][B]Parece estar Bloqueado por su Operadora de Internet[/B][/COLOR][CR]'
+                    txt += txt_blocs
 
                     if 'actuales:' in txt:
-                        if 'Sin proxies' in txt: txt += '[COLOR red][B]Configure Proxies a Usar ...[/B][/COLOR][CR]'
+                        if 'Sin proxies' in txt: txt += txt_proxs
                         else:
-                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += '[COLOR red][B] Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
-                           txt += '[COLOR plum][B]Obtenga Nuevos Proxies desde el proveedor[/B] [COLOR yellow][B]All-providers[/B][/COLOR] ó [COLOR yellow][B]Proxyscrape.com[/B][/COLOR][CR]'
+                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                           txt += txt_provs
 
-                    txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
+                    txt += txt_routs
 
                 else:
-                    txt += '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
-                    txt += '[COLOR tomato][B]Compruebe su Internet y/ó el Canal, a través de un Navegador Web[/B][/COLOR][CR]'
-                    txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
+                    txt += txt_coffs
+                    txt += txt_checs
+                    txt += txt_routs
 
     if not 'Sugerencias:' in txt:
         if 'Suspendida' in txt:
-            txt += '[COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+            txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
             txt += '[COLOR goldenrod][B]Puede estar Renovando el Dominio o quizás estar en Mantenimiento[/B][/COLOR]'
+
+        elif not host in response.data:
+            host_in_data = host.replace('http://', '').replace('https://', '').replace('www.', '').replace('www1.', '')
+            if host_in_data.endswith("/"): host_in_data = host_in_data[:-1]
+
+            falso = True
+
+            if channel_id in str(channels_despised): falso = False
+            elif host_in_data in str(response.data.lower()): falso = False
+            elif channel_id in str(response.data.lower()): falso = False
+
+            if falso:
+                if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
+                if str(len(response.data)) == '0':
+                    if not 'nuevo:' in txt: txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR red][B] Sin Información de Datos.[/B][/COLOR][CR]'
+                else:
+                    txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
+
+                if 'Proxies:' in txt:
+                    if 'actuales:' in txt:
+                        if 'Sin proxies' in txt: txt += txt_proxs
+                        else:
+                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                           txt += txt_provs
+
+                if not 'Headers:' in txt:
+                    txt += '[CR][CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
+                    txt += str(response.headers) + '[CR]'
 
         elif response.sucess == False:
             txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
-            txt += '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
-            txt += '[COLOR tomato][B]Compruebe su Internet y/ó el Canal, a través de un Navegador Web[/B][/COLOR][CR]'
-            txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/B][/I][/COLOR][CR]'
+            txt += txt_coffs
+            txt += txt_checs
+            txt += txt_routs
 
     return response, txt
 
@@ -750,7 +834,10 @@ def test_server(server_name):
            avisado = True
 
     if servers_unsatisfactory == 'unsatisfactory':
-        if not avisado: return
+        if not avisado: return ''
+        else:
+           platformtools.dialog_textviewer(server_name.capitalize(), txt)
+           return txt
 
     platformtools.dialog_textviewer(server_name.capitalize(), txt)
 
@@ -772,11 +859,12 @@ def info_server(server_name, server_poe, url, txt):
             if not 'Cloudflare' in txt:
                if not 'Invisible Captcha' in txt:
                    if not 'timed out' in txt:
-                       platformtools.dialog_notification(config.__addon_name, el_server + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
-
-                       response, txt = acces_server(server_name, url, txt, follow_redirects=True)
+                       if not 'Denegado' in txt:
+                           platformtools.dialog_notification(config.__addon_name, el_server + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
+                           response, txt = acces_server(server_name, url, txt, follow_redirects=True)
 
     return txt
+
 
 def acces_server(server_name, url, txt, follow_redirects=None):
     el_server = ('Testeando [B][COLOR %s]' + server_name) % color_avis
@@ -810,6 +898,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
         if '| 502: Bad gateway</title>' in response.data:  txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
         elif '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
         elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
+        elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
         else:
            if len(response.data) > 0:
                txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR][CR]'
@@ -823,24 +912,37 @@ def acces_server(server_name, url, txt, follow_redirects=None):
                        txt += '[CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
                        txt += str(response.data).strip() + '[CR]'
     else:
+        if  '<span class="error-description">Access denied</span>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
+
         if len(response.data) >= 1000:
-            if new_web:
-                if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente (ver Headers 'location')[/B][/COLOR]"
-                elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal (ver Headers) 'location')[/B][/COLOR]"
+            if new_web == '?op=login':
+                if 'Diagnosis:' in txt:
+                    if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
+
+                txt += '[CR]login: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
+                new_web = ''
+
+                if response.code == 301 or response.code == 302 or response.code == 307 or response.code == 308:
+                    txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]"
+
+            elif new_web:
+                if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
                 txt += '[CR][CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
                 txt += str(response.headers) + '[CR]'
+
         else:
             if len(response.data) < 1000:
                 if not 'Diagnosis:' in txt: txt += '[CR][CR][COLOR moccasin][B]Diagnosis:[/B][/COLOR]'
 
                 if new_web:
                     if not '/cgi-sys/suspendedpage.cgi' in new_web and not '/wp-admin/install.php' in new_web:
-                        if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente (ver Headers 'location')[/B][/COLOR]"
-                        elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal (ver Headers) 'location')[/B][/COLOR]"
-                        else: txt += "[CR][CR][COLOR orangered][B]Comprobar Dominio (ver Headers 'location')[/B][/COLOR]"
+                        if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                        elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                        else: txt += "[CR][CR][COLOR orangered][B]Comprobar Dominio[/B][/COLOR]"
 
                     if '/cgi-sys/suspendedpage.cgi' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'
                     elif '/wp-admin/install.php' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'
@@ -864,7 +966,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
     if not 'Sugerencias:' in txt:
         if 'Invisible Captcha' in txt:
             txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
-            txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/B][/I][/COLOR][CR]'
+            txt += txt_routs
 
         elif 'Suspendida' in txt:
             txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
@@ -876,7 +978,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
 
             txt += '[COLOR gold][B]Puede Descartar el Servidor en la Configuración (categoría Play)[/B][/COLOR][CR]'
             txt += '[COLOR tomato][B]Compruebe su Internet y/ó el Servidor, a través de un Navegador Web[/B][/COLOR][CR]'
-            txt += '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/B][/I][/COLOR][CR]'
+            txt += txt_routs
 
     return response, txt
 

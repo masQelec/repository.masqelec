@@ -147,10 +147,11 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<a class="pagination-link" href="' in data:
-        next_url = scrapertools.find_single_match(data, '<a class="pagination-link" href="([^"]+)">Siguiente')
-        next_url = item.url.split("?")[0] + next_url
-        itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
+    if itemlist:
+        if '<a class="pagination-link" href="' in data:
+            next_url = scrapertools.find_single_match(data, '<a class="pagination-link" href="([^"]+)">Siguiente')
+            next_url = item.url.split("?")[0] + next_url
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
 
     return itemlist
 
@@ -319,19 +320,8 @@ def play(item):
             data = httptools.downloadpage(url).data
             url = scrapertools.find_single_match(data, '"file":"([^"]+)"')
 
-        elif 'burstcloud' in url:
-            data = httptools.downloadpage(url).data
-
-            file = scrapertools.find_single_match(data, 'data-file-id="(.*?)"')
-
-            if file:
-                post = {"fileId": file}
-
-                data = httptools.downloadpage('https://www.burstcloud.co/file/play-request/', post=post, headers={'referer': url}).data
-
-                url = scrapertools.find_single_match(data, '"cdnUrl".*?"([^"]+)"')
-
-                if url: url = url + '|referer=https://www.burstcloud.co/'
+        elif 'terabox.' in url:
+            url = ''
 
         elif '.fireload.com' in url:
             url = scrapertools.find_single_match(url, 'v=(.*?)$')

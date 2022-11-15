@@ -16,6 +16,14 @@ msgstr ""
 "Language: en_GB\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "Kodi's frontend for Tvheadend"
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Tvheadend frontend; supporting streaming of Live TV & Recordings, EPG, Timers"
+msgstr ""
+
 #settings labels
 
 msgctxt "#30000"
@@ -63,10 +71,14 @@ msgid "Timer settings"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Hide notifications"
+msgid "Use HTTPS"
 msgstr ""
 
-#empty strings from id 30012 to 30049
+msgctxt "#30012"
+msgid "Server MAC for Wake-on-LAN"
+msgstr ""
+
+#empty strings from id 30013 to 30049
 
 msgctxt "#30050"
 msgid "Auto recordings"
@@ -112,7 +124,11 @@ msgctxt "#30060"
 msgid "Ignore duplicates (tvh 4.3+)"
 msgstr ""
 
-#empty strings from id 30061 to 30099
+msgctxt "#30061"
+msgid "Use regular expressions (regex) for programme matching"
+msgstr ""
+
+#empty strings from id 30062 to 30099
 
 msgctxt "#30100"
 msgid "Data transfer"
@@ -378,7 +394,12 @@ msgctxt "#30389"
 msgid "Forever (tvh 4.1+)"
 msgstr ""
 
-#empty strings from id 30390 to 30399
+#. Recording lifetime representation
+msgctxt "#30390"
+msgid "Use backend setting"
+msgstr ""
+
+#empty strings from id 30391 to 30399
 
 msgctxt "#30400"
 msgid "Predictive tuning"
@@ -450,7 +471,11 @@ msgctxt "#30504"
 msgid "Stream read chunk size for recordings (KB)"
 msgstr ""
 
-#empty strings from id 30505 to 30509
+msgctxt "#30505"
+msgid "Use HTTP streaming for channels"
+msgstr ""
+
+#empty strings from id 30506 to 30509
 
 msgctxt "#30510"
 msgid "Recordings"

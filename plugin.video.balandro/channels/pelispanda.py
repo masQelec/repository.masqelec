@@ -183,7 +183,6 @@ def temporadas(item):
     return itemlist
 
 
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -259,7 +258,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    links = scrapertools.find_multiple_matches(data, '<td>Torrent</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+    links = scrapertools.find_multiple_matches(data, '<td>Torrent</td>.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
 
     for qlty, lang, size, link in links:
         if 'Castellano' in lang: lang = 'Esp'

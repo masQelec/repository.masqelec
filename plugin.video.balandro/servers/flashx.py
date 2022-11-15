@@ -16,8 +16,10 @@ def get_video_url(page_url, url_referer=''):
     url = 'https://www.flashx.tv/playvideo-%s.html?playvid' % video_id
     data = httptools.downloadpage(url, headers={'Referer': 'https://www.flashx.tv/embed-%s.html' % video_id}).data
 
-    if 'Too many views' in data or 'NOT FOUND' in data:
+    if 'Too many views' in data:
         return 'Vídeo no encontrado'
+    elif 'NOT FOUND' in data or 'file was deleted or the link is expired' in data:
+        return 'El archivo no existe o ha sido borrado'
 
     if 'normal.mp4' not in data:
         file_id = base64.b64encode(scrapertools.find_single_match(data, "'file_id', '([^']+)'"))

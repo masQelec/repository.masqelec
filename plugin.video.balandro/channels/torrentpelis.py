@@ -111,9 +111,13 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
+    link = scrapertools.find_single_match(data, "id='link-.*?<a href='(.*?)'")
+
     links = scrapertools.find_multiple_matches(data, "<tr id='link-.*?<a href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?<td>(.*?)</td>.*?<td>(.*?)</td>")
 
     for url, qlty, lang, size in links:
+        if url == 'https://adfly.mobi/directlinkg': url = link
+
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
                               language = IDIOMAS.get(lang, lang), quality = qlty, other = size))
 
@@ -126,7 +130,7 @@ def play(item):
 
     url = item.url
 
-    urlb64 = scrapertools.find_single_match(url, 'urlb64=(.*?)$')
+    urlb64 = scrapertools.find_single_match(url, "urlb64=(.*?)$")
 
     if urlb64:
         urlb64 = base64.b64decode(urlb64).decode('utf-8')

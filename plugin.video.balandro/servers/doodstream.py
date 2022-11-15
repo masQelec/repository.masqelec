@@ -42,6 +42,8 @@ def get_video_url(page_url, url_referer=''):
 
     video_urls = []
 
+    ini_page_url = page_url
+
     page_url = page_url.replace('/dood.cx/', '/dood.so/')
 
     page_url = page_url.replace('/d/', '/e/')
@@ -54,6 +56,7 @@ def get_video_url(page_url, url_referer=''):
                 import_libs('script.module.resolveurl')
 
                 import resolveurl
+                page_url = ini_page_url
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
@@ -80,6 +83,7 @@ def get_video_url(page_url, url_referer=''):
                     import_libs('script.module.resolveurl')
 
                     import resolveurl
+                    page_url = ini_page_url
                     resuelto = resolveurl.resolve(page_url)
 
                     if resuelto:
@@ -102,5 +106,27 @@ def get_video_url(page_url, url_referer=''):
         a += '?token=' + token + '&expiry=' + str(int(time.time()*1000))
 
         video_urls.append(['mp4', data2 + a + '|Referer=%s' % page_url])
+
+    if not video_urls:
+        if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            try:
+                import_libs('script.module.resolveurl')
+
+                import resolveurl
+                page_url = ini_page_url
+                resuelto = resolveurl.resolve(page_url)
+
+                if resuelto:
+                    video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
+                    return video_urls
+
+                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
+            except:
+               import traceback
+               logger.error(traceback.format_exc())
+               platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+        else:
+           return 'Acceso Denegado (3ro.)' # ~ Cloudflare recaptcha
 
     return video_urls

@@ -2,19 +2,40 @@
 
 import base64
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://www.pelispedia.de/'
+host = 'https://pelispedia.de/'
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_pelispedia_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -23,7 +44,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://pelispedia.co/']
+    ant_hosts = ['https://pelispedia.co/', 'https://www.pelispedia.de/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -202,15 +223,16 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<nav class="pagination mat2 tac">' in data:
-        bloque = scrapertools.find_single_match(data, '<nav class="pagination mat2 tac">(.*?)</nav>')
+    if itemlist:
+        if '<nav class="pagination mat2 tac">' in data:
+            bloque = scrapertools.find_single_match(data, '<nav class="pagination mat2 tac">(.*?)</nav>')
 
-        prev_page = ''
-        if 'Anterior' in bloque: prev_page = 'Anterior.*?'
-        next_page = scrapertools.find_single_match(bloque, prev_page + '<a href="(.*?)"')
+            prev_page = ''
+            if 'Anterior' in bloque: prev_page = 'Anterior.*?'
+            next_page = scrapertools.find_single_match(bloque, prev_page + '<a href="(.*?)"')
 
-        if '/page/' in next_page:
-            itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
+            if '/page/' in next_page:
+                itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
 
     return itemlist
 

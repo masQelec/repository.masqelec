@@ -53,11 +53,12 @@ def list_all(item):
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, plot = plot,
                                     contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
-    if '<nav class="navigation pagination"' in data:
-        next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="(.*?)"')
-        if next_page:
-            if '/page/' in next_page:
-                itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
+    if itemlist:
+        if '<nav class="navigation pagination"' in data:
+            next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="(.*?)"')
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 

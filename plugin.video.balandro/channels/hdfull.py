@@ -15,29 +15,37 @@ from lib import balandroresolver
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-# ~ webs  1)-'https://hdfullcdn.cc/'  2)-'https://new.hdfull.one/'  3)-'https://dominioshdfull.com/'  4)-'https://hdfull.vip/'
+# ~ webs  1)-'https://dominioshdfull.com/'  2)-'https://hdfull.vip/'  3)-'https://new.hdfull.one/'
+
 
 dominios = [
          'https://new.hdfull.one/',
+         'https://hdfull.work/',
+         'https://hdfull.video/',
          'https://hdfull.cloud/',
+         'https://hdfull.one/',
+         'https://hdfull.org/',
          'https://hdfull.wtf/',
          'https://hdfull.vip/',
          'https://hdfull.top/',
          'https://hdfull.fun/',
          'https://hdfull.lol/',
-         'https://hdfull.one/',
-         'https://hdfull.org/',
          'https://hdfull.link/',
          'https://hdfull.click/',
          'https://hdfull.stream/'
          ]
+
 
 host = config.get_setting('dominio', 'hdfull', default=dominios[0])
 
 ant_hosts = ['https://hdfull.sh/', 'https://hdfull.ch/', 'https://hdfull.im/',
              'https://hdfull.in/', 'https://hdfull.pro/', 'https://hdfull.la/',
              'https://hdfull.tv/', 'https://hd-full.cc/', 'https://www2.hdfull.cx/',
-             'https://hdfull.me/', 'https://hdfull.io/', 'https://hdfull.lv/']
+             'https://hdfull.me/', 'https://hdfull.io/', 'https://hdfull.lv/',
+             'https://hdfullcdn.cc/']
+
+
+login_ok = '[COLOR chartreuse]HdFull Login correcto[/COLOR]'
 
 perpage = 20
 
@@ -146,7 +154,10 @@ def login(item):
         if username:
             if username in user:
                 if not status: config.set_setting('hdfull_login', True, 'hdfull')
-                if not item: platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]HdFull Login correcto[/COLOR]')
+
+                if not item: platformtools.dialog_notification(config.__addon_name, login_ok)
+                else:
+                   if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
 
                 platformtools.itemlist_refresh()
                 return True
@@ -176,8 +187,11 @@ def login(item):
         data = do_make_login_logout(url, post=post)
 
         if 'Bienvenido %s' % username in data or "<script>window.location='/'" in data or "<script>window.location=''" in data:
-            platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]HdFull Login correcto[/COLOR]')
-            if not status: config.set_setting('hdfull_login', True, 'hdfull')
+            if not status:
+                config.set_setting('hdfull_login', True, 'hdfull')
+                platformtools.dialog_notification(config.__addon_name, login_ok)
+            else:
+                if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
 
             platformtools.itemlist_refresh()
             return True
@@ -243,9 +257,31 @@ def configurar_dominio(item):
 def item_configurar_proxies(item):
     dominio = config.get_setting('dominio', 'hdfull', default=dominios[0])
 
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_hdfull_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + dominio + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     dominio = config.get_setting('dominio', 'hdfull', default=dominios[0])
@@ -290,35 +326,43 @@ def acciones(item):
     logger.info()
     itemlist = []
 
+    domain_memo = config.get_setting('dominio', 'hdfull', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_hdfull', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='hdfull', folder=False, text_color='chartreuse' ))
+
     username = config.get_setting('hdfull_username', 'hdfull', default='')
 
     if username:
-        domain_memo = config.get_setting('dominio', 'hdfull', default='')
-
-        if domain_memo:
-            itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title= 'Test Web del canal [COLOR yellow][B] ' + domain_memo + '[/B][/COLOR]',
-                                        from_channel='hdfull', folder=False, text_color='chartreuse' ))
-
-        itemlist.append(Item( channel='actions', action='last_domain_hdfull', title='[B]Comprobar último dominio vigente[/B]',
+        itemlist.append(Item( channel='domains', action='last_domain_hdfull', title='[B]Comprobar último dominio vigente[/B]',
                               desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
-        if domain_memo:
-            itemlist.append(item.clone( channel='actions', action='manto_domain_hdfull', title= '[B]Modificar el dominio memorizado[/B]',
-                                        desde_el_canal = True, folder=False, text_color='darkorange' ))
+    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
-        itemlist.append(item_configurar_dominio(item))
-        itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( channel='domains', action='manto_domain_hdfull', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     if not config.get_setting('hdfull_login', 'hdfull', default=False):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
+            itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', text_color='crimson' ))
         else:
-            itemlist.append(item.clone( title = '[COLOR crimson][B]Credenciales cuenta[/B][/COLOR]', action = 'login' ))
-
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+            itemlist.append(item.clone( title = '[COLOR crimson][B]Credenciales cuenta[/B][/COLOR]', action = 'login' ))
 
     if config.get_setting('hdfull_login', 'hdfull', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR]', action = 'logout' ))
+
+    itemlist.append(item_configurar_dominio(item))
+    itemlist.append(item_configurar_proxies(item))
 
     platformtools.itemlist_refresh()
 
@@ -567,17 +611,18 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        next_page_link = scrapertools.find_single_match(data, '<a href="([^"]+)">&raquo;</a>')
-        if next_page_link:
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_page_link, page = 0, action = 'list_all', text_color = 'coral' ))
+        if buscar_next:
+            next_page_link = scrapertools.find_single_match(data, '<a href="([^"]+)">&raquo;</a>')
+            if next_page_link:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page_link, page = 0, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 
@@ -626,8 +671,9 @@ def list_episodes(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(itemlist) >= perpage:
-        itemlist.append(item.clone( title = 'Siguientes ...', desde = item.desde + perpage, action = 'list_episodes', text_color = 'coral' ))
+    if itemlist:
+        if len(itemlist) >= perpage:
+            itemlist.append(item.clone( title = 'Siguientes ...', desde = item.desde + perpage, action = 'list_episodes', text_color = 'coral' ))
 
     return itemlist
 

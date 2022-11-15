@@ -44,6 +44,7 @@ def list_all(item):
 
     patron = '<div class="fotonoticia">\s*<a\s*target="_blank" href="([^"]+)"><img src="([^"]+)" alt="([^"]+)"'
     patron += ' /></a><br /><br />\s*</div>\s*<div class="textonoticia">.*?<br /><br />(.*?)</div>'
+
     matches = scrapertools.find_multiple_matches(data, patron)
 
     for url, thumb, title, plot in matches:
@@ -55,9 +56,10 @@ def list_all(item):
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, plot = plot,
                                     contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
-    next_page_link = scrapertools.find_single_match(data, '<span class="current">\d*</span>&nbsp;<a href="([^"]+)')
-    if next_page_link != '':
-        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = host + next_page_link, text_color='coral' ))
+    if itemlist:
+        next_page_link = scrapertools.find_single_match(data, '<span class="current">\d*</span>&nbsp;<a href="([^"]+)')
+        if next_page_link != '':
+            itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = host + next_page_link, text_color='coral' ))
 
     return itemlist
 

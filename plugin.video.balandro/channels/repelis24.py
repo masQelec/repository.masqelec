@@ -7,18 +7,73 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://ww1.repelis24.so/'
+host = 'https://wwe.repelis24.cx/'
 
-player = 'https://player.repelis24.so'
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://repelis24.co/', 'https://ww1.repelis24.so/', 'https://www2.repelis24.so/',
+             'https://www3.repelis24.so/', 'https://www4.repelis24.so/', 'https://repelis24.li/',
+             'https://ww1.repelis24.cx/', 'https://wws.repelis24.cx/', 'https://wwc.repelis24.cx/',
+             'https://www.repelis24.cx/', 'https://wwr.repelis24.so/', 'https://w1.repelis24.cx/',
+             'https://s1.repelis24.cx/']
+
+
+domain = config.get_setting('dominio', 'repelis24', default='')
+
+
+if domain:
+    if domain in str(ant_hosts): config.set_setting('dominio', '', 'repelis24')
+    else: host = domain
+
+# ~ player 'https://player.repelis24.cx'
+points = host.count('.')
+
+if points == 1:
+    player = host.replace('https://', '').replace('/', '')
+else:
+    tmp_host = host.split('.')[0]
+    tmp_host = tmp_host + '.'
+    player = host.replace(tmp_host, '').replace('/', '')
+
+player = 'https://player.' + player
 
 
 descartar_anime = config.get_setting('descartar_anime', default=False)
 
 
-def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://repelis24.co/']
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
 
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_repelis24_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -26,13 +81,56 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     if '/fecha/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('repelis24', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if '<title>You are being redirected...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                data = httptools.downloadpage_proxy('repelis24', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        except:
+            pass
+
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'repelis24', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_repelis24', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='repelis24', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_repelis24', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -45,6 +143,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -73,6 +173,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -125,18 +227,21 @@ def generos(item):
     url = host + 'pelicula/'
 
     data = do_downloadpage(url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '>Géneros Disponibles<(.*?)>Años de Lanzamiento<')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href=(.*?)>(.*?)</a>')
 
     for url, title in matches:
-        if title == 'Superhéroe': continue
-        elif title == 'Animes': continue
-        elif title == 'Infantiles': continue
+        if '<div ' in title: continue
 
         url = url.strip()
         title = title.strip()
+
+        if title == 'Superhéroe': continue
+        elif title == 'Animes': continue
+        elif title == 'Infantiles': continue
 
         if not url.startswith("http"): url = host[:-1] + url
 
@@ -234,18 +339,20 @@ def list_all(item):
     matches = re.compile('<article(.*?)</article>').findall(bloque)
 
     for article in matches:
-        url = scrapertools.find_single_match(article, ' href=(.*?)>')
+        url = scrapertools.find_single_match(article, '<a href=(.*?)>').strip()
 
         title = scrapertools.find_single_match(article, '<div class=title><h4>(.*?)</h4>')
-        if not title: title = scrapertools.find_single_match(article, 'alt="(.*?)"')
+        if not title:
+            title = scrapertools.find_single_match(article, 'alt="(.*?)"')
+            if not title: title = scrapertools.find_single_match(article, 'alt=(.*?)>').strip()
 
         if not url or not title: continue
 
         tipo = 'tvshow' if '/serie/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        thumb = scrapertools.find_single_match(article, 'data-src=(.*?) alt=')
-        if thumb.startswith('//'): thumd = 'https:' + thumb
+        thumb = scrapertools.find_single_match(article, 'data-src=(.*?) alt=').strip()
+        if thumb.startswith('//'): thumb = 'https:' + thumb
 
         qlty = scrapertools.find_single_match(article, '<span class=quality>(.*?)</span>')
 
@@ -258,12 +365,15 @@ def list_all(item):
         if not year: year = '-'
 
         if '/serie/' in url:
-            if item.search_type == 'movie': continue
+            if item.search_type != 'all':
+                if item.search_type == 'movie': continue
 
             itemlist.append(item.clone( action ='temporadas', url = url, title = title, thumbnail = thumb, qualities=qlty, languages=', '.join(langs),
                                         fmt_sufijo=sufijo, contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
-        else:
-            if item.search_type == 'tvshow': continue
+
+        if '/pelicula/' in url:
+            if item.search_type != 'all':
+                if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title = title, thumbnail = thumb, qualities=qlty, languages=', '.join(langs),
                                         fmt_sufijo=sufijo, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
@@ -271,7 +381,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<span class=current>.*?<a href=(.*?) ').strip()
+        next_page = scrapertools.find_single_match(data, '<span class=current>.*?' + "<a href=(.*?)class=").strip()
 
         if next_page:
             if '/page/' in next_page:
@@ -285,6 +395,7 @@ def temporadas(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = re.compile("<span class=.*?se-t.*?>(.*?)</span>", re.DOTALL).findall(data)
 
@@ -336,11 +447,11 @@ def episodios(item):
                 item.perpage = 250
 
     for datos in matches[item.page * item.perpage:]:
-        thumb = scrapertools.find_single_match(datos, "data-src=(.*?)>")
-        if thumb.startswith('//'): thumd = 'https:' + thumb
+        thumb = scrapertools.find_single_match(datos, "src=(.*?)>").strip()
+        if thumb.startswith('//'): thumb = 'https:' + thumb
 
-        url = scrapertools.find_single_match(datos, " href=(.*?)>")
-        title = scrapertools.find_single_match(datos, " href=.*?>(.*?)</a>")
+        url = scrapertools.find_single_match(datos, " href=(.*?)>").strip()
+        title = scrapertools.find_single_match(datos, " href=.*?>(.*?)</a>").strip()
 
         if not url or not title: continue
 
@@ -385,6 +496,7 @@ def corregir_servidor(servidor):
     elif servidor == 'stream': return 'mystream'
     elif servidor in ['evoplay', 'evo']: return 'evoload'
     elif servidor == 'zplay': return 'zplayer'
+    elif servidor == 'descargar': return 'mega' # 1fichier, Uptobox
     else: return servidor
 
 
@@ -404,9 +516,9 @@ def findvideos(item):
     for options in matches:
         ses += 1
 
-        dtype = scrapertools.find_single_match(data, "data-type=(.*?) ").strip()
-        dpost = scrapertools.find_single_match(data, "data-post=(.*?) ").strip()
-        dnume = scrapertools.find_single_match(data, "data-nume=(.*?) ").strip()
+        dtype = scrapertools.find_single_match(data, "data-type=(.*?)data-post=").strip()
+        dpost = scrapertools.find_single_match(data, "data-post=(.*?)data-nume=").strip()
+        dnume = scrapertools.find_single_match(data, "data-nume=(.*?)>").strip()
 
         if dnume == 'trailer': continue
         elif not dtype or not dpost or not dnume: continue
@@ -434,18 +546,18 @@ def findvideos(item):
         if 'Latino' in options: langs.append('Lat')
         if 'Subtitulado' in options: langs.append('Vose')
 
-        data = do_downloadpage(url, headers = {'Referer': item.url})
-        data = re.sub('\n|\r|\t|\s{2}|&nbsp;', '', data)
+        data3 = do_downloadpage(url, headers = {'Referer': item.url})
+        data3 = re.sub('\n|\r|\t|\s{2}|&nbsp;', '', data3)
 
-        if 'IdiomaSet' in data:
-            patron = 'onclick="IdiomaSet\(this, \'(\d)\'\);" class="select.*?"><span class="title"><img src="/assets/player/lang/([^.]+)'
+        if 'IdiomaSet' in data3:
+            patron = 'onclick="IdiomaSet\(this, \'(\d)\'\);" class="select.*?">.*?<span class="title">.*?<img src="/assets/player/lang/([^.]+)'
 
-            matches1 = scrapertools.find_multiple_matches(data, patron)
+            matches1 = scrapertools.find_multiple_matches(data3, patron)
 
             for n, lang2 in matches1:
-                data1 = scrapertools.find_single_match(data, '<div class="Player%s(.*?)</div></div>' % n)
+                data4 = scrapertools.find_single_match(data3, '<div class="Player%s(.*?)</div></div>' % n)
 
-                matches2 = scrapertools.find_multiple_matches(data1, "go_to_player\('([^']+).*?<span class=\"serverx\">([^<]+)")
+                matches2 = scrapertools.find_multiple_matches(data4, "go_to_player\('([^']+).*?<span class=\"serverx\">([^<]+)")
 
                 for embed, srv in matches2:
                     if srv.lower() == 'meplay': continue
@@ -466,14 +578,14 @@ def findvideos(item):
 
                     itemlist.append(Item( channel = item.channel, action = 'play', url = embed, server = servidor, title = '', language = lang ))
         else:
-            matches3 = scrapertools.find_multiple_matches(data, 'data-embed="([^"]+)".*?<span class="serverx">([^<]+)</span>')
+            matches3 = scrapertools.find_multiple_matches(data3, 'data-embed="([^"]+)".*?<span class="serverx">([^<]+)</span>')
 
             for embed, srv in matches3:
                 if srv.lower() == 'meplay': continue
                 elif srv.lower() == 'stream': continue
                 elif srv.lower() == 'descargar':
                     if not embed.startswith("http"):
-                        embed = 'https://embeds.repelis24.so/redirect?url=' + embed
+                        embed = 'https://embeds.repelis24.cx/redirect?url=' + embed
                         srv = 'directo'
 
                 servidor = corregir_servidor(srv)
@@ -510,7 +622,7 @@ def play(item):
         new_url = new_url.replace('/download?url=', '')
 
         if new_url:
-            if not new_url.startswith("http"): new_url = 'https://embeds.repelis24.so/redirect?url=' + new_url
+            if not new_url.startswith("http"): new_url = 'https://embeds.repelis24.cx/redirect?url=' + new_url
 
             data = do_downloadpage(new_url)
 
@@ -531,6 +643,7 @@ def play(item):
         data = do_downloadpage(url_play, headers={'Referer': url_play})
 
         url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
+        if not url: url = scrapertools.find_single_match(data, 'action="(.*?)"')
 
         if not url:
             if 'action="r.php"' in data:
