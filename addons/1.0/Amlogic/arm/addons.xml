@@ -168,7 +168,7 @@
   </extension>
 </addon>
 
-<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="19.5.105" provider-name="Team CoreELEC">
+<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="19.6.105" provider-name="Team CoreELEC">
   <requires><import addon="xbmc.python" version="3.0.0"/>
 
   </requires>
@@ -333,7 +333,7 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
             <import addon="xbmc.addon" version="12.0.0"/>
         </requires>
         <extension point="xbmc.addon.repository" name="masQelec Repository">
-            <info compressed="false">https://raw.githubusercontent.com/masQelec/repository.masQelec//addons/1.0/Amlogic/arm/addons.xml</info>
+            <info compressed="false">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/addons.xml</info>
             <checksum>https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/addons.xml.md5</checksum>
             <datadir zip="true">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/</datadir>
             <hashes>false</hashes>
