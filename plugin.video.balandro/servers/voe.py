@@ -17,7 +17,9 @@ def get_video_url(page_url, url_referer=''):
 
     if not video_srcs:
         bloque = scrapertools.find_single_match(data, "sources.*?\}")
+
         video_srcs = scrapertools.find_multiple_matches(bloque, ': "([^"]+)')
+        if not video_srcs: video_srcs = scrapertools.find_multiple_matches(bloque, ": '(.*?)'")
 
     for url in video_srcs:
         video_urls.append(['mp4', url])
