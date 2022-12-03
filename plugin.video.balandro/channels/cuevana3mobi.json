@@ -3,7 +3,7 @@
   "name": "Cuevana3Mobi",
   "thumbnail": "cuevana3mobi.png",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["kids", "docs", "vos"],
 
-  "notes": "Películas por idiomas, géneros."
+  "notes": "Web CERRADA. Películas por idiomas, géneros."
 }

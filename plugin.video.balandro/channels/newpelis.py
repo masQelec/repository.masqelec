@@ -7,13 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://newpelis.org/'
+host = 'https://newpelis.re/'
 
 
 # ~ Series NO pq no hay buscar
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://newpelis.org/']
+
     raise_weberror = False if '/year/' in url else True
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data

@@ -2,9 +2,10 @@
 
 from platformcode import logger
 from core.item import Item
-from core import httptools, scrapertools, servertools
+from core import httptools, scrapertools, servertools, tmdb
 
-host = "https://www.documentaleson.com/"
+
+host = 'https://www.documentaleson.com/'
 
 
 def mainlist(item):
@@ -47,17 +48,22 @@ def list_all(item):
     for match in matches:
         title = scrapertools.find_single_match(match, 'title="(.*?)"')
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
+
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
         plot = scrapertools.find_single_match(match, ' <p>(.*?)</p>')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, plot = plot,
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, plot = plot, infoLabels = {'year': '-'},
                                     contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
-    if '<nav class="navigation pagination"' in data:
-        next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="(.*?)"')
-        if next_page:
-            if '/page/' in next_page:
-                itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if '<nav class="navigation pagination"' in data:
+            next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="(.*?)"')
+
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 

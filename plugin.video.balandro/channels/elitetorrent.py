@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
@@ -10,10 +10,21 @@ from lib import decrypters
 host = 'https://www.elitetorrent.com/'
 
 
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://elitetorrent.app/', 'https://elitetorrent.la/', 'https://www.elitetorrent.wtf/',
+             'https://www.elitetorrent.dev/']
+
+
+domain = config.get_setting('dominio', 'elitetorrent', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'elitetorrent')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'elitetorrent')
+    else: host = domain
+
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://elitetorrent.app/', 'https://elitetorrent.la/', 'https://www.elitetorrent.wtf/', 'https://www.elitetorrent.dev/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -22,9 +33,37 @@ def do_downloadpage(url, post=None, headers=None):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'elitetorrent', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_elitetorrent', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='elitetorrent', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_elitetorrent', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -37,6 +76,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -54,6 +95,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -129,9 +172,6 @@ def list_all(item):
         title = title.replace('(720)', '').replace('(720p)', '').replace('(1080)', '').replace('(1080p)', '').replace('(microHD)', '').replace('(BR-Line)', '').strip()
         title = title.replace('(HDR)', '').replace('(HDRip)', '').replace('(DVDRip)', '').replace('(BR-SCREENER)', '').replace('(TS-SCREENER)', '').strip()
 
-        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         qlty = scrapertools.find_single_match(match, 'style=.*?<i>(.*?)</i>')
@@ -152,45 +192,31 @@ def list_all(item):
                    if lng == 'Voi': lng = 'Vo'
                    lngs.append(lng)
 
-        if '/peliculas/' in url:
+        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
             if not item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                    qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': "-"} ))
+                                        qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': "-"} ))
 
-        if '/series/' in url:
+        if tipo == 'tvshow':
             if not item.search_type == 'all':
                 if item.search_type == 'movie': continue
 
             title = title.replace('&#8211;', '').replace('&#215;', ' ')
 
-            if '-la-serie-s' in url: temp_epis = scrapertools.find_single_match(url, "-la-serie-s(.*?)$")
-            elif '-serie-s' in url: temp_epis = scrapertools.find_single_match(url, "-serie-s(.*?)$")
-            else: temp_epis = scrapertools.find_single_match(url, "-s(.*?)$")
-
-            if not temp_epis:
-               i +=1
-               temp_epis = '99e' + str (i)
-
             SerieName = url
 
-            SerieName = SerieName.replace(host, '').replace('series/', '').replace('-s' + temp_epis, '').strip()
+            SerieName = SerieName.replace(host, '').replace('series/', '').strip()
             SerieName = SerieName.replace('-', ' ')
 
-            temp_epis = temp_epis.replace('/', '').strip()
-
-            season = scrapertools.find_single_match(temp_epis, "(.*?)e")
-            episode = scrapertools.find_single_match(temp_epis, ".*?e(.*?)$")
-
-            if not season or not episode: continue
-
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
                                         qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
-                                        contentSerieName = SerieName,
-                                        contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode,
-                                        infoLabels={'year': "-"} ))
+                                        contentType = 'episode', contentSerieName = SerieName, infoLabels={'year': "-"} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -200,6 +226,37 @@ def list_all(item):
         if next_url:
             if '/page/' in next_url:
                 itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
+
+    return itemlist
+
+
+def tracking_all_episodes(item):
+    return episodios(item)
+
+
+def episodios(item):
+    logger.info()
+    itemlist = []
+
+    if "temporada" in item.contentSerieName:
+        SerieName = item.contentSerieName.split("temporada")[0]
+        season = scrapertools.find_single_match(item.url, "-temporada-(.*?)-")
+        episode = scrapertools.find_single_match(item.url, "-capitulo-(.*?)-")
+
+    elif "S" in item.title:
+        SerieName = item.title.split("S")[0]
+        season = scrapertools.find_single_match(item.title, "S(.*?)E")
+        episode = scrapertools.find_single_match(item.title, "E(.*?)$")
+
+    else:
+        SerieName = item.contentSerieName
+        season = 0
+        episode = 0
+
+    itemlist.append(item.clone( action = 'findvideos', url = item.url, title = item.title, thumbnail = item.thumbnail, contentSerieName = SerieName,
+                                contentSeason = season, contentType = 'episode', contentEpisodeNumber = episode ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 

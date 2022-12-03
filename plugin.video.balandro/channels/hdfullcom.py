@@ -23,9 +23,31 @@ color_adver = config.get_setting('notification_adver_color', default='violet')
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_hdfullcom_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -43,6 +65,17 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('hdfullcom', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if '<title>You are being redirected...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                data = httptools.downloadpage_proxy('hdfullcom', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        except:
+            pass
 
     return data
 
@@ -172,17 +205,17 @@ def list_epis(item):
         if len(itemlist) >= perpage:
             break
 
-    buscar_next = True
-    if num_matches > ((item.page + 1) * perpage):
-        itemlist.append(item.clone( title="Siguientes ...", action="list_epis", page=item.page + 1, text_color='coral' ))
-        buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > ((item.page + 1) * perpage):
+            itemlist.append(item.clone( title="Siguientes ...", action="list_epis", page=item.page + 1, text_color='coral' ))
+            buscar_next = False
 
-    if buscar_next:
-        next_page = scrapertools.find_single_match(data, '<a class="page-numbers".*?</a>.*?href="(.*?)"')
-
-        if next_page:
-            if '/page/' in next_page:
-                itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_epis', text_color = 'coral'))
+        if buscar_next:
+            next_page = scrapertools.find_single_match(data, '<a class="page-numbers".*?</a>.*?href="(.*?)"')
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_epis', text_color = 'coral'))
 
     return itemlist
 
@@ -210,9 +243,6 @@ def list_all(item):
 
         if not url or not title: continue
 
-        tipo = 'movie' if '/ver-pelicula' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
@@ -225,24 +255,32 @@ def list_all(item):
         if '/mexico2.png' in match: langs.append('Lat')
         if '/subs.png' in match: langs.append('Vose')
 
-        if '/ver-pelicula' in url:
-            if item.search_type == 'tvshow': continue
+        tipo = 'movie' if '/ver-pelicula' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages=', '.join(langs), fmt_sufijo=sufijo,
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                        qualities=qlty, languages=', '.join(langs), fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
-            if item.search_type == 'movie': continue
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="(.*?)"')
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="(.*?)"')
 
-    if next_page:
-        if '/page/' in next_page:
-            itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
+        if next_page:
+            if '/page/' in next_page:
+                itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
 
     return itemlist
 

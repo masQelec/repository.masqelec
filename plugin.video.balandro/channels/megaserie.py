@@ -6,14 +6,38 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
+from lib import decrypters
+
 
 host = 'https://megaxserie.me/'
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_megaserie_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -159,11 +183,14 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
+    bloque = scrapertools.find_single_match(data, '(.*?)<p>MegaxSerie')
+
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
-        title = scrapertools.find_single_match(article, '<h3 class="Title">(.*?)</h3>')
+        title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
+
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
@@ -180,22 +207,28 @@ def list_all(item):
         if '/United-States-Minor-Outlying.png' in article: langs.append('Vose')
 
         tipo = 'tvshow' if '/series/' in url else 'movie'
-        if item.search_type not in ['all', tipo]: continue
-
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages=', '.join(langs), fmt_sufijo=sufijo, 
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                        qualities=qlty, languages=', '.join(langs), fmt_sufijo=sufijo, 
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        if '>Siguiente' in data:
-            next_page = scrapertools.find_single_match(data, 'class="page-numbers current">.*?href="([^"]+)')
+        if '>SIGUIENTE' in data:
+            next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="([^"]+)')
             if next_page:
                 if '/page/' in next_page:
                     itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
@@ -209,7 +242,7 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('data-tab="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('data-season="(.*?)"', re.DOTALL).findall(data)
 
     for numtempo in matches:
         title = 'Temporada ' + numtempo
@@ -228,10 +261,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -241,13 +270,17 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, 'data-tab="' + str(item.contentSeason) + '"(.*?)</table>')
+    data_post = scrapertools.find_single_match(data, 'data-post="(.*?)"')
 
-    bloque = bloque.replace('&lt;img', '<img').replace('&quot;', '"')
+    if not data_post: return itemlist
 
-    patron = '<span class="Num">(.*?)</span>.*?<a href="(.*?)".*?<img src="(.*?)".*?<a href=".*?">(.*?)</a>'
+    post = {'action': 'action_select_season', 'season': str(item.contentSeason), 'post': data_post}
 
-    matches = scrapertools.find_multiple_matches(bloque, patron)
+    data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post)
+
+    patron = '<article.*?src="(.*?)".*?<span class="num-epi">(.*?)</span>.*?<h2 class="entry-title">(.*?)</h2>.*?<a href="(.*?)"'
+
+    matches = scrapertools.find_multiple_matches(data, patron)
 
     if item.page == 0:
         sum_parts = len(matches)
@@ -256,10 +289,14 @@ def episodios(item):
                 platformtools.dialog_notification('MegaSerie', '[COLOR cyan]Cargando elementos[/COLOR]')
                 item.perpage = 250
 
-    for epis, url, thumb, title in matches[item.page * item.perpage:]:
+    for thumb, temp_epis, title, url in matches[item.page * item.perpage:]:
         if not 'http' in thumb: thumb = 'https:' + thumb
 
-        titulo = str(item.contentSeason) + 'x' + epis + ' ' + title
+        title = title.replace(temp_epis, '').strip()
+
+        titulo = temp_epis + ' ' + title
+
+        epis = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$').strip()
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'episode', contentEpisodeNumber = epis ))
 
@@ -282,36 +319,171 @@ def findvideos(item):
     IDIOMAS = {'Castellano': 'Esp', 'Latino': 'Lat', 'Subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = scrapertools.find_multiple_matches(data, 'td><span class="Num">.*?href="(.*?)".*?alt="Imagen(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, 'href="#options-(.*?)".*?<span class="server">(.*?)</span>')
 
     ses = 0
 
-    for url, lang in matches:
+    for opt, srv_lang in matches:
         ses += 1
 
-        url = url.strip()
-        if not url: continue
+        srv = scrapertools.find_single_match(srv_lang, '(.*?)-').lower().strip()
 
-        if '/netu' in url or '/waaw' in url or '/hqq' in url: continue
-        elif '/ul' in url: continue
-        elif '/1fichier' in url: continue
-        elif '/rapidgator' in url: continue
-        elif '/mediafire' in url: continue
+        if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
 
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
+        elif srv == 'ul': continue
+        elif srv == '1fichier': continue
+        elif srv == 'rapidgator': continue
+        elif srv == 'mediafire': continue
+        elif srv == 'uploaded': continue
 
-        servidor = servertools.corregir_servidor(servidor)
+        lang = scrapertools.find_single_match(srv_lang, '.*?-(.*?)$').strip()
 
-        lang = lang.strip()
+        url = scrapertools.find_single_match(data, '<div id="options-' + opt + '.*?src="(.*?)"')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
+        if srv == 'descargaonline':
+            if '/acortar24.xyz/' in url:
+                host_torrent = host[:-1]
+                url_base64 = decrypters.decode_url_base64(url, host_torrent)
+
+                new_url = httptools.downloadpage_proxy('megaserie', url_base64, follow_redirects=False).headers.get('location', '')
+
+                if new_url:
+                    data1 = do_downloadpage(new_url)
+
+                    matches1 = scrapertools.find_multiple_matches(data1, '<a target=".*?href="(.*?)"')
+
+                    for link in matches1:
+                        if '/hqq' in link or '/waaw' in link or '/netu' in link: continue
+
+                        elif '/ul' in link: continue
+                        elif '/1fichier' in link: continue
+                        elif '/rapidgator' in link: continue
+                        elif '/mediafire' in link: continue
+                        elif '/uploaded' in link: continue
+
+                        servidor = servertools.get_server_from_url(link)
+                        servidor = servertools.corregir_servidor(servidor)
+
+                        if servidor != 'directo':
+                            link = servertools.normalize_url(servidor, link)
+
+                            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                                  language = IDIOMAS.get(lang, lang)))
+
+                    continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url,
+                              language = IDIOMAS.get(lang, lang), other = srv ))
+
+    # ~ Descargar
+    matches = scrapertools.find_multiple_matches(data, '<td><span class="num">.*?</span>(.*?)</td>.*?<td>(.*?)</td>.*?<td><span>(.*?)</span>.*?href="(.*?)"')
+    if not matches:
+        matches = scrapertools.find_multiple_matches(data, '<td><span class="Num">.*?</span>(.*?)</td>.*?<td>(.*?)</td>.*?<td><span>(.*?)<span>.*?href="(.*?)"')
+
+    for srv, lang, qlty, url in matches:
+        ses += 1
+
+        srv = srv.replace(' &amp; ', '').lower().strip()
+
+        if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
+
+        elif 'ul' in srv: continue
+        elif '1fichier' in srv: continue
+        elif 'rapidgator' in srv: continue
+        elif 'mediafire' in srv: continue
+        elif 'uploaded' in srv: continue
+
+        if srv == 'descargaonline':
+            if '/acortar24.xyz/' in url:
+                host_torrent = host[:-1]
+                url_base64 = decrypters.decode_url_base64(url, host_torrent)
+
+                new_url = httptools.downloadpage_proxy('megaserie', url_base64, follow_redirects=False).headers.get('location', '')
+
+                if new_url:
+                    data2 = do_downloadpage(new_url)
+
+                    matches2 = scrapertools.find_multiple_matches(data2, '<a target=".*?href="(.*?)"')
+
+                    for link in matches2:
+                        if '/hqq' in link or '/waaw' in link or '/netu' in link: continue
+
+                        elif '/ul' in link: continue
+                        elif '/1fichier' in link: continue
+                        elif '/rapidgator' in link: continue
+                        elif '/mediafire' in link: continue
+                        elif '/uploaded' in link: continue
+
+                        servidor = servertools.get_server_from_url(link)
+                        servidor = servertools.corregir_servidor(servidor)
+
+                        if servidor != 'directo':
+                            link = servertools.normalize_url(servidor, link)
+
+                            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                                  language = IDIOMAS.get(lang, lang), quality = qlty ))
+
+                    continue
+
+        if url:
+            lang = lang.strip()
+
+            other = 'D ' + srv
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url,
+                                  language = IDIOMAS.get(lang, lang), other = other ))
 
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
+
+    if item.server != 'directo':
+        itemlist.append(item.clone( url = url, server = item.server ))
+
+        return itemlist
+
+    if url.startswith(host):
+        data = do_downloadpage(url)
+
+        url = scrapertools.find_single_match(data, 'src="(.*?)"')
+
+        if url:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            url = servertools.normalize_url(servidor, url)
+
+            if servidor != 'directo':
+                itemlist.append(item.clone( url = url, server = servidor ))
+
+            return itemlist
+
+    else:
+        host_torrent = host[:-1]
+        url_base64 = decrypters.decode_url_base64(url, host_torrent)
+
+        url = httptools.downloadpage_proxy('megaserie', url_base64, follow_redirects=False).headers.get('location', '')
+
+        if url:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            url = servertools.normalize_url(servidor, url)
+
+            if servidor != 'directo':
+                itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
 

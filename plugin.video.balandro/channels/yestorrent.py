@@ -8,6 +8,7 @@ from core import httptools, scrapertools, servertools, tmdb
 
 from lib import decrypters
 
+
 host = 'https://yestorrent.org/'
 
 
@@ -158,31 +159,28 @@ def list_all(item):
         elif lang == 'VO': lang = 'VO'
 
         tipo = 'tvshow' if '/series/' in url else 'movie'
-
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if '/series/' in url:
-            if item.search_type != 'all':
-                if item.search_type == 'movie': continue
-
-            if tipo == 'movie': continue
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
-        else:
-            if item.search_type != 'all':
-                if item.search_type == 'tvshow': continue
 
-            if tipo == 'tvshow': continue
+        if tipo == 'movie'::
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, qualities=qlty, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
-    if next_page_link:
-        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page_link, text_color='coral' ))
+    if itemlist:
+        next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
+        if next_page_link:
+            itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page_link, text_color='coral' ))
 
     return itemlist
 
@@ -211,10 +209,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):

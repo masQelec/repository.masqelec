@@ -56,9 +56,9 @@ def get_video_url(page_url, url_referer=''):
     page_url = page_url.replace('/embed#!', '/embed#')
     page_url = page_url.replace('/embed/', '/embed#')
 
-    page_url = page_url.replace('/file/', '/embed#!')
+    page_url = page_url.replace('/file/', '/embed#')
 
-    page_url = page_url.replace('/embed#', '/#')
+    page_url = page_url.replace('/embed#', '/#!')
 
     try:
        c = Client(url=page_url, is_playing_fnc=platformtools.is_playing)

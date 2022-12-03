@@ -32,6 +32,11 @@ channels_search_excluded_mixed = config.get_setting(cfg_search_excluded_mixed, d
 channels_search_excluded_all = config.get_setting(cfg_search_excluded_all, default='')
 
 
+cfg_search_included = 'search_included_all'
+
+channels_search_included = config.get_setting(cfg_search_included, default='')
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -89,6 +94,24 @@ def mainlist(item):
         if channels_search_excluded_all or tot_opt_anular > 1:
             itemlist.append(item.clone( title = '[B]Anular [COLOR green]Todas[/COLOR][/B] las exclusiones', action = 'channels_excluded_del',
                                         extra= 'all', folder = False, text_color='yellow' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
+def mainlist2(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( action = 'channels_excluded', title='[COLOR greenyellow][B]Incluir en las búsquedas Solo determinados canales[/B][/COLOR]',
+                                extra = 'included', folder = False ))
+
+    if channels_search_included:
+        itemlist.append(item.clone( title = '[COLOR green][B]Anular Todos los canales[/COLOR][/B] Incluidos en las búsquedas de Solo determinados canales',
+                                    action = 'channels_excluded_del', extra = 'included', folder = False, text_color='yellow' ))
+
+    platformtools.itemlist_refresh()
 
     return itemlist
 
@@ -606,7 +629,7 @@ def channels_status(item):
 
         channels_ids.append(ch['id'])
 
-    ret = xbmcgui.Dialog().multiselect('Personalizar canales  [COLOR yellow]' + cabecera + '[/COLOR]', opciones, preselect=preselect, useDetails=True)
+    ret = xbmcgui.Dialog().multiselect('Personalizar canales [COLOR yellow]' + cabecera + '[/COLOR]', opciones, preselect=preselect, useDetails=True)
 
     if ret is None: return
 
@@ -664,7 +687,11 @@ def channels_preferidos_make(ret, channels_ids):
 def channels_excluded(item):
     logger.info()
 
-    if item.extra == 'movies':
+    if item.extra == 'included':
+        cabecera = 'Todos (Solo determinados canales)'
+        filtros = {'searchable': True}
+
+    elif item.extra == 'movies':
         cabecera = 'Películas'
         filtros = {'categories': 'movie', 'searchable': True}
     elif item.extra == 'tvshows':
@@ -687,7 +714,11 @@ def channels_excluded(item):
     channels_ids = []
     opciones = []
 
-    cfg_excludes = 'search_excludes_' + item.extra
+    if item.extra == 'included':
+        cfg_excludes = 'search_included_all'
+    else:
+        cfg_excludes = 'search_excludes_' + item.extra
+
     channels_search = config.get_setting(cfg_excludes, default='')
 
     ch_list = channeltools.get_channels_list(filtros=filtros)
@@ -733,6 +764,7 @@ def channels_excluded(item):
                 preselect = []
 
     i = 0
+
     for ch in ch_list:
         if ch['searchable'] == False: continue
 
@@ -787,7 +819,10 @@ def channels_excluded(item):
         it.setArt({'thumb': ch['thumbnail']})
         opciones.append(it)
 
-    ret = xbmcgui.Dialog().multiselect('Excluir canales en las búsquedas de  [COLOR yellow]' + cabecera + '[/COLOR]', opciones, preselect=preselect, useDetails=True)
+    if item.extra == 'included': cab = 'Incluir canales en las búsquedas de [COLOR yellow]'
+    else: cab = 'Excluir canales en las búsquedas de  [COLOR yellow]'
+
+    ret = xbmcgui.Dialog().multiselect(cab + cabecera + '[/COLOR]', opciones, preselect=preselect, useDetails=True)
 
     if ret is None: return
 
@@ -802,7 +837,11 @@ def channels_excluded(item):
 def channels_excluded_del(item):
     logger.info()
 
-    if item.extra == 'movies':
+    if item.extra == 'included':
+        canales_excluidos = channels_search_included
+        txt = 'Todos'
+
+    elif item.extra == 'movies':
         canales_excluidos = channels_search_excluded_movies
         txt = 'Películas'
     elif item.extra == 'tvshows':
@@ -829,10 +868,17 @@ def channels_excluded_del(item):
         if not txt_excluidos: txt_excluidos = id_canal.capitalize()
         else: txt_excluidos += (', ' + id_canal.capitalize())
 
-    if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum]' + str(txt_excluidos) + '[/COLOR]', '[COLOR red]¿ Desea anular los canales memorizados para excluirlos en las búsquedas de ? [COLOR yellow] ' + txt + '[/COLOR]'):
-        return
+    if item.extra == 'included':
+        if not platformtools.dialog_yesno(config.__addon_name + ' [COLOR greenyellow][B]Inclusiones[/B][/COLOR]', '[COLOR plum]' + str(txt_excluidos) + '[/COLOR]', '[COLOR red]¿ Desea anular los canales memorizados para Incluirlos de Nuevo en las búsquedas de ? [COLOR yellow] ' + txt + '[/COLOR]'):
+            return
 
-    if item.extra == 'movies': config.set_setting(cfg_search_excluded_movies, '')
+    else:
+        if not platformtools.dialog_yesno(config.__addon_name + ' [COLOR cyan][B]Exclusiones[/B][/COLOR]', '[COLOR plum]' + str(txt_excluidos) + '[/COLOR]', '[COLOR red]¿ Desea anular los canales memorizados para excluirlos en las búsquedas de ? [COLOR yellow] ' + txt + '[/COLOR]'):
+            return
+
+    if item.extra == 'included': config.set_setting(cfg_search_included, '')
+
+    elif item.extra == 'movies': config.set_setting(cfg_search_excluded_movies, '')
     elif item.extra == 'tvshows': config.set_setting(cfg_search_excluded_tvshows, '')
     elif item.extra == 'documentaries': config.set_setting(cfg_search_excluded_documentaries, '')
     elif item.extra == 'torrents': config.set_setting(cfg_search_excluded_torrents, '')
@@ -1028,7 +1074,7 @@ def show_channels_list(item):
         elif item.no_stable == True: filtros = {'clusters': 'inestable'}
         elif item.cta_register == True: filtros = {'clusters': 'register'}
         elif item.suggesteds == True: filtros = {'clusters': 'suggested'}
-        elif item.lat_domain == True: filtros = {'clusters': 'current'}
+        elif item.last_domain == True: filtros = {'clusters': 'current'}
         elif item.mismatched == True: filtros = {'clusters': 'mismatched'}
         elif item.problematics == True: filtros = {'clusters': 'problematic'}
         else: filtros = {}
@@ -1083,6 +1129,15 @@ def show_channels_list(item):
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
                 info = info + '[B][COLOR cyan] %s [/B][/COLOR]' % dominio
+        else:
+            if 'current' in ch['clusters']:
+                vigente = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
+                if item.only_last_domain:
+                    if not vigente: continue
+
+                if vigente:
+                    vigente = vigente.replace('https://', '').replace('/', '')
+                    info = info + '[B][COLOR cyan] %s [/B][/COLOR]' % vigente
 
         if 'problematic' in ch['clusters']: info = info + '[B][I][COLOR darkgoldenrod] Problemático [/I][/B][/COLOR]'
 
@@ -1122,7 +1177,9 @@ def show_channels_list(item):
         elif item.no_stable == True: cabecera = 'Canales [COLOR yellow]Inestables[/COLOR]'
         elif item.cta_register == True: cabecera = 'Canales [COLOR yellow]con Cuenta[/COLOR]'
         elif item.var_domains == True: cabecera = 'Canales [COLOR yellow]con varios Dominios[/COLOR]'
-        elif item.last_domain == True: cabecera = 'Canales [COLOR yellow]que puede comprobarse el Último Dominio Vigente[/COLOR]'
+        elif item.last_domain == True:
+              cabecera = 'Canales [COLOR yellow]que puede comprobarse el Último Dominio Vigente[/COLOR]'
+              if item.only_last_domain: cabecera = 'Canales con el [COLOR yellow]Último Dominio Vigente[/COLOR] informado'
         elif item.suggesteds == True: cabecera = 'Canales [COLOR yellow]Sugeridos[/COLOR]'
         elif item.privates == True: cabecera = 'Canales [COLOR yellow]Privados[/COLOR]'
         elif item.mismatched == True: cabecera = 'Canales [COLOR yellow]Incompatibles con su Media Center[/COLOR]'
@@ -1182,10 +1239,22 @@ def search_new_proxies(canal_0, canal_1, canal_2):
 def tests_channels(canal_0, canal_1, canal_2):
     if platformtools.dialog_yesno(canal_0, canal_1, canal_2, '[COLOR darkorange][B]¿ Efectuar Test Web del Canal ?[/B][/COLOR]'):
         from modules import tester
-        tester.test_channel(canal_0)
 
+        config.set_setting('developer_test_channels', '')
+
+        try:
+            tester.test_channel(canal_0)
+        except:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 def tests_servers(servidor_0, servidor_1):
     if platformtools.dialog_yesno(servidor_0, servidor_1, '[COLOR darkorange][B]¿ Efectuar Test Web del Servidor ?[/B][/COLOR]'):
         from modules import tester
-        tester.test_server(servidor_0)
+
+        config.set_setting('developer_test_servers', '')
+
+        try:
+            tester.test_server(servidor_0)
+        except:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+

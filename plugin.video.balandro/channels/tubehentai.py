@@ -68,12 +68,12 @@ def list_all(item):
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'movie',
                                     contentTitle = title, contentExtra='adults' ))
 
-    next_page = scrapertools.find_single_match(data,'<a href=\'([^\']+)\' class="next"')
+    if itemlist:
+        next_page = scrapertools.find_single_match(data,'<a href=\'([^\']+)\' class="next"')
+        if next_page:
+            next_page = host + next_page
 
-    if next_page:
-        next_page = host + next_page
-
-        itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
     return itemlist
 

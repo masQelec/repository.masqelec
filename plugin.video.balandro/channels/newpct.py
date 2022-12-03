@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
@@ -10,12 +10,12 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www1.newpct.net/'
+host = 'https://www2.newpct.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.newpct.net/']
+    ant_hosts = ['https://www.newpct.net/', 'https://www1.newpct.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -50,8 +50,9 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'estrenos-4/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     return itemlist
 
@@ -104,6 +105,8 @@ def generos(item):
     matches = re.compile('<a href="(.*?)".*?">(.*?)</a>').findall(bloque)
 
     for url, title in matches:
+        title = title.replace('&amp;', '&')
+
         itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
 
     return sorted(itemlist, key=lambda x: x.title)
@@ -132,8 +135,6 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
-        year = '-'
-
         lang = scrapertools.find_single_match(match, '</div>.*?</b>.*?<b>(.*?)</b>')
         if lang.lower() == 'castellano': lang = 'Esp'
         elif lang.lower() == 'latino': lang = 'Lat'
@@ -147,7 +148,7 @@ def list_all(item):
         tipo = 'tvshow' if '/series/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if '/series/' in url:
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
@@ -164,13 +165,15 @@ def list_all(item):
             titulo = titulo.replace('&#8211;', '').replace('&#215;', '').strip()
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, qualities=qlty, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = titulo, infoLabels={'year': year} ))
-        else:
+                                        contentType = 'episode', contentSerieName = titulo, contentSeason = 1, contentEpisodeNumber = 1,
+                                        infoLabels={'year': '-'} ))
+
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, qualities=qlty, fmt_sufijo=sufijo,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -194,28 +197,39 @@ def findvideos(item):
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
+    ses = 0
+
     for url1, url2 in matches:
+        ses += 1
+
         if url1:
             if url1.startswith('/'): url1 = host[:-1] + url1
 
             url1 = url1.replace('&amp;', '&')
 
-            other = ''
-            if url1.startswith('magnet:?'): other = 'Magnet'
+            if not url1.startswith('https://ouo.io/'):
+               other = ''
+               if url1.startswith('magnet:?'): other = 'Magnet'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url1, server = 'torrent',
-                                  language = item.languages, quality = item.qualities, other = other ))
+               itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url1, server = 'torrent',
+                                     language = item.languages, quality = item.qualities, other = other ))
 
         if url2:
             if url2.startswith('/'): url2 = host[:-1] + url2
 
             url2 = url2.replace('&amp;', '&')
 
-            other = ''
-            if url2.startswith('magnet:?'): other = 'Magnet'
+            if not url2.startswith('https://ouo.io/'):
+                other = ''
+                if url2.startswith('magnet:?'): other = 'Magnet'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url2, server = 'torrent',
-                                  language = item.languages, quality = item.qualities, other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url2, server = 'torrent',
+                                      language = item.languages, quality = item.qualities, other = other ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -243,6 +257,12 @@ def play(item):
         itemlist.append(item.clone( url = url, server = 'torrent' ))
 
     else:
+        if '/ouo.io/' in url:
+            url = decrypters.decode_uiiio(url)
+
+            if not url:
+                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
         host_torrent = host[:-1]
         url_base64 = decrypters.decode_url_base64(url, host_torrent)
 

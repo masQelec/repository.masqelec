@@ -4,22 +4,13 @@ import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
-from core import httptools, scrapertools, jsontools
+from core import httptools, scrapertools
 
 
-host = "https://www.xvideos.com/"
+host = 'https://www.xvideos.com/'
+
 
 perpage = 30
-
-
-def item_configurar_proxies(item):
-    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-def configurar_proxies(item):
-    from core import proxytools
-    return proxytools.configurar_proxies_canal(item.channel, host)
 
 
 def do_downloadpage(url, post=None, headers=None):
@@ -43,8 +34,6 @@ def mainlist_pelis(item):
     if config.get_setting('adults_password'):
         from modules import actions
         if actions.adults_password(item) == False: return itemlist
-
-    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
@@ -87,13 +76,6 @@ def list_all(item):
         itemlist.append(item.clone( action = 'findvideos', url = url if url.startswith('http') else host[:-1] + url,
                                     title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
-    if not itemlist:
-        if ses == 0:
-            if external:
-                if not host in external:
-                    platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Enlace externo al canal No Admitido[/B][/COLOR]')
-                    return
-
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a href="([^"]+)" class="no-page next-page">')
 
@@ -101,6 +83,13 @@ def list_all(item):
             if not next_url == '#1':
                 itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
                                             action = 'list_all', page = item.page + 1, text_color = 'coral' ))
+
+    if not itemlist:
+        if ses == 0:
+            if external:
+                if not host in external:
+                    platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Enlace externo al canal No Admitido[/B][/COLOR]')
+                    return
 
     return itemlist
 

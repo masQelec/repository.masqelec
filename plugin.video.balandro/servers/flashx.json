@@ -12,7 +12,7 @@
         "url": "https://www.flashx.co/\\1.\\2"
       },
      {
-        "pattern": "flashx.(?:tv|pw|ws|sx|to|cc)/(?:embed.php\\?c=|embed-|playvid-|)([A-z0-9]+)",
+        "pattern": "flashx.(?:tv|pw|ws|sx|to|cc|bz)/(?:embed.php\\?c=|embed-|playvid-|)([A-z0-9]+)",
         "url": "https://www.flashx.tv/\\1.html"
       }
     ]

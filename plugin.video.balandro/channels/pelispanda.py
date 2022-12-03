@@ -9,10 +9,13 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://pelispanda.com/'
+host = 'https://pelispanda.re/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://pelispanda.com/']
+
     if '/years/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -125,21 +128,23 @@ def list_all(item):
 
         if not url or not title: continue
 
-        tipo = 'tvshow' if '/series/' in url else 'movie'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         qlty = scrapertools.find_single_match(match, '<ul class="card__list">.*?<li>(.*?)</li>')
 
-        if '/series/' in url:
-            if item.search_type == 'movie': continue
+        tipo = 'tvshow' if '/series/' in url else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': "-"} ))
 
-        else:
-            if item.search_type == 'tvshow': continue
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, fmt_sufijo=sufijo,
                                     contentType='movie', contentTitle=title, infoLabels={'year': "-"} ))
@@ -181,7 +186,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
 
 
 def episodios(item):
@@ -259,7 +263,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    links = scrapertools.find_multiple_matches(data, '<td>Torrent</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+    links = scrapertools.find_multiple_matches(data, '<td>Torrent</td>.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
 
     for qlty, lang, size, link in links:
         if 'Castellano' in lang: lang = 'Esp'

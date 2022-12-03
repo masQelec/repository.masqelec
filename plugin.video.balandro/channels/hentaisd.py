@@ -71,9 +71,10 @@ def list_all(item):
         itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
                                     contentType = 'movie', contentTitle = title, infoLabels={'plot': plot} ))
 
-    next_page = scrapertools.find_single_match(data, '<li class="next"><a href="([^"]+)"')
-    if next_page:
-        itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<li class="next"><a href="([^"]+)"')
+        if next_page:
+            itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
     return itemlist
 
@@ -90,9 +91,10 @@ def list_list(item):
     for url, thumb, title in matches:
         itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title ))
 
-    next_page = scrapertools.find_single_match(data, '<li class="next"><a href="([^"]+)"')
-    if next_page:
-        itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_list', url = next_page, text_color = 'coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<li class="next"><a href="([^"]+)"')
+        if next_page:
+            itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_list', url = next_page, text_color = 'coral' ))
 
     return itemlist
 

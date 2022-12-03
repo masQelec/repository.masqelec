@@ -7,20 +7,58 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww3.animeflv.cc/'
+host = 'https://www1.animeflv.bz/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www10.animeflv.cc/', 'https://www3.animeflv.net/', 'https://www3.animeflv.cc/',
+             'https://ww3.animeflv.cc/', 'https://animeflv.bz/'] 
+
+
+domain = config.get_setting('dominio', 'animeflv', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'animeflv')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'animeflv')
+    else: host = domain
+
 
 perpage = 30
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www10.animeflv.cc/', 'https://www3.animeflv.net/', 'https://www3.animeflv.cc/'] 
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post).data
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'animeflv', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_animeflv', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='animeflv', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_animeflv', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
@@ -39,6 +77,8 @@ def mainlist_animes(item):
         from modules import actions
         if actions.adults_password(item) == False:
             return itemlist
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
@@ -149,15 +189,15 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        if itemlist:
+        if buscar_next:
             next_url = scrapertools.find_single_match(data, "li\s*class=selected><a href='[^']+.*?<\/li><li.*?<a href='([^']+)")
             if next_url:
                 itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if url.startswith('http') else item.url + next_url if not '?' in item.url else item.url.split('?')[0] + next_url,

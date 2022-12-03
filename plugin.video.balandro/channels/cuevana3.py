@@ -7,16 +7,67 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww1.cuevana3.me/'
+host = 'https://cuevana3.ai/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['http://www.cuevana3.co/', 'https://cuevana3.co/', 'https://cuevana3.io/',
+             'https://cuevana3.me/', 'https://ww1.cuevana3.me/', 'https://ww2.cuevana3.me/',
+             'https://ww3.cuevana3.me/', 'https://ww4.cuevana3.me/,' 'https://ww5.cuevana3.me/',
+             'https://c3.cuevana3.me/', 'https://s3.cuevana3.me/', 'https://es.cuevana3.me/',
+             'https://a2.cuevana3.me/', 'https://b2.cuevana3.me/', 'https://d2.cuevana3.me/',
+             'https://e2.cuevana3.me/', 'https://g2.cuevana3.me/', 'https://z2.cuevana3.me/',
+             'https://s2.cuevana3.me/', 'https://m2.cuevana3.me/', 'https://n2.cuevana3.me/',
+             'https://ver.cuevana3.me/', 'https://u2.cuevana3.me/', 'https://u3.cuevana3.me/',
+             'https://n3.cuevana3.me/', 'https://v3.cuevana3.me/', 'https://m3.cuevana3.me/',
+             'https://z3.cuevana3.me/', 'https://t3.cuevana3.me/', 'https://v3.cuevana3.me/',
+             'https://d3.cuevana3.me/', 'https://r3.cuevana3.me/', 'https://k3.cuevana3.me/',
+             'https://p3.cuevana3.me/', 'https://c1.cuevana3.me/', 'https://e1.cuevana3.me/',
+             'https://a1.cuevana3.me/', 'https://z1.cuevana3.me/', 'https://b1.cuevana3.me/',
+             'https://q1.cuevana3.me/', 'https://o1.cuevana3.me/', 'https://l2.cuevana3.me/',
+             'https://j2.cuevana3.me/', 'https://k2.cuevana3.me/', 'https://o2.cuevana3.me/',
+             'https://y2.cuevana3.me/', 'https://f3.cuevana3.me/', 'https://h3.cuevana3.me/',
+             'https://j3.cuevana3.me/', 'https://l3.cuevana3.me/', 'https://y4.cuevana3.me/',
+             'https://b4.cuevana3.me/', 'https://u4.cuevana3.me/', 'https://r4.cuevana3.me/']
+
+
+domain = config.get_setting('dominio', 'cuevana3', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'cuevana3')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'cuevana3')
+    else: host = domain
 
 
 IDIOMAS = {'Latino': 'Lat', 'Español': 'Esp', 'Subtitulado': 'Vose'}
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_cuevana3_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -25,9 +76,6 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['http://www.cuevana3.co/', 'https://cuevana3.co/', 'https://cuevana3.io/', 'https://cuevana3.me/'
-                 'https://ww3.cuevana3.me/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -38,11 +86,39 @@ def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_he
     return resp.data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'cuevana3', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_cuevana3', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='cuevana3', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_cuevana3', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -56,7 +132,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -76,7 +152,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -128,47 +204,64 @@ def list_all(item):
         elif item.filtro == 'tabserie-2': post['action'] = 'cuevana_ajax_pagination_estreno'
         elif item.filtro == 'tabserie-3': post['action'] = 'cuevana_ajax_pagination_rating'
         elif item.filtro == 'tabserie-4': post['action'] = 'cuevana_ajax_pagination_view'
+
         data = do_downloadpage(host+'wp-admin/admin-ajax.php', post=post)
+        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
     else:
         data = do_downloadpage(item.url)
+        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
         if item.filtro:
-            data = scrapertools.find_single_match(data, '<div\s*id=%s(.*?)</nav>\s*</div>' % item.filtro)
+            data = scrapertools.find_single_match(data, '<div id="%s(.*?)</div></nav>' % item.filtro)
 
     matches = re.compile('<li\s*class="[^"]*TPostMv">(.*?)</li>', re.DOTALL).findall(data)
 
     for article in matches:
-        tipo = 'tvshow' if 'class=Qlty>SERIE' in article or 'class="Qlty">SERIE' in article else 'movie'
-        if item.search_type not in ['all', tipo]: continue
-
-        sufijo = '' if item.search_type != 'all' else tipo
-
         url = scrapertools.find_single_match(article, '\s*href=(?:"|)([^ >"]+)')
+
+        title = scrapertools.find_single_match(article, '<h2 class="Title">([^<]+)</h2>')
+
+        if not url or not title: continue
+
         if '/pagina-ejemplo' in url: continue
 
         thumb = scrapertools.find_single_match(article, 'data-src=([^ >]+)')
         if not thumb: thumb = scrapertools.find_single_match(article, ' src=(?:"|)([^ >"]+)')
-        title = scrapertools.find_single_match(article, '<h2 class="Title">([^<]+)</h2>')
+
         year = scrapertools.find_single_match(article, '<span\s*class=(?:"|)Year(?:"|)>(\d+)</span>')
+        if not year: year = '-'
+
         qlty = scrapertools.find_single_match(article, '<span\s*class=(?:"|)Qlty(?:"|)>([^<]+)</span>')
 
+        tipo = 'tvshow' if '/serie/' in url else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
+
         if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, fmt_sufijo=sufijo, 
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, 
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page_link = scrapertools.find_single_match(data, ' rel="next" href="([^"]+)"')
-    if next_page_link == '':
-        next_page_link = scrapertools.find_single_match(data, '\s*href=(?:"|)([^ >"]+) class="next')
-    if next_page_link:
-        if not item.filtro:
-            itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, action='list_all', text_color='coral' ))
-        else:
-            pagina = 2 if not item.page else item.page + 1
-            itemlist.append(item.clone( title='Siguientes ...', url=next_page_link, action='list_all', page=pagina, text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="(.*?)"')
+
+        if next_page:
+            if '/page/' in next_page or '?paged=' in next_page:
+                if not item.filtro:
+                    itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', text_color='coral' ))
+                else:
+                    pagina = 2 if not item.page else item.page + 1
+
+                    itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', page=pagina, text_color='coral' ))
 
     return itemlist
 
@@ -179,27 +272,26 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<option\s*value=(\d+)>Temporada \d+</option>', re.DOTALL).findall(data)
+    matches = re.compile('<option value=".*?>Temporada(.*?)</option>', re.DOTALL).findall(data)
 
-    for numtempo in matches:
-        title = 'Temporada ' + numtempo
+    for tempo in matches:
+        tempo = tempo.strip()
+
+        title = 'Temporada ' + tempo
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.contentType = 'season'
-            item.contentSeason = numtempo
+            item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = numtempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 def episodios(item):
     logger.info()
@@ -211,9 +303,9 @@ def episodios(item):
     data = do_downloadpage(item.url)
 
     if item.contentSeason:
-        data = scrapertools.find_single_match(data, '<ul\s*id=season-' + str(item.contentSeason) + '(.*?)</ul>')
+        data = scrapertools.find_single_match(data, '<ul id="season-' + str(item.contentSeason) + '(.*?)</ul>')
 
-    matches = re.compile('<li.*?<a\s*href=([^ >]+)>(.*?)</li>', re.DOTALL).findall(data)
+    matches = re.compile('<a href="(.*?)">(.*?)</li>', re.DOTALL).findall(data)
 
     if item.page == 0:
         sum_parts = len(matches)
@@ -224,18 +316,19 @@ def episodios(item):
 
     for url, datos in matches[item.page * item.perpage:]:
         try:
-            season, episode = scrapertools.find_single_match(url, '-(\d+)x(\d+)$')
+            season, epis = scrapertools.find_single_match(url, '-(\d+)x(\d+)$')
         except:
-            continue
+            season = scrapertools.find_single_match(url, '-(\d+)x')
+            epis = scrapertools.find_single_match(url, '-.*?x(\d+)$')
 
         if item.contentSeason:
-           if not str(item.contentSeason) == str(season): continue
+            if not str(item.contentSeason) == str(season): continue
 
         title = scrapertools.find_single_match(datos, '<h2[^>]*>(.*?)</h2>')
         thumb = scrapertools.find_single_match(datos, 'data-src=([^ >]+)"')
 
         itemlist.append(item.clone( action='findvideos', title = title, thumbnail=thumb, url = url,
-                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -254,38 +347,49 @@ def puntuar_calidad(txt):
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
+
 def findvideos(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('TPlayerNv=Opt(\w\d+).*?img\s*src=(.*?)<span>\d+ - (.*?) - ([^<]+)<', re.DOTALL).findall(data)
+    matches = re.compile('<li data-TPlayerNv="Opt(\w\d+).*?<span class="cdtr"><span>\d+ - (.*?) - ([^<]+)<', re.DOTALL).findall(data)
 
     ses = 0
 
-    for option, url_data, language, quality in matches:
+    for option, lang, qlty in matches:
         ses += 1
 
-        url = scrapertools.find_single_match(data, 'id=Opt%s><iframe.*? data-src=(?:"|)([^ >"]+)' % option)
-        if url.startswith('/'): url = 'https:' + url
+        if ' - ' in lang: lang = scrapertools.find_single_match(qlty, '(.*?)-').strip()
+
+        if ' - ' in qlty: qlty = scrapertools.find_single_match(qlty, ' - (.*?)$').strip()
+
+        url = scrapertools.find_single_match(data, '<div class="TPlayerTb".*?id="Opt%s".*?data-src="(.*?)"' % option)
+
+        if url.startswith('//'): url = 'https:' + url
 
         if url and 'youtube' not in url:
             url = url.replace('#Synchronization+Service', '')
+
             itemlist.append(Item( channel = item.channel, action = 'play', other = option, title = '', url = url, referer = item.url,
-                                  language = IDIOMAS.get(language, language), quality = quality, quality_num = puntuar_calidad(quality) ))
+                                  language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty) ))
 
     # Enlaces descarga
     patron = 'Uptobox</td><td>([^<]*)</td><td><span>([^<]*)</span></td><td><a\s*rel=nofollow target=_blank href="([^"]+)" class="Button STPb">Descargar</a>'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    for language, quality, url in matches:
+    for lang, qlty, url in matches:
         ses += 1
+
+        if ' - ' in lang: lang = scrapertools.find_single_match(qlty, '(.*?)-').strip()
+
+        if ' - ' in qlty: qlty = scrapertools.find_single_match(qlty, ' - (.*?)$').strip()
 
         if url.startswith('/'): url = 'https:' + url
 
         itemlist.append(Item( channel = item.channel, action = 'play', other = 'D', server = 'uptobox', title = '', url = url, referer = item.url,
-                              language = IDIOMAS.get(language, language), quality = quality, quality_num = puntuar_calidad(quality) ))
+                              language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty) ))
 
     itemlist = servertools.get_servers_itemlist(itemlist)
 
@@ -345,7 +449,7 @@ def play(item):
                         return itemlist
 
                 elif 'openloadpremium.com/embed/' in url:
-                    continue # no encontrado ningún ejemplo válido
+                    url = '' # no encontrado ningún ejemplo válido
 
                 else:
                     lbl = scrapertools.find_single_match(resto, '"label":"([^"]+)')
@@ -425,7 +529,7 @@ def play(item):
 def search(item, texto):
     logger.info()
     try:
-        item.url = host + '?s=' + texto.replace(" ", "+")
+        item.url = host + 'search/' + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

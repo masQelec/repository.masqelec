@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from platformcode import config, logger, platformtools
+
 from core.item import Item
 from core import tmdb
 
@@ -13,15 +14,15 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( action='personas', search_type='cast', title=' - Buscar [COLOR aquamarine][B]intérprete[/B][/COLOR] ...',
+    itemlist.append(item.clone( action='personas', search_type='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...',
                                 plot = 'Escribir el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
 
-    itemlist.append(item.clone( action='personas', search_type='crew', title=' - Buscar [COLOR springgreen][B]dirección[/B][/COLOR] ...',
+    itemlist.append(item.clone( action='personas', search_type='crew', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...',
                                 plot = 'Escribir el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( action='listado_personas', search_type='person', extra = 'popular', title=' - Personas más populares' ))
+    itemlist.append(item.clone( action='listado_personas', search_type='person', extra = 'popular', title=' - [COLOR limegreen]Personas[/COLOR] más populares' ))
 
     presentar = True
     if item.search_type == 'tvshow': presentar = False
@@ -30,7 +31,7 @@ def mainlist(item):
        if item.search_type == 'movie': presentar = False
 
     if presentar:
-        itemlist.append(item.clone( title = '[B] - Películas:[/B]', thumbnail=config.get_thumb('movie'), action = '', text_color='deepskyblue' ))
+        itemlist.append(item.clone( title = '[B]Películas:[/B]', thumbnail=config.get_thumb('movie'), action = '', text_color='deepskyblue' ))
 
         itemlist.append(item.clone( action='listado', search_type='movie', extra = 'now_playing', title='   - En cartelera' ))
         itemlist.append(item.clone( action='listado', search_type='movie', extra = 'popular', title='   - Más populares' ))
@@ -47,7 +48,7 @@ def mainlist(item):
        if item.search_type == 'tvshow': presentar = False
 
     if presentar:
-        itemlist.append(item.clone( title = '[B] - Series:[/B]', thumbnail=config.get_thumb('tvshow'), action = '', text_color='hotpink' ))
+        itemlist.append(item.clone( title = '[B]Series:[/B]', thumbnail=config.get_thumb('tvshow'), action = '', text_color='hotpink' ))
 
         itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'on_the_air', title='   - En emisión' ))
         itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'popular', title='   - Más populares' ))

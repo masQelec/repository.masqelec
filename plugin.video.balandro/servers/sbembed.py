@@ -40,6 +40,8 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
+    ini_page_url = page_url
+
     page_url = page_url.replace('/e/', '/play/').replace('/d/', '/play/')
     page_url = page_url.replace('embed-', '')
 
@@ -97,6 +99,7 @@ def get_video_url(page_url, url_referer=''):
                 import_libs('script.module.resolveurl')
 
                 import resolveurl
+                page_url = ini_page_url
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:

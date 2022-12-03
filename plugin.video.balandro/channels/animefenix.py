@@ -7,9 +7,104 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.animefenix.com/'
+host = 'https://www.animefenix.tv/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www.animefenix.com/']
+
+
+domain = config.get_setting('dominio', 'animefenix', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'animefenix')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'animefenix')
+    else: host = domain
+
 
 perpage = 30
+
+
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_animefenix_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = '[B]Configurar proxies a usar[/B] ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers).data
+
+    if '<title>You are being redirected...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+                data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers).data
+        except:
+            pass
+
+    return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'animefenix', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_animefenix', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='animefenix', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_animefenix', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
@@ -28,6 +123,8 @@ def mainlist_animes(item):
         from modules import actions
         if actions.adults_password(item) == False:
             return itemlist
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
@@ -62,8 +159,7 @@ def categorias(item):
 
     url_cat = host + 'animes'
 
-    data = httptools.downloadpage(url_cat).data
-
+    data = do_downloadpage(url_cat)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = scrapertools.find_single_match(data, r'<select name="[^"]+" id="order_select"(.*?)<\/select>')
@@ -86,7 +182,7 @@ def generos(item):
 
     url_genre = host + 'animes'
 
-    data = httptools.downloadpage(url_genre).data
+    data = do_downloadpage(url_genre)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = scrapertools.find_single_match(data, r'<select name="[^"]+" id="genre_select" multiple="multiple">(.*?)<\/select>')
@@ -107,7 +203,7 @@ def anios(item):
 
     url_anio = host + 'animes'
 
-    data = httptools.downloadpage(url_anio).data
+    data = do_downloadpage(url_anio)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = scrapertools.find_single_match(data, r'<select name="[^"]+" id="year_select" multiple="multiple">(.*?)<\/select>')
@@ -128,7 +224,7 @@ def list_all(item):
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     patron = '<article class="serie-card"><div class="serie-card__information"><p>([^<]+)<\/p>'
@@ -141,16 +237,17 @@ def list_all(item):
         if not url or not title: continue
 
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year':year, 'plot': info} ))
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year, 'plot': info} ))
 
         if len(itemlist) >= perpage: break
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<a class="pagination-link" href="' in data:
-        next_url = scrapertools.find_single_match(data, '<a class="pagination-link" href="([^"]+)">Siguiente')
-        next_url = item.url.split("?")[0] + next_url
-        itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
+    if itemlist:
+        if '<a class="pagination-link" href="' in data:
+            next_url = scrapertools.find_single_match(data, '<a class="pagination-link" href="([^"]+)">Siguiente')
+            next_url = item.url.split("?")[0] + next_url
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
 
     return itemlist
 
@@ -159,7 +256,7 @@ def list_last(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, 'Últimas series agregadas(.*?)Comentarios')
 
@@ -167,7 +264,7 @@ def list_last(item):
 
     for url, thumb, title in matches:
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year':'-'} ))
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -178,7 +275,7 @@ def list_epis(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, 'Últimos Episodios Agregados(.*?)Últimas series agregadas')
 
@@ -204,7 +301,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = re.compile('<a class="fa-play-circle d-inline-flex align-items-center is-rounded " href="([^"]+)".*?<span>([^<]+)', re.DOTALL).findall(data)
 
@@ -239,7 +336,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
@@ -290,7 +387,8 @@ def play(item):
 
     if '/videa.hu/' in url:
         if url.startswith('//'): url = 'https:' + url
-        data = httptools.downloadpage(url).data
+
+        data = do_downloadpage(url)
 
         if '/recaptcha/api.js?render=explicit&hl=hu' in data:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
@@ -298,17 +396,19 @@ def play(item):
     elif '/stream/amz.php' in url:
         if not url.startswith("http"): url = host + url[1:]
 
-        data = httptools.downloadpage(url).data
+        data = do_downloadpage(url)
 
         url = scrapertools.find_single_match(data, '"file":"([^"]+)"')
 
     elif '/redirect.php?' in url:
-        data = httptools.downloadpage(url).data
+        data = do_downloadpage(url)
+
         url = scrapertools.find_single_match(data, 'playerContainer.*?src="([^"]+)"')
 
         if '/videa.hu/' in url:
             if url.startswith('//'): url = 'https:' + url
-            data = httptools.downloadpage(url).data
+
+            data = do_downloadpage(url)
 
             if '/recaptcha/api.js?render=explicit&hl=hu' in data:
                 return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
@@ -316,22 +416,12 @@ def play(item):
         elif '/stream/amz.php' in url:
             if not url.startswith("http"): url = host + url[1:]
 
-            data = httptools.downloadpage(url).data
+            data = do_downloadpage(url)
+
             url = scrapertools.find_single_match(data, '"file":"([^"]+)"')
 
-        elif 'burstcloud' in url:
-            data = httptools.downloadpage(url).data
-
-            file = scrapertools.find_single_match(data, 'data-file-id="(.*?)"')
-
-            if file:
-                post = {"fileId": file}
-
-                data = httptools.downloadpage('https://www.burstcloud.co/file/play-request/', post=post, headers={'referer': url}).data
-
-                url = scrapertools.find_single_match(data, '"cdnUrl".*?"([^"]+)"')
-
-                if url: url = url + '|referer=https://www.burstcloud.co/'
+        elif 'terabox.' in url:
+            url = ''
 
         elif '.fireload.com' in url:
             url = scrapertools.find_single_match(url, 'v=(.*?)$')
@@ -341,6 +431,7 @@ def play(item):
 
     if url:
         if not url.startswith("http"): url = "https:" + url
+
         url = url.replace('&amp;', '&').replace("\\/", "/")
 
         servidor = servertools.get_server_from_url(url)

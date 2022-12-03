@@ -32,10 +32,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action='list_all', url = host + 'serie/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action='list_all', url = host + 'serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por género', action='generos' ))
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico' ))
+    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -86,7 +87,6 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
-
         title = scrapertools.find_single_match(match, '<h2 class="Title">(.*?)</h2>')
 
         if not url or not title: continue
@@ -95,16 +95,19 @@ def list_all(item):
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
         year = scrapertools.find_single_match(match, ' <span class="Date">(.*?)</span>')
+        if not year: year = '-'
 
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
                                     contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<a class="page-link current"' in data:
-        next_page = scrapertools.find_single_match(data, '<a class="page-link" href="(.*?)">')
-        if next_page:
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
+    if itemlist:
+        if '<a class="page-link current"' in data:
+            next_page = scrapertools.find_single_match(data, '<a class="page-link" href="(.*?)">')
+
+            if next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -119,7 +122,6 @@ def list_letra(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, ' <a href="([^"]+)"')
-
         title = scrapertools.find_single_match(match, ' <strong>(.*?)</strong>')
 
         if not url or not title: continue
@@ -128,16 +130,19 @@ def list_letra(item):
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
         year = scrapertools.find_single_match(match, ' <td>Serie.*?<td>(.*?)</td>')
+        if not year: year = '-'
 
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
                                     contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<a class="page-link current"' in data:
-        next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?<a class="page-link" href="(.*?)">')
-        if next_page:
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_letra', text_color='coral' ))
+    if itemlist:
+        if '<a class="page-link current"' in data:
+            next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?<a class="page-link" href="(.*?)">')
+
+            if next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_letra', text_color='coral' ))
 
     return itemlist
 
@@ -236,7 +241,7 @@ def findvideos(item):
         url = host + '?trembed=' + data_key + '&trid=' + data_id + '&trtype=2'
 
         itemlist.append(Item(channel = item.channel, action = 'play', server='directo', title = '', url = url,
-                             language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = other ))
+                                                     language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = other ))
 
     return itemlist
 
@@ -267,6 +272,7 @@ def play(item):
                 elif '/manifest.mpd' in url:
                     if platformtools.is_mpd_enabled(): itemlist.append(['mpd', url, 0, '', True])
                     itemlist.append(['m3u8', url.replace('/users/', 'hls/users/', 1).replace('/manifest.mpd', '/index.m3u8')])
+
                 else: itemlist.append(['m3u8', url])
 
                 return itemlist

@@ -115,12 +115,13 @@ def list_all(item):
             itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
-    next_page = scrapertools.find_single_match(data,'<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
-    if next_page:
-        if itemlist:
-            next_page = host + next_page
+    if itemlist:
+        next_page = scrapertools.find_single_match(data,'<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
+        if next_page:
+            if itemlist:
+                next_page = host + next_page
 
-            itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
     return itemlist
 

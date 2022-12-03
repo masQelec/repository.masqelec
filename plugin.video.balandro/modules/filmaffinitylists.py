@@ -4,10 +4,12 @@ import re
 
 from datetime import datetime
 
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
+
 from core.item import Item
-from modules import search
 from core import httptools, scrapertools, tmdb
+
+from modules import search
 
 
 host = "https://www.filmaffinity.com/es/"
@@ -23,6 +25,19 @@ perpage = 30
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen' ))
+
+    itemlist.append(item.clone( action='listas', search_type='person', stype='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...',
+                                plot = 'Escribir el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
+
+    itemlist.append(item.clone( action='listas', search_type='person', stype='director', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...',
+                                plot = 'Escribir el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
+
+    itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen' ))
+
+    itemlist.append(item.clone( action='listas', search_type='all', stype='title', title=' - Buscar [COLOR yellow]película y/ó serie[/COLOR] ...' ))
+    itemlist.append(item.clone( action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]documental[/COLOR] ...' ))
 
     por_plataforma = False
     por_tema = False
@@ -124,6 +139,69 @@ def oscars(item):
     itemlist.append(item.clone( title = 'Películas Ganadoras de los 5 Oscars principales', action = 'list_oscars', url = item.url, grupo = 'Películas ganadoras de los 5 Oscars principales' ))
     itemlist.append(item.clone( title = 'Últimas Películas Ganadoras del Oscar principal', action = 'list_oscars', url = item.url, grupo = 'Últimas películas ganadoras del Oscar principal' ))
     itemlist.append(item.clone( title = 'Ediciones Premios Oscar', action = 'oscars_ediciones', url = host + 'award_data.php?award_id=academy_awards' ))
+
+    return itemlist
+
+
+def listas(item):
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+
+    if item.page == 0:
+        last_search = config.get_setting('search_last_' + item.search_type, default='')
+
+        if item.search_type == 'person': texto = 'Nombre de la persona a buscar'
+        else: texto = 'Texto a buscar'
+
+        tecleado = platformtools.dialog_input(last_search, texto)
+
+        if tecleado is None or tecleado == '': return
+
+        config.set_setting('search_last_' + item.search_type, tecleado)
+
+        if ':' in tecleado: tecleado.split(':')[1].strip()
+
+        item.tecleado = tecleado
+
+    url = host + 'search.php?stype=' + item.stype + '&stext=' + item.tecleado
+
+    data = httptools.downloadpage(url).data
+
+    matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="lists-box">')
+
+    num_matches = len(matches)
+    desde = item.page * perpage
+    hasta = desde + perpage
+
+    for match in matches[desde:hasta]:
+        title = scrapertools.find_single_match(match, 'title="(.*?)"')
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+        thumb = thumb.replace('-mtiny', '-large') + '|User-Agent=Mozilla/5.0'
+
+        if '(Serie de TV)' in title or '(Miniserie de TV)' in title:
+            _search_type = 'tvshow'
+            if item.search_type == 'documentary': _search_type = 'all'
+
+            name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '')
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type,
+                                        name = name, contentSerieName = name, infoLabels = {'year': '-'} ))
+        else:
+            _search_type = 'movie'
+            if item.search_type == 'documentary': _search_type = 'all'
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type,
+                                        name = title, contentTitle = title, infoLabels = {'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if num_matches > hasta:
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, tecleado = item.tecleado, stype = item.stype,
+                                        action = 'listas', text_color='coral' ))
 
     return itemlist
 
@@ -389,9 +467,9 @@ def list_premios_anyo(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, 'class="win-label">Ganador/a</span>.*?src="(.*?)".*?href="(.*?)".*?title="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, 'class="win-label">Ganador/a</span>.*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"')
 
-    for thumb, url, title in matches:
+    for url, title, thumb in matches:
         title = title.strip()
 
         if 'Edición de los Oscar' in title: continue

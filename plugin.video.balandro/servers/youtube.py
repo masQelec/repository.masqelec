@@ -25,12 +25,13 @@ web_yt = 'https://www.youtube.com'
 
 # ~ https://tyrrrz.me/blog/reverse-engineering-youtube
 
+
 def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
 
-    if not page_url.startswith("http"):
-        page_url = web_yt + '/watch?v=%s' % page_url
-        logger.info(" page_url->'%s'" % page_url)
+    ini_page_url = page_url
+
+    if not page_url.startswith("http"): page_url = web_yt + '/watch?v=%s' % page_url
 
     page_url = servertools.normalize_url('youtube', page_url)
 
@@ -41,7 +42,7 @@ def get_video_url(page_url, url_referer=''):
 
     video_id = scrapertools.find_single_match(page_url, '(?:v=|embed/)([A-z0-9_-]{11})')
 
-    video_urls = extract_videos(video_id)
+    video_urls = extract_videos(video_id, ini_page_url)
 
     return video_urls
 
@@ -80,10 +81,8 @@ def extract_flashvars(data):
 
         if found:
             data = json.load(data)
-            if assets:
-                flashvars = data["assets"]
-            else:
-                flashvars = data["args"]
+            if assets: flashvars = data["assets"]
+            else: flashvars = data["args"]
 
         for k in ["html", "css", "js"]:
             if k in flashvars:
@@ -138,10 +137,8 @@ def obtener_js_signature(youtube_page_data):
         data_js = httptools.downloadpage(urljs).data
 
         funcname = scrapertools.find_single_match(data_js, '\.sig\|\|([A-z0-9$]+)\(')
-        if not funcname:
-            funcname = scrapertools.find_single_match(data_js, '["\']signature["\']\s*,\s*([A-z0-9$]+)\(')
-        if not funcname:
-            funcname = scrapertools.find_single_match(data_js, '([A-z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\);\w+\.')
+        if not funcname: funcname = scrapertools.find_single_match(data_js, '["\']signature["\']\s*,\s*([A-z0-9$]+)\(')
+        if not funcname: funcname = scrapertools.find_single_match(data_js, '([A-z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\);\w+\.')
         if not funcname:
             # No se puede decodificar este vídeo
             logger.info("check-youtube: %s" % 'Youtube signature not found')
@@ -151,7 +148,7 @@ def obtener_js_signature(youtube_page_data):
         jsi = JSInterpreter(data_js)
         js_signature = jsi.extract_function(funcname)
     else:
-        logger.info('Youtube no detectada js_signature')
+        logger.info('Check-Youtube no detectada js_signature')
 
 
 def extract_from_player_response(params, youtube_page_data=''):
@@ -172,8 +169,8 @@ def extract_from_player_response(params, youtube_page_data=''):
                 aux = vid['cipher'] if 'cipher' in vid else vid['signatureCipher']
                 v_url = urllib.unquote(scrapertools.find_single_match(aux, 'url=([^&]+)'))
                 v_sig = urllib.unquote(scrapertools.find_single_match(aux, 's=([^&]+)'))
-                if not js_signature and not js_signature_checked:
-                    obtener_js_signature(youtube_page_data)
+
+                if not js_signature and not js_signature_checked: obtener_js_signature(youtube_page_data)
 
                 if not js_signature: continue
 
@@ -183,6 +180,7 @@ def extract_from_player_response(params, youtube_page_data=''):
             if 'itag' in vid: lbl = label_from_itag(vid['itag'])
             if not lbl and 'qualityLabel' in vid: lbl = vid['qualityLabel']
             if not lbl: lbl = '?'
+
             video_urls.append([lbl, vid['url']])
     except:
         pass
@@ -214,7 +212,7 @@ def import_libs(module):
             sys.path.append(os.path.join(path, lib))
 
 
-def extract_videos(video_id):
+def extract_videos(video_id, ini_page_url):
     youtube_page_data = ''
 
     url =  web_yt + '/get_video_info?c=TVHTML5&cver=7.20201028&html5=1&video_id=%s&eurl=https://youtube.googleapis.com/v/%s&ssl_stream=1' % (video_id, video_id)
@@ -227,8 +225,11 @@ def extract_videos(video_id):
         if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
             try:
                 import_libs('plugin.video.youtube')
+
                 import youtube_resolver
-                items = youtube_resolver.resolve(video_id)
+                page_url = ini_page_url
+
+                items = youtube_resolver.resolve(ini_page_url)
 
                 for item in list(filter(lambda x: not 'opus' in x.get('title') and not 'webm' in x.get('title'), items)):
                     if '/manifest.googlevideo.com/' in item['url']: continue
@@ -264,9 +265,7 @@ def extract_videos(video_id):
         if len(video_urls) > 0: return video_urls
 
     if params.get('dashmpd') and platformtools.is_mpd_enabled():
-        if params.get('use_cipher_signature', '') != 'True':
-            video_urls.append(['mpd HD', params['dashmpd'], 0, '', True])
-
+        if params.get('use_cipher_signature', '') != 'True': video_urls.append(['mpd HD', params['dashmpd'], 0, '', True])
 
     youtube_page_data = httptools.downloadpage(web_yt + '/watch?v=%s' % video_id).data
 
@@ -289,24 +288,21 @@ def extract_videos(video_id):
                 lbl = label_from_itag(int(url_desc_map["itag"]))
                 if not lbl: continue
 
-                if url_desc_map.get("url"):
-                    url = urllib.unquote(url_desc_map["url"])
+                if url_desc_map.get("url"): url = urllib.unquote(url_desc_map["url"])
                 elif url_desc_map.get("conn") and url_desc_map.get("stream"):
                     url = urllib.unquote(url_desc_map["conn"])
-                    if url.rfind("/") < len(url) - 1:
-                        url += "/"
+                    if url.rfind("/") < len(url) - 1: url += "/"
                     url += urllib.unquote(url_desc_map["stream"])
-                elif url_desc_map.get("stream") and not url_desc_map.get("conn"):
-                    url = urllib.unquote(url_desc_map["stream"])
+                elif url_desc_map.get("stream") and not url_desc_map.get("conn"): url = urllib.unquote(url_desc_map["stream"])
 
-                if url_desc_map.get("sig"):
-                    url += "&signature=" + url_desc_map["sig"]
+                if url_desc_map.get("sig"): url += "&signature=" + url_desc_map["sig"]
                 elif url_desc_map.get("s"):
                     sig = url_desc_map["s"]
 
-                    if not js_signature and not js_signature_checked:
-                        obtener_js_signature(youtube_page_data)
+                    if not js_signature and not js_signature_checked: obtener_js_signature(youtube_page_data)
+
                     if not js_signature: continue
+
                     url += "&sig=" + urllib.quote(js_signature([sig]), safe='')
 
                 url = url.replace(",", "%2C")
@@ -316,5 +312,33 @@ def extract_videos(video_id):
                 logger.info(traceback.format_exc())
 
         video_urls.reverse()
+
+    if not video_urls:
+        if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+            try:
+                import_libs('plugin.video.youtube')
+
+                import youtube_resolver
+                page_url = ini_page_url
+
+                items = youtube_resolver.resolve(page_url)
+
+                for item in list(filter(lambda x: not 'opus' in x.get('title') and not 'webm' in x.get('title'), items)):
+                    if '/manifest.googlevideo.com/' in item['url']: continue
+                    elif "'dash/audio': True" in str(item): continue
+
+                    video_urls.append([item['title'],  item['url']])
+
+            except:
+                # YouTubeExceptions: Sign in to confirm your age or private video
+                import traceback
+                logger.error(traceback.format_exc())
+
+        else:
+            color_exec = config.get_setting('notification_exec_color', default='cyan')
+            el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
+            el_srv += ('YouTube[/B][/COLOR]')
+            platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
 
     return video_urls

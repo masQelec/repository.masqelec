@@ -200,10 +200,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -291,6 +287,7 @@ def findvideos(item):
             url = scrapertools.find_single_match(dat_server, "to_player.*?'(.*?)'")
 
             if '/netu.' in url or '/hqq.' in url or '/waaw.' in url: continue
+            elif '/saikoudane.' in url: continue
 
             if url:
                 if url == 'undefined': continue

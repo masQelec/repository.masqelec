@@ -109,10 +109,12 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, ' rel=next href=([^ >]+)')
-    if not next_page: next_page = scrapertools.find_single_match(data, ' rel="next" href="([^"]+)"')
-    if next_page:
-        itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, ' rel=next href=([^ >]+)')
+        if not next_page: next_page = scrapertools.find_single_match(data, ' rel="next" href="([^"]+)"')
+
+        if next_page:
+            itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', text_color='coral' ))
 
     return itemlist
 

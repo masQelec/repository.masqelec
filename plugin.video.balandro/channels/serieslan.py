@@ -7,7 +7,6 @@ if sys.version_info[0] < 3:
 else:
     import urllib.parse as urllib
 
-
 import re
 
 from platformcode import logger, platformtools
@@ -17,11 +16,13 @@ from core import httptools, scrapertools, servertools, jsontools, tmdb
 
 host = 'https://serieslan.com/'
 
+
 perpage = 30
 
 
 def mainlist(item):
     return mainlist_series(item)
+
 
 def mainlist_series(item):
     logger.info()
@@ -29,13 +30,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title='Catálogo por alfabético (A - Z)', action ='list_all', url = host + 'lista.php?or=abc' ))
-    itemlist.append(item.clone( title='Catálogo por alfabético (Z - A)', action ='list_all', url = host + 'lista.php?or=cba' ))
+    itemlist.append(item.clone( title='Catálogo por alfabético (A - Z)', action ='list_all', url = host + 'lista.php?or=abc', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Catálogo por alfabético (Z - A)', action ='list_all', url = host + 'lista.php?or=cba', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title='Más populares', action ='list_all', url = host + 'lista.php?or=mas' ))
-    itemlist.append(item.clone( title='Más antiguas', action ='list_all', url = host + 'lista.php?or=ler' ))
-    itemlist.append(item.clone( title='Más actuales', action ='list_all', url = host + 'lista.php?or=rel' ))
-    itemlist.append(item.clone( title='Más impopulares', action ='list_all', url = host + 'lista.php?or=sam' ))
+    itemlist.append(item.clone( title='Más populares', action ='list_all', url = host + 'lista.php?or=mas', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Más antiguas', action ='list_all', url = host + 'lista.php?or=ler', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Más actuales', action ='list_all', url = host + 'lista.php?or=rel', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Más impopulares', action ='list_all', url = host + 'lista.php?or=sam', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -56,13 +57,16 @@ def list_all(item):
     hasta = desde + perpage
 
     for thumb, url, title, year in matches[desde:hasta]:
+        if not year: year = '-'
+
         itemlist.append(item.clone( action='temporadas', url = host + url, title = title, thumbnail = host + thumb[1:], 
                                     contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > hasta:
-        itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
+    if itemlist:
+        if num_matches > hasta:
+            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -138,7 +142,7 @@ def episodios(item):
         if len(itemlist) >= item.perpage:
             break
 
-    # ~ tmdb.set_infoLabels(itemlist)
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if len(matches) > (item.page + 1) * item.perpage:
@@ -219,12 +223,19 @@ def search(item, texto):
     itemlist = []
 
     try:
-        data = httptools.downloadpage(host+'b.php', post='k='+texto.replace(' ', '+')).data
+        data = httptools.downloadpage(host + 'b.php', post='k='+texto.replace(' ', '+')).data
         matches = jsontools.load(data)
+
         for datos in matches['dt']:
-            if len(datos) < 4 or not datos[1] or not datos[2]: continue
-            itemlist.append(item.clone( title=datos[1], url=host + datos[2], action='temporadas', thumbnail=host + 'tb/' + datos[0] + '.jpg', 
-                                        contentType='tvshow', contentSerieName=datos[1], infoLabels={'year': datos[3]} ))
+            if len(datos) < 4: continue
+            elif not datos[1]: continue
+            elif not datos[2]: continue
+
+            year = datos[3]
+            if not year: year = '-'
+
+            itemlist.append(item.clone( title=datos[1], url= host + datos[2], action='temporadas', thumbnail=host + 'tb/' + datos[0] + '.jpg', 
+                                        contentType='tvshow', contentSerieName=datos[1], infoLabels={'year': year} ))
 
         tmdb.set_infoLabels(itemlist)
     except:

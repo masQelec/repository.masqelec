@@ -16,6 +16,8 @@ host = 'https://www.pelisplus.lat/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    if not headers: headers = {'Referer': host}
+
     if '/release/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -150,6 +152,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title =  re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', title)
+
         if url.startswith('/'): url = host[:-1] + url
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
@@ -228,10 +232,6 @@ def temporadas(item):
     return sorted(itemlist, key=lambda it: it.title)
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -294,9 +294,10 @@ def episodios(item):
             if len(itemlist) >= item.perpage:
                 break
 
-        if num_matches > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", data_epi = item.data_epi, orden = '10000',
-                                        page = item.page + 1, perpage = item.perpage, text_color = 'coral' ))
+        if itemlist:
+            if num_matches > ((item.page + 1) * item.perpage):
+                itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", data_epi = item.data_epi, orden = '10000',
+                                            page = item.page + 1, perpage = item.perpage, text_color = 'coral' ))
 
         return itemlist
 
@@ -312,7 +313,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    langs = scrapertools.find_multiple_matches(data, 'data-lang="#([^"]+).*?lngopt"><a>([^<]+)')
+    langs = scrapertools.find_multiple_matches(data, 'data-lang="#([^"]+).*?lngopt">.*?<a>([^<]+)</a>')
 
     ses = 0
 
@@ -327,7 +328,7 @@ def findvideos(item):
             ses += 1
 
             url = base64.b64decode(url)
-            if PY3 and isinstance(url, bytes):  url = "".join(chr(x) for x in bytes(url))
+            if PY3 and isinstance(url, bytes): url = "".join(chr(x) for x in bytes(url))
 
             if not 'http' in url: url = host + url
 
@@ -335,10 +336,13 @@ def findvideos(item):
             elif 'mystream.to' in url: continue
 
             if 'pelisplus.lat' in url:
-                prv = do_downloadpage(url)
+                prv = do_downloadpage(url, headers={'Referer': item.url})
+
                 url = scrapertools.find_single_match(prv, "(?is)window.location.href = '([^']+)")
 
                 if not url: continue
+
+                if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
                 if not url.startswith('http'): url = 'https:' + url
 
@@ -404,20 +408,42 @@ def play(item):
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-        data = do_downloadpage(url)
+        if "cinestart" in url:
+            _id = scrapertools.find_single_match(url, 'id=(\w+)')
+            _token = scrapertools.find_single_match(url, 'token=(\w+)')
 
-        urls = scrapertools.find_multiple_matches(data, "sources:\[{file:.*?\'(.*?)\',label")
+            _dd = httptools.downloadpage("https://cinestart.streams3.com/r.php", post = {'id' : _id, 'token' : _token}, follow_redirects=False).headers.get('location', '')
 
-        for url in urls:
-            if not 'error' in url:
-                if '/pelisloadtop.com/' in url: continue
+            _v = scrapertools.find_single_match(_dd, 't=(\w+)')
 
-                servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
+            if _v:
+                data = httptools.downloadpage("https://cinestart.net/vr.php?v=%s" % _v).data
 
-                url = servertools.normalize_url(servidor, url)
+                if data:
+                    url = scrapertools.find_single_match(str(data), '"file":"(.*?)"')
 
-                itemlist.append(item.clone( url = url, server = servidor ))
+                    if url:
+                        url = url.replace('\\/', '/')
+
+                        itemlist.append(item.clone(url=url , server='directo'))
+                        return itemlist
+
+        else:
+            data = do_downloadpage(url)
+
+            urls = scrapertools.find_multiple_matches(data, "sources:\[{file:.*?\'(.*?)\',label")
+
+            for url in urls:
+                if not 'error' in url:
+                    if '/pelisloadtop.com/' in url: continue
+
+                    servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.corregir_servidor(servidor)
+
+                    url = servertools.normalize_url(servidor, url)
+
+                    itemlist.append(item.clone( url = url, server = servidor ))
+
     else:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -445,6 +471,8 @@ def list_search(item):
 
         if not url or not title: continue
 
+        title =  re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', title)
+
         if url.startswith('/'): url = host[:-1] + url
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
@@ -465,19 +493,17 @@ def list_search(item):
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if '/pelicula/' in url:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
-            sufijo = '' if item.search_type != 'all' else 'movie'
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
+
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
-
-            sufijo = '' if item.search_type != 'all' else 'tvshow'
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))

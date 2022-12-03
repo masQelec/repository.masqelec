@@ -22,6 +22,10 @@
       {
         "pattern": "(https://nuuuppp.click/watch/[A-z0-9\\?=]+)",
         "url": "\\1"
+      },
+      {
+        "pattern": "(https://nuuuppp.online/watch/[A-z0-9\\?=]+)",
+        "url": "\\1"
       }
     ]
   }

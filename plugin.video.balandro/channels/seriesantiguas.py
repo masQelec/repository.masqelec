@@ -28,15 +28,15 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'search/label/ESTRENO' ))
+    itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'search/label/ESTRENO', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'search/label/POPULARES' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'search/label/POPULARES', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = "Las de los 80's", action = 'list_all', url = host + 'search/label/80s' ))
-    itemlist.append(item.clone( title = "Las de los 90's", action = 'list_all', url = host + 'search/label/90s' ))
-    itemlist.append(item.clone( title = "Las de los 00's", action = 'list_all', url = host + 'search/label/00s' ))
+    itemlist.append(item.clone( title = "Las de los 80's", action = 'list_all', url = host + 'search/label/80s', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = "Las de los 90's", action = 'list_all', url = host + 'search/label/90s', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = "Las de los 00's", action = 'list_all', url = host + 'search/label/00s', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -63,10 +63,8 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
         if not thumb: thumb = scrapertools.find_single_match(match, "src='(.*?)'")
 
-        year = '-'
-
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

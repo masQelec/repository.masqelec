@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Filemoon,  Mvidoo,  Ninjastream,  Rutube,  Tubeload,  Videovard,  Yandex)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Filemoon,  Mvidoo,  Ninjastream,  Rutube,  Streamhub,  Tubeload,  Videovard,  Videowood,  Yandex)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -54,6 +54,14 @@
       },
       {
         "pattern": "(https://yadi.(?:sk|disk)/(?:d|i|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://streamhub.to/watch/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(?:videowood.tv)/(?:embed/|video/)([0-9a-z]+)",
         "url": "\\1"
       }
     ]

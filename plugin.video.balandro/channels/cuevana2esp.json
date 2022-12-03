@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["movie"],
-  "language": ["cast"],
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
 
-  "clusters": ["rankings"],
+  "clusters": ["news", "rankings", "lasts"],
 
-  "notes": "Películas en español. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas en español por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

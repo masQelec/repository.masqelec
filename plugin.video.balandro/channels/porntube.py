@@ -142,8 +142,8 @@ def list_all(item):
 
     itemlist = sorted(itemlist, key=lambda x: x.pos)
 
-    next_page = scrapertools.find_single_match(data, '<li class="pagination-item next"><a href="([^"]+)"')
     if itemlist:
+        next_page = scrapertools.find_single_match(data, '<li class="pagination-item next"><a href="([^"]+)"')
         if next_page:
             if next_page.startswith('/'): next_page = host + next_page[1:]
 

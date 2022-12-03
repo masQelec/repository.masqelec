@@ -134,12 +134,15 @@ def list_all(item):
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
-            if item.search_type == 'tvshow': continue
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
-        else:
-            if item.search_type == 'movie': continue
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo, 
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
@@ -340,19 +343,22 @@ def play(item):
 
                     _result = do_downloadpage(_url, post = 'key=' + _key + '&token=' + str(_token), headers = headers)
 
-                    _json = jsontools.load(_result)
+                    if _result:
+                        if '"error":"empty link"' in _result: return itemlist
 
-                    if _json["link"]:
-                        url = base64.b64decode(_json['link'])
+                        _json = jsontools.load(_result)
 
-                        if not 'https:' in str(url): url = 'https:' + str(url)
+                        if _json["link"]:
+                            url = base64.b64decode(_json['link'])
 
-                        servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
+                            if not 'https:' in str(url): url = 'https:' + str(url)
 
-                        url = servertools.normalize_url(servidor, url)
+                            servidor = servertools.get_server_from_url(url)
+                            servidor = servertools.corregir_servidor(servidor)
 
-                        itemlist.append(item.clone(server = servidor, url = url))
+                            url = servertools.normalize_url(servidor, url)
+
+                            itemlist.append(item.clone(server = servidor, url = url))
 
                 return itemlist
 
@@ -376,19 +382,22 @@ def play(item):
 
                         _result = do_downloadpage(_url, post = 'key=' + _key + '&token=' + str(_token), headers = headers)
 
-                        _json = jsontools.load(_result)
+                        if _result:
+                            if '"error":"empty link"' in _result: return itemlist
 
-                        if _json["link"]:
-                            url = base64.b64decode(_json["link"])
+                            _json = jsontools.load(_result)
 
-                            if not 'https:' in str(url): url = 'https:' + str(url)
+                            if _json["link"]:
+                                url = base64.b64decode(_json["link"])
 
-                            servidor = servertools.get_server_from_url(url)
-                            servidor = servertools.corregir_servidor(servidor)
+                                if not 'https:' in str(url): url = 'https:' + str(url)
 
-                            url = servertools.normalize_url(servidor, url)
+                                servidor = servertools.get_server_from_url(url)
+                                servidor = servertools.corregir_servidor(servidor)
 
-                            itemlist.append(item.clone(server = servidor, url = url))
+                                url = servertools.normalize_url(servidor, url)
+
+                                itemlist.append(item.clone(server = servidor, url = url))
 
                     return itemlist
 
@@ -404,6 +413,8 @@ def play(item):
                     _result = do_downloadpage(_url, post = 'acc=' + _acc + '&id=' + _id + '&tk=' + _token, headers = headers)
 
                     if _result:
+                        if '"error":"empty link"' in _result: return itemlist
+
                         _json = jsontools.load(_result)
 
                         urlremoto_matches = re.compile("file:'(.*?)'", re.DOTALL).findall(_json['urlremoto'])
@@ -436,6 +447,8 @@ def play(item):
                     _result = do_downloadpage(_url, post='acc=' + _acc + '&id=' + _id + '&tk=' + _token, headers = headers)
 
                     if _result:
+                        if '"error":"empty link"' in _result: return itemlist
+
                         _json = jsontools.load(_result)
 
                         if _json['urlremoto']:

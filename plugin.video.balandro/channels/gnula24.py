@@ -6,6 +6,7 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+
 host = 'https://www3.gnula24.xyz/'
 
 
@@ -32,13 +33,16 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_episodes', url = host + 'ver-episodio/' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + 'ver-episodio/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Novelas', action = 'list_all', url = host + 'genero/novelas/' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
+    itemlist.append(item.clone( title = 'Novelas', action = 'list_all', url = host + 'genero/novelas/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow' ))
 
     return itemlist
@@ -68,21 +72,40 @@ def plataformas(item):
 
     productoras = [
         ('amazon', 'Amazon'),
+        ('antena-3', 'Antena 3'),
         ('apple-tv', 'Apple TV'),
         ('atresplayer-premium', 'Atresplayer Premium'),
+        ('canal', 'Canal+'),
+        ('cbc-television', 'CBC Television'),
+        ('cbs', 'Cbs'),
         ('caracol-tv', 'Caracol TV'),
         ('disney', 'Disney+'),
+        ('elisa-viihde-viaplay', 'Elisa Viihde Viaplay'),
         ('fox', 'FOX'),
+        ('globoplay', 'Globoplay'),
         ('hbo', 'HBO'),
+        ('hulu', 'Hulu'),
+        ('itv', 'ITV'),
         ('jtbc', 'Jtbc'),
         ('kanal-d', 'Kanal D'),
         ('las-estrellas', 'Las Estrellas'),
+        ('nbc', 'NBC'),
         ('netflix', 'Netflix'),
         ('novelastv', 'Novelas TV'),
+        ('peacock', 'Peacock'),
         ('rcn', 'Rcn'),
+        ('rede-globo', 'Rede Globo'),
         ('rtbf-be', 'Rtbf BE'),
+        ('showtime', 'Showtime'),
+        ('star-tv', 'Star Tv'),
+        ('starz', 'Starz'),
+        ('telemundo', 'Telemundo'),
         ('tf1', 'TF1'),
-        ('tv-globo', 'TV Globo')
+        ('the-roku-channel', 'The Roku Channel'),
+        ('the-wb', 'The WB'),
+        ('tv-globo', 'TV Globo'),
+        ('tv8', 'TV8'),
+        ('upn', 'UPN')
         ]
 
     for opc, tit in productoras:
@@ -123,14 +146,15 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<span class="current">' in data:
-        patron = '<span class="current">.*?'
-        patron += "href='(.*?)'"
+    if itemlist:
+        if '<span class="current">' in data:
+            patron = '<span class="current">.*?'
+            patron += "href='(.*?)'"
 
-        next_page = scrapertools.find_single_match(data, patron)
-        if next_page:
-            if '/page/' in next_page:
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
+            next_page = scrapertools.find_single_match(data, patron)
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -144,7 +168,6 @@ def last_episodes(item):
     bloque = scrapertools.find_single_match(data, '<h1(.*?)</h2>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'data-ids=(.*?)</article>')
-
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
@@ -169,14 +192,17 @@ def last_episodes(item):
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=title,
                                    contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
 
-    if '<span class="current">' in data:
-        patron = '<span class="current">.*?'
-        patron += "href='(.*?)'"
+    tmdb.set_infoLabels(itemlist)
 
-        next_page = scrapertools.find_single_match(data, patron)
-        if next_page:
-            if '/page/' in next_page:
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'last_episodes', text_color='coral' ))
+    if itemlist:
+        if '<span class="current">' in data:
+            patron = '<span class="current">.*?'
+            patron += "href='(.*?)'"
+
+            next_page = scrapertools.find_single_match(data, patron)
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'last_episodes', text_color='coral' ))
 
     return itemlist
 
@@ -216,10 +242,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):
@@ -308,6 +330,7 @@ def findvideos(item):
         if 'trailer' in servidor: continue
 
         elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
+        elif 'flix555' in servidor: continue
         elif 'openload' in servidor: continue
         elif 'powvideo' in servidor: continue
         elif 'streamplay' in servidor: continue
@@ -352,6 +375,7 @@ def findvideos(item):
         elif 'rapidgator' in url: continue
         elif 'rockfile' in url: continue
         elif 'nitroflare' in url: continue
+        elif '1fichier' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -422,7 +446,7 @@ def list_search(item):
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<div class="contenido"><p>(.*?)</p>'))
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                    contentType='movie', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
+                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 

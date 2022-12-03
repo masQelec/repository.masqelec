@@ -40,6 +40,8 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
+    ini_page_url = page_url
+
     page_url = page_url.replace('//cloudemb.com/e/', '//streamsb.net/play/').replace('//cloudemb.com/d/', '//streamsb.net/play/')
 
     if '//tubesb.com/' in page_url:
@@ -54,6 +56,10 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('//sbfull.com/e/', '//streamsb.net/play/').replace('//sbfull.com/d/', '//streamsb.net/play/')
     elif '//sbspeed.com/' in page_url:
         page_url = page_url.replace('//sbspeed.com/e/', '//streamsb.net/play/').replace('//sbspeed.com/d/', '//streamsb.net/play/')
+    elif '//sblanh.com/' in page_url:
+        page_url = page_url.replace('//sblanh.com/e/', '//streamsb.net/play/').replace('//sblanh.com/d/', '//streamsb.net/play/')
+    elif '//sbanh.com/' in page_url:
+        page_url = page_url.replace('//sbanh.com/e/', '//streamsb.net/play/').replace('//sbanh.com/d/', '//streamsb.net/play/')
 
     data = httptools.downloadpage(page_url).data
 
@@ -109,6 +115,7 @@ def get_video_url(page_url, url_referer=''):
                 import_libs('script.module.resolveurl')
 
                 import resolveurl
+                page_url = ini_page_url
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:

@@ -294,9 +294,23 @@ def proxysearch_all(item):
                if not 'torrent' in ch['categories']: continue
 
            else:
-               if not 'all' in ch['search_types']: continue
+               if 'Puede requerir el uso de proxies' in ch['notes']: pass
+               elif not 'all' in ch['search_types']: continue
 
         proxysearch_channel(item, ch['id'], ch['name'], iniciales_channels_proxies_memorized)
+
+
+    filtros = {'searchable': False}
+    ch_list = channeltools.get_channels_list(filtros=filtros)
+
+    if ch_list:
+       for ch in ch_list:
+           if not 'proxies' in ch['notes'].lower(): continue
+
+           cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
+
+           if not config.get_setting(cfg_proxies_channel, default=''):
+               platformtools.dialog_ok(config.__addon_name + '[COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[COLOR red][B]Se ha ignorado este canal, deberá Configurar los proxies, en el caso de necesitarlos, dentro del propio canal[/COLOR][/B]')
 
     if config.get_setting('memorize_channels_proxies', default=True):
        txt = 'Revise los canales Memorizados, porque podría ser que algún canal no los necesite ó viceversa. '
@@ -452,10 +466,10 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
         if response.sucess == True:
             if len(response.data) > 999:
                 if config.get_setting('memorize_channels_proxies', default=True):
-                   el_memorizado = "'" + channel_id + "'"
-                   if el_memorizado in str(channels_proxies_memorized):
-                       channels_proxies_memorized = str(channels_proxies_memorized).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
-                       config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
+                    el_memorizado = "'" + channel_id + "'"
+                    if el_memorizado in str(channels_proxies_memorized):
+                        channels_proxies_memorized = str(channels_proxies_memorized).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                        config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
                 el_canal = ('[B][COLOR %s]Proxies quitados ') % color_alert
                 el_canal += ('[COLOR %s]' + channel_name + '[/COLOR][/B]') % color_exec
@@ -478,7 +492,10 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
             config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
         else:
            if not el_memorizado in str(channels_proxies_memorized):
-               channels_proxies_memorized = channels_proxies_memorized + ', ' + el_memorizado
+               if not channels_proxies_memorized:
+                   channels_proxies_memorized = channels_proxies_memorized  + el_memorizado + ','
+               else:
+                   channels_proxies_memorized = channels_proxies_memorized + ' ' + el_memorizado + ','
                config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
         if el_memorizado in str(channels_proxies_memorized):

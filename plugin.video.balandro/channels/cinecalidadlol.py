@@ -10,12 +10,21 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://cinecalidad.run/'
 
 
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://ww3.cinecalidad.link/',
+             'https://ww2.cinecalidad.link/', 'https://ww5.cinecalidad.link/', 'https://cinecalidad.fan/']
+
+
+domain = config.get_setting('dominio', 'cinecalidadlol', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'cinecalidadlol')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'cinecalidadlol')
+    else: host = domain
+
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/',
-                 'https://ww3.cinecalidad.link/', 'https://ww2.cinecalidad.link/', 'https://ww5.cinecalidad.link/',
-                 'https://cinecalidad.fan/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -27,9 +36,37 @@ def do_downloadpage(url, post=None, headers=None):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'cinecalidadlol', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_cinecalidadlol', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='cinecalidadlol', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_cinecalidadlol', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -43,22 +80,24 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
+
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='plum' ))
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'espana/?ref=es', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host + 'espana/?ref=es', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/?ref=es', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie', group = '?ref=es' ))
-    itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie', group = '?ref=es' ))
+    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='aquamarine' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'espana/?ref=es', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'destacadas', url = host + 'espana/?ref=es', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/?ref=es', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'movie', group = '?ref=es' ))
+    itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'movie', group = '?ref=es' ))
 
 
-    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='plum' ))
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='aquamarine' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'movie' ))
 
     return itemlist
 
@@ -67,17 +106,19 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
+
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='plum' ))
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/?ref=es', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - Últimas', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow', group = '?ref=es' ))
+    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='aquamarine' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie/?ref=es', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'tvshow', group = '?ref=es' ))
 
-    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='plum' ))
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - Últimas', action = 'destacadas', url = host, search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='aquamarine' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -155,6 +196,8 @@ def list_all(item):
         else:
             year = '-'
 
+        if not year: year = '-'
+
         tipo = 'tvshow' if '/ver-serie/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
@@ -164,10 +207,16 @@ def list_all(item):
             if not '/ver-serie/' in url: continue
 
         if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year, 'plot': plot} ))
 
         if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+
             itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title,  infoLabels = {'year': '-'} ))
 
@@ -250,10 +299,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -289,8 +334,9 @@ def episodios(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(matches) > ((item.page + 1) * item.perpage):
-        itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
+    if itemlist:
+        if len(matches) > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
 
@@ -431,6 +477,9 @@ def play(item):
         elif 'magnet:?' in url:
             itemlist.append(item.clone( url = url, server = 'torrent' ))
             return itemlist
+
+        elif servidor == 'zplayer':
+            url = url + '|' + host
 
         itemlist.append(item.clone(url = url, server = servidor))
 

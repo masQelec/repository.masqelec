@@ -24,9 +24,31 @@ color_adver = config.get_setting('notification_adver_color', default='violet')
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_seriespapayaxyz_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -138,10 +160,8 @@ def generos(item):
     for tit, opc in opciones:
         url = host + 'category/' + opc + '/'
 
-        if item.search_type == 'tvshow':
-            url = url + '?tr_post_type=2'
-        else:
-            url = url + '?tr_post_type=1'
+        if item.search_type == 'tvshow': url = url + '?tr_post_type=2'
+        else: url = url + '?tr_post_type=1'
 
         itemlist.append(item.clone( title = tit, action = 'list_all', url = url ))
 
@@ -155,18 +175,14 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    if item.search_type == 'tvshow':
-       tope = 1999
-    else:
-       tope = 1999
+    if item.search_type == 'tvshow': tope = 1999
+    else: tope = 1999
 
     for x in range(current_year, tope, -1):
         url = host + '?s=trfilter&trfilter=1&years%5B%5D=' + str(x)
 
-        if item.search_type == 'tvshow':
-            url = url + '&tr_post_type=2'
-        else:
-            url = url + '&tr_post_type=1'
+        if item.search_type == 'tvshow': url = url + '&tr_post_type=2'
+        else: url = url + '&tr_post_type=1'
 
         itemlist.append(item.clone( title = str(x), action = 'list_all', url = url ))
 
@@ -180,10 +196,8 @@ def list_all(item):
     item.url = item.url.replace('&#038;', '&')
 
     if not 'tr_post_type=' in item.url:
-        if item.search_type == 'tvshow':
-            item.url = item.url + '?tr_post_type=2'
-        elif item.search_type == 'movie':
-           item.url = item.url + '?tr_post_type='
+        if item.search_type == 'tvshow': item.url = item.url + '?tr_post_type=2'
+        elif item.search_type == 'movie': item.url = item.url + '?tr_post_type='
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -193,6 +207,8 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(data, patron)
 
     for url, thumb, title, year, info in matches:
+        if not title or not url: continue
+
         tipo = 'movie' if item.search_type == 'movie' else 'tvshow'
 
         if item.search_type == 'all':
@@ -204,18 +220,26 @@ def list_all(item):
         thumb if thumb.startswith('http') else "https:" + thumb
 
         if tipo == 'tvshow':
+            if not item.search_type == 'all':
+                if item.search_type == 'movie': continue
+
             itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title,  infoLabels = {'year': year} ))
 
         if tipo == 'movie':
+            if not item.search_type == 'all':
+                if item.search_type == 'tvshow': continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
-    if itemlist and next_page:
-        itemlist.append(item.clone( title = 'Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
+    if itemlist:
+         next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
+
+         if itemlist and next_page:
+             itemlist.append(item.clone( title = 'Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -229,10 +253,8 @@ def alfabetico(item):
 
         url = host + 'letter/' + title  + '/'
 
-        if item.search_type == 'tvshow':
-            url = url + '?tr_post_type=2'
-        else:
-            url = url + '?tr_post_type=1'
+        if item.search_type == 'tvshow': url = url + '?tr_post_type=2'
+        else: url = url + '?tr_post_type=1'
 
         itemlist.append(item.clone( action='por_letra', title = title, url = url ))
 
@@ -262,17 +284,23 @@ def por_letra(item):
         year = scrapertools.find_single_match(match, '</strong>.*?<td>(.*?)</td>')
 
         if item.search_type == 'movie':
+            if item.search_type == 'tvshow': continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
         else:
+            if item.search_type == 'movie': continue
+
             itemlist.append(item.clone( action = 'temporadas', url= url, title = title, thumbnail = thumb,
                                         contentType = 'tvshow', contentSerieName = title,  infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
-    if itemlist and next_page:
-        itemlist.append(item.clone( title = 'Siguientes ...', action = 'por_letra', url = next_page, text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
+
+        if itemlist and next_page:
+            itemlist.append(item.clone( title = 'Siguientes ...', action = 'por_letra', url = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -346,8 +374,7 @@ def episodios(item):
 
     bloque = scrapertools.find_single_match(data, '<div class="Title AA-Season.*?data-tab="%s">.*?<tbody>(.*?)</tbody>' % str(item.contentSeason))
 
-    if 'src=&quot;' in bloque:
-         bloque = bloque.replace('src=&quot;', 'src="').replace('&quot;', '"')
+    if 'src=&quot;' in bloque: bloque = bloque.replace('src=&quot;', 'src="').replace('&quot;', '"')
 
     matches = scrapertools.find_multiple_matches(bloque, '<td><span class="Num">(\d+)</span></td>.*?src="([^"]+).*?href="([^"]+)">([^<]*)')
 
@@ -379,7 +406,7 @@ def episodios(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['ts-scr', '240-p', '360-p', '480-p', 'w-rip', 'hd-rip', '720-p', '1080-p']
+    orden = ['ts-scr', '240-p', '360-p', '480-p', 'w-rip', 'hd-rip', '720-p', '1080-p', 'DVD-RIP']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
@@ -421,13 +448,35 @@ def findvideos(item):
         if quality == 'desconocido': quality = ''
 
         servidor = servidor.strip().lower()
+
         if servidor == 'ok': servidor = 'okru'
+
+        if servidor == 'descarga &amp; online':
+             url = url.replace('&#038;', '&').replace('&amp;', '&')
+
+             data2 = do_downloadpage(url)
+
+             matches2 = scrapertools.find_multiple_matches(data2, '<a target="_blank" href="(.*?)"')
+
+             for link in matches2:
+                 servidor = servertools.get_server_from_url(link)
+                 servidor = servertools.corregir_servidor(servidor)
+
+                 if servidor == 'directo': continue
+
+                 url = servertools.normalize_url(servidor, link)
+
+                 itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = 'Paste',
+                                                language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
+
+             continue
 
         servidor = servertools.corregir_servidor(servidor)
 
         itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                                     language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
+                                       language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
 
+    # ~ Descargas
     if 'data-tplayernv="Opt' in data:
         options = scrapertools.find_multiple_matches(data, 'data-tplayernv="Opt(.*?)"><span>(.*?)</span><span>(.*?) - (.*?)</span>')
 
@@ -440,7 +489,28 @@ def findvideos(item):
             if quality == 'desconocido': quality = ''
 
             servidor = servidor.strip().lower()
+
             if servidor == 'ok': servidor = 'okru'
+
+            if servidor == 'descarga &amp; online':
+                url = url.replace('&#038;', '&').replace('&amp;', '&')
+
+                data2 = do_downloadpage(url)
+
+                matches2 = scrapertools.find_multiple_matches(data2, '<a target="_blank" href="(.*?)"')
+
+                for link in matches2:
+                    servidor = servertools.get_server_from_url(link)
+                    servidor = servertools.corregir_servidor(servidor)
+
+                    if servidor == 'directo': continue
+
+                    url = servertools.normalize_url(servidor, link)
+
+                    itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = 'Paste',
+                                                   language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
+
+                continue
 
             servidor = servertools.corregir_servidor(servidor)
 
@@ -530,6 +600,12 @@ def play(item):
                 url = servertools.normalize_url(servidor, url)
                 itemlist.append(item.clone(url = url, server = servidor))
 
+    elif item.other == 'Paste':
+        servidor = servertools.get_server_from_url(item.url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        itemlist.append(item.clone(url = item.url, server = servidor))
+
     else:
         data = httptools.downloadpage(item.url).data
 
@@ -548,12 +624,9 @@ def search(item, texto):
     try:
        item.url = host + '?s=' + texto.replace(" ", "+")
 
-       if item.search_type == 'movie':
-           item.url = item.url + '&tr_post_type=1'
-       elif item.search_type == 'tvshow':
-           item.url = item.url + '&tr_post_type=2'
-       else:
-           item.url = item.url + '&tr_post_type='
+       if item.search_type == 'movie': item.url = item.url + '&tr_post_type=1'
+       elif item.search_type == 'tvshow': item.url = item.url + '&tr_post_type=2'
+       else: item.url = item.url + '&tr_post_type='
 
        return list_all(item)
     except:

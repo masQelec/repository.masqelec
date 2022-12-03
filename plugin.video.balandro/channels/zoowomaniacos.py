@@ -330,10 +330,11 @@ def directores(item):
 
         if len(itemlist) >= paginacion: break
 
-    if num_matches > paginacion:
-        hasta = ((item.paginacion * paginacion) + paginacion)
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', paginacion = item.paginacion + 1, action='directores', text_color='coral' ))
+    if itemlist:
+        if num_matches > paginacion:
+            hasta = ((item.paginacion * paginacion) + paginacion)
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', paginacion = item.paginacion + 1, action='directores', text_color='coral' ))
 
     return itemlist
 

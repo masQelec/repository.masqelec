@@ -33,7 +33,7 @@ def get_aux(page_url):
     if not url_data:
         import time
         from platformcode import platformtools
-        espera = 3
+        espera = 5
 
         platformtools.dialog_notification('Cargando Streamtape', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))

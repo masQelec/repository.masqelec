@@ -153,9 +153,6 @@ def list_all(item):
 
         if not url or not title: continue
 
-        tipo = 'tvshow' if '/series/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         if not '/?s=' in item.url:
@@ -171,16 +168,22 @@ def list_all(item):
         qlty = scrapertools.find_single_match(match, '<div class="quality yellow".*?">(.*?)</div>')
         if not qlty: qlty = scrapertools.find_single_match(match, '<div class="hdAudio"></div><div class="(.*?)">')
 
-        if '/series/' in url:
+        tipo = 'tvshow' if '/series/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = lang, qualities=qlty, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
-        else:
-            if item.search_type != 'all':
-                if item.search_type == 'tvshow': continue
+            title = title.replace('&#8211;', '').strip()
 
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, languages = lang, qualities=qlty, fmt_sufijo=sufijo,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+-
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = lang, qualities=qlty, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
@@ -196,18 +199,94 @@ def list_all(item):
     return itemlist
 
 
+def episodios(item):
+    logger.info()
+    itemlist=[]
+
+    if not item.page: item.page = 0
+    if not item.perpage: item.perpage = 50
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '<tbody>(.*?)</tbody>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<tr class="lol">.*?</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+
+    if item.page == 0:
+        sum_parts = len(matches)
+        if sum_parts > 250:
+            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
+                platformtools.dialog_notification('MovidyTv', '[COLOR cyan]Cargando elementos[/COLOR]')
+                item.perpage = 250
+
+    for temp_epis, qlty, url in matches[item.page * item.perpage:]:
+        temp_epis = temp_epis.replace('&#215;', 'x')
+
+        if 'completa' in temp_epis.lower():
+            season = 99
+            episode = 99
+        else:
+           season = scrapertools.find_single_match(temp_epis, '(.*?)x').strip()
+           episode = scrapertools.find_single_match(temp_epis, 'x(.*?)$').strip()
+
+           if '(Especial' in episode:
+               episode = episode.split("(Especial")[0]
+               episode = episode.strip()
+           elif 'Final' in episode:
+               episode = episode.split("Final")[0]
+               episode = episode.strip()
+           elif '(Contraseña' in episode:
+               episode = episode.split("(Contraseña")[0]
+               episode = episode.strip()
+
+        if "Temporada" in item.contentSerieName: SerieName = item.contentSerieName.split("Temporada")[0]
+        else: SerieName = item.contentSerieName
+
+        title = SerieName
+
+        titulo = '%sx%s %s' % (season, episode, title)
+
+        if url.startswith("/"): url = host[:-1] + url
+
+        itemlist.append(item.clone( action = 'findvideos', title = titulo, url = url, quality = qlty,
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
+
+        if len(itemlist) >= item.perpage:
+            break
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if len(matches) > ((item.page + 1) * item.perpage):
+            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
+
+    return itemlist
+
+
 def findvideos(item):
     logger.info()
     itemlist = []
 
     lang = 'Esp'
 
+    if '/download_tt.php?'in item.url:
+        resp = httptools.downloadpage(item.url, follow_redirects=False, only_headers=True)
+
+        if resp.headers:
+            url = scrapertools.find_single_match(str(resp.headers), "filename=(.*?)'")
+
+            if url:
+                url = host + url
+
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, other = 'D' ))
+
+                return itemlist
+
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<tbody>.*?</td>.*?</td>.*?<td>(.*?)</td>.*?href="(.*?)"'
-
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('<tbody>.*?</td>.*?</td>.*?<td>(.*?)</td>.*?href="(.*?)"', re.DOTALL).findall(data)
 
     for peso, url in matches:
         if not url.startswith('http'): url = host[:-1] + url
@@ -233,7 +312,7 @@ def play(item):
         if '<meta name="captcha-bypass" id="captcha-bypass"' in str(data):
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-        if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+        if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data) or '<!doctype' in str(data):
             return 'Archivo [COLOR red]Inexistente[/COLOR]'
 
         import os

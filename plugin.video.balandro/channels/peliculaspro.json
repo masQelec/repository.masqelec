@@ -13,5 +13,5 @@
 
   "clusters": ["news", "kids", "docs", "vos"],
 
-  "notes": "Películas por géneros. Tambien Series."
+  "notes": "Películas por géneros. También Series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

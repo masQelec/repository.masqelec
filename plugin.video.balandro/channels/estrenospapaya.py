@@ -18,6 +18,7 @@ host = "https://www.estrenospapaya.com/"
 
 perpage = 15
 
+
 IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'in': 'Eng', 'ca': 'Cat', 'sub': 'Vose',
            'Español Latino': 'Lat', 'Español Castellano': 'Esp', 'Sub Español': 'Vose'}
 
@@ -40,16 +41,16 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title='Buscar serie ...', action='search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title='Nuevas al azar', action='list_all', url= host + 'lista-series-estrenos/' ))
+    itemlist.append(item.clone( title='Nuevas al azar', action='list_all', url= host + 'lista-series-estrenos/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title='Capítulos estreno en castellano', action='estrenos', url = host + 'estreno-serie-castellano/' ))
-    itemlist.append(item.clone( title='Capítulos estreno en latino', action='estrenos', url = host + 'estreno-serie-espanol-latino/' ))
-    itemlist.append(item.clone( title='Capítulos estreno subtitulado', action='estrenos', url = host + 'estreno-serie-sub-espanol/' ))
+    itemlist.append(item.clone( title='Capítulos estreno en castellano', action='estrenos', url = host + 'estreno-serie-castellano/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Capítulos estreno en latino', action='estrenos', url = host + 'estreno-serie-espanol-latino/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Capítulos estreno subtitulado', action='estrenos', url = host + 'estreno-serie-sub-espanol/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title='Más vistas', action='list_all', url = host + 'lista-series-populares/' ))
-    itemlist.append(item.clone( title='Recomendadas', action='list_all', url = host + 'lista-series-recomendadas/' ))
+    itemlist.append(item.clone( title='Más vistas', action='list_all', url = host + 'lista-series-populares/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title='Recomendadas', action='list_all', url = host + 'lista-series-recomendadas/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title='Por letra (A - Z)', action='alfabetico' ))
+    itemlist.append(item.clone( title='Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -70,6 +71,8 @@ def list_all(item):
         url = urlparse.urljoin(host, url)
 
         thumb = httptools.get_url_headers(urlparse.urljoin(host, img))
+
+        if not year: year = '-'
 
         itemlist.append(item.clone( action='temporadas', url=url, title=name, thumbnail=thumb,
                                     contentType = 'tvshow', contentSerieName = name, infoLabels={'year': year, 'plot': plot} ))
@@ -123,15 +126,16 @@ def series_por_letra(item):
 
         thumb = httptools.get_url_headers(urlparse.urljoin(host, img))
 
-        new_item = item.clone( action='temporadas', url=url, title=name, thumbnail=thumb,
-                               contentType = 'tvshow', contentSerieName = name, infoLabels={'year': year, 'plot': plot} )
+        if not year: year = '-'
 
-        itemlist.append(new_item)
+        itemlist.append(item.clone( action ='temporadas', url = url, title = name, thumbnail = thumb,
+                                    contentType = 'tvshow', contentSerieName = name, infoLabels = {'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(matches) >= 8:
-        itemlist.append(item.clone( title = 'Siguientes ...', action = 'series_por_letra', page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(matches) >= 8:
+            itemlist.append(item.clone( title = 'Siguientes ...', action = 'series_por_letra', page=item.page + 1, text_color='coral' ))
 
     return itemlist
 
@@ -169,10 +173,10 @@ def estrenos(item):
         if not url.startswith(host): url = urlparse.urljoin(host, url)
 
         context = []
-        context.append({ 'title': '[COLOR pink]Listar temporada %s[/COLOR]' % season, 
+        context.append({ 'title': '[B][COLOR pink]Temporada %s[/COLOR][/B]' % season, 
                          'action': 'episodios', 'url': url_serie, 'context': '', 'folder': True, 'link_mode': 'update' })
 
-        context.append({ 'title': '[COLOR pink]Listar temporadas[/COLOR]',
+        context.append({ 'title': '[B][COLOR hotpink]Temporadas[/B][/COLOR]',
                          'action': 'temporadas', 'url': url_serie, 'context': '', 'folder': True, 'link_mode': 'update' })
 
         thumb = httptools.get_url_headers(urlparse.urljoin(host, img))
@@ -185,8 +189,9 @@ def estrenos(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(matches) > (item.page + 1) * perpage:
-        itemlist.append(item.clone( title= 'Siguientes ...', action="estrenos", page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if len(matches) > (item.page + 1) * perpage:
+            itemlist.append(item.clone( title= 'Siguientes ...', action="estrenos", page=item.page + 1, text_color='coral' ))
 
     return itemlist
 
@@ -217,10 +222,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):

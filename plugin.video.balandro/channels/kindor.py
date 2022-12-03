@@ -2,18 +2,28 @@
 
 import re, base64
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, jsontools, tmdb
 
 
-host = 'https://kindor.vip/'
+host = 'https://kindor.pro/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://kindor.io/', 'https://kindor.me/', 'https://kindor.vip/']
+
+
+domain = config.get_setting('dominio', 'kindor', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'kindor')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'kindor')
+    else: host = domain
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://kindor.io/', 'https://kindor.me/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -22,9 +32,37 @@ def do_downloadpage(url, post=None, headers=None):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'kindor', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_kindor', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='kindor', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_kindor', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -37,6 +75,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -56,6 +96,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -102,19 +144,19 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(bloque, patron)
 
     for url, thumb, title in matches:
+        if thumb.startswith('//'): thumb = 'https:' + thumb
+
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if thumb.startswith('//'): thumb = 'https:' + thumb
-
-        if '/serie/' in url:
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
-        else:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
@@ -232,9 +274,10 @@ def episodios(item):
             if len(itemlist) >= item.perpage:
                 break
 
-        if num_matches > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", data_epi = item.data_epi, orden = '10000',
-                                        page = item.page + 1, perpage = item.perpage, text_color = 'coral' ))
+        if itemlist:
+            if num_matches > ((item.page + 1) * item.perpage):
+                itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", data_epi = item.data_epi, orden = '10000',
+                                            page = item.page + 1, perpage = item.perpage, text_color = 'coral' ))
 
         return itemlist
 

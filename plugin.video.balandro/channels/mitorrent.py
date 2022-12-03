@@ -182,17 +182,14 @@ def list_all(item):
 
     matches = scrapertools.find_multiple_matches(data, '<div class="browse-movie-wrap(.*?)</div></div>')
 
-    i = 0
-
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
         title = scrapertools.find_single_match(match, 'class="browse-movie-title">(.*?)</a>')
 
-        if not url or not title: continue
+        if '(Garantía 1 año)' in title or ' 1 año' in title: continue
 
-        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
+        if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
@@ -215,14 +212,17 @@ def list_all(item):
             if lng:
                if not lng in str(lngs): lngs.append(lng)
 
-        if '/peliculas/' in url:
+        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
             if not item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = ', '.join(lngs), fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
-        if '/series/' in url:
+        if tipo == 'tvshow':
             if not item.search_type == 'all':
                if item.search_type == 'movie': continue
 
@@ -284,9 +284,18 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<li>.*?Descargar Capitulo(.*?)<a.*?href="(.*?)"'
+    link = scrapertools.find_single_match(data, '<form action="(.*?)"')
 
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    if link:
+        link = link.replace('https://short-link.one/#', 'https://short-link.one/s.php?i=')
+
+        host_torrent = host[:-1]
+        url_base64 = decrypters.decode_url_base64(link, host_torrent)
+
+        data = do_downloadpage(url_base64)
+
+
+    matches = re.compile('<li>.*?Descargar Capitulo(.*?)<a.*?href="(.*?)"', re.DOTALL).findall(data)
 
     if item.page == 0:
         sum_parts = len(matches)

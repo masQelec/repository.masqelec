@@ -7,13 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www1.pelispop.info/'
+host = 'https://pelispop.mobi/'
 
 
 perpage = 27
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www1.pelispop.info/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/fecha/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -119,19 +125,19 @@ def list_all(item):
 
         if not url or not title: continue
 
+        thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
+
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
-
-        if '/pelicula/' in url:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
 
-        if '/serie/' in url:
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
@@ -144,15 +150,15 @@ def list_all(item):
 
     if item.group: return itemlist
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        if itemlist:
+        if buscar_next:
             url = host + 'wp-admin/admin-ajax.php'
 
             if not item.next_page:
@@ -352,13 +358,36 @@ def play(item):
             else:
                data = do_downloadpage(item.url)
 
-               url = scrapertools.find_single_match(data, 'url="(.*?)"')
+               url = scrapertools.find_single_match(data, 'function showLinksFree.*?let url = "(.*?)"')
+               if not url: url = scrapertools.find_single_match(data, 'url="(.*?)"')
+
+               if '.tomatomatela.' in url:
+                   data = do_downloadpage(url)
+
+                   new_url = scrapertools.find_single_match(data, '<a class="link" id="link" href="goto.php.*?h=(.*?)"')
+
+                   if new_url:
+                       data = do_downloadpage('https://apialfa.tomatomatela.com/ir/goto.php?h=' + new_url)
+
+                       new_url_post = scrapertools.find_single_match(data, '<input type="hidden" id="url" name="url" value="(.*?)"')
+                       if new_url_post:
+                           resp = httptools.downloadpage('https://apialfa.tomatomatela.com/ir/rd.php', post={'url': new_url_post}, follow_redirects=False, only_headers=True)
+
+                           url = resp.headers['location']
+
+                           servidor = servertools.get_server_from_url(url)
+                           servidor = servertools.corregir_servidor(servidor)
+
+                           itemlist.append(item.clone( url = url, server = servidor ))
+
+                           return itemlist
 
                if not url:
                    new_url = scrapertools.find_single_match(data, 'href="(.*?)"')
                    if new_url:
                       if '/short/' in new_url:
                           data = do_downloadpage(new_url)
+
                           url = scrapertools.find_single_match(data, 'url=(.*?)"')
 
         if url:
@@ -401,28 +430,28 @@ def play(item):
            if item.other == 'Apialfa':
                if new_url:
                    if '.tomatomatela.' in new_url:
-                      data = do_downloadpage(new_url)
+                       data = do_downloadpage(new_url)
 
-                      url_post = scrapertools.find_single_match(data, '<input type="hidden" id="url" name="url" value="(.*?)"')
+                       url_post = scrapertools.find_single_match(data, '<input type="hidden" id="url" name="url" value="(.*?)"')
 
-                      if url_post:
-                          data = do_downloadpage('https://apialfa.tomatomatela.com/ir/rd.php', post={'url': url_post})
+                       if url_post:
+                           data = do_downloadpage('https://apialfa.tomatomatela.com/ir/rd.php', post={'url': url_post})
 
-                          new_url_post = scrapertools.find_single_match(data, '<input type="hidden" id="url" name="url" value="(.*?)"')
-                          if new_url_post:
-                              resp = httptools.downloadpage('https://apialfa.tomatomatela.com/ir/redirect_ddh.php', post={'url': new_url_post}, follow_redirects=False, only_headers=True)
+                           new_url_post = scrapertools.find_single_match(data, '<input type="hidden" id="url" name="url" value="(.*?)"')
+                           if new_url_post:
+                               resp = httptools.downloadpage('https://apialfa.tomatomatela.com/ir/redirect_ddh.php', post={'url': new_url_post}, follow_redirects=False, only_headers=True)
 
-                              url = resp.headers['location']
-                              url = resuelve_dame_toma(url)
+                               url = resp.headers['location']
+                               url = resuelve_dame_toma(url)
 
-                              itemlist.append(item.clone( url = url, server = item.server ))
-                              return itemlist
+                               itemlist.append(item.clone( url = url, server = item.server ))
+                               return itemlist
 
                    elif '/tomatomatela.' in new_url:
-                      url = resuelve_dame_toma(new_url)
+                       url = resuelve_dame_toma(new_url)
 
-                      itemlist.append(item.clone( url = url, server = item.server ))
-                      return itemlist
+                       itemlist.append(item.clone( url = url, server = item.server ))
+                       return itemlist
 
            url = scrapertools.find_single_match(data, '>Ver ahora<.*?src="(.*?)"')
 

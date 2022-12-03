@@ -7,14 +7,26 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www5.pelisplushd.to/'
+host = 'https://www4.pelisplushd.lat/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://pelisplushd.net/', 'https://pelisplushd.to/', 'https://www1.pelisplushd.to/',
+             'https://www3.pelisplushd.to/', 'https://www4.pelisplushd.to/', 'https://www5.pelisplushd.to/',
+             'https://www6.pelisplushd.to/', 'https://www7.pelisplushd.to/', 'https://www8.pelisplushd.to/',
+             'https://www.pelisplushd.lat/']
+
+
+domain = config.get_setting('dominio', 'pelisplushd', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'pelisplushd')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'pelisplushd')
+    else: host = domain
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://pelisplushd.net/', 'https://pelisplushd.to/',
-                'https://www1.pelisplushd.to/', 'https://www3.pelisplushd.to/', 'https://www4.pelisplushd.to/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -25,9 +37,37 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'pelisplushd', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_pelisplushd', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='pelisplushd', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_pelisplushd', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -43,6 +83,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -61,6 +103,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -162,6 +206,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title =  re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', title)
+
         if url.startswith('/'): url = host[:-1] + url
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
@@ -191,7 +237,7 @@ def list_all(item):
                 if not '/anime/' in url: continue
 
             itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
-                                        contentType = 'season', contentSerieName = title, infoLabels={'year': '-'} ))
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -234,10 +280,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return sorted(itemlist, key=lambda it: it.title)
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):
@@ -302,9 +344,10 @@ def episodios(item):
             if len(itemlist) >= item.perpage:
                 break
 
-        if num_matches > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", data_epi = item.data_epi, orden = '10000',
-                                        page = item.page + 1, perpage = item.perpage, text_color = 'coral' ))
+        if itemlist:
+            if num_matches > ((item.page + 1) * item.perpage):
+                itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", data_epi = item.data_epi, orden = '10000',
+                                            page = item.page + 1, perpage = item.perpage, text_color = 'coral' ))
 
         return itemlist
 
@@ -445,6 +488,8 @@ def list_search(item):
 
         if not url or not title: continue
 
+        title =  re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', title)
+
         if url.startswith('/'): url = host[:-1] + url
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
@@ -465,19 +510,16 @@ def list_search(item):
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if '/pelicula/' in url:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
-            sufijo = '' if item.search_type != 'all' else 'movie'
-
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
+
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
-
-            sufijo = '' if item.search_type != 'all' else 'tvshow'
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))

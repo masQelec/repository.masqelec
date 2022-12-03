@@ -128,15 +128,15 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        if itemlist:
+        if buscar_next:
             url = host + 'pelis/wp-admin/admin-ajax.php'
 
             if not item.next_page:

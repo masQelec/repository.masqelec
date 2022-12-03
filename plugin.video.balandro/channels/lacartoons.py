@@ -18,13 +18,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + '/?Categoria_id=1' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + '/?Categoria_id=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por productora', action = 'categorias', url = host ))
+    itemlist.append(item.clone( title = 'Por productora', action = 'categorias', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico' ))
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -64,13 +64,14 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<ul class=" pagination">' in data:
-        next_page = scrapertools.find_single_match(data, '(?is)next" href="([^"]+)"')
+    if itemlist:
+        if '<ul class=" pagination">' in data:
+            next_page = scrapertools.find_single_match(data, '(?is)next" href="([^"]+)"')
 
-        if next_page:
-            if next_page.startswith('/'): next_page = host[:-1] + next_page
+            if next_page:
+                if next_page.startswith('/'): next_page = host[:-1] + next_page
 
-            itemlist.append(item.clone (action = 'list_all', title = 'Siguientes ...', url = next_page, text_color='coral' ))
+                itemlist.append(item.clone (action = 'list_all', title = 'Siguientes ...', url = next_page, text_color='coral' ))
 
     return itemlist
 

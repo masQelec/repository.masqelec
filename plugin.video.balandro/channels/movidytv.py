@@ -6,13 +6,36 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+
 host = 'https://movidy.tv/'
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_movidytv_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
@@ -29,6 +52,17 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('movidytv', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if '<title>You are being redirected...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                data = httptools.downloadpage_proxy('movidytv', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        except:
+            pass
 
     return data
 
@@ -62,7 +96,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas-2', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas-2/', search_type = 'movie' ))
 
     # ~ itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas-2/?estrenos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'peliculas-2/?mejor-valoradas', search_type = 'movie' ))
@@ -171,7 +205,7 @@ def list_all(item):
 
     # ~ 14/1/2022
     if '/?s=' in item.url:
-        if not data or '<title>Please Wait... | Cloudflare</title>' in data:
+        if not data or '<title>Please Wait... | Cloudflare</title>' in data or not host in data:
             platformtools.dialog_notification('MovidyTv', '[COLOR yellow]Requiere verificación [COLOR red]reCAPTCHA[/COLOR]')
             return itemlist
 
@@ -179,13 +213,14 @@ def list_all(item):
 
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
-        thumb = scrapertools.find_single_match(article, ' data-echo="([^"]+)"')
         title = scrapertools.find_single_match(article, ' title="([^"]+)"').strip()
+
         if not url or not title: continue
 
+        thumb = scrapertools.find_single_match(article, ' data-echo="([^"]+)"')
+
         year = scrapertools.find_single_match(article, '<div class="CInfo noHidetho"><p>(.*?)</p>')
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         if es_busqueda:
             tipo = 'tvshow' if '/serie' in url else 'movie'
@@ -196,9 +231,16 @@ def list_all(item):
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
-        else:
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+
             if '/episodio-' in url:
 
                season_episode = scrapertools.find_single_match(article, '<h2><b>(.*?)</b>')
@@ -212,17 +254,19 @@ def list_all(item):
                itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, fmt_sufijo = sufijo,
                                            contentSerieName = title, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode,
                                            infoLabels = {'year': year} ))
+
             else:
                 itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                             contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]*>Pagina siguiente')
-    if next_page:
-        next_page = next_page.replace('#038;', '')
-        if '/page/' in next_page:
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]*>Pagina siguiente')
+        if next_page:
+            next_page = next_page.replace('#038;', '')
+            if '/page/' in next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -233,7 +277,7 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile(' onclick="activeSeason\(this,\'temporada-(\d+)', re.DOTALL).findall(data)
+    matches = re.compile('onclick="activeSeason.*?temporada-.*?">T(.*?)</div>', re.DOTALL).findall(data)
 
     for numtempo in matches:
         title = 'Temporada ' + numtempo
@@ -250,10 +294,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):
@@ -294,6 +334,8 @@ def episodios(item):
 
         if item.contentSeason:
             if not str(item.contentSeason) == season: continue
+
+        if not title: title = item.contentSerieName
 
         titulo = '%sx%s %s' % (season, episode, title)
 

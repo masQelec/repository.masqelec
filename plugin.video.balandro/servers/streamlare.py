@@ -13,6 +13,7 @@ def get_video_url(page_url, url_referer=''):
         return "El fichero no existe o ha sido borrado"
 
     id = scrapertools.find_single_match(page_url, '/e/(\w+)')
+    if not id: id = scrapertools.find_single_match(page_url, '/v/(\w+)')
 
     post = {"id": id}
 

@@ -16,13 +16,36 @@ IDIOMAS = {'la': 'Lat', 'es': 'Esp', 'en_es': 'Vose', 'en': 'VO'}
 
 
 def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_dilo_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
 
 def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
+
 
 def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False, raise_weberror=True):
     headers = {'Referer': host}
@@ -47,21 +70,21 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host_catalogue ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host_catalogue, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_episodes', url = host ))
+    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_episodes', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Las de la semana', action = 'list_all', url = host_catalogue+'?sort=mosts-week' ))
-    itemlist.append(item.clone( title = 'Actualizadas', action = 'list_all', url = host_catalogue+'?sort=latest' ))
+    itemlist.append(item.clone( title = 'Las de la semana', action = 'list_all', url = host_catalogue+'?sort=mosts-week', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Actualizadas', action = 'list_all', url = host_catalogue+'?sort=latest', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host_catalogue+'?status=0' ))
-    itemlist.append(item.clone( title = 'Finalizadas', action = 'list_all', url = host_catalogue+'?status=1' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host_catalogue+'?status=0', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Finalizadas', action = 'list_all', url = host_catalogue+'?status=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host_catalogue + '?genre[]=pelicula', group ='pelis' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host_catalogue + '?genre[]=pelicula', group ='pelis', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
-    itemlist.append(item.clone( title = 'Por año', action = 'anios' ))
-    itemlist.append(item.clone( title = 'Por país', action = 'paises' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -76,12 +99,14 @@ def generos(item):
 
     patron = '<input type="checkbox" class="[^"]+" id="[^"]+" value="([^"]+)" name="genre\[\]">'
     patron += '\s*<label class="custom-control-label" for="[^"]+">([^<]+)</label>'
+
     matches = re.compile(patron, re.DOTALL).findall(data)
+
     for valor, titulo in matches:
         if titulo == 'Libros': continue
         elif titulo == 'Pelicula': continue
 
-        itemlist.append(item.clone( title=titulo.strip(), url=host_catalogue+'?genre[]='+valor, action='list_all' ))
+        itemlist.append(item.clone( title = titulo.strip(), url = host_catalogue + '?genre[]=' + valor, action = 'list_all' ))
 
     if not descartar_xxx:
         itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'search?s=adultos' ))
@@ -98,7 +123,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1970, -1):
-        itemlist.append(item.clone( title=str(x), url=host_catalogue+'?year[]='+str(x), action='list_all' ))
+        itemlist.append(item.clone( title = str(x), url = host_catalogue + '?year[]=' + str(x), action = 'list_all' ))
 
     return itemlist
 
@@ -169,7 +194,21 @@ def paises(item):
        ]
 
     for x in sorted(web_paises, key=lambda x: x[1]):
-        itemlist.append(item.clone( title=x[1], url=host_catalogue+'?country[]='+x[0], action='list_all' ))
+        title = x[1]
+
+        if x[1] == 'B\xc3\xa9lgica': title = 'Bélgica'
+        elif x[1] == 'Canad\xc3\xa1': title = 'Canadá'
+        elif x[1] == 'Rep\xc3\xbablica Checa': title = 'República Checa'
+        elif x[1] == 'Hungr\xc3\xada': title = 'Hungría'
+        elif x[1] == 'Jap\xc3\xb3n': title = 'Japón'
+        elif x[1] == 'M\xc3\xa9xico': title = 'México'
+        elif x[1] == 'Pa\xc3\xadses Bajos': title = 'Países Bajos'
+        elif x[1] == 'Panam\xc3\xa1': title = 'Panamá'
+        elif x[1] == 'Per\xc3\xba': title = 'Perú'
+        elif x[1] == 'Espa\xc3\xb1a': title = 'España'
+        elif x[1] == 'Turqu\xc3\xada': title = 'Turquía'
+
+        itemlist.append(item.clone( title = title, url = host_catalogue + '?country[]=' + x[0], action = 'list_all' ))
 
     return itemlist
 
@@ -183,11 +222,17 @@ def list_all(item):
     data = do_downloadpage(item.url)
 
     matches = re.compile('<div class="col-lg-2 col-md-3 col-6 mb-3">\s*<a(.*?)</a>\s*</div>', re.DOTALL).findall(data)
+
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
-        thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         title = scrapertools.find_single_match(article, '<div class="text-white[^"]*">([^<]+)</div>').strip()
+
+        if not url or not title: continue
+
         year = scrapertools.find_single_match(article, '<div class="txt-gray-200 txt-size-\d+">(\d+)</div>')
+        if not year: year = '-'
+
+        thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
 
         if descartar_xxx and ('/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url): continue
 
@@ -199,10 +244,11 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page_link = scrapertools.find_single_match(data, '<li class="page-item"><a href="([^"]+)" aria-label="(?:Netx|Next)"')
-    if next_page_link:
-        itemlist.append(item.clone( title='Siguientes ...', url = host_catalogue + next_page_link, action='list_all',
-                                    group = item.group, text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<li class="page-item"><a href="([^"]+)" aria-label="(?:Netx|Next)"')
+        if next_page:
+            itemlist.append(item.clone( title='Siguientes ...', url = host_catalogue + next_page, action='list_all',
+                                        group = item.group, text_color='coral' ))
 
     return itemlist
 
@@ -331,10 +377,10 @@ def last_episodes(item):
         thumb = scrapertools.find_single_match(match, ' src="([^"]+)"')
         name = scrapertools.find_single_match(match, ' style="max.*?">(.*?)</div>')
 
-        temp_epis = titulo.replace(titulo, name)
+        temp_epis = scrapertools.find_single_match(match, '</div><div>(.*?)</div>')
 
         season = scrapertools.find_single_match(temp_epis, '(.*?)x')
-        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)')
+        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$')
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=name,
                                    contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
@@ -344,8 +390,9 @@ def last_episodes(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > ((item.page + 1) * perpage):
-        itemlist.append(item.clone( title="Siguientes ...", action="last_episodes", page=item.page + 1, text_color='coral' ))
+    if itemlist:
+        if num_matches > ((item.page + 1) * perpage):
+            itemlist.append(item.clone( title="Siguientes ...", action="last_episodes", page=item.page + 1, text_color='coral' ))
 
     return itemlist
 

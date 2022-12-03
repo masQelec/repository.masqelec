@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["lasts", "lists", "producers", "kids", "vos", "anime"],
+  "clusters": ["lasts", "rankings", "producers", "docs", "kids", "vos", "anime", "tales"],
 
   "notes": "Series por Géneros."
 }

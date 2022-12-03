@@ -108,19 +108,19 @@ def list_all(item):
 
         if not url or not title: continue
 
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
-
-        if '/pelicula/' in url:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
-        if '/serie/' in url:
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
@@ -129,10 +129,11 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="(.*?)"')
-    if next_page:
-        if '/page/' in next_page:
-             itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral'))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="(.*?)"')
+        if next_page:
+            if '/page/' in next_page:
+                 itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral'))
 
     return itemlist
 

@@ -2,9 +2,10 @@
 
 from platformcode import logger
 from core.item import Item
-from core import httptools, scrapertools, servertools
+from core import httptools, scrapertools, servertools, tmdb
 
-host = "https://www.ciberdocumentales.com"
+
+host = 'https://www.ciberdocumentales.com'
 
 
 def mainlist(item):
@@ -44,20 +45,25 @@ def list_all(item):
 
     patron = '<div class="fotonoticia">\s*<a\s*target="_blank" href="([^"]+)"><img src="([^"]+)" alt="([^"]+)"'
     patron += ' /></a><br /><br />\s*</div>\s*<div class="textonoticia">.*?<br /><br />(.*?)</div>'
+
     matches = scrapertools.find_multiple_matches(data, patron)
 
     for url, thumb, title, plot in matches:
         title = title.capitalize()
         url = host + url
+
         thumb = host + thumb
         plot = scrapertools.htmlclean(plot)
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, plot = plot,
-                                    contentType='movie', contentTitle=title, contentExtra='documentary' ))
+                                    contentType='movie', infoLabels={"year": '-', "plot": plot}, contentTitle=title, contentExtra='documentary' ))
 
-    next_page_link = scrapertools.find_single_match(data, '<span class="current">\d*</span>&nbsp;<a href="([^"]+)')
-    if next_page_link != '':
-        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = host + next_page_link, text_color='coral' ))
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        next_page_link = scrapertools.find_single_match(data, '<span class="current">\d*</span>&nbsp;<a href="([^"]+)')
+        if next_page_link != '':
+            itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = host + next_page_link, text_color='coral' ))
 
     return itemlist
 

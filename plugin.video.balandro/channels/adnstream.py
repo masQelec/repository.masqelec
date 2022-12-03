@@ -5,24 +5,23 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = "http://www.adnstream.com/"
+host = "https://www.adnstream.com/"
 
 
 def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Documentales:', folder=False, text_color='plum' ))
+    itemlist.append(item.clone( title = '[B]Documentales:[/B]', folder=False, text_color='aquamarine' ))
 
-    itemlist.append(item.clone( title = ' - Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
 
-    itemlist.append(item.clone( title = ' - Destacados', action = 'list_all', url = host + 'canal/Grandes-documentales/', search_type = 'documentary' ))
-    itemlist.append(item.clone( title = ' - Viajes', action = 'list_all', url = host + 'canal/Viajes/', search_type = 'documentary' ))
+    itemlist.append(item.clone( title = 'Destacados', action = 'list_all', url = host + 'canal/Grandes-documentales/', search_type = 'documentary' ))
+    itemlist.append(item.clone( title = 'Viajes', action = 'list_all', url = host + 'canal/Viajes/', search_type = 'documentary' ))
 
-    itemlist.append(item.clone( title = 'Películas:', folder=False, text_color='plum' ))
+    itemlist.append(item.clone( title = '[B]Películas:[/B]', folder=False, text_color='aquamarine' ))
 
-    itemlist.append(item.clone( title = ' - Cine de ayer y siempre', action = 'list_all', url = host + 'canal/Cine-de-ayer-y-siempre/',
-                                search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Cine de ayer y siempre', action = 'list_all', url = host + 'canal/Cine-de-ayer-y-siempre/', search_type = 'movie' ))
 
     return itemlist
 
@@ -46,9 +45,10 @@ def list_all(item):
     if item.search_type == 'movie':
         tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, '<span class="this pagina">.*?class="pagina">.*?href="(.*?)"')
-    if next_page:
-        itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<span class="this pagina">.*?class="pagina">.*?href="(.*?)"')
+        if next_page:
+            itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 

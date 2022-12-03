@@ -27,9 +27,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '?op=categories_all' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '?op=categories_all', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_epis', url = host + 'just_added.html' ))
+    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_epis', url = host + 'just_added.html', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -54,15 +54,15 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_all', text_color = 'coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        if itemlist:
+        if buscar_next:
             next_url = scrapertools.find_single_match(data, '<div class="paging">.*?</b>' + "<a href='(.*?)'")
 
             if next_url:
@@ -92,21 +92,29 @@ def last_epis(item):
     num_matches = len(matches)
 
     for url, thumb, title in matches[item.page * perpage:]:
-        epis = scrapertools.find_single_match(title, 'Capitulo (\d+)')
-        if not epis: epis = 1
-
         season = scrapertools.find_single_match(title, ' (\d+) Temporada')
         if not season: season = 1
 
+        epis = scrapertools.find_single_match(title, 'Capitulo (\d+)$')
+        if not epis: epis = 1
+
+        if " - " in title: SerieName = title.split(" - ")[0]
+        elif " Temporada" in title: SerieName = title.split(" Temporada")[0]
+        elif " Capitulo" in title: SerieName = title.split(" Capitulo")[0]
+        else: SerieName = title
+
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= perpage: break
 
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'last_epis', text_color = 'coral' ))
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'last_epis', text_color = 'coral' ))
 
     return itemlist
 

@@ -32,9 +32,9 @@ def get_video_url(page_url, url_referer=''):
         if not lbl: lbl = url[-4:]
         if lbl == '.mpd':
             if platformtools.is_mpd_enabled():
-                video_urls.append([lbl, url+'|Referer=https://upstream.to/', 0, '', True])
+                video_urls.append([lbl, url + '|Referer=https://upstream.to/', 0, '', True])
         else:
-            video_urls.append([lbl, url+'|Referer=https://upstream.to/'])
+            video_urls.append([lbl, url + '|Referer=https://upstream.to/'])
 
     if len(video_urls) == 0:
         url = scrapertools.find_single_match(bloque, '"(http.*?)"')
@@ -45,7 +45,7 @@ def get_video_url(page_url, url_referer=''):
             if matches:
                 for res, url in matches:
                     if '/iframes' in url: continue
-                    video_urls.append([res+'p', url])
+                    video_urls.append([res + 'p', url])
 
         elif url and 'mp4' in url:
             video_urls.append(['mp4', url])

@@ -106,6 +106,7 @@ def categorias(item):
         title = title.strip()
 
         if title == 'Categoría': continue
+        elif title == 'PREESTRENO': continue
 
         url = host + '/animes?categoria=%s&genero=false&letra=false' % cat
 
@@ -131,7 +132,8 @@ def list_all(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
                                     infoLabels={'year': '-'}, contentType = 'tvshow', contentSerieName = title ))
@@ -239,8 +241,9 @@ def findvideos(item):
         servidor = servidor.lower()
 
         if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
+        elif servidor == 'puj': continue
 
-        if servidor == 'ok': servidor = 'okru'
+        elif servidor == 'ok': servidor = 'okru'
         elif servidor == 'zeus': servidor = 'directo'
 
         elif 'fembed' in servidor: servidor = 'fembed'
@@ -248,7 +251,8 @@ def findvideos(item):
         elif 'drive' in servidor: servidor = 'gvideo'
         elif 'anonfile' in servidor: servidor = 'anonfiles'
         elif 'zippy' in servidor: servidor = 'zippyshare'
-              
+        elif 'sblanh' in servidor: servidor = 'streamsb'
+
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose' ))
 
     # download
@@ -262,6 +266,8 @@ def findvideos(item):
         srv = srv.lower().strip()
 
         if srv == '1fichier': continue
+        elif srv == 'fireload': continue
+        elif srv == 'mediafire': continue
 
         elif 'anonfile' in srv: srv = 'anonfiles'
         elif 'zippy' in srv: srv = 'zippyshare'

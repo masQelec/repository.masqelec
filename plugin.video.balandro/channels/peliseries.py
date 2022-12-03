@@ -102,13 +102,6 @@ def list_all(item):
 
         title = title.replace('&ntilde;', 'ñ')
 
-        tipo = 'tvshow' if "<div class='ln'>Serie</div>" in match else 'movie'
-        if tipo == 'movie':
-            if "<div class='ln'>Anime</div>" in match: tipo = 'tvshow'
-            elif "<div class='ln'>Novela</div>" in match: tipo = 'tvshow'
-
-        sufijo = '' if item.search_type != 'all' else tipo
-
         url = host + url
 
         thumb = scrapertools.find_single_match(match, 'img="(.*?)"')
@@ -128,6 +121,13 @@ def list_all(item):
         year = scrapertools.find_single_match(match,'<div class="post_info">.*?Estreno: (\d{4})-')
         if not year: year = '-'
 
+        tipo = 'tvshow' if "<div class='ln'>Serie</div>" in match else 'movie'
+        if tipo == 'movie':
+            if "<div class='ln'>Anime</div>" in match: tipo = 'tvshow'
+            elif "<div class='ln'>Novela</div>" in match: tipo = 'tvshow'
+
+        sufijo = '' if item.search_type != 'all' else tipo
+
         if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
@@ -141,7 +141,7 @@ def list_all(item):
                                         tv_tipo = tv_tipo, fmt_sufijo=sufijo,
                                         languages = ', '.join(langs), contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
-        else:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
@@ -154,15 +154,15 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if not '/Buscar.html' in item.url:
-        buscar_next = True
-        if num_matches > perpage:
-            hasta = (item.page * perpage) + perpage
-            if hasta < num_matches:
-                itemlist.append(item.clone( title='Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
-                buscar_next = False
+        if itemlist:
+            buscar_next = True
+            if num_matches > perpage:
+                hasta = (item.page * perpage) + perpage
+                if hasta < num_matches:
+                    itemlist.append(item.clone( title='Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
+                    buscar_next = False
 
-        if buscar_next:
-            if itemlist:
+            if buscar_next:
                 next_page = scrapertools.find_single_match(data, "<li class='num active'>.*?<li class='num'>.*?<a href='(.*?)'")
                 if next_page:
                     next_page = host + next_page
@@ -309,11 +309,28 @@ def findvideos(item):
 
     if not iframe: return itemlist
 
-    link = scrapertools.find_single_match(iframe, 'src="([^"]+)"')
+    link = scrapertools.find_single_match(str(iframe), 'src="([^"]+)"')
 
     if not link: return itemlist
 
-    data = httptools.downloadpage(host + link, headers={'Referer': item.url}).data
+    link = host + link
+
+    data = httptools.downloadpage(link, headers={'Referer': item.url}).data
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    atob = scrapertools.find_single_match(str(data), "atob.*?'(.*?)'")
+
+    if not atob: return itemlist
+
+    atob =  base64.b64decode(base64.b64decode(atob))
+
+    code = scrapertools.find_single_match(str(atob), '<a href="([^"]+)"')
+
+    if not code: return itemlist
+
+    ref = host + '/Options' + code
+
+    data = httptools.downloadpage(ref, headers={'Referer': link}).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, 'onclick="get_link(.*?)</i></div>')
@@ -321,6 +338,8 @@ def findvideos(item):
     ses = 0
 
     for match in matches:
+        match = match.replace('(', '').replace(')', '')
+
         ses += 1
 
         pos = ''
@@ -405,7 +424,7 @@ def findvideos(item):
 
             other = other.capitalize() + play_down
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, ref = host + link, other = other,
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, ref = ref, other = other,
                                   language = lang, quality = qlty, quality_num = puntuar_calidad(qlty) ))
 
     if not itemlist:

@@ -43,12 +43,13 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por dirección, interprete', action = 'otros', search_type = 'movie' ))
 
     return itemlist
@@ -106,7 +107,7 @@ def categorias(item):
         despreciar = url.replace(host, '').replace('tag/', '').replace('/', '')
         if despreciar in web_otros: continue
 
-        itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = title.capitalize(), url = url, action = 'list_all' ))
 
     return sorted(itemlist, key = lambda it: it.title)
 
@@ -117,6 +118,7 @@ def otros(item):
 
     for x in web_otros:
         title = str(x)
+
         title = title.replace('-', ' ').capitalize()
 
         url = host + 'tag/' + str(x) + '/'
@@ -132,37 +134,30 @@ def list_all(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, '<article id="post-(.*?)</article>')
+    matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-        if not url: continue
+
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+        if not title: title = scrapertools.find_single_match(match, 'rel="bookmark">(.*?)</a>')
+
+        if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        try:
-           title, year, plot = scrapertools.find_single_match(match, "<p>(.*?) (\(?\d{4}\)?)([^<]+)</p>")
-        except:
-           title = scrapertools.find_single_match(match, "<p>(.*?) ")
-           year = scrapertools.find_single_match(match, "<p>.*? (.*?)")
-           plot = scrapertools.find_single_match(match, "<p>(.*?)</p>")
+        plot = scrapertools.find_single_match(match, "<p>(.*?)</p>")
 
-        titulo = scrapertools.find_single_match(match, '<span class="visuallyhidden">(.*?)</span>')
-        if not titulo: titulo = title
-
-        year = re.sub(r'\(|\)','', year)
-
-        if not year: year = '-'
-
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
-                                        contentType = 'movie', contentTitle = title, infoLabels={'year': year, 'plot': plot} ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                    contentType = 'movie', contentTitle = title, infoLabels={'year': '-', 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, '<div class="nav-previous"><a href="(.*?)"')
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<div class="nav-previous"><a href="(.*?)"')
 
-    if next_page:
-        itemlist.append(item.clone(action = 'list_all', title = 'Siguientes ...', url = next_page, text_color='coral' ))
+        if next_page:
+            itemlist.append(item.clone(action = 'list_all', title = 'Siguientes ...', url = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -174,6 +169,7 @@ def findvideos(item):
     data = httptools.downloadpage(item.url).data
 
     idioma = scrapertools.find_single_match(data, '<p><strong>(.*?)</strong>').lower()
+
     if 'subtitul' in idioma: lang = 'Vose'
     elif 'n original' in idioma: lang = 'VO'
     else: lang = 'Esp'

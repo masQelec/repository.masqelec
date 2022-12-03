@@ -206,10 +206,11 @@ def list_lst(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, pagina = item.pagina, action='list_lst', text_color='coral' ))
+    if itemlist:
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, pagina = item.pagina, action='list_lst', text_color='coral' ))
 
     return itemlist
 

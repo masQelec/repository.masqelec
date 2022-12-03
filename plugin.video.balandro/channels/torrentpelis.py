@@ -2,25 +2,61 @@
 
 import re, base64
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 from lib import decrypters
 
 
-host = 'https://www1.torrentpelis.com/'
+host = 'https://www2.torrentpelis.com/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://torrentpelis.com/', 'https://www1.torrentpelis.com/']
+
+
+domain = config.get_setting('dominio', 'torrentpelis', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'torrentpelis')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'torrentpelis')
+    else: host = domain
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://torrentpelis.com/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post).data
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'torrentpelis', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_torrentpelis', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='torrentpelis', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_torrentpelis', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
@@ -30,6 +66,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -111,9 +149,13 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
+    link = scrapertools.find_single_match(data, "id='link-.*?<a href='(.*?)'")
+
     links = scrapertools.find_multiple_matches(data, "<tr id='link-.*?<a href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?<td>(.*?)</td>.*?<td>(.*?)</td>")
 
     for url, qlty, lang, size in links:
+        if url == 'https://adfly.mobi/directlinkg': url = link
+
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
                               language = IDIOMAS.get(lang, lang), quality = qlty, other = size))
 
@@ -126,7 +168,7 @@ def play(item):
 
     url = item.url
 
-    urlb64 = scrapertools.find_single_match(url, 'urlb64=(.*?)$')
+    urlb64 = scrapertools.find_single_match(url, "urlb64=(.*?)$")
 
     if urlb64:
         urlb64 = base64.b64decode(urlb64).decode('utf-8')
@@ -171,7 +213,7 @@ def list_search(item):
     for url, title, qlty, type in matches:
         qlty = qlty.replace('(', '').replace(')', '').strip()
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty,
                                     contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
 
     if itemlist:

@@ -1,5 +1,12 @@
-[COLOR coral][B]Balandro[/COLOR][COLOR red]  1 de Septiembre 2022[/B][/COLOR]
-   [COLOR yellow][B]Version 2.4.0[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR][COLOR red]  28 de Noviembre 2022[/B][/COLOR]
+   [COLOR yellow][B]Version 2.5.2[/B][/COLOR]
+
+   [COLOR yellow]CONTACTO:[/COLOR]
+      Foro  mimediacenter.info/foro/  Instalaciones, Novedades, Sugerencias, etc.
+      Telegram  t.me/@balandro_asesor  Asesoramiento, Dudas, Consultas, etc.
+
+   [COLOR yellow]FUENTE:[/COLOR]
+      Fuente  balandro-tk.github.io/balandro/  Repositorio, Add-On, etc.
 
    [COLOR yellow]INCIDENCIAS CORREGIDAS:[/COLOR]
       Bugs de la version anterior
@@ -7,20 +14,13 @@
    [COLOR yellow]MODIFICACIONES:[/COLOR]
       Generos: Re-configurados
       Canales: Revision generalizada y Anulados las webs cerradas
-      Servidores: Revision generalizada y  y Anulados las webs cerradas
+      Servidores: Revision generalizada y  Anulados las webs cerradas
 
    [COLOR yellow]NOVEDADES:[/COLOR]
       Canales: Sin novedades
       Servidores: Sin novedades
 
-   [COLOR yellow]CANALES SUGERIDOS:[/COLOR]
-      CineCalidad,  CineDeAntes,  CineTux,  Cuevana3,  Dilo,  EnNovelas,
-      EntrePeliculasySeries,  EstrenosCinesaa,  EstrenosPapaya,  HdFull,
-      Ievenn,  InkaPelis,  LaCartoons, PeliculasFlv,  PelisEnCastellano,
-      PlayDede,  SeriesLan,  SeoDiv,  Series24,  SeriesYonkis,  SigloXX,
-      Tekilaz,  TvSeries,  VerDocumentalesOnline,  ZoowoManiacos
-
-   [COLOR yellow]BUSCAR:[/COLOR]
+   [COLOR yellow]BUSCAR GENERAL:[/COLOR]
       [B][COLOR fuchsia]Que canales Nunca Intervendran en las busquedas:[/COLOR][/B]
          - [B][COLOR deepskyblue]De Peliculas:[/B][/COLOR]
            CineDeAntes,  CineLibreOnline,  SigloXX
@@ -28,13 +28,14 @@
          - [B][COLOR hotpink]De Series:[/B][/COLOR]
            SeoDiv,  TvSeries
 
-         - [B][COLOR yellow]De Peliculas y Series[/B][/COLOR]:
+         - [B][COLOR yellow]De Peliculas y Series:[/B][/COLOR]:
            MovidyTv
 
          - [B][COLOR blue]De Torrents:[/B][/COLOR]
            Frozenlayer
 
-         - [B][COLOR goldenrod]Todos los canales con contenido Exclusivo de:[/B][/COLOR]
+         - [B][COLOR gold]Para busquedas en Peliculas, Series y Documentales:[/B][/COLOR]
+           [B][COLOR goldenrod]No intervienen los canales con estos tipos de contenido Exclusivo[/B][/COLOR]
            [B][COLOR firebrick]Doramas[/COLOR][/B]
            [B][COLOR springgreen]Animes[/COLOR][/B]
            [B][COLOR orange]Adultos[/COLOR][/B]
@@ -43,109 +44,73 @@
       [B][COLOR teal]Que canales Requieren Registrarse (Cuenta):[/B][/COLOR]
          HdFull,  PlayDede
 
-   [COLOR yellow]CANALES QUE PUEDEN USAR PROXIES:[/COLOR]
-      [B][COLOR red]Que canales Pueden Usar Proxies (Bloqueo Operadoras):[/B][/COLOR]
-         - [B][COLOR deepskyblue]De Peliculas[/COLOR][/B]:
-           CineTux,  Cuevana2esp,  EspaPelis,  EstrenosCinesaa,  Gnula,  Pelis28,
-           PelisForte,  PelisPlanet,  PelisXd
-
-         - [B][COLOR hotpink]De Series:[/B][/COLOR]
-           Dilo
-
-         - [B][COLOR yellow]De Peliculas y Series[/B][/COLOR]:
-           CineCalidad,  CliverSite,  Cuevana3,  Cuevana3Video,
-           EntrePeliculasySeries,  HdFull,  HdfullCom,  HdFullSe,  HomeCine,
-           InkaPelis,  MegaSerie,  MovidyTv,  PelisHouse,  PelisMaraton,
-           PelisPedia,  PelisPedia2,  PelisPlay,  PlayDede,  PlayView,
-           Ppeliculas,  RePelisHd,  SeriesFlixVideo,  SeriesPapayaXyz,
-           SeriesYonkis
-
-         - [B][COLOR blue]De Torrents:[/B][/COLOR]
-           DivxTotal,  DonTorrents,  DonTorrentsIn,  GranTorrent,  LilaTorrent,
-           MejorTorrentNz,  Newpct1,  RojoTorrent,  SubTorrents,  TorrentDivx,
-           VerdeTorrent
-
-         - [B][COLOR springgreen]De Animes:[/B][/COLOR]
-           HenaOjara
-
-         - [B][COLOR orange]De Adultos:[/B][/COLOR]
-           PornHub,  XVideos
-
-   [COLOR yellow]CANALES INCOMPATIBLES:[/COLOR]
+   [COLOR yellow]CANALES POSIBLES INCOMPATIBLES:[/COLOR]
       [B][COLOR violet]Que canales pueden ser Incompatibles:[/COLOR][/B]
-         [COLOR coral]Si Media Center anterior a 19.x, podrian NO resultar operativos.[/COLOR]
-         HdFullCom,  PlayDede,  SeriesPapayaXyz
+         [COLOR coral]Si Media Centers anteriores a 19.x, podrian NO resultar operativos.[/COLOR]
+         SeriesPapayaXyz
 
    [COLOR yellow]CANALES INESTABLES:[/COLOR]
       [B][COLOR plum]Que canales estan Inestables:[/COLOR][/B]
          [COLOR coral]Son los pendientes de su evolucion, para evaluar su Situacion Definitiva.[/COLOR]
-         Gnula
-
-   [COLOR yellow]CANALES PROBLEMATICOS:[/COLOR]
-      [B][COLOR darkgoldenrod]Que canales son Problematicos:[/COLOR][/B]
-         [COLOR coral]Son en los que Predominan Sin enlaces Disponibles/Válidos/Soportados.[/COLOR]
-         CiberDocumentales,  CineMatteFlix,  CineTux,  DescargaCineClasico,
-         NewPct1,  PelisHouseOnline,  PelisPedia,  PelisPlusHd,  PelisPlusHdLat,
-         Ppeliculas,  RetroTv,  SeriesRetro,  TuPeliculaTv
+         Gnula,  MejorTorrentNz
 
    [COLOR yellow]CANALES TEMPORALMENTE DESACTIVADOS:[/COLOR]
       [B][COLOR cyan]Que canales estan Temporalmente Inactivos:[/COLOR][/B]
          [COLOR coral]Son los pendientes de su situacion, para evaluar su Re-activacion o Anulacion.[/COLOR]
-         CaricaturasHd,  DocumaniaTv,  FrozenLayer,  MejorTorretNz,  PanDrama,
-         PeliSeries,  PelisPlanet, SrNovelas
+         DocumaniaTv,  HdFullCom,  NewPct1,  PanDrama,  PelisPedia2,
+         PeliSeries,  SrNovelas
 
    [COLOR yellow]SERVIDORES CON VIAS ALTERNATIVAS:[/COLOR]
       [B][COLOR tan]Servidores con Vias Alternativas:[/COLOR][/B]
-         Doodstream,  Sbembed,  Streamsb,  Uptobox,  Various,  Vk,  Youtube
+         Doodstream,  MegaUp,  Sbembed,  Streamsb,  Uptobox,  Various,
+         Vk,  Youtube
 
       [B][COLOR goldenrod]Que Vias Alternativas pueden necesitarse:[/COLOR][/B]
          plugin.video.youtube
          script.module.resolveurl
 
-   [COLOR yellow]RESUMEN CANALES:[/COLOR]
-      Totales:
-       223 [COLOR darkorange]Canales[/COLOR]
+   [COLOR yellow]RESUMEN TOTALES DE CANALES:[/COLOR]
+       257 [COLOR darkorange]Canales[/COLOR]
 
-         57 [COLOR coral]Inactivos[/COLOR]
-           8 [COLOR cyan]Temporalmente Inactivos[/COLOR]
+         62 [COLOR coral]Inactivos[/COLOR]
+           7 [COLOR cyan]Temporalmente Inactivos[/COLOR]
 
-           3 [COLOR violet]Con probable Incompatibilidad[/COLOR]
-           1 [COLOR plum]Inestables[/COLOR]
-         13 [COLOR darkgoldenrod]Problematicos[/COLOR]
-         49 [COLOR red]Pueden Usar Proxies[/COLOR]
+           1 [COLOR violet]Con probable Incompatibilidad[/COLOR]
+           2 [COLOR plum]Inestables[/COLOR]
+         14 [COLOR darkgoldenrod]Problematicos[/COLOR]
+         52 [COLOR red]Pueden Usar Proxies[/COLOR]
 
            2 [COLOR teal]Requieren Cuenta[/COLOR]
            1 [COLOR green]Con varios Dominios[/COLOR]
-           2 [COLOR goldenrod]Con control dominio Vigente[/COLOR]
+         36 [COLOR goldenrod]Con gestion ultimo dominio Vigente[/COLOR]
 
-         33 [COLOR fuchsia]No Intervendran en busquedas[/COLOR]
+         47 [COLOR fuchsia]No Intervendran en busquedas[/COLOR]
 
-       158 [COLOR gold]Disponibles[/COLOR]
+       186 [COLOR gold]Disponibles[/COLOR]
 
    [COLOR yellow]DISTRIBUCION CANALES DISPONIBLES:[/COLOR]
-         25 de [COLOR moccasin]Sugeridos[/COLOR]
+         30 de [COLOR moccasin]Sugeridos[/COLOR]
 
-       109 de [COLOR deepskyblue]Peliculas[/COLOR]
-         79 de [COLOR hotpink]Series[/COLOR]
-         70 de [COLOR yellow]Peliculas y Series[/COLOR]
+       119 de [COLOR deepskyblue]Peliculas[/COLOR]
+         89 de [COLOR hotpink]Series[/COLOR]
+         75 de [COLOR yellow]Peliculas y Series[/COLOR]
 
          27 de [COLOR thistle]Generos[/COLOR]
            8 de [COLOR cyan]Documentales[/COLOR]
-           6 de [COLOR lightyellow]Infantiles[/COLOR]
-           4 de [COLOR limegreen]Novelas[/COLOR]
-         43 de [COLOR blue]Torrents[/COLOR]
-           6 de [COLOR firebrick]Doramas[/COLOR]
-           9 de [COLOR springgreen]Animes[/COLOR]
-         11 de [COLOR orange]Adultos[/COLOR]
+           9 de [COLOR lightyellow]Infantiles[/COLOR]
+           7 de [COLOR limegreen]Novelas[/COLOR]
+         48 de [COLOR blue]Torrents[/COLOR]
+           8 de [COLOR firebrick]Doramas[/COLOR]
+         14 de [COLOR springgreen]Animes[/COLOR]
+         18 de [COLOR orange]Adultos[/COLOR]
 
            1 de [COLOR grey]Privados[/COLOR]
 
-   [COLOR yellow]RESUMEN SERVIDORES:[/COLOR]
-      Totales:
-       152 [COLOR darkorange]Servidores[/COLOR]
+   [COLOR yellow]RESUMEN TOTALES SERVIDORES:[/COLOR]
+       155 [COLOR darkorange]Servidores[/COLOR]
 
-         53 [COLOR coral]Inactivos[/COLOR]
+         54 [COLOR coral]Inactivos[/COLOR]
          18 [COLOR fuchsia]Sin Soporte[/COLOR]
-           7 [COLOR green]Con Vias alternativas[/COLOR]
+           8 [COLOR green]Con Vias alternativas[/COLOR]
 
-         99 [COLOR gold]Disponibles[/COLOR]
+       101 [COLOR gold]Disponibles[/COLOR]

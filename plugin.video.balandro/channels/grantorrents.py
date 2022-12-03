@@ -10,11 +10,21 @@ from core import httptools, scrapertools, tmdb
 host = 'https://grantorrent.win/'
 
 
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://grantorrents.org/', 'https://grantorrents.pro/', 'https://grantorrent.co/',
+             'https://grantorrent.plus/', 'https://grantorrent.uk/']
+
+
+domain = config.get_setting('dominio', 'grantorrents', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'grantorrents')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'grantorrents')
+    else: host = domain
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://grantorrents.org/', 'https://grantorrents.pro/', 'https://grantorrent.co/', 'https://grantorrent.plus/',
-                 'https://grantorrent.uk/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -25,9 +35,37 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'grantorrents', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_grantorrents', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='grantorrents', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_grantorrents', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -41,6 +79,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -57,6 +97,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -123,7 +165,6 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '</h3> <span>.*? .*? (.*?)</span>').strip()
-
         if not year: year = '-'
 
         lang = 'Esp'
@@ -177,10 +218,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):
@@ -279,36 +316,31 @@ def list_search(item):
         title = scrapertools.find_single_match(match, ' alt="(.*?)"')
         if not url or not title: continue
 
-        tipo = 'movie' if '/pelis/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         title = title.replace('Descargar', '').replace('en torrent', '').replace('torrent', '').strip()
 
         thumb = scrapertools.find_single_match(match, '<noscript><img src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>').strip()
-
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         lang = 'Esp'
 
-        if '/series-tv/' in url:
-            if item.search_type != 'all':
-                if item.search_type == 'movie': continue
+        tipo = 'movie' if '/pelis/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             if ' castellano ' in title: title = title.replace(' castellano ', '')
             if 'HD' in title: title = title.replace('HD', '').strip()
 
-            sufijo = '' if item.search_type != 'all' else 'tvshow'
-
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
-        else:
-            if item.search_type != 'all':
-                if item.search_type == 'tvshow': continue
 
-            sufijo = '' if item.search_type != 'all' else 'movie'
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = lang, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))

@@ -262,7 +262,7 @@ def episodios(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<div class="col-item col-6">.*?<a href="(.*?)".*?<img src="(.*?)".*?<p>(.*?)</p>'
+    patron = '<div class="col-item">.*?<a href="(.*?)".*?<img src="(.*?)".*?<p>(.*?)</p>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 

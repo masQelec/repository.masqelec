@@ -54,32 +54,22 @@ def generos(item):
 
     descartar_xxx = config.get_setting('descartar_xxx', default=False)
 
-    data = do_downloadpage(host)
+    itemlist.append(item.clone( title = 'Análisis y estudios', url = host + 'category/analisis-y-estudios/', action = 'list_all' ))
+    itemlist.append(item.clone( title = 'Artículos de cine', url = host + 'category/articulos-de-cine/', action = 'list_all' ))
 
-    matches = scrapertools.find_multiple_matches(data, '<a href="' + host + 'tag/(.*?)">(.*?)</a>')
+    itemlist.append(item.clone( title = 'Cinematte', url = host + 'category/cinematte-flix/', action = 'list_all' ))
+    itemlist.append(item.clone( title = 'Críticas', url = host + 'category/critica/', action = 'list_all' ))
+    itemlist.append(item.clone( title = 'Contemporaneo', url = host + 'category/actualidad/', action = 'list_all' ))
 
-    for url, title in matches:
-        url = host + 'tag/' + url
+    if not descartar_xxx:
+        itemlist.append(item.clone( title = 'Erotismo', url = host + 'category/erotismo/', action = 'list_all' ))
 
-        if '/tag/cinematte-80/' in url: continue
-        elif '/tag/cinematte-videoclub/' in url: continue
-        elif '/tag/cinematte-obras-maestras/' in url: continue
-        elif '/tag/cinematte-culto/' in url: continue
+    itemlist.append(item.clone( title = 'Imprescindibles', url = host + 'category/imprescindibles/', action = 'list_all' ))
+    itemlist.append(item.clone( title = 'Lecciones de cine', url = host + 'category/lecciones-de-cine/', action = 'list_all' ))
+    itemlist.append(item.clone( title = 'Operas primas', url = host + 'category/obras-maestras/', action = 'list_all' ))
+    itemlist.append(item.clone( title = 'Uncategorized', url = host + 'category/uncategorized/', action = 'list_all' ))
 
-        title = title.replace('Cinematte', '').strip()
-
-        title = title.lower()
-        title = title.capitalize()
-
-        if descartar_xxx:
-            if title == 'Erótico': continue
-
-        itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
-
-    if itemlist:
-        itemlist.append(item.clone( title = 'Uncategorized', url = host + 'category/uncategorized/', action = 'list_all' ))
-
-    return sorted(itemlist, key = lambda it: it.title)
+    return itemlist
 
 
 def list_all(item):
@@ -97,7 +87,7 @@ def list_all(item):
         if item.group == 'magazine':
             if '/sin-categoria/' in match: continue
 
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'class="entry-title"><a href="(.*?)"')
         if not url: continue
 
         if '/passionatte.com/' in url: continue
@@ -109,6 +99,8 @@ def list_all(item):
         if not year: year = '-'
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(match, ' style="background-image.*?' + "'(.*?)'")
+		
         thumb = thumb.replace('&#038;', '&').replace('&amp;', '&')
 
         capitulos = False
@@ -123,9 +115,11 @@ def list_all(item):
         elif 'Versión ' in info: langs = 'Vo'
         else: langs = 'Esp'
 
-        title = scrapertools.find_single_match(info, '<h2 class="post-title">.*?">(.*?)</a>').lower()
+        title = scrapertools.find_single_match(match, 'rel="bookmark">(.*?)</a>').lower()
 
-        title = title.replace('ver ', '').replace('videoclub gratuito', '').replace('videoclub ', '').strip()
+        if not title: continue
+
+        title = title.lower().replace('ver ', '').replace('videoclub gratuito ', '').replace('videoclub online ', '').replace('videoclub ', '').replace('y descargar ', '').strip()
 
         if title.startswith('|'):
             title = title.split("|")[1]
@@ -158,7 +152,10 @@ def list_all(item):
         tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<div class="previous-page">.*?href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="(.*?)"')
+        ################if not next_page: next_page = scrapertools.find_single_match(data, '<nav class="pagination group">.*?<li class="next right">.*?href="(.*?)"')
+
+        ##################if not next_page: next_page = scrapertools.find_single_match(data, '<nav class="pagination group">.*?href="(.*?)"')
 
         if next_page:
             if '/page/' in next_page:
@@ -230,8 +227,10 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
+    logger.info("check-00-flix: %s" % data)
+
     links = scrapertools.find_multiple_matches(data, '<div class="jetpack-video-wrapper">.*?src="(.*?)"')
-    if not links: links = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
+    links = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
     ses = 0
 

@@ -21,14 +21,14 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista-series/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista-series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
-    itemlist.append(item.clone( title = 'Por año', action = 'anios' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico' ))
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -99,8 +99,7 @@ def list_all(item):
             thumb = 'https:' + thumb
 
         year = scrapertools.find_single_match(match, '<span class="Year">(.*?)</span>')
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         name = title.replace('&#038;', '&')
 
@@ -113,22 +112,23 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        if '<div class="wp-pagenavi">' in data:
-            if '<a class="page-numbers"' in data:
-                next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
+        if buscar_next:
+            if '<div class="wp-pagenavi">' in data:
+                if '<a class="page-numbers"' in data:
+                    next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
 
-                if next_url:
-                    next_url = next_url.strip()
-                    if '/page/' in next_url:
-                       itemlist.append(item.clone( action = 'list_all', page = 0, url = next_url, title = 'Siguientes ...', text_color='coral' ))
+                    if next_url:
+                        next_url = next_url.strip()
+                        if '/page/' in next_url:
+                            itemlist.append(item.clone( action = 'list_all', page = 0, url = next_url, title = 'Siguientes ...', text_color='coral' ))
 
     return itemlist
 

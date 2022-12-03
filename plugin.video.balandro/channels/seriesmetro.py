@@ -6,7 +6,9 @@ from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+
 host = 'https://seriesmetro.net/'
+
 
 perpage = 30
 
@@ -32,13 +34,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action ='list_all', url = host + 'series/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action ='list_all', url = host + 'series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ultimos-capitulos/' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ultimos-capitulos/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico' ))
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -108,6 +110,7 @@ def list_all(item):
     elif '<aside class="sidebar"' in data: data = data.split('<aside class="sidebar"')[0]
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
+
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)" class="lnk-blk"')
         title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
@@ -120,15 +123,18 @@ def list_all(item):
         if not year: year = '-'
 
         plot = scrapertools.find_single_match(article, '<p><p>(.*?)</p>')
+        plot = scrapertools.htmlclean(plot)
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': scrapertools.htmlclean(plot)} ))
+                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
-    next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]*><i class="fa-arrow-right">')
-    if next_page:
-       itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]*><i class="fa-arrow-right">')
+
+        if next_page:
+            itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -152,6 +158,7 @@ def last_epis(item):
         title = scrapertools.find_single_match(article, '<span class="tvshow">(.*?)</span>').strip()
 
         season, episode = scrapertools.find_single_match(article, '<span class="tv-num">T(.*?)E(.*?)</span>')
+
         season = season.strip()
         episode = episode.strip()
 
@@ -179,18 +186,19 @@ def last_epis(item):
 
         if len(itemlist) >= perpage: break
 
-    buscar_next = True
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='last_epis', text_color='coral' ))
-            buscar_next = False
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='last_epis', text_color='coral' ))
+                buscar_next = False
 
-    if buscar_next:
-        next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination".*?class="page-numbers current">.*?href="([^"]+)"')
-        if next_page:
-            if '/page/' in next_page:
-                itemlist.append(item.clone (url = next_page, page = 0, title = 'Siguientes ...', action = 'last_epis', text_color='coral' ))
+        if buscar_next:
+            next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination".*?class="page-numbers current">.*?href="([^"]+)"')
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone (url = next_page, page = 0, title = 'Siguientes ...', action = 'last_epis', text_color='coral' ))
 
     return itemlist
 
@@ -295,9 +303,10 @@ def findvideos(item):
     if not dterm: return itemlist
 
     matches = scrapertools.find_multiple_matches(data, '<a data-opt="([^"]+)".*?<span class="option">(?:Cload|CinemaUpload) - ([^<]*)')
+
     for dopt, lang in matches:
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', dterm = dterm, dopt = dopt, url = item.url, 
-                              language = IDIOMAS.get(lang, lang) ))
+                                                      language = IDIOMAS.get(lang, lang) ))
 
     return itemlist
 
@@ -335,6 +344,7 @@ def play(item):
                 data = do_downloadpage(new_url, raise_weberror=False)
 
         url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
+
         if url:
             if '/download/' in url:
                 url = url.replace('//download/', '/files/').replace('/download/', '/files/')

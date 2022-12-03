@@ -206,10 +206,11 @@ def list_list(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_genre', text_color='coral' ))
+    if itemlist:
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_genre', text_color='coral' ))
 
     return itemlist
 
@@ -247,10 +248,11 @@ def list_genre(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > perpage:
-        hasta = (item.page * perpage) + perpage
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_genre', text_color='coral' ))
+    if itemlist:
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_genre', text_color='coral' ))
 
     return itemlist
 
@@ -296,10 +298,11 @@ def listas(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if num_matches > perpage_lis:
-        hasta = (item.page * perpage_lis) + perpage_lis
-        if hasta < num_matches:
-            itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='listas', text_color='coral' ))
+    if itemlist:
+        if num_matches > perpage_lis:
+            hasta = (item.page * perpage_lis) + perpage_lis
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='listas', text_color='coral' ))
 
     return itemlist
 

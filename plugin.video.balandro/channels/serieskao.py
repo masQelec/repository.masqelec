@@ -129,16 +129,9 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
-
-        if not item.search_type == "all":
-            if item.search_type == "movie":
-                if '/series/' in url: continue
-            else:
-                if '/pelicula/' in url: continue
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
@@ -148,13 +141,18 @@ def list_all(item):
 
         title = title.replace('#038', '')
 
-        if '/pelicula/' in url:
-            sufijo = '' if item.search_type != 'all' else 'movie'
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
-            sufijo = '' if item.search_type != 'all' else 'tvshow'
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, 
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
@@ -195,10 +193,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):

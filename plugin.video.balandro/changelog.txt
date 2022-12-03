@@ -2,6 +2,74 @@
 
 [COLOR yellow][B]2022[/B][/COLOR]
 
+2.5.2  [COLOR darkorange] 28 de Noviembre 2022[/COLOR]
+    Correcciones: Bugs de la version anterior
+
+    Generos: Re-configurados
+
+    Canales:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+    Servidores:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+2.5.1  [COLOR darkorange] 11 de Noviembre 2022[/COLOR]
+    Correcciones: Bugs de la version anterior
+
+    Configuracion:
+       Sistema: Nueva opcion para comprobar Balandro Repo
+
+    Generos: Re-configurados
+
+    Canales:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+    Servidores:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+2.5.0  [COLOR darkorange] 28 de Octubre 2022[/COLOR]
+    Correcciones: Bugs de la version anterior
+
+    Generos: Re-configurados
+
+    Canales:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+    Servidores:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+2.4.2  [COLOR darkorange] 8 de Octubre 2022[/COLOR]
+    Correcciones: Bugs de la version anterior
+
+    Generos: Re-configurados
+
+    Canales:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+    Servidores:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+2.4.1  [COLOR darkorange]29 de Septiembre 2022[/COLOR]
+    Correcciones: Bugs de la version anterior
+
+    Generos: Re-configurados
+
+    Canales:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+    Servidores:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
 2.4.0  [COLOR darkorange]1 de Septiembre 2022[/COLOR]
     Correcciones: Bugs de la version anterior
 

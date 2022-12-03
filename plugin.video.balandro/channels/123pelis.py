@@ -201,10 +201,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -418,9 +414,6 @@ def list_search(item):
 
         if not url or not title: continue
 
-        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '</h3><span>(.*?)</span>')
@@ -441,7 +434,10 @@ def list_search(item):
             if lng:
                if not lng in str(lngs): lngs.append(lng)
 
-        if '/pelicula/' in url:
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
@@ -450,7 +446,7 @@ def list_search(item):
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = ', '.join(lngs), fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
 
-        if '/serie/' in url:
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 

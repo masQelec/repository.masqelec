@@ -59,8 +59,9 @@ def list_playlists(item):
             itemlist.append(item.clone( action='list_all', title=title, playlist_id=vid['id'], page=1, 
                                         thumbnail=vid['thumbnail_480_url'], plot=plot ))
 
-        if data['has_more']:
-            itemlist.append(item.clone( title='Siguientes ...', action='list_playlists', page = item.page + 1, text_color='coral'))
+        if itemlist:
+            if data['has_more']:
+                itemlist.append(item.clone( title='Siguientes ...', action='list_playlists', page = item.page + 1, text_color='coral'))
     except:
         pass
 
@@ -99,8 +100,9 @@ def list_all(item):
                                         thumbnail=vid['thumbnail_url'], plot=plot,
                                         contentType='movie', contentTitle=vid['title'], contentExtra='documentary' ))
 
-        if data['has_more']:
-            itemlist.append(item.clone( title='Siguientes ...', action='list_all', page = item.page + 1, text_color='coral' ))
+        if itemlist:
+            if data['has_more']:
+                itemlist.append(item.clone( title='Siguientes ...', action='list_all', page = item.page + 1, text_color='coral' ))
     except:
         pass
 
