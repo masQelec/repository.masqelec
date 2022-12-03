@@ -20,14 +20,14 @@ import datetime
 import os.path
 import xml.dom.minidom
 try:
-    from ConfigParser import SafeConfigParser
+    from ConfigParser import ConfigParser
 except ImportError:
-    from configparser import SafeConfigParser
+    from configparser import ConfigParser
 
 __version__ = '1.2.0'
 
 # Load the configuration:
-config = SafeConfigParser()
+config = ConfigParser()
 config.read('config.ini')
 tools_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__))))
 output_path = config.get('locations', 'output_path')
