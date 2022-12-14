@@ -12,9 +12,10 @@
     <summary>Balandro es un Navegador de páginas Webs</summary>
     <assets>
       <icon>icon.png</icon>
+      <fanart>fanart.png</fanart>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]2.5.2[/COLOR][COLOR red]  Noviembre 2022[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]2.5.1[/COLOR][COLOR red]  Noviembre 2022[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers Soportados[/COLOR][COLOR plum]  20.x,  19.x,  18.x  y  17.x[/B][/COLOR]
 
