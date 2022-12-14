@@ -402,17 +402,19 @@ def list_search(item):
         if 'title="Latino"' in article: langs.append('Lat')
         if 'title="Subtitulado"' in article: langs.append('Vose')
 
-        if '/peliculas-online-gratis/' in url:
-            if item.search_type != 'all':
-                if item.search_type == 'tvshow': continue
+        tipo = 'movie' if '/peliculas-online-gratis/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
 
-            sufijo = '' if item.search_type != 'all' else 'movie'
+        if tipo == 'movie':
+            if not item.search_type == 'all':
+               if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = ', '.join(langs), fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
-        else:
-            if item.search_type != 'all':
-                if item.search_type == 'movie': continue
+
+        if tipo == 'tvshow':
+            if not item.search_type == 'all':
+               if item.search_type == 'movie': continue
 
             sufijo = '' if item.search_type != 'all' else 'tvshow'
 

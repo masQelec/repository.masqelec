@@ -49,7 +49,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_torrentpelis', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='torrentpelis', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_torrentpelis', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -213,7 +213,7 @@ def list_search(item):
     for url, title, qlty, type in matches:
         qlty = qlty.replace('(', '').replace(')', '').strip()
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty,
                                     contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
 
     if itemlist:

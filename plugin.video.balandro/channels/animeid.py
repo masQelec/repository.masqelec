@@ -111,8 +111,7 @@ def episodios(item):
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
-        epis = scrapertools.find_single_match(match, '<div class="type"><span>(.*?)<span>').strip()
-
+        epis = scrapertools.find_single_match(match, '<div class="type"><span>(.*?)</span>').lower().strip()
         epis = epis.replace('ep', '').strip()
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
@@ -171,39 +170,6 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
-
-    return itemlist
-
-
-def play2(item):
-    logger.info()
-    itemlist = []
-
-    servidor = item.server
-
-    url = item.url
-
-    if not servidor == 'directo':
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
-
-        itemlist.append(item.clone(url = url, server = servidor))
-
-        return itemlist
-
-    if url:
-        if not url.startswith("http"): url = "https:" + url
-
-        url = url.replace('&amp;', '&').replace("\\/", "/")
-
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
-
-        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

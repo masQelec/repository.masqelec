@@ -156,7 +156,7 @@ def list_all(item):
             if item.search_type == 'movie': continue
 
             itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
-                                        contentType = 'season', contentSerieName = title, infoLabels={'year': '-'} ))
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -207,10 +207,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return sorted(itemlist, key=lambda it: it.title)
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):
@@ -441,19 +437,16 @@ def list_search(item):
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if '/pelicula/' in url:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
-            sufijo = '' if item.search_type != 'all' else 'movie'
-
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
+
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
-
-            sufijo = '' if item.search_type != 'all' else 'tvshow'
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
@@ -468,7 +461,6 @@ def search(item, texto):
 
     try:
        item.url = host + 'search?s=' + texto.replace(" ", "+")
-
        return list_search(item)
     except:
        import sys

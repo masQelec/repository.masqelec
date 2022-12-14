@@ -3,7 +3,7 @@
   "name": "PelisPop",
   "thumbnail": "pelispop.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow", "torrent"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["torrents", "rankings", "years", "kids", "docs"],
+  "clusters": ["temporary", "torrents", "rankings", "years", "kids", "docs"],
 
   "notes": "Canal con enlaces Streaming y Torrent. Películas por géneros. También Series."
 }

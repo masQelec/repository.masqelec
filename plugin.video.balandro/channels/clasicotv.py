@@ -160,13 +160,16 @@ def list_all(item):
         plot = scrapertools.find_single_match(article, '<div class="texto">(.*?)</div>')
         plot = scrapertools.htmlclean(plot)
 
-        if '/movies/' in url:
-            if item.search_type == 'tvshow': continue
+        if tipo == 'movie':
+            if item.search_type != 'all':
+                if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year, 'plot': plot} ))
-        else:
-            if item.search_type == 'movie': continue
+
+        if tipo == 'tvshow':
+            if item.search_type != 'all':
+                if item.search_type == 'movie': continue
 
             itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year, 'plot': plot} ))

@@ -123,10 +123,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -152,7 +148,7 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + epis + ' ' + title
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentSerieName = item.contentSerieName,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:

@@ -137,9 +137,6 @@ def list_all(item):
         title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
         if not url or not title: continue
 
-        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
@@ -148,13 +145,17 @@ def list_all(item):
 
         qlty = scrapertools.find_single_match(article, '<span class="Qlty">([^<]+)</span>')
 
-        if '/pelicula/' in url:
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, fmt_sufijo = sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
+
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 

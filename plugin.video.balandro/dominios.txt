@@ -1,5 +1,5 @@
-[COLOR coral][B]Balandro[/COLOR][COLOR cyan]  11 de Noviembre 2022 [/COLOR][COLOR limegreen] 07:00[/B][/COLOR]
-   [COLOR yellow][B]Version 2.5.1[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR][COLOR cyan]  28 de Noviembre 2022 [/COLOR][COLOR limegreen] 08:00[/B][/COLOR]
+   [COLOR yellow][B]Version 2.5.2[/B][/COLOR]
 
    [COLOR yellow]CONTACTO:[/COLOR]
      Foro  mimediacenter.info/foro/  Instalaciones, Novedades, Sugerencias, etc.
@@ -13,3 +13,4 @@
    [COLOR cyan][B]CANALES SITUACION Y ULTIMOS CAMBIOS DE DOMINIOS:[/B][/COLOR]
      [B][COLOR moccasin] 123Pelis [/COLOR][COLOR springgreen] https://123pelis.fun/ [COLOR red] Suspendida [/B][/COLOR]
      [B][COLOR moccasin] CineTorrents [/COLOR][COLOR springgreen] https://cinetorrent.eu/ [COLOR red] Suspendida [/B][/COLOR]
+     [B][COLOR moccasin] EstrenosPapaya [/COLOR][COLOR springgreen] https://www.estrenospapaya.com/ [COLOR orangered] Avisa CIERRE [/B][/COLOR]

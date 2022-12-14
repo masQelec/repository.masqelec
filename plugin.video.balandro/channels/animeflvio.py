@@ -188,10 +188,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -305,20 +301,16 @@ def list_search(item):
         tipo = 'tvshow' if '/serie/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if '/serie/' in url:
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
-            sufijo = '' if item.search_type != 'all' else 'tvshow'
-
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year':year} ))
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
-        else:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
-
-            sufijo = '' if item.search_type != 'all' else 'movie'
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))

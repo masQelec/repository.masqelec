@@ -9,6 +9,7 @@ from core import httptools, scrapertools, servertools, tmdb
 
 host = 'https://seriesretro.com/'
 
+
 perpage = 20
 
 

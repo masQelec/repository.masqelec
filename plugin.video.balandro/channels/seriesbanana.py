@@ -87,13 +87,9 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, 'data-post="(.*?)</section>')
+    matches = scrapertools.find_multiple_matches(data, '<div class="Title">.*?<a href="(.*?)".*?>Temporada <span>(.*?)</span>')
 
-    for match in matches:
-        season = scrapertools.find_single_match(match, 'data-season="(.*?)"')
-
-        url =  scrapertools.find_single_match(match, '<a href="(.*?)"')
-
+    for url, season in matches:
         title = 'Temporada ' + season
 
         if len(matches) == 1:
@@ -111,10 +107,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -124,7 +116,7 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '- Temporada <span>' + str(item.contentSeason) + '(.*?)placeholder="Buscar Serie"')
+    bloque = scrapertools.find_single_match(data, 'Temporada ' + str(item.contentSeason) + '</h1>(.*?)$')
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr class="Viewed">(.*?)</a></td></tr>')
 

@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://animeflv.bz/'
+host = 'https://www1.animeflv.bz/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www10.animeflv.cc/', 'https://www3.animeflv.net/', 'https://www3.animeflv.cc/',
-             'https://ww3.animeflv.cc/'] 
+             'https://ww3.animeflv.cc/', 'https://animeflv.bz/'] 
 
 
 domain = config.get_setting('dominio', 'animeflv', default='')
@@ -51,7 +51,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_animeflv', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='animeflv', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_animeflv', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))

@@ -174,11 +174,17 @@ def submnu_canales(item):
 
     itemlist.append(item.clone( action='', title= '[B]CANALES (Situación):[/B]', text_color='goldenrod', folder=False, thumbnail=config.get_thumb('settings') ))
 
+    itemlist.append(item.clone( action='show_help_animefenix', title= ' - [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]AnimeFenix[/B][/COLOR]',
+                                thumbnail=config.get_thumb('animefenix', 'thumb', 'channels') ))
+
     itemlist.append(item.clone( action='show_help_hdfull', title= ' - [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HdFull[/B][/COLOR]',
                                 thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
 
     itemlist.append(item.clone( action='show_help_henaojara', title= ' - [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HenaOjara[/B][/COLOR]',
                                 thumbnail=config.get_thumb('henaojara', 'thumb', 'channels') ))
+
+    itemlist.append(item.clone( action='show_help_playdede', title= ' - [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]PlayDede[/B][/COLOR]',
+                                thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
 
     itemlist.append(item.clone( action='channels_with_proxies', title= '    - Qué canales pueden necesitar [COLOR red][B]Proxies[/B][/COLOR]', new_proxies=True, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están [COLOR plum][B]Inestables[/B][/COLOR]', no_stable = True, thumbnail=config.get_thumb('stack') ))
@@ -410,6 +416,8 @@ def submnu_actualizar(item):
 
     itemlist.append(item.clone( action='show_help_fixes', title= ' - ¿ Qué son los Fix ?' ))
     itemlist.append(item.clone( action='show_last_fix', title= ' - [COLOR green][B]Información[/B][/COLOR] último Fix instalado', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title= ' - [COLOR cyan][B]Últimos Cambios[/B][/COLOR] de Dominios', thumbnail=config.get_thumb('news') ))
+
     itemlist.append(item.clone( channel='actions', action = 'check_addon_updates', title= ' - Comprobar últimas actualizaciones tipo Fix', thumbnail=config.get_thumb('download') ))
     itemlist.append(item.clone( channel='actions', action = 'check_addon_updates_force', title= ' - Forzar Todas las actualizaciones tipo Fix', thumbnail=config.get_thumb('download') ))
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR cyan][B]Actualizar[/B][/COLOR])', thumbnail=config.get_thumb('settings') ))
@@ -675,13 +683,28 @@ def show_help_register(item):
 
     txt += '[CR][CR]*) Imprescindible tomar buena nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para cada web.'
 
-    txt += '[CR][CR]*) Una vez tengais vuestros datos, podeis informarlos en la configuración, ó bien se os solicitará al acceder a ese canal determinado.'
+    txt += '[CR][CR]*) Una vez tengáis vuestros datos, podéis informarlos en la configuración, ó bien se os solicitará al acceder a ese canal determinado.'
 
-    txt += '[CR][CR]*) Mientras mantengais las sesiones abiertas via navegador en estos dominios, no tendreis q volver a informar vuestras credenciales.'
+    txt += '[CR][CR]*) Mientras mantengáis las sesiones abiertas via navegador en estos dominios, no tendreis q volver a informar vuestras credenciales.'
 
     txt += '[CR][CR]*) [B][COLOR gold]Atención[/COLOR][/B]: las [COLOR chartreuse]Sesiones Abiertas[/COLOR] en vuestro Media Center [B][COLOR yellow]No son In Eternum[/COLOR][/B], por ello es conveniente, que procedaís a [COLOR chartreuse]Cerrar vuestra Sesión[/COLOR] cada cierto tiempo, porque podría provocar que no se presentaran resultados.'
 
     platformtools.dialog_textviewer('Información dominios que requieren Registrarse', txt)
+
+
+def show_help_animefenix(item):
+    logger.info()
+
+    txt = ' [COLOR aquamarine][B]El webmaster de AnimeFenix, ha activado un nivel mas de protección con CloudFlare.[CR]'
+
+    txt += '[CR] Desconocemos si será Temporal o Definitivo.[CR]'
+
+    txt += '[CR] Por ello, si no os funciona, pues hay que tener paciencia,'
+    txt += '[CR] e ir probando uno a uno cada Proveedores de proxies, con Configurar proxies a usar ...[CR]'
+
+    txt += '[CR] O bien prescindir del canal hasta que se estabilize posiblemente en un futuro.[/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Información canal AnimeFenix', txt)
 
 
 def show_help_hdfull(item):
@@ -714,6 +737,23 @@ def show_help_henaojara(item):
     txt += '[CR] O bien prescindir del canal hasta que se estabilize posiblemente en un futuro.[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información canal HenaOjara', txt)
+
+
+def show_help_playdede(item):
+    logger.info()
+
+    txt = ' [COLOR aquamarine][B]El webmaster de PlayDede, ha activado un nivel mas de protección con CloudFlare.[CR]'
+
+    txt += '[CR] Desconocemos si será Temporal o Definitivo.[CR]'
+
+    txt += '[CR] Ya ocurrió alguna vez en el pasado y al cabo de un cierto tiempo lo retiró.[CR]'
+
+    txt += '[CR] Por ello, si no os funciona, pues hay que tener paciencia,'
+    txt += '[CR] e ir probando el dominio / informarlo manualmente, con y sin proxies.[CR]'
+
+    txt += '[CR] O bien prescindir del canal hasta que se estabilize posiblemente en un futuro.[/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Información canal PlayDede', txt)
 
 
 def show_help_gamovideo(item):
@@ -752,7 +792,7 @@ def show_help_uptobox(item):
 
     txt += '[CR][CR]*) Imprescindible tomar buena nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para ese servidor.'
 
-    txt += '[CR][CR]*) Una vez tengais vuestros datos, se os solicitará al acceder a ese servidor determinado.'
+    txt += '[CR][CR]*) Una vez tengáis vuestros datos, se os solicitará al acceder a ese servidor determinado.'
 
     txt += '[CR][CR]*) Acceder desde otro equipo via navegador a [B][COLOR gold]uptobox.com/pin[/COLOR][/B], solo se gestionan las cuentas [B][COLOR gold]Free[/COLOR][/B]'
 
@@ -761,7 +801,7 @@ def show_help_uptobox(item):
     txt += '[CR][CR] Iniciar la sesión con vuestras credenciales'
     txt += ' e introducir el [B][COLOR gold]PIN[/COLOR][/B] que se os mostró en la ventana al intentar reproducir, para tener vinculada vuestra cuenta.'
 
-    txt += '[CR][CR]*) Mientras mantengais las sesiones abiertas via navegador en ese servidor, no tendreis q volver a informar vuestras credenciales.'
+    txt += '[CR][CR]*) Mientras mantengáis las sesiones abiertas via navegador en ese servidor, no tendreis q volver a informar vuestras credenciales.'
 
     txt += '[CR][CR]*) Hay servidores que limitan el [B][COLOR gold]tiempo máximo de visionado diario[/COLOR][/B] (aprox. 150 minutos).'
 
@@ -1724,17 +1764,21 @@ def show_help_adults(item):
 def show_help_domains(item):
     logger.info()
 
-    txt = '*) Determinadas webs Cambian constantemente de Dominio y es necesario modifiarlo para permitir su acceso.'
+    txt = '*) Determinadas webs Cambian constantemente de Dominio y es necesario modificarlo para permitir su acceso.'
 
     txt += '[CR][CR]*) Para ello desde otro equipo debeis accecder a la web en cuestión y obtener ese nuevo dominio.'
+    txt += '[CR]    Si desconoceís el dominio actual de esa web, mediante un navegador web deberéis localizarlo.'
 
-    txt += '[CR][CR] Si desconoceís el dominio actual de esa web, mediante un navegador debereis localizarlo.'
+    txt += '[CR][CR]*) También lo podreis obtener durante un corto espacio de tiempo efectuando el [B][COLOR gold]Test Web del Canal[/COLOR][/B].'
+    txt += '[CR]    ver los datos [B][COLOR yellow]Host/Nuevo[/COLOR][/B] en la información del Test.'
 
-    txt += '[CR][CR] También lo podreis obtener durante un corto espacio de tiempo efectuando el [B][COLOR gold]Test Web del Canal[/COLOR][/B] (ver los datos Host/Nuevo dentro de la información del Test).'
+    txt += '[CR][CR]    Así mismo, bajo ciertas circunstancias ese [B][COLOR gold]Test Web del Canal[/COLOR][/B].'
+    txt += '[CR]    podría obtener automáticamente el [B][COLOR yellow]Nuevo Dominio Permanente[/COLOR][/B] como propuesta.'
 
-    txt += '[CR][CR]*) Imprescindible tomar buena nota de ese [B][COLOR gold]Nuevo Dominio[/COLOR][/B] para esa web.'
+    txt += '[CR][CR]*) Imprescindible en caso de ser necesario, tomar buena nota de ese [B][COLOR gold]Nuevo Dominio[/COLOR][/B] para esa web.'
 
-    txt += '[CR][CR]*) Una vez tengais ese Dato, podeis informarlo en la configuración [B][COLOR gold]categoría Dominios[/COLOR][/B], ó bien al acceder a ese canal determinado a través de su opción [B][COLOR gold]Acciones[/COLOR][/B].'
+    txt += '[CR][CR]*) Una vez tengáis ese Dominio, podéis informarlo en la configuración [B][COLOR gold]categoría Dominios[/COLOR][/B],'
+    txt += '[CR]    ó bien al acceder a ese canal determinado a través de su opción [B][COLOR yellow]Acciones[/COLOR][/B].'
 
     platformtools.dialog_textviewer('Gestión Dominios', txt)
 
@@ -1964,10 +2008,20 @@ def show_test(item):
 
     tex_dom = ''
 
+    animefenix_dominio = config.get_setting('channel_animefenix_dominio', default='')
+    if animefenix_dominio:
+       if tex_dom: tex_dom = tex_dom + '  ' + animefenix_dominio
+       else: tex_dom = animefenix_dominio
+
     animeflv_dominio = config.get_setting('channel_animeflv_dominio', default='')
     if animeflv_dominio:
        if tex_dom: tex_dom = tex_dom + '  ' + animeflv_dominio
        else: tex_dom = animeflv_dominio
+
+    caricaturashd_dominio = config.get_setting('channel_caricaturashd_dominio', default='')
+    if caricaturashd_dominio:
+       if tex_dom: tex_dom = tex_dom + '  ' + caricaturashd_dominio
+       else: tex_dom = caricaturashd_dominio
 
     cinecalidad_dominio = config.get_setting('channel_cinecalidad_dominio', default='')
     if cinecalidad_dominio:
@@ -2064,6 +2118,11 @@ def show_test(item):
        if tex_dom: tex_dom = tex_dom + '  '  + pelisflix_dominio
        else: tex_dom = pelisflix_dominio
 
+    pelishouse_dominio = config.get_setting('channel_pelishouse_dominio', default='')
+    if pelishouse_dominio:
+       if tex_dom: tex_dom = tex_dom + '  ' + pelishouse_dominio
+       else: tex_dom = pelishouse_dominio
+
     pelismaraton_dominio = config.get_setting('channel_pelismaraton_dominio', default='')
     if pelismaraton_dominio:
        if tex_dom: tex_dom = tex_dom + '  ' + pelismaraton_dominio
@@ -2108,6 +2167,11 @@ def show_test(item):
     if series24_dominio:
        if tex_dom: tex_dom = tex_dom + '  ' + series24_dominio
        else: tex_dom = series24_dominio
+
+    seriesyonkis_dominio = config.get_setting('channel_seriesyonkis_dominio', default='')
+    if seriesyonkis_dominio:
+       if tex_dom: tex_dom = tex_dom + '  ' + seriesyonkis_dominio
+       else: tex_dom = seriesyonkis_dominio
 
     subtorrents_dominio = config.get_setting('channel_subtorrents_dominio', default='')
     if subtorrents_dominio:

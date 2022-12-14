@@ -63,10 +63,8 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
         if not thumb: thumb = scrapertools.find_single_match(match, "src='(.*?)'")
 
-        year = '-'
-
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

@@ -18,6 +18,7 @@ host = "https://www.estrenospapaya.com/"
 
 perpage = 15
 
+
 IDIOMAS = {'es': 'Esp', 'lat': 'Lat', 'in': 'Eng', 'ca': 'Cat', 'sub': 'Vose',
            'Español Latino': 'Lat', 'Español Castellano': 'Esp', 'Sub Español': 'Vose'}
 
@@ -71,6 +72,8 @@ def list_all(item):
 
         thumb = httptools.get_url_headers(urlparse.urljoin(host, img))
 
+        if not year: year = '-'
+
         itemlist.append(item.clone( action='temporadas', url=url, title=name, thumbnail=thumb,
                                     contentType = 'tvshow', contentSerieName = name, infoLabels={'year': year, 'plot': plot} ))
 
@@ -123,6 +126,8 @@ def series_por_letra(item):
 
         thumb = httptools.get_url_headers(urlparse.urljoin(host, img))
 
+        if not year: year = '-'
+
         itemlist.append(item.clone( action ='temporadas', url = url, title = name, thumbnail = thumb,
                                     contentType = 'tvshow', contentSerieName = name, infoLabels = {'year': year, 'plot': plot} ))
 
@@ -168,10 +173,10 @@ def estrenos(item):
         if not url.startswith(host): url = urlparse.urljoin(host, url)
 
         context = []
-        context.append({ 'title': '[COLOR pink]Listar temporada %s[/COLOR]' % season, 
+        context.append({ 'title': '[B][COLOR pink]Temporada %s[/COLOR][/B]' % season, 
                          'action': 'episodios', 'url': url_serie, 'context': '', 'folder': True, 'link_mode': 'update' })
 
-        context.append({ 'title': '[COLOR pink]Listar temporadas[/COLOR]',
+        context.append({ 'title': '[B][COLOR hotpink]Temporadas[/B][/COLOR]',
                          'action': 'temporadas', 'url': url_serie, 'context': '', 'folder': True, 'link_mode': 'update' })
 
         thumb = httptools.get_url_headers(urlparse.urljoin(host, img))
@@ -217,10 +222,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):

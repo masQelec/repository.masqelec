@@ -2,10 +2,11 @@
 
 from platformcode import config, logger, platformtools
 from core.item import Item
-from core import httptools, scrapertools, servertools
+from core import httptools, scrapertools, servertools, tmdb
 
 
-host = "https://www.documentales-online.com"
+host = 'https://www.documentales-online.com'
+
 
 perpage = 25
 
@@ -36,8 +37,7 @@ def categorias(item):
 
     bloque = scrapertools.find_single_match(data, '<ul class="sub-menu">(.*?)</ul>')
 
-    patron = ' href="([^"]+)">([^<]+)'
-    matches = scrapertools.find_multiple_matches(bloque, patron)
+    matches = scrapertools.find_multiple_matches(bloque, ' href="([^"]+)">([^<]+)')
 
     for url, title in matches:
         if url.startswith('/'): url = host + url
@@ -59,9 +59,7 @@ def series(item):
 
     bloque = scrapertools.find_single_match(data, 'Populares</a>.*?Series / Temas(.*?)</article>')
 
-    patron  = '<a href="(.*?)".*?>(.*?)</a>'
-
-    matches = scrapertools.find_multiple_matches(bloque, patron)
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?>(.*?)</a>')
 
     num_matches = len(matches)
 
@@ -69,13 +67,16 @@ def series(item):
         url = host + url
         title = title.split("<")[0].capitalize()
 
-        itemlist.append(item.clone( action='list_videos', url=url, title=title ))
+        itemlist.append(item.clone( action='list_videos', url=url, title=title, infoLabels = {'year': '-'} ))
 
         if len(itemlist) >= perpage: break
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if num_matches > perpage:
             hasta = (item.page * perpage) + perpage
+
             if hasta < num_matches:
                 itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='series', text_color='coral' ))
 
@@ -104,11 +105,14 @@ def list_all(item):
 
         if '/series-temas/' in url: continue
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, plot=plot,
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, plot=plot, infoLabels = {'year': '-'},
                                     contentType='movie', contentTitle=title, contentExtra='documentary' ))
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page_link = scrapertools.find_single_match(data, '<span aria-current="page" class="page-numbers current">.*?href="(.*?)"')
+
         if next_page_link:
             itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page_link, text_color='coral' ))
 
@@ -125,8 +129,7 @@ def list_top(item):
 
     bloque = scrapertools.find_single_match(data, 'Populares</a>.*?%s(.*?)>Última revisión' % item.grupo)
 
-    patron  = '<a href="(.*?)".*?>(.*?)</a>'
-    matches = scrapertools.find_multiple_matches(bloque, patron)
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?>(.*?)</a>')
 
     num_matches = len(matches)
 
@@ -135,13 +138,17 @@ def list_top(item):
 
         title = title.replace('&#8230;', '').replace('&#8211;', '')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, contentType='movie', contentTitle=title, contentExtra='documentary' ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, infoLabels = {'year': '-'},
+                                    contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
         if len(itemlist) >= perpage: break
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if num_matches > perpage:
             hasta = (item.page * perpage) + perpage
+
             if hasta < num_matches:
                 itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_top', text_color='coral' ))
 
@@ -152,20 +159,29 @@ def list_videos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    datas = httptools.downloadpage(item.url).data
 
-    patron = 'Populares</a>(.*?)</div></article></div></div>'
-    data = scrapertools.find_single_match(data, patron)
+    data = scrapertools.find_single_match(datas, 'Populares</a>(.*?)>Destacados<')
 
-    patron = 'href="([^"]+).*?src="([^"]+).*?bookmark">([^<]+)'
-    matches = scrapertools.find_multiple_matches(data, patron)
+    matches = scrapertools.find_multiple_matches(data, 'href="([^"]+).*?src="([^"]+).*?bookmark">([^<]+)')
 
     for url, thumb, title in matches:
         title = title.replace("&#8211;","-").strip()
         if not title: continue
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+        if url == '#': continue
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, infoLabels = {'year': '-'},
                                     contentType='movie', contentTitle=title, contentExtra='documentary' ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        next_url = scrapertools.find_single_match(datas, '<link rel="next" href="(.*?)"')
+
+        if next_url:
+            if'/page/' in next_url:
+               itemlist.append(item.clone( title='Siguientes ...', url=next_url,  action='list_videos', text_color='coral' ))
 
     return itemlist
 
@@ -204,6 +220,8 @@ def findvideos(item):
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
+        if not 'http' in url: url = 'https:' + url
 
         if servidor and servidor != 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url = url, language = 'Esp', other = other ))

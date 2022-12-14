@@ -11,6 +11,8 @@ def get_video_url(page_url, url_referer=''):
     data = httptools.downloadpage(page_url).data
 
     id = scrapertools.find_single_match(page_url, "/d/([^$]+)")
+    if not id: id = scrapertools.find_single_match(page_url, "api.gofile.io/(.*?)$")
+
     api_data = httptools.downloadpage('https://api.gofile.io/createAccount').data
 
     if not '"ok"' in str(api_data):
@@ -20,7 +22,7 @@ def get_video_url(page_url, url_referer=''):
     if not token: return video_urls
 
     url = 'https://api.gofile.io/getContent?contentId=%s&token=%s' % (id, token)
-    data = httptools.downloadpage(url, headers={'Referer': page_url}).data
+    data = httptools.downloadpage(url, headers={'Referer': page_url.replace('/api.gofile.io/', '/gofile.io/d/')}).data
 
     if not '"contents"' in str(data):
         return 'Vídeo no autorizado'

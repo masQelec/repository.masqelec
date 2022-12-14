@@ -132,9 +132,6 @@ def list_all(item):
         title = title.replace('(720)', '').replace('(720p)', '').replace('(1080)', '').replace('(1080p)', '').replace('(microHD)', '').replace('(BR-Line)', '').strip()
         title = title.replace('(HDR)', '').replace('(HDRip)', '').replace('(DVDRip)', '').replace('(BR-SCREENER)', '').replace('(TS-SCREENER)', '').strip()
 
-        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
         thumb = host[:-1] + thumb
 
@@ -156,45 +153,31 @@ def list_all(item):
                    if lng == 'Voi': lng = 'Vo'
                    lngs.append(lng)
 
-        if '/peliculas/' in url:
+        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
             if not item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                    qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': "-"} ))
+                                        qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': "-"} ))
 
-        if '/series/' in url:
+        if tipo == 'tvshow':
             if not item.search_type == 'all':
-               if item.search_type == 'movie': continue
+                if item.search_type == 'movie': continue
 
             title = title.replace('&#8211;', '').replace('&#215;', ' ')
 
-            if '-la-serie-s' in url: temp_epis = scrapertools.find_single_match(url, "-la-serie-s(.*?)$")
-            elif '-serie-s' in url: temp_epis = scrapertools.find_single_match(url, "-serie-s(.*?)$")
-            else: temp_epis = scrapertools.find_single_match(url, "-t(.*?)$")
-
-            if not temp_epis:
-               i +=1
-               temp_epis = '99e' + str (i)
-
             SerieName = url
 
-            SerieName = SerieName.replace(host, '').replace('series/', '').replace('-t' + temp_epis, '').strip()
+            SerieName = SerieName.replace(host, '').strip()
             SerieName = SerieName.replace('-', ' ')
 
-            temp_epis = temp_epis.replace('/', '').strip()
-
-            season = scrapertools.find_single_match(temp_epis, "(.*?)e")
-            episode = scrapertools.find_single_match(temp_epis, ".*?e(.*?)$")
-
-            if not season or not episode: continue
-
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
                                         qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
-                                        contentSerieName = SerieName,
-                                        contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode,
-                                        infoLabels={'year': "-"} ))
+                                        contentType = 'episode', contentSerieName = SerieName, infoLabels={'year': "-"} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -204,6 +187,37 @@ def list_all(item):
         if next_url:
             if '/page/' in next_url:
                 itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
+
+    return itemlist
+
+
+def tracking_all_episodes(item):
+    return episodios(item)
+
+
+def episodios(item):
+    logger.info()
+    itemlist = []
+
+    if "temporada" in item.contentSerieName:
+        SerieName = item.contentSerieName.split("temporada")[0]
+        season = scrapertools.find_single_match(item.url, "-temporada-(.*?)-")
+        episode = scrapertools.find_single_match(item.url, "-capitulo-(.*?)-")
+
+    elif "T" in item.title:
+        SerieName = item.title.split("T")[0]
+        season = scrapertools.find_single_match(item.title, "T(.*?)E")
+        episode = scrapertools.find_single_match(item.title, "E(.*?)$")
+
+    else:
+        SerieName = item.contentSerieName
+        season = 0
+        episode = 0
+
+    itemlist.append(item.clone( action = 'findvideos', url = item.url, title = item.title, thumbnail = item.thumbnail, contentSerieName = SerieName,
+                                contentSeason = season, contentType = 'episode', contentEpisodeNumber = episode ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 

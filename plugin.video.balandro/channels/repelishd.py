@@ -60,7 +60,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -115,7 +115,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_repelishd', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='repelishd', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_repelishd', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -326,7 +326,7 @@ def list_all(item):
     if '<h2>Añadido recientemente' in data:
         bloque = scrapertools.find_single_match(data, '<h2>Añadido recientemente(.*?)>Géneros<')
     else:
-        bloque = scrapertools.find_single_match(data, '<h1 class=".*?</h1>(.*?)>Géneros<')
+        bloque = scrapertools.find_single_match(data, '<h1>(.*?)>Géneros<')
 
     matches = re.compile('<article(.*?)</article>').findall(bloque)
 
@@ -339,9 +339,6 @@ def list_all(item):
             if not title: title = scrapertools.find_single_match(article, 'alt=(.*?)>').strip()
 
         if not url or not title: continue
-
-        tipo = 'tvshow' if '/serie/' in url else 'movie'
-        sufijo = '' if item.search_type != 'all' else tipo
 
         thumb = scrapertools.find_single_match(article, 'data-src=(.*?) alt=').strip()
         if thumb.startswith('//'): thumb = 'https:' + thumb
@@ -356,14 +353,17 @@ def list_all(item):
         year = scrapertools.find_single_match(article, '</h3> <span>(.*?)</span>')
         if not year: year = '-'
 
-        if '/serie/' in url:
+        tipo = 'tvshow' if '/serie/' in url else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
             itemlist.append(item.clone( action ='temporadas', url = url, title = title, thumbnail = thumb, qualities=qlty, languages=', '.join(langs),
                                         fmt_sufijo=sufijo, contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
-        if '/pelicula/' in url:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
@@ -409,11 +409,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
-
 
 def episodios(item):
     logger.info()

@@ -12,8 +12,6 @@ host = 'https://playview.io/'
 
 perpage = 20
 
-# En la web: No hay acceso a series solamente a serie+temporada
-
 
 def item_configurar_proxies(item):
     color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
@@ -111,10 +109,8 @@ def estrenos(item):
     current_year = int(datetime.today().year)
     previous_year = current_year - 1
 
-    itemlist.append(item.clone( title = 'Estrenos ' + str(current_year), action = 'list_all', url = host + 'estrenos-' + str(current_year), 
-                                search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Estrenos ' + str(previous_year), action = 'list_all', url = host + 'estrenos-' + str(previous_year),
-                                search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Estrenos ' + str(current_year), action = 'list_all', url = host + 'estrenos-' + str(current_year), search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Estrenos ' + str(previous_year), action = 'list_all', url = host + 'estrenos-' + str(previous_year), search_type = 'movie' ))
 
     return itemlist
 
@@ -126,12 +122,14 @@ def generos(item):
     data = do_downloadpage(host)
 
     patron = '<li><a href="(%s[^"]+)">([^<]+)</a></li>' % (host + 'peliculas-online/')
+
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, title in matches:
         itemlist.append(item.clone( action="list_all", title=title.strip(), url=url ))
 
     return sorted(itemlist, key=lambda it: it.title)
+
 
 def anios(item):
     logger.info()
@@ -158,30 +156,44 @@ def list_all(item):
 
     if item.search_type != 'all':
         matches = list(filter(lambda x: (' class="info-series"' not in x and item.search_type == 'movie') or \
-                                   (' class="info-series"' in x and item.search_type == 'tvshow'), matches))
+                                        (' class="info-series"' in x and item.search_type == 'tvshow'), matches))
 
     num_matches = len(matches)
 
     for article in matches[item.page * perpage:]:
-        tipo = 'tvshow' if ' class="info-series"' in article else 'movie'
-        sufijo = '' if item.search_type != 'all' else tipo
-
-        thumb = scrapertools.find_single_match(article, ' data-original="([^"]+)"')
         title = scrapertools.find_single_match(article, '<div class="spotlight_title">(.*?)</div>').strip()
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
+
+        if not title or not url: continue
+
+        thumb = scrapertools.find_single_match(article, ' data-original="([^"]+)"')
+
         year = scrapertools.find_single_match(article, '<span class="slqual sres">(\d{4})</span>')
+        if not year: year = '-'
+
         quality = 'HD' if '<span class="slqual-HD">HD</span>' in article else ''
 
         if 'data-cfemail' in title: title = scrapertools.clean_cfemail(title)
 
+        tipo = 'tvshow' if ' class="info-series"' in article else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
+
         if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=quality, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+
             title = scrapertools.find_single_match(title, '(.*?)<br').strip()
             title = title[:1].upper() + title[1:]
 
             season = scrapertools.find_single_match(url, '-temp-(\d+)$')
+
             if season:
                 titulo = '%s [COLOR gray](Temporada %s)[/COLOR]' % (title, season)
                 itemlist.append(item.clone( action='episodios', url=url, title=titulo, thumbnail=thumb, qualities=quality, fmt_sufijo=sufijo, 
@@ -218,7 +230,8 @@ def temporadas(item):
 
     matches = scrapertools.find_multiple_matches(data, 'class="overviewPlay playLink" href="([^"]+)')
 
-    #  cuantas temporadas
+    num_matches = len(matches)
+
     tot_temp = 0
 
     for url in matches:
@@ -241,6 +254,9 @@ def temporadas(item):
             item.contentSeason = season
             itemlist = episodios(item)
             return itemlist
+
+        if num_matches > 9:
+            if len(season) == 1: season = '0' + season
 
         itemlist.append(item.clone( action = 'episodios', title = title, url = url, contentType = 'season', contentSeason = season ))
 
@@ -279,6 +295,7 @@ def episodios(item):
 
     for episode, thumb, title, plot in matches[item.page * item.perpage:]:
         titulo = '%sx%s %s' % (item.contentSeason, episode, title)
+
         itemlist.append(item.clone( action='findvideos', title=titulo, thumbnail=thumb, plot=plot, dataid=dataid, datatype=datatype,
                                     contentType='episode', contentEpisodeNumber=episode ))
 
@@ -295,6 +312,7 @@ def episodios(item):
         for episode, title in matches:
             title = re.sub('^\d+\s*-', '', title).strip()
             titulo = '%sx%s %s' % (item.contentSeason, episode, title)
+
             itemlist.append(item.clone( action='findvideos', title=titulo, dataid=dataid, datatype=datatype,
                                         contentType='episode', contentEpisodeNumber=episode ))
 
@@ -346,6 +364,7 @@ def findvideos(item):
             post = 'set=LoadOptionsEpisode&action=Step2&id=%s&type=%s&quality=%s&episode=%s' % (item.dataid, item.datatype, calidad.replace(' ', '+'), item.contentEpisodeNumber)
         else:
             post = 'set=LoadOptions&action=Step2&id=%s&type=%s&quality=%s' % (dataid, tipo, calidad.replace(' ', '+'))
+
         data = do_downloadpage(host + 'playview', post=post)
 
         enlaces = scrapertools.find_multiple_matches(data, 'data-id="([^"]+)">\s*<h4>([^<]+)</h4>\s*<small><img src="https://www\.google\.com/s2/favicons\?domain=([^"]*)')
@@ -355,6 +374,7 @@ def findvideos(item):
 
             servidor = servidor.replace('https://', '').replace('http://', '').replace('www.', '').lower()
             servidor = servidor.split('.', 1)[0]
+
             servidor = corregir_servidor(servidor)
 
             if servidor == 'desiupload': continue
@@ -364,6 +384,7 @@ def findvideos(item):
             elif servidor == 'fastclick': continue
             elif servidor == 'userload': continue
             elif servidor == 'embedgram': continue
+            elif servidor == 'uppit': continue
 
             elif servidor == 'anonfile': servidor = 'anonfiles'
 
@@ -399,25 +420,18 @@ def play(item):
     if not url: url = scrapertools.find_single_match(data, '<iframe src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, 'data-url="([^"]+)')
 
-    if url.startswith(host):
-        url = do_downloadpage(url, follow_redirects=False, only_headers=True).get('location', '')
-
-        url = url.replace('youtvgratis', 'fembed')
-
-        if url and 'http' not in url:
-            if item.server == 'jetload': url = 'https://jetload.net/e/' + url
-            else: url = None
+    if url.startswith(host): url = do_downloadpage(url, follow_redirects=False, only_headers=True).get('location', '')
 
     if url:
-        if not item.servidor:
-            servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
 
-            if servidor and servidor != 'directo':
-                url = servertools.normalize_url(servidor, url)
-                itemlist.append(item.clone( url=url, server=servidor ))
-        else:   
-            itemlist.append(item.clone(url = url))
+        url = servertools.normalize_url(servidor, url)
+
+        if not servidor == 'directo':
+            if 'zplayer' in url: url += "|referer=%s" % host
+
+            itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
 

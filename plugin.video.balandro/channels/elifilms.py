@@ -42,7 +42,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -62,7 +62,7 @@ def do_downloadpage(url, post=None, headers=None):
     raise_weberror = False if '/year/' in url else True
 
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpagee_proxy('elifilms', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('elifilms', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -83,7 +83,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_elifilms', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='elifilms', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_elifilms', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -174,6 +174,7 @@ def list_all(item):
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, 'class="page-numbers current">.*?href="(.*?)"')
+
         if next_url:
             if '/page/' in next_url:
                itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
@@ -196,7 +197,7 @@ def findvideos(item):
     for dvid, srv in matches:
         ses += 1
 
-        srv = srv.replace('.com', '').replace('.co', '').replace('.live', '').replace('.nz', '').replace('.to', '').replace('v2.', '').lower().strip()
+        srv = srv.replace('.com', '').replace('.co', '').replace('.live', '').replace('.nz', '').replace('.to', '').replace('v2.', '').replace('.ru', '').replace('.sx', '').lower().strip()
 
         if 'trailer' in srv: continue
 
@@ -257,6 +258,8 @@ def play(item):
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'zplayer': url = url + '|' + host
 
         itemlist.append(item.clone(server = servidor, url = url))
 

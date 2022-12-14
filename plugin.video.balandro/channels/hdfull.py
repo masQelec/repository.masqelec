@@ -20,6 +20,7 @@ from lib import balandroresolver
 
 dominios = [
          'https://new.hdfull.one/',
+         'https://hdfull.digital/',
          'https://hdfull.work/',
          'https://hdfull.video/',
          'https://hdfull.cloud/',
@@ -276,7 +277,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + dominio + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -347,7 +348,7 @@ def acciones(item):
         itemlist.append(Item( channel='domains', action='last_domain_hdfull', title='[B]Comprobar último dominio vigente[/B]',
                               desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_hdfull', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -463,7 +464,7 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( action='list_all', title='Últimas', url = dominio + 'series/date', search_type='tvshow' ))
 
-        itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='plum' ))
+        itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='aquamarine' ))
 
         itemlist.append(item.clone( action='list_episodes', title=' - Estreno', opcion = 'premiere', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_episodes', title=' - Anime ', opcion = 'anime', search_type = 'tvshow' ))
@@ -596,17 +597,24 @@ def list_all(item):
 
     for url, thumb, langs, title in matches[item.page * perpage:]:
         title = title.strip()
+
         languages = detectar_idiomas(langs)
+
+        if url.startswith('/'): url = dominio + url[1:]
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if url.startswith('/'): url = dominio + url[1:]
-
         if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=', '.join(languages), fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
-        else:
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages=', '.join(languages), fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, referer=item.url, infoLabels={'year': '-'} ))
 
@@ -663,10 +671,10 @@ def list_episodes(item):
         url = url_tempo + '/episodio-' + epi['episode']
 
         context = []
-        context.append({ 'title': '[COLOR pink]Listar temporada %s[/COLOR]' % epi['season'], 
+        context.append({ 'title': '[B][COLOR pink]Temporada %s[/COLOR][/B]' % epi['season'], 
                          'action': 'episodios', 'url': url_tempo, 'context': '', 'folder': True, 'link_mode': 'update' })
 
-        context.append({ 'title': '[COLOR pink][B]Listar temporadas[/B][/COLOR]',
+        context.append({ 'title': '[B][COLOR hotpink]Temporadas[/COLOR][/B]',
                          'action': 'temporadas', 'url': url_serie, 'context': '', 'folder': True, 'link_mode': 'update' })
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, context = context,

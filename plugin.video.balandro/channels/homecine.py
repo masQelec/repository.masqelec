@@ -412,9 +412,6 @@ def list_all(item):
     matches = re.compile('movie-id="\d+".*?<a href="([^"]+)".*?<.*?original="([^"]+)".*?<h2>([^<]+)</h2>.*?jtip(.*?)clearfix', re.DOTALL).findall(data)
 
     for url, thumb, title, info in matches:
-        tipo = 'tvshow' if '/series/' in url else 'movie'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         url = host + url
 
         if thumb.startswith('//'): thumb = 'https:' + thumb
@@ -427,13 +424,19 @@ def list_all(item):
 
         qlty = scrapertools.find_single_match(info, '-quality">(.*?)</div>')
 
-        if '/series/' in url:
-            if item.search_type == 'movie': continue
+        tipo = 'tvshow' if '/series/' in url else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action ='temporadas', url = url, title = title, thumbnail = thumb, qualities=qlty, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
-        else:
-            if item.search_type == 'tvshow': continue
+
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb, qualities=qlty, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
@@ -463,7 +466,7 @@ def list_episodes(item):
         serie_name = scrapertools.find_single_match(title, '(.*?) Temporada').strip()
 
         season = scrapertools.find_single_match(info, '-quality">Season(.*?)</div>').strip()
-        episode = scrapertools.find_single_match(info, '<div class="jt-info jt-imdb">Episode(.*?)</div>').strip()
+        episode = scrapertools.find_single_match(info, '">Episode:(.*?)</div>').strip()
         if not season or not episode: continue
 
         url = host + url
@@ -475,6 +478,8 @@ def list_episodes(item):
 
         itemlist.append(item.clone( action='findvideos', title = titulo, url = url, thumbnail = thumb,
                                     contentType = 'episode', contentSerieName=serie_name, contentSeason = season, contentEpisodeNumber = episode ))
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, "<li class='active'>.*?class='page larger' href='([^']+)'")

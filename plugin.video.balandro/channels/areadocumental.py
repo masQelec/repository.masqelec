@@ -2,10 +2,10 @@
 
 from platformcode import config, logger, platformtools
 from core.item import Item
-from core import httptools, scrapertools
+from core import httptools, scrapertools, tmdb
 
 
-host = "https://www.area-documental.com/"
+host = 'https://www.area-documental.com/'
 
 
 def mainlist(item):
@@ -19,13 +19,13 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Destacados', action = 'list_all', url = host + 'resultados.php?buscar=&genero=' ))
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host +'resultados-visto.php?buscar=&genero=' ))
 
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
-    itemlist.append(item.clone( title = 'Por fecha', action = 'list_all', url = host + 'resultados-anio.php?buscar=&genero=' ))
-    itemlist.append(item.clone( title = 'Por alfabético', action = 'list_all', url = host +'resultados-titulo.php?buscar=&genero=' ))
-
     itemlist.append(item.clone( title = 'En 3D', action = 'list_all', url = host + '3D.php' ))
 
     itemlist.append(item.clone( title = 'Series', action = 'list_all', url = host + 'series.php' ))
+
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
+    itemlist.append(item.clone( title = 'Por fecha', action = 'list_all', url = host + 'resultados-anio.php?buscar=&genero=' ))
+    itemlist.append(item.clone( title = 'Por alfabético', action = 'list_all', url = host +'resultados-titulo.php?buscar=&genero=' ))
 
     return itemlist
 
@@ -36,26 +36,39 @@ def categorias(item):
 
     data = httptools.downloadpage(host).data
 
-    patron = '<a href="(resultados[^"]+)" class="dropdown-toggle" data-toggle="dropdown">([^<]+)'
-    matches = scrapertools.find_multiple_matches(data, patron)
+    block = scrapertools.find_single_match(data, '<ul class="nav navbar-nav">(.*?)</nav>')
+
+    matches = scrapertools.find_multiple_matches(block, '<a href="(.*?)" class="dropdown-toggle" data-toggle="dropdown">(.*?)<b')
 
     for url, title in matches:
-        patron = '<li><a href="%s">TODO</a></li>(.*?)</ul>' % url.replace('?', '\?')
+        title = title.strip()
+
+        if title == 'Navegación': continue
+
+        patron = 'data-toggle="dropdown">%s.*?<b(.*?)</ul>' % title
+
         bloque = scrapertools.find_single_match(data, patron)
-        subitems = scrapertools.find_multiple_matches(bloque, '<li><a href="[^"]+">([^<]+)')
 
-        itemlist.append(item.clone( action='subcategorias', title=title.strip(), url=host + url, subitems=subitems, plot=', '.join(subitems) ))
+        subcats = scrapertools.find_multiple_matches(bloque, '<li><a href=".*?>(.*?)</a>')
 
-    return itemlist
+        url = host[:-1] + url
+
+        itemlist.append(item.clone( action='subcategorias', title = title, url = host + url, subcats = subcats, plot=', '.join(subcats) ))
+
+    return sorted(itemlist,key=lambda x: x.title)
+
 
 def subcategorias(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='list_all', title='Todo ' + item.title, url=item.url ))
+    if item.subcats:
+        itemlist.append(item.clone( action='list_all', title='Todo ' + item.title, url=item.url ))
 
-    for subgenero in item.subitems:
-        itemlist.append(item.clone( action='list_all', title=subgenero, url=host+'resultados.php?genero=&buscar='+subgenero.replace(' ', '+') ))
+    for subcat in item.subcats:
+        if subcat == 'TODO': continue
+
+        itemlist.append(item.clone( action = 'list_all', title = subcat, url = host + 'resultados.php?genero=&buscar=' + subcat.replace(' ', '+') ))
 
     return itemlist
 
@@ -68,31 +81,32 @@ def list_all(item):
 
     patron = '<a class="hvr-shutter-out-horizontal" href="([^"]+)"><img (?:data-|)src="([^"]+)" alt="([^"]+)"'
     patron += '.*?&nbsp;&nbsp;&nbsp;(\d+| ).*?<div class="comments-space">(.*?)</div>'
+
     matches = scrapertools.find_multiple_matches(data, patron)
 
     for url, thumb, title, year, plot in matches:
         thumb = host + thumb
         plot = scrapertools.htmlclean(plot).strip()
 
+        if not year: year = '-'
+
         if 'player.php' not in url:
             titulo = '%s [COLOR gray](%s)[/COLOR]' % (title, year)
-            itemlist.append(item.clone( action='list_all', url=url, title=titulo, thumbnail=thumb, plot=plot ))
+            itemlist.append(item.clone( action='list_all', url = url, title = titulo, thumbnail=thumb, infoLabels={"year": year, "plot": plot} ))
         else:
-            itemlist.append(item.clone( action='findvideos', url=host+url, title=title, thumbnail=thumb,
-                                        infoLabels={"year": year, "plot": plot}, contentType='movie', contentTitle=title, contentExtra='documentary' ))
+            itemlist.append(item.clone( action='findvideos', url=host+url, title=title, thumbnail=thumb, infoLabels={"year": year,
+                                        "plot": plot}, contentType='movie', contentTitle=title, contentExtra='documentary' ))
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-         next_page_link = scrapertools.find_single_match(data, '<li><a class="last">\d+</a></li>\s*<li>\s*<a href="([^"]+)')
+         next_page = scrapertools.find_single_match(data, '<li><a class="last">.*?<a href="([^"]+)')
 
-         if next_page_link:
-             if next_page_link.startswith('?'): 
-                 if 'series.php' in item.url: next_page_link = host + 'series.php' + next_page_link
-                 else: next_page_link = host + 'index.php' + next_page_link
-             else: next_page_link = host + next_page_link[1:]
+         if next_page:
+             next_page = next_page.replace('&amp;', '&')
 
-             next_page_link = next_page_link.replace('&amp;', '&')
-
-             itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page_link, text_color='coral' ))
+             if '?page=' in next_page or '/pagina/' in next_page:
+                 itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -110,10 +124,18 @@ def findvideos(item):
     for url, lbl in matches:
         ses += 1
 
-        if '.mp4' not in url and url != 'video.php' and url != 'videoHD.php' and url != 'video3Dfull.php': continue
+        php = False
 
-        if url in ['video.php', 'videoHD.php', 'video3Dfull.php']:
-            url = host + url + '|Referer=' + item.url 
+        if '.mp4' not in url:
+            if 'video.php' in url: pass 
+            elif 'videoHD.php' in url: pass
+            elif 'video3Dfull.php' in url: pass
+            else: continue
+
+            php = True
+
+        if php:
+            url = url + '|Referer=' + item.url 
             url += '&Cookie=' + httptools.get_cookies('www.area-documental.com')
 
         sub_url = scrapertools.find_single_match(data, 'file:\s*"/(webvtt/[^"]+)"')

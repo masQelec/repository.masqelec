@@ -50,7 +50,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -89,7 +89,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_subtorrents', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='subtorrents', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_subtorrents', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -301,20 +301,32 @@ def episodios(item):
             patron += '.*?(?:<td\s*class="capitulosubtitulo">\s*<a\s*href="([^"]+)[^>]+>.*?<\/td>)?'
             patron += '.*?(?:<td\s*class="capitulodescarga">\s*<a\s*(?:target="[^"]*"\s*)?href="([^"]+)")?'
 
+    i = 0
+
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for lang, title, url, year, sub_tit, url_2 in matches:
         if not title: continue
 
+        if not year: year = '-'
+
         s_e = scrapertools.get_season_and_episode(title)
 
-        season = int(s_e.split("x")[0])
-        episode = s_e.split("x")[1]
+        try:
+           season = int(s_e.split("x")[0])
+           epis = s_e.split("x")[1]
+        except:
+           i += 1
+           season = 0
+           epis = i
 
-        if not item.contentSeason: continue
-        elif not str(item.contentSeason) == str(season): continue
+        if item.contentSeason:
+            if not str(item.contentSeason) == str(season): continue
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
+        if not item.contentSerieName in title: title = title + ' ' + item.contentSerieName
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title,contentSerieName = item.contentSerieName, contentType = 'episode',
+                                    contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': year} ))
 
     return sorted(itemlist, key=lambda x: x.contentEpisodeNumber)
 
@@ -400,16 +412,19 @@ def list_search(item):
         title_clean = re.sub('\([^\)]+\)', '', title).strip()
 
         tipo = 'tvshow' if '/series/' in url else 'movie'
-
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
-            if item.search_type == 'tvshow': continue
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, fmt_sufijo=sufijo, 
                                         contentType='movie', contentTitle=title_clean, infoLabels={'year': year} ))
-        else:
-            if item.search_type == 'movie': continue
+									
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title_clean, infoLabels={'year': year} ))

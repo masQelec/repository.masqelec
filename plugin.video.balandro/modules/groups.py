@@ -674,9 +674,10 @@ def ch_groups(item):
             tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
             context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
-            tit = '[COLOR %s][B]Últimos Cambios dominios[/B][/COLOR]' % color_exec
-            context.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
+        tit = '[COLOR %s][B]Últimos Cambios dominios[/B][/COLOR]' % color_exec
+        context.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
+        if cfg_domains:
             tit = '[COLOR yellowgreen][B]Dominio vigente[/B][/COLOR]'
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominio_vigente'})
 

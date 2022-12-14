@@ -7,12 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www6.pelisplushd.to/'
+host = 'https://www4.pelisplushd.lat/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://pelisplushd.net/', 'https://pelisplushd.to/', 'https://www1.pelisplushd.to/',
-             'https://www3.pelisplushd.to/', 'https://www4.pelisplushd.to/', 'https://www5.pelisplushd.to/']
+             'https://www3.pelisplushd.to/', 'https://www4.pelisplushd.to/', 'https://www5.pelisplushd.to/',
+             'https://www6.pelisplushd.to/', 'https://www7.pelisplushd.to/', 'https://www8.pelisplushd.to/',
+             'https://www.pelisplushd.lat/']
 
 
 domain = config.get_setting('dominio', 'pelisplushd', default='')
@@ -51,7 +53,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_pelisplushd', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='pelisplushd', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_pelisplushd', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -235,7 +237,7 @@ def list_all(item):
                 if not '/anime/' in url: continue
 
             itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
-                                        contentType = 'season', contentSerieName = title, infoLabels={'year': '-'} ))
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -278,10 +280,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return sorted(itemlist, key=lambda it: it.title)
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):
@@ -512,19 +510,16 @@ def list_search(item):
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if '/pelicula/' in url:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
-            sufijo = '' if item.search_type != 'all' else 'movie'
-
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
+
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
-
-            sufijo = '' if item.search_type != 'all' else 'tvshow'
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))

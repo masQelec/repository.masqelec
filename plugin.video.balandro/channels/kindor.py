@@ -48,7 +48,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_kindor', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='kindor', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_kindor', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -144,19 +144,19 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(bloque, patron)
 
     for url, thumb, title in matches:
+        if thumb.startswith('//'): thumb = 'https:' + thumb
+
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if thumb.startswith('//'): thumb = 'https:' + thumb
-
-        if '/serie/' in url:
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
-        else:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 

@@ -203,20 +203,42 @@ def list_all(item):
         title = scrapertools.find_single_match(data_thumb, 'class="vid-card_n">(.*?)</span>')
         title = title.replace('(EEEE) p30', '').replace('(EEE) p20', '').replace('(EE)', '').replace('(C)', '').replace('(c)', '').strip()
 
+        invertir_temp_epis = True
+
         if not title:
             order += 1
             title = '¿ Episodio  ' + str(order) + ' ?'
         else:
-            if title.endswith(") 0") == True: title = title.replace(' 0', '')
-            elif title.endswith(") 1") == True: title = title.replace(' 1', '')
-            elif title.endswith(") 2") == True: title = title.replace(' 2', '')
-            elif title.endswith(") 3") == True: title = title.replace(' 3', '')
-            elif title.endswith(") 4") == True: title = title.replace(' 4', '')
-            elif title.endswith(") 5") == True: title = title.replace(' 5', '')
-            elif title.endswith(") 6") == True: title = title.replace(' 6', '')
-            elif title.endswith(") 7") == True: title = title.replace(' 7', '')
-            elif title.endswith(") 8") == True: title = title.replace(' 8', '')
-            elif title.endswith(") 9") == True: title = title.replace(' 9', '')
+            if title.endswith(") 0") == True:
+                invertir_temp_epis = False
+                title = title.replace(' 0', '')
+            elif title.endswith(") 1") == True:
+                invertir_temp_epis = False
+                title = title.replace(' 1', '')
+            elif title.endswith(") 2") == True:
+                invertir_temp_epis = False
+                title = title.replace(' 2', '')
+            elif title.endswith(") 3") == True:
+                invertir_temp_epis = False
+                title = title.replace(' 3', '')
+            elif title.endswith(") 4") == True:
+                invertir_temp_epis = False
+                title = title.replace(' 4', '')
+            elif title.endswith(") 5") == True:
+                invertir_temp_epis = False
+                title = title.replace(' 5', '')
+            elif title.endswith(") 6") == True:
+                invertir_temp_epis = False
+                title = title.replace(' 6', '')
+            elif title.endswith(") 7") == True:
+                invertir_temp_epis = False
+                title = title.replace(' 7', '')
+            elif title.endswith(") 8") == True:
+                invertir_temp_epis = False
+                title = title.replace(' 8', '')
+            elif title.endswith(") 9") == True:
+                invertir_temp_epis = False
+                title = title.replace(' 9', '')
 
         lang = 'Esp'
         if ' Vose' in title or ' VOSE' in title or ' vose' in title or ' V.o.s.e.' in title or ' V.O.S.E.' in title or ' v.o.s.e.' in title: lang = 'Vose'
@@ -227,10 +249,16 @@ def list_all(item):
         if not '"' in title:
             titulo = title.lower()
             titulo = titulo.replace('(', '"').replace(')', '"')
-            temporada = scrapertools.find_single_match(titulo, '.*?"(.*?)x')
-            capitulo = scrapertools.find_single_match(titulo, '.*?".*?x(.*?)"')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, language = lang, thumbnail = thumb, contentType='episode', contentSeason = temporada, contentEpisodeNumber = capitulo ))
+            if not invertir_temp_epis:
+                temporada = scrapertools.find_single_match(titulo, '.*?"(.*?)x')
+                capitulo = scrapertools.find_single_match(titulo, '.*?".*?x(.*?)"')
+            else:
+                temporada = scrapertools.find_single_match(titulo, '.*?".*?x(.*?)"')
+                capitulo = scrapertools.find_single_match(titulo, '.*?"(.*?)x')
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, language = lang, thumbnail = thumb,
+                                    contentType='episode', contentSeason = temporada, contentEpisodeNumber = capitulo ))
 
     return itemlist
 

@@ -146,6 +146,7 @@ def list_all(item):
     bloque = scrapertools.find_single_match(data, '<h2 class="Title">(.*?)<nav class="wp-pagenavi">')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
+
     num_matches = len(matches)
 
     for article in matches[item.page * perpage:]:
@@ -241,7 +242,8 @@ def episodios(item):
         if not url or not episode: continue
 
         title = scrapertools.find_single_match(data_epi, '<td class="MvTbTtl">.*?>(.*?)</a>')
-        titulo = str(item.contentSeason) + 'x' + episode + ' ' + title
+
+        if not item.contentSerieName in title: title = item.contentSerieName + ' ' + str(item.contentSeason) + 'x' + episode + ' ' + title
 
         fecha = scrapertools.find_single_match(data_epi, '<span>(.*?)</span>')
         if fecha: title = title + ' [COLOR gray](' + fecha + ')[/COLOR]'

@@ -110,9 +110,6 @@ def list_all(item):
 
         if not url or not title: continue
 
-        tipo = 'tvshow' if '<span class="TpTv BgA">TV</span>' in article else 'movie'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
@@ -121,14 +118,19 @@ def list_all(item):
 
         qlty = scrapertools.find_single_match(article, '</span><span class="Qlty">(.*?)</span>')
 
+        tipo = 'tvshow' if '<span class="TpTv BgA">TV</span>' in article else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
+
         if tipo == 'tvshow':
-            if item.search_type == 'movie': continue
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                         fmt_sufijo=sufijo, contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
         if tipo == 'movie':
-            if item.search_type == 'tvshow': continue
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty,
                                         fmt_sufijo=sufijo,  contentType='movie', contentTitle=title, infoLabels={'year': year} ))
@@ -169,10 +171,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):

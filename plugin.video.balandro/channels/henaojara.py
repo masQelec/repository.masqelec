@@ -49,8 +49,11 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers).data
+    timeout = None
+    if host in url: timeout = 50
+
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+    data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -58,8 +61,8 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-                data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers).data
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+                data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 

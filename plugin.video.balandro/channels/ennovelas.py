@@ -92,16 +92,23 @@ def last_epis(item):
     num_matches = len(matches)
 
     for url, thumb, title in matches[item.page * perpage:]:
-        epis = scrapertools.find_single_match(title, 'Capitulo (\d+)')
-        if not epis: epis = 1
-
         season = scrapertools.find_single_match(title, ' (\d+) Temporada')
         if not season: season = 1
 
+        epis = scrapertools.find_single_match(title, 'Capitulo (\d+)$')
+        if not epis: epis = 1
+
+        if " - " in title: SerieName = title.split(" - ")[0]
+        elif " Temporada" in title: SerieName = title.split(" Temporada")[0]
+        elif " Capitulo" in title: SerieName = title.split(" Capitulo")[0]
+        else: SerieName = title
+
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= perpage: break
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if num_matches > perpage:

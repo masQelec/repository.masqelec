@@ -254,7 +254,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -311,7 +311,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_playdede', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='playdede', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_playdede', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -495,7 +495,9 @@ def plataformas(item):
         itemlist.append(item.clone(title = title, action = 'list_plataforma', thumbnail = thumb, url = url, id_network = id_network))
 
     if not itemlist:
-        if datos_ko in str(data): platformtools.dialog_notification('PlayDede', close_open)
+        if datos_ko in str(data):
+            platformtools.dialog_notification('PlayDede', close_open)
+            return
 
     return sorted(itemlist, key=(lambda x: x.title))
 
@@ -552,7 +554,9 @@ def generos(item):
             itemlist.append(item.clone( title = 'Documental', action = 'list_all', genre = '?genre=documental' ))
 
     else:
-        if datos_ko in str(data): platformtools.dialog_notification('PlayDede', close_open)
+        if datos_ko in str(data):
+            platformtools.dialog_notification('PlayDede', close_open)
+            return
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -597,7 +601,9 @@ def idiomas(item):
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, lang = idioma ))
 
     if not itemlist:
-        if datos_ko in str(data): platformtools.dialog_notification('PlayDede', close_open)
+        if datos_ko in str(data):
+            platformtools.dialog_notification('PlayDede', close_open)
+            return
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -624,7 +630,9 @@ def calidades(item):
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, qlty = calidad ))
 
     if not itemlist:
-        if datos_ko in str(data): platformtools.dialog_notification('PlayDede', close_open)
+        if datos_ko in str(data):
+            platformtools.dialog_notification('PlayDede', close_open)
+            return
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -655,7 +663,9 @@ def paises(item):
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, country = pais ))
 
     if not itemlist:
-        if datos_ko in str(data): platformtools.dialog_notification('PlayDede', close_open)
+        if datos_ko in str(data): 
+            latformtools.dialog_notification('PlayDede', close_open)
+            return
 
     return itemlist
 
@@ -785,6 +795,8 @@ def list_last(item):
 
     data = data.replace('\\/', '/')
 
+    i = 0
+
     matches = re.compile('<article(.*?)</article>').findall(data)
 
     num_matches = len(matches)
@@ -825,18 +837,84 @@ def list_last(item):
             titulo = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
             titulo = titulo.replace('/episodios/', '').replace('_1', '').replace('_', ' ').replace('-', ' ').strip()
-            titulo = titulo.replace('//', '')
+            titulo = titulo.replace('//', '').strip()
 
             titulo = titulo.capitalize()
 
             thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
             thumb = thumb.replace('http:', 'https:')
 
-            season = scrapertools.find_single_match(match, '<span>(.*?)-').strip()
-            epis = scrapertools.find_single_match(match, '<span>.*?-(.*?)</span>').strip()
+            s_e = scrapertools.get_season_and_episode(title)
+
+            try:
+               season = int(s_e.split("x")[0])
+               epis = s_e.split("x")[1]
+            except:
+               i += 1
+               season = 0
+               epis = i
+
+            title = title.replace('/', '').strip()
+
+            titulo = titulo.replace(str(season) + 'x' + epis, '').strip()
+            titulo = titulo.replace(title, '').strip()
+
+            if not 'Episodio' in title: titulo = titulo +  ' ' + title
+
+            SerieName = titulo
+
+            del_temp_epis = ''
+            del_titulo = ''
+            del_num_url = ''
+
+            if '_' in url:
+                del_num_url = scrapertools.find_single_match(url, '_(.*?)-').strip()
+                if not del_num_url: del_num_url = scrapertools.find_single_match(del_num_url, '_(.*?)$').strip()
+
+                if '_' in del_num_url:
+                    del_num_url = scrapertools.find_single_match(del_num_url, '_(.*?)$').strip()
+
+                    if '_' in del_num_url:
+                        while '_' in del_num_url:
+                           del_num_url = scrapertools.find_single_match(del_num_url, '_(.*?)$').strip()
+
+                try:
+                   del_num_url = int(del_num_url)
+                   titulo = titulo.replace(str(del_num_url), '').strip()
+                except:
+                   del_num_url = ''
+
+            if ':' in title: del_temp_epis = scrapertools.find_single_match(title, ':(.*?)$').strip()
+
+            if ':' in titulo:
+                del_titulo = scrapertools.find_single_match(titulo, ':(.*?)$').strip()
+                titulo = titulo.replace(del_titulo, '').strip()
+                titulo = titulo.replace(':', '').strip()
+
+            if del_temp_epis:
+                SerieName = SerieName.replace(del_temp_epis, '').strip()
+                SerieName = SerieName.replace(':', '').strip()
+
+            if del_num_url:
+                ini_SerieName = SerieName
+                SerieName = SerieName.replace(str(del_num_url), '').strip()
+
+                if ini_SerieName == SerieName:
+                    del_num_url = str(del_num_url)[1:]
+
+                    if del_num_url:
+                        SerieName = SerieName.replace(str(del_num_url), '').strip()
+
+                        if del_num_url in titulo: titulo = titulo.replace(str(del_num_url), '').strip()
+
+            titulo = titulo.replace('  ', ' ')
+
+            if not 'x' in titulo: titulo = titulo + ' ' + str(season) + 'x' + str (epis)
+
+            SerieName = SerieName.replace('  ', ' ')
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
-                                        contentSerieName = titulo, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= perpage: break
 
@@ -1193,13 +1271,19 @@ def list_search(item):
         year = scrapertools.find_single_match(match, '<p>, (\d+)</p>')
         if not year: year = '-'
 
-        if '/pelicula/' in url:
-            sufijo = '' if item.search_type != 'all' else 'movie'
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
-        else:
-            sufijo = '' if item.search_type != 'all' else 'tvshow'
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo, 
                                         contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
@@ -1226,6 +1310,16 @@ def list_search(item):
                 next_url = scrapertools.find_single_match(data, patron)
                 if next_url:
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_search', page = 0, text_color = 'coral' ))
+
+    if not itemlist:
+        if datos_ko in str(data):
+            avisar = False
+            # ~ Buscar solo de la opcion del canal
+            if item.plot: avisar = True
+            elif config.get_setting('notificar_login', default=False): avisar = True
+
+            if avisar: platformtools.dialog_notification('PlayDede', close_open)
+            return
 
     return itemlist
 

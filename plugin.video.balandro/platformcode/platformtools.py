@@ -134,6 +134,7 @@ def dialog_textviewer(heading, text):
 
 def dialog_recaptcha(sitekey, referer):
     from platformcode import recaptcha
+
     return recaptcha.get_recaptcha_response(sitekey, referer)
 
 
@@ -405,14 +406,10 @@ def set_context_commands(item, parent_item, colores):
 
             c_it = item.clone(**command) if link_item == 'clone' else Item(**command)
 
-            if link_mode == 'refresh':
-                context_commands.append( (titulo, config.build_ContainerRefresh(c_it)) )
-            elif link_mode == 'update':
-                context_commands.append( (titulo, config.build_ContainerUpdate(c_it)) )
-            elif link_mode == 'replace':
-                context_commands.append( (titulo, config.build_ContainerUpdate(c_it, replace=True)) )
-            else:
-                context_commands.append( (titulo, config.build_RunPlugin(c_it)) )
+            if link_mode == 'refresh': context_commands.append( (titulo, config.build_ContainerRefresh(c_it)) )
+            elif link_mode == 'update': context_commands.append( (titulo, config.build_ContainerUpdate(c_it)) )
+            elif link_mode == 'replace': context_commands.append( (titulo, config.build_ContainerUpdate(c_it, replace=True)) )
+            else: context_commands.append( (titulo, config.build_RunPlugin(c_it)) )
 
     # Guardar seguimiento (preferidos)
     if not config.get_setting('mnu_simple', default=False):
@@ -614,6 +611,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
     if os.path.isfile(os.path.join(config.get_runtime_path(), 'core', 'developertools.py')):
         try:
            from core import developertools
+
            developertools.developer_mode_check_findvideos(itemlist, parent_item)
         except:
            pass
@@ -634,6 +632,7 @@ def play_from_itemlist(itemlist, parent_item):
     # si viene de tracking, parent_item contiene los datos mínimos, recuperar infolabels
     if parent_item.channel == 'tracking':
         from core import trackingtools
+
         trackingtools.set_infolabels_from_min(parent_item)
         # Para algunos servers (ej: gamovideo) se necesita la url para usar como referer
         if len(itemlist) > 0: parent_item.url = itemlist[0].parent_item_url
@@ -646,6 +645,7 @@ def play_from_itemlist(itemlist, parent_item):
     total_enlaces = len(itemlist)
     
     from core import servertools
+
     itemlist = servertools.filter_and_sort_by_quality(itemlist)
     itemlist = servertools.filter_and_sort_by_server(itemlist)
     itemlist = servertools.filter_and_sort_by_language(itemlist)
@@ -810,6 +810,7 @@ def play_video(item, parent_item, autoplay=False):
         video_urls, puedes, motivo = item.video_urls, True, ""
     else:
         from core import servertools
+
         url_referer = item.url_referer if item.url_referer else parent_item.url
         video_urls, puedes, motivo = servertools.resolve_video_urls_for_playing(item.server, item.url, url_referer=url_referer)
 
@@ -953,6 +954,7 @@ def play_torrent(mediaurl, parent_item):
     notification_d_ok = config.get_setting('notification_d_ok', default=True)
 
     from core import jsontools
+
     torrent_clients = jsontools.get_node_from_file('torrent.json', 'clients', os.path.join(config.get_runtime_path(), 'servers'))
 
     cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')

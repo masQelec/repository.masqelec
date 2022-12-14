@@ -6,6 +6,7 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+
 host = 'https://www3.gnula24.xyz/'
 
 
@@ -34,10 +35,10 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + 'ver-episodio/', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings/', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + 'ver-episodio/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Novelas', action = 'list_all', url = host + 'genero/novelas/', search_type = 'tvshow' ))
 
@@ -168,7 +169,6 @@ def last_episodes(item):
 
     matches = scrapertools.find_multiple_matches(bloque, 'data-ids=(.*?)</article>')
 
-
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
 
@@ -191,6 +191,8 @@ def last_episodes(item):
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=title,
                                    contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if '<span class="current">' in data:
@@ -240,10 +242,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):

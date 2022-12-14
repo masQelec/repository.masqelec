@@ -53,7 +53,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_cinecalidadla', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='cinecalidadla', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_cinecalidadla', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -150,6 +150,8 @@ def list_all(item):
             year = m.group(2)
         else:
             year = '-'
+
+        if not year: year = '-'
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
                                     contentType = 'movie', contentTitle = title, infoLabels = {'year': year, 'plot': plot} ))

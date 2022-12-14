@@ -110,8 +110,13 @@ def get_settings_proxytools(canal):
     tipo_proxy = config.get_setting('proxytools_tipo', canal, default='')
     pais_proxy = config.get_setting('proxytools_pais', canal, default='')
 
-    if proxies_maximo: valor = 50
-    else: valor = 20
+    if provider == all_providers:
+        if proxies_maximo: valor = 50
+        else: valor = 20
+    else:
+        valor = proxies_totales_limit
+        config.set_setting('proxytools_max', valor, canal)
+        time.sleep(0.5)
 
     max_proxies = config.get_setting('proxytools_max', canal, default=valor)
 
@@ -183,7 +188,7 @@ def configurar_proxies_canal(canal, url):
 
                 if not el_memorizado in str(channels_proxies_memorized):
                     if not channels_proxies_memorized:
-                        channels_proxies_memorized = channels_proxies_memorized  + el_memorizado + ','
+                        channels_proxies_memorized = channels_proxies_memorized + el_memorizado + ','
                     else:
                         channels_proxies_memorized = channels_proxies_memorized + ' ' + el_memorizado + ','
                     config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
@@ -776,7 +781,7 @@ def _buscar_proxies(canal, url, provider, procesar):
     if search_provider:
         proxies = all_providers_proxies
 
-        if len(proxies) > 50: platformtools.dialog_notification('Buscar proxies', '[B][COLOR %s]Cargando proxies ...[/COLOR][/B]' % color_adver)
+        if len(proxies) >= 50: platformtools.dialog_notification('Buscar proxies', '[B][COLOR %s]Cargando proxies ...[/COLOR][/B]' % color_adver)
 
         tot_proxies = len(proxies)
         if tot_proxies >= proxies_totales_limit: tot_proxies = proxies_totales_limit
@@ -1359,8 +1364,11 @@ def acumulaciones(provider, proxies, all_providers_proxies, max_proxies):
         tot_proxies = len(proxies)
 
         if tot_proxies >= 50:
-           if proxies_totales: pass
-           else: tot_proxies = 50
+            if provider == all_providers:
+                if proxies_totales: pass
+                else: tot_proxies = 50
+        else:
+            tot_proxies = proxies_totales_limit
 
         if max_proxies:
             if proxies_totales: pass
@@ -1397,7 +1405,7 @@ def testear_lista_proxies(canal, provider, url, proxies=[]):
 
     num_proxies = float(len(proxies)) # float para calcular porcentaje
 
-    progreso = platformtools.dialog_progress('Test proxies ' + '[COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR] con ' + provider.capitalize(), '%d proxies a comprobar. Cancelar si tarda demasiado.' % num_proxies)
+    progreso = platformtools.dialog_progress('Test proxies ' + '[COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR] con [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '%d proxies a comprobar. Cancelar si tarda demasiado.' % num_proxies)
 
     repeated = 0
 
@@ -1450,7 +1458,7 @@ def testear_lista_proxies(canal, provider, url, proxies=[]):
     progreso.close()
 
     if not proceso_test:
-        if platformtools.dialog_yesno('ERROR Test proxies en ' + provider.capitalize(), '[COLOR red][B]Sin disponibilidad de suficiente Memoria para este proceso.[/B][/COLOR]', '[COLOR yellow][B]¿ Desea anular el test automatico en TODOS los proveedores para intentar evitar este inconveniente ?[/B][/COLOR]'):
+        if platformtools.dialog_yesno('ERROR Test proxies en [COLOR yellow][B]' + provider.capitalize() + '[/B][/COLOR]', '[COLOR red][B]Sin disponibilidad de suficiente Memoria para este proceso.[/B][/COLOR]', '[COLOR yellow][B]¿ Desea anular el test automatico en TODOS los proveedores para intentar evitar este inconveniente ?[/B][/COLOR]'):
             config.set_setting('proxies_auto', False)
 
     # Ordenar según proxy válido y tiempo de respuesta

@@ -1,5 +1,6 @@
 {
   "id": "streamsb",
+  "more_ids": ["streamsb.com"],
   "name": "Streamsb",
 
   "active": true,
@@ -9,7 +10,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(?:streamsb.net|sbembed.com|sbembed1.com|sbplay.org|sbplay.one|sbplay1.com|sbplay2.com|sbplay2.xyz|pelistop.co|sbfast.com|sbfull.com|ssbstream.net|sbthe.com|sbspeed.com|streamsss.net|sblanh.com|sbanh.com)/(?:embed-|d/|e/)([A-z0-9]+)",
+        "pattern": "(?:streamsb.net|sbplay.org|sbplay.one|sbplay1.com|sbplay2.com|sbplay2.xyz|pelistop.co|sbfast.com|sbfull.com|ssbstream.net|sbthe.com|sbspeed.com|streamsss.net|sblanh.com|sbanh.com|sblongvu.com)/(?:embed-|d/|e/)([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -114,6 +115,18 @@
       },
       {
         "pattern": "(?:sbfast.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sblongvu.com)/(?:embed-|d/|e/)([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sblongvu.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sblongvu.com)/([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
       }
     ]

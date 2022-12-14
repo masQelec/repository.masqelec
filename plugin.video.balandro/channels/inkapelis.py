@@ -60,7 +60,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -112,7 +112,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_inkapelis', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='inkapelis', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_inkapelis', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -333,12 +333,14 @@ def list_all(item):
 
         title_alt = title.split('(')[0].strip() if ' (' in title else ''
 
-        tipo = 'tvshow' if '/serie/' in url else 'movie'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         year = scrapertools.find_single_match(article, '<span class="year">(\d+)</span>')
         if not year: year = scrapertools.find_single_match(article, '<span>(\d{4})</span>')
+        if not year: year = '-'
+
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<div class="texto">(.*?)</div>'))
+
+        tipo = 'tvshow' if '/serie/' in url else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
 
         if '/pelicula/' in url:
             if item.search_type != 'all':
@@ -402,10 +404,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -417,7 +415,8 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, "<span class=.*?se-t.*?>" + str(season) + "</span>(.*?)</ul></div></div>")
+    if item.no_block: bloque = data
+    else: bloque = scrapertools.find_single_match(data, "<span class=.*?se-t.*?>" + str(season) + "</span>(.*?)</ul></div></div>")
 
     matches = re.compile("<li class=mark-(.*?)</div></li>").findall(bloque)
 
@@ -446,7 +445,7 @@ def episodios(item):
         titulo = season + 'x' + epis + ' ' + title
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
-                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+                                    contentSerieName = item.contentSerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -479,21 +478,23 @@ def last_episodes(item):
 
         if not url or not title: continue
 
-        season = scrapertools.find_single_match(article, '<span>T(.*?) E').strip()
-        episode = scrapertools.find_single_match(article, '<span>T.*? E(.*?) /').strip()
+        season = scrapertools.find_single_match(article, '<span>T(.*?)E').strip()
+        episode = scrapertools.find_single_match(article, '<span>T.*?E(.*?)/').strip()
         if not season or not episode: continue
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
-        if not thumb: thumb = scrapertools.find_single_match(article, ' src=(.*?)>').strip()
+        if not thumb: thumb = scrapertools.find_single_match(article, ' src=(.*?)alt=').strip()
         if thumb.startswith('//'): thumb = 'https:' + thumb
+
+        title = title.replace('&#215;', ' ')
+        if ":" in title: title = title.split(":")[0]
 
         titulo = season + 'x' + episode + ' ' + title.strip()
 
-        titulo = titulo.replace('&#215;', ' ')
-        title = title.replace('&#215;', ' ')
-
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail = thumb, url = url,
                                     contentType = 'episode', contentSerieName = title, contentSeason = season, contentEpisodeNumber = episode ))
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "href='(.*?)'")
@@ -524,16 +525,19 @@ def last_seasons(item):
             title = scrapertools.find_single_match(article, 'alt="(.*?)"')
             if not title: title = scrapertools.find_single_match(article, 'alt=(.*?)>').strip()
 
-        numtempo = scrapertools.find_single_match(article, '>Temporada (.*?)</a>')
+        numtempo = scrapertools.find_single_match(article, '<span class=b>(.*?)</span>')
 
         if not url or not title or not numtempo: continue
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
-        if not thumb: thumb = scrapertools.find_single_match(article, ' src=(.*?)>').strip()
+        if not thumb: thumb = scrapertools.find_single_match(article, ' src=(.*?)alt=').strip()
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
-        itemlist.append(item.clone( action='episodios', title=title, thumbnail=thumb, url = url,
-                                    contentType='season', contentSeason=numtempo, contentSerieName=title ))
+        serie_name = title.replace('&#215;', ' ')
+        if ":" in serie_name: serie_name = serie_name.split(":")[0]
+
+        itemlist.append(item.clone( action='episodios', title=title, thumbnail=thumb, url = url, no_block = True,
+                                    contentSerieName=serie_name, contentType='season', contentSeason=numtempo ))
 
     tmdb.set_infoLabels(itemlist)
 

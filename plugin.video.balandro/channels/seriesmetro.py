@@ -6,7 +6,9 @@ from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+
 host = 'https://seriesmetro.net/'
+
 
 perpage = 30
 
@@ -108,6 +110,7 @@ def list_all(item):
     elif '<aside class="sidebar"' in data: data = data.split('<aside class="sidebar"')[0]
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
+
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)" class="lnk-blk"')
         title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
@@ -120,14 +123,16 @@ def list_all(item):
         if not year: year = '-'
 
         plot = scrapertools.find_single_match(article, '<p><p>(.*?)</p>')
+        plot = scrapertools.htmlclean(plot)
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': scrapertools.htmlclean(plot)} ))
+                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]*><i class="fa-arrow-right">')
+
         if next_page:
             itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
 
@@ -153,6 +158,7 @@ def last_epis(item):
         title = scrapertools.find_single_match(article, '<span class="tvshow">(.*?)</span>').strip()
 
         season, episode = scrapertools.find_single_match(article, '<span class="tv-num">T(.*?)E(.*?)</span>')
+
         season = season.strip()
         episode = episode.strip()
 
@@ -297,9 +303,10 @@ def findvideos(item):
     if not dterm: return itemlist
 
     matches = scrapertools.find_multiple_matches(data, '<a data-opt="([^"]+)".*?<span class="option">(?:Cload|CinemaUpload) - ([^<]*)')
+
     for dopt, lang in matches:
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', dterm = dterm, dopt = dopt, url = item.url, 
-                              language = IDIOMAS.get(lang, lang) ))
+                                                      language = IDIOMAS.get(lang, lang) ))
 
     return itemlist
 
@@ -337,6 +344,7 @@ def play(item):
                 data = do_downloadpage(new_url, raise_weberror=False)
 
         url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
+
         if url:
             if '/download/' in url:
                 url = url.replace('//download/', '/files/').replace('/download/', '/files/')

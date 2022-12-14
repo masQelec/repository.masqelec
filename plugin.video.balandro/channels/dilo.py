@@ -222,11 +222,17 @@ def list_all(item):
     data = do_downloadpage(item.url)
 
     matches = re.compile('<div class="col-lg-2 col-md-3 col-6 mb-3">\s*<a(.*?)</a>\s*</div>', re.DOTALL).findall(data)
+
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
-        thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         title = scrapertools.find_single_match(article, '<div class="text-white[^"]*">([^<]+)</div>').strip()
+
+        if not url or not title: continue
+
         year = scrapertools.find_single_match(article, '<div class="txt-gray-200 txt-size-\d+">(\d+)</div>')
+        if not year: year = '-'
+
+        thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
 
         if descartar_xxx and ('/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url): continue
 
@@ -371,10 +377,10 @@ def last_episodes(item):
         thumb = scrapertools.find_single_match(match, ' src="([^"]+)"')
         name = scrapertools.find_single_match(match, ' style="max.*?">(.*?)</div>')
 
-        temp_epis = titulo.replace(titulo, name)
+        temp_epis = scrapertools.find_single_match(match, '</div><div>(.*?)</div>')
 
         season = scrapertools.find_single_match(temp_epis, '(.*?)x')
-        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)')
+        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$')
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=name,
                                    contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))

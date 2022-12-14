@@ -230,9 +230,6 @@ def list_all(item):
 
         if not url or not title: continue
 
-        tipo = 'movie' if '/ver-pelicula' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
@@ -245,14 +242,20 @@ def list_all(item):
         if '/mexico2.png' in match: langs.append('Lat')
         if '/subs.png' in match: langs.append('Vose')
 
-        if '/ver-pelicula' in url:
-            if item.search_type == 'tvshow': continue
+        tipo = 'movie' if '/ver-pelicula' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                         qualities=qlty, languages=', '.join(langs), ref=url, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
-            if item.search_type == 'movie': continue
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, ref=url, fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))

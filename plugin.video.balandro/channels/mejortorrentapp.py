@@ -193,30 +193,33 @@ def list_all(item):
 
     bloque = scrapertools.find_single_match(data, '<div class=""><span class="bg-mejortorrent-card-(.*?)$')
 
-    matches = scrapertools.find_multiple_matches(bloque, r'href="([^"]+)">([^<]+)</a>.*?<b>(.*?)<')
+    matches = scrapertools.find_multiple_matches(bloque, 'href="([^"]+)">([^<]+)</a>.*?<b>(.*?)<')
 
     num_matches = len(matches)
 
     for url, title, qlty in matches[item.page * perpage:]:
-        title = title.replace('-', ' ')
-
-        if '4K' in title: title = title.replace('[4K]', '').replace('4K', '').strip()
-        elif '3D' in title: title = title.replace('[3D]', '').replace('3D', '').strip()
-
         qlty = qlty.replace('(', '').replace(')', '').strip()
 
         thumb = scrapertools.find_single_match(data, url + '.*?<img src="(.*?)"')
 
         url = host + url
 
+        title = title.replace('-', ' ')
+
         if item.search_type == 'movie':
+            titulo = title
+
+            if '4K' in titulo: titulo = title.replace('[4K]', '').replace('4K', '').strip()
+            elif '3D' in titulo: titulo = title.replace('[3D]', '').replace('3D', '').strip()
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+                                        contentType='movie', contentTitle=titulo, infoLabels={'year': '-'} ))
         else:
-            titulo = title.replace('Temporada', '').strip()
+            if " - " in title: SerieName = title.split(" - ")[0]
+            else: SerieName = title
 
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, qualities=qlty,
-                                        contentType='tvshow', contentSerieName=titulo, infoLabels={'year': '-'} ))
+                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -260,9 +263,6 @@ def list_list(item):
 
         if not url or not title: continue
 
-        if '4K' in title: title = title.replace('[4K]', '').replace('4K', '').strip()
-        elif '3D' in title: title = title.replace('[3D]', '').replace('3D', '').strip()
-
         qlty = scrapertools.find_single_match(match, '<strong>(.*?)</strong>')
 
         qlty = qlty.replace ('(', '').replace (')', '').strip()
@@ -289,12 +289,27 @@ def list_list(item):
             elif type == 'series': sufijo = 'tvshow'
             else: sufijo = '[COLOR yellow]Documental[/COLOR]'
 
-        if item.search_type == 'movie':
+        title = title.replace('-', ' ')
+
+        if item.search_type == 'movie' or item.search_type == 'documentary':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+            titulo = title
+
+            if '4K' in titulo: titulo = title.replace('[4K]', '').replace('4K', '').strip()
+            elif '3D' in titulo: titulo = title.replace('[3D]', '').replace('3D', '').strip()
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
-        else:
+                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
+
+        if item.search_type == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+            if " - " in title: SerieName = title.split(" - ")[0]
+            else: SerieName = title
+
             itemlist.append(item.clone( action='episodios', url = url, title = title, fmt_sufijo = sufijo,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': year} ))
 
         if len(itemlist) >= perpage: break
 
@@ -325,20 +340,57 @@ def episodios(item):
 
     bloque = scrapertools.find_single_match(data, '>Episodios:(.*?)</tbody>')
 
-    season = scrapertools.find_single_match(bloque, '-Temporada-(.*?)-')
-    if not season: season = 0
+    matches = scrapertools.find_multiple_matches(bloque, '<tr wire:key="episode-(.*?)".*?<a href="(.*?)"')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
+    tempo = 0
+
+    for nro_epis, link in matches:
+        s_e = scrapertools.get_season_and_episode(link)
+
+        try:
+           tempo = int(s_e.split("x")[0])
+        except:
+           pass
+
+        if not tempo == 0:
+           break
 
     i = 0
 
-    for url in matches:
+    matches = scrapertools.find_multiple_matches(bloque, '<tr wire:key="episode-(.*?)".*?<a href="(.*?)"')
+
+    for num_epis, url in matches:
         i += 1
 
-        title = str(season) + 'x' + str(i) + ' ' + item.contentTitle
+        if not tempo == 0:
+            season = tempo
+            episode = num_epis
+        else:
+            if 'Cap. ' in str(item.qualities):
+               season = scrapertools.find_single_match(str(item.qualities), 'Cap. (.*?)-').strip()
+               episode = scrapertools.find_single_match(str(item.qualities), '-(.*?)$').strip()
+            else:
+               s_e = scrapertools.get_season_and_episode(url)
+ 
+               try:
+                  season = int(s_e.split("x")[0])
+                  episode = s_e.split("x")[1]
+               except:
+                  i += 1
+                  season = 0
+                  episode = i
+
+        title = str(season) + 'x' + str(i) + ' ' + item.contentSerieName
+
+        if "Temporada" in title: title = title.split("Temporada")[0]
+        else: title = title
+
+        SerieName = title.replace(season + 'x' + episode, '').strip()
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title,
-                                    contentType='episode', contentSeason = season, contentEpisodeNumber = i ))
+                                    contentSerieName = SerieName, contentType='episode', contentSeason = season, contentEpisodeNumber = episode ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 

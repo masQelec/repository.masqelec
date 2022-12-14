@@ -9,7 +9,7 @@ from core import httptools, scrapertools, tmdb, servertools
 
 # ~ 27/10/2022 por los controles que tiene la web necesitara proxies siempre incluso para hacer Play?
 
-host = 'https://ze.repelis24.cx/'
+host = 'https://repelis24.se/'
 
 
 # ~ por si viene de enlaces guardados
@@ -21,7 +21,10 @@ ant_hosts = ['https://repelis24.co/', 'https://ww1.repelis24.so/', 'https://www2
              'https://wwo.repelis24.cx/', 'https://wwu.repelis24.cx/', 'https://waw.repelis24.cx/',
              'https://rw.repelis24.cx/', 'https://ju.repelis24.cx/', 'https://ev.repelis24.cx/',
              'https://cy.repelis24.cx/', 'https://me.repelis24.cx/', 'https://ge.repelis24.cx/',
-             'https://fv.repelis24.cx/']
+             'https://fv.repelis24.cx/', 'https://ze.repelis24.cx/', 'https://ab.repelis24.cx/',
+             'https://ek.repelis24.cx/', 'https://sa.repelis24.cx/', 'https://sn.repelis24.cx/',
+             'https://uc.repelis24.cx/', 'https://vw.repelis24.cx/', 'https://ob.repelis24.cx/',
+             'https://sj.repelis24.cx/', 'https://vn.repelis24.cx/']
 
 
 domain = config.get_setting('dominio', 'repelis24', default='')
@@ -68,7 +71,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -121,7 +124,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_repelis24', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='repelis24', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_repelis24', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -355,9 +358,6 @@ def list_all(item):
 
         if not url or not title: continue
 
-        tipo = 'tvshow' if '/serie/' in url else 'movie'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(article, 'data-src=(.*?) alt=').strip()
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
@@ -371,16 +371,19 @@ def list_all(item):
         year = scrapertools.find_single_match(article, '<span class=imdb>.*?<span>(.*?)</span>')
         if not year: year = '-'
 
-        if '/serie/' in url:
-            if item.search_type != 'all':
-                if item.search_type == 'movie': continue
+        tipo = 'tvshow' if '/serie/' in url else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action ='temporadas', url = url, title = title, thumbnail = thumb, qualities=qlty, languages=', '.join(langs),
                                         fmt_sufijo=sufijo, contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
-        if '/pelicula/' in url:
-            if item.search_type != 'all':
-                if item.search_type == 'tvshow': continue
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title = title, thumbnail = thumb, qualities=qlty, languages=', '.join(langs),
                                         fmt_sufijo=sufijo, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
@@ -424,10 +427,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):

@@ -16,11 +16,50 @@ from lib import decrypters
 
 host = 'https://www.divxtotal.cc/'
 
+
 host_play = 'https://www.divxtotal.cat/'
 
 
+# ~ 11/2022 Para play en peliculas necesita proxies por bloqueo operadoras
+
+
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_divxtotalcc_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    if not url.startswith(host_play):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('divxtotalcc', url, post=post, headers=headers).data
 
     return data
 
@@ -28,6 +67,8 @@ def do_downloadpage(url, post=None, headers=None):
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -40,6 +81,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -56,6 +99,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -128,9 +173,6 @@ def list_all(item):
 
         url = host[:-1] + url
 
-        tipo = 'movie' if '/peliculas' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         titulo = title
 
         titulo = titulo.replace('(720)', '').replace('(720p)', '').replace('(1080)', '').replace('(1080p)', '').replace('(microHD)', '').replace('(BR-Line)', '').strip()
@@ -139,21 +181,31 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, "'(.*?)'")
 
-        if '/peliculas' in url:
+        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
             if not item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
+
+            if "(" in titulo: titulo = titulo.split("(")[0]
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                     contentType='movie', contentTitle=titulo, infoLabels={'year': "-" } ))
 
-        if '/series/' in url:
+        if tipo == 'tvshow':
             if not item.search_type == 'all':
                 if item.search_type == 'movie': continue
 
             titulo = titulo.replace(' - serie', '').strip()
 
+            titulo = titulo.replace(' - serie', '').strip()
+
+            if " - " in titulo: SerieName = titulo.split(" - ")[0]
+            else: SerieName = titulo
+
             itemlist.append(item.clone( action='temporadas', url=url, title=titulo, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = titulo, infoLabels={'year': "-" } ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': "-" } ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -173,6 +225,8 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
+    seasons = []
+
     data = do_downloadpage(item.url)
 
     temporadas = re.compile('class="titulotemporada".*?">(.*?)</a>', re.DOTALL).findall(data)
@@ -189,15 +243,14 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo ))
+        if not tempo in str(seasons):
+           seasons.append(['Season: ' + tempo])
+
+           itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):
@@ -208,6 +261,7 @@ def episodios(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '">Temporada ' + str(item.contentSeason) + '</a>(.*?)</tbody>')
+    if not bloque: bloque = scrapertools.find_single_match(data, '">Temporada ' + str(item.contentSeason) + '</a>(.*?)</div></div>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
 
@@ -215,13 +269,30 @@ def episodios(item):
 
     for match in matches:
         title = scrapertools.find_single_match(match, 'title="">(.*?)</a>')
+        if not title: title = scrapertools.find_single_match(match, '<a href=.*?title="(.*?)"')
 
         if not title: continue
 
-        i =+ 1
+        s_e = scrapertools.get_season_and_episode(title)
 
-        itemlist.append(item.clone( action='findvideos', match=match, title=title, 
-                                    language = 'Esp', contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = str(i) ))
+        try:
+           season = int(s_e.split("x")[0])
+           episode = s_e.split("x")[1]
+        except:
+           i += 1
+           season = 0
+           episode = i
+
+        title = '%sx%s %s' % (str(item.contentSeason), episode, item.contentSerieName)
+
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        if url.startswith('/'): url = host[:-1] + url
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, match=match,
+                                    language = 'Esp', contentSeason = item.contentSeason, contentType = 'episode', contentEpisodeNumber = episode ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -249,6 +320,10 @@ def findvideos(item):
 
     qlty = scrapertools.find_single_match(data, '>Formato:.*?<p>(.*?)</p>')
 
+    if item.url.endswith('.torrent'):
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent', language = lang, quality = qlty))
+        return itemlist
+
     link1 = scrapertools.find_multiple_matches(data, 'class="linktorrent".*?.*?href="(.*?)"')
 
     link2 = scrapertools.find_multiple_matches(data, 'class="opcion_2".*?href="(.*?)"')
@@ -265,7 +340,9 @@ def findvideos(item):
         if link.startswith('??'): continue
 
         other = ''
-        if not link.startswith('http'): other = 'Directo'
+        if not link.startswith('http'):
+            if link.startswith('/'): link = host[:-1] + link
+            other = 'Directo'
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent',
                               language = lang, quality = qlty, other = other))
@@ -287,7 +364,7 @@ def play(item):
 
         if PY3:
             from core import requeststools
-            data = requeststools.read(item.url, '')
+            data = requeststools.read(item.url, 'divxtotalcc')
         else:
             data = do_downloadpage(item.url)
 
@@ -297,6 +374,9 @@ def play(item):
                    platformtools.dialog_ok('DivxTotalCc', '[COLOR yellow]Archivo no encontrado[/COLOR]')
                    return itemlist
                elif '<p>Por causas ajenas a ' in str(data):
+                   if not config.get_setting('proxies', item.channel, default=''):
+                       return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+
                    return 'Archivo [COLOR red]bloqueado[/COLOR]'
             except:
                pass
@@ -317,7 +397,7 @@ def play(item):
     if item.url.endswith('.torrent'):
         if PY3:
             from core import requeststools
-            data = requeststools.read(item.url, '')
+            data = requeststools.read(item.url, 'divxtotalcc')
         else:
             data = do_downloadpage(item.url)
 
@@ -327,6 +407,9 @@ def play(item):
                    platformtools.dialog_ok('DivxTotalCc', '[COLOR yellow]Archivo no encontrado[/COLOR]')
                    return itemlist
                elif '<p>Por causas ajenas a ' in str(data):
+                   if not config.get_setting('proxies', item.channel, default=''):
+                       return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+
                    return 'Archivo [COLOR red]bloqueado[/COLOR]'
             except:
                pass
@@ -342,7 +425,7 @@ def play(item):
 def search(item, texto):
     logger.info()
     try:
-       item.url = host + '?s=' + texto.replace(" ", "+")
+       item.url = host + '?q=' + texto.replace(" ", "+")
        return list_all(item)
     except:
        import sys

@@ -160,10 +160,8 @@ def generos(item):
     for tit, opc in opciones:
         url = host + 'category/' + opc + '/'
 
-        if item.search_type == 'tvshow':
-            url = url + '?tr_post_type=2'
-        else:
-            url = url + '?tr_post_type=1'
+        if item.search_type == 'tvshow': url = url + '?tr_post_type=2'
+        else: url = url + '?tr_post_type=1'
 
         itemlist.append(item.clone( title = tit, action = 'list_all', url = url ))
 
@@ -177,18 +175,14 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    if item.search_type == 'tvshow':
-       tope = 1999
-    else:
-       tope = 1999
+    if item.search_type == 'tvshow': tope = 1999
+    else: tope = 1999
 
     for x in range(current_year, tope, -1):
         url = host + '?s=trfilter&trfilter=1&years%5B%5D=' + str(x)
 
-        if item.search_type == 'tvshow':
-            url = url + '&tr_post_type=2'
-        else:
-            url = url + '&tr_post_type=1'
+        if item.search_type == 'tvshow': url = url + '&tr_post_type=2'
+        else: url = url + '&tr_post_type=1'
 
         itemlist.append(item.clone( title = str(x), action = 'list_all', url = url ))
 
@@ -202,10 +196,8 @@ def list_all(item):
     item.url = item.url.replace('&#038;', '&')
 
     if not 'tr_post_type=' in item.url:
-        if item.search_type == 'tvshow':
-            item.url = item.url + '?tr_post_type=2'
-        elif item.search_type == 'movie':
-           item.url = item.url + '?tr_post_type='
+        if item.search_type == 'tvshow': item.url = item.url + '?tr_post_type=2'
+        elif item.search_type == 'movie': item.url = item.url + '?tr_post_type='
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -215,6 +207,8 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(data, patron)
 
     for url, thumb, title, year, info in matches:
+        if not title or not url: continue
+
         tipo = 'movie' if item.search_type == 'movie' else 'tvshow'
 
         if item.search_type == 'all':
@@ -226,10 +220,16 @@ def list_all(item):
         thumb if thumb.startswith('http') else "https:" + thumb
 
         if tipo == 'tvshow':
+            if not item.search_type == 'all':
+                if item.search_type == 'movie': continue
+
             itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title,  infoLabels = {'year': year} ))
 
         if tipo == 'movie':
+            if not item.search_type == 'all':
+                if item.search_type == 'tvshow': continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
@@ -237,6 +237,7 @@ def list_all(item):
 
     if itemlist:
          next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
+
          if itemlist and next_page:
              itemlist.append(item.clone( title = 'Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
 
@@ -252,10 +253,8 @@ def alfabetico(item):
 
         url = host + 'letter/' + title  + '/'
 
-        if item.search_type == 'tvshow':
-            url = url + '?tr_post_type=2'
-        else:
-            url = url + '?tr_post_type=1'
+        if item.search_type == 'tvshow': url = url + '?tr_post_type=2'
+        else: url = url + '?tr_post_type=1'
 
         itemlist.append(item.clone( action='por_letra', title = title, url = url ))
 
@@ -285,9 +284,13 @@ def por_letra(item):
         year = scrapertools.find_single_match(match, '</strong>.*?<td>(.*?)</td>')
 
         if item.search_type == 'movie':
+            if item.search_type == 'tvshow': continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
         else:
+            if item.search_type == 'movie': continue
+
             itemlist.append(item.clone( action = 'temporadas', url= url, title = title, thumbnail = thumb,
                                         contentType = 'tvshow', contentSerieName = title,  infoLabels={'year': year} ))
 
@@ -295,6 +298,7 @@ def por_letra(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
+
         if itemlist and next_page:
             itemlist.append(item.clone( title = 'Siguientes ...', action = 'por_letra', url = next_page, text_color='coral' ))
 
@@ -370,8 +374,7 @@ def episodios(item):
 
     bloque = scrapertools.find_single_match(data, '<div class="Title AA-Season.*?data-tab="%s">.*?<tbody>(.*?)</tbody>' % str(item.contentSeason))
 
-    if 'src=&quot;' in bloque:
-         bloque = bloque.replace('src=&quot;', 'src="').replace('&quot;', '"')
+    if 'src=&quot;' in bloque: bloque = bloque.replace('src=&quot;', 'src="').replace('&quot;', '"')
 
     matches = scrapertools.find_multiple_matches(bloque, '<td><span class="Num">(\d+)</span></td>.*?src="([^"]+).*?href="([^"]+)">([^<]*)')
 
@@ -621,12 +624,9 @@ def search(item, texto):
     try:
        item.url = host + '?s=' + texto.replace(" ", "+")
 
-       if item.search_type == 'movie':
-           item.url = item.url + '&tr_post_type=1'
-       elif item.search_type == 'tvshow':
-           item.url = item.url + '&tr_post_type=2'
-       else:
-           item.url = item.url + '&tr_post_type='
+       if item.search_type == 'movie': item.url = item.url + '&tr_post_type=1'
+       elif item.search_type == 'tvshow': item.url = item.url + '&tr_post_type=2'
+       else: item.url = item.url + '&tr_post_type='
 
        return list_all(item)
     except:

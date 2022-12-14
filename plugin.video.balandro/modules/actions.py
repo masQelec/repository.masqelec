@@ -285,7 +285,9 @@ def manto_params(item):
     if platformtools.dialog_yesno(config.__addon_name, "Se quitarán: 'Logins' en canales, 'Dominios' seleccionados en los canales, 'Canales Incluidos/Excluidos' en búsquedas, 'Canales Excluidos' en buscar proxies global, y se Inicializarán otros 'Parámetros'.", '[COLOR yellow]¿ Confirma Restablecer a sus valores por defecto los Parámetros Internos del addon ?[/COLOR]'):
         config.set_setting('adults_password', '')
 
+        config.set_setting('channel_animefenix_dominio', '')
         config.set_setting('channel_animeflv_dominio', '')
+        config.set_setting('channel_caricaturashd_dominio', '')
         config.set_setting('channel_cinecalidad_dominio', '')
         config.set_setting('channel_cinecalidadla_dominio', '')
         config.set_setting('channel_cinecalidadlol_dominio', '')
@@ -310,6 +312,7 @@ def manto_params(item):
         config.set_setting('channel_kindor_dominio', '')
         config.set_setting('channel_pelis28_dominio', '')
         config.set_setting('channel_pelisflix_dominio', '')
+        config.set_setting('channel_pelishouse_dominio', '')
         config.set_setting('channel_pelismaraton_dominio', '')
         config.set_setting('channel_pelispedia_dominio', '')
         config.set_setting('channel_pelisplus_dominio', '')
@@ -324,6 +327,7 @@ def manto_params(item):
         config.set_setting('channel_repelis24_dominio', '')
         config.set_setting('channel_repelishd_dominio', '')
         config.set_setting('channel_series24_dominio', '')
+        config.set_setting('channel_seriesyonkis_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
         config.set_setting('channel_torrentdivx_dominio', '')
         config.set_setting('channel_torrentpelis_dominio', '')
@@ -348,13 +352,15 @@ def manto_params(item):
 
         config.set_setting('downloadpath', '')
 
-        config.set_setting('chrome_last_version', '107.0.5304.91')
+        config.set_setting('chrome_last_version', '107.0.5304.122')
 
         config.set_setting('debug', '0')
 
         config.set_setting('developer_mode', False)
         config.set_setting('developer_test_channels', '')
         config.set_setting('developer_test_servers', '')
+
+        config.set_setting('user_test_channel', '')
 
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Parámetros restablecidos[/B][/COLOR]' % color_infor)
 

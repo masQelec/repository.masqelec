@@ -177,6 +177,8 @@ def submnu_sistema(item):
     existe = filetools.exists(path)
     if existe: presentar = True
     if presentar:
+        itemlist.append(item.clone( action='', title=' - Hay Descargas', thumbnail=config.get_thumb('computer'), text_color='goldenrod' ))
+
         itemlist.append(item.clone( channel='actions', action='manto_folder_downloads', title= " - Eliminar 'Todo' el contenido de Descargas", thumbnail=config.get_thumb('computer'), text_color='red' ))
 
     presentar = False
@@ -186,6 +188,8 @@ def submnu_sistema(item):
     existe = filetools.exists(path)
     if existe: presentar = True
     if presentar:
+        itemlist.append(item.clone( action='', title=' - Hay Preferidos', thumbnail=config.get_thumb('computer'), text_color='goldenrod' ))
+
         itemlist.append(item.clone( channel='actions', action='manto_tracking_dbs', title= " - Eliminar 'Todo' el contenido de Preferidos", thumbnail=config.get_thumb('computer'), text_color='red' ))
 
     presentar = False
@@ -297,6 +301,9 @@ def submnu_canales(item):
     itemlist = []
 
     itemlist.append(item.clone( action='', title='[B]Tests Canales:[/B]', thumbnail=config.get_thumb('tools'), text_color='gold' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title=' - [COLOR cyan][B]Últimos Cambios dominios[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     itemlist.append(item.clone( action='test_all_webs', title=' - Insatisfactorios', thumbnail=config.get_thumb('stack'), unsatisfactory = True ))
     itemlist.append(item.clone( action='test_all_webs', title=' - Todos', thumbnail=config.get_thumb('stack') ))
 
@@ -322,6 +329,8 @@ def test_all_webs(item):
     logger.info()
 
     config.set_setting('developer_test_channels', '')
+
+    config.set_setting('user_test_channel', '')
 
     if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Canales Insatisfactorios ?'
     else: text = '¿ Iniciar Test Web de Todos los Canales ?'
@@ -356,6 +365,8 @@ def test_all_webs(item):
             else: continue
 
         rememorize = False
+
+        if not txt: continue
 
         if 'code: [COLOR springgreen][B]200' in str(txt):
             if 'Falso Positivo.' in str(txt):
@@ -411,6 +422,8 @@ def test_all_webs(item):
 
            if 'code: [COLOR [COLOR orangered][B]302' in str(txt) or 'code: [COLOR [COLOR orangered][B]307' in str(txt): continue
 
+           if 'Podría estar Correcto' in str(txt): continue
+
            if ' con proxies ' in str(txt):
                if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]¿ Desea Iniciar una nueva Búsqueda de Proxies en el Canal ?[/B][/COLOR]'):
                    _proxies(item, ch['id'])
@@ -450,11 +463,15 @@ def test_all_webs(item):
 
     config.set_setting('developer_test_channels', '')
 
+    config.set_setting('user_test_channel', '')
+
 
 def test_one_channel(item):
     logger.info()
 
     config.set_setting('developer_test_channels', '')
+
+    config.set_setting('user_test_channel', '')
 
     try:
         filters.show_channels_list(item)
@@ -513,10 +530,16 @@ def test_all_srvs(item):
 
         i += 1
 
+        txt = ''
+
         try:
             txt = tester.test_server(dict_server['name'])
         except:
-            platformtools.dialog_notification(config.__addon_name, '[B][COLOR red]Error en la comprobación,[/B][/COLOR]')
+            if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + dict_server['name'] + '[/B][/COLOR]', '[B][COLOR red]Error en la comprobación,[/B][/COLOR]', '[COLOR yellowgreen][B]¿ Desea comprobar el Servidor de nuevo ?[/B][/COLOR]'):
+                txt = tester.test_server(dict_server['name'])
+            else: continue
+
+        if not txt: continue
 
     if i > 0: platformtools.dialog_ok(config.__addon_name, 'Servidores Testeados ' + str(i))
 

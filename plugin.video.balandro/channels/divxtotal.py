@@ -50,7 +50,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -89,7 +89,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_divxtotal', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='divxtotal', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_divxtotal', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -208,7 +208,7 @@ def list_all(item):
 
         if not host in url: continue
 
-        tipo = 'movie' if '/peliculas' in url else 'tvshow'
+        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
         titulo = title
@@ -219,9 +219,11 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, "'(.*?)'")
 
-        if '/peliculas' in url:
+        if '/peliculas/' in url:
             if not item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
+
+            if "(" in titulo: titulo = titulo.split("(")[0]
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                     contentType='movie', contentTitle=titulo, infoLabels={'year': "-" } ))
@@ -232,8 +234,11 @@ def list_all(item):
 
             titulo = titulo.replace(' - serie', '').strip()
 
+            if " - " in titulo: SerieName = titulo.split(" - ")[0]
+            else: SerieName = titulo
+
             itemlist.append(item.clone( action='temporadas', url=url, title=titulo, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = titulo, infoLabels={'year': "-" } ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': "-" } ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -274,10 +279,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -286,20 +287,34 @@ def episodios(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '">Temporada ' + str(item.contentSeason) + '</a>(.*?)</tbody>')
-
-    matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
+    if not bloque: bloque = scrapertools.find_single_match(data, '">Temporada ' + str(item.contentSeason) + '</a>(.*?)</div></div>')
 
     i = 0
 
+    matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
+
     for match in matches:
         title = scrapertools.find_single_match(match, 'title="">(.*?)</a>')
+        if not title: title = scrapertools.find_single_match(match, '<a href=.*?title="(.*?)"')
 
         if not title: continue
 
-        i =+ 1
+        s_e = scrapertools.get_season_and_episode(title)
 
-        itemlist.append(item.clone( action='findvideos', match=match, title=title, 
-                                    language = 'Esp', contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = str(i) ))
+        try:
+           season = int(s_e.split("x")[0])
+           episode = s_e.split("x")[1]
+        except:
+           i += 1
+           season = 0
+           episode = i
+
+        title = '%sx%s %s' % (str(item.contentSeason), episode, item.contentSerieName)
+
+        itemlist.append(item.clone( action='findvideos', url=match, title=title, match=match,
+                                    language = 'Esp', contentSeason = item.contentSeason, contentType = 'episode', contentEpisodeNumber = episode ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -327,6 +342,10 @@ def findvideos(item):
 
     qlty = scrapertools.find_single_match(data, '>Formato:.*?<p>(.*?)</p>')
 
+    if item.url.endswith('.torrent'):
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent', language = lang, quality = qlty))
+        return itemlist
+
     link1 = scrapertools.find_multiple_matches(data, 'class="linktorrent".*?href="(.*?)"')
 
     link2 = scrapertools.find_multiple_matches(data, 'class="opcion_2".*?href="(.*?)"')
@@ -343,7 +362,9 @@ def findvideos(item):
         if link.startswith('??'): continue
 
         other = ''
-        if not link.startswith('http'): other = 'Directo'
+        if not link.startswith('http'):
+            if link.startswith('/'): link = host[:-1] + link
+            other = 'Directo'
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent',
                               language = lang, quality = qlty, other = other))
@@ -375,6 +396,9 @@ def play(item):
                    platformtools.dialog_ok('DivxTotal', '[COLOR yellow]Archivo no encontrado[/COLOR]')
                    return itemlist
                elif '<p>Por causas ajenas a ' in str(data):
+                   if not config.get_setting('proxies', item.channel, default=''):
+                       return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+
                    return 'Archivo [COLOR red]bloqueado[/COLOR]'
             except:
                pass
@@ -405,6 +429,9 @@ def play(item):
                    platformtools.dialog_ok('DivxTotal', '[COLOR yellow]Archivo no encontrado[/COLOR]')
                    return itemlist
                elif '<p>Por causas ajenas a ' in str(data):
+                   if not config.get_setting('proxies', item.channel, default=''):
+                       return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+
                    return 'Archivo [COLOR red]bloqueado[/COLOR]'
             except:
                pass

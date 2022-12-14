@@ -296,8 +296,14 @@ def _dominios(item):
         item.channel = 'hdfull'
         hdfull.configurar_dominio(item)
 
+    elif item.from_channel == 'animefenix':
+        domains.manto_domain_animefenix(item)
+
     elif item.from_channel == 'animeflv':
         domains.manto_domain_animeflv(item)
+
+    elif item.from_channel == 'caricaturashd':
+        domains.manto_domain_caricaturashd(item)
 
     elif item.from_channel == 'cinecalidad':
         domains.manto_domain_cinecalidad(item)
@@ -356,6 +362,9 @@ def _dominios(item):
     elif item.from_channel == 'pelisflix':
         domains.manto_domain_pelisflix(item)
 
+    elif item.from_channel == 'pelishouse':
+        domains.manto_domain_pelishouse(item)
+
     elif item.from_channel == 'pelismaraton':
         domains.manto_domain_pelismaraton(item)
 
@@ -382,6 +391,9 @@ def _dominios(item):
 
     elif item.from_channel == 'series24':
         domains.manto_domain_series24(item)
+
+    elif item.from_channel == 'seriesyonkis':
+        domains.manto_domain_seriesyonkis(item)
 
     elif item.from_channel == 'subtorrents':
         domains.manto_domain_subtorrents(item)
@@ -414,8 +426,14 @@ def _dominio_vigente(item):
 def _dominio_memorizado(item):
     from modules import domains
 
-    if item.from_channel == 'animeflv':
+    if item.from_channel == 'animefenix':
+        domains.manto_domain_animefenix(item)
+
+    elif item.from_channel == 'animeflv':
         domains.manto_domain_animeflv(item)
+
+    elif item.from_channel == 'caricaturashd':
+        domains.manto_domain_caricaturashd(item)
 
     elif item.from_channel == 'cinecalidad':
         domains.manto_domain_cinecalidad(item)
@@ -474,6 +492,9 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'pelisflix':
         domains.manto_domain_pelisflix(item)
 
+    elif item.from_channel == 'pelishouse':
+        domains.manto_domain_pelishouse(item)
+
     elif item.from_channel == 'pelismaraton':
         domains.manto_domain_pelismaraton(item)
 
@@ -500,6 +521,9 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'series24':
         domains.manto_domain_series24(item)
+
+    elif item.from_channel == 'seriesyonkis':
+        domains.manto_domain_seriesyonkis(item)
 
     elif item.from_channel == 'subtorrents':
         domains.manto_domain_subtorrents(item)
@@ -600,7 +624,12 @@ def _proxies(item):
 
     refrescar = True
 
-    if item.from_channel == 'cinecalidad':
+    if item.from_channel == 'animefenix':
+        from channels import animefenix
+        item.channel = 'animefenix'
+        animefenix.configurar_proxies(item)
+
+    elif item.from_channel == 'cinecalidad':
         from channels import cinecalidad
         item.channel = 'cinecalidad'
         cinecalidad.configurar_proxies(item)
@@ -639,6 +668,11 @@ def _proxies(item):
         from channels import divxtotal
         item.channel = 'divxtotal'
         divxtotal.configurar_proxies(item)
+
+    elif item.from_channel == 'divxtotalcc':
+        from channels import divxtotalcc
+        item.channel = 'divxtotalcc'
+        divxtotalcc.configurar_proxies(item)
 
     elif item.from_channel == 'dontorrents':
         from channels import dontorrents
@@ -805,11 +839,6 @@ def _proxies(item):
         item.channel = 'playview'
         playview.configurar_proxies(item)
 
-    elif item.from_channel == 'pornhub':
-        from channels import pornhub
-        item.channel = 'pornhub'
-        pornhub.configurar_proxies(item)
-
     elif item.from_channel == 'ppeliculas':
         from channels import ppeliculas
         item.channel = 'ppeliculas'
@@ -875,11 +904,6 @@ def _proxies(item):
         item.channel = 'verdetorrent'
         verdetorrent.configurar_proxies(item)
 
-    elif item.from_channel == 'xvideos':
-        from channels import xvideos
-        item.channel = 'xvideos'
-        xvideos.configurar_proxies(item)
-
     else:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta _Proxies[/B][/COLOR]' % color_alert)
         refrescar = False
@@ -901,6 +925,8 @@ def _test_webs(item):
 
     config.set_setting('developer_test_channels', '')
     config.set_setting('developer_test_servers', '')
+
+    config.set_setting('user_test_channel', '')
 
     from modules import tester
 

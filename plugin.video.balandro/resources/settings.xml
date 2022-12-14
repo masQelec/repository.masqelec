@@ -10,7 +10,7 @@
         <setting id="mnu_simple" type="bool" label="Activar Menú [COLOR yellow][B][I]Simplificado[/I][/B][/COLOR]" default="false" visible="eq(-1,true)"/>
 
         <setting id="mnu_sugeridos" type="bool" label="Añadir opción [COLOR aquamarine][B]Sugeridos[/B][/COLOR] (Simplificado y Predeterminado)" default="true" visible="eq(-2,true)"/>
-        <setting id="channels_link_main" type="bool" label="Añadir opción [COLOR aquamarine][B]Canales[/B][/COLOR] (Simplificado y Predeterminado)" default="true" visible="eq(-3,true)"/>
+        <setting id="channels_link_main" type="bool" label="Añadir opción [COLOR gold][B]Canales[/B][/COLOR] (Simplificado y Predeterminado)" default="true" visible="eq(-3,true)"/>
         <setting id="mnu_idiomas" type="bool" label="Añadir opción [COLOR limegreen][B]Idiomas[/B][/COLOR] (Simplificado y Predeterminado)" default="true" visible="eq(-4,true)"/>
         <setting id="mnu_grupos" type="bool" label="Añadir opción [COLOR magenta][B]Grupos[/B][/COLOR] (Simplificado y Predeterminado)" default="true" visible="eq(-5,true)"/>
 
@@ -106,10 +106,20 @@
 
         <setting label="Canales:" type="lsep"/>
 
+		<setting id="ac_animefenix" type="bool" label="AnimeFenix" default="false"/>
+		<setting id="ch_animefenix_test" type="action" label="[COLOR cyan][B]AnimeFenix[/B][/COLOR] efectuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_animefenix)"/>
+		<setting id="ch_animefenix_dominio" type="action" label="[COLOR cyan][B]AnimeFenix[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_animefenix)"/>
+		<setting id="channel_animefenix_dominio" type="text" label="AnimeFenix dominio memorizado" enable="false" visible="eq(-3,true)" default=""/>
+
 		<setting id="ac_animeflv" type="bool" label="AnimeFlv" default="false"/>
 		<setting id="ch_animeflv_test" type="action" label="[COLOR cyan][B]AnimeFlv[/B][/COLOR] efectuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_animeflv)"/>
 		<setting id="ch_animeflv_dominio" type="action" label="[COLOR cyan][B]AnimeFlv[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_animeflv)"/>
 		<setting id="channel_animeflv_dominio" type="text" label="AnimeFlv dominio memorizado" enable="false" visible="eq(-3,true)" default=""/>
+
+		<setting id="ac_caricaturashd" type="bool" label="CaricaturasHd" default="false"/>
+		<setting id="ch_caricaturashd_test" type="action" label="[COLOR cyan][B]CaricaturasHd[/B][/COLOR] efectuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_caricaturashd)"/>
+		<setting id="ch_caricaturashd_dominio" type="action" label="[COLOR cyan][B]CaricaturasHd[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_caricaturashd)"/>
+		<setting id="channel_caricaturashd_dominio" type="text" label="CaricaturasHd dominio memorizado" enable="false" visible="eq(-3,true)" default=""/>
 
 		<setting id="ac_cinecalidad" type="bool" label="CineCalidad" default="false"/>
 		<setting id="ch_cinecalidad_test" type="action" label="[COLOR cyan][B]CineCalidad[/B][/COLOR] efetuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_cinecalidad)"/>
@@ -209,6 +219,11 @@
 		<setting id="ch_pelisflix_dominio" type="action" label="[COLOR cyan][B]PelisFlix[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_pelisflix)"/>
 		<setting id="channel_pelisflix_dominio" type="text" label="PelisFlix dominio memorizado" enable="false" visible="eq(-3,true)" default=""/>
 
+		<setting id="ac_pelishouse" type="bool" label="PelisHouse" default="false"/>
+		<setting id="ch_pelishouse_test" type="action" label="[COLOR cyan][B]PelisHouse[/B][/COLOR] efectuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_pelishouse)"/>
+		<setting id="ch_pelishouse_dominio" type="action" label="[COLOR cyan][B]PelisHouse[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_pelishouse)"/>
+		<setting id="channel_pelishouse_dominio" type="text" label="PelisHouse dominio memorizado" enable="false" visible="eq(-3,true)" default=""/>
+
 		<setting id="ac_pelismaraton" type="bool" label="PelisMaraton" default="false"/>
 		<setting id="ch_pelismaraton_test" type="action" label="[COLOR cyan][B]PelisMaraton[/B][/COLOR] efectuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_pelismaraton)"/>
 		<setting id="ch_pelismaraton_dominio" type="action" label="[COLOR cyan][B]PelisMaraton[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_pelismaraton)"/>
@@ -253,6 +268,11 @@
 		<setting id="ch_series24_test" type="action" label="[COLOR cyan][B]Series24[/B][/COLOR] efectuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_series24)"/>
 		<setting id="ch_series24_dominio" type="action" label="[COLOR cyan][B]Series24[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_series24)"/>
 		<setting id="channel_series24_dominio" type="text" label="Series24 dominio memorizado" enable="false" visible="eq(-3,true)" default=""/>
+
+		<setting id="ac_seriesyonkis" type="bool" label="SeriesYonkis" default="false"/>
+		<setting id="ch_seriesyonkis_test" type="action" label="[COLOR cyan][B]SeriesYonkis[/B][/COLOR] efectuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_seriesyonkis)"/>
+		<setting id="ch_seriesyonkis_dominio" type="action" label="[COLOR cyan][B]SeriesYonkis[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_seriesyonkis)"/>
+		<setting id="channel_seriesyonkis_dominio" type="text" label="SeriesYonkis dominio memorizado" enable="false" visible="eq(-3,true)" default=""/>
 
 		<setting id="ac_subtorrents" type="bool" label="SubTorrents" default="false"/>
 		<setting id="ch_subtorrents_test" type="action" label="[COLOR cyan][B]SubTorrents[/B][/COLOR] efectuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_subtorrents)"/>
@@ -504,8 +524,9 @@
         <setting id="show_last_fix" type="action" label="Información último Fix" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_last_fix)"/>
         <setting id="addon_update_atstart" type="bool" label="Comprobar actualizaciones Fix al Iniciar su Media Center" default="true" visible="eq(-2,true)"/>
         <setting id="addon_update_verbose" type="bool" label="Notificar resultado de la Actualización Fix" default="false" visible="eq(-3,true)"/>
-        <setting id="addon_update_doit" type="action" label="Pulsar para [COLOR chocolate][B]'Comprobar'[/B][/COLOR] actualizaciones Fix" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=check_addon_updates)"/>
-        <setting id="addon_update_doitforce" type="action" label="Pulsar para [COLOR gold][B]'Forzar'[/B][/COLOR] Todas las actualizaciones Fix" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=check_addon_updates_force)"/>
+        <setting id="addon_update_domains" type="bool" label="Presentar los [COLOR cyan][B]Últimos Cambios[/B][/COLOR] de dominios al actualizar el Fix" default="false" visible="eq(-4,true)"/>
+        <setting id="addon_update_doit" type="action" label="Pulsar para [COLOR chocolate][B]'Comprobar'[/B][/COLOR] actualizaciones Fix" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=check_addon_updates)"/>
+        <setting id="addon_update_doitforce" type="action" label="Pulsar para [COLOR gold][B]'Forzar'[/B][/COLOR] Todas las actualizaciones Fix" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=check_addon_updates_force)"/>
 
         <setting label="Buscar y Actualizar Nuevos Episodios en Preferidos:" type="lsep"/>
         <setting id="track_opc" type="bool" label="Opciones" default="false"/>

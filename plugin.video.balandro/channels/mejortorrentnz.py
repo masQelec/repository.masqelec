@@ -196,12 +196,12 @@ def list_last(item):
         fin_movies = 'Series:' if 'Series:' in data else 'Juegos:'
         if fin_movies == 'Juegos:' and not 'Juegos:' in data: fin_movies = '</table>'
 
-        data = scrapertools.find_single_match(data, r'Peliculas:(.*?)' + fin_movies)
+        data = scrapertools.find_single_match(data, 'Peliculas:(.*?)' + fin_movies)
     else:
         fin_tvshows = 'Variados:' if 'Variados:' in data else '</table>>'
-        data = scrapertools.find_single_match(data, r'Series:(.*?)' + fin_tvshows)
+        data = scrapertools.find_single_match(data, 'Series:(.*?)' + fin_tvshows)
 
-    matches = scrapertools.find_multiple_matches(data, r"href='([^']+)'.*?>(.*?)<.*?'>(.*?)<")
+    matches = scrapertools.find_multiple_matches(data, "href='([^']+)'.*?>(.*?)<.*?'>(.*?)<")
 
     for url, title, qlty in matches:
         title = title.replace('[720p]', '').strip()
@@ -253,9 +253,9 @@ def list_alfa(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, r'Mostrando(.*?)</table>')
+    bloque = scrapertools.find_single_match(data, 'Mostrando(.*?)</table>')
 
-    matches = scrapertools.find_multiple_matches(bloque, r"href='([^']+)'.*?>(.*?)<")
+    matches = scrapertools.find_multiple_matches(bloque, "href='([^']+)'.*?>(.*?)<")
 
     num_matches = len(matches)
 
@@ -324,18 +324,34 @@ def episodios(item):
 
     matches = scrapertools.find_multiple_matches(bloque, "bgcolor='#C8DAC8'.*?" + '<a href="(.*?)">(.*?)</a>.*?' + "name='(.*?)'.*?value='(.*?)'")
 
-    for url, title, id, value in matches:
-        title = title.strip()
+    for url, temp_epis, id, value in matches:
+        title = temp_epis.strip()
+
+        if item.name_search:
+           if not title.lower() in item.name_search.lower(): continue
 
         if item.grupo == 'selecc':
             title = title + '  ' + item.title
         else:
             title = title + ' ' + str(item.contentSerieName)
 
-        i += 1
+        if 'Temporada' in title:
+            title = title.split("Temporada")[0]
+            title = title.strip()
+
+        tempo = scrapertools.find_single_match(temp_epis, '(.*?)X')
+
+        if ' y ' in temp_epis:
+            epis = scrapertools.find_single_match(temp_epis, 'X(.*?)y').strip()
+        else:
+            epis = scrapertools.find_single_match(temp_epis, 'X(.*?)$')
+
+        SerieName = scrapertools.find_single_match(item.contentSerieName, '(.*?)Temporada').strip()
 
         itemlist.append(item.clone( action='findvideos', id = id, value = value, ref = item.url, title = title,
-                                    contentType='episode', contentSeason = 1, contentEpisodeNumber = i ))
+                                    contentSerieName = SerieName, contentType='episode', contentSeason = tempo, contentEpisodeNumber = epis ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -436,12 +452,17 @@ def list_search(item):
 
     bloque = scrapertools.find_single_match(data, r'Has realizado una búsqueda(.*?)</table>')
 
-    matches = scrapertools.find_multiple_matches(bloque, r"href='(.*?)'.*?>(.*?)</a>.*?'>(.*?)<.*?<td.*?>(.*?)<")
+    matches = scrapertools.find_multiple_matches(bloque, "href='(.*?)'.*?" + '">' + "(.*?)</a>.*?'>(.*?)</a>.*?<.*?'>(.*?)</td>")
 
     num_matches = len(matches)
 
     for url, title, qlty, type in matches[item.page * perpage:]:
-        if not type == 'Peliculas' and not type == 'Series' and not type == 'Series HD' and not type == 'Capitulos' and not type == 'Documentales': continue
+        if type == 'Peliculas': pass 
+        elif type == 'Series': pass
+        elif type == 'Series HD': pass
+        elif type == 'Capitulos': pass
+        elif type == 'Documentales': pass
+        else: continue
 
         if item.search_type != 'all':
             if item.search_type == 'movie':
@@ -452,6 +473,8 @@ def list_search(item):
                 elif type == 'Documentales': continue
 
         sufijo = ''
+
+        search_type = item.search_type
 
         if item.search_type == 'all':
             if type == 'Peliculas':
@@ -465,9 +488,7 @@ def list_search(item):
                search_type = 'documentary'
 
         title = title.replace("<font Color='darkblue'>", '').replace('</font>', '').replace("<span style='color:gray;'>", '').replace('</span>', '').strip()
-
         title = title.replace('[720p]', '').strip()
-
         title = title.replace('&#215;', 'x')
 
         titulo = title.split('-')[0].strip()
@@ -475,11 +496,20 @@ def list_search(item):
 
         qlty = qlty.replace('(', '').replace(')', '').strip()
 
-        if search_type == 'movie':
+        if type == 'Capitulos': name_search = titulo
+        else: name_search = ''
+
+        if search_type == 'movie' or search_type == 'documentary':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
                                         search_type = search_type, contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
-        else:
-            itemlist.append(item.clone( action='episodios', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
+
+        if search_type == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+            itemlist.append(item.clone( action='episodios', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo, name_search = name_search,
                                         search_type = search_type,  contentType = 'tvshow', contentSerieName = titulo, infoLabels = {'year': '-'} ))
 
         if len(itemlist) >= perpage: break

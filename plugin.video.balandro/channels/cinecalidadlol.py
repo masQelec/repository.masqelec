@@ -52,7 +52,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_cinecalidadlol', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='cinecalidadlol', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_cinecalidadlol', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -85,19 +85,19 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='aquamarine' ))
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'espana/?ref=es', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host + 'espana/?ref=es', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/?ref=es', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie', group = '?ref=es' ))
-    itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie', group = '?ref=es' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'espana/?ref=es', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'destacadas', url = host + 'espana/?ref=es', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/?ref=es', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'movie', group = '?ref=es' ))
+    itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'movie', group = '?ref=es' ))
 
 
     itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='aquamarine' ))
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'movie' ))
 
     return itemlist
 
@@ -110,15 +110,15 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='plum' ))
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/?ref=es', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - Últimas', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow', group = '?ref=es' ))
+    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='aquamarine' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie/?ref=es', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'tvshow', group = '?ref=es' ))
 
-    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='plum' ))
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - Últimas', action = 'destacadas', url = host, search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='aquamarine' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -196,6 +196,8 @@ def list_all(item):
         else:
             year = '-'
 
+        if not year: year = '-'
+
         tipo = 'tvshow' if '/ver-serie/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
@@ -205,10 +207,16 @@ def list_all(item):
             if not '/ver-serie/' in url: continue
 
         if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year, 'plot': plot} ))
 
         if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+
             itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title,  infoLabels = {'year': '-'} ))
 
@@ -289,10 +297,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):

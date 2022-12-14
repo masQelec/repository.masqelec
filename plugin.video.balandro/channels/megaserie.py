@@ -207,14 +207,20 @@ def list_all(item):
         if '/United-States-Minor-Outlying.png' in article: langs.append('Vose')
 
         tipo = 'tvshow' if '/series/' in url else 'movie'
-        if item.search_type not in ['all', tipo]: continue
-
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages=', '.join(langs), fmt_sufijo=sufijo, 
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                        qualities=qlty, languages=', '.join(langs), fmt_sufijo=sufijo, 
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 

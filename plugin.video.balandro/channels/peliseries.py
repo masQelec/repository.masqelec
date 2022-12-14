@@ -102,13 +102,6 @@ def list_all(item):
 
         title = title.replace('&ntilde;', 'ñ')
 
-        tipo = 'tvshow' if "<div class='ln'>Serie</div>" in match else 'movie'
-        if tipo == 'movie':
-            if "<div class='ln'>Anime</div>" in match: tipo = 'tvshow'
-            elif "<div class='ln'>Novela</div>" in match: tipo = 'tvshow'
-
-        sufijo = '' if item.search_type != 'all' else tipo
-
         url = host + url
 
         thumb = scrapertools.find_single_match(match, 'img="(.*?)"')
@@ -128,6 +121,13 @@ def list_all(item):
         year = scrapertools.find_single_match(match,'<div class="post_info">.*?Estreno: (\d{4})-')
         if not year: year = '-'
 
+        tipo = 'tvshow' if "<div class='ln'>Serie</div>" in match else 'movie'
+        if tipo == 'movie':
+            if "<div class='ln'>Anime</div>" in match: tipo = 'tvshow'
+            elif "<div class='ln'>Novela</div>" in match: tipo = 'tvshow'
+
+        sufijo = '' if item.search_type != 'all' else tipo
+
         if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
@@ -141,7 +141,7 @@ def list_all(item):
                                         tv_tipo = tv_tipo, fmt_sufijo=sufijo,
                                         languages = ', '.join(langs), contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
-        else:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 

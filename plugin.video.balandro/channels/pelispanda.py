@@ -128,21 +128,23 @@ def list_all(item):
 
         if not url or not title: continue
 
-        tipo = 'tvshow' if '/series/' in url else 'movie'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         qlty = scrapertools.find_single_match(match, '<ul class="card__list">.*?<li>(.*?)</li>')
 
-        if '/series/' in url:
-            if item.search_type == 'movie': continue
+        tipo = 'tvshow' if '/series/' in url else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': "-"} ))
 
-        else:
-            if item.search_type == 'tvshow': continue
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, fmt_sufijo=sufijo,
                                     contentType='movie', contentTitle=title, infoLabels={'year': "-"} ))

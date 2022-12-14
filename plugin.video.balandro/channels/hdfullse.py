@@ -48,7 +48,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -90,7 +90,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_hdfullse', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='hdfullse', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_hdfullse', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -223,17 +223,24 @@ def list_all(item):
     for url, thumb, langs, title in matches[item.page * perpage:]:
         title = title.strip()
         languages = detectar_idiomas(langs)
-        tipo = 'movie' if '/movie/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
 
         thumb = host + thumb
         url = host + url
 
+        tipo = 'movie' if '/movie/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
         if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, 
                                         languages = ', '.join(languages), fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
-        else:
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
             itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
                                         languages = ', '.join(languages), fmt_sufijo = sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
@@ -275,6 +282,9 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
+    # ~ Reintentar a veces tarda en responder
+    if not data: data = do_downloadpage(item.url)
+
     patron = 'itemprop="season".*?'
     patron += "<a href='(.*?)'.*?"
     patron += '<img class=.*?original-title="(.*?)".*?'
@@ -285,8 +295,9 @@ def temporadas(item):
 
     for url, title, thumb, retitle in matches:
         numtempo = scrapertools.find_single_match(title, 'Temporadas (\d+)')
-        if numtempo == '': numtempo = scrapertools.find_single_match(url, '-(\d+)$')
-        if numtempo == '': continue
+        if not numtempo: numtempo = scrapertools.find_single_match(url, '-(\d+)$')
+
+        if not numtempo: continue
 
         titulo = title
         if retitle != title: 
@@ -334,14 +345,15 @@ def episodios(item):
     if not item.perpage: item.perpage = 50
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<div class="item center">.*?'
-    patron += '<a href="(.*?)".*?'
+    bloque = scrapertools.find_single_match(data, 'id="season-episodes">(.*?)</div></div></div>')
+
+    patron = 'itemprop="season".*?'
+    patron += "<a href='(.*?)'.*?"
     patron += 'src="(.*?)".*?'
-    patron += 'title="(.*?)".*?'
-    patron += '<div class="item-flag(.*?)'
-    patron += '<div class="rating">(.*?)<.*?'
-    patron += '</b>(.*?)</div>'
+    patron += '"name">(.*?)<.*?'
+    patron += '</b>(.*?)</h5>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
@@ -352,23 +364,14 @@ def episodios(item):
                 platformtools.dialog_notification('HdFullSe', '[COLOR cyan]Cargando elementos[/COLOR]')
                 item.perpage = 250
 
-    for url, thumb, title, idio, tempo, epis in matches[item.page * item.perpage:]:
-        titulo = title.replace(item.contentSerieName, '').strip()
-
-        if ' - ' in titulo: titulo = titulo.split(' - ')[1]
-        titulo = tempo + 'x' + epis + ' ' + titulo
-
-        idio = idio.replace('ESPSUB', 'Vose').replace('ENG', 'Eng').replace('ESP', 'Esp').replace('LAT', 'Lat').replace('EngSUB', 'EngSub')
-
-        langs = scrapertools.find_multiple_matches(idio, 'item-flag-(.*?)">')
-        if str(langs) == "['']": langs = ''
-        if langs: titulo += ' [COLOR %s]%s[/COLOR]' % (color_lang, ', '.join(langs))
+    for url, thumb, title, epis in matches[item.page * item.perpage:]:
+        titulo = str(item.contentSeason) + 'x' + epis + ' ' + item.contentSerieName
 
         thumb = host + thumb
         url = host + url
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
-                                    contentType = 'episode', contentSeason = tempo, contentEpisodeNumber = epis ))
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break

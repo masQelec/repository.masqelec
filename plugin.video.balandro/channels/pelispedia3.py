@@ -233,10 +233,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -272,12 +268,15 @@ def episodios(item):
         if '<img title="Subtitulado"' in idiomas: langs.append('Vose')
         if '<img title="Ingles"' in idiomas: langs.append('VO')
 
-        epis = scrapertools.find_single_match(temp_epis, ".*?-(.*?)$").strip()
+        epis = scrapertools.find_single_match(temp_epis, "-(.*?)$").strip()
 
         titulo = str(item.contentSeason) + 'x' + epis + ' ' + title
 
+        if "|" in item.contentSerieName: SerieName = item.contentSerieName.split("|")[0]
+        else: SerieName = item.contentSerieName
+
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, languages = ', '.join(langs),
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break

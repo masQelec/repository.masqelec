@@ -49,7 +49,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'series/estrenos', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + 'episodios', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'episodios', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'series/tendencias/semana', search_type = 'tvshow' ))
 
@@ -117,13 +117,16 @@ def list_all(item):
         tipo = 'movie' if 'pelicula' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if '/pelicula/' in url:
-            if item.search_type == 'tvshow': continue
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year, 'plot': plot} ))
-        else:
-            if item.search_type == 'movie': continue
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action ='temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year, 'plot': plot} ))
@@ -143,7 +146,7 @@ def list_all(item):
     return itemlist
 
 
-def last_episodes(item):
+def last_epis(item):
     logger.info()
     itemlist = []
 
@@ -189,7 +192,7 @@ def last_episodes(item):
                 if '/page/' in next_page:
                     if next_page.startswith("/"): next_page = host[:-1] + next_page
 
-                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'last_episodes', url = next_page, text_color='coral' ))
+                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'last_epis', url = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -217,10 +220,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):
@@ -334,7 +333,7 @@ def findvideos(item):
         lang = scrapertools.find_single_match(match, '<td>(.*?)</td>')
 
         if lang == 'Subtitulado': lang = 'Vose'
-        elif lang == 'Español Latino': lang = 'Lat'
+        elif lang == 'Español Latino' or lang == 'Latino': lang = 'Lat'
         elif lang == 'Español': lang = 'Esp'
 
         qlty = scrapertools.find_single_match(match, '<span>(.*?)</span>')

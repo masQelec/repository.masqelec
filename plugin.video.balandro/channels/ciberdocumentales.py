@@ -2,9 +2,10 @@
 
 from platformcode import logger
 from core.item import Item
-from core import httptools, scrapertools, servertools
+from core import httptools, scrapertools, servertools, tmdb
 
-host = "https://www.ciberdocumentales.com"
+
+host = 'https://www.ciberdocumentales.com'
 
 
 def mainlist(item):
@@ -50,11 +51,14 @@ def list_all(item):
     for url, thumb, title, plot in matches:
         title = title.capitalize()
         url = host + url
+
         thumb = host + thumb
         plot = scrapertools.htmlclean(plot)
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, plot = plot,
-                                    contentType='movie', contentTitle=title, contentExtra='documentary' ))
+                                    contentType='movie', infoLabels={"year": '-', "plot": plot}, contentTitle=title, contentExtra='documentary' ))
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page_link = scrapertools.find_single_match(data, '<span class="current">\d*</span>&nbsp;<a href="([^"]+)')

@@ -103,7 +103,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + 'episodios/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'episodios/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'series/', group = 'destacadas', search_type = 'tvshow' ))
 
@@ -244,13 +244,16 @@ def list_top(item):
     return itemlist
 
 
-def last_episodes(item):
+def last_epis(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, 'recientemente</h2(.*?)</a></div></div>')
+
+    i = 0
+
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
@@ -262,15 +265,24 @@ def last_episodes(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        season, episode = scrapertools.find_single_match(match, '</h3> <span>T(.*?)E(.*?)/')
+        s_e = scrapertools.get_season_and_episode(url)
 
-        season = season.strip()
-        episode = episode.strip()
+        try:
+           season = int(s_e.split("x")[0])
+           epis = s_e.split("x")[1]
+        except:
+           i += 1
+           season = 0
+           epis = i
 
         title = title.replace('Online', '').replace('Sub Español', 'Vose').strip()
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentSerieName=title,
-                                   contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+        if ':' in title: SerieName = scrapertools.find_single_match(title, '(.*?):').strip()
+        elif ' (' in title: SerieName = title.split(" (")[0]
+        else: SerieName = title
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                    contentSerieName = SerieName, contentType='episode', contentSeason=season, contentEpisodeNumber=epis ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -280,7 +292,7 @@ def last_episodes(item):
 
         if next_page:
             if '/page/' in next_page:
-                itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'last_episodes', text_color = 'coral'))
+                itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'last_epis', text_color = 'coral'))
 
     return itemlist
 
@@ -310,10 +322,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -340,7 +348,7 @@ def episodios(item):
         titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail=thumb,
-                                    contentType = 'episode', contentEpisodeNumber = episode ))
+                                    contentType = 'episode', contentSeason = item.contentSeason , contentEpisodeNumber = episode ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -361,11 +369,6 @@ def findvideos(item):
     # ~ torrents No se tratan dan error  https://www.pepeliculas.org/link/361535-zypzvbie5v/   13/10/2022
 
     data = do_downloadpage(item.url)
-
-    patron = "<li id='player-option-.*?"
-    patron += "data-post='(.*?)'.*?data-type='(.*?)'.*?data-nume='(.*?)'.*?<span class='title'>(.*?)</span>.*?<span class='server'>(.*?)</span>"
-
-    matches = scrapertools.find_multiple_matches(data, patron)
 
     patron = "<li id='player-option-.*?"
     patron += "data-post='(.*?)'.*?data-type='(.*?)'.*?data-nume='(.*?)'.*?<span class='title'>(.*?)</span>.*?<span class='server'>(.*?)</span>"
@@ -395,8 +398,8 @@ def findvideos(item):
             lang = '?'
 
         other = _server.lower()
-        other = other.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-        other = other.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '')
+        other = other.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
+        other = other.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.xx', '')
         other = other.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
 
         if 'youtube' in other: continue
@@ -423,11 +426,12 @@ def findvideos(item):
         elif 'uploadbuzz' in other: continue
         elif 'mediafire' in other: continue
         elif 'drive.google' in other: continue
+        elif 'fileflares' in other: continue
 
         if other == qlty: qlty = ''
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url,
-                              other = other.capitalize(), language = lang, quality = qlty ))
+                                                      other = other.capitalize(), language = lang, quality = qlty ))
 
     # ~ orden type
 
@@ -455,8 +459,8 @@ def findvideos(item):
             lang = '?'
 
         other = _server.lower()
-        other = other.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-        other = other.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '')
+        other = other.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
+        other = other.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.sx', '')
         other = other.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
 
         if 'youtube' in other: continue
@@ -483,11 +487,12 @@ def findvideos(item):
         elif 'uploadbuzz' in other: continue
         elif 'mediafire' in other: continue
         elif 'drive.google' in other: continue
+        elif 'fileflares' in other: continue
 
         if other == qlty: qlty = ''
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url,
-                              other = other.capitalize(), language = lang, quality = qlty ))
+                                                      other = other.capitalize(), language = lang, quality = qlty ))
 
     # ~ Ver
 
@@ -504,7 +509,7 @@ def findvideos(item):
 
             servidor = domain.lower()
             servidor = servidor.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '')
+            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.sx', '')
             servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
 
             servidor = servertools.corregir_servidor(servidor)
@@ -538,7 +543,7 @@ def findvideos(item):
             else: lang = '?'
 
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, ref = item.url,
-                                  other = 'v', language = lang, quality = qlty ))
+                                                          other = 'v', language = lang, quality = qlty ))
 
     # ~ Descargas
 
@@ -554,8 +559,8 @@ def findvideos(item):
             if not tipo == 'Descarga': continue
 
             servidor = domain.lower()
-            servidor = servidor.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '')
+            servidor = servidor.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
+            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.sx', '')
             servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
 
             servidor = servertools.corregir_servidor(servidor)
@@ -587,7 +592,10 @@ def findvideos(item):
             elif 'ddownload' in servidor: continue
             elif 'fastclick' in servidor: continue
             elif 'nitro.download' in servidor: continue
-            elif 'multiup.org' in servidor: continue
+            elif 'multiup' in servidor: continue
+            elif 'fileflares' in servidor: continue
+
+            if servidor == 'filemoon': servidor = 'various'
 
             if lang == 'Latino': lang = 'Lat'
             elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
@@ -595,7 +603,7 @@ def findvideos(item):
             else: lang = '?'
 
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, ref = item.url,
-                                  other = 'd', language = lang, quality = qlty ))
+                                                          other = 'd', language = lang, quality = qlty ))
 
     if not itemlist:
         if not ses == 0:
@@ -653,9 +661,6 @@ def list_search(item):
 
         if not url or not title: continue
 
-        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
@@ -663,13 +668,19 @@ def list_search(item):
 
         plot = scrapertools.htmlclean(scrapertools.find_single_match(match, '<p>(.*?)</p>'))
 
-        if '/pelicula/' in url:
-            if item.search_type == 'tvshow': continue
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
-        else:
-            if item.search_type == 'movie': continue
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))

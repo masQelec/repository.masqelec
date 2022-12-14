@@ -7,7 +7,6 @@ if sys.version_info[0] < 3:
 else:
     import urllib.parse as urllib
 
-
 import re
 
 from platformcode import logger, platformtools
@@ -17,11 +16,13 @@ from core import httptools, scrapertools, servertools, jsontools, tmdb
 
 host = 'https://serieslan.com/'
 
+
 perpage = 30
 
 
 def mainlist(item):
     return mainlist_series(item)
+
 
 def mainlist_series(item):
     logger.info()
@@ -56,6 +57,8 @@ def list_all(item):
     hasta = desde + perpage
 
     for thumb, url, title, year in matches[desde:hasta]:
+        if not year: year = '-'
+
         itemlist.append(item.clone( action='temporadas', url = host + url, title = title, thumbnail = host + thumb[1:], 
                                     contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
@@ -139,7 +142,7 @@ def episodios(item):
         if len(itemlist) >= item.perpage:
             break
 
-    # ~ tmdb.set_infoLabels(itemlist)
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if len(matches) > (item.page + 1) * item.perpage:
@@ -220,12 +223,19 @@ def search(item, texto):
     itemlist = []
 
     try:
-        data = httptools.downloadpage(host+'b.php', post='k='+texto.replace(' ', '+')).data
+        data = httptools.downloadpage(host + 'b.php', post='k='+texto.replace(' ', '+')).data
         matches = jsontools.load(data)
+
         for datos in matches['dt']:
-            if len(datos) < 4 or not datos[1] or not datos[2]: continue
-            itemlist.append(item.clone( title=datos[1], url=host + datos[2], action='temporadas', thumbnail=host + 'tb/' + datos[0] + '.jpg', 
-                                        contentType='tvshow', contentSerieName=datos[1], infoLabels={'year': datos[3]} ))
+            if len(datos) < 4: continue
+            elif not datos[1]: continue
+            elif not datos[2]: continue
+
+            year = datos[3]
+            if not year: year = '-'
+
+            itemlist.append(item.clone( title=datos[1], url= host + datos[2], action='temporadas', thumbnail=host + 'tb/' + datos[0] + '.jpg', 
+                                        contentType='tvshow', contentSerieName=datos[1], infoLabels={'year': year} ))
 
         tmdb.set_infoLabels(itemlist)
     except:

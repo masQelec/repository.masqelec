@@ -99,8 +99,7 @@ def list_all(item):
             thumb = 'https:' + thumb
 
         year = scrapertools.find_single_match(match, '<span class="Year">(.*?)</span>')
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         name = title.replace('&#038;', '&')
 

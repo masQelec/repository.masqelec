@@ -667,11 +667,17 @@ def list_search(item):
                 titulo = '%s [%s]' % (title, m.group(2))
 
         if is_tvshow:
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+
             sufijo = '' if item.search_type != 'all' else 'tvshow'
 
             itemlist.append(item.clone( action='episodios', url=url, title=titulo, thumbnail=thumb, languages=idioma, qualities=tcali, fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
         else:
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
             sufijo = '' if item.search_type != 'all' else 'movie'
 
             itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, languages=idioma, qualities=tcali, fmt_sufijo=sufijo,

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools
 
 
-host = "https://www.cumlouder.com"
+host = 'https://www.cumlouder.com'
 
 
 def mainlist(item):
@@ -61,6 +61,7 @@ def repertorios(item):
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
+
         if next_url:
             next_url = host + next_url
 
@@ -95,6 +96,7 @@ def canales(item):
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
+
         if next_url:
             next_url = host + next_url
 
@@ -112,20 +114,22 @@ def categorias(item):
         item.url = host + '/categories/'
 
     data = httptools.downloadpage(item.url).data
-
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;", "", data)
 
-    patron = r'class="muestra-escena muestra-categoria show-tag" href="([^"]+)\?show=cumlouder".*?<img class="thumb lazy".*?data-src="([^"]+).*?alt="([^"]+)"'
+    patron = '<a tag-url=.*?href="([^"]+)".*?data-src="([^"]+)".*?alt="([^"]+)"'
 
     matches = scrapertools.find_multiple_matches(data, patron)
 
     for url, thumb, title in matches:
-        url = host + url + '?show=cumlouder'
+        url = host + url
+
+        if not thumb.startswith('http'): thumb = 'https:' + thumb
 
         itemlist.append(item.clone( action = 'list_all', url = url, title = title, thumbnail = thumb, page = 1 ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
+
         if next_url:
             next_url = host + next_url
 
@@ -188,8 +192,7 @@ def list_all(item):
     for url, thumb, title, durac, qlty in matches:
         url = host + url
 
-        if not thumb.startswith('http'):
-            thumb = 'https:' + thumb
+        if not thumb.startswith('http'): thumb = 'https:' + thumb
 
         thumb = thumb.replace('ep1.jpg', 'ep.jpg')
 

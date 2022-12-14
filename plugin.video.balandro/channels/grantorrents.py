@@ -51,7 +51,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_grantorrents', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='grantorrents', folder=False, text_color='chartreuse' ))
 
-    if domain_memo: title = '[B]Modificar el dominio memorizado[/B]'
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_grantorrents', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
@@ -165,7 +165,6 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '</h3> <span>.*? .*? (.*?)</span>').strip()
-
         if not year: year = '-'
 
         lang = 'Esp'
@@ -219,10 +218,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):
@@ -321,36 +316,31 @@ def list_search(item):
         title = scrapertools.find_single_match(match, ' alt="(.*?)"')
         if not url or not title: continue
 
-        tipo = 'movie' if '/pelis/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo
-
         title = title.replace('Descargar', '').replace('en torrent', '').replace('torrent', '').strip()
 
         thumb = scrapertools.find_single_match(match, '<noscript><img src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>').strip()
-
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         lang = 'Esp'
 
-        if '/series-tv/' in url:
-            if item.search_type != 'all':
-                if item.search_type == 'movie': continue
+        tipo = 'movie' if '/pelis/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
 
             if ' castellano ' in title: title = title.replace(' castellano ', '')
             if 'HD' in title: title = title.replace('HD', '').strip()
 
-            sufijo = '' if item.search_type != 'all' else 'tvshow'
-
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
-        else:
-            if item.search_type != 'all':
-                if item.search_type == 'tvshow': continue
 
-            sufijo = '' if item.search_type != 'all' else 'movie'
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = lang, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))

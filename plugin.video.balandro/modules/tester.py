@@ -350,26 +350,38 @@ def test_channel(channel_name):
 
     if not 'code: [COLOR springgreen][B]200' in str(txt):
         if ant_hosts:
-            ant_hosts = str(ant_hosts).replace('[', '').replace("'", '').replace('"', '').replace(', ', ',  ').strip()
+            ant_hosts = str(ant_hosts).replace('[', '').replace("'", '').replace('"', '').replace(', ', ',  ').replace(',', '').strip()
 
             txt += '[CR][CR][COLOR moccasin][B]Anteriores:[/B][/COLOR][CR]'
             txt += '[COLOR mediumaquamarine][B]' + ant_hosts + '[/B][/COLOR]'
+
+    if config.get_setting('user_test_channel', default=''): return ''
 
     avisado = False
 
     if channel_id in str(channels_poe): pass
     else:
        if not 'code: [COLOR springgreen][B]200' in txt:
-           platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
-           avisado = True
+           if not channels_unsatisfactory == 'unsatisfactory':
+               platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+               avisado = True
 
+           else:
+               if 'Podría estar Correcto' in txt: pass
+               else:
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+
+               avisado = True
+			   
     if channels_unsatisfactory == 'unsatisfactory':
         if not avisado:
             if 'Falso Positivo.' in txt: return txt
             return ''
         else:
-            platformtools.dialog_textviewer(channel_name.capitalize(), txt)
-            return txt
+            if 'Podría estar Correcto' in txt: return ''
+            else:
+                platformtools.dialog_textviewer(channel_name.capitalize(), txt)
+                return txt
 
     platformtools.dialog_textviewer(channel_name.capitalize(), txt)
 
@@ -383,7 +395,7 @@ def info_channel(channel_name, channel_poe, host, dominio, txt):
     if dominio: txt_dominio = 'dominio'
     else: txt_dominio = ''
 
-    response, txt = acces_channel(channel_name, host, txt_dominio, txt, follow_redirects=False)
+    response, txt = acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirects=False)
 
     if channel_id == channel_poe: return txt
 
@@ -397,16 +409,16 @@ def info_channel(channel_name, channel_poe, host, dominio, txt):
                                if not 'timed out' in txt:
                                    if not 'Denegado' in txt:
                                        platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
-                                       response, txt = acces_channel(channel_name, host, '', txt, follow_redirects=True)
+                                       response, txt = acces_channel(channel_name, host, '', dominio, txt, follow_redirects=True)
 
     if not dominio:
         dominio = config.get_setting('dominio', channel_id, default='')
-        if dominio: response, txt = acces_channel(channel_name, dominio, 'dominio', txt, follow_redirects=False)
+        if dominio: response, txt = acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirects=False)
 
     return txt
 
 
-def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
+def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirects=None):
     el_canal = ('Testeando [B][COLOR %s]' + channel_name) % color_infor
     platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
 
@@ -420,7 +432,7 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
 
     host_acces = host
 
-    if channel_name == 'hdfull': host_acces = host_acces + 'login'
+    if channel_name.lower() == 'hdfull': host_acces = host_acces + 'login'
 
     if not config.get_setting(cfg_proxies_channel, default=''):
         response = httptools.downloadpage(host_acces, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
@@ -503,8 +515,8 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
 	
     if dominio: dominio = '[COLOR coral]' + dominio + '[/COLOR]'
 
-    if follow_redirects == False: txt += '[CR][CR][COLOR moccasin][B]Acceso: ' + dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
-    else: txt += '[CR][CR][COLOR moccasin][B]Redirect: ' + dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
+    if follow_redirects == False: txt += '[CR][CR][COLOR moccasin][B]Acceso: ' + txt_dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
+    else: txt += '[CR][CR][COLOR moccasin][B]Redirect: ' + txt_dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
 
     txt += 'host: [COLOR pink][B]' + host + '[/B][/COLOR][CR]'
 
@@ -758,6 +770,10 @@ def acces_channel(channel_name, host, dominio, txt, follow_redirects=None):
             txt += txt_checs
             txt += txt_routs
 
+    if config.get_setting('user_test_channel', default=''):
+        if 'Nuevo Dominio Permanente' in str(txt):
+            if new_web: config.set_setting('user_test_channel', new_web)
+
     return response, txt
 
 
@@ -849,18 +865,32 @@ def test_server(server_name):
     except:
        txt += 'patrones: ' + str(bloc) + '[CR][CR]'
 
+    txt_diag = ''
+
     try:
        notes = dict_server['notes']
     except: 
        notes = ''
-
-    txt_diag = ''
 
     if 'Alternative' in notes:
         notes = notes.replace('Alternative vía:', '').strip()
         txt_diag  += 'alternativas: ' + '[COLOR plum][B]' + str(notes) + '[/B][/COLOR][CR]'
     else:
         if notes: txt_diag  += 'notes: ' + '[COLOR plum][B]' + str(notes) + '[/B][/COLOR][CR]'
+
+    try:
+       more_ids = dict_server['more_ids']
+    except: 
+       more_ids = ''
+
+    if more_ids: txt_diag  += 'more ids: ' + '[COLOR gold][B]' + str(more_ids) + '[/B][/COLOR][CR]'
+
+    try:
+       ignore_urls = dict_server['ignore_urls']
+    except: 
+       ignore_urls = ''
+
+    if ignore_urls: txt_diag  += 'more ids: ' + '[COLOR coral][B]' + str(ignore_urls) + '[/B][/COLOR][CR]'
 
     if txt_diag:
         txt += '[COLOR moccasin][B]Diagnosis:[/B][/COLOR][CR]'

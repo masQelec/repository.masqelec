@@ -115,7 +115,6 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-
         title = scrapertools.find_single_match(match, '<h2 class="Title">(.*?)</h2>')
 
         if not url or not title: continue
@@ -168,10 +167,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
-
-
-def tracking_all_episodes(item):
-    return episodios(item)
 
 
 def episodios(item):
@@ -249,7 +244,7 @@ def findvideos(item):
             elif 'vidtodo' in other: continue
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url,
-                                  language = IDIOMAS.get(lang, lang), quality = qlty, other = other.capitalize() ))
+                                                          language = IDIOMAS.get(lang, lang), quality = qlty, other = other.capitalize() ))
 
     # ~ Descargas
     bloque = scrapertools.find_single_match(data, '<div class="OptionBx on">(.*?)</section>')
@@ -264,7 +259,7 @@ def findvideos(item):
         lang = lang.lower()
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url,
-                              language = IDIOMAS.get(lang, lang), quality = qlty, other = srv  + ' d' ))
+                                                     language = IDIOMAS.get(lang, lang), quality = qlty, other = srv  + ' d' ))
 
     if not itemlist:
         if not ses == 0:
