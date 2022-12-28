@@ -7545,7 +7545,7 @@ Archivos soportados: .sfc, .smc, .bml</description>
     </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="2.5.2" provider-name="Balandro Team">
+<addon id="plugin.video.balandro" name="Balandro" version="2.5.4" provider-name="Balandro Team">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
