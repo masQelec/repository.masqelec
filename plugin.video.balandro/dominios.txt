@@ -1,16 +1,16 @@
-[COLOR coral][B]Balandro[/COLOR][COLOR cyan]  28 de Noviembre 2022 [/COLOR][COLOR limegreen] 08:00[/B][/COLOR]
-   [COLOR yellow][B]Version 2.5.2[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR][COLOR cyan]  22 de Diciembre 2022 [/COLOR][COLOR limegreen] 7:00[/B][/COLOR]
+   [COLOR yellow][B]Version 2.5.4[/B][/COLOR]
 
    [COLOR yellow]CONTACTO:[/COLOR]
      Foro  mimediacenter.info/foro/  Instalaciones, Novedades, Sugerencias, etc.
      Telegram  t.me/@balandro_asesor  Asesoramiento, Dudas, Consultas, etc.
 
    [COLOR gold][B]CAMBIOS FRECUENTES DE DOMINIOS:[/B][/COLOR]
-     [B][COLOR moccasin]Cuevana3 [COLOR goldenrod] Habitualmente, cambia su Dominio 2 veces cada dia [/B][/COLOR]
-     [B][COLOR moccasin]DonTorrents [COLOR goldenrod] Habitualmente, cambia su Dominio 1 vez por semana [/B][/COLOR]
-     [B][COLOR moccasin]RePelis24 [COLOR goldenrod] Habitualmente, cambia su Dominio 2 veces cada dia [/B][/COLOR]
+     [B][COLOR moccasin]DonTorrents [COLOR goldenrod] Habitualmente, cambia su Dominio 1 vez por semana[/B][/COLOR]
 
    [COLOR cyan][B]CANALES SITUACION Y ULTIMOS CAMBIOS DE DOMINIOS:[/B][/COLOR]
-     [B][COLOR moccasin] 123Pelis [/COLOR][COLOR springgreen] https://123pelis.fun/ [COLOR red] Suspendida [/B][/COLOR]
-     [B][COLOR moccasin] CineTorrents [/COLOR][COLOR springgreen] https://cinetorrent.eu/ [COLOR red] Suspendida [/B][/COLOR]
-     [B][COLOR moccasin] EstrenosPapaya [/COLOR][COLOR springgreen] https://www.estrenospapaya.com/ [COLOR orangered] Avisa CIERRE [/B][/COLOR]
+     [B][COLOR moccasin] 123Pelis [/COLOR][COLOR springgreen] 123pelis.fun [COLOR red] Suspendida[/B][/COLOR]
+     [B][COLOR moccasin] CineTorrents [/COLOR][COLOR springgreen] cinetorrent.eu [COLOR red] Suspendida[/B][/COLOR]
+     [B][COLOR moccasin] EstrenosPapaya [/COLOR][COLOR springgreen] www.estrenospapaya.com [COLOR red] Host Error 522[COLOR orangered] Cerrada[/B][/COLOR]
+     [B][COLOR moccasin] PlayDede [/COLOR][COLOR springgreen] playdede.nu [COLOR red] reCAPTCHA[COLOR orangered] Oculto[/B][/COLOR]
+     [B][COLOR moccasin] SeriesFlixVideo [/COLOR][COLOR springgreen] seriesflix.video [COLOR red] Host Error 522[/B][/COLOR]

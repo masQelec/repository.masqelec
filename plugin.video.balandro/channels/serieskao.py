@@ -74,25 +74,36 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    exist_gen = []
+    logger.info()
+    itemlist=[]
 
-    data = do_downloadpage(host)
+    genres = [
+       'accion',
+       'animacion',
+       'aventura',
+       'belica',
+       'ciencia-ficcion',
+       'comedia',
+       'crimen',
+       'documental',
+       'drama',
+       'familia',
+       'fantasia',
+       'historia',
+       'misterio',
+       'musica',
+       'romance',
+       'suspense',
+       'terror',
+       'western'
+       ]
 
-    matches = scrapertools.find_multiple_matches(data, '(?is)href="(/genero[^"]+)">([^<]+)')
+    for genre in genres:
+        url = host + 'genero/' + genre + '/'
 
-    for url, title in matches:
-        if title in exist_gen: continue
+        itemlist.append(item.clone( action = 'list_all', title = genre.capitalize(), url = url ))
 
-        exist_gen.append(title)
-
-        url = host[:-1] + url
-
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
-
-    if itemlist:
-        itemlist.append(item.clone( title = 'Western', action = 'list_all', url = host + 'genero/western/' ))
-
-    return sorted(itemlist,key=lambda x: x.title)
+    return itemlist
 
 
 def anios(item):
@@ -212,10 +223,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('SeriesKao', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('SeriesKao', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('SeriesKao', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('SeriesKao', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('SeriesKao', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('SeriesKao', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for episode, url, epi_name in matches[item.page * item.perpage:]:
         epi_num = scrapertools.find_single_match(episode, "- (\d+)")
@@ -399,6 +435,8 @@ def play(item):
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'zplayer': url = url + '|' + host
 
         itemlist.append(item.clone(url = url, server = servidor))
 

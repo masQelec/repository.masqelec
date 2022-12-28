@@ -177,7 +177,7 @@ def mainlist_pelis(item):
                               infoLabels = infolabels, context=context ))
 
     if item.desde + tracking_perpage < count_movies:
-        itemlist.append(item.clone( title="Siguiente >>", desde=item.desde + tracking_perpage ))
+        itemlist.append(item.clone( title = 'Siguientes ...', desde = item.desde + tracking_perpage, text_color = 'coral' ))
 
     db.close()
 
@@ -214,7 +214,7 @@ def mainlist_series(item):
                               infoLabels = infolabels, context=context ))
 
     if item.desde + tracking_perpage < count_shows:
-        itemlist.append(item.clone( title="Siguiente >>", desde=item.desde + tracking_perpage ))
+        itemlist.append(item.clone( title = 'Siguientes ...', desde = item.desde + tracking_perpage, text_color = 'coral' ))
 
     db.close()
 
@@ -254,7 +254,7 @@ def mainlist_episodios(item):
         itemlist.append(item.clone( action='findvideos', title=titulo, thumbnail = thumbnail, fanart = fanart, infoLabels = infolabels, context=context ))
 
     if item.desde + tracking_perpage < count_episodes:
-        itemlist.append(item.clone( title="Siguiente >>", desde=item.desde + tracking_perpage ))
+        itemlist.append(item.clone( title = 'Siguientes ...', desde = item.desde + tracking_perpage, text_color = 'coral' ))
 
     db.close()
 
@@ -286,7 +286,8 @@ def serie_temporadas(item):
 
         context = [ {'title': 'Gestionar temporada', 'channel': item.channel, 'action': 'acciones_temporada'} ]
 
-        itemlist.append(item.clone( action='serie_episodios', title=titulo, thumbnail = thumbnail, fanart = fanart, infoLabels = infolabels, context=context ))
+        itemlist.append(Item( channel=item.channel, action='serie_episodios', title=titulo, thumbnail = thumbnail, fanart = fanart,
+                                                    infoLabels = infolabels, context=context ))
 
     db.close()
 

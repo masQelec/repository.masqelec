@@ -1772,7 +1772,9 @@ class Tmdb(object):
             elif k == 'credits_crew' or k == 'episodio_crew' or k == 'temporada_crew':
                 for crew in v:
                     if crew['job'].lower() == 'director':
-                        l_director = list(set(l_director + [crew['name']]))
+                        try:
+                            l_director = list(set(l_director + [crew['name']]))
+                        except: pass
 
                     elif crew['job'].lower() in ('screenplay', 'writer'):
                         try:

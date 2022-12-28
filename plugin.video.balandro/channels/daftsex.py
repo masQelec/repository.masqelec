@@ -10,16 +10,19 @@ from core import httptools, scrapertools
 host = 'https://daft.sex/'
 
 
-def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+_player = 'https://dxb.to/'
 
-    if '<title>You are being redirected...</title>' in data:
+
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(resp.data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                data = httptools.downloadpage(url, post=post, headers=headers).data
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -84,8 +87,7 @@ def pornstars(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<div class="pornstar"><a href="([^"]+)"><div class="[^"]+">'
-    patron += '<div class="lazy thumb" data-thumb="([^"]+)"></div></div><span>([^<]+)'
+    patron = '<div class="pornstar"><a href="([^"]+)"><div class="[^"]+"><div class="lazy thumb".*?data-thumb="([^"]+)"></div></div><span>([^<]+)'
 
     matches = re.compile(patron).findall(data)
 
@@ -116,12 +118,14 @@ def list_all(item):
     data = do_downloadpage(item.url, post=post)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<div class="video-item video([^"]+)".*?data-thumb="([^"]+)".*?div class="video-title" (?:[^"]+"){2}>([^<]+)').findall(data)
+    matches = re.compile('<div class="video-item video([^"]+)".*?data-thumb="([^"]+)".*?<span class="video-time">([^<]+)<.*?<div class="video-title"[^>]+>([^<]+)<').findall(data)
 
-    for video_id, thumb, title in matches:
+    for video_id, thumb, time, title in matches:
         url = host + 'watch/%s' % (video_id)
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+        titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
@@ -145,10 +149,8 @@ def listas(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<div class="video-title" (?:[^"]+"){2}>([^<]+)'
-    patron += '.*?a href="([^"]+).*?data-thumb="([^"]+)"'
+    matches = re.compile('<div class="video-title"[^>]+>([^<]+)<.*?a href="([^"]+).*?data-thumb="([^"]+)"').findall(data)
 
-    matches = re.compile(patron).findall(data)
     for title, url, thumb in matches:
         itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url,
                                     thumbnail = thumb if thumb.startswith('http') else host[:-1] + thumb, title = title))
@@ -174,26 +176,45 @@ def findvideos(item):
     hash = scrapertools.find_single_match(data, 'hash:\s*"([^"]+)"')
     color = scrapertools.find_single_match(data, 'color:\s*"([^"]+)"')
 
-    url = host + 'player/%s?color=%s'  % (hash, color)
+    url = _player + 'player/%s?color=%s'  % (hash, color)
 
-    headers = {'Referer': item.url}
+    data = do_downloadpage(url, headers = {'Referer': item.url})
 
-    data = do_downloadpage(url, headers=headers)
+    ids = scrapertools.find_single_match(data, 'id:\s*"([^"]+)"')
+    if not ids: return itemlist
 
-    id = scrapertools.find_single_match(data, 'id:\s*"([^"]+)"')
-    id1, id2 = id.split('_')
+    id1, id2 = ids.split('_')
 
     srv =  scrapertools.find_single_match(data, 'server:\s*"([^"]+)')[::-1]
     srv = base64.b64decode(srv).decode('utf-8')
+    if not srv: return itemlist
+
     srv = "https://%s" % srv
 
-    patron = '"mp4_\d+":"(\d+).([^"]+)"'
-    matches = re.compile(patron,re.DOTALL).findall(data)
+    token = scrapertools.find_single_match(data, 'access_token: "(.*?)"')
+    idv = scrapertools.find_single_match(data, 'id: "(.*?)"')
+    c_key = scrapertools.find_single_match(data, 'c_key: "(.*?)"')
+    credentials = scrapertools.find_single_match(data, 'credentials: "(.*?)"')
 
-    for qlty, url in matches:
-        url = '%s/videos/%s/%s/%s.mp4?extra=%s' % (srv, id1, id2, qlty, url)
+    if credentials:
+        url = srv + '/method/video.get/%s?token=%s&videos=%s&ckey=%s&credentials=%s' % (ids, token, idv, c_key, credentials)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = qlty, url = url, language = 'VO' ))
+        data = do_downloadpage(url, headers = {'Referer': _player}, raise_weberror=False)
+
+        matches = re.compile('"mp4_(.*?)":"(.*?)"', re.DOTALL).findall(str(data))
+
+        for qlty, url in matches:
+            url = url.replace('\\u0026', '&')
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = qlty, url = url, language = 'VO' ))
+
+    else:
+        matches = re.compile('"mp4_\d+":"(\d+).([^"]+)"', re.DOTALL).findall(data)
+
+        for qlty, url in matches:
+            url = '%s/videos/%s/%s/%s.mp4?extra=%s' % (srv, id1, id2, qlty, url)
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = qlty, url = url, language = 'VO' ))
 
     return itemlist
 

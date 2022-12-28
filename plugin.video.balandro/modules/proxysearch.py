@@ -495,7 +495,7 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
                if not channels_proxies_memorized:
                    channels_proxies_memorized = channels_proxies_memorized  + el_memorizado + ','
                else:
-                   channels_proxies_memorized = channels_proxies_memorized + ' ' + el_memorizado + ','
+                   channels_proxies_memorized = channels_proxies_memorized + ' ,' + el_memorizado
                config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
         if el_memorizado in str(channels_proxies_memorized):

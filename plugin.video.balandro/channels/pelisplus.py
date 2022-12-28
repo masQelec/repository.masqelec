@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www2.pelisplus.ph/'
+host = 'https://www3.pelisplus.ph/'
 
 
 # ~ por si viene de enlaces guardados
@@ -15,7 +15,7 @@ ant_hosts = ['https://pelisplus.so/', 'https://www1.pelisplus.so/', 'https://www
              'https://pelisplus.sh/', 'https://pelisplus.ac/', 'https://pelisplus.pe/',
              'https://www1.pelisplus.pe/', 'https://pelisplus.cx/', 'https://www1.pelisplus.cx/',
              'https://www2.pelisplus.cx/', 'https://www3.pelisplus.cx/', 'https://pelisplus.ph/',
-             'https://www1.pelisplus.ph/']
+             'https://www1.pelisplus.ph/', 'https://www2.pelisplus.ph/']
 
 
 domain = config.get_setting('dominio', 'pelisplus', default='')
@@ -247,10 +247,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = num_matches
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('PelisPlus', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('PelisPlus', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('PelisPlus', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('PelisPlus', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('PelisPlus', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('PelisPlus', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for url, title in matches:
         if url.startswith('/'): url = host[:-1] + url
@@ -346,6 +371,7 @@ def normalize_other(url):
     if 'pelisplus' in url: link_other = 'plus'
     elif 'pelisplay' in url: link_other = 'play'
     elif 'damedamehoy' in url: link_other = 'dame'
+    elif 'apialfa' in url: link_other = 'apialfa'
     elif 'tomatomatela' in url: link_other = 'dame'
     else:
        if config.get_setting('developer_mode', default=False): link_other = url
@@ -380,6 +406,27 @@ def play(item):
         if url:
             itemlist.append(item.clone(url=url , server='directo'))
             return itemlist
+
+    elif item.other == 'apialfa':
+        fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
+        if fid:
+            vid = item.url.replace('https://apialfa.tomatomatela.club/ir/player.php', 'https://apialfa.tomatomatela.club/ir/rd.php')
+            post = {'url': fid}
+
+            try:
+                # ~ url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+            except:
+                url = ''
+
+            if url:
+                servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
+
+                url = servertools.normalize_url(servidor, url)
+
+                itemlist.append(item.clone(url=url, server=servidor))
+                return itemlist
 
     elif item.server == 'directo':
         data = do_downloadpage(url)

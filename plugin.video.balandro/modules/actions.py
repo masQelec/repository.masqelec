@@ -63,6 +63,13 @@ def _marcar_canales(item):
 def comprobar_nuevos_episodios(item):
     logger.info()
 
+    path = os.path.join(config.get_data_path(), 'tracking_dbs')
+
+    existe = filetools.exists(path)
+    if not existe:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Preferidos[/COLOR][/B]' % color_exec)
+        return
+
     la_notif = ('[B][COLOR %s]') % color_infor
     la_notif += ('Comprobando existencia nuevos episodios[/B][/COLOR]')
     platformtools.dialog_notification(config.__addon_name, la_notif, time=2000, sound=False)
@@ -327,6 +334,7 @@ def manto_params(item):
         config.set_setting('channel_repelis24_dominio', '')
         config.set_setting('channel_repelishd_dominio', '')
         config.set_setting('channel_series24_dominio', '')
+        config.set_setting('channel_seriesanimadas_dominio', '')
         config.set_setting('channel_seriesyonkis_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
         config.set_setting('channel_torrentdivx_dominio', '')
@@ -352,7 +360,7 @@ def manto_params(item):
 
         config.set_setting('downloadpath', '')
 
-        config.set_setting('chrome_last_version', '107.0.5304.122')
+        config.set_setting('chrome_last_version', '108.0.5359.99')
 
         config.set_setting('debug', '0')
 

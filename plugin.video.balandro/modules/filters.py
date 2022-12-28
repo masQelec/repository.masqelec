@@ -104,11 +104,11 @@ def mainlist2(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action = 'channels_excluded', title='[COLOR greenyellow][B]Incluir en las búsquedas Solo determinados canales[/B][/COLOR]',
+    itemlist.append(item.clone( action = 'channels_excluded', title='[COLOR greenyellow][B]Efectuar las búsquedas Solo en determinados canales[/B][/COLOR]',
                                 extra = 'included', folder = False ))
 
     if channels_search_included:
-        itemlist.append(item.clone( title = '[COLOR green][B]Anular Todos los canales[/COLOR][/B] Incluidos en las búsquedas de Solo determinados canales',
+        itemlist.append(item.clone( title = '[COLOR coral][B]Anular Todos los canales[/COLOR][/B] En las búsquedas de Solo determinados canales',
                                     action = 'channels_excluded_del', extra = 'included', folder = False, text_color='yellow' ))
 
     platformtools.itemlist_refresh()
@@ -1121,6 +1121,10 @@ def show_channels_list(item):
 
             if ch['id'] in channels_search: info = info + '[COLOR coral][B] No búsquedas [/B][/COLOR]'
 
+        cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
+
+        if config.get_setting(cfg_searchable_channel, default=False): info = info + '[COLOR violet][B] Descartado búsquedas [/B][/COLOR]'
+
         if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
         elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
 
@@ -1230,8 +1234,11 @@ def show_clients_torrent(item):
 
 def search_new_proxies(canal_0, canal_1, canal_2):
     if platformtools.dialog_yesno(canal_0, canal_1, '[COLOR red][B]¿ Desea efectuar una nueva búsqueda de proxies en el canal ?[/B][/COLOR]'):
+        channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
+        iniciales_channels_proxies_memorized = channels_proxies_memorized
+
         from modules import proxysearch
-        proxysearch.proxysearch_channel('', canal_0.lower(), canal_0)
+        proxysearch.proxysearch_channel('', canal_0.lower(), canal_0, iniciales_channels_proxies_memorized)
         return True
 
     return False

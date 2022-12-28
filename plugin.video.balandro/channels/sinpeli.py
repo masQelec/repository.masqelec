@@ -227,7 +227,9 @@ def play(item):
         url = base64.b64decode(url)
         if url: url = scrapertools.find_single_match(str(url), "<iframe src='(.*?)'")
     except:
-        pass
+        url = item.url
+
+    if not url: url = item.url
 
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:

@@ -12,6 +12,12 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://www1.inkapelis.li/'
 
 
+embeds = 'inkapelis.li'
+
+# ~ _player = 'https://gcs.megaplay.cc/'
+_player = 'https://players.oceanplay.me/'
+
+
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://inkapelis.me/', 'https://inkapelis.in/', 'https://ww1.inkapelis.de/']
 
@@ -24,7 +30,7 @@ if domain:
     else: host = domain
 
 
-# ~ players 'https://players.inkapelis.li'
+# ~ players 'https://players.inkapelis.??'
 points = host.count('.')
 
 if points == 1:
@@ -82,7 +88,7 @@ def do_downloadpage(url, post=None, headers=None):
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('inkapelis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
-    if '<title>You are being redirected...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
@@ -119,6 +125,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(Item( channel='helper', action='show_help_inkapelis', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -148,10 +156,12 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'pelicula/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos en HD', action = 'list_all', url = host + 'genero/estrenos-hd/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'genero/destacadas/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Estrenos en HD', action = 'list_all', url = host + 'estado/estrenos-hd/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'estado/destacadas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'calidad/hd/', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Superheroes', action = 'list_all', url = host + 'seccion/superheroes/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Infantiles', action = 'list_all', url = host + 'seccion/infantil/', search_type = 'movie' ))
 
@@ -175,8 +185,10 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_episodes', url = host + 'episodio/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Últimas temporadas', action = 'last_seasons', url = host + 'temporada/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host + 'episodio/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas temporadas', action = 'last_temps', url = host + 'temporada/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Superheroes', action = 'list_all', url = host + 'seccion/superheroes/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Infantiles', action = 'list_all', url = host + 'seccion/infantil/', search_type = 'tvshow' ))
 
@@ -238,7 +250,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1938, -1):
-        itemlist.append(item.clone( title=str(x), url= host + '/fecha/' + str(x) + '/', action='list_all' ))
+        itemlist.append(item.clone( title=str(x), url= host + 'fecha/' + str(x) + '/', action='list_all' ))
 
     return itemlist
 
@@ -306,11 +318,10 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    if '<h2>Añadido recientemente' in data:
-        patron = '<h2>Añadido recientemente(.*?)<div class=copy>'
-        if '/page/' in item.url: patron = '(.*?)<div class=copy>'
+    if '<h2>Añadido recientemente' in data: patron = '<h2>Añadido recientemente(.*?)<div class=copy>'
     else:
-        patron = '<h1>(.*?)>Géneros<'
+        if '/page/' in item.url: patron = '</h1>(.*?)<div class=copy>'
+        else: patron = '<h1>(.*?)>Géneros<'
 
     bloque = scrapertools.find_single_match(data, patron)
 
@@ -342,7 +353,7 @@ def list_all(item):
         tipo = 'tvshow' if '/serie/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        if '/pelicula/' in url:
+        if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
@@ -358,7 +369,7 @@ def list_all(item):
                                         languages = ', '.join(langs), fmt_sufijo = sufijo, 
                                         contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot}, contentTitleAlt = title_alt ))
 
-        if '/serie/' in url:
+        if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
@@ -368,7 +379,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "href='(.*?)'")
+        next_page = scrapertools.find_single_match(data, '<div class="pagination".*?<span class="current">.*?href=(.*?) ')
         if not next_page: next_page = scrapertools.find_single_match(data, '<a class=arrow_pag href=([^>]+)><i id=nextpagination')
         if not next_page: next_page = scrapertools.find_single_match(data, '<span class=current>.*?<a href=(.*?) class=inactive').strip()
 
@@ -422,10 +433,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('InkaPelis', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('InkaPelis', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('InkaPelis', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('InkaPelis', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('InkaPelis', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('InkaPelis', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for datos in matches[item.page * item.perpage:]:
         thumb = scrapertools.find_single_match(datos, "src=(.*?)>").strip()
@@ -459,7 +495,7 @@ def episodios(item):
     return itemlist
 
 
-def last_episodes(item):
+def last_epis(item):
     logger.info()
     itemlist = []
 
@@ -497,18 +533,20 @@ def last_episodes(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "href='(.*?)'")
+        next_page = scrapertools.find_single_match(data, '<div class="pagination".*?<span class="current".*?href=(.*?) ')
         if not next_page: next_page = scrapertools.find_single_match(data, '<a class=arrow_pag href=([^>]+)><i id=nextpagination')
         if not next_page: next_page = scrapertools.find_single_match(data, '<span class=current>.*?<a href=(.*?) class=inactive').strip()
 
         if next_page:
             if '/page/' in next_page:
-                itemlist.append(item.clone( title="Siguientes ...", action="last_episodes", url = next_page, text_color='coral' ))
+                mext_page = next_page.strip()
+
+                itemlist.append(item.clone( title="Siguientes ...", action="last_epis", url = next_page, text_color='coral' ))
 
     return itemlist
 
 
-def last_seasons(item):
+def last_temps(item):
     logger.info()
     itemlist=[]
 
@@ -542,13 +580,13 @@ def last_seasons(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "href='(.*?)'")
+        next_page = scrapertools.find_single_match(data, '<div class="pagination".*?<span class="current">.*?href=(.*?) ')
         if not next_page: next_page = scrapertools.find_single_match(data, '<a class=arrow_pag href=([^>]+)><i id=nextpagination')
         if not next_page: next_page = scrapertools.find_single_match(data, '<span class=current>.*?<a href=(.*?) class=inactive').strip()
 
         if next_page:
             if '/page/' in next_page:
-                itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='last_seasons', text_color='coral' ))
+                itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='last_temps', text_color='coral' ))
 
     return itemlist
 
@@ -713,6 +751,23 @@ def play(item):
 
     vurl = ''
 
+    if '/go.megaplay.cc/' in item.url or '/gcs.megaplay.cc/' in item.url or '/plays.megaplay.cc' in item.url or '/players.oceanplay.me/' in item.url:
+        data = do_downloadpage(item.url)
+
+        try:
+            key, value = scrapertools.find_single_match(data, 'name="([^"]+)" value="([^"]+)"')
+
+            if '/go.megaplay.cc/' in item.url: url_post = 'https://go.megaplay.cc/r.php'
+            elif '/gcs.megaplay.cc/' in item.url: url_post = 'https://gcs.megaplay.cc/r.php'
+            elif '/plays.megaplay.cc' in item.url: url_post = 'https://plays.megaplay.cc/r.php'
+            else: url_post = 'https://players.oceanplay.me/r.php'
+
+            # ~ vurl = httptools.downloadpage(url_post, post={key: value}, follow_redirects=False).headers['location']
+            vurl = httptools.downloadpage_proxy('repelishd', url_post, post={key: value}, follow_redirects=False).headers['location']
+
+        except:
+            vurl = scrapertools.find_single_match(data, 'location.href = "(.*?)"')
+
     if item.lembed and item.ltype and item.lurl:
         post = {'type': item.ltype, 'streaming': item.lembed}
         data = do_downloadpage(item.lurl + '/edge-data/', post=post, headers={'Referer': item.referer})
@@ -725,10 +780,9 @@ def play(item):
         if not item.url:
             return itemlist
 
-        item.url = item.url.replace('inkapelis.in/player?url=', 'inkapelis.in/player/?url=')
-        item.url = item.url.replace('inkapelis.in/fplayer?url=', 'inkapelis.in/redirector.php?url=')
+        item.url = item.url.replace(embeds + '/fplayer?url=', embeds + '/redirector.php?url=')
 
-    if 'playerd.xyz/' in item.url or 'inkapelis.in/' in item.url:
+    if 'playerd.xyz/' in item.url or embeds in item.url:
         # ~ resp = httptools.downloadpage(item.url, headers={'Referer': item.referer if item.referer else item.url}, follow_redirects=False)
         resp = httptools.downloadpage_proxy('inkapelis', item.url, headers={'Referer': item.referer if item.referer else item.url}, follow_redirects=False)
 
@@ -740,7 +794,7 @@ def play(item):
             if not url: url = scrapertools.find_single_match(resp.data, 'location\.href = "([^"]+)')
             if url and url.startswith('/'): url = '/'.join(item.url.split('/')[:3]) + url
 
-            if 'playerd.xyz/' in url or 'inkapelis.in/' in url:
+            if 'playerd.xyz/' in url or embeds in url:
                 url = url.replace('iframe?url=', 'redirect?url=')
                 # ~ resp = httptools.downloadpage(url, headers={'Referer': item.url}, follow_redirects=False)
                 resp = httptools.downloadpage_proxy('inkapelis', url, headers={'Referer': item.url}, follow_redirects=False)
@@ -777,11 +831,12 @@ def play(item):
                             if 'action="r.php"' in data:
                                 hash = scrapertools.find_single_match(data, 'value="(.*?)"')
                                 post = {'h': hash}
-                                _player = 'https://gcs.megaplay.cc/'
 
-                                # ~ url = httptools.downloadpage(_player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
-                                url = httptools.downloadpage_proxy('inkapelis', _player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
-
+                                try:
+                                    # ~ url = httptools.downloadpage(_player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                                    url = httptools.downloadpage_proxy('inkapelis', _player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                                except:
+                                    url = ''
                         if not url:
                             try:
                                # ~ url = httptools.downloadpage(url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
@@ -837,9 +892,12 @@ def play(item):
         elif 'index.php?h=' in vurl:
             hash = scrapertools.find_single_match(vurl, 'h=(.*?)&')
             post = {'h': hash}
-            player = 'https://gcs.megaplay.cc/'
 
-            vurl = httptools.downloadpage(player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+            try:
+                # ~ vurl = httptools.downloadpage(_player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                vurl = httptools.downloadpage_proxy('inkapelis', _player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+            except:
+                vurl = ''
 
     if vurl:
         if '/hqq.' in vurl or '/waaw.' in vurl or '/netu.' in vurl:
@@ -853,7 +911,7 @@ def play(item):
                 return 'Servidor erróneo [COLOR plum]No es Uptobox[/COLOR]'
 
         if servidor == 'zplayer':
-            player = 'https://player.inkapelis.in/'
+            player = 'https://player.' + embeds + '/'
             vurl = vurl + '|' + player
 
         if servidor and (servidor != 'directo' or 'googleapis.com' in vurl):

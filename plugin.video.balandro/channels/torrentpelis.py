@@ -153,6 +153,10 @@ def findvideos(item):
 
     links = scrapertools.find_multiple_matches(data, "<tr id='link-.*?<a href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?<td>(.*?)</td>.*?<td>(.*?)</td>")
 
+    linksd =  scrapertools.find_multiple_matches(data, "<tr class='downloads'.*?id='.*?<a href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?<td>(.*?)</td>.*?<td>(.*?)</td>")
+
+    links = links + linksd
+
     for url, qlty, lang, size in links:
         if url == 'https://adfly.mobi/directlinkg': url = link
 
@@ -206,18 +210,24 @@ def list_search(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, r'Has realizado una búsqueda(.*?)</table>')
+    bloque = scrapertools.find_single_match(data, '<h1>Resultados encontrados(.*?)<h3>')
 
-    matches = scrapertools.find_multiple_matches(bloque, r"href='(.*?)'.*?>(.*?)</a>.*?'>(.*?)<.*?<td.*?>(.*?)<")
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article')
 
-    for url, title, qlty, type in matches:
-        qlty = qlty.replace('(', '').replace(')', '').strip()
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty,
-                                    contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
-    if itemlist:
-         itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action='list_search', text_color='coral' ))
+        if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+
+        year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
+        if not year: year = '-'
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb,
+                                    contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

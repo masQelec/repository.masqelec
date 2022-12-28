@@ -191,7 +191,7 @@ def last_epis(item):
         if num_matches > perpage:
             hasta = (item.page * perpage) + perpage
             if hasta < num_matches:
-                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='last_epis', text_color='coral' ))
+                itemlist.append(item.clone( title='Siguientes ...', page = item.page + 1, action='last_epis', text_color='coral' ))
                 buscar_next = False
 
         if buscar_next:
@@ -222,6 +222,7 @@ def temporadas(item):
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.dobject = dobject
             item.dpost = dpost
             item.contentType = 'season'
@@ -229,7 +230,8 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, dobject = dobject, dpost = dpost, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, dobject = dobject, dpost = dpost,
+                                    contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 

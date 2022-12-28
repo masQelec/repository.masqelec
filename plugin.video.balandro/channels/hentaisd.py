@@ -69,7 +69,7 @@ def list_all(item):
         title = title.strip()
 
         itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
-                                    contentType = 'movie', contentTitle = title, infoLabels={'plot': plot} ))
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults', infoLabels={'plot': plot} ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<li class="next"><a href="([^"]+)"')
@@ -89,7 +89,8 @@ def list_list(item):
     matches = re.compile('<div class="col-sm-6 col-md-2 central">.*?<a href="([^"]+)".*?<img src="([^"]+)".*?<h5>([^<]+)</h5>', re.DOTALL).findall(data)
 
     for url, thumb, title in matches:
-        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title ))
+        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<li class="next"><a href="([^"]+)"')
@@ -111,8 +112,8 @@ def episodios(item):
     for url, title in matches:
         title = title + " - " + item.title
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType = 'movie',
-                                    contentTitle = title, contentExtra='adults' ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     return itemlist
 

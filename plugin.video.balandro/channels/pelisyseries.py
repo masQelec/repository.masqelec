@@ -1,19 +1,60 @@
 # -*- coding: utf-8 -*-
 
-import re
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+
+import re, os
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
+# ~ series solo hay 11
+
 host = 'https://pelisyseries.net/'
+
+
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_pelisyseries_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if '/lanzamiento/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -24,7 +65,9 @@ def mainlist(item):
 
     return mainlist_pelis(item)
 
-    # ~ series solo hay 11
+    # ~ itemlist.append(item_configurar_proxies(item))
+
+    # ~ itemlist.append(Item( channel='helper', action='show_help_pelisyseries', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     # ~ itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -37,6 +80,10 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_pelisyseries', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -59,6 +106,10 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_pelisyseries', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -144,11 +195,11 @@ def plataformas(item):
     data = do_downloadpage(host)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    # ~ bloque =  scrapertools.find_single_match(data, '>Networks</a>(.*?)>TENDENCIAS<')
-    # ~ matches = re.compile('<li id="menu-item-.*?<a href="(.*?)">(.*?)</a>').findall(bloque)
+    bloque =  scrapertools.find_single_match(data, '>Networks</a>(.*?)>TENDENCIAS<')
+    matches = re.compile('<li id="menu-item-.*?<a href="(.*?)">(.*?)</a>').findall(bloque)
 
-    # ~ for url, title in matches:
-    # ~     itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
+    for url, title in matches:
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
 
     return itemlist
 
@@ -160,12 +211,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    if '<h1>' in data:
-         bloque = scrapertools.find_single_match(data, '</h1>(.*?)>Año de lanzamiento<')
-    elif '<h2>' in data:
-         bloque = scrapertools.find_single_match(data, '</h2>(.*?)>Año de lanzamiento<')
-    else:
-         bloque = data
+    if '<h1>' in data: bloque = scrapertools.find_single_match(data, '</h1>(.*?)>Año de lanzamiento<')
+    elif '<h2>' in data: bloque = scrapertools.find_single_match(data, '</h2>(.*?)>Año de lanzamiento<')
+    else: bloque = data
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
@@ -179,8 +227,7 @@ def list_all(item):
 
         year = scrapertools.find_single_match(match, '</h3>.*?<span>.*?,(.*?)</span>').strip()
         if not year: year = '-'
-        else:
-           title = title.replace('(' + year + ')', '').strip()
+        else: title = title.replace('(' + year + ')', '').strip()
 
         qlty = scrapertools.find_single_match(match, '<span class="quality">(.*?)</span>')
 
@@ -200,6 +247,7 @@ def list_all(item):
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<span class="current">' + ".*?<a href='(.*?)'")
+
         if next_url:
             itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
 
@@ -231,10 +279,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -245,10 +289,8 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    if '/seasons/' in item.url:
-        bloque = data
-    else:
-        bloque = scrapertools.find_single_match(data, "<span class='se-t.*?'>" + str(item.contentSeason) + "</span>(.*?)</div></div>")
+    if '/seasons/' in item.url: bloque = data
+    else: bloque = scrapertools.find_single_match(data, "<span class='se-t.*?'>" + str(item.contentSeason) + "</span>(.*?)</div></div>")
 
     patron = "<li class='mark-.*?src='(.*?)'.*?<div class='numerando'>(.*?)</div>.*?<a href='(.*?)'>(.*?)</a>"
 
@@ -266,8 +308,8 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=episode ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = episode ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -328,7 +370,8 @@ def findvideos(item):
         elif other == 'player.vimeo': other = 'vimeo'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '',
-                              dpost = dpost, dtype = dtype, dnume = dnume, language = lang, quality = item.qualities, other = other.capitalize() ))
+                                                      dpost = dpost, dtype = dtype, dnume = dnume,
+                                                      language = lang, quality = item.qualities, other = other.capitalize() ))
 
     # Descargas y Torrents
     matches = scrapertools.find_multiple_matches(data, "<tr id='link-(.*?)</tr>")
@@ -370,7 +413,7 @@ def findvideos(item):
         url = scrapertools.find_single_match(match, "<a href='(.*?)'")
 
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '',
-                              language = lang, quality = qlty, other = size ))
+                                                      language = lang, quality = qlty, other = size ))
 
     if not itemlist:
         if not ses == 0:
@@ -469,10 +512,6 @@ def play(item):
 
         url = url.replace('&#038;', '&').replace('&amp;', '&')
 
-        if url.startswith('magnet:') or url.endswith('.torrent'):
-            itemlist.append(item.clone( url = url, server = 'torrent' ))
-            return itemlist
-
         if item.server == 'upstream':
             if 'dl?op=download_orig' in url:
                 return 'Upstream download [COLOR tan]No soportado[/COLOR]'
@@ -480,6 +519,24 @@ def play(item):
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+        if url.startswith('magnet:') or url.endswith('.torrent'):
+            if PY3:
+                from core import requeststools
+                data = requeststools.read(url, 'pelisyseries')
+            else:
+                data = do_downloadpage(url)
+
+            if data:
+                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+
+            return itemlist
 
         if 'archive.org' in url: url = url.replace('https%3A%2F%2Farchive.org%2Fdownload%2F', 'https://archive.org/download/').replace('%2F', '/')
 
@@ -515,8 +572,7 @@ def list_search(item):
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
         if not year: year = '-'
-        else:
-           title = title.replace('(' + year + ')', '').strip()
+        else: title = title.replace('(' + year + ')', '').strip()
 
         langs = []
         lngs = scrapertools.find_multiple_matches(match, '.*?/flags/(.*?).png')

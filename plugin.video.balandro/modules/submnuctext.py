@@ -31,6 +31,10 @@ current_year = int(datetime.today().year)
 current_month = int(datetime.today().month)
 
 
+thumb_filmaffinity = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'filmaffinity.jpg')
+thumb_tmdb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'tmdb.jpg')
+
+
 context_proxy_channels = []
 
 tit = '[COLOR %s]Información menús[/COLOR]' % color_infor
@@ -92,22 +96,22 @@ def submnu_special(item):
     if config.get_setting('search_extra_main', default=False):
         if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'movies' or item.extra == 'tvshows':
             itemlist.append(item.clone( action='', title = '[COLOR yellow][B]Películas y Series[/COLOR] búsquedas de Personas en TMDB:[/B]',
-                                        thumbnail=config.get_thumb('heart'), folder=False, text_color='pink' ))
+                                         thumbnail=thumb_tmdb, folder=False, text_color='pink' ))
 
             itemlist.append(item.clone( channel='tmdblists', action='personas', title= ' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...',
-                                        search_type='cast', thumbnail=config.get_thumb('computer') ))
+                                        search_type='cast', thumbnail=config.get_thumb('search') ))
 
             itemlist.append(item.clone( channel='tmdblists', action='personas', title= ' - Buscar [COLOR springgreen]dirección[/COLOR] ...',
-                                        search_type='crew', thumbnail=config.get_thumb('computer') ))
+                                        search_type='crew', thumbnail=config.get_thumb('search') ))
 
             itemlist.append(item.clone( action='', title = '[COLOR yellow][B]Películas y Series[/COLOR] búsquedas de Personas en Filmaffinity:[/B]',
-                                        thumbnail=config.get_thumb('heart'), folder=False, text_color='pink' ))
+                                        thumbnail=thumb_filmaffinity, folder=False, text_color='pink' ))
 
             itemlist.append(item.clone( channel='filmaffinitylists', action='listas', search_type='person', stype='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...',
-                                        thumbnail=config.get_thumb('computer')))
+                                        thumbnail=config.get_thumb('search')))
 
             itemlist.append(item.clone( channel='filmaffinitylists', action='listas', search_type='person', stype='director', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...',
-                                        thumbnail=config.get_thumb('computer')))
+                                        thumbnail=config.get_thumb('search')))
 
         if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'movies' or item.extra == 'torrents':
             itemlist.append(item.clone( action='', title='[COLOR deepskyblue][B]Películas[/COLOR] búsquedas en TMDB ó Filmaffinity:[/B]',
@@ -155,9 +159,9 @@ def submnu_special(item):
 
         if not item.extra == 'documentaries':
             itemlist.append(item.clone( action='', title = '[COLOR teal][B]Películas y Series[/COLOR] búsquedas en Filmaffinity:[/B]',
-                                        thumbnail=config.get_thumb('heart'), folder=False, text_color='pink' ))
+                                        thumbnail=thumb_filmaffinity, folder=False, text_color='pink' ))
 
-            itemlist.append(item.clone( channel='filmaffinitylists', action='plataformas', title=' - Por plataforma', thumbnail=config.get_thumb('heart'), search_type = 'all' ))
+            itemlist.append(item.clone( channel='filmaffinitylists', action='plataformas', title=' - Por plataforma', thumbnail=config.get_thumb('booklet'), search_type = 'all' ))
 
             itemlist.append(item.clone( channel='filmaffinitylists', action='_genres', title=' - Por género', thumbnail=config.get_thumb('listgenres'), search_type = 'all' ))
 
@@ -168,7 +172,7 @@ def submnu_special(item):
         if not item.no_docs:
             if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'documentaries' or item.extra == 'torrents':
                 itemlist.append(item.clone( action='', title = '[COLOR cyan][B]Documentales[/COLOR] búsquedas en Filmaffinity:[/B]',
-                                            thumbnail=config.get_thumb('documentary'), folder=False, text_color='pink' ))
+                                            thumbnail=thumb_filmaffinity, folder=False, text_color='pink' ))
 
             if config.get_setting('mnu_documentales', default=True):
                 itemlist.append(item.clone( channel='filmaffinitylists', action='_bestdocumentaries', title=' - Los Mejores',
@@ -234,7 +238,7 @@ def submnu_search(item):
                                         extra='movies' ))
 
     elif item.extra == 'tvshows':
-        itemlist.append(item.clone( channel='filters', action='channels_excluded', title=' - [COLOR tomato][B]Excluir canales en las búsquedas de [COLOR hotpink]Series[[/B]/COLOR]',
+        itemlist.append(item.clone( channel='filters', action='channels_excluded', title=' - [COLOR tomato][B]Excluir canales en las búsquedas de [COLOR hotpink]Series[/B][/COLOR]',
                                     extra='tvshows', thumbnail=config.get_thumb('stack') ))
 
         if channels_search_excluded_tvshows:
@@ -283,6 +287,60 @@ def _refresh_menu(item):
 
 def _marcar_canal(item):
     config.set_setting('status', item.estado, item.from_channel)
+    _refresh_menu(item)
+
+def _poner_no_searchable(item):
+    platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR violet]Excluyendo de búsquedas[/COLOR][/B]')
+
+    config.set_setting('no_searchable', True, item.from_channel)
+    _refresh_menu(item)
+
+def _quitar_no_searchable(item):
+    platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR violet]Incluyendo en búsquedas[/COLOR][/B]')
+
+    config.set_setting('no_searchable', False, item.from_channel)
+    _refresh_menu(item)
+
+
+def _channels_included(item):
+    logger.info()
+
+    from modules import filters
+
+    item.extra = 'included'
+
+    filters.channels_excluded(item)
+    _refresh_menu(item)
+
+def _channels_included_del(item):
+    logger.info()
+
+    from modules import filters
+
+    item.extra = 'included'
+
+    filters.channels_excluded_del(item)
+    _refresh_menu(item)
+
+
+def _channels_excluded(item):
+    logger.info()
+
+    from modules import filters
+
+    item.extra = 'all'
+
+    filters.channels_excluded(item)
+    _refresh_menu(item)
+
+def _channels_excluded_del(item):
+    logger.info()
+
+    from modules import filters
+
+    item.extra = 'all'
+
+    filters.channels_excluded_del(item)
     _refresh_menu(item)
 
 
@@ -392,6 +450,9 @@ def _dominios(item):
     elif item.from_channel == 'series24':
         domains.manto_domain_series24(item)
 
+    elif item.from_channel == 'seriesanimadas':
+        domains.manto_domain_seriesanimadas(item)
+
     elif item.from_channel == 'seriesyonkis':
         domains.manto_domain_seriesyonkis(item)
 
@@ -405,7 +466,7 @@ def _dominios(item):
         domains.manto_domain_torrentpelis(item)
 
     else:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Configuración No Permitida[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Configuración No Permitida[/B][/COLOR]' % color_alert)
 
 
 def _dominio_vigente(item):
@@ -420,7 +481,7 @@ def _dominio_vigente(item):
         domains.last_domain_dontorrents(item)
 
     else:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Efectue Test Web, la comprobación No está permitida[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Efectue Test Web, la comprobación No está permitida[/B][/COLOR]' % color_alert)
 
 
 def _dominio_memorizado(item):
@@ -522,6 +583,9 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'series24':
         domains.manto_domain_series24(item)
 
+    elif item.from_channel == 'seriesanimadas':
+        domains.manto_domain_seriesanimadas(item)
+
     elif item.from_channel == 'seriesyonkis':
         domains.manto_domain_seriesyonkis(item)
 
@@ -535,7 +599,7 @@ def _dominio_memorizado(item):
         domains.manto_domain_torrentpelis(item)
 
     else:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta _Domainmemorizado[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Falta _DomainMemorizado[/B][/COLOR]' % color_alert)
 
 
 def _credenciales(item):
@@ -546,7 +610,7 @@ def _credenciales(item):
         _credenciales_playdede(item)
 
     else:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta _Credenciales[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Falta _Credenciales[/B][/COLOR]' % color_alert)
 
 
 def _credenciales_hdfull(item):
@@ -565,7 +629,7 @@ def _credenciales_hdfull(item):
        params = jsontools.load(data)
     except:
        el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       platformtools.dialog_notification(config.__addon_name + ' - HdFull', el_canal + '[/COLOR][/B]')
        return
 
     if params['active'] == False:
@@ -600,7 +664,7 @@ def _credenciales_playdede(item):
        params = jsontools.load(data)
     except:
        el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       platformtools.dialog_notification(config.__addon_name + ' - PlayDede', el_canal + '[/COLOR][/B]')
        return
 
     if params['active'] == False:
@@ -761,7 +825,7 @@ def _proxies(item):
         movidytv.configurar_proxies(item)
 
     elif item.from_channel == 'newpct1':
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Configurar proxies desde el canal[/COLOR][/B]' % color_avis)
+        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Configurar proxies desde el canal[/COLOR][/B]' % color_adver)
         refrescar = False
 
     elif item.from_channel == 'peliculaspro':
@@ -783,11 +847,6 @@ def _proxies(item):
         from channels import pelisforte
         item.channel = 'pelisforte'
         pelisforte.configurar_proxies(item)
-
-    elif item.from_channel == 'pelisgratis':
-        from channels import pelisgratis
-        item.channel = 'pelisgratis'
-        pelisgratis.configurar_proxies(item)
 
     elif item.from_channel == 'pelishouse':
         from channels import pelishouse
@@ -828,6 +887,11 @@ def _proxies(item):
         from channels import pelisxd
         item.channel = 'pelisxd'
         pelisxd.configurar_proxies(item)
+
+    elif item.from_channel == 'pelisyseries':
+        from channels import pelisyseries
+        item.channel = 'pelisyseries'
+        pelisyseries.configurar_proxies(item)
 
     elif item.from_channel == 'playdede':
         from channels import playdede
@@ -904,24 +968,27 @@ def _proxies(item):
         item.channel = 'verdetorrent'
         verdetorrent.configurar_proxies(item)
 
+    elif item.from_channel == 'yespornplease':
+        from channels import yespornplease
+        item.channel = 'yespornplease'
+        yespornplease.configurar_proxies(item)
+
     else:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta _Proxies[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Falta _Proxies[/B][/COLOR]' % color_alert)
         refrescar = False
 
     if refrescar: _refresh_menu(item)
 
 
 def _quitar_proxies(item):
-    el_canal = ('Quitando proxies [B][COLOR %s]' + item.from_channel.capitalize() + '[/COLOR][/B]') % color_avis
-    platformtools.dialog_notification(config.__addon_name, el_canal)
+    platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR red]Quitando los proxies[/COLOR][/B]')
 
     config.set_setting('proxies', '', item.from_channel)
     _refresh_menu(item)
 
 
 def _test_webs(item):
-    el_canal = ('Test web canal [B][COLOR %s]' + item.from_channel.capitalize() + '[/COLOR][/B]') % color_adver
-    platformtools.dialog_notification(config.__addon_name, el_canal)
+    platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR violet]Test web canal[/COLOR][/B]')
 
     config.set_setting('developer_test_channels', '')
     config.set_setting('developer_test_servers', '')
@@ -933,4 +1000,4 @@ def _test_webs(item):
     try:
         tester.test_channel(item.from_channel)
     except:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)

@@ -142,6 +142,8 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)".*?title=.*?">(.*?)</a>')
 
     for url, title in matches:
+        title = title.replace('&amp;', '&')
+
         if '/animacion-2' in url: title = title + '-2'
 
         itemlist.append(item.clone( action='list_all', title=title, url=url ))
@@ -214,9 +216,11 @@ def list_all(item):
             SerieName = SerieName.replace(host, '').replace('series/', '').strip()
             SerieName = SerieName.replace('-', ' ')
 
+            if ' s0' in SerieName: SerieName = SerieName.split(" s0")[0]
+
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
                                         qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
-                                        contentType = 'episode', contentSerieName = SerieName, infoLabels={'year': "-"} ))
+                                        contentSerieName = SerieName, contentType = 'tvshow', infoLabels={'year': "-"} ))
 
     tmdb.set_infoLabels(itemlist)
 

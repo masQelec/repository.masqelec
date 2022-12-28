@@ -220,6 +220,8 @@ def list_all(item):
             if "(" in title: titulo = titulo.split("(")[0]
             else: titulo = title
 
+            titulo = titulo.strip()
+
             itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title,
                                         contentType = 'movie', contentTitle = titulo, contentExtra = 'documentary', infoLabels={'year': "-"} ))
 

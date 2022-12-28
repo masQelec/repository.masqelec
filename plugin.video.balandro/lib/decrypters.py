@@ -138,7 +138,6 @@ def decode_url_base64(url, host_torrent):
     logger.info()
 
     host_list = [
-        ('mediafire.com'),
         ('adfly.mobi')
         ]
 
@@ -146,12 +145,21 @@ def decode_url_base64(url, host_torrent):
 
     url_base64 = url
 
+    url_sufix = ''
+
+    if '&' in url_base64 and not 'magnet:' in url_base64:
+        url_base64_list = url_base64.split('&')
+        url_base64 = url_base64_list[0]
+
+        for param in url_base64_list[1:]:
+            url_sufix += '&%s' % param
+
     if '=http' in url_base64 and not 'magnet:' in url_base64: url_base64 = scrapertools.find_single_match(url_base64, '=(http.*?$)')
 
     if len(url_base64) > 1 and not 'magnet:' in url_base64 and not '.torrent' in url_base64:
-        patron_php = 'php(?:#|\?\w=)(.*?$)'
+        patron_php = 'php(?:#|\?\w=)(.*?)(?:\&|$)'
 
-        if not scrapertools.find_single_match(url_base64, patron_php): patron_php = '\?type=(?:anonym&)?(?:urlb64)?=(.*?$)'
+        if not scrapertools.find_single_match(url_base64, patron_php): patron_php = '\?(?:\w+=.*&)?(?:urlb64)?=(.*?)(?:&|$)'
 
         url_base64 = scrapertools.find_single_match(url_base64, patron_php)
 
@@ -163,7 +171,7 @@ def decode_url_base64(url, host_torrent):
 
             if not url_base64: url_base64 = url
 
-            if url_base64.startswith('magnet') or url_base64.endswith('.torrent'): return url_base64
+            if url_base64.startswith('magnet') or url_base64.endswith('.torrent'): return url_base64 + url_sufix
 
             if domain and domain in str(host_list): url_base64_bis = sorted_urls(url_base64, url_base64, host_torrent)
             else: url_base64_bis = sorted_urls(url, url_base64, host_torrent)
@@ -187,7 +195,7 @@ def decode_url_base64(url, host_torrent):
             host_name = scrapertools.find_single_match(url_base64, patron_host)
             url_base64 = re.sub(host_name, host_torrent, url_base64)
 
-    return url_base64
+    return url_base64 + url_sufix
 
 
 def sorted_urls(url, url_base64, host_torrent):
@@ -201,6 +209,7 @@ def sorted_urls(url, url_base64, host_torrent):
             'acorta-enlace.com': ['linkser=ngbzgg.pbz', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
             'short-link.one': ['linkser=uggcf%3A%2F%2Fpvargbeerag.pb', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
             'acorta-link.com': ['linkser=uggcf%3A%2F%2Fgbqbgbeeragf.arg', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
+            'acortame-esto.com': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
             'mediafire.com': [None, '(?i)=\s*"Download file"\s*href="([^"]+)"\s*id\s*=\s*"downloadButton"', 0, 0, False],
             'sub-short.link': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
             'divxto.site': [None, [64, 123 ,77, 91, 96, 109, 13, 13], 0, 0, False],
@@ -221,7 +230,7 @@ def sorted_urls(url, url_base64, host_torrent):
 
     if sortened_domains.get(domain, False) == False or not url_base64 or url_base64.startswith('magnet'): return url_base64
 
-    if '//' in url_base64 and not (url_base64.startswith('magnet') or url_base64.startswith('http')):
+    if ('//' in url_base64  or ':?' in url_base64) and not (url_base64.startswith('magnet') or url_base64.startswith('http')):
         try:
             chers = []
 

@@ -28,9 +28,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/terror-1/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/terror-2/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Asiaticas', action = 'list_all', url = host + 'category/asiatico/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Asiaticas', action = 'list_all', url = host + 'category/asiatico1/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))

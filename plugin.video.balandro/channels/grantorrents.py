@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import re
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
+
+from lib import decrypters
 
 
 host = 'https://grantorrent.win/'
@@ -28,7 +30,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    if '/fecha/' in url: raise_weberror = False
+    if '/fechas/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -138,7 +140,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1949, -1):
-        itemlist.append(item.clone( title = str(x), url = host + 'fecha/' + str(x) + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = host + 'fechas/' + str(x) + '/', action = 'list_all' ))
 
     return itemlist
 
@@ -170,18 +172,23 @@ def list_all(item):
         lang = 'Esp'
 
         if '/series-tv/' in url:
-            if item.search_type == 'movie': continue
+            if " castellano" in title: SerieName = title.split(" castellano")[0]
+            else: SerieName = title
 
-            if ' castellano ' in title: title = title.replace(' castellano ', '')
+            if ' castellano ' in title: title = title.replace(' castellano ', '').strip()
             if 'HD' in title: title = title.replace('HD', '').strip()
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages = lang,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
         else:
-            if item.search_type == 'tvshow': continue
+            if " castellano" in title: titulo = title.split(" castellano")[0]
+            else: titulo = title
+
+            if ' castellano ' in title: title = title.replace(' castellano ', '').strip()
+            if 'HD' in title: title = title.replace('HD', '').strip()
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = lang,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -237,10 +244,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('GranTorrents', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('GranTorrents', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('GranTorrents', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('GranTorrents', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('GranTorrents', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('GranTorrents', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for epis, thumb, url, title in matches[item.page * item.perpage:]:
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
@@ -282,9 +314,23 @@ def play(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(item.url)
+    url = ''
 
-    url = scrapertools.find_single_match(data, '<a id="link".*?href="(.*?)"')
+    if '&urlb64=' in item.url:
+        new_url = scrapertools.find_single_match(item.url, "&urlb64=(.*?)$")
+        url = base64.b64decode(new_url).decode("utf-8")
+        url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+
+    if not item.url.endswith('.torrent'):
+        host_torrent = host[:-1]
+        url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
+
+        if url_base64.endswith('.torrent'): url = url_base64
+
+    if not url:
+        data = do_downloadpage(item.url)
+
+        url = scrapertools.find_single_match(data, '<a id="link".*?href="(.*?)"')
 
     if url.endswith('.torrent'):
         if 'url=' in url:
@@ -332,18 +378,27 @@ def list_search(item):
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
-            if ' castellano ' in title: title = title.replace(' castellano ', '')
+            if " castellano" in title: SerieName = title.split(" castellano")[0]
+            else: SerieName = title
+
+            if ' castellano ' in title: title = title.replace(' castellano ', '').strip()
             if 'HD' in title: title = title.replace('HD', '').strip()
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
         if tipo == 'movie':
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
+            if " castellano" in title: titulo = title.split(" castellano")[0]
+            else: titulo = title
+
+            if ' castellano ' in title: title = title.replace(' castellano ', '').strip()
+            if 'HD' in title: title = title.replace('HD', '').strip()
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = lang, fmt_sufijo=sufijo,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

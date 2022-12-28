@@ -65,7 +65,7 @@ def do_downloadpage(url, post=None, headers=None):
     # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
     data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers).data
 
-    if '<title>You are being redirected...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
@@ -102,6 +102,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(Item( channel='helper', action='show_help_animefenix', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -132,18 +134,15 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animes?estado[]=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'animes?type%5B%5D=ova&order=default',
-                                search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'animes?type%5B%5D=ova&order=default', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'animes?type%5B%5D=movie&order=default',
-                                search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'animes?type%5B%5D=movie&order=default', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'animes?type%5B%5D=special&order=default',
-                                search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'animes?type%5B%5D=special&order=default',  search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por categorías', action = 'categorias', search_type = 'tvshow' ))
 
@@ -236,8 +235,20 @@ def list_all(item):
     for info, url, title, thumb, year in matches[item.page * perpage:]:
         if not url or not title: continue
 
-        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year, 'plot': info} ))
+        SerieName = title
+
+        if 'Peliculas' in title: SerieName = title.split("Peliculas")[0]
+        if 'Latino' in title: SerieName = title.split("Latino")[0]
+        if 'Movie' in title: SerieName = title.split("Movie")[0]
+
+        SerieName = SerieName.strip()
+
+        if item.search_type == 'tvshow':
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year, 'plot': info} ))
+        else:
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': info} ))
 
         if len(itemlist) >= perpage: break
 
@@ -263,15 +274,23 @@ def list_last(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?<img src="(.*?)".*?alt="(.*?)"')
 
     for url, thumb, title in matches:
+        SerieName = title
+
+        if 'Peliculas' in title: SerieName = title.split("Peliculas")[0]
+        if 'Latino' in title: SerieName = title.split("Latino")[0]
+        if 'Movie' in title: SerieName = title.split("Movie")[0]
+
+        SerieName = SerieName.strip()
+
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
+                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
 
-def list_epis(item):
+def last_epis(item):
     logger.info()
     itemlist = []
 
@@ -282,12 +301,24 @@ def list_epis(item):
     matches = re.compile('<a href="(.*?)".*?<img src="(.*?)".*?alt="(.*?)".*?<div class="overepisode.*?">(.*?)</div>', re.DOTALL).findall(bloque)
 
     for url, thumb, title, episode in matches:
-        episode = episode.replace('EP', 'epis.')
+        SerieName = title
 
-        title = episode + ' ' + title
+        if 'Peliculas' in title: SerieName = title.split("Peliculas")[0]
+        if 'Latino' in title: SerieName = title.split("Latino")[0]
+        if 'Movie' in title: SerieName = title.split("Movie")[0]
+
+        try:
+            epis = scrapertools.find_single_match(episode, "Episodio.*?(\d+)")
+        except:
+            epis = 0
+
+        SerieName = SerieName.replace(str(epis), '').strip()
+
+        title = episode + ' ' + title.replace(str(epis), '').strip()
 
         if url:
-            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb, contentType = 'episode'))
+            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb, infoLabels={'year': '-'},
+                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -307,10 +338,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('AnimeFenix', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('AnimeFenix', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('AnimeFenix', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('AnimeFenix', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('AnimeFenix', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('AnimeFenix', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for url, title in matches[item.page * item.perpage:]:
         try:

@@ -206,6 +206,9 @@ def list_all(item):
         elif item.search_type == 'tvshow':
             if not '/ver-serie/' in url: continue
 
+        if '/espana/' in item.url:
+            if not '?ref=es' in item.url: url = url + '?ref=es'
+
         if tipo == 'movie':
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
@@ -315,10 +318,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for thumb, temp_epis, url, title in matches[item.page * item.perpage:]:
         epis = scrapertools.find_single_match(temp_epis, '.*?E(.*?)$')
@@ -345,27 +373,27 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'latino': 'Lat', 'castellano': 'Esp', 'subtitulado': 'Vose'}
-
     lang = 'Lat'
 
     if '?ref=es' in item.url: lang = 'Esp'
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     ses = 0
 
     if '>VER ONLINE<' in data:
         bloque = scrapertools.find_single_match(data, '>VER ONLINE<(.*?)>DESCARGAR<')
 
-        matches = scrapertools.find_multiple_matches(bloque, '<li id="player-option-.*?data-option="(.*?)".*?data-src=.*?/flags/(.*?).png')
+        matches = scrapertools.find_multiple_matches(bloque, '<li id="player-option-.*?data-option="(.*?)">(.*?)<.*?data-src=.*?/flags/(.*?).png')
 
-        for url, idio in matches:
+        for url, srv, idio in matches:
             ses += 1
 
             if '/play/' in url: continue
-            elif '/netu' in url or '/waaw' in url or '/hqq' in url: continue
             elif 'youtube' in url: continue
+
+            if srv.lower() == 'netu' or srv.lower() == 'waaw' or srv.lower() == 'hqq': continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -380,7 +408,9 @@ def findvideos(item):
                elif idio == 'es': language = 'Esp'
                elif idio == 'en': language = 'Vose'
 
-            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = qlty, language = language ))
+            other = srv
+            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                                          quality = qlty, language = language, other = other ))
 
     if '>DESCARGAR<' in data:
         bloque = scrapertools.find_single_match(data, '>DESCARGAR<(.*?)</ul>')

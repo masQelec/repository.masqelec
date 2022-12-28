@@ -25,7 +25,7 @@ def mainlist_series(item):
         if actions.adults_password(item) == False:
             return itemlist
 
-    itemlist.append(item.clone( title = 'Buscar anime, ova, dorama, manga ...', action = 'search', search_type = 'tvshow', text_color = 'blue' ))
+    itemlist.append(item.clone( title = 'Buscar anime, ova, dorama, manga ...', action = 'search', search_type = 'tvshow', text_color = 'plum' ))
 
     itemlist.append(item.clone( title = 'Catálogo general', action = 'list_all', url = host + '/descargas/detallada/bittorrent', search_type = 'tvshow' ))
 
@@ -106,45 +106,6 @@ def alfabetico(item):
     return itemlist
 
 
-def list_lst(item):
-    logger.info()
-    itemlist = []
-
-    data = httptools.downloadpage(item.url).data
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    matches = scrapertools.find_multiple_matches(data, "id='descarga_anime_row'>(.*?)</span></div>")
-
-    for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-
-        if url:
-            if url == '/buscar/descargas/tv': continue
-
-            url = url + '/descargas'
-
-            title = scrapertools.find_single_match(match, 'src=".*?<a href=".*?">(.*?)</a>').strip()
-
-            thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
-
-            itemlist.append(item.clone( action='list_lists', url=url, title=title, thumbnail=thumb,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
-
-    tmdb.set_infoLabels(itemlist)
-
-    if itemlist:
-        if "<span class='next'>" in data:
-            next_page = scrapertools.find_single_match(data, "<span class='next'>" + '.*?href="(.*?)"')
-
-            if next_page:
-                if 'page=' in next_page:
-                    next_page = host + next_page
-
-                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_lst', url = next_page, text_color='coral' ))
-
-    return itemlist
-
-
 def list_all(item):
     logger.info()
     itemlist = []
@@ -175,10 +136,19 @@ def list_all(item):
 
         title_ser = title_ser.strip()
 
+        SerieName = title_ser
+
+        if 'Película' in title_ser: SerieName = title_ser.split("Película")[0]
+        if 'Episodio' in title_ser: SerieName = title_ser.split("Episodio")[0]
+        if 'Season' in title_ser: SerieName = title_ser.split("Season")[0]
+        if 'Pack' in title_ser: SerieName = title_ser.split("Pack")[0]
+
+        SerieName = SerieName.strip()
+
         url_tor = scrapertools.find_single_match(match, "<div id='descargar_torrent'>.*?href='(.*?)'")
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, url_tor = url_tor,
-                                    contentType = 'tvshow', contentSerieName = title_ser, infoLabels = {'year': '-'} ))
+                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -191,6 +161,94 @@ def list_all(item):
                     next_page = host + next_page
 
                     itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color='coral' ))
+
+    return itemlist
+
+
+def list_lst(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    matches = scrapertools.find_multiple_matches(data, "id='descarga_anime_row'>(.*?)</span></div>")
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        if url:
+            if url == '/buscar/descargas/tv': continue
+
+            url = url + '/descargas'
+
+            title = scrapertools.find_single_match(match, 'src=".*?<a href=".*?">(.*?)</a>').strip()
+
+            thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+            title_ser = title.strip()
+
+            SerieName = title_ser
+
+            if 'Película' in title_ser: SerieName = title_ser.split("Película")[0]
+            if 'Episodio' in title_ser: SerieName = title_ser.split("Episodio")[0]
+            if 'Season' in title_ser: SerieName = title_ser.split("Season")[0]
+            if 'Pack' in title_ser: SerieName = title_ser.split("Pack")[0]
+            if '(TV)' in title_ser: SerieName = title_ser.split("(TV)")[0]
+            if 'TV' in title_ser: SerieName = title_ser.split("TV")[0]
+
+            SerieName = SerieName.strip()
+
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if "<span class='next'>" in data:
+            next_page = scrapertools.find_single_match(data, "<span class='next'>" + '.*?href="(.*?)"')
+
+            if next_page:
+                if 'page=' in next_page:
+                    next_page = host + next_page
+
+                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_lst', url = next_page, text_color='coral' ))
+
+    return itemlist
+
+
+def episodios(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    matches = scrapertools.find_multiple_matches(data, "<td class='tit'>(.*?)<td class='detalles'>")
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, 'class="detalles_link">(.*?)</a>').strip()
+
+        try:
+            episode = scrapertools.find_single_match(title, "Episodio.*?(\d+)")
+        except:
+            episode = 0
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if "<span class='next'>" in data:
+            next_page = scrapertools.find_single_match(data, "<span class='next'>" + '.*?href="(.*?)"')
+
+            if next_page:
+                if 'page=' in next_page:
+                    next_page = host + next_page
+
+                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'episodios', url = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -222,9 +280,6 @@ def findvideos(item):
     for seeds, peers, url in matches:
         ses += 1
 
-        # ~ seeds = "[COLOR cyan]Seeds: " + seeds + "[/COLOR]" + " "
-        # ~ peers = "[COLOR yellowgreen]Peers: " + peers+ "[/COLOR]"
-
         if url.endswith('.torrent'): servidor = 'torrent'
         elif url.startswith('magnet:?'): servidor = 'torrent'
         else: continue
@@ -237,35 +292,6 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
-
-    return itemlist
-
-
-def list_lists(item):
-    logger.info()
-    itemlist = []
-
-    data = httptools.downloadpage(item.url).data
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    matches = scrapertools.find_multiple_matches(data, "<td class='tit'>(.*?)<td class='detalles'>")
-
-    for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-
-        title = scrapertools.find_single_match(match, 'class="detalles_link">(.*?)</a>').strip()
-
-        itemlist.append(item.clone( action='findvideos', url=url, title=title,  contentType = 'tvshow', contentSerieName = item.contentSerieName ))
-
-    if itemlist:
-        if "<span class='next'>" in data:
-            next_page = scrapertools.find_single_match(data, "<span class='next'>" + '.*?href="(.*?)"')
-
-            if next_page:
-                if 'page=' in next_page:
-                    next_page = host + next_page
-
-                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_lists', url = next_page, text_color='coral' ))
 
     return itemlist
 

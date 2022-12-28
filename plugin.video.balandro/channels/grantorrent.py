@@ -5,7 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import re, base64
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -286,7 +286,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('>Download<.*?href="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium ml-auto">.*?href="(.*?)"', re.DOTALL).findall(data)
 
     for url in matches:
         if not url.endswith('.torrent'):

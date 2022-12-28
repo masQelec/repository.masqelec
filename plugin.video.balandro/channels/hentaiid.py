@@ -75,9 +75,11 @@ def list_all(item):
         title = title.replace('][', ' ').replace('[', ' ').replace(']', ' ')
 
         if item.group == 'find':
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'movie', contentTitle = title, contentExtra='adults' ))
         else:
-            itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title ))
+            itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
         bloque = scrapertools.find_single_match(data, "<div class='wp-pagenavi'(.*?)</div>")
@@ -105,8 +107,7 @@ def episodios(item):
     for url, title in matches:
         title = title.replace('][', ' ').replace('[', ' ').replace(']', ' ')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType = 'movie',
-                                    contentTitle = title, contentExtra='adults' ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     return itemlist
 
@@ -155,6 +156,7 @@ def findvideos(item):
     for url in videos:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
         elif '/megadl.fr/' in url: continue
+        elif '/1fichier.com/' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

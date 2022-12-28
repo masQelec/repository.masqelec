@@ -147,6 +147,8 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
+        if servidor == 'zplayer': url += "|referer=%s" % host
+
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = idioma ))
 
     if not itemlist:

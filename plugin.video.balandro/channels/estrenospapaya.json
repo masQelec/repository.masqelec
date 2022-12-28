@@ -3,7 +3,7 @@
   "name": "EstrenosPapaya",
   "thumbnail": "estrenospapaya.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["suggested", "lasts", "rankings", "vos"],
 
-  "notes": "Series, con capítulos de estreno en castellano, latino y Vose."
+  "notes": "WEB CERRADA. Series, con capítulos de estreno en castellano, latino y Vose."
 }

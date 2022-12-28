@@ -31,7 +31,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_last', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'animes?estado%5B%5D=2&order=created', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animes?estado%5B%5D=0&order=created', search_type = 'tvshow' ))
@@ -108,14 +108,21 @@ def list_all(item):
         type = type.strip().lower()
 
         titulo = title
-        titulo = titulo.replace('Español Latino', '').replace('Español latino', '').replace('español Latino', '').replace('spañol latino', '').strip()
+        titulo = titulo.replace('Español Latino', '').replace('Español latino', '').replace('español Latino', '').replace('español latino', '').strip()
 
         if type == 'pelicula':
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
                                         contentType = 'movie', contentTitle = titulo, infoLabels={'year': '-', 'plot': plot} ))
         else:
+            SerieName = titulo
+
+            if 'Temporada' in titulo: SerieName = titulo.split("Temporada")[0]
+            if 'Audio' in titulo: SerieName = titulo.split("Audio")[0]
+
+            SerieName = SerieName.strip()
+
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
-                                        contentType = 'tvshow', contentSerieName = titulo, infoLabels={'year': '-', 'plot': plot} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-', 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -131,7 +138,7 @@ def list_all(item):
     return itemlist
 
 
-def list_last(item):
+def last_epis(item):
     logger.info()
     itemlist = []
 
@@ -149,10 +156,23 @@ def list_last(item):
 
         thumb = host + thumb
 
+        SerieName = title
+
+        if 'Temporada' in title: SerieName = title.split("Temporada")[0]
+        if 'episodio' in title: SerieName = title.split("episodio")[0]
+        if 'Audio' in title: SerieName = title.split("Audio")[0]
+
+        SerieName = SerieName.strip()
+
         if not epis.lower() in title: titulo = '%s - %s' % (title, epis)
         else: titulo = title
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentType='movie', contentTitle=title ))
+        epis = epis.replace('Episodio', '').strip()
+
+        season = 1
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis))
 
     return itemlist
 
@@ -171,10 +191,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('AnimeJl', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('AnimeJl', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('AnimeJl', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('AnimeJl', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('AnimeJl', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('AnimeJl', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for epis, url, thumb in matches[item.page * item.perpage:]:
         title = 'Episodio %s' % epis
@@ -182,7 +227,7 @@ def episodios(item):
         url = "%s/%s" % (item.url, url)
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, language='Vose',
-                        contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
+                                    contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break

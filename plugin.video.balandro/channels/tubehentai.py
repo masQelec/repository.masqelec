@@ -106,7 +106,7 @@ def findvideos(item):
     if not url: url = scrapertools.find_single_match(data, '<div class="videohere".*?src="([^"]+)"')
 
     if url:
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = 'VOS' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = 'VO' ))
 
     return itemlist
 

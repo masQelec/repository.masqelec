@@ -35,8 +35,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = url_doramas, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone ( title = 'Últimos episodios', action = 'list_all', url = host + 'ultimoscapitulos.php', group = 'last',
-                                 search_type = 'tvshow' ))
+    itemlist.append(item.clone ( title = 'Últimos episodios', action = 'list_all', url = host + 'ultimoscapitulos.php', group = 'last', search_type = 'tvshow' ))
 
     itemlist.append(item.clone ( title = 'En emisión', action = 'list_lst',
                                  post = {"countries": "", "generos": "", "years": "", "emition": "[\"Si\"]", "submit": ""}, search_type = 'tvshow' ))
@@ -63,7 +62,7 @@ def generos(item):
         ('Hetero', 'Hetero'),
         ('Lesbianas', 'Lesbianas'),
         ('Queer', 'Queer'),
-        ('Transgenero', 'Transgenero')
+        ('Transgénero', 'Transgenero')
         ]
 
     for tit, opc in opciones:
@@ -140,12 +139,23 @@ def list_all(item):
         if thumb.startswith('./'): thumb = thumb.replace('./', '/')
         thumb = host[:-1] + thumb
 
+        titulo = re.sub(r'(\d{4})$', '', title)
+
+        if titulo: title = titulo
+
         if item.group == 'last':
+            if "Capitulo" in title: titulo = title.split("Capitulo")[0]
+            else: titulo = title
+
+            titulo = titulo.strip()
+            titulo = re.sub(r'(\d{4})$', '', titulo)
+            if titulo: SerieName = titulo
+
             episode = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
 
             if not episode: episode = 1
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentSerieName=SerieName,
                                         contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode, infoLabels={'year': '-'} ))
         else:
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
@@ -155,6 +165,7 @@ def list_all(item):
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, "<li class='active'>.*?" + "<a href='(.*?)'")
+
         if next_url:
             actu_page = item.url
             if 'page_no=' in item.url: 
@@ -199,6 +210,10 @@ def list_lst(item):
         if thumb.startswith('./'): thumb = thumb.replace('./', '/')
         thumb = host[:-1] + thumb
 
+        titulo = re.sub(r'(\d{4})$', '', title)
+
+        if titulo: title = titulo
+
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
                                     contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
 
@@ -230,10 +245,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -261,10 +272,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('DoramasQueen', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('DoramasQueen', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DoramasQueen', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DoramasQueen', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DoramasQueen', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('DoramasQueen', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for match in matches[item.page * item.perpage:]:
         episode += 1
@@ -277,7 +313,7 @@ def episodios(item):
         _episode = scrapertools.find_single_match(match, '<button class="btn btn-default btn-sub-text">(.*?)</button>')
         _episode = _episode.replace('Cap', '').strip()
 
-        title = str(_season) + 'x' + str(_episode)
+        title = str(_season) + 'x' + str(_episode) + ' ' + item.contentSerieName
 
         url = host[:-1] + url
 

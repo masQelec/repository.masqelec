@@ -414,7 +414,7 @@ def set_context_commands(item, parent_item, colores):
     # Guardar seguimiento (preferidos)
     if not config.get_setting('mnu_simple', default=False):
         if config.get_setting('mnu_preferidos', default=True):
-            if item.contentType in ['movie', 'tvshow', 'season', 'episode'] and item.contentExtra != '3' \
+            if item.contentType in ['movie', 'tvshow', 'season', 'episode'] and item.contentExtra not in ['3', 'adults'] \
                and parent_item.channel not in ['tracking', 'downloads', 'tmdblists', 'filmaffinitylists']:
                 tipo = {'movie': 'película', 'tvshow': 'serie', 'season': 'temporada', 'episode': 'episodio'}
                 context_commands.append( ('[B][COLOR %s]Guardar %s en Preferidos[/COLOR][/B]' % (colores['tracking'], tipo[item.contentType]), config.build_RunPlugin(
@@ -835,7 +835,7 @@ def play_video(item, parent_item, autoplay=False):
     # Si hay varias opciones dar a elegir, si sólo hay una reproducir directamente
     if len(opciones) > 1:
         if not autoplay: 
-            seleccion = dialog_select("Elige una opción", opciones)
+            seleccion = dialog_select("Elige una opción [B][COLOR yellow]" + item.server.capitalize() + '[/B][/COLOR]', opciones)
         else:
             seleccion = len(opciones) - 1 # la última es la de más calidad !?
     else:
