@@ -234,7 +234,8 @@ def list_all(item):
         elif item.search_type == 'tvshow':
             if not '/serie/' in url and not '/animes/' in url: continue
 
-        if '/espana/' in item.url: url = url + '?castellano=sp'
+        if '/espana/' in item.url:
+           if not '?castellano=sp' in item.url: url = url + '?castellano=sp'
 
         if tipo == 'movie':
             if not item.search_type == "all":
@@ -280,7 +281,7 @@ def destacadas(item):
         if item.search_type == 'movie':
             if '/serie/' in url or '/animes/' in url: continue
         else:
-            if '/ver-pelicula/' in url: continue
+            if '/pelicula/' in url: continue
 
         thumb = scrapertools.find_single_match(match, 'alt=".*?src="(.*?)"')
 
@@ -368,10 +369,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for thumb, epis, url in matches[item.page * item.perpage:]:
         if not epis: epis = '0'
@@ -442,6 +468,7 @@ def findvideos(item):
             elif servidor == 'turbobit': continue
             elif servidor == 'mediafire': continue
             elif servidor == 'google': continue
+            elif servidor == 'google drive': continue
 
             elif servidor == 'latmax': servidor = 'fembed'
             elif servidor == 'maxplay': servidor = 'voe'
@@ -461,6 +488,7 @@ def findvideos(item):
             elif 'doostream' in servidor: servidor = 'doodstream'
             elif 'voesx' in servidor: servidor = 'voe'
             elif 'watchsb' in servidor: servidor = 'streamsb'
+            elif 'sblongvu' in servidor: servidor = 'streamsb'
 
             qlty = '1080'
 
@@ -499,6 +527,7 @@ def findvideos(item):
             elif servidor == 'turbobit': continue
             elif servidor == 'mediafire': continue
             elif servidor == 'google': continue
+            elif servidor == 'google drive': continue
 
             elif servidor == 'bittorrent': servidor = 'torrent'
 
@@ -531,6 +560,7 @@ def findvideos(item):
                 elif servidor == 'turbobit': continue
                 elif servidor == 'mediafire': continue
                 elif servidor == 'google': continue
+                elif servidor == 'google drive': continue
                 elif servidor == 'subtitulos': continue
 
                 elif servidor == 'bittorrent': servidor = 'torrent'

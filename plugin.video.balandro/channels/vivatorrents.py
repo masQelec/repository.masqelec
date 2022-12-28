@@ -7,6 +7,8 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
+# ~ las Series todos los links NO so validos
+
 host = 'https://www.vivatorrents.org/'
 
 
@@ -19,18 +21,7 @@ def do_downloadpage(url, post=None, headers=None):
 
 
 def mainlist(item):
-    # ~ las Series todos los links NO so validos
     return mainlist_pelis(item)
-
-    # ~ logger.info()
-    # ~ itemlist = []
-
-    # ~ itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
-
-    # ~ itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
-    # ~ itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
-
-    # ~ return itemlist
 
 
 def mainlist_pelis(item):
@@ -48,25 +39,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por alfabético (Z - A)', action = 'list_all', url = host + '?orderby=title', search_type = 'movie'))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
-
-    return itemlist
-
-
-def mainlist_series_bad(item):
-    logger.info()
-    itemlist = []
-
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
-
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'serie/?orderby=relevance', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Al azar', action = 'list_all', url = host + 'serie/?orderby=rand', search_type = 'tvshow'))
-
-    itemlist.append(item.clone( title = 'Por fecha', action = 'list_all', url = host + 'serie/?orderby=date', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Por alfabético', action = 'list_all', url = host + 'serie/?orderby=title', search_type = 'tvshow'))
 
     return itemlist
 

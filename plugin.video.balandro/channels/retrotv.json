@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["tvshow"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["tvshow"],
+  "categories": ["movie", "tvshow"],
   "language": ["lat"],
 
   "clusters": ["problematic", "infantil", "classic", "years", "lasts", "kids"],
 
-  "notes": "Series clásicas, por Géneros. en idioma orignal de emisión."
+  "notes": "Series clásicas, por Géneros. En idioma orignal de emisión."
 }

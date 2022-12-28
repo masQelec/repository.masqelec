@@ -50,6 +50,8 @@ servers_poe = [
         ]
 
 
+timeout = 30
+
 espera = 3
 
 
@@ -269,6 +271,12 @@ def test_channel(channel_name):
             if txt_diag: txt_diag += '[CR]'
             txt_diag += 'excluido: Buscar en [COLOR green][B]Todos[/B][/COLOR]'
 
+    if params['searchable']:
+        cfg_searchable_channel = 'channel_' + channel_id + '_no_searchable'
+
+        if config.get_setting(cfg_searchable_channel, default=False):
+            txt_diag += '[COLOR violet][B]Excluido en Búsquedas[/B][/COLOR]'
+
     if txt_diag:
         txt += '[CR][CR][COLOR moccasin][B]Diagnosis:[/B][/COLOR][CR]'
         txt += txt_diag
@@ -355,7 +363,9 @@ def test_channel(channel_name):
             txt += '[CR][CR][COLOR moccasin][B]Anteriores:[/B][/COLOR][CR]'
             txt += '[COLOR mediumaquamarine][B]' + ant_hosts + '[/B][/COLOR]'
 
-    if config.get_setting('user_test_channel', default=''): return ''
+    if config.get_setting('user_test_channel', default=''):
+        if config.get_setting('user_test_channel') == 'host_channel': config.set_setting('user_test_channel', host)
+        return ''
 
     avisado = False
 
@@ -434,34 +444,39 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
 
     if channel_name.lower() == 'hdfull': host_acces = host_acces + 'login'
 
+    # ~ 11/12/2022
+    headers = {}
+    if channel_name.lower() == 'playdede':
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 pddkit/2023", "authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
+
     if not config.get_setting(cfg_proxies_channel, default=''):
-        response = httptools.downloadpage(host_acces, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+        response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
 
         if 'Checking if the site connection is secure' in response.data:
-            platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]' + channel_name.capitalize() + '[/B][/COLOR] requiere esperar %s segundos' % espera)
+            platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]Requiere esperar %s segundos[/B][/COLOR]' % espera)
             time.sleep(int(espera))
 
-            response = httptools.downloadpage(host_acces, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+            response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, timeout=timeout, raise_weberror=False, bypass_cloudflare=False)
 
-        if '<title>You are being redirected...</title>' in response.data:
+        if '<title>You are being redirected...</title>' in response.data or '<title>Just a moment...</title>' in response.data:
             try:
                 from lib import balandroresolver
                 ck_name, ck_value = balandroresolver.get_sucuri_cookie(response.data)
                 if ck_name and ck_value:
                     httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                    response = httptools.downloadpage(host_acces, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+                    response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
             except:
                 pass
 
     else:
-        response = httptools.downloadpage(host_acces, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+        response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
         if response.sucess == True: quitar_proxies = True
 
         if 'Checking if the site connection is secure' in response.data:
-            platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]' + channel_name.capitalize() + '[/B][/COLOR] requiere esperar %s segundos' % espera)
+            platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]Requiere esperar %s segundos[/B][/COLOR]' % espera)
             time.sleep(int(espera))
 
-            response = httptools.downloadpage(host_acces, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+            response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, timeout=timeout, raise_weberror=False, bypass_cloudflare=False)
 
         proxies = config.get_setting(cfg_proxies_channel, default='')
 
@@ -477,13 +492,13 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
                 platformtools.dialog_notification(el_canal + '[/COLOR][/B]', '[COLOR orangered]Test con [B]' + str(len(proxies)) + '[/B] proxies ...[/COLOR]')
                 time.sleep(1)
 
-        response = httptools.downloadpage_proxy(channel_id, host_acces, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+        response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
 
         if 'Checking if the site connection is secure' in response.data:
             platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]' + channel_name.capitalize() + '[/B][/COLOR] requiere esperar %s segundos' % espera)
             time.sleep(int(espera))
 
-            response = httptools.downloadpage_proxy(channel_id, host_acces, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+            response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, timeout=timeout, raise_weberror=False, bypass_cloudflare=False)
 
         if '<title>You are being redirected...</title>' in response.data:
             try:
@@ -491,7 +506,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
                 ck_name, ck_value = balandroresolver.get_sucuri_cookie(response.data)
                 if ck_name and ck_value:
                     httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                    response = httptools.downloadpage_proxy(channel_id, host_acces, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+                    response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
             except:
                 pass
 

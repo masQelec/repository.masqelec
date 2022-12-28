@@ -30,7 +30,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/animes/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + '/animes?genero=emision', search_type = 'tvshow' ))
 
@@ -132,11 +132,20 @@ def list_all(item):
 
         if not url or not title: continue
 
+        SerieName = title
+
+        if 'OVA' in title: SerieName = title.split("OVA")[0]
+        if 'Doblaje' in title: SerieName = title.split("Doblaje")[0]
+        if 'La película' in title: SerieName = title.split("La película")[0]
+        if 'Season' in title: SerieName = title.split("Season")[0]
+
+        SerieName = SerieName.strip()
+
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
         if not thumb: thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                    infoLabels={'year': '-'}, contentType = 'tvshow', contentSerieName = title ))
+                                    infoLabels={'year': '-'}, contentType = 'tvshow', contentSerieName = SerieName ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -149,7 +158,7 @@ def list_all(item):
     return itemlist
 
 
-def list_epis(item):
+def last_epis(item):
     logger.info()
     itemlist = []
 
@@ -174,10 +183,17 @@ def list_epis(item):
 
         if not epis: epis = 1
 
-        titulo = title + ' [COLOR springgreen]Epis. ' + epis +'[/COLOR]'
+        SerieName = title
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb,
-                                    contentSerieName=title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
+        if 'OVA' in title: SerieName = title.split("OVA")[0]
+        if 'Doblaje' in title: SerieName = title.split("Doblaje")[0]
+        if 'capitulo' in title: SerieName = title.split("capitulo")[0]
+        if 'Season' in title: SerieName = title.split("Season")[0]
+
+        SerieName = SerieName.strip()
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -197,10 +213,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('MonosChinos', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('MonosChinos', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('MonosChinos', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('MonosChinos', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('MonosChinos', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('MonosChinos', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     i = 0
 
@@ -252,6 +293,7 @@ def findvideos(item):
         elif 'anonfile' in servidor: servidor = 'anonfiles'
         elif 'zippy' in servidor: servidor = 'zippyshare'
         elif 'sblanh' in servidor: servidor = 'streamsb'
+        elif 'sblongvu' in servidor: servidor = 'streamsb'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose' ))
 
@@ -292,8 +334,7 @@ def play(item):
 
     url = base64.b64decode(item.d_play).decode("utf-8")
 
-    if host in url:
-        url = scrapertools.find_single_match(url, 'url=(.*?)$')
+    if host in url: url = scrapertools.find_single_match(url, 'url=(.*?)$')
 
     if url:
         servidor = servertools.get_server_from_url(url)

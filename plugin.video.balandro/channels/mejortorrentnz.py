@@ -77,9 +77,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
-
-    itemlist.append(item.clone( title = 'Documentales', action = 'list_all', url = host + '/documentales-3/',
-	                            search_type = 'documentary', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Documentales', action = 'mainlist_documentales', text_color = 'cyan' ))
 
     return itemlist
 
@@ -117,9 +115,22 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/series-hd-2/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Documentales', action = 'list_all', url = host + '/documentales-3/', search_type = 'documentary' ))
-
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def mainlist_documentales(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'tvshow', text_color = 'cyan' ))
+
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/documentales-3/', search_type = 'documentary' ))
+
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/ultimos-torrents-3/', search_type = 'documentary' ))
+
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'documentary' ))
 
     return itemlist
 
@@ -161,8 +172,11 @@ def list_all(item):
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                         contentType='movie', contentTitle=titulo, infoLabels={'year': '-'} ))
         else:
+            if " Temporada" in title: SerieName = title.split(" Temporada")[0]
+            else: SerieName = title
+
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                        contentType='tvshow', contentSerieName=titulo, infoLabels={'year': '-'} ))
+                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -236,8 +250,10 @@ def alfabetico(item):
     for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
         if item.search_type == 'tvshow':
             url = host + '/listado/?cat=series&letra=' + letra
-        else:
+        if item.search_type == 'movie':
             url = host + '/listado/?cat=peliculas&letra=' + letra
+        else:
+            url = host + '/listado/?cat=documentales&letra=' + letra
 
         itemlist.append(item.clone( title = letra, action = 'list_alfa', url = url, letra = letra ))
 
@@ -275,9 +291,16 @@ def list_alfa(item):
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = refer,
                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
-        else:
+
+        if item.search_type == 'tvshow':
             itemlist.append(item.clone( action='episodios', url = url, title = title, grupo = 'selecc',
                                         contentType = 'tvshow', contentSerieName = titulo, infoLabels = {'year': '-'} ))
+
+        if item.search_type == 'documentary':
+            refer = scrapertools.find_single_match(url, '/peli-descargar-torrent-(.*?)-')
+
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = refer,
+                                       contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -341,10 +364,8 @@ def episodios(item):
 
         tempo = scrapertools.find_single_match(temp_epis, '(.*?)X')
 
-        if ' y ' in temp_epis:
-            epis = scrapertools.find_single_match(temp_epis, 'X(.*?)y').strip()
-        else:
-            epis = scrapertools.find_single_match(temp_epis, 'X(.*?)$')
+        if ' y ' in temp_epis: epis = scrapertools.find_single_match(temp_epis, 'X(.*?)y').strip()
+        else: epis = scrapertools.find_single_match(temp_epis, 'X(.*?)$')
 
         SerieName = scrapertools.find_single_match(item.contentSerieName, '(.*?)Temporada').strip()
 
@@ -499,9 +520,11 @@ def list_search(item):
         if type == 'Capitulos': name_search = titulo
         else: name_search = ''
 
-        if search_type == 'movie' or search_type == 'documentary':
+        if search_type == 'movie':
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
+
+            titulo = titulo.replace('4K', '').replace('[HDRip]', '').replace('[BluRay', '').replace('[MicroHD', '').strip()
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
                                         search_type = search_type, contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
@@ -509,8 +532,23 @@ def list_search(item):
         if search_type == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
+
+            if " Temporada" in title: SerieName = title.split(" Temporada")[0]
+            else: SerieName = title
+
             itemlist.append(item.clone( action='episodios', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo, name_search = name_search,
-                                        search_type = search_type,  contentType = 'tvshow', contentSerieName = titulo, infoLabels = {'year': '-'} ))
+                                        search_type = search_type, contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': '-'} ))
+
+        if item.search_type == 'documentary':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
+            titulo = title
+
+            titulo = titulo.replace('4K', '').replace('[HDRip]', '').replace('[BluRay', '').replace('[MicroHD', '').strip()
+
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
+                                        search_type = search_type, contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 

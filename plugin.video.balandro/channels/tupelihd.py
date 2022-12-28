@@ -115,6 +115,8 @@ def generos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)"><i[^>]*></i><span>([^<]+)')
     for url, title in matches:
+        title = title.replace('&amp;', '&')
+
         if '/estrenos/' in url: continue
 
         itemlist.append(item.clone( action='list_all', title=title, url=url ))

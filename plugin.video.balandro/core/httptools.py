@@ -48,8 +48,8 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.5304.91 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.5304.122 Safari/537.36"
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.5304.122 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.99 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -173,6 +173,11 @@ def downloadpage_proxy(canal,
                         proxy_ok = True
                         break
 
+                    if 'file not found' in resp.data.lower():
+                        logger.info('El proxy (error 404 y data = File not found) %s SI responde adecuadamente. %s' % (proxy, resp.code))
+                        proxy_ok = True
+                        break
+
             else:
                 if (type(resp.code) == int and (resp.code == 404)):
                     if len(resp.data) > 1000:
@@ -180,8 +185,13 @@ def downloadpage_proxy(canal,
                         proxy_ok = True
                         break
 
+                    if 'file not found' in resp.data.lower():
+                        logger.info('El proxy (error 404 y data = File not found) %s SI responde adecuadamente. %s' % (proxy, resp.code))
+                        proxy_ok = True
+                        break
+
         else:
-            if 'ERROR 404 - File not found' in str(resp.data) or 'HTTP Error 404: Not Found' in str(resp.data) or'<title>Site Blocked</title>' in str(resp.data) or 'HTTP/1.1 400 Bad Request' in str(resp.data):
+            if 'ERROR 404 - File not found' in str(resp.data) or 'HTTP Error 404: Not Found' in str(resp.data) or '<title>Site Blocked</title>' in str(resp.data) or 'HTTP/1.1 400 Bad Request' in str(resp.data):
                 logger.info('Respuesta insuficiente con el proxy %s' % proxy)
             else:
                 proxy_ok = True
@@ -194,10 +204,8 @@ def downloadpage_proxy(canal,
 
     if not proxy_ok: 
         from platformcode import platformtools
-        if use_proxy == None: 
-            txt = 'Configura los proxies del canal.'
-        else:
-            txt = 'Ningún proxy ha funcionado.' if len(proxies) > 1 else 'El proxy no ha funcionado.'
+        if use_proxy == None: txt = 'Configure los proxies del canal.'
+        else: txt = 'Ningún proxy ha funcionado.' if len(proxies) > 1 else 'El proxy no ha funcionado.'
 
         color_alert = config.get_setting('notification_alert_color', default='red')
         el_canal = ('Sin respuesta en [B][COLOR %s]') % color_alert

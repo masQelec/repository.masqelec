@@ -19,13 +19,14 @@ from lib import balandroresolver
 
 
 dominios = [
-         'https://new.hdfull.one/',
+         'https://hdfull.life/',
          'https://hdfull.digital/',
          'https://hdfull.work/',
          'https://hdfull.video/',
          'https://hdfull.cloud/',
          'https://hdfull.one/',
          'https://hdfull.org/',
+         'https://hdfull.gdn/',
          'https://hdfull.wtf/',
          'https://hdfull.vip/',
          'https://hdfull.top/',
@@ -33,7 +34,8 @@ dominios = [
          'https://hdfull.lol/',
          'https://hdfull.link/',
          'https://hdfull.click/',
-         'https://hdfull.stream/'
+         'https://hdfull.stream/',
+         'https://new.hdfull.one/'
          ]
 
 
@@ -123,7 +125,7 @@ def do_make_login_logout(url, post=None):
         platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]Dominio hidden CAPTCHA[/B][/COLOR]')
         return ''
 
-    if '<title>You are being redirected...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
@@ -237,7 +239,7 @@ def logout(item):
 
 def item_configurar_dominio(item):
     plot = 'Este canal tiene varios posibles dominios. Si uno no te funciona puedes probar con los otros antes de intentarlo con proxies.'
-    return item.clone( title = 'Configurar dominio a usar ...', action = 'configurar_dominio', folder=False, plot=plot, text_color='yellowgreen' )
+    return item.clone( title = '[B]Configurar dominio a usar ...[/B]', action = 'configurar_dominio', folder=False, plot=plot, text_color='yellowgreen' )
 
 def configurar_dominio(item):
     dominio = config.get_setting('dominio', 'hdfull', default=dominios[0])
@@ -346,7 +348,7 @@ def acciones(item):
                               desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='mediumaquamarine' ))
 
         itemlist.append(Item( channel='domains', action='last_domain_hdfull', title='[B]Comprobar último dominio vigente[/B]',
-                              desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
+                              desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
@@ -355,7 +357,7 @@ def acciones(item):
 
     if not config.get_setting('hdfull_login', 'hdfull', default=False):
         if username:
-            itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
+            itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login' ))
             itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
@@ -363,10 +365,12 @@ def acciones(item):
             itemlist.append(item.clone( title = '[COLOR crimson][B]Credenciales cuenta[/B][/COLOR]', action = 'login' ))
 
     if config.get_setting('hdfull_login', 'hdfull', default=False):
-        itemlist.append(item.clone( title = '[COLOR chartreuse]Cerrar sesión[/COLOR]', action = 'logout' ))
+        itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
 
     itemlist.append(item_configurar_dominio(item))
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_hdfull', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     platformtools.itemlist_refresh()
 
@@ -773,6 +777,7 @@ def temporadas(item):
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.referer = item.url
             item.url = url
             item.thumbnail = thumb
@@ -782,7 +787,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, sid = sid, referer = item.url,
+        itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, sid = sid, referer = item.url, page = 0,
                                     contentType = 'season', contentSeason = numtempo ))
 
     # ~  Temporadas ocultas No detectadas
@@ -807,14 +812,16 @@ def temporadas(item):
                         url = last_url + '-' + str(last_tempo)
                         title = 'Temporada ' + str(last_tempo)
 
-                        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, sid = sid, referer = item.url,
+                        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
+                                                    page = 0, sid = sid, referer = item.url,
                                                     contentType = 'season', contentSeason = last_tempo, infoLabels={'year': any} ))
                 except:
                     pass
 
     # Alguna serie de una sola temporada que no la tiene identificada
     if len(itemlist) == 0:
-        itemlist.append(item.clone( action='episodios', url = item.url + '/temporada-1', title = 'Temporada 1', sid = sid, referer = item.url,
+        itemlist.append(item.clone( action='episodios', url = item.url + '/temporada-1', title = 'Temporada 1',
+                                    sid = sid, referer = item.url, page = 0,
                                     contentType = 'season', contentSeason = 1 ))
 
     tmdb.set_infoLabels(itemlist)
@@ -848,10 +855,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(data)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for epi in data[item.page * item.perpage:]:
         tit = epi['title']['es'] if 'es' in epi['title'] and epi['title']['es'] else epi['title']['en'] if 'en' in epi['title'] and epi['title']['en'] else ''
@@ -1014,10 +1046,12 @@ def list_user_subsections(item):
 
     if item.post:
         post = item.post
+        tope = scrapertools.find_single_match(item.post, 'limit=(\d+)')
     else:
         post = "target=%s&action=%s&start=0&limit=28" % (item.tipo_list, item.target_action)
+        tope = perpage
 
-    url = "%sa/my" % domain
+    url = "%sa/my?" % domain
 
     data = do_downloadpage(url, post=post)
 
@@ -1025,6 +1059,21 @@ def list_user_subsections(item):
 
     for match in data:
         title = match.get('title').get('es') if match.get('title').get('es') else match.get('title').get('en')
+
+        season = scrapertools.find_single_match(str(match), "'season':.*?'(.*?)'")
+        episode = scrapertools.find_single_match(str(match), "'episode':.*?'(.*?)'")
+
+        epis = False
+        if season and episode:
+            epis = True
+            show_title = scrapertools.find_single_match(str(match), "'show_title':.*?'es':.*?'(.*?)'")
+            if not show_title: show_title = scrapertools.find_single_match(str(match), "'show_title':.*?'en':.*?'(.*?)'")
+
+            SerieName = show_title
+
+            if title: title = season + 'x' + episode + ' ' + show_title + '  (' + title + ')'
+            else: title = season + 'x' + episode + ' ' + show_title
+
         thumb = '%sthumb/172x256/%s' % (domain, match.get('thumb'))
 
         perma = match.get('perma')
@@ -1033,24 +1082,34 @@ def list_user_subsections(item):
         if item.tipo_list == 'movies':
             url = '%spelicula/%s' % (domain, perma)
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, page = 0,
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
-        else:
-            url = '%sserie/%s' % (domain, perma)
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, page = 0,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
+        else:
+            if epis:
+                url = '%sserie/%s/temporada-%s/episodio-%s' % (domain, perma, season, episode)
+
+                itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                            contentSerieName = SerieName,
+                                            contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode, infoLabels = {'year': '-'} ))
+
+            else:
+                url = '%sserie/%s' % (domain, perma)
+
+                itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, page = 0,
+                                            contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        if len(itemlist) > 1:
+        if len(itemlist) >= int(tope):
             next_start = (item.page * perpage)
             next_page = item.page + 1
 
             next_post = 'target=%s&action=%s&start=%s&limit=28' % (item.tipo_list, item.target_action, next_start)
 
-            itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, pageaction = 'list_listas', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page,
+                                        pageaction = 'list_user_subsections', text_color = 'coral' ))
 
     return itemlist
 
@@ -1067,12 +1126,14 @@ def list_listas(item):
 
     if not config.get_setting('dominio', 'hdfull'): config.set_setting('dominio', dominio, 'hdfull')
 
-    url = '%sa/my' % domain
+    url = '%sa/my?' % domain
 
     if item.post:
         post = item.post
+        tope = scrapertools.find_single_match(item.post, 'limit=(\d+)')
     else:
         post = 'target=lists&action=%s&start=0&limit=28' % (item.target_action)
+        tope = perpage
 
     data = jsontools.load(do_downloadpage(url, post=post))
 
@@ -1083,14 +1144,15 @@ def list_listas(item):
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, page = 0 ))
 
     if itemlist:
-        if len(itemlist) > 1:
+        if len(itemlist) >= int(tope):
             if not '&search=' in post:
                 next_start = (item.page * perpage)
                 next_page = item.page + 1
 
                 next_post = 'target=lists&action=%s&start=%s&limit=28' % (item.target_action, next_start)
 
-                itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, pageaction = 'list_listas', text_color = 'coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, 
+                                            pageaction = 'list_listas', text_color = 'coral' ))
 
     return itemlist
 

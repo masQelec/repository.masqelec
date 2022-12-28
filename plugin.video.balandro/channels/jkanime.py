@@ -36,7 +36,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_caps', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'genero/latino/', search_type = 'tvshow' ))
 
@@ -102,8 +102,16 @@ def list_all(item):
 
         if url:
             if item.search_type == "tvshow":
+                SerieName = title
+
+                if 'OVA' in title: SerieName = title.split("OVA")[0]
+                if 'Season' in title: SerieName = title.split("Season")[0]
+                if 'Movie' in title: SerieName = title.split("Movie")[0]
+
+                SerieName = SerieName.strip()
+
                 itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                            contentType = 'tvshow', contentSerieName = title, infoLabels={'year':'-'} ))
+                                            contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-'} ))
             else:
                 url = url + 'pelicula/'
 
@@ -145,8 +153,16 @@ def list_last(item):
     num_matches = len(matches)
 
     for thumb, url, title in matches[item.page * perpage:]:
+        SerieName = title
+
+        if 'OVA' in title: SerieName = title.split("OVA")[0]
+        if 'Season' in title: SerieName = title.split("Season")[0]
+        if 'Movie' in title: SerieName = title.split("Movie")[0]
+
+        SerieName = SerieName.strip()
+
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year':'-'} ))
+                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -161,7 +177,7 @@ def list_last(item):
     return itemlist
 
 
-def list_caps(item):
+def last_epis(item):
     logger.info()
     itemlist = []
 
@@ -176,10 +192,14 @@ def list_caps(item):
     num_matches = len(matches)
 
     for url, thumb, title, episode in matches[item.page * perpage:]:
+        SerieName = title
+
+        SerieName = SerieName.strip()
+
         title = 'cap.{} - {}'.format(episode, title)
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
-                                    contentType = 'episode', contentEpisodeNumber=episode ))
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode ))
 
         if len(itemlist) >= perpage: break
 
@@ -189,7 +209,7 @@ def list_caps(item):
         if num_matches > perpage:
             hasta = (item.page * perpage) + perpage
             if hasta < num_matches:
-                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'list_caps', text_color = 'coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action = 'last_epis', text_color = 'coral' ))
 
     return itemlist
 
@@ -198,7 +218,9 @@ def pages_episodes(data):
     results = scrapertools.find_multiple_matches(data, 'href="#pag([0-9]+)".*?>[0-9]+ - ([0-9]+)')
     if results:
         return int(results[-1][0]), int(results[-1][1])
+
     return 1, 0
+
 
 def episodios(item):
     logger.info()
@@ -221,7 +243,7 @@ def episodios(item):
        paginas, capitulos = pages_episodes(data)
 
        if paginas > 1:
-           platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Cargando Temporadas y Episodios[/COLOR]')
+           platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Cargando ' + str(paginas) + ' Páginas[/COLOR]')
 
        for pag in range(1, paginas + 1):
            pag_nro = str(pag)
@@ -233,7 +255,8 @@ def episodios(item):
 
            for nro, title in matches:
                title = title.strip()
-               title = pag_nro + 'x' + str(nro) + ' ' + title
+
+               title = '1x' + str(nro) + ' ' + title
 
                url = item.url + nro
 
@@ -260,16 +283,14 @@ def findvideos(item):
     matches = re.compile(r'video\[\d+\] = \'<iframe.*?src="(.*?)".*?</iframe>', re.DOTALL).findall(data)
 
     for url in matches:
-        if 'jkanime.net/um2.php' in url:
-           url = url.replace('jkanime.net/um2.php', 'jkanime.net/um.php')
-        elif '/um2.php' in url:
-           url = url.replace('/um2.php', '/um.php')
+        if 'jkanime.net/um2.php' in url: url = url.replace('jkanime.net/um2.php', 'jkanime.net/um.php')
+        elif '/um2.php' in url: url = url.replace('/um2.php', '/um.php')
 
         other = ''
         if "/um.php" in url: other = 'um'
         elif "/jk.php" in url: other = 'jk'
-        elif "okru" in url:  other = 'okru'
-        elif "fembed" in url:  other = 'fembed'
+        elif "okru" in url: other = 'okru'
+        elif "fembed" in url: other = 'fembed'
         elif "mixdrop" in url: other = 'mixdrop'
 
         servidor = servertools.get_server_from_url(url)
@@ -284,9 +305,12 @@ def play(item):
     logger.info()
     itemlist = []
 
-    if not item.url.startswith(host): item.url = host[:-1] + item.url
 
     servidor = item.server
+
+    if servidor == 'directo':
+        if not item.url.startswith(host): item.url = host[:-1] + item.url
+
     url_play = item.url
 
     if "/um.php" in item.url or "/um2.php" in item.url:
@@ -299,8 +323,7 @@ def play(item):
         data = httptools.downloadpage(item.url).data
 
         url_play = scrapertools.find_single_match(data, '<source src="(.*?)"')
-        if not url_play:
-            url_play = scrapertools.find_single_match(data, "video: {.*?url:.*?'(.*?)'")
+        if not url_play: url_play = scrapertools.find_single_match(data, "video: {.*?url:.*?'(.*?)'")
 
         if host in url_play:
             url_play = httptools.downloadpage(url_play, follow_redirects=False, only_headers=True).headers.get("location", "")
@@ -310,8 +333,7 @@ def play(item):
         url_play = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)"')
 
         if url_play:
-           if not url_play.startswith("http"):
-               url_play = "https:" + url_play
+           if not url_play.startswith("http"): url_play = "https:" + url_play
 
            url_play = url_play.replace("\\/", "/")
 
@@ -321,8 +343,7 @@ def play(item):
            url_play = servertools.normalize_url(servidor, url_play)
 
     if url_play:
-        if not url_play.startswith("http"):
-            url_play = "https:" + url_play
+        if not url_play.startswith("http"): url_play = "https:" + url_play
 
         url_play = url_play.replace("\\/", "/")
 

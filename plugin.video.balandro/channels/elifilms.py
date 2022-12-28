@@ -142,7 +142,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1993, -1):
-        itemlist.append(item.clone( title=str(x), url= host + '/year/' + str(x) + '/', action='list_all', any = str(x) ))
+        itemlist.append(item.clone( title=str(x), url= host + 'year/' + str(x) + '/', action='list_all', any = str(x) ))
 
     return itemlist
 

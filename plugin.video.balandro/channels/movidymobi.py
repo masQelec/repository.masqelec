@@ -175,14 +175,31 @@ def findvideos(item):
         if lang == 'es': lang = 'Esp'
         elif lang == 'la': lang = 'Lat'
         elif lang == 'mx': lang = 'Lat'
+        elif lang == 'en': lang = 'Vose'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
-        itemlist.append(Item(channel = item.channel, action = 'play', title = '', server = servidor, url = url,
-                        language = lang, quality = qlty ))
+        if '/links.' in url:
+            data = do_downloadpage(url)
+
+            links = scrapertools.find_multiple_matches(data, '<li onclick="go_to_player.*?' + "'(.*?)'")
+
+            for link in links:
+                if '/hqq.' in link or '/waaw.' in link or '/netu.' in link: continue
+
+                servidor = servertools.get_server_from_url(link)
+                servidor = servertools.corregir_servidor(servidor)
+
+                link = servertools.normalize_url(servidor, link)
+
+                itemlist.append(Item (channel = item.channel, action = 'play', title = '', server = servidor, url = link, language = lang, quality = qlty ))
+
+            continue
+
+        itemlist.append(Item (channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = lang, quality = qlty ))
 
     itemlist = servertools.get_servers_itemlist(itemlist)
 

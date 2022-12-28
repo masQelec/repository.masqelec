@@ -12,7 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://dontorrent.click/'
+host = 'https://dontorrent.army/'
 
 
 # ~ por si viene de enlaces guardados
@@ -36,7 +36,8 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.moe/', 'https://dontorrent.pub/', 'https://dontorrent.tf/',
              'https://dontorrent.vin/', 'https://dontorrent.ist/', 'https://dontorrent.uno/',
              'https://dontorrent.fans/', 'https://dontorrent.ltd/', 'https://dontorrent.me/',
-             'https://dontorrent.gs/', 'https://dontorrent.gy/']
+             'https://dontorrent.gs/', 'https://dontorrent.gy/', 'https://dontorrent.click/',
+             'https://dontorrent.fail/', 'https://dontorrent.futbol/', 'https://dontorrent.mba/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -106,7 +107,7 @@ def acciones(item):
                                 from_channel='dontorrents', folder=False, text_color='chartreuse' ))
 
     itemlist.append(Item( channel='domains', action='last_domain_dontorrents', title='[B]Comprobar último dominio vigente[/B]',
-                          desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
+                          desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
@@ -283,6 +284,8 @@ def list_all(item):
         for url, title in matches:
             if "(" in title: titulo = titulo.split("(")[0]
             else: titulo = title
+
+            titulo = titulo.strip()
 
             itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title,
                                         contentType = 'movie', contentTitle = titulo, contentExtra = 'documentary', infoLabels={'year': "-"} ))

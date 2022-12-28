@@ -123,7 +123,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/peliculas/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host, group = 'lasts', search_type = 'movie' ))
 
@@ -163,7 +163,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host + '/peliculas/')
+    data = do_downloadpage(host + 'peliculas/')
 
     bloque = scrapertools.find_single_match(data, '<div id="bloque_cat"(.*?)</div>')
 

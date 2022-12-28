@@ -45,9 +45,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'doramas?categoria=dorama', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Live action', action = 'list_all', url = host + 'doramas?categoria=live-action', search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Episodios recientes', action = 'last_episodes', url = host, search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Live action', action = 'list_all', url = host + 'doramas?categoria=live-action', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'emision', search_type = 'tvshow' ))
 
@@ -130,10 +130,8 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    if item.search_type == 'movie':
-        url_any = host + 'doramas?categoria=pelicula&fecha='
-    else:
-        url_any = host + 'doramas?categoria=dorama&fecha='
+    if item.search_type == 'movie': url_any = host + 'doramas?categoria=pelicula&fecha='
+    else: url_any = host + 'doramas?categoria=dorama&fecha='
 
     for x in range(current_year, 1981, -1):
         url = url_any + str(x)
@@ -163,9 +161,6 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        year = scrapertools.find_single_match(match, '<button class="btntwo">(.*?)</button>')
-        if not year: year = '-'
-
         if 'latino' in title.lower(): lang = 'Lat'
         elif 'castellano' in title.lower(): lang = 'Esp'
         else: lang = 'Vose'
@@ -184,13 +179,14 @@ def list_all(item):
                 if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo,
-                                        contentType='movie', contentTitle=title, contentSeason = 1, infoLabels={'year': year} ))
-        else:
+                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+
+        if tipo == 'tvshow':
             if not item.search_type == 'all':
                 if item.search_type == 'movie': continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo, 
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+                                        contentSerieName = title, contentType = 'tvshow', contentSeason = 1, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -198,6 +194,7 @@ def list_all(item):
         if '<ul class="pagination">' in data:
             bloque = scrapertools.find_single_match(data, '<ul class="pagination">(.*?)</nav>')
             next_url = scrapertools.find_single_match(bloque, '<li class="page-item active".*?href="(.*?)"')
+
             if next_url:
                 next_url = next_url.replace('&amp;', '&')
                 itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
@@ -212,14 +209,17 @@ def last_episodes(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = r'<div class="col-lg-3 col-md-6 col-6 chaps">.*?<a href="(.*?)".*?<img src="(.*?)".*?<h3>(.*?)</h3>.*?<p>(.*?)</p>'
+    patron = r'<div class="col-lg-3 col-md-6 col-6 chaps">.*?<a href="(.*?)".*?<img src="(.*?)".*?alt="(.*?)".*?<h3>(.*?)</h3>'
 
     matches = scrapertools.find_multiple_matches(data, patron)
 
-    for url, thumb, epis, title in matches:
+    for url, thumb, title, epis in matches:
         if not url or not title: continue
 
         title = title.strip()
+
+        if "capitulo" in title: SerieName = title.split("capitulo")[0]
+        else: titulo = SerieName
 
         season = 1
         if not epis: epis = 0
@@ -227,7 +227,7 @@ def last_episodes(item):
         titulo = str(season) + 'x' + str(epis) + ' ' + title
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail = thumb, url = url,
-                                    contentType = 'episode', contentSerieName = title, contentSeason = season, contentEpisodeNumber = epis ))
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -248,10 +248,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -268,10 +264,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#039;', "'").replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for url, thumb, epis, in matches[item.page * item.perpage:]:
         epis = epis.strip()
@@ -318,6 +339,8 @@ def findvideos(item):
         if 'hqq' in srv or 'waaw' in srv or 'netu' in srv: continue
 
         elif 'ok' in srv: srv = 'okru'
+
+        srv = srv.replace('com/', '')
 
         if url:
             url = base64.b64decode(url).decode("utf-8")

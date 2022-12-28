@@ -117,6 +117,7 @@ def list_all(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<h3>(.*?)$')
 
@@ -145,7 +146,7 @@ def list_all(item):
         if '<b>4k</b>' in match: qlty = '4K'
         else: qlty = qlty.replace('GBs', ' GB').replace('MBs', ' MB')
 
-        tipo = 'tvshow' if '/series/' in url else 'tvshow'
+        tipo = 'tvshow' if '/series/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'tvshow':
@@ -155,12 +156,12 @@ def list_all(item):
             title = title.replace('&#8211;', '').replace('&#215;', ' ')
 
             titulo = title
-            if 'temporada' in titulo: titulo = scrapertools.find_single_match(titulo, '(.*?)temporada').strip()
-            elif 'Temporada' in titulo: titulo = scrapertools.find_single_match(titulo, '(.*?)Temporada').strip()
-            elif 'episodios' in titulo: titulo = scrapertools.find_single_match(titulo, '(.*?)episodios').strip()
-            elif 'Episodios' in titulo: titulo = scrapertools.find_single_match(titulo, '(.*?)Episodios').strip()
 
-            if ' - ' in titulo: titulo = scrapertools.find_single_match(titulo, '(.*?)-').strip()
+            if "temporada" in titulo: titulo = titulo.split("temporada")[0]
+            if "Temporada" in titulo: titulo = titulo.split("Temporada")[0]
+            if "episodios" in titulo: titulo = titulo.split("episodios")[0]
+            if "Episodios" in titulo: titulo = titulo.split("Episodios")[0]
+            if " - " in titulo: titulo = titulo.split(" - ")[0]
 
             titulo = titulo.replace('&#8211;', '').replace('&#215;', '').strip()
 
@@ -172,8 +173,13 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
+            titulo = title
+
+            if "(Inglés)" in titulo: titulo = titulo.split("(Inglés)")[0]
+            if "(Castellano)" in title: titulo = titulo.split("(Castellano)")[0]
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, qualities=qlty, fmt_sufijo=sufijo,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
+                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

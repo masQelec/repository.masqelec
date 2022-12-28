@@ -53,6 +53,20 @@ context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_help_d
 tit = '[COLOR cyan][B]Últimos Cambios dominios[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
+tit = '[COLOR greenyellow][B]Buscar Solo en los canales[/B][/COLOR]'
+context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_included'})
+
+if config.get_setting('search_included_all', default=''):
+    tit = '[COLOR greenyellow][B]Quitar canales de Buscar Solo[/B][/COLOR]'
+    context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_included_del'})
+
+tit = '[COLOR violet][B]Excluir canales[/B][/COLOR]'
+context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_excluded'})
+
+if config.get_setting('search_excludes_all', default=''):
+    tit = '[COLOR violet][B]Quitar canales excluidos[/B][/COLOR]'
+    context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_excluded_del'})
+
 tit = '[COLOR %s][B]Global configurar proxies[/B][/COLOR]' % color_list_proxies
 context_buscar.append({'title': tit, 'channel': 'proxysearch', 'action': 'proxysearch_all'})
 
@@ -168,6 +182,9 @@ context_preferidos = []
 tit = '[COLOR %s][B]Información preferidos[/B][/COLOR]' % color_infor
 context_preferidos.append({'title': tit, 'channel': 'helper', 'action': 'show_help_tracking'})
 
+tit = '[COLOR %s][B]Comprobar Nuevos Episodios[/B][/COLOR]' % color_adver
+context_preferidos.append({'title': tit, 'channel': 'actions', 'action': 'comprobar_nuevos_episodios'})
+
 tit = '[COLOR %s][B]Eliminar Todos los preferidos[/B][/COLOR]' % color_alert
 context_preferidos.append({'title': tit, 'channel': 'actions', 'action': 'manto_tracking_dbs'})
 
@@ -191,6 +208,45 @@ context_descargas.append({'title': tit, 'channel': 'helper', 'action': 'show_men
 
 tit = '[COLOR %s]Ajustes categoría descargas[/COLOR]' % color_exec
 context_descargas.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+
+context_config = []
+
+tit = '[COLOR %s][B]Quitar Proxies memorizados[/B][/COLOR]' % color_alert
+context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
+
+tit = '[COLOR %s]Información menús[/COLOR]' % color_avis
+context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
+
+tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
+context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
+
+tit = '[COLOR %s][B]Últimos Cambios dominios[/B][/COLOR]' % color_exec
+context_config.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
+
+tit = '[COLOR %s]Sus Ajustes personalizados[/COLOR]' % color_avis
+context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_sets'})
+
+tit = '[COLOR %s]Cookies actuales[/COLOR]' % color_infor
+context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_cook'})
+
+tit = '[COLOR %s][B]Eliminar Cookies[/B][/COLOR]' % color_alert
+context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_cookies'})
+
+tit = '[COLOR %s]Sus Advanced Settings[/COLOR]' % color_adver
+context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_advs'})
+
+tit = '[COLOR %s][B]Eliminar Advanced Settings[/B][/COLOR]' % color_alert
+context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_advs'})
+
+tit = '[COLOR darkorange][B]Borrar Carpeta Caché[/B][/COLOR]'
+context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_folder_cache'})
+
+tit = '[COLOR mediumaquamarine][B]Restablecer parámetros Internos[/B][/COLOR]'
+context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_params'})
+
+tit = '[COLOR green][B]Informacion plataforma[/B][/COLOR]'
+context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_plataforma'})
 
 
 def mainlist(item):
@@ -222,6 +278,10 @@ def mainlist(item):
     elif current_month == 11:
          itemlist.append(item.clone( channel='tmdblists', action='descubre', title='[B]Halloween[/B]', text_color='orchid', extra = 27, search_type = 'movie',
                                      thumbnail=config.get_thumb('halloween'), plot = 'Películas del género Terror' ))
+
+    elif current_month == 12:
+        itemlist.append(item.clone( channel='filmaffinitylists', action='_navidad', title='[B]Navidad[/B]', text_color='orchid',
+                                    thumbnail=config.get_thumb('navidad'), plot = 'Películas y Series del tema Navidad' ))
 
     if config.get_setting('sub_mnu_special', default=True):
         itemlist.append(item.clone( channel='submnuctext', action='submnu_special', title='[B]Especiales[/B]', context=context_cfg_search,
@@ -381,44 +441,6 @@ def mainlist(item):
 
     itemlist.append(item.clone( channel='helper', action='mainlist', title=title, context=context_ayuda,
                                 thumbnail=config.get_thumb('help'), text_color='chartreuse' ))
-
-    context_config = []
-
-    tit = '[COLOR %s][B]Quitar Proxies memorizados[/B][/COLOR]' % color_alert
-    context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
-
-    tit = '[COLOR %s]Información menús[/COLOR]' % color_avis
-    context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
-
-    tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
-    context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
-
-    tit = '[COLOR %s][B]Últimos Cambios dominios[/B][/COLOR]' % color_exec
-    context_config.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
-
-    tit = '[COLOR %s]Sus Ajustes personalizados[/COLOR]' % color_avis
-    context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_sets'})
-
-    tit = '[COLOR %s]Cookies actuales[/COLOR]' % color_infor
-    context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_cook'})
-
-    tit = '[COLOR %s][B]Eliminar Cookies[/B][/COLOR]' % color_alert
-    context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_cookies'})
-
-    tit = '[COLOR %s]Sus Advanced Settings[/COLOR]' % color_adver
-    context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_advs'})
-
-    tit = '[COLOR %s][B]Eliminar Advanced Settings[/B][/COLOR]' % color_alert
-    context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_advs'})
-
-    tit = '[COLOR darkorange][B]Borrar Carpeta Caché[/B][/COLOR]'
-    context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_folder_cache'})
-
-    tit = '[COLOR mediumaquamarine][B]Restablecer parámetros Internos[/B][/COLOR]'
-    context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_params'})
-
-    tit = '[COLOR green][B]Informacion plataforma[/B][/COLOR]'
-    context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_plataforma'})
 
     if not 'desfasada' in last_ver:
         if 'fix' in last_fix:
@@ -734,6 +756,10 @@ def channels(item):
                 itemlist.append(Item( channel='search', action='search', search_type='all', title='Buscar Anime ...',
                                       thumbnail=config.get_thumb('anime'), search_special = 'anime', text_color='springgreen' ))
 
+        if item.extra == 'proxies' or item.extra == 'problematics':
+            itemlist.append(item.clone( channel='actions', action='open_settings', title='[B]Configuración[/B]', context=context_config,
+                                        folder=False, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
+
         accion = 'mainlist'
         filtros = {}
 
@@ -887,6 +913,17 @@ def channels(item):
                 tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
                 context.append({'title': tit, 'channel': item.channel, 'action': '_quitar_proxies'})
 
+        if ch['searchable']:
+            if not ch['status'] == -1:
+                cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
+
+                if config.get_setting(cfg_searchable_channel, default=False):
+                    tit = '[COLOR %s][B]Quitar exclusión en búsquedas[/B][/COLOR]' % color_adver
+                    context.append({'title': tit, 'channel': item.channel, 'action': '_quitar_no_searchables'})
+                else:
+                    tit = '[COLOR %s][B]Excluir de búsquedas[/B][/COLOR]' % color_adver
+                    context.append({'title': tit, 'channel': item.channel, 'action': '_poner_no_searchables'})
+
         if ch['status'] != 1:
             tit = '[COLOR %s][B]Marcar canal como Preferido[/B][/COLOR]' % color_list_prefe
             context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': 1})
@@ -1001,9 +1038,16 @@ def channels(item):
         if not PY3:
             if 'mismatched' in ch['clusters']: titulo += '[I][COLOR coral] (Incompatible)[/COLOR][/I]'
 
-        if 'inestable' in ch['clusters']: titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
+        if 'inestable' in ch['clusters']:
+            if config.get_setting('channels_list_no_inestables', default=False): continue
 
-        if 'problematic' in ch['clusters']: titulo += '[I][COLOR darkgoldenrod] (problemático)[/COLOR][/I]'
+            titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
+
+        if 'problematic' in ch['clusters']:
+            if not config.get_setting('mnu_problematicos', default=False):
+                if config.get_setting('channels_list_no_problematicos', default=False): continue
+
+            titulo += '[I][COLOR darkgoldenrod] (problemático)[/COLOR][/I]'
 
         i =+ 1
 
@@ -1035,6 +1079,15 @@ def idioma_canal(lang):
 def _marcar_canal(item):
     from modules import submnuctext
     submnuctext._marcar_canal(item)
+
+
+def _poner_no_searchables(item):
+    from modules import submnuctext
+    submnuctext._poner_no_searchable(item)
+
+def _quitar_no_searchables(item):
+    from modules import submnuctext
+    submnuctext._quitar_no_searchable(item)
 
 
 def _quitar_proxies(item):

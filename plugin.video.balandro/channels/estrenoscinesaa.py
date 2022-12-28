@@ -81,6 +81,8 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)">(.*?)</a>\s*<i>(.*?)</i>')
 
     for url, title, count in matches:
+        title = title.replace('&amp;', '&')
+
         if '/genre/d-c/' in url: continue
         elif '/genre/marvel/' in url: continue
         elif '/genre/netflix/' in url: continue

@@ -207,8 +207,8 @@ def list_all(item):
         year = scrapertools.find_single_match(article, '<span>(\d{4})')
         if not year: year = '-'
 
-        tipo_suf = 'movie' if '/pelicula/' in url else 'tvshow'
-        sufijo = '' if item.search_type != 'all' else tipo_suf
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
             if not item.search_type == "all":
@@ -267,6 +267,7 @@ def temporadas(item):
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.contentType = 'season'
             item.contentSeason = numtempo
             itemlist = episodios(item)
@@ -278,7 +279,7 @@ def temporadas(item):
 
            title = 'Temporada ' + nro_temp
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = numtempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -302,10 +303,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = num_matches
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for match in matches:
         season = scrapertools.find_single_match(match, 'data-season="([^"]+)')
@@ -420,6 +446,7 @@ def normalize_other(srv):
     elif srv == 'damedamehoy': link_other = 'dame'
     elif srv == 'tomatomatela': link_other = 'dame'
     elif srv == 'suppervideo': link_other = 'super'
+    elif srv == 'apialfa': link_other = 'apialfa'
     else:
        if config.get_setting('developer_mode', default=False): link_other = srv
        else: link_other = ''
@@ -468,12 +495,32 @@ def play(item):
             url = resuelve_dame_toma(item.url)
 
             if url:
-                itemlist.append(item.clone(url=url , server=servidor))
+                itemlist.append(item.clone(url=url, server=servidor))
                 return itemlist
+
+        elif item.other == 'apialfa':
+            fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
+            if fid:
+                vid = item.url.replace('https://apialfa.tomatomatela.club/ir/player.php', 'https://apialfa.tomatomatela.club/ir/rd.php')
+                post = {'url': fid}
+
+                try:
+                    # ~ url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                    url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                except:
+                    url = ''
+
+                if url:
+                    servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.corregir_servidor(servidor)
+
+                    url = servertools.normalize_url(servidor, url)
+
+                    itemlist.append(item.clone(url=url, server=servidor))
+                    return itemlist
 
         elif item.other == 'super':
             if '/pelisplay.ccplay?' in item.url:
-                # ~ resp = httptools.downloadpage(item.url)
                 resp = httptools.downloadpage(item.url)
                 if not resp.data:
                     return itemlist
@@ -491,7 +538,7 @@ def play(item):
 
                     url = servertools.normalize_url(servidor, url)
 
-                    itemlist.append(item.clone(url=url , server=servidor))
+                    itemlist.append(item.clone(url=url, server=servidor))
                     return itemlist
 
             for url in matches:
@@ -499,7 +546,7 @@ def play(item):
                     url = resuelve_dame_toma(url)
 
                     if url:
-                        itemlist.append(item.clone(url = url , server = 'directo'))
+                        itemlist.append(item.clone(url = url, server = 'directo'))
                         return itemlist
 
                 servidor = servertools.get_server_from_url(url)
@@ -508,7 +555,7 @@ def play(item):
                 url = servertools.normalize_url(servidor, url)
 
                 if servidor and servidor != 'directo':
-                    itemlist.append(item.clone(url = url , server = servidor))
+                    itemlist.append(item.clone(url = url, server = servidor))
                     return itemlist
 
     if url:

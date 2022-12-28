@@ -5,9 +5,10 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-# ~ links_genres_series host = "https://cinedeantes2.weebly.com"
+# ~ links_genres_series host = 'https://cinedeantes2.weebly.com'
 
 host = 'https://seriestvdeantes'
+
 
 perpage = 25
 

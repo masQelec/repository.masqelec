@@ -30,9 +30,9 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'videos/', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Buscar tráiler ...', action = 'search', search_type = 'movie', text_color = 'darkgoldenrod' ))
+
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'videos/', search_type = 'movie' ))
 
     return itemlist
 

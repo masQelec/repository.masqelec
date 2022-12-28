@@ -98,6 +98,8 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)".*?title=.*?">(.*?)</a>')
 
     for url, title in matches:
+        title = title.replace('&amp;', '&')
+
         if '/animacion-2' in url: title = title + '-2'
 
         itemlist.append(item.clone( action='list_all', title=title, url=url ))
@@ -172,12 +174,24 @@ def list_all(item):
 
             SerieName = url
 
-            SerieName = SerieName.replace(host, '').strip()
+            SerieName = SerieName.replace(host, '').replace('series/', '').strip()
             SerieName = SerieName.replace('-', ' ')
+
+            if ' t0' in SerieName: SerieName = SerieName.split(" t0")[0]
+            elif ' 1x' in SerieName: SerieName = SerieName.split(" 1x")[0]
+            elif ' 2x' in SerieName: SerieName = SerieName.split(" 2x")[0]
+            elif ' 3x' in SerieName: SerieName = SerieName.split(" 3x")[0]
+            elif ' 4x' in SerieName: SerieName = SerieName.split(" 4x")[0]
+            elif ' 5x' in SerieName: SerieName = SerieName.split(" 4x")[0]
+            elif ' 01x' in SerieName: SerieName = SerieName.split(" 01x")[0]
+            elif ' 02x' in SerieName: SerieName = SerieName.split(" 02x")[0]
+            elif ' 03x' in SerieName: SerieName = SerieName.split(" 03x")[0]
+            elif ' 04x' in SerieName: SerieName = SerieName.split(" 04x")[0]
+            elif ' 05x' in SerieName: SerieName = SerieName.split(" 05x")[0]
 
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
                                         qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
-                                        contentType = 'episode', contentSerieName = SerieName, infoLabels={'year': "-"} ))
+                                        contentSerieName = SerieName, contentType = 'tvshow', infoLabels={'year': "-"} ))
 
     tmdb.set_infoLabels(itemlist)
 

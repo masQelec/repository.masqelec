@@ -50,14 +50,18 @@
     <category label="Canales">
         <setting id="show_channels_parameters" type="action" label="Información sobre sus Parámetros Actuales" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_parameters)"/>
 
-        <setting label="Listas:" type="lsep"/>
+        <setting label="Filtrar Canales:" type="lsep"/>
         <setting id="lcan_opc" type="bool" label="Opciones" default="false"/>
 
         <setting id="channels_list_status" type="enum" label="Qué canales se mostrarán" values="Todos|Preferidos y Activos|Sólo Preferidos" default="0" visible="eq(-1,true)"/>
         <setting id="show_channels_list" type="action" label="Qué canales están Disponibles" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list)"/>
         <setting id="channels_suggesteds" type="action" label="Qué canales están [COLOR aquamarine][B]Sugeridos[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_suggesteds)"/>
+
         <setting id="no_channels_inestables" type="action" label="Qué canales están [COLOR plum][B]Inestables[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_inestables)"/>
-        <setting id="no_channels_problematicos" type="action" label="Qué canales son [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] (Predominan Sin enlaces Disponibles/Válidos/Soportados)" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_problematicos)"/>
+        <setting id="channels_list_no_inestables" type="bool" label="No presentar los canales [COLOR plum][B]Inestables[/B][/COLOR] en las Listas" default="false" visible="eq(-5,true)"/>
+
+        <setting id="no_channels_problematicos" type="action" label="Qué canales son [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] (Predominan Sin enlaces Disponibles/Válidos/Soportados)" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_problematicos)"/>
+        <setting id="channels_list_no_problematicos" type="bool" label="No presentar los canales [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] en las Listas" default="false" visible="eq(-7,true)"/>
 
         <setting label="Preferidos:" type="lsep"/>
         <setting id="lpre_opc" type="bool" label="Opciones" default="false"/>
@@ -269,6 +273,11 @@
 		<setting id="ch_series24_dominio" type="action" label="[COLOR cyan][B]Series24[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_series24)"/>
 		<setting id="channel_series24_dominio" type="text" label="Series24 dominio memorizado" enable="false" visible="eq(-3,true)" default=""/>
 
+		<setting id="ac_seriesanimadas" type="bool" label="SeriesAnimadas" default="false"/>
+		<setting id="ch_seriesanimadas_test" type="action" label="[COLOR cyan][B]SeriesAnimadas[/B][/COLOR] efectuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_seriesanimadas)"/>
+		<setting id="ch_seriesanimadas_dominio" type="action" label="[COLOR cyan][B]SeriesAnimadas[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_seriesanimadas)"/>
+		<setting id="channel_seriesanimadas_dominio" type="text" label="SeriesAnimadas dominio memorizado" enable="false" visible="eq(-3,true)" default=""/>
+
 		<setting id="ac_seriesyonkis" type="bool" label="SeriesYonkis" default="false"/>
 		<setting id="ch_seriesyonkis_test" type="action" label="[COLOR cyan][B]SeriesYonkis[/B][/COLOR] efectuar test del dominio" enable="eq(-1,true)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_seriesyonkis)"/>
 		<setting id="ch_seriesyonkis_dominio" type="action" label="[COLOR cyan][B]SeriesYonkis[/B][/COLOR] modificar el dominio Memorizado" enable="eq(-2,true)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_seriesyonkis)"/>
@@ -437,19 +446,29 @@
 
         <setting id="search_no_searchables" type="action" label="Qué canales Nunca intervendrán en las búsquedas" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_no_searchables)"/>
         <setting id="search_no_channels_actives" type="action" label="Qué canales No intervienen en las búsquedas (marcados como [COLOR gray][B]Desactivados[/B][/COLOR])" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_no_actives)"/>
-        <setting id="search_channels_suggesteds" type="action" label="Qué canales están [COLOR aquamarine][B]Sugeridos[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_suggesteds)"/>
-        <setting id="search_only_suggesteds" type="bool" label="Efectuar búsquedas Solo en los canales [COLOR aquamarine][B]Sugeridos[/B][/COLOR]" default="false" visible="eq(-4,true)"/>
-        <setting id="search_channels_prefered" type="action" label="Qué canales tiene marcados como [COLOR gold][B]Preferidos[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_prefered)"/>
-        <setting id="search_only_prefered" type="bool" label="Efectuar búsquedas Solo en los canales [COLOR gold][B]Preferidos[/B][/COLOR]" default="false" visible="eq(-6,true)"/>
-        <setting id="search_con_torrents" type="bool" label="Efectuar búsquedas Solo en los canales que pueden contener archivos [COLOR blue][B]Torrent[/B][/COLOR]" default="false" visible="eq(-7,true)"/>
-        <setting id="search_no_torrents" type="bool" label="Descartar búsquedas en los canales que Puedan contener archivos [COLOR blue][B]Torrent[/B][/COLOR]" default="false" visible="eq(-8,true)"/>
-        <setting id="search_no_exclusively_torrents" type="bool" label="Descartar búsquedas en los canales con enlaces [COLOR blue][B]Torrent[/B][/COLOR] Exclusivamente" default="false" visible="eq(-9,true)"/>
-        <setting id="search_no_channels_with_proxies" type="action" label="Qué canales pueden usar [COLOR red][B]Proxies[/B][/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
-        <setting id="search_no_proxies" type="bool" label="Descartar búsquedas en los canales con [COLOR red][B]Proxies[/B][/COLOR] Informados" default="false" visible="eq(-11,true)"/>
-        <setting id="search_no_channels_inestables" type="action" label="Qué canales están [COLOR plum][B]Inestables[/B][/COLOR]" visible="eq(-12,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_inestables)"/>
-        <setting id="search_no_inestables" type="bool" label="Descartar búsquedas en los canales [COLOR plum][B]Inestables[/B][/COLOR]" default="false" visible="eq(-13,true)"/>
-        <setting id="search_no_channels_problematicos" type="action" label="Qué canales son [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] (Predominan Sin enlaces Disponibles/Válidos/Soportados)" visible="eq(-14,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_problematicos)"/>
-        <setting id="search_no_problematicos" type="bool" label="Descartar búsquedas en los canales [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR]" default="false" visible="eq(-15,true)"/>
+
+        <setting id="search_channels_included" type="action" label="Efectuar las búsquedas 'Solo' en determinados canales" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuctext&action=_channels_included)"/>
+        <setting id="search_channels_excluded" type="action" label="Excluir canales de las búsquedas" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuctext&action=_channels_excluded)"/>
+
+        <setting id="search_channels_suggesteds" type="action" label="Qué canales están [COLOR aquamarine][B]Sugeridos[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_suggesteds)"/>
+        <setting id="search_only_suggesteds" type="bool" label="Efectuar búsquedas Solo en los canales [COLOR aquamarine][B]Sugeridos[/B][/COLOR]" default="false" visible="eq(-6,true)"/>
+
+        <setting id="search_channels_prefered" type="action" label="Qué canales tiene marcados como [COLOR gold][B]Preferidos[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_prefered)"/>
+        <setting id="search_only_prefered" type="bool" label="Efectuar búsquedas Solo en los canales [COLOR gold][B]Preferidos[/B][/COLOR]" default="false" visible="eq(-8,true)"/>
+
+        <setting id="search_con_torrents" type="bool" label="Efectuar búsquedas Solo en los canales que pueden contener archivos [COLOR blue][B]Torrent[/B][/COLOR]" default="false" visible="eq(-9,true)"/>
+        <setting id="search_no_torrents" type="bool" label="Descartar búsquedas en los canales que Puedan contener archivos [COLOR blue][B]Torrent[/B][/COLOR]" default="false" visible="eq(-10,true)"/>
+        <setting id="search_no_exclusively_torrents" type="bool" label="Descartar búsquedas en los canales con enlaces [COLOR blue][B]Torrent[/B][/COLOR] Exclusivamente" default="false" visible="eq(-11,true)"/>
+
+        <setting id="search_no_channels_with_proxies" type="action" label="Qué canales pueden usar [COLOR red][B]Proxies[/B][/COLOR]" visible="eq(-12,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
+        <setting id="search_no_proxies" type="bool" label="Descartar búsquedas en los canales con [COLOR red][B]Proxies[/B][/COLOR] Informados" default="false" visible="eq(-13,true)"/>
+
+        <setting id="search_no_channels_inestables" type="action" label="Qué canales están [COLOR plum][B]Inestables[/B][/COLOR]" visible="eq(-14,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_inestables)"/>
+        <setting id="search_no_inestables" type="bool" label="Descartar búsquedas en los canales [COLOR plum][B]Inestables[/B][/COLOR]" default="false" visible="eq(-15,true)"/>
+
+        <setting id="search_no_channels_problematicos" type="action" label="Qué canales son [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] (Predominan Sin enlaces Disponibles/Válidos/Soportados)" visible="eq(-16,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_problematicos)"/>
+        <setting id="search_no_problematicos" type="bool" label="Descartar búsquedas en los canales [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR]" default="false" visible="eq(-17,true)"/>
+
 
         <setting label="Especiales:" type="lsep"/>
         <setting id="buse_opc" type="bool" label="Opciones" default="false"/>
@@ -467,7 +486,7 @@
         <setting label="Proceso:" type="lsep"/>
         <setting id="pre_opc" type="bool" label="Opciones" default="false"/>
 
-        <setting id="show_help_tracking_update" type="action" label="Búsqueda Automática de [COLOR cyan][B]Nuevos Episodios[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_tracking_update)"/>
+        <setting id="show_help_tracking_update" type="action" label="Información búsqueda Automática de [COLOR cyan][B]Nuevos Episodios[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_tracking_update)"/>
         <setting id="tracking_confirm_tmdbid" type="bool" label="Confirmar Siempre la Identificación de la Película ó Serie" default="false" visible="eq(-2,true)"/>
 
         <setting label="Ordenar listas de Películas:" type="lsep"/>

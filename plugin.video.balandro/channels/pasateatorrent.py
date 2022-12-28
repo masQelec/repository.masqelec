@@ -155,20 +155,12 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
-        if not '/?s=' in item.url:
-            year = scrapertools.find_single_match(match, '<div class="releaseDate".*?title=".*? .*? (.*?)</span>').strip()
-            if not year: year = scrapertools.find_single_match(match, '<div class="releaseDate".*?title=".*? .*? (.*?)">').strip()
-        else: year = scrapertools.find_single_match(match, '<div class="genres">(.*?), </div>').strip()
+        lang = scrapertools.find_single_match(match, '<div class="imagen-idioma">.*?/icono_(.*?).png')
+        if lang == 'espaniol': lang = 'Esp'
 
-        if not year: year = '-'
+        qlty = scrapertools.find_single_match(match, '<div class="bloque-superior">(.*?)<div')
 
-        lang = scrapertools.find_single_match(match, '<div class="language".*?title="(.*?)">')
-        if lang == 'Spanish': lang = 'Esp'
-
-        qlty = scrapertools.find_single_match(match, '<div class="quality yellow".*?">(.*?)</div>')
-        if not qlty: qlty = scrapertools.find_single_match(match, '<div class="hdAudio"></div><div class="(.*?)">')
-
-        tipo = 'tvshow' if '/series/' in url else 'tvshow'
+        tipo = 'tvshow' if '/series/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'tvshow':
@@ -177,15 +169,18 @@ def list_all(item):
 
             title = title.replace('&#8211;', '').strip()
 
+            if " Temporada" in title: SerieName = title.split(" Temporada ")[0]
+            else: SerieName = title
+
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, languages = lang, qualities=qlty, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
         if tipo == 'movie':
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
--
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = lang, qualities=qlty, fmt_sufijo=sufijo,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -215,10 +210,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('MovidyTv', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('PasateaTorrent', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('PasateaTorrent', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('PasateaTorrent', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('PasateaTorrent', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('PasateaTorrent', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for temp_epis, qlty, url in matches[item.page * item.perpage:]:
         temp_epis = temp_epis.replace('&#215;', 'x')
@@ -271,29 +291,21 @@ def findvideos(item):
     lang = 'Esp'
 
     if '/download_tt.php?'in item.url:
-        resp = httptools.downloadpage(item.url, follow_redirects=False, only_headers=True)
-
-        if resp.headers:
-            url = scrapertools.find_single_match(str(resp.headers), "filename=(.*?)'")
-
-            if url:
-                url = host + url
-
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, other = 'D' ))
-
-                return itemlist
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent', language = lang, other = 'D' ))
+        return itemlist
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<tbody>.*?</td>.*?</td>.*?<td>(.*?)</td>.*?href="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<tbody>.*?</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"', re.DOTALL).findall(data)
 
-    for peso, url in matches:
+    for qlty, peso, url in matches:
         if not url.startswith('http'): url = host[:-1] + url
 
         other = peso.replace('&#8230;', '').strip()
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
+                              language = lang, quality = qlty, other = other ))
 
     return itemlist
 

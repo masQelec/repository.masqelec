@@ -38,9 +38,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por alfabético', action = 'listas', url= host + 'p/peliculas.html', search_type='movie' ))
 
     itemlist.append(item.clone( title = 'Por categorias', action = 'categorias', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
@@ -109,7 +107,6 @@ def list_all(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     patron  = "(?is)post-title entry.*?href='([^']+)'>([^<]+)"
@@ -118,13 +115,11 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(data, patron)
 
     for url, title, Title, year, thumb in matches:
-        if not year:
-            year = '-'
+        if not year: year = '-'
         else:
             if year in title:
                 title = title.replace('(' + year + ')', '').strip()
-                if year in title:
-                    title = title.replace(year, '').strip()
+                if year in title: title = title.replace(year, '').strip()
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                     contentType='movie', contentTitle=Title, infoLabels={'year': year} ))
@@ -134,12 +129,13 @@ def list_all(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, """blog-pager-older-link.*?href='([^']+)""")
+
         if next_page:
             res = scrapertools.find_single_match(next_page, '&max-results=\w+')
-            if not next_page.endswith("&"):
-                next_page += '&'
+            if not next_page.endswith("&"): next_page += '&'
 
             next_page = next_page.replace(res, '') + 'max-results=' + str(results)
+
             itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral'))
 
     return itemlist
@@ -152,7 +148,6 @@ def list_list(item):
     if not item.page: item.page = 0
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, '<span style="font-size:.*?">(.*?)<br /><br /><br /><br />')
@@ -162,20 +157,17 @@ def list_list(item):
     for match in matches[item.page * perpage:]:
         title = scrapertools.find_single_match(match, '<u><b>(.*?)</b>')
 
-        if title == '<br />':
-            title = scrapertools.find_single_match(match, '<span style="font-size:.*?"><u><b>(.*?)</b>')
+        if title == '<br />': title = scrapertools.find_single_match(match, '<span style="font-size:.*?"><u><b>(.*?)</b>')
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
         year = scrapertools.find_single_match(match, '<i>Año</i>: (.*?)"<br />').strip()
-        if not year:
-            year = '-'
+        if not year: year = '-'
         else:
             if year in title:
                 title = title.replace('(' + year + ')', '').strip()
-                if year in title:
-                    title = title.replace(year, '').strip()
+                if year in title: title = title.replace(year, '').strip()
 
         bloque = scrapertools.find_single_match(match, '>Ver online(.*?)$')
 
@@ -185,6 +177,7 @@ def list_list(item):
 
         if url:
             if url.startswith('//'): url = 'https:' + url
+
             ver = scrapertools.find_single_match(bloque, '</b></a>(.*?)<br />').strip()
             titulo = title + ' ' + ver
 
@@ -196,6 +189,7 @@ def list_list(item):
 
             if url:
                 if url.startswith('//'): url = 'https:' + url
+
                 ver = scrapertools.find_single_match(bloque, 'Ver online.*?</b></a>(.*?)$').strip()
                 titulo = title + ' ' + ver
 
@@ -209,6 +203,7 @@ def list_list(item):
     if itemlist:
         if num_matches > perpage:
             hasta = (item.page * perpage) + perpage
+
             if hasta < num_matches:
                 itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_genre', text_color='coral' ))
 
@@ -222,15 +217,13 @@ def list_genre(item):
     if not item.page: item.page = 0
 
     data = do_downloadpage(item.url)
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, """(?is)id='post-body(.*?)clear: both;""")
 
     if item.exec_action:
         matches = scrapertools.find_multiple_matches(bloque, '<h3>.*?href="(.*?)".*?target="_blank">(.*?)</a>.*?src="(.*?)"')
-        if not matches:
-            matches = scrapertools.find_multiple_matches(bloque, 'href="([^"]+).*?alt="([^"]+).*?src="([^"]+)')
+        if not matches: matches = scrapertools.find_multiple_matches(bloque, 'href="([^"]+).*?alt="([^"]+).*?src="([^"]+)')
     else:
         matches = scrapertools.find_multiple_matches(bloque, 'href="([^"]+).*?alt="([^"]+).*?src="([^"]+)')
 
@@ -251,6 +244,7 @@ def list_genre(item):
     if itemlist:
         if num_matches > perpage:
             hasta = (item.page * perpage) + perpage
+
             if hasta < num_matches:
                 itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_genre', text_color='coral' ))
 
@@ -262,7 +256,6 @@ def listas(item):
     itemlist = []
 
     if not item.page: item.page = 0
-
     data = do_downloadpage(item.url)
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -277,17 +270,15 @@ def listas(item):
         title = title.replace('<b>', '').replace('</b>', '')
 
         if '<span' in title:
-            if  '</span></span>' in title:
-               title = scrapertools.find_single_match(title, '<span.*?">(.*?)<span').strip()
-            elif not '></span>' in title:
-               title = scrapertools.find_single_match(title, '<span.*?">(.*?)</span').strip()
-            else:
-               title = scrapertools.find_single_match(title, '(.*?)<span').strip()
-        elif '.html' in title:
-            title = scrapertools.find_single_match(title, '.html.*?">(.*?)$').strip()
+            if  '</span></span>' in title: title = scrapertools.find_single_match(title, '<span.*?">(.*?)<span').strip()
+            elif not '></span>' in title:  title = scrapertools.find_single_match(title, '<span.*?">(.*?)</span').strip()
+            else: title = scrapertools.find_single_match(title, '(.*?)<span').strip()
+
+        elif '.html' in title: title = scrapertools.find_single_match(title, '.html.*?">(.*?)$').strip()
 
         action = 'findvideos'
         contentTitle = title
+
         if item.exec_action:
             action = item.exec_action
             contentTitle = ''
@@ -301,6 +292,7 @@ def listas(item):
     if itemlist:
         if num_matches > perpage_lis:
             hasta = (item.page * perpage_lis) + perpage_lis
+
             if hasta < num_matches:
                 itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='listas', text_color='coral' ))
 
@@ -349,8 +341,7 @@ def findvideos(item):
             elif 'subtítulos' in idioma: lang = 'Vose'	
             else: lang = 'VO'
         elif 'español' in idioma: lang = 'Esp'
-        else:
-           lang = '?'
+        else: lang = '?'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

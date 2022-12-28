@@ -78,12 +78,9 @@ def list_all(item):
 
     data = httptools.downloadpage(item.url).data
 
-    if '>Tendencias<' in data:
-        bloque = scrapertools.find_single_match(data, '>Tendencias<(.*?)>DoramedPlay.com<')
-    elif '>Ratings<' in data:
-        bloque = scrapertools.find_single_match(data, '>Ratings<(.*?)>DoramedPlay.com<')
-    else:
-        bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>DoramedPlay.com<')
+    if '>Tendencias<' in data: bloque = scrapertools.find_single_match(data, '>Tendencias<(.*?)>DoramedPlay.com<')
+    elif '>Ratings<' in data: bloque = scrapertools.find_single_match(data, '>Ratings<(.*?)>DoramedPlay.com<')
+    else: bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>DoramedPlay.com<')
 
     matches = re.compile('<article id="(.*?)</article>').findall(bloque)
 
@@ -91,17 +88,14 @@ def list_all(item):
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
-        if not title:
-            title = scrapertools.find_single_match(match, '<div class="title"> <h4>(.*?)</h4>')
+        if not title: title = scrapertools.find_single_match(match, '<div class="title"> <h4>(.*?)</h4>')
 
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, 'div class="metadata"> <span>(.*?)</span>')
-        if not year:
-            year = scrapertools.find_single_match(match, '</h3> <span>.*?,(.*?)</span>')
-
+        if not year: year = scrapertools.find_single_match(match, '</h3> <span>.*?,(.*?)</span>')
         if not year: year = '-'
 
         if '/movies/' in url:
@@ -112,14 +106,18 @@ def list_all(item):
         else:
             if item.search_type == 'movie': continue
 
+            if '(En Emisión)' in title: SerieName = title.split("(En Emisión)")[0]
+            else: SerieName = title
+
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year':year} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':year} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if '<div class="pagination">' in data:
             next_url = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "<a href='(.*?)'")
+
             if next_url:
                 if '/page/' in next_url:
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
@@ -153,10 +151,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -174,10 +168,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('DoramedPlay', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('DoramedPlay', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DoramedPlay', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DoramedPlay', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DoramedPlay', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('DoramedPlay', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for thumb, numer, url in matches[item.page * item.perpage:]:
         episode = scrapertools.find_single_match(numer, '.*?-(.*?)$').strip()
@@ -284,38 +303,41 @@ def list_search(item):
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
-        if not title:
-            title = scrapertools.find_single_match(match, '<div class="title"> <h4>(.*?)</h4>')
+        if not title: title = scrapertools.find_single_match(match, '<div class="title"> <h4>(.*?)</h4>')
 
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year">(\d+)</span>')
-
-        if not year:
-            year = '-'
+        if not year: year = '-'
 
         tipo = 'tvshow' if '/tvshows/' in url else 'movie'
-
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
-            if item.search_type == 'tvshow': continue
+            if item.search_type != 'all':
+                if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, 
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-        else:
-            if item.search_type == 'movie': continue
+
+        if tipo == 'tvshow':
+            if item.search_type != 'all':
+                if item.search_type == 'movie': continue
+
+            if '(En Emisión)' in title: SerieName = title.split("(En Emisión)")[0]
+            else: SerieName = title
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
+                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if '<div class="pagination">' in data:
             next_url = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "<a href='(.*?)'")
+
             if next_url:
                 if '/page/' in next_url:
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_search', text_color = 'coral' ))

@@ -12,12 +12,14 @@ def mainlist(item):
 
     item.category = 'TMDB'
 
+    itemlist.append(item.clone( action='show_help', title='[B]Información TMDB[/B]', folder=False, thumbnail=config.get_thumb('help'), text_color='green' ))
+
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( action='personas', search_type='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...',
+    itemlist.append(item.clone( action='personas', search_type='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...', thumbnail=config.get_thumb('search'),
                                 plot = 'Escribir el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
 
-    itemlist.append(item.clone( action='personas', search_type='crew', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...',
+    itemlist.append(item.clone( action='personas', search_type='crew', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...', thumbnail=config.get_thumb('search'),
                                 plot = 'Escribir el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen' ))
@@ -56,8 +58,6 @@ def mainlist(item):
         # ~ itemlist.append(item.clone( action='listado', search_type='tvshow', url = 'tv/airing_today', title='   - Que se emiten Hoy' ))
         itemlist.append(item.clone( action='generos', search_type='tvshow', title='   - Por género' ))
         itemlist.append(item.clone( action='anios', search_type='tvshow', title='   - Por año' ))
-
-    itemlist.append(item.clone( action='show_help', title='Información TMDB', folder=False, thumbnail=config.get_thumb('help'), text_color='green' ))
 
     return itemlist
 

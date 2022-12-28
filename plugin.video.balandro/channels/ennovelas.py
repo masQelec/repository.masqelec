@@ -47,7 +47,8 @@ def list_all(item):
     num_matches = len(matches)
 
     for url, thumb, title in matches[item.page * perpage:]:
-        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
+        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
+                                    page = 0,
                                     contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
@@ -98,12 +99,15 @@ def last_epis(item):
         epis = scrapertools.find_single_match(title, 'Capitulo (\d+)$')
         if not epis: epis = 1
 
-        if " - " in title: SerieName = title.split(" - ")[0]
-        elif " Temporada" in title: SerieName = title.split(" Temporada")[0]
-        elif " Capitulo" in title: SerieName = title.split(" Capitulo")[0]
-        else: SerieName = title
+        SerieName = title
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+        if " - " in title: SerieName = title.split(" - ")[0]
+        if " Temporada" in title: SerieName = title.split(" Temporada")[0]
+        if " Capitulo" in title: SerieName = title.split(" Capitulo")[0]
+
+        SerieName = SerieName.strip()
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, infoLabels={'year': '-'},
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= perpage: break
@@ -119,10 +123,6 @@ def last_epis(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -136,7 +136,7 @@ def episodios(item):
         matches = scrapertools.find_multiple_matches(data, patron)
 
         if matches:
-            platformtools.dialog_notification('EnrNovelas', '[COLOR cyan]Cargando elementos[/COLOR] página ' + str(pagina))
+            platformtools.dialog_notification('EnrNovelas', '[COLOR cyan]Cargando página ' + str(pagina) + '[/COLOR]')
 
             for thumb, url, title in matches:
                 epis = scrapertools.find_single_match(title, 'Capitulo (\d+)')

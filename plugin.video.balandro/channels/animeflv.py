@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www1.animeflv.bz/'
+host = 'https://www2.animeflv.bz/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www10.animeflv.cc/', 'https://www3.animeflv.net/', 'https://www3.animeflv.cc/',
-             'https://ww3.animeflv.cc/', 'https://animeflv.bz/'] 
+             'https://ww3.animeflv.cc/', 'https://animeflv.bz/', 'https://www1.animeflv.bz/'] 
 
 
 domain = config.get_setting('dominio', 'animeflv', default='')
@@ -86,7 +86,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=4',
                                 search_type = 'tvshow' ))
@@ -182,8 +182,16 @@ def list_all(item):
             itemlist.append(item.clone( action='findvideos', url=url if url.startswith('http') else host[:-1] + url, title=title, thumbnail=thumb,
                                         contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
         else:
-            itemlist.append(item.clone( action='episodios', url=url if url.startswith('http') else host[:-1] + url, title=title, thumbnail=thumb, 
-                                        contentType = 'tvshow', plot = info, contentSerieName = title, infoLabels={'year':'-'} ))
+            SerieName = title
+
+            if 'Season' in title: SerieName = title.split("Season")[0]
+            if 'Movie' in title: SerieName = title.split("Movie")[0]
+
+            SerieName = SerieName.strip()
+
+            itemlist.append(item.clone( action='episodios', url=url if url.startswith('http') else host[:-1] + url, title=title, thumbnail=thumb,
+                                        page = 0,
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-', 'plot': info} ))
 
         if len(itemlist) >= perpage: break
 
@@ -206,7 +214,7 @@ def list_all(item):
     return itemlist
 
 
-def list_epis(item):
+def last_epis(item):
     logger.info()
     itemlist = []
 
@@ -220,13 +228,22 @@ def list_epis(item):
     matches = re.compile(patron, re.DOTALL).findall(bloque)
 
     for url, thumb, episode, title in matches:
+        epis = episode.replace('Episodio', '').strip()
+
         episode = episode.replace('Episodio', 'epis.')
 
         title = episode + ' ' + title
 
+        SerieName = title
+
+        if 'Season' in title: SerieName = title.split("Season")[0]
+        if 'Movie' in title: SerieName = title.split("Movie")[0]
+
+        SerieName = SerieName.strip()
+
         if url:
-            itemlist.append(item.clone( action='findvideos', url = url if url.startswith('http') else host[:-1] + url, title = title,
-                                        thumbnail=thumb, contentType = 'episode'))
+            itemlist.append(item.clone( action='findvideos', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail=thumb,
+                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -247,10 +264,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('AnimeFlv', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('AnimeFlv', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('AnimeFlv', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('AnimeFlv', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('AnimeFlv', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('AnimeFlv', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     i = 0
 

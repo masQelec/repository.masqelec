@@ -189,6 +189,23 @@ def show_help_parameters(item):
 
         txt += '[CR]    ' + str(config.get_setting('search_included_all'))
 
+    filtros = {'searchable': True}
+    opciones = []
+
+    ch_list = channeltools.get_channels_list(filtros=filtros)
+
+    if ch_list:
+       txt_ch = ''
+
+       for ch in ch_list:
+           cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
+
+           if not config.get_setting(cfg_searchable_channel, default=False): continue
+
+           txt_ch += '[COLOR violet]%s[/COLOR]  ' % ch['name']
+
+       if txt_ch: txt += '[CR][CR] - [COLOR gold][B]Excluidos:[B][/COLOR]  %s' % str(txt_ch)
+
     if config.get_setting('search_excludes_movies', default=''):
         txt += '[CR][CR] - Canales excluidos en las búsquedas de [B][COLOR deepskyblue]Películas[/COLOR][/B]:'
 
@@ -429,10 +446,16 @@ def do_search(item, tecleado):
         if channels_search_excluded:
             channels_preselct = str(channels_search_excluded).replace('[', '').replace(']', ',')
             if ("'" + ch['id'] + "'") in str(channels_preselct):
-                if no_channels: platformtools.dialog_notification(ch['name'], '[B][COLOR %s]Ignorado por excluido[/COLOR][/B]' % color_exec)
+                if no_channels: platformtools.dialog_notification(ch['name'], '[B][COLOR %s]Ignorado por Excluido[/COLOR][/B]' % color_exec)
 
                 num_canales = num_canales - 1
                 continue
+
+        cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
+        if config.get_setting(cfg_searchable_channel, default=False):
+            if no_channels: platformtools.dialog_notification(ch['name'], '[B][COLOR %s]Ignorado por Excluido[/COLOR][/B]' % color_adver)
+            num_canales = num_canales - 1
+            continue
 
         if item.only_channels_group:
             if not ("'" + ch['id'] + "'") in str(item.only_channels_group):
@@ -584,18 +607,27 @@ def do_search(item, tecleado):
                         if 'problematic' in ch['clusters']: continue
 
                     if no_proxies:
-                        if only_includes:
-                            channels_preselct = str(only_includes).replace('[', '').replace(']', ',')
-                            if not ("'" + ch['id'] + "'") in str(channels_preselct):
-                                if no_channels: titulo = titulo + ' [COLOR yellow]Ignorado no está en Incluidos'
-
-                        elif 'proxies' in ch['notes'].lower():
+                        if 'proxies' in ch['notes'].lower():
                             if config.get_setting(cfg_proxies_channel, default=''):
                                 if no_channels: titulo = titulo + ' [COLOR yellow]Ignorado por proxies'
+                                continue
 
-                        elif channels_search_excluded:
-                            channels_preselct = str(channels_search_excluded).replace('[', '').replace(']', ',')
-                            if ("'" + ch['id'] + "'") in str(channels_preselct): titulo = titulo + ' [COLOR cyan]ignorado por excluido'
+                    if only_includes:
+                        channels_preselct = str(only_includes).replace('[', '').replace(']', ',')
+                        if not ("'" + ch['id'] + "'") in str(channels_preselct):
+                            if no_channels: titulo = titulo + ' [COLOR yellow]Ignorado no está en Incluidos'
+                            continue
+
+                    if channels_search_excluded:
+                        channels_preselct = str(channels_search_excluded).replace('[', '').replace(']', ',')
+                        if ("'" + ch['id'] + "'") in str(channels_preselct):
+                            if no_channels: titulo = titulo + ' [COLOR cyan]Ignorado por Excluido'
+                            continue
+
+                    cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
+                    if config.get_setting(cfg_searchable_channel, default=False):
+                        if no_channels: titulo = titulo + ' [COLOR cyan]Ignorado por Excluido'
+                        continue
 
                     else:
                        if only_prefered: continue
@@ -610,9 +642,14 @@ def do_search(item, tecleado):
                        else:
                            if channels_search_excluded:
                                channels_preselct = str(channels_search_excluded).replace('[', '').replace(']', ',')
-                               if ("'" + ch['id'] + "'") in str(channels_preselct): titulo = titulo + ' [COLOR cyan]ignorado por excluido'
+                               if ("'" + ch['id'] + "'") in str(channels_preselct):
+                                   if no_channels: titulo = titulo + ' [COLOR cyan]Ignorado por Excluido'
 
-                           else: titulo = titulo + ' [COLOR yellow]comprobar canal'
+                           else:
+                              cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
+                              if config.get_setting(cfg_searchable_channel, default=False):
+                                  if no_channels: titulo = titulo + ' [COLOR cyan]Ignorado por Excluido'
+                              else: titulo = titulo + ' [COLOR yellow]comprobar canal'
 
             nro += 1
 
@@ -627,6 +664,9 @@ def do_search(item, tecleado):
 
             context = []
 
+            tit = '[COLOR cyan][B]Cambios en Próximas Búsquedas[/B][/COLOR]'
+            context.append({'title': tit, 'channel': '', 'action': ''})
+
             if ' proxies' in titulo or 'sin resultados' in titulo:
                 tit = '[COLOR darkorange][B]Test Web del canal[/B][/COLOR]'
                 context.append({'title': tit, 'channel': item.channel, 'action': '_tests'})
@@ -640,6 +680,15 @@ def do_search(item, tecleado):
 
                     tit = '[COLOR %s][B]Configurar proxies a usar[/B][/COLOR]' % color_list_proxies
                     context.append({'title': tit, 'channel': item.channel, 'action': '_proxies'})
+
+            cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
+
+            if config.get_setting(cfg_searchable_channel, default=False):
+                tit = '[COLOR %s][B]Quitar exclusión en búsquedas[/B][/COLOR]' % color_adver
+                context.append({'title': tit, 'channel': item.channel, 'action': '_quitar_no_searchables'})
+            else:
+                tit = '[COLOR %s][B]Excluir de búsquedas[/B][/COLOR]' % color_adver
+                context.append({'title': tit, 'channel': item.channel, 'action': '_poner_no_searchables'})
 
             if ch['status'] != 1:
                 tit = '[COLOR %s][B]Marcar canal como Preferido[/B][/COLOR]' % color_list_prefe
@@ -684,12 +733,18 @@ def do_search(item, tecleado):
 def _tests(item):
     from modules import submnuctext
     submnuctext._test_webs(item)
-    return True
 
 
 def _proxies(item):
-    if platformtools.dialog_yesno(item.from_channel.capitalize(), '[COLOR yellow][B]Solo se tendrá en cuenta para próximas búsquedas[/B][/COLOR]','[COLOR red][B]¿ Desea efectuar una nueva búsqueda de proxies en el canal ?[/B][/COLOR]'):
+    if platformtools.dialog_yesno(item.from_channel.capitalize(), '[COLOR yellow][B]Solo se tendrán en cuenta para las próximas búsquedas[/B][/COLOR]','[COLOR red][B]¿ Desea efectuar una nueva búsqueda de proxies en el canal ?[/B][/COLOR]'):
         from modules import submnuctext
         submnuctext._proxies(item)
-        return True
 
+
+def _poner_no_searchables(item):
+    from modules import submnuctext
+    submnuctext._poner_no_searchable(item)
+
+def _quitar_no_searchables(item):
+    from modules import submnuctext
+    submnuctext._quitar_no_searchable(item)

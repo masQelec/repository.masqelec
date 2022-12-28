@@ -12,6 +12,12 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://wwu.repelishd.de/'
 
 
+embeds = 'repelishd.de'
+
+# ~ _player = 'https://gcs.megaplay.cc/'
+_player = 'https://players.oceanplay.me/'
+
+
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://repelishd.me/', 'https://www1.repelishd.de/', 'https://wwa.repelishd.de/',
              'https://wwi.repelishd.de/', 'https://wwo.repelishd.de/']
@@ -24,7 +30,7 @@ if domain:
     else: host = domain
 
 
-# ~ player 'https://player.repelishd.de'
+# ~ player 'https://player.repelishd.??'
 points = host.count('.')
 
 if points == 1:
@@ -85,7 +91,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('repelishd', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
-    if '<title>You are being redirected...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
@@ -122,6 +128,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(Item( channel='helper', action='show_help_repelishd', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -155,6 +163,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más destacadas', action = 'destacadas', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Superheroes', action = 'list_all', url = host + 'categoria/superheroes/', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Infantiles', action = 'list_all', url = host + 'categoria/infantil/', search_type = 'movie' ))
 
     if not descartar_anime:
@@ -177,7 +187,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'genero/serie-destacada/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + 'secciones/series-destacadas/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Superheroes', action = 'list_all', url = host + 'categoria/superheroes/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Infantiles', action = 'list_all', url = host + 'categoria/infantil/', search_type = 'tvshow' ))
 
@@ -221,10 +233,12 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host)
+    url = host + 'pelicula/'
+
+    data = do_downloadpage(url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '">Géneros<(.*?)>Años de Lanzamiento<')
+    bloque = scrapertools.find_single_match(data, '>Géneros</h2>(.*?)>Años de lanzamiento<')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href=(.*?)>(.*?)</a>')
 
@@ -323,10 +337,10 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    if '<h2>Añadido recientemente' in data:
-        bloque = scrapertools.find_single_match(data, '<h2>Añadido recientemente(.*?)>Géneros<')
+    if '<h2>Añadido recientemente' in data: bloque = scrapertools.find_single_match(data, '<h2>Añadido recientemente(.*?)>Géneros<')
     else:
-        bloque = scrapertools.find_single_match(data, '<h1>(.*?)>Géneros<')
+        if '/page/' in item.url: bloque = scrapertools.find_single_match(data, '</h1>(.*?)</h2>')
+        else: bloque = scrapertools.find_single_match(data, '<h1>(.*?)>Géneros<')
 
     matches = re.compile('<article(.*?)</article>').findall(bloque)
 
@@ -410,6 +424,7 @@ def temporadas(item):
 
     return itemlist
 
+
 def episodios(item):
     logger.info()
     itemlist = []
@@ -428,10 +443,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('RePelisHd', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('RePelisHd', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('RePelisHd', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('RePelisHd', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('RePelisHd', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('RePelisHd', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for datos in matches[item.page * item.perpage:]:
         thumb = scrapertools.find_single_match(datos, "src=(.*?)>").strip()
@@ -570,7 +610,7 @@ def findvideos(item):
 
                 if srv.lower() == 'descargar':
                     if not embed.startswith("http"):
-                        embed = 'https://embeds.repelishd.de/redirect?url=' + embed
+                        embed = 'https://embeds.' + embeds + '/redirect?url=' + embed
                         srv = 'directo'
 
                 servidor = corregir_servidor(srv)
@@ -594,7 +634,7 @@ def play(item):
 
     url = ''
 
-    if '/go.megaplay.cc/' in item.url or '/gcs.megaplay.cc/' in item.url or '/plays.megaplay.cc' in item.url:
+    if '/go.megaplay.cc/' in item.url or '/gcs.megaplay.cc/' in item.url or '/plays.megaplay.cc' in item.url or '/players.oceanplay.me/' in item.url:
         data = do_downloadpage(item.url)
 
         try:
@@ -602,9 +642,12 @@ def play(item):
 
             if '/go.megaplay.cc/' in item.url: url_post = 'https://go.megaplay.cc/r.php'
             elif '/gcs.megaplay.cc/' in item.url: url_post = 'https://gcs.megaplay.cc/r.php'
-            else: url_post = 'https://plays.megaplay.cc/r.php'
+            elif '/plays.megaplay.cc' in item.url: url_post = 'https://plays.megaplay.cc/r.php'
+            else: url_post = 'https://players.oceanplay.me/r.php'
 
-            url = httptools.downloadpage(url_post, post={key: value}, follow_redirects=False).headers['location']
+            # ~ url = httptools.downloadpage(url_post, post={key: value}, follow_redirects=False).headers['location']
+            url = httptools.downloadpage_proxy('repelishd', url_post, post={key: value}, follow_redirects=False).headers['location']
+
         except:
             url = scrapertools.find_single_match(data, 'location.href = "(.*?)"')
  
@@ -615,7 +658,7 @@ def play(item):
         new_url = new_url.replace('/download?url=', '')
 
         if new_url:
-            if not new_url.startswith("http"): new_url = 'https://embeds.repelishd.de/redirect?url=' + new_url
+            if not new_url.startswith("http"): new_url = 'https://embeds.' + embeds + '/redirect?url=' + new_url
 
             data = do_downloadpage(new_url)
 
@@ -642,13 +685,16 @@ def play(item):
             if 'action="r.php"' in data:
                 hash = scrapertools.find_single_match(data, 'value="(.*?)"')
                 post = {'h': hash}
-                _player = 'https://gcs.megaplay.cc/'
 
-                url = httptools.downloadpage(_player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
-
+                try:
+                    # ~ url = httptools.downloadpage(_player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                    url = httptools.downloadpage_proxy('repelishd', _player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                except:
+                    url = ''
         if not url:
             try:
-               url = httptools.downloadpage(url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
+               # ~ url = httptools.downloadpage(url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
+               url = httptools.downloadpage_proxy('repelishd', url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
             except:
                url = ''
 

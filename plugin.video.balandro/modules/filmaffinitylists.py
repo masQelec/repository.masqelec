@@ -12,7 +12,7 @@ from core import httptools, scrapertools, tmdb
 from modules import search
 
 
-host = "https://www.filmaffinity.com/es/"
+host = 'https://www.filmaffinity.com/es/'
 
 
 ruta_sel = 'topgen.php?country=%s&genre=%s&fromyear=%s&toyear=%s'
@@ -28,16 +28,16 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( action='listas', search_type='person', stype='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...',
+    itemlist.append(item.clone( action='listas', search_type='person', stype='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...', thumbnail=config.get_thumb('search'),
                                 plot = 'Escribir el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
 
-    itemlist.append(item.clone( action='listas', search_type='person', stype='director', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...',
+    itemlist.append(item.clone( action='listas', search_type='person', stype='director', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...', thumbnail=config.get_thumb('search'),
                                 plot = 'Escribir el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( action='listas', search_type='all', stype='title', title=' - Buscar [COLOR yellow]película y/ó serie[/COLOR] ...' ))
-    itemlist.append(item.clone( action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]documental[/COLOR] ...' ))
+    itemlist.append(item.clone( action='listas', search_type='all', stype='title', title=' - Buscar [COLOR yellow]película y/ó serie[/COLOR] ...', thumbnail=config.get_thumb('search'), ))
+    itemlist.append(item.clone( action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]documental[/COLOR] ...', thumbnail=config.get_thumb('search'), ))
 
     por_plataforma = False
     por_tema = False
@@ -85,7 +85,7 @@ def mainlist(item):
 
         itemlist.append(item.clone( title = '[B]Series:[/B]', thumbnail=config.get_thumb('tvshow'), action = '', text_color='hotpink' ))
 
-        itemlist.append(item.clone( title = ' - Premios Emmy', action = 'emmy_ediciones', url = host + 'awards.php?award_id=emmy&year=' ))
+        itemlist.append(item.clone( title = ' - Premios Emmy', action = 'emmy_ediciones', url = host + 'award_data.php?award_id=emmy&year=' ))
 
         itemlist.append(item.clone( title = ' - Las mejores', action = 'list_sel', url = host + ruta_sel + '&nodoc=1', cod_genre = 'TV_SE' ))
 
@@ -105,10 +105,10 @@ def mainlist(item):
 
     if not item.search_type:
         if config.get_setting('channels_link_main', default=True):
-            itemlist.append(item.clone( title = '[B]Películas y Series:[/B]', thumbnail=config.get_thumb('heart'), action = '', text_color='yellow' ))
+            itemlist.append(item.clone( title = '[B]Películas y Series:[/B]', thumbnail=config.get_thumb('booklet'), action = '', text_color='yellow' ))
 
-            itemlist.append(item.clone( title = ' - Novedades a la venta', action = 'list_all', url = host + 'cat_new_sa_es.html' ))
-            itemlist.append(item.clone( title = ' - Novedades en alquiler', action = 'list_all', url = host + 'cat_new_re_es.html' ))
+            itemlist.append(item.clone( title = ' - Novedades a la venta', action = 'list_all', url = host + 'cat_new_sa_es.html', thumbnail=config.get_thumb('novedades') ))
+            itemlist.append(item.clone( title = ' - Novedades en alquiler', action = 'list_all', url = host + 'cat_new_re_es.html', thumbnail=config.get_thumb('novedades') ))
 
     return itemlist
  
@@ -266,7 +266,7 @@ def generos(item):
           ('Terror', 'TE'),
           ('Thriller', 'TH'),
           ('Western', 'WE')
-    ]
+          ]
 
     ruta_gen = 'topgen.php?country=%s&genres=%s&fromyear=%s&toyear=%s'
 
@@ -286,23 +286,52 @@ def paises(item):
     itemlist = []
 
     labels_paises = [
-          ('Argentina','AR'), 
-          ('Australia','AU'), 
-          ('Bolivia','BO'), 
-          ('Canadá','CA'), 
-          ('Chile','CL'), 
-          ('Colombia','CO'), 
-          ('Costa Rica','CR'), 
-          ('Ecuador','EC'), 
-          ('España','ES'), 
-          ('Estados Unidos','US'), 
-          ('Irlanda','IE'), 
-          ('México','MX'), 
-          ('Perú','PE'), 
-          ('Reino Unido','gb'), 
-          ('Uruguay','UY'), 
-          ('Venezuela','VE') 
-    ]
+          ('Alemania', 'DE'),
+          ('Argentina', 'AR'),
+          ('Australia', 'AU'),
+          ('Austria', 'AT'),
+          ('Bélgica', 'BE'),
+          ('Bolivia', 'BO'),
+          ('Brasil', 'BR'),
+          ('Canadá', 'CA'),
+          ('Chile', 'CL'),
+          ('China', 'CN'),
+          ('Colombia', 'CO'),
+          ('Costa Rica', 'CR'),
+          ('Ecuador', 'EC'),
+          ('España', 'ES'),
+          ('Estados Unidos', 'US'),
+          ('Francia', 'FR'),
+          ('Guatemala', 'GT'),
+          ('Holanda', 'NL'),
+          ('Honduras', 'HN'),
+          ('India', 'IN'),
+          ('Irlanda', 'IE'),
+          ('Israel', 'IL'),
+          ('Italia', 'IT'),
+          ('Japón', 'JP'),
+          ('México', 'MX'),
+          ('Nicaragua', 'NI'),
+          ('Noruega', 'NO'),
+          ('Panamá', 'PA'),
+          ('Paraguay', 'PY'),
+          ('Perú', 'PE'),
+          ('Polonia', 'PL'),
+          ('Portugal', 'PT'),
+          ('Reino Unido', 'GB'),
+          ('Rep. Dominicana', 'DO'),
+          ('Rusia', 'RU'),
+          ('Sudafrica', 'ZA'),
+          ('Suecia', 'SE'),
+          ('Suiza', 'CH'),
+          ('Tailandia', 'TH'),
+          ('Taiwán', 'TW'),
+          ('Turquía', 'TR'),
+          ('Unión Soviética', 'ZY'),
+          ('Uruguay', 'UY'),
+          ('Venezuela', 'VE'),
+          ('Yugoeslavia', 'YU')
+          ]
 
     for pais in labels_paises:
         itemlist.append(item.clone ( title = pais[0], action = 'list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', cod_country = pais[1] ))
@@ -314,7 +343,7 @@ def anios(item):
     logger.info()
     itemlist = []
 
-    for x in range(current_year, 1899, -1):
+    for x in range(current_year, 1909, -1):
         anyo = str(x)
 
         itemlist.append(item.clone( title = anyo, action='list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', fromyear = anyo, toyear = anyo  ))
@@ -432,7 +461,9 @@ def list_oscars(item):
     for year, title, premios in matches:
         title = title.strip()
         premios = premios.replace('Oscar', '').strip()
-        titulo = '[COLOR tan][' + premios + '][/COLOR]  ' + title
+
+        if len(premios) == 2: titulo = '[COLOR tan][B]' + premios + '[/B][/COLOR]  ' + title
+        else: titulo = '[COLOR tan][B]  ' + premios + '[/B][/COLOR]  ' + title
 
         itemlist.append(item.clone( action = 'find_search', title = titulo, search_type = 'movie', name = title, contentType='movie',
                                     contentTitle = title, infoLabels = {'year': year} ))
@@ -452,7 +483,7 @@ def oscars_ediciones(item):
 
     for url, title, anyo in matches:
         title = title.strip()
-        if not title: title = anyo
+        if not title: title = 'Premios Oscars ' + anyo
 
         itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo ))
 
@@ -499,10 +530,12 @@ def emmy_ediciones(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, '<a class="award-years-link" title="(.*?)" href="(.*?)">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(data, '<td><a href="(.*?)".*?title="">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(data, '<td><a href="(.*?)" title="(.*?)">(.*?)</a>')
 
-    for title, url, anyo in matches:
-        title = title.replace('(Principales categorías)', '').replace('(principales categorías)', '').strip()
+    for url, title, anyo in matches:
+        title = title.strip()
+        if not title: title = 'Premios Emmy ' + anyo
 
         itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo ))
 
@@ -626,7 +659,9 @@ def list_sel(item):
         year = scrapertools.find_single_match(match, ' title=.*?</a>(.*?)<img').strip()
         year = year.replace('(', '').replace(')', '').strip()
 
-        if not year: year = '-'
+        if not year:
+            if item.toyear: year = item.toyear
+            else: year = '-'
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
         thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
@@ -711,7 +746,7 @@ def _oscars_categories(item):
 def _emmys(item):
     logger.info()
 
-    item.url = host + 'awards.php?award_id=emmy&year='
+    item.url = host + 'award_data.php?award_id=emmy&year='
 
     if item.origen == 'mnu_esp':
         return emmy_ediciones(item)
@@ -782,6 +817,17 @@ def _themes(item):
     item.url = host + 'topics.php'
 
     return temas(item)
+
+
+def _navidad(item):
+    logger.info()
+
+    item.page = 1
+    item.search_type = 'all'
+
+    item.url = host + 'movietopic.php?topic=308785&nodoc&attr=all&order=BY_YEAR'
+
+    return list_temas(item)
 
 
 def find_search(item):

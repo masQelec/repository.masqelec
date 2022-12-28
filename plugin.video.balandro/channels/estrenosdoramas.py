@@ -59,9 +59,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/doramas-online/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_episodes', url = host + 'category/ultimos-capitulos-online/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -152,6 +152,7 @@ def list_all(item):
     if itemlist:
         if "<div class='wp-pagenavi'" in data:
             next_url = scrapertools.find_single_match(data, "class='current'>" + '.*?href="(.*?)"')
+
             if next_url:
                 if '/page/' in next_url:
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
@@ -182,6 +183,7 @@ def last_episodes(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         season = 1
+
         epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
         if not epis: epis = 0
 
@@ -189,7 +191,7 @@ def last_episodes(item):
         titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
-                                    contentType = 'tvshow', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis,
+                                    contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis,
                                     infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -197,6 +199,7 @@ def last_episodes(item):
     if itemlist:
         if "<div class='wp-pagenavi'" in data:
             next_url = scrapertools.find_single_match(data, "class='current'>" + '.*?href="(.*?)"')
+
             if next_url:
                 if '/page/' in next_url:
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'last_episodes', text_color = 'coral' ))
@@ -218,10 +221,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -240,10 +239,35 @@ def episodios(item):
 
     if item.page == 0:
         sum_parts = len(matches)
-        if sum_parts > 250:
-            if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#039;', "'").replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos?'):
-                platformtools.dialog_notification('EstrenosDoramas', '[COLOR cyan]Cargando elementos[/COLOR]')
-                item.perpage = 250
+
+        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('EstrenosDoramas', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('EstrenosDoramas', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('EstrenosDoramas', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('EstrenosDoramas', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    item.perpage = 100
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('EstrenosDoramas', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
 
     for url, title in matches[item.page * item.perpage:]:
         if not 'Capitulo' in title: continue
@@ -296,6 +320,7 @@ def findvideos(item):
         else: lang = ''
 
         other = ''
+
         if servidor == 'directo':
             other = scrapertools.find_single_match(data, '<ul class="tabs">.*?<a href="#tab' + str(opt) + '">.*?<b>(.*?)</b>')
             other = other.replace('(', '').replace(')', '')
@@ -330,7 +355,7 @@ def play(item):
 
             data = resp.data
 
-            if 'pi76823.php' in item.url:
+            if 'pi76823.php' in item.url or 'pipi5558762.php' in item.url:
                 matches = re.compile('post\( "(.*?)", { key: \'(.*?)\'', re.DOTALL).findall(data)
 
                 for _page, _key in matches:
@@ -481,18 +506,6 @@ def play(item):
     return itemlist
 
 
-def search(item, texto):
-    logger.info()
-    try:
-        item.url = host + 'search/' + texto.replace(" ", "+")
-        return list_all(item)
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
-
-
 def set_player(secret):
     global GLBPLAYER
     GLBPLAYER = secret
@@ -583,3 +596,15 @@ def decodeone(w):
         i +=  str(chr(int(w[s:s+2], 36)))
 
     return i
+
+
+def search(item, texto):
+    logger.info()
+    try:
+        item.url = host + 'search/' + texto.replace(" ", "+")
+        return list_all(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []
