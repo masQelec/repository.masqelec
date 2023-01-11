@@ -439,7 +439,7 @@ def play(item):
                         if urlb.startswith('//') == True: urlb = 'https:' + urlb
 
                         if urlb.startswith('https://blenditall.com/playlist.m3u8?data='):
-                            itemlist.append(['m3u8', urlb])
+                            itemlist.append(item.clone(server = 'm3u8hls', url = urlb))
                             return itemlist
 
                         data = httptools.downloadpage(urlb).data
@@ -449,10 +449,11 @@ def play(item):
                         if new_url:
                             url = 'https://blenditall.com/playlist.m3u8?data=' + new_url
 
-                            itemlist.append(['m3u8', url])
+                            itemlist.append(item.clone(server = 'm3u8hls', url = url))
                             return itemlist
 
     if '/app.retrotvshows.com/' in url: url = ''
+    elif 'blenditall' in url:  url = ''
 
     if url:
         if url.startswith('//') == True: url = 'https:' + url

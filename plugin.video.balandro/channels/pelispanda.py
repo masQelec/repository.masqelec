@@ -121,6 +121,7 @@ def list_all(item):
 
     for match in matches:
         if '>Promoción<' in match: continue
+        elif 'NETFLIX PREMIUM' in match: continue
 
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
@@ -176,12 +177,13 @@ def temporadas(item):
 
         if len(temporadas) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 

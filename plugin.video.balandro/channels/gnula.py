@@ -9,13 +9,14 @@ from core import httptools, scrapertools, servertools, tmdb
 
 host = 'https://gnula.nu/'
 
+
 url_estrenos = host + 'peliculas-de-estreno/lista-de-peliculas-online-parte-1/'
 
 url_recomendadas = host + 'peliculas/lista-de-peliculas-recomendadas/'
 
 IDIOMAS = {'VC': 'Esp', 'VL': 'Lat', 'VS': 'Vose', 'castellano': 'Esp', 'latino': 'Lat', 'vose': 'Vose'}
 
-perpage = 15
+perpage = 30
 
 
 def item_configurar_proxies(item):
@@ -49,6 +50,7 @@ def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
 
+
 def do_downloadpage(url, post=None):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['http://gnula.nu/']
@@ -80,6 +82,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, group = 'estrenos' ))
+    itemlist.append(item.clone( title = 'Novedades', action = 'list_last', url = host, group = 'novedades' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_last', url = host, group = 'recomendadas' ))
+
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = url_estrenos ))
 
     itemlist.append(item.clone( title = 'Recomendadas', action = 'list_all', url = url_recomendadas ))
@@ -97,10 +103,13 @@ def generos(item):
     data = do_downloadpage(host + 'generos/lista-de-generos/')
 
     matches = re.compile('<td>\s*<strong>([^<]+)</strong>\s*\[<a href="([^"]+)" title="([^"]+)"', re.DOTALL).findall(data)
+
     for title, url, plot in matches:
         itemlist.append(item.clone( title=title, url=url, action='list_all', plot=plot ))
 
+
     matches = re.compile('<td>\s*<strong>([^<]+)</strong>\s*\[<a href="([^"]+)"', re.DOTALL).findall(data)
+
     for title, url in matches:
         if url in [it.url for it in itemlist]: continue # descartar repetidos
 
@@ -161,7 +170,10 @@ def list_all(item):
     for url, title, thumb, resto in list(matches)[item.page * perpage:]:
         year = scrapertools.find_single_match(url, '-(\d+)-online/$')
         spans = scrapertools.find_multiple_matches(resto, '<span style="[^"]+">([^<]+)</span>')
-        langs = []; quality = ''
+
+        langs = []
+        quality = ''
+
         for span in spans:
             if span.startswith('(') and span.endswith(')'):
                 lg = span[1:-1]
@@ -184,8 +196,38 @@ def list_all(item):
     return itemlist
 
 
+def list_last(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    if item.group == 'estrenos':
+        bloque = scrapertools.find_single_match(data, '<strong>ESTRENOS DE CINE</strong>(.*?)</table>')
+    elif item.group == 'novedades':
+        bloque = scrapertools.find_single_match(data, '<strong>NOVEDADES DE PELÍCULAS</strong>(.*?)</table>')
+    else:
+        bloque = scrapertools.find_single_match(data, '<strong>PELÍCULAS RECOMENDADAS</strong>(.*?)</table>')
+
+    matches = re.compile('<a href="(.*?)".*?alt="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
+
+    for url, title, thumb in list(matches):
+        title = title.replace('Poster pequeño de', '').strip()
+
+        titulo = title
+
+        if " (" in titulo: titulo = titulo.split(" (")[0]
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                        contentType='movie', contentTitle=titulo, infoLabels={'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
 def puntuar_calidad(txt):
-    orden = ['CAM', 'TS', 'TS-HQ', 'WEB-S', 'HD-S', 'DVD-S', 'BR-S', 'HD-TC', 'HD-TV', 'DVD-R', 'HD-R', 'BR-R']
+    orden = ['CAM', 'TS', 'TS-HQ', 'WEB-S', 'HC-CAM', 'HD-S', 'DVD-S', 'BR-S', 'HD-TC', 'HD-TV', 'DVD-R', 'HD-R', 'BR-R']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
@@ -197,6 +239,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
 
     matches = re.compile('<em>([^<]+)</em></p>(.*?)<table[^>]*>(.*?)</table>', re.DOTALL).findall(data)
+
     if len(matches) == 0:
         patron = '<strong>Ver película online</strong> \[<span style="[^"]*">([^<]+)</span>\](.*?)<table[^>]*>(.*?)</table>'
         matches = re.compile(patron, re.DOTALL).findall(data)
@@ -212,10 +255,10 @@ def findvideos(item):
         for url in links:
             if url.endswith('/soon') or url.startswith('http://soon.'): continue
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url,
-                                  language = IDIOMAS.get(lang, lang), quality = quality ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, language = IDIOMAS.get(lang, lang), quality = quality ))
 
         links = re.compile('<a href="([^"]+)', re.DOTALL).findall(tabla)
+
         for url in links:
             if url.endswith('/soon') or url.startswith('http://soon.'): continue
 
@@ -238,6 +281,7 @@ def search(item, texto):
 
         item.url = url_recomendadas
         itemlist2 = list_all(item)
+
         for it2 in itemlist2:
             if it2.url not in [it.url for it in itemlist]:
                 itemlist.append(it2)

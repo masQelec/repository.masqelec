@@ -1,5 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
+<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="19.6.105" provider-name="Team CoreELEC">
+  <requires><import addon="xbmc.python" version="3.0.0"/>
+
+  </requires>
+  <extension point="xbmc.service" library="default.py">
+    <provides></provides>
+  </extension>
+  <extension point="xbmc.python.script" library="download.py">
+    <provides></provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Tvheadend: a TV streaming server for Linux</summary>
+    <description>
+Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T
+    </description>
+    <disclaimer>
+
+    </disclaimer>
+    <platform>all</platform>
+    <news>
+105
+- tvh bump to eb59284 (master 2021.06.12)
+
+104
+- tvh bump to c66e3bc (master 2020.10.22)
+
+103
+- tvh bump to 0f13f59 (master 2020.07.07)
+
+102
+- tvh bump to 51a4c5b (master 2020.06.10)
+
+101
+- python3, tvh bump to 2af3b9e (master 2020.05.22)
+- update gnutls to 3.6.14
+
+100
+- initial CoreELEC version
+    </news>
+    <assets><icon>resources/icon.png</icon><fanart>resources/fanart.png</fanart>
+<screenshot>resources/screenshot-01.png</screenshot>
+<screenshot>resources/screenshot-02.png</screenshot>
+<screenshot>resources/screenshot-03.png</screenshot>
+<screenshot>resources/screenshot-04.png</screenshot>
+
+    </assets>
+  </extension>
+</addon>
+
 <addon id="plugin.video.amazon-test"
        name="Amazon VOD"
        version="0.9.5+matrix.1"
@@ -37,6 +86,135 @@
       <clearlogo>clearlogo.png</clearlogo>
     </assets>
   </extension>
+</addon>
+
+<addon id="plugin.video.elementum" name="Elementum" version="0.1.86" provider-name="elgatito">
+    <requires>
+        <import addon="xbmc.addon" version="16.0.0" />
+        <import addon="repository.elementum" optional="true" />
+        <import addon="script.module.kodi-six" />
+        <import addon="script.module.requests" />
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="navigation.py">
+        <provides></provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" start="startup" />
+    <extension point="xbmc.python.module" library="resources/site-packages" />
+    <extension point="xbmc.subtitle.module" library="navigation.py" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="ru">Elementum: Стриминг видео</summary>
+        <summary lang="en">Elementum: Media streaming</summary>
+        <summary lang="hr">Elementum: Medijsko strujanje</summary>
+        <summary lang="es">Elementum: Transmisión de medios</summary>
+        <summary lang="sv">Elementum: medieströmning</summary>
+        <description lang="ru">Elementum это дополнение для поиска и воспроизведения торрентов. Дополнение не ходит на запрещенные сайты самостоятельно. Хотя, для поиска используются дополнения (называемые провайдерами), которые устанавливаются отдельно.[CR]Этот проект является ответвлением хорошо извесных, но не поддерживаемых Pulsar/Quasar от steeve и scakemyer.</description>
+        <description lang="en">Elementum is a torrent finding and streaming engine. It doesn't go on torrent websites for legal reasons. However, it calls specially crafted add-ons (called providers) that are installed separately.[CR]This project is a fork of the well known, but no longer maintained Pulsar/Quasar projects from steeve and scakemyer.</description>
+        <description lang="hr">Elementum je pogon pretraživanja i strujanja. Ne posjećuje torrent web stranice iz pravnih razloga. Ipak, koristi posebno napravljene dodatke (nazvane pružatelji usluge) koji su instalirani odvojeno.[CR]Ovaj projekt je ogranak dobro poznatih, ali više ne održavanih Pulsar/Quasar projekata od autora steevea i scakemyera.</description>
+        <description lang="es">Elementum es un motor de búsqueda y transmisión torrent. No navega por sitios web torrent por razones legales. Sin embargo, llama a complementos especialmente diseñados para ello (denominados providers o proveedores) que se instalan por separado.[CR]Este proyecto es un fork de los bien conocidos, pero ya sin soporte proyectos Pulsar/Quasar de steeve y scakemyer.[CR]</description>
+        <description lang="sv">Elementum är en torrentsöknings- och strömningsmotor. Det går inte till torrentwebbplatser av juridiska skäl. Den anropar dock speciellt utformade tillägg (kallade leverantörer) som installeras separat.[CR]Detta projekt är en förgrening av de välkända, men inte längre underhållna Pulsar/Quasar-projekten av steeve och scakemyer. </description>
+        <disclaimer lang="ru">Автор дополнения не несёт ответственности за скачивание или поиск информации и содержимого в этом дополнении. Автор никак не связан с Kodi, командой Kodi, или XBMC Foundation.</disclaimer>
+        <disclaimer lang="en">The author does not own or host any content found within this Addon. The author is not connected to or in any other way affiliated with Kodi, Team Kodi, or the XBMC Foundation.</disclaimer>
+        <disclaimer lang="hr">Autor ovog dodatka ne posjeduje i ne distribuira bilo kakav sadržaj koji je pronađen. Autor nije povezan sa ili na bilo koji drugi način bilo sa Kodijem, Team Kodijem ili XBMC fundacijom.</disclaimer>
+        <disclaimer lang="es">El autor no posee ni aloja ningún contenido que se encuentre a través de este complemento. El autor no está unido ni relacionado de ninguna manera con Kodi, Team Kodi, o XBMC Foundation.</disclaimer>
+        <disclaimer lang="sv">Skaparen äger inte eller är värd av något innehåll som finns i detta tillägg. Författaren är inte ansluten till eller på något annat sätt en del av Kodi, Team Kodi eller XBMC Foundation.</disclaimer>
+        <language>en el es de fi fr he hr it nl pt ro sk sv</language>
+        <platform>all</platform>
+        <website>http://elementum.surge.sh/</website>
+        <source>https://github.com/elgatito/plugin.video.elementum</source>
+        <forum></forum>
+        <license>Non commercial. See https://github.com/elgatito/plugin.video.elementum/blob/master/LICENSE</license>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+            <screenshot>resources/screenshots/home.png</screenshot>
+            <screenshot>resources/screenshots/movies.png</screenshot>
+            <screenshot>resources/screenshots/webui.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="service.cloud.masqelec" name="Cloud masQelec" version="0.0.4" provider-name="Cloud masQelec">
+	<requires>
+		<import addon="xbmc.python" version="3.0.0"/>
+	</requires>
+	<extension point="xbmc.service" library="autoexec.py">
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="es_ES">Cloud masQelec mantiene actualizada tu biblioteca.</summary>
+		<description lang="es_ES">Cloud masQelec mantiene actualizada tu biblioteca.</description>
+		<platform>all</platform>
+		<license>GNU GENERAL PUBLIC LICENSE Version 2</license>
+	</extension>
+</addon>
+
+<addon id="plugin.video.balandro" name="Balandro" version="2.5.5" provider-name="Balandro Team">
+  <requires>
+     <import addon="script.module.requests"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <summary>Balandro es un Navegador de páginas Webs</summary>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.png</fanart>
+    </assets>
+    <news>
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]2.5.5[/COLOR][COLOR red]  Enero 2023[/B][/COLOR]
+
+    [COLOR goldenrod][B]Media Centers Soportados[/COLOR][COLOR plum]  20.x,  19.x,  18.x  y  17.x[/B][/COLOR]
+
+    [COLOR springgreen][B]Fuente:[/COLOR]  [COLOR cyan]balandro-tk.github.io/balandro/[/B][/COLOR]
+
+    [COLOR limegreen][B]Contacto:[/B][/COLOR]
+        Foro  mimediacenter.info/foro/
+        Telegram  t.me/@balandro_asesor
+
+    [COLOR blue][B]Agradecimientos:[/B][/COLOR]
+        Cita destacada a los miembros de Balandro Team
+        Mención especial al grupo de Balandro Checkers
+
+    [COLOR cyan][B]Canales:[/B][/COLOR]
+        Revisión Generalizada
+        Nuevos - Sin novedades
+        Anulados - Las webs cerradas
+
+    [COLOR springgreen][B]Servidores:[/B][/COLOR]
+        Revisión Generalizada
+        Nuevos - Sin novedades
+        Anulados - Las webs cerradas
+    </news>
+    <summary>Balandro es un navegador de páginas webs</summary>
+    <description>[COLOR yellow][B]Balandro es desde el año [COLOR cyan]2018[COLOR yellow] un MOD derivado de Pelisalacarta y Alfa,[COLOR mediumaquamarine] y tiene como objeto, permitir visualizar Películas, Series y Documentales, todo a través de Internet y directamente desde su sistema Media Center. [COLOR orchid]Este Add-On es tan solo un mero Ejercicio de Aprendizaje del Lenguaje de Programación Python y se distribuye sin Ningún Contenido Multimedia adjunto al mismo [COLOR lightgrey][I]En consecuencia solo las Webs son Plenamente Responsables de los contenidos que publiquen.[/I][/B][/COLOR]</description>
+    <disclaimer>[COLOR tan][B]Está Prohibida su distribución, solo ó junto con Contenidos Multimedia Protegidos por los Derechos de Autor. [COLOR chocolate]Si este tipo de contenido está Prohibido en su País, solamente Usted será el Responsable de su uso. [COLOR white]La vulneración de estas prohibiciones Exonerarán de cualquier Culpa a sus Autores, [COLOR red]Siendo el unico Responsable quien lo haya Distribuido ó Utilizado Ilegalmente.[/B][/COLOR]</disclaimer>
+    <platform>all</platform>
+    <license>GNU GPL v3</license>
+    <source>https://balandro-tk.github.io/balandro/</source>
+    <forum>https://www.mimediacenter.info/foro/</forum>
+  </extension>
+
+  <extension point="xbmc.service" library="services.py" start="login|startup"/>
+</addon>
+
+    <addon id="repository.masQelec" name="masQelec Repository" version="1.0.0" provider-name="masQelec">
+        <requires>
+            <import addon="xbmc.addon" version="12.0.0"/>
+        </requires>
+        <extension point="xbmc.addon.repository" name="masQelec Repository">
+            <info compressed="false">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/</datadir>
+            <hashes>false</hashes>
+        </extension>
+        <extension point="xbmc.addon.metadata">
+            <summary>masQelec Repository</summary>
+		<description lang="en">The masQelec add-on repository contains Kodi PVR Clients and Servers, Screensavers, Visualisations, and more. Add-ons in this repository are maintained and supported by masQelec staff and YOU the community. If you find a broken or non-working add-on please report it via the forums, or help by submitting fixes via GitHub.</description>
+		<description lang="es">El repositorio de complementos masQelec contiene clientes y servidores Kodi PVR, protectores de pantalla, visualizaciones y más. Los complementos en este repositorio son mantenidos y respaldados por el personal de masQelec y USTED la comunidad. Si encuentra un complemento roto o que no funciona, infórmelo a través de los foros o ayude enviando soluciones a través de GitHub.</description>
+            <platform>all</platform>
+    </extension>
 </addon>
 
 <addon id="pvr.hts" version="19.0.6.1" name="Tvheadend HTSP Client" provider-name="Adam Sutton, Sam Stenvall, Lars Op den Kamp, Kai Sommerfeld">
@@ -166,183 +344,5 @@
     <description lang="zh_CN">Tvheadend 前端，支持直播电视和录像流媒体、电子节目单、定时器</description>
     <description lang="zh_TW">Tvheadend前端，支援的串流媒體包含有直播電視和錄製節目，電子節目表，定時器 等</description>
   </extension>
-</addon>
-
-<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="19.6.105" provider-name="Team CoreELEC">
-  <requires><import addon="xbmc.python" version="3.0.0"/>
-
-  </requires>
-  <extension point="xbmc.service" library="default.py">
-    <provides></provides>
-  </extension>
-  <extension point="xbmc.python.script" library="download.py">
-    <provides></provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <summary>Tvheadend: a TV streaming server for Linux</summary>
-    <description>
-Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T
-    </description>
-    <disclaimer>
-
-    </disclaimer>
-    <platform>all</platform>
-    <news>
-105
-- tvh bump to eb59284 (master 2021.06.12)
-
-104
-- tvh bump to c66e3bc (master 2020.10.22)
-
-103
-- tvh bump to 0f13f59 (master 2020.07.07)
-
-102
-- tvh bump to 51a4c5b (master 2020.06.10)
-
-101
-- python3, tvh bump to 2af3b9e (master 2020.05.22)
-- update gnutls to 3.6.14
-
-100
-- initial CoreELEC version
-    </news>
-    <assets><icon>resources/icon.png</icon><fanart>resources/fanart.png</fanart>
-<screenshot>resources/screenshot-01.png</screenshot>
-<screenshot>resources/screenshot-02.png</screenshot>
-<screenshot>resources/screenshot-03.png</screenshot>
-<screenshot>resources/screenshot-04.png</screenshot>
-
-    </assets>
-  </extension>
-</addon>
-
-<addon id="plugin.video.balandro" name="Balandro" version="2.5.4" provider-name="Balandro Team">
-  <requires>
-     <import addon="script.module.requests"/>
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="default.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <summary>Balandro es un Navegador de páginas Webs</summary>
-    <assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.png</fanart>
-    </assets>
-    <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]2.5.1[/COLOR][COLOR red]  Noviembre 2022[/B][/COLOR]
-
-    [COLOR goldenrod][B]Media Centers Soportados[/COLOR][COLOR plum]  20.x,  19.x,  18.x  y  17.x[/B][/COLOR]
-
-    [COLOR springgreen][B]Fuente:[/COLOR]  [COLOR cyan]balandro-tk.github.io/balandro/[/B][/COLOR]
-
-    [COLOR limegreen][B]Contacto:[/B][/COLOR]
-        Foro  mimediacenter.info/foro/
-        Telegram  t.me/@balandro_asesor
-
-    [COLOR blue][B]Agradecimientos:[/B][/COLOR]
-        Cita destacada a los miembros de Balandro Team
-        Mención especial al grupo de Balandro Checkers
-
-    [COLOR cyan][B]Canales:[/B][/COLOR]
-        Revisión Generalizada
-        Nuevos - Sin novedades
-        Anulados - Las webs cerradas
-
-    [COLOR springgreen][B]Servidores:[/B][/COLOR]
-        Revisión Generalizada
-        Nuevos - Sin novedades
-        Anulados - Las webs cerradas
-    </news>
-    <summary>Balandro es un navegador de páginas webs</summary>
-    <description>[COLOR yellow][B]Balandro es desde el año [COLOR cyan]2018[COLOR yellow] un MOD derivado de Pelisalacarta y Alfa,[COLOR mediumaquamarine] y tiene como objeto, permitir visualizar Películas, Series y Documentales, todo a través de Internet y directamente desde su sistema Media Center. [COLOR orchid]Este Add-On es tan solo un mero Ejercicio de Aprendizaje del Lenguaje de Programación Python y se distribuye sin Ningún Contenido Multimedia adjunto al mismo [COLOR lightgrey][I]En consecuencia solo las Webs son Plenamente Responsables de los contenidos que publiquen.[/I][/B][/COLOR]</description>
-    <disclaimer>[COLOR tan][B]Está Prohibida su distribución, solo ó junto con Contenidos Multimedia Protegidos por los Derechos de Autor. [COLOR chocolate]Si este tipo de contenido está Prohibido en su País, solamente Usted será el Responsable de su uso. [COLOR white]La vulneración de estas prohibiciones Exonerarán de cualquier Culpa a sus Autores, [COLOR red]Siendo el unico Responsable quien lo haya Distribuido ó Utilizado Ilegalmente.[/B][/COLOR]</disclaimer>
-    <platform>all</platform>
-    <license>GNU GPL v3</license>
-    <source>https://balandro-tk.github.io/balandro/</source>
-    <forum>https://www.mimediacenter.info/foro/</forum>
-  </extension>
-
-  <extension point="xbmc.service" library="services.py" start="login|startup"/>
-</addon>
-
-<addon id="service.cloud.masqelec" name="Cloud masQelec" version="0.0.4" provider-name="Cloud masQelec">
-	<requires>
-		<import addon="xbmc.python" version="3.0.0"/>
-	</requires>
-	<extension point="xbmc.service" library="autoexec.py">
-	</extension>
-	<extension point="xbmc.addon.metadata">
-		<summary lang="es_ES">Cloud masQelec mantiene actualizada tu biblioteca.</summary>
-		<description lang="es_ES">Cloud masQelec mantiene actualizada tu biblioteca.</description>
-		<platform>all</platform>
-		<license>GNU GENERAL PUBLIC LICENSE Version 2</license>
-	</extension>
-</addon>
-
-<addon id="plugin.video.elementum" name="Elementum" version="0.1.86" provider-name="elgatito">
-    <requires>
-        <import addon="xbmc.addon" version="16.0.0" />
-        <import addon="repository.elementum" optional="true" />
-        <import addon="script.module.kodi-six" />
-        <import addon="script.module.requests" />
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="navigation.py">
-        <provides></provides>
-    </extension>
-    <extension point="xbmc.service" library="service.py" start="startup" />
-    <extension point="xbmc.python.module" library="resources/site-packages" />
-    <extension point="xbmc.subtitle.module" library="navigation.py" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="ru">Elementum: Стриминг видео</summary>
-        <summary lang="en">Elementum: Media streaming</summary>
-        <summary lang="hr">Elementum: Medijsko strujanje</summary>
-        <summary lang="es">Elementum: Transmisión de medios</summary>
-        <summary lang="sv">Elementum: medieströmning</summary>
-        <description lang="ru">Elementum это дополнение для поиска и воспроизведения торрентов. Дополнение не ходит на запрещенные сайты самостоятельно. Хотя, для поиска используются дополнения (называемые провайдерами), которые устанавливаются отдельно.[CR]Этот проект является ответвлением хорошо извесных, но не поддерживаемых Pulsar/Quasar от steeve и scakemyer.</description>
-        <description lang="en">Elementum is a torrent finding and streaming engine. It doesn't go on torrent websites for legal reasons. However, it calls specially crafted add-ons (called providers) that are installed separately.[CR]This project is a fork of the well known, but no longer maintained Pulsar/Quasar projects from steeve and scakemyer.</description>
-        <description lang="hr">Elementum je pogon pretraživanja i strujanja. Ne posjećuje torrent web stranice iz pravnih razloga. Ipak, koristi posebno napravljene dodatke (nazvane pružatelji usluge) koji su instalirani odvojeno.[CR]Ovaj projekt je ogranak dobro poznatih, ali više ne održavanih Pulsar/Quasar projekata od autora steevea i scakemyera.</description>
-        <description lang="es">Elementum es un motor de búsqueda y transmisión torrent. No navega por sitios web torrent por razones legales. Sin embargo, llama a complementos especialmente diseñados para ello (denominados providers o proveedores) que se instalan por separado.[CR]Este proyecto es un fork de los bien conocidos, pero ya sin soporte proyectos Pulsar/Quasar de steeve y scakemyer.[CR]</description>
-        <description lang="sv">Elementum är en torrentsöknings- och strömningsmotor. Det går inte till torrentwebbplatser av juridiska skäl. Den anropar dock speciellt utformade tillägg (kallade leverantörer) som installeras separat.[CR]Detta projekt är en förgrening av de välkända, men inte längre underhållna Pulsar/Quasar-projekten av steeve och scakemyer. </description>
-        <disclaimer lang="ru">Автор дополнения не несёт ответственности за скачивание или поиск информации и содержимого в этом дополнении. Автор никак не связан с Kodi, командой Kodi, или XBMC Foundation.</disclaimer>
-        <disclaimer lang="en">The author does not own or host any content found within this Addon. The author is not connected to or in any other way affiliated with Kodi, Team Kodi, or the XBMC Foundation.</disclaimer>
-        <disclaimer lang="hr">Autor ovog dodatka ne posjeduje i ne distribuira bilo kakav sadržaj koji je pronađen. Autor nije povezan sa ili na bilo koji drugi način bilo sa Kodijem, Team Kodijem ili XBMC fundacijom.</disclaimer>
-        <disclaimer lang="es">El autor no posee ni aloja ningún contenido que se encuentre a través de este complemento. El autor no está unido ni relacionado de ninguna manera con Kodi, Team Kodi, o XBMC Foundation.</disclaimer>
-        <disclaimer lang="sv">Skaparen äger inte eller är värd av något innehåll som finns i detta tillägg. Författaren är inte ansluten till eller på något annat sätt en del av Kodi, Team Kodi eller XBMC Foundation.</disclaimer>
-        <language>en el es de fi fr he hr it nl pt ro sk sv</language>
-        <platform>all</platform>
-        <website>http://elementum.surge.sh/</website>
-        <source>https://github.com/elgatito/plugin.video.elementum</source>
-        <forum></forum>
-        <license>Non commercial. See https://github.com/elgatito/plugin.video.elementum/blob/master/LICENSE</license>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-            <screenshot>resources/screenshots/home.png</screenshot>
-            <screenshot>resources/screenshots/movies.png</screenshot>
-            <screenshot>resources/screenshots/webui.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-    <addon id="repository.masQelec" name="masQelec Repository" version="1.0.0" provider-name="masQelec">
-        <requires>
-            <import addon="xbmc.addon" version="12.0.0"/>
-        </requires>
-        <extension point="xbmc.addon.repository" name="masQelec Repository">
-            <info compressed="false">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/addons.xml</info>
-            <checksum>https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/addons.xml.md5</checksum>
-            <datadir zip="true">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_19/addons/1.0/Amlogic/arm/</datadir>
-            <hashes>false</hashes>
-        </extension>
-        <extension point="xbmc.addon.metadata">
-            <summary>masQelec Repository</summary>
-		<description lang="en">The masQelec add-on repository contains Kodi PVR Clients and Servers, Screensavers, Visualisations, and more. Add-ons in this repository are maintained and supported by masQelec staff and YOU the community. If you find a broken or non-working add-on please report it via the forums, or help by submitting fixes via GitHub.</description>
-		<description lang="es">El repositorio de complementos masQelec contiene clientes y servidores Kodi PVR, protectores de pantalla, visualizaciones y más. Los complementos en este repositorio son mantenidos y respaldados por el personal de masQelec y USTED la comunidad. Si encuentra un complemento roto o que no funciona, infórmelo a través de los foros o ayude enviando soluciones a través de GitHub.</description>
-            <platform>all</platform>
-    </extension>
 </addon>
 </addons>

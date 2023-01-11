@@ -165,6 +165,8 @@ def submnu_special(item):
 
             itemlist.append(item.clone( channel='filmaffinitylists', action='_genres', title=' - Por género', thumbnail=config.get_thumb('listgenres'), search_type = 'all' ))
 
+            itemlist.append(item.clone( channel='filmaffinitylists', action='paises', title=' - Por país', thumbnail=thumb_filmaffinity, search_type = 'all' ))
+
             itemlist.append(item.clone( channel='filmaffinitylists', action='_years', title=' - Por año', thumbnail=config.get_thumb('listyears'), search_type = 'all' ))
 
             itemlist.append(item.clone( channel='filmaffinitylists', action='_themes', title=' - Por tema', thumbnail=config.get_thumb('listthemes'), search_type = 'all' ))
@@ -271,7 +273,7 @@ def submnu_search(item):
 
     itemlist.append(item.clone( action='', title= '[B]Configuración:[/B]', folder=False, text_color='goldenrod' ))
 
-    itemlist.append(item.clone( channel='actions', title=' - Ajustes categorías [COLOR goldenrod]proxies y buscar[/COLOR]', action = 'open_settings',
+    itemlist.append(item.clone( channel='actions', title=' - [COLOR chocolate]Ajustes[/COLOR] categorías ([COLOR red][B]Proxies[/B][/COLOR] y [COLOR yellow][B]Buscar[/B][/COLOR])', action = 'open_settings',
                                 thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( channel='search', action='show_help', title='[COLOR green][B]Información búsquedas[/B][/COLOR]',
@@ -396,6 +398,9 @@ def _dominios(item):
     elif item.from_channel == 'entrepeliculasyseries':
         domains.manto_domain_entrepeliculasyseries(item)
 
+    elif item.from_channel == 'gnula24':
+        domains.manto_domain_gnula24(item)
+
     elif item.from_channel == 'grantorrent':
         domains.manto_domain_grantorrent(item)
 
@@ -428,6 +433,9 @@ def _dominios(item):
 
     elif item.from_channel == 'pelispedia':
         domains.manto_domain_pelispedia(item)
+
+    elif item.from_channel == 'pelispediaws':
+        domains.manto_domain_pelispediaws(item)
 
     elif item.from_channel == 'pelisplus':
         domains.manto_domain_pelisplus(item)
@@ -475,6 +483,10 @@ def _dominio_vigente(item):
     if item.from_channel == 'hdfull':
         item.desde_el_canal = True
         domains.last_domain_hdfull(item)
+
+    elif item.from_channel == 'hdfullse':
+        item.desde_el_canal = True
+        domains.last_domain_hdfullse(item)
 
     elif item.from_channel == 'dontorrents':
         item.desde_el_canal = True
@@ -529,6 +541,9 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'entrepeliculasyseries':
         domains.manto_domain_entrepeliculasyseries(item)
 
+    elif item.from_channel == 'gnula24':
+        domains.manto_domain_gnula24(item)
+
     elif item.from_channel == 'grantorrent':
         domains.manto_domain_grantorrent(item)
 
@@ -558,6 +573,9 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'pelismaraton':
         domains.manto_domain_pelismaraton(item)
+
+    elif item.from_channel == 'pelispediaws':
+        domains.manto_domain_pelispediaws(item)
 
     elif item.from_channel == 'pelispedia':
         domains.manto_domain_pelispedia(item)
@@ -693,6 +711,11 @@ def _proxies(item):
         item.channel = 'animefenix'
         animefenix.configurar_proxies(item)
 
+    elif item.from_channel == 'animeonline':
+        from channels import animeonline
+        item.channel = 'animeonline'
+        animeonline.configurar_proxies(item)
+
     elif item.from_channel == 'cinecalidad':
         from channels import cinecalidad
         item.channel = 'cinecalidad'
@@ -779,11 +802,6 @@ def _proxies(item):
         hdfull.configurar_proxies(item)
         refrescar = True
 
-    elif item.from_channel == 'hdfullcom':
-        from channels import hdfullcom
-        item.channel = 'hdfullcom'
-        hdfullcom.configurar_proxies(item)
-
     elif item.from_channel == 'hdfullse':
         from channels import hdfullse
         item.channel = 'hdfullse'
@@ -867,11 +885,6 @@ def _proxies(item):
         from channels import pelispedia
         item.channel = 'pelispedia'
         pelispedia.configurar_proxies(item)
-
-    elif item.from_channel == 'pelispedia2':
-        from channels import pelispedia2
-        item.channel = 'pelispedia2'
-        pelispedia2.configurar_proxies(item)
 
     elif item.from_channel == 'pelisplanet':
         from channels import pelisplanet

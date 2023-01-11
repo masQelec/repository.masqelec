@@ -192,6 +192,7 @@ def temporadas(item):
         data_epi = json_data[elem]
 
         platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]Temporada' + str(i) + '[/COLOR]')
+        item.page = 0
         item.data_epi = data_epi
         item.hash = hash
         item.contentType = 'season'
@@ -209,7 +210,7 @@ def temporadas(item):
 
         titulo = 'Temporada ' + season
 
-        itemlist.append(item.clone( action = 'episodios', title = titulo, data_epi = data_epi, hash = hash,
+        itemlist.append(item.clone( action = 'episodios', title = titulo, page = 0, data_epi = data_epi, hash = hash,
                                     contentType = 'season', contentSeason = season ))
 
     tmdb.set_infoLabels(itemlist)

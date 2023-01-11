@@ -303,6 +303,8 @@ def episodios(item):
         if item.contentSerieName: titulo = item.contentSerieName
         else: titulo = item.contentTitle
 
+        if item.contentType == 'movie': item.contentSeason = 1
+
         title = str(item.contentSeason) + 'x' + str(epis) + ' ' + titulo
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,

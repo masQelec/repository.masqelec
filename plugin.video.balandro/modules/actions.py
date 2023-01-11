@@ -51,7 +51,7 @@ def _marcar_canales(item):
             platformtools.dialog_notification(config.__addon_name, el_canal)
             return
 
-        if not platformtools.dialog_yesno(config.__addon_name + ' - ' + item.canal.capitalize(), '[COLOR red]¿ Confirma cambiar la personalización del canal ?[/COLOR]', 'de:  [COLOR cyan]' + ant_tipo + '[/COLOR]', 'a:    [COLOR yellow]' + new_tipo + '[/COLOR]'): 
+        if not platformtools.dialog_yesno(config.__addon_name + ' - ' + item.canal.capitalize(), '[COLOR red][B]¿ Confirma cambiar la personalización del canal ?[/B][/COLOR]', 'de:  [COLOR cyan]' + ant_tipo + '[/COLOR]', 'a:    [COLOR yellow]' + new_tipo + '[/COLOR]'): 
             return
 
     config.set_setting('status', item.estado, item.canal)
@@ -110,15 +110,15 @@ def manto_last_fix(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero Fix[/COLOR][/B]' % color_infor)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar el fichero de control FIX ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero de control FIX ?[/B][/COLOR]'):
         filetools.remove(path)
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero de control FIX eliminado[/B][/COLOR]' % color_infor)
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero control FIX eliminado[/B][/COLOR]' % color_infor)
 
 
 def drop_db_cache(item):
     logger.info()
 
-    if platformtools.dialog_yesno('Borrar Caché Tmdb', '[COLOR red]¿ Eliminar Todos los registros de la caché de Tmdb ?[/COLOR]'): 
+    if platformtools.dialog_yesno('Borrar Caché Tmdb', '[COLOR red][B]¿ Eliminar Todos los registros de la caché de Tmdb ?[/B][/COLOR]'): 
         from core import tmdb
         if tmdb.drop_bd():
             platformtools.dialog_notification(config.__addon_name, 'Caché Tmdb borrada', time=2000, sound=False)
@@ -143,9 +143,9 @@ def clean_db_cache(item):
     c.execute('SELECT COUNT() FROM tmdb_cache WHERE added < ?', (fecha_caducidad,))
     numregs_expired = c.fetchone()[0]
 
-    txt = 'El caché de Tmdb ocupa [COLOR gold]%s[/COLOR]' % config.format_bytes(filetools.getsize(fname))
-    txt += ' y contiene [COLOR gold]%s[/COLOR] registros.' % numregs
-    txt += ' ¿ Borrar los [COLOR blue]%s[/COLOR] registros que tienen más de un mes de antiguedad de Tmdb ?' % numregs_expired
+    txt = 'El caché de Tmdb ocupa [COLOR gold][B]%s[/B][/COLOR]' % config.format_bytes(filetools.getsize(fname))
+    txt += ' y contiene [COLOR gold][B]%s[[/B]/COLOR] registros.' % numregs
+    txt += ' ¿ Borrar los [COLOR blue][B]%s[/B][/COLOR] registros que tienen más de un mes de antiguedad de Tmdb ?' % numregs_expired
 
     if platformtools.dialog_yesno('Limpiar la caché de Tmdb', txt): 
         c.execute('DELETE FROM tmdb_cache WHERE added < ?', (fecha_caducidad,))
@@ -231,10 +231,34 @@ def search_trailers(item):
 def global_proxies(item):
     logger.info()
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow]¿ Confirma Obtener Proxies en los canales que los necesiten ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow][B]¿ Confirma Obtener Proxies en los canales que los necesiten ?[/B][/COLOR]'):
         from modules import proxysearch
 
         proxysearch.proxysearch_all(item)
+
+
+def manto_domains(item):
+    logger.info()
+
+    from core import channeltools
+
+    filtros = {}
+
+    ch_list = channeltools.get_channels_list(filtros=filtros)
+
+    if not ch_list:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales de este tipo[/B][/COLOR]' % color_adver)
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar los Dominios memorizados en Todos los canales que los tengan?[/B][/COLOR]'):
+       for ch in ch_list:
+           if not 'current' in ch['clusters']: continue
+
+           cfg_domain_channel = 'channel_' + ch['name'] + '_dominio'
+
+           if config.get_setting(cfg_domain_channel, default=''): config.set_setting(cfg_domain_channel, '')
+
+       platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Dominios eliminados[/B][/COLOR]' % color_infor)
 
 
 def manto_proxies(item):
@@ -250,10 +274,9 @@ def manto_proxies(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales de este tipo[/B][/COLOR]' % color_adver)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los Proxies memorizados en Todos los canales que los tengan?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar los Proxies memorizados en Todos los canales que los tengan?[/B][/COLOR]'):
        for ch in ch_list:
-           if not 'proxies' in ch['notes'].lower():
-               continue
+           if not 'proxies' in ch['notes'].lower(): continue
 
            # por NAME anteriores a 2.0
            cfg_proxies_channel = 'channel_' + ch['name'] + '_proxies'
@@ -289,7 +312,7 @@ def manto_proxies(item):
 def manto_params(item):
     logger.info()
 
-    if platformtools.dialog_yesno(config.__addon_name, "Se quitarán: 'Logins' en canales, 'Dominios' seleccionados en los canales, 'Canales Incluidos/Excluidos' en búsquedas, 'Canales Excluidos' en buscar proxies global, y se Inicializarán otros 'Parámetros'.", '[COLOR yellow]¿ Confirma Restablecer a sus valores por defecto los Parámetros Internos del addon ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, "Se quitarán: 'Logins' en canales, 'Dominios' seleccionados en los canales, 'Canales Incluidos/Excluidos' en búsquedas, 'Canales Excluidos' en buscar proxies global, y se Inicializarán otros 'Parámetros'.", '[COLOR yellow][B]¿ Confirma Restablecer a sus valores por defecto los Parámetros Internos del addon ?[/B][/COLOR]'):
         config.set_setting('adults_password', '')
 
         config.set_setting('channel_animefenix_dominio', '')
@@ -306,6 +329,8 @@ def manto_params(item):
         config.set_setting('channel_elifilms_dominio', '')
         config.set_setting('channel_elitetorrent_dominio', '')
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
+
+        config.set_setting('channel_gnula24_dominio', '')
         config.set_setting('channel_grantorrent_dominio', '')
         config.set_setting('channel_grantorrents_dominio', '')
 
@@ -322,6 +347,7 @@ def manto_params(item):
         config.set_setting('channel_pelishouse_dominio', '')
         config.set_setting('channel_pelismaraton_dominio', '')
         config.set_setting('channel_pelispedia_dominio', '')
+        config.set_setting('channel_pelispediaws_dominio', '')
         config.set_setting('channel_pelisplus_dominio', '')
         config.set_setting('channel_pelisplushd_dominio', '')
         config.set_setting('channel_pelisplushdlat_dominio', '')
@@ -388,13 +414,14 @@ def manto_textos(item):
          platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay Textos Memorizados[/COLOR][/B]' % color_alert)
          return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los Textos Memorizados ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar los Textos Memorizados ?[/B][/COLOR]'):
         config.set_setting('search_last_all', '')
         config.set_setting('search_last_movie', '')
         config.set_setting('search_last_tvshow', '')
         config.set_setting('search_last_documentary', '')
         config.set_setting('search_last_person', '')
 
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Texos restablecidos[/B][/COLOR]' % color_infor)
 
 def manto_cookies(item):
     logger.info()
@@ -406,7 +433,7 @@ def manto_cookies(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero de Cookies[/COLOR][/B]' % color_alert)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar el fichero de Cookies ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero de Cookies ?[/B][/COLOR]'):
         filetools.remove(path)
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Cookies eliminado[/B][/COLOR]' % color_infor)
 
@@ -426,7 +453,7 @@ def manto_advs(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero Advancedsettings[/COLOR][/B]' % color_infor)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar el fichero Advancedsettings ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Advancedsettings ?[/B][/COLOR]'):
         filetools.remove(file)
         platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Fichero Advancedsettings eliminado[/B][/COLOR]', '[B][COLOR yellow]Debe Abandonar obligatoriamente su Media Center e Ingresar de nuevo en el.[/B][/COLOR]')
 
@@ -441,7 +468,7 @@ def manto_folder_cache(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no hay Carpeta Caché[/COLOR][/B]' % color_exec)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar Toda la carpeta Caché ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar Toda la carpeta Caché ?[/B][/COLOR]'):
         filetools.rmdirtree(path)
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Carpeta Caché eliminada[/B][/COLOR]' % color_infor)
 
@@ -505,9 +532,9 @@ def manto_temporales(item):
         return
 
     if item._logs:
-        texto = '[COLOR red]¿ Confirma Eliminar los ficheros Logs ?[/COLOR]'
+        texto = '[COLOR red][B]¿ Confirma Eliminar los ficheros Logs ?[/B][/COLOR]'
     else:
-        texto = '[COLOR red]¿ Confirma Eliminar los ficheros Temporales ?[/COLOR]'
+        texto = '[COLOR red][B]¿ Confirma Eliminar los ficheros Temporales ?[/B][/COLOR]'
 
     if platformtools.dialog_yesno(config.__addon_name, texto):
         if item._logs:
@@ -576,7 +603,7 @@ def manto_addons_packages(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros en Addons/Packages[/COLOR][/B]' % color_alert)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los ficheros de Addons/Packages ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar los ficheros de Addons/Packages ?[/B][/COLOR]'):
         filetools.rmdirtree(path)
 
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Ficheros Addons/Packages eliminados[/B][/COLOR]' % color_infor)
@@ -596,7 +623,7 @@ def manto_addons_temp(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros en Addons/Temp[/COLOR][/B]' % color_alert)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los ficheros de Addons/Temp ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar los ficheros de Addons/Temp ?[/B][/COLOR]'):
         filetools.rmdirtree(path)
 
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Ficheros Addons/Temp eliminados[/B][/COLOR]' % color_infor)
@@ -616,10 +643,10 @@ def manto_caches(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros de Caché en su Media Center[/COLOR][/B]' % color_alert)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar los ficheros de Caché de su Media Center ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar los ficheros de Caché de su Media Center ?[/B][/COLOR]'):
         filetools.rmdirtree(path)
 
-        platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Ficheros de Caché de su Media Center eliminados[/B][/COLOR]', '[B][COLOR yellow]Debe Abandonar obligatoriamente su Media Center e Ingresar de nuevo en el.[/B][/COLOR]')
+        platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Ficheros Caché de su Media Center eliminados[/B][/COLOR]', '[B][COLOR yellow]Debe Abandonar obligatoriamente su Media Center e Ingresar de nuevo en el.[/B][/COLOR]')
 
 
 def manto_tracking_dbs(item):
@@ -632,7 +659,7 @@ def manto_tracking_dbs(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Preferidos[/COLOR][/B]' % color_exec)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar Todo el contenido de sus Preferidos ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar Todo el contenido de sus Preferidos ?[/B][/COLOR]'):
         filetools.rmdirtree(path)
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Contenido Preferidos eliminado[/B][/COLOR]' % color_infor)
 
@@ -652,7 +679,7 @@ def manto_folder_downloads(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Descargas[/COLOR][/B]' % color_exec)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ Confirma Eliminar el contenido de Todas sus Descargas ?[/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el contenido de Todas sus Descargas ?[/B][/COLOR]'):
         filetools.rmdirtree(path)
 
         # por si varió el path y quedaron descargas huerfanas en el path default
@@ -674,7 +701,7 @@ def manto_folder_addon(item):
     existe = filetools.exists(path)
 
     if not existe == False:
-        if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]¿ ATENCION: Confirma Eliminar Todos los Datos del Addon ?[/COLOR]'):
+        if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ ATENCION: Confirma Eliminar Todos los Datos del Addon ?[/B][/COLOR]'):
             filetools.rmdirtree(path)
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Datos del Addon eliminados[/B][/COLOR]' % color_adver)
 

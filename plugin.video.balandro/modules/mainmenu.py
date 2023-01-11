@@ -53,6 +53,9 @@ context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_help_d
 tit = '[COLOR cyan][B]Últimos Cambios dominios[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
+tit = '[COLOR %s][B]Quitar Dominios memorizados[/B][/COLOR]' % color_infor
+context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'manto_domains'})
+
 tit = '[COLOR greenyellow][B]Buscar Solo en los canales[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_included'})
 
@@ -224,6 +227,9 @@ context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_help_d
 tit = '[COLOR %s][B]Últimos Cambios dominios[/B][/COLOR]' % color_exec
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
+tit = '[COLOR %s][B]Quitar Dominios memorizados[/B][/COLOR]' % color_infor
+context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_domains'})
+
 tit = '[COLOR %s]Sus Ajustes personalizados[/COLOR]' % color_avis
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_sets'})
 
@@ -276,12 +282,18 @@ def mainlist(item):
                                     thumbnail=config.get_thumb('emmys'), plot = 'Las Series nominadas a los premios Emmy' ))
 
     elif current_month == 11:
-         itemlist.append(item.clone( channel='tmdblists', action='descubre', title='[B]Halloween[/B]', text_color='orchid', extra = 27, search_type = 'movie',
+         itemlist.append(item.clone( channel='tmdblists', action='descubre', title='[B]Halloween[/B]', text_color='orchid',
+                                     extra = 27, search_type = 'movie',
                                      thumbnail=config.get_thumb('halloween'), plot = 'Películas del género Terror' ))
 
     elif current_month == 12:
         itemlist.append(item.clone( channel='filmaffinitylists', action='_navidad', title='[B]Navidad[/B]', text_color='orchid',
                                     thumbnail=config.get_thumb('navidad'), plot = 'Películas y Series del tema Navidad' ))
+
+    else:
+        itemlist.append(item.clone( channel='tmdblists', action='listado', title='[B]Novedades[/B]', text_color='orchid',
+                                    extra = 'now_playing', search_type = 'movie',
+                                    thumbnail=config.get_thumb('novedades'), plot = 'Películas en cartelera' ))
 
     if config.get_setting('sub_mnu_special', default=True):
         itemlist.append(item.clone( channel='submnuctext', action='submnu_special', title='[B]Especiales[/B]', context=context_cfg_search,
@@ -995,6 +1007,10 @@ def channels(item):
             tit = '[COLOR %s][B]Configurar proxies a usar[/B][/COLOR]' % color_list_proxies
             context.append({'title': tit, 'channel': item.channel, 'action': '_proxies'})
 
+        if 'notice' in ch['clusters']:
+            tit = '[COLOR tan][B]Aviso del canal[/B][/COLOR]'
+            context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_' + ch['id']})
+		
         tit = '[COLOR darkorange][B]Test Web del canal[/B][/COLOR]'
         context.append({'title': tit, 'channel': item.channel, 'action': '_tests'})
 

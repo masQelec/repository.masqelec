@@ -289,6 +289,7 @@ def temporadas(item):
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.url = item.url
             item.nrotemp = nro_temp
             item.contentType = 'season'
@@ -296,7 +297,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, nrotemp = nro_temp, 
+        itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0, nrotemp = nro_temp, 
                                     contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)

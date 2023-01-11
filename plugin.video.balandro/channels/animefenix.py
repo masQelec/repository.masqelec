@@ -76,6 +76,11 @@ def do_downloadpage(url, post=None, headers=None):
         except:
             pass
 
+    if '<title>Just a moment...</title>' in data:
+        if not 'animes?q=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 

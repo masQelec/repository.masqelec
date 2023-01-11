@@ -77,7 +77,7 @@ def proxysearch_all(item):
     if ch_list:
         if config.get_setting('memorize_channels_proxies', default=True):
             if channels_proxies_memorized:
-                if not platformtools.dialog_yesno(config.__addon_name, '[COLOR cyan]¿ Desea SOLO buscar en los canales con proxies memorizados actualmente ?[/COLOR]', '[COLOR yellow]En el caso de NO contestar afirmativamente se Eliminaran los proxies memorizados en la actualidad de estos canales ?[/COLOR]'):
+                if not platformtools.dialog_yesno(config.__addon_name, '[COLOR cyan][B]¿ Desea SOLO buscar en los canales con proxies memorizados actualmente ?[/B][/COLOR]', '[COLOR yellow]En el caso de NO contestar afirmativamente se Eliminaran los proxies memorizados en la actualidad de estos canales ?[/COLOR]'):
                     config.set_setting('channels_proxies_memorized', '')
                     iniciales_channels_proxies_memorized = ''
                 else: proceso_seleccionar = False
@@ -86,7 +86,7 @@ def proxysearch_all(item):
             txt_avis = '¿ Desea Quitar previamente los Proxies memorizados en TODOS los canales ?'
             if item.extra: txt_avis = '¿ Desea Quitar previamente los Proxies memorizados en los canales ?'
 
-            if platformtools.dialog_yesno(config.__addon_name, '[COLOR red]' + txt_avis + '[/COLOR]'):
+            if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]' + txt_avis + '[/B][/COLOR]'):
                for ch in ch_list:
                    if not 'proxies' in ch['notes'].lower(): continue
 
@@ -153,7 +153,7 @@ def proxysearch_all(item):
 
     if proceso_seleccionar:
         if not channels_excludes:
-            if not platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow]¿ Quiere excluir canales en la búsqueda Global de Configurar proxies a usar en los canales que los necesiten ?[/COLOR]'):
+            if not platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow][B]¿ Quiere excluir canales en la búsqueda Global de Configurar proxies a usar en los canales que los necesiten ?[/B][/COLOR]'):
                 proceso_seleccionar = False
 
     filtros = { 'searchable': True, 'status': 0}
@@ -258,7 +258,7 @@ def proxysearch_all(item):
        ret = xbmcgui.Dialog().multiselect('Excluir canales en las búsquedas de [COLOR yellow] Proxies [/COLOR]', opciones, preselect=preselect, useDetails=True)
 
        if ret is None:
-           if platformtools.dialog_yesno(config.__addon_name, "[COLOR tan]¿ Desea abandonar la búsqueda de proxies para 'Todos' los canales que los necesiten ?[/COLOR]"):
+           if platformtools.dialog_yesno(config.__addon_name, "[COLOR tan][B]¿ Desea abandonar la búsqueda de proxies para 'Todos' los canales que los necesiten ?[/B][/COLOR]"):
                return
 
        seleccionados = channels_excluded_list(ret, channels_ids, channels_excludes)
@@ -520,7 +520,7 @@ def channels_proxysearch_del(item):
         if not txt_excluidos: txt_excluidos = id_canal.capitalize()
         else: txt_excluidos += (', ' + id_canal.capitalize())
 
-    if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum]' + str(txt_excluidos) + '[/COLOR]', '[COLOR red]¿ Desea anular los canales memorizados para excluirlos de Configurar Proxies a usar ?[/COLOR]'):
+    if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum][B]' + str(txt_excluidos) + '[/B][/COLOR]', '[COLOR red][B]¿ Desea anular los canales memorizados para excluirlos de Configurar Proxies a usar ?[/B][/COLOR]'):
         return
 
     config.set_setting(cfg_excludes, '')

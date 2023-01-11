@@ -65,6 +65,7 @@ if proxies_extended:
     opciones_provider.append('z-free-proxy-list.uk')
     opciones_provider.append('z-opsxcq')
     opciones_provider.append('z-proxy-daily')
+    opciones_provider.append('z-proxy-list.org')
     opciones_provider.append('z-proxyhub')
     opciones_provider.append('z-proxyranker')
     opciones_provider.append('z-xroxy')
@@ -447,6 +448,18 @@ def _buscar_proxies(canal, url, provider, procesar):
                     if search_provider: platformtools.dialog_notification('Buscar en Proxy-daily', msg_txt % color_infor)
 
                     proxies = proxytoolsz.z_proxy_daily(url, tipo_proxy, pais_proxy, max_proxies)
+                    if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
+        if search_provider or provider == 'z-proxy-list.org':
+            searching = True
+            if providers_preferred:
+                if not 'proxy-list.org' in providers_preferred: searching = False
+
+            if searching:
+                if len(all_providers_proxies) < proxies_totales_limit:
+                    if search_provider: platformtools.dialog_notification('Buscar en Proxy-list.org', msg_txt % color_infor)
+
+                    proxies = proxytoolsz.z_proxy_list_org(url, tipo_proxy, pais_proxy, max_proxies)
                     if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
         if search_provider or provider == 'z-proxyhub':
@@ -884,7 +897,7 @@ def sin_news_proxies(provider, proxies_actuales, procesar):
     if avisar:
         texto_mensaje = ''
         if proxies_actuales: texto_mensaje = '[COLOR yellow][B]Se conservan los proxies almacenados actualmente.[/B][/COLOR]'
-        platformtools.dialog_ok('Búsqueda proxies en [COLOR blue]' + provider.capitalize() + '[/COLOR]', 'No se ha obtenido ningún proxy válido con este proveedor.', texto_mensaje, '[COLOR coral]Puede intentar obtener nuevos proxies, cambiando de proveedor, en los parámetros para buscar proxies.[/COLOR]')
+        platformtools.dialog_ok('Búsqueda proxies en [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '[COLOR yellow][B]No se ha obtenido ningún proxy válido con este proveedor.[/B][/COLOR]', texto_mensaje, '[COLOR coral][B]Puede intentar obtener nuevos proxies, cambiando de proveedor, en los parámetros para buscar proxies.[/B][/COLOR]')
 
 
 def top_news_proxies(provider, proxies_actuales, valor, procesar):
@@ -906,7 +919,7 @@ def top_news_proxies(provider, proxies_actuales, valor, procesar):
     if avisar:
         texto_mensaje = ''
         if proxies_actuales: texto_mensaje = '[COLOR yellow][B]El tiempo de espera acceso al canal podría ser muy elevado.[/B][/COLOR]'
-        platformtools.dialog_ok('Búsqueda proxies en [COLOR blue]' + provider.capitalize() + '[/COLOR]', 'Se han obtenido ' + str(valor) + ' proxies válidos con este proveedor.', texto_mensaje, '[COLOR coral]Puede intentar obtener menos proxies, cambiando de proveedor, en los parámetros para buscar proxies.[/COLOR]')
+        platformtools.dialog_ok('Búsqueda proxies en [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '[COLOR yellow][B]Se han obtenido ' + str(valor) + ' proxies válidos con este proveedor.[/B][/COLOR]', texto_mensaje, '[COLOR coral][B]Puede intentar obtener menos proxies, cambiando de proveedor, en los parámetros para buscar proxies.[/B][/COLOR]')
 
 
 def _dailyproxylists_com(url, tipo_proxy, pais_proxy, max_proxies):
@@ -918,6 +931,25 @@ def _dailyproxylists_com(url, tipo_proxy, pais_proxy, max_proxies):
     resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
 
     enlaces = scrapertools.find_multiple_matches(resp.data, '<td class="cell-.*?>(.*?)</td>.*?class=.*?>(.*?)</td>')
+
+    if not enlaces:
+        el_provider = '[B][COLOR %s] Proxypremium.top[/B][/COLOR]' % color_exec
+        platformtools.dialog_notification('Dailyproxylists.com', 'Vía' + el_provider)
+
+        url_provider = 'https://proxypremium.top/full-proxy-list'
+        resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
+
+        enlaces = scrapertools.find_multiple_matches(resp.data, '<tr class=pp1x onmouseover=.*?<font class=".*?">(.*?)<font.*?</font>(.*?)</font>')
+
+        for prox, port in enlaces:
+            if not prox or not port: continue
+
+            prox = prox.replace('/n', '').strip()
+
+            if prox: proxies.append(prox + ':' + port)
+
+        return proxies
+
 
     for prox, port in enlaces:
         if not prox or not port: continue
@@ -1073,11 +1105,25 @@ def _hidemy_name(url, tipo_proxy, pais_proxy, max_proxies):
     if tipo_proxy == 'anonymous': url_provider += '&anon=3'
     elif tipo_proxy == 'transparent': url_provider += '&anon=2'
     elif tipo_proxy == 'elite': url_provider += '&anon=4'
-    else: url_provider += '&anon=1&anon=2&anon=3&anon=4'
+    else: url_provider += '&anon=1'
 
     resp = httptools.downloadpage(url_provider, raise_weberror=False)
 
     enlaces = scrapertools.find_multiple_matches(resp.data, '<tr><td>(\d+\.\d+\.\d+\.\d+)</td><td>(\d+)</td>')
+
+    if not enlaces:
+        el_provider = '[B][COLOR %s] TheSpeedX.proxy-list[/B][/COLOR]' % color_exec
+        platformtools.dialog_notification('Hidemy.name', 'Vía' + el_provider)
+
+        url_provider = 'https://github.com/TheSpeedX/PROXY-List/blob/master/socks5.txt'
+        resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
+
+        enlaces = scrapertools.find_multiple_matches(resp.data, 'class="blob-code blob-code-inner js-file-line">(.*?)</td>')
+
+        for prox in enlaces:
+            proxies.append(prox)
+
+        return proxies
 
     for prox, puerto in enlaces:
         proxies.append(prox + ':' + puerto)
@@ -1322,7 +1368,7 @@ def _proxysource_org(url, tipo_proxy, pais_proxy, max_proxies):
 
     if proxies: return
 
-    el_provider = '[B][COLOR %s] TheSpeedX[/B][/COLOR]' % color_exec
+    el_provider = '[B][COLOR %s] TheSpeedX.socks-list[/B][/COLOR]' % color_exec
     platformtools.dialog_notification('Spys.one', 'Vía' + el_provider)
 
     url_provider = 'https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/http.txt'

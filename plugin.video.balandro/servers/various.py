@@ -46,7 +46,9 @@ def get_video_url(page_url, url_referer=''):
         elif 'rutube' in page_url: txt_server = 'Rutube'
         elif 'videovard' in page_url: txt_server = 'Videovard'
         elif 'filemoon' in page_url: txt_server = 'Filemoon'
+        elif 'streamhide' in page_url: txt_server = 'Streamhide'
         elif 'streamhub' in page_url: txt_server = 'Streamhub'
+        elif 'uploadever' in page_url: txt_server = 'Uploadever'
         elif 'videowood' in page_url: txt_server = 'Videowood'
 
         elif 'yandex' in page_url: txt_server = 'Yandex'

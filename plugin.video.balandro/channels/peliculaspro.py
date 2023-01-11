@@ -7,6 +7,9 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
+# ~ 23/12/2022 las series en la web NO acceden bien a los episodios
+
+
 host = 'https://peliculaspro.net/'
 
 
@@ -46,7 +49,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
-    if '<title>You are being redirected...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
@@ -82,9 +85,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'peliculas', search_type = 'movie' ))
 
-    itemlist.append(item.clone ( title = 'Estrenos', action = 'list_all', url = host + 'category/uncategorized/', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = 'Estrenos', action = 'list_all', url = host + 'category/estrenos', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -99,7 +102,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -128,13 +131,18 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque =  scrapertools.find_single_match(data, '</h1>(.*?)>Register<')
+    if '</h1>' in data: bloque =  scrapertools.find_single_match(data, '</h1>(.*?)>Ultimas Peliculas<')
+    elif '</h3>' in data: bloque =  scrapertools.find_single_match(data, '</h3>(.*?)>Ultimas Peliculas<')
+    else: bloque = data
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
+        if url.startswith('//'): url = 'https:' + url
+
         title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
+
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
@@ -167,6 +175,7 @@ def list_all(item):
     if itemlist:
         if '>NEXT<' in data:
             next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="([^"]+)')
+
             if next_page:
                 if '/page/' in next_page:
                     itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
@@ -187,13 +196,14 @@ def temporadas(item):
 
         if len(temporadas) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.dpost = dpost
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, dpost = url, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, dpost = url, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 

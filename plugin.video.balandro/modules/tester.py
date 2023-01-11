@@ -31,6 +31,17 @@ txt_checs = '[COLOR tomato][B]Compruebe su Internet y/ó el Canal, a través de 
 txt_coffs = '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
 
 
+_useragent = ''
+_chrome_version = ''
+
+ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
+if ver_stable_chrome:
+    cfg_last_ver_chrome = config.get_setting('chrome_last_version', default='')
+    if cfg_last_ver_chrome:
+        _chrome_version = cfg_last_ver_chrome
+        _useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36" % _chrome_version
+
+
 channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
@@ -88,10 +99,12 @@ def test_channel(channel_name):
 
     txt += '[COLOR moccasin][B]Balandro:[/B][/COLOR] ' + config.get_addon_version() + '[CR][CR]'
 
+    if _useragent: txt += '[COLOR moccasin][B]UserAgent:[/B][/COLOR][CR]' + _useragent + '[CR][CR]'
+
     txt += '[COLOR moccasin][B]Parámetros:[/B][/COLOR][CR]'
     txt += 'id: ' + str(params['id']) + '[CR]'
     txt += 'active: ' + str(params['active']) + '[CR]'
-    txt += 'searchable: ' + str(params['searchable']) + '[CR]'
+    txt += 'searchable: [COLOR yellowgreen][B]' + str(params['searchable']) + '[/B][/COLOR][CR]'
 
     search_types = str(params['search_types'])
     search_types = search_types.replace('[', '').replace(']', '').replace("'", '').strip()
@@ -143,7 +156,7 @@ def test_channel(channel_name):
     if 'Puede requerir el uso de proxies' in notes:
         notes = scrapertools.find_single_match(str(notes), '(.*?)Puede requerir el uso de proxies').strip()
 
-    txt += 'notes: ' + str(notes)
+    txt += 'notes: [COLOR yellowgreen][B]' + str(notes) + '[/B][/COLOR]'
 
     txt_diag = ''
 
@@ -328,18 +341,27 @@ def test_channel(channel_name):
              return
 
           part_py = 'def mainlist'
-          if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
-          elif 'CLASS ' in data or 'class ' in data: part_py = 'class '
 
+          if 'ver_stable_chrome' in data: part_py = 'ver_stable_chrome'
+
+          elif 'CLONES =' in data or 'clones =' in data: part_py = 'clones  ='
+          elif 'CLASS login_' in data or 'class login_' in data: part_py = 'class login_'
+
+          elif 'def do_make_login_logout' in data: part_py = 'def do_make_login_logout'
           elif 'def login' in data: part_py = 'def login'
+          elif 'def logout' in data: part_py = 'def logout'
+
           elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
           elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
 
           bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
           bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
 
-          host = scrapertools.find_single_match(bloc, '.*?host.*?"(.*?)"')
-          if not host: host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
+          host = scrapertools.find_single_match(str(bloc), "host = '(.*?)'")
+          if not host: host = scrapertools.find_single_match(str(bloc), 'host = "(.*?)"')
+
+          if not host: host = scrapertools.find_single_match(str(bloc), "host.*?'(.*?)'")
+          if not host: host = scrapertools.find_single_match(str(bloc), 'host.*?"(.*?)"')
 
           ant_hosts = scrapertools.find_single_match(str(bloc), 'ant_hosts.*?=.*?(.*?)]')
           if not ant_hosts: ant_hosts = scrapertools.find_single_match(str(bloc), "ant_hosts.*?=.*?(.*?)]")
@@ -446,8 +468,12 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
 
     # ~ 11/12/2022
     headers = {}
+
     if channel_name.lower() == 'playdede':
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 pddkit/2023", "authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
+        if _useragent:
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + _chrome_version + " Safari/537.36 pddkit/2023", "authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
+        else:
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 pddkit/2023", "authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
 
     if not config.get_setting(cfg_proxies_channel, default=''):
         response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
@@ -522,7 +548,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
 
             cfg_provider_channel = 'channel_' + channel_id + '_proxytools_provider'
 
-            if config.get_setting(cfg_provider_channel): txt += '[CR]provider: ' + config.get_setting(cfg_provider_channel)
+            if config.get_setting(cfg_provider_channel): txt += '[CR]provider: [COLOR yellowgreen][B]' + config.get_setting(cfg_provider_channel) + '[/B][/COLOR]'
     else:
         if 'requerir el uso de proxies' in txt:
             txt += '[CR][CR][COLOR moccasin][B]Proxies: [/B][/COLOR][CR]'
@@ -534,6 +560,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
     else: txt += '[CR][CR][COLOR moccasin][B]Redirect: ' + txt_dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
 
     txt += 'host: [COLOR pink][B]' + host + '[/B][/COLOR][CR]'
+
+    if headers: txt += 'Headers: [COLOR yellowgreen][B][CR]' + str(headers) + '[/B][/COLOR][CR]'
 
     if response.sucess == True: color_sucess = '[COLOR yellow][B]'
     else: color_sucess = '[COLOR red][B]'
@@ -638,7 +666,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
                 if new_web:
                     if '/cgi-sys/suspendedpage.cgi' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'
                     elif '/wp-admin/install.php' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'
-                    else: txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
+                    else:
+                       if channel_id in str(channels_despised):
+                           txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR][COLOR pink][B] (Falso)[/B][/COLOR]'
+                       else:
+                           txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
             else:
                 if '/cgi-sys/suspendedpage.cgi' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'
                 elif '/wp-admin/install.php' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'

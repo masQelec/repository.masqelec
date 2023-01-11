@@ -9,6 +9,10 @@ from core import httptools, scrapertools, jsontools, servertools, tmdb
 from lib import balandroresolver
 
 
+# ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
+# ~ web 0)-'https://hdfull.pm'
+
+
 host = 'https://www.hdfull.it'
 
 
@@ -89,6 +93,12 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='domains', action='test_domain_hdfullse', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='hdfullse', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(Item( channel='domains', action='operative_domains_hdfullse', title='[B]Dominios Operativos Vigentes[/B]',
+                          desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='mediumaquamarine' ))
+
+    itemlist.append(Item( channel='domains', action='last_domain_hdfullse', title='[B]Comprobar último dominio vigente[/B]',
+                          desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'

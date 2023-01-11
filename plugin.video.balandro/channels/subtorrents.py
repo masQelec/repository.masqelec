@@ -14,12 +14,13 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www.subtorrents.re/'
+host = 'https://www.subtorrents.eu/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.subtorrents.nl/', 'https://www.subtorrents.ch/', 'https://www.subtorrents.nz/',
-             'https://www.subtorrents.in/', 'https://www.subtorrents.li/', 'https://www.subtorrents.do/']
+             'https://www.subtorrents.in/', 'https://www.subtorrents.li/', 'https://www.subtorrents.do/',
+             'https://www.subtorrents.re/']
 
 
 domain = config.get_setting('dominio', 'subtorrents', default='')
@@ -195,6 +196,7 @@ def list_all(item):
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, "<span class='current'>\d+<\/span><a href='([^']+)'")
+
         if '/page/' in next_url:
             itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
 
@@ -227,6 +229,7 @@ def list_series(item):
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, "<span class='current'>.*?<a href='([^']+)'")
+
         if '/page/' in next_url:
             itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_series', text_color='coral' ))
 
@@ -267,12 +270,13 @@ def temporadas(item):
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url=item.url, contentType = 'season', contentSeason = int(tempo) ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0, contentType = 'season', contentSeason = int(tempo) ))
 
     return itemlist    
 
@@ -351,6 +355,10 @@ def findvideos(item):
 def play(item):
     logger.info()
     itemlist = []
+
+    # ~ por si viene de enlaces guardados
+    for ant in ant_hosts:
+        item.url = item.url.replace(ant, host)
 
     if not item.url.endswith('.torrent'):
         host_torrent = host[:-1]
