@@ -66,6 +66,11 @@ def do_downloadpage(url, post=None, headers=None):
         except:
             pass
 
+    if '<title>Just a moment...</title>' in data:
+        if not '?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -212,12 +217,13 @@ def temporadas(item):
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]Una Temporada[/COLOR]')
+            item.page = 0
             item.contentType = 'season'
             item.contentSeason = season
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = season ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = season ))
 
     return itemlist
 
@@ -394,7 +400,7 @@ def play(item):
 def search(item, texto):
     logger.info()
     try:
-        item.url =  host + "?s=" + texto.replace(" ", "+")
+        item.url =  host + '?s=' + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

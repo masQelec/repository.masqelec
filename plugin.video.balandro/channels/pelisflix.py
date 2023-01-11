@@ -7,13 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://pelisflix.run/'
+host = 'https://pelisflix2.fun/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://pelisflix.li/', 'https://pelisflix2.one/', 'https://ww1.pelisflix2.one/',
              'https://ww2.pelisflix2.one/', 'https://ww3.pelisflix.biz/', 'https://pelisflix.biz/',
-             'https://pelisflix.pw/']
+             'https://pelisflix.pw/', 'https://pelisflix.run/']
 
 
 domain = config.get_setting('dominio', 'pelisflix', default='')
@@ -64,7 +64,7 @@ def do_downloadpage(url, post=None, headers=None):
     # ~ data = httptools.downloadpage(url, post=post, headers=headers.data
     data = httptools.downloadpage_proxy('pelisflix', url, post=post, headers=headers).data
 
-    if '<title>You are being redirected...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
@@ -234,6 +234,7 @@ def list_all(item):
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="(.*?)"')
+
         if next_url:
             if '/page/' in next_url:
                 itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', group = item.group, text_color = 'coral' ))
@@ -254,13 +255,14 @@ def temporadas(item):
 
         if len(temporadas) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.url = url
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 

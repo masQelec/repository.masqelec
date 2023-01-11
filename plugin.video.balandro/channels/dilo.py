@@ -54,7 +54,24 @@ def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_he
     # ~ resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror, timeout=timeout)
     resp = httptools.downloadpage_proxy('dilo', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror, timeout=timeout)
 
+    if '<title>You are being redirected...</title>' in resp.data or '<title>Just a moment...</title>' in resp.data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(resp.data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror, timeout=timeout)
+                resp = httptools.downloadpage_proxy('dilo', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror, timeout=timeout)
+        except:
+            pass
+
     if only_headers: return resp.headers
+
+    if '<title>Just a moment...</title>' in resp.data:
+        if not 'search?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return resp.data
 
 
@@ -67,6 +84,8 @@ def mainlist_series(item):
     itemlist = []
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_dilo', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -280,13 +299,14 @@ def temporadas(item):
             if not item.group == 'pelis':
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
+            item.page = 0
             item.id = item_id
             item.contentType = 'season'
             item.contentSeason = numtempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, item_id = item_id, contentType = 'season', contentSeason = numtempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, item_id = item_id, contentType = 'season', contentSeason = numtempo ))
 
     tmdb.set_infoLabels(itemlist)
 

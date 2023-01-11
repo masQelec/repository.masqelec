@@ -29,6 +29,34 @@ def mainlist_series(item):
     return itemlist
 
 
+def categorias(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+
+    bloque = scrapertools.find_single_match(data, 'botontes-categorias.*?</ul>')
+
+    matches = scrapertools.find_multiple_matches(bloque, 'submit" value="([^"]+).*?value="([^"]+)')
+
+    for title, id in matches:
+        if id == '1': continue
+
+        itemlist.append(item.clone( title = title, url = host + '?Categoria_id=' + id, action = 'list_all' ))
+
+    return itemlist
+
+
+def alfabetico(item):
+    logger.info()
+    itemlist = []
+
+    for letra in 'abcdefghijklmnopqrstuvwxyz#':
+        itemlist.append(item.clone ( title = letra.upper(), url = host + '?utf8=✓&Titulo=' + letra, action = 'list_all', filtro_search = letra ))
+
+    return itemlist
+
+
 def list_all(item):
     logger.info()
     itemlist = []
@@ -76,34 +104,6 @@ def list_all(item):
     return itemlist
 
 
-def categorias(item):
-    logger.info()
-    itemlist = []
-
-    data = httptools.downloadpage(item.url).data
-
-    bloque = scrapertools.find_single_match(data, 'botontes-categorias.*?</ul>')
-
-    matches = scrapertools.find_multiple_matches(bloque, 'submit" value="([^"]+).*?value="([^"]+)')
-
-    for title, id in matches:
-        if id == '1': continue
-
-        itemlist.append(item.clone( title = title, url = host + '?Categoria_id=' + id, action = 'list_all' ))
-
-    return itemlist
-
-
-def alfabetico(item):
-    logger.info()
-    itemlist = []
-
-    for letra in 'abcdefghijklmnopqrstuvwxyz#':
-        itemlist.append(item.clone ( title = letra.upper(), url = host + '?utf8=✓&Titulo=' + letra, action = 'list_all', filtro_search = letra ))
-
-    return itemlist
-
-
 def temporadas(item):
     logger.info()
     itemlist = []
@@ -119,12 +119,13 @@ def temporadas(item):
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.contentType = 'season'
             item.contentSeason = season
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = season ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = season ))
 
     tmdb.set_infoLabels(itemlist)
 

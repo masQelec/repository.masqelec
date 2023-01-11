@@ -147,10 +147,6 @@ def temporadas(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []

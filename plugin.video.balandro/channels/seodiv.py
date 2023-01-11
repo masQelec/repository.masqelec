@@ -79,8 +79,20 @@ def list_all(item):
             epis =  scrapertools.find_single_match(url, '-capitulo-(.*?).')
             if not epis: epis = '1'
 
-            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
-                                        contentSerieName=title, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+            SerieName = title
+
+            if "Capitulo" in title: SerieName = title.split("Capitulo")[0]
+            if "Temporada" in title: SerieName = title.split("Temporada")[0]
+
+            SerieName = SerieName.strip()
+
+            if '/main/' in url:
+                itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+            else:
+                itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                            contentSerieName=SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+
         else:
             itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
@@ -135,8 +147,20 @@ def list_alfa(item):
             epis =  scrapertools.find_single_match(url, '-capitulo-(.*?).')
             if not epis: epis = '1'
 
-            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
-                                        contentSerieName=title, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+            SerieName = title
+
+            if "Capitulo" in title: SerieName = title.split("Capitulo")[0]
+            if "Temporada" in title: SerieName = title.split("Temporada")[0]
+
+            SerieName = SerieName.strip()
+
+            if '/main/' in url:
+                itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+            else:
+                itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                            contentSerieName=SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+
         else:
             itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
@@ -151,6 +175,7 @@ def temporadas(item):
     itemlist = []
 
     platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin Temporadas')
+    item.page = 0
     item.dialog = False
     item.contentType = 'season'
     item.contentSeason = 1
@@ -324,8 +349,20 @@ def list_search(item):
             epis =  scrapertools.find_single_match(url, '-capitulo-(.*?).')
             if not epis: epis = '1'
 
-            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
-                                        contentSerieName=title, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+            SerieName = title
+
+            if "Capitulo" in title: SerieName = title.split("Capitulo")[0]
+            if "Temporada" in title: SerieName = title.split("Temporada")[0]
+
+            SerieName = SerieName.strip()
+
+            if '/main/' in url:
+                itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+            else:
+                itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                            contentSerieName=SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+
         else:
             itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
                                         contentType='tvshow', contentSerieName=title,  infoLabels={'year': '-'} ))

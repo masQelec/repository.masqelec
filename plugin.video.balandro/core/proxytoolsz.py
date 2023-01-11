@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import base64
+
+
 from core import httptools, scrapertools
 from platformcode import config, logger, platformtools
 
@@ -42,6 +45,26 @@ def z_proxy_daily(url, tipo_proxy, pais_proxy, max_proxies):
 
     for prox in enlaces:
         proxies.append(prox)
+
+    return proxies
+
+
+def z_proxy_list_org(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    proxies = []
+
+    url_provider = 'https://proxy-list.org/spanish/index.php'
+    resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
+
+    enlaces = scrapertools.find_multiple_matches(resp.data, '<li class="proxy"><script.*?' + "'(.*?)'")
+
+    for prox in enlaces:
+        prox = base64.b64decode(prox)
+
+        if "b'" in str(prox): prox = scrapertools.find_single_match(str(prox), "b'(.*?)'")
+
+        if prox: proxies.append(prox)
 
     return proxies
 

@@ -2,13 +2,22 @@
 
 import sys
 
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True
+if sys.version_info[0] >= 3:
+    PY3 = True
+
+    import urllib3
+
+else:
+    PY3 = False
+
+    import urllib2
+
 
 import time, random
 
 from platformcode import logger, config, platformtools
 from core import scrapertools
+
 
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -58,14 +67,14 @@ def read(url, channel):
 
     # ~ Sin proxies
     if not channel:
-        data = read_data(url)
+        data = read_data(url, headers)
 
         if not data:
             espera = 3
             platformtools.dialog_notification('Requests', 'Espera requerida de %s segundos' % espera)
             time.sleep(int(espera))
 
-            data = read_data(url)
+            data = read_data(url, headers)
 
         return data
 
@@ -88,7 +97,7 @@ def read(url, channel):
          for n, proxy in enumerate(proxies):
              px = {'http': proxy, 'https': proxy}
 
-             source = read_proxy(url, px)
+             source = read_proxy(url, px, headers)
 
              if source: break
 
@@ -96,97 +105,152 @@ def read(url, channel):
              platformtools.dialog_notification(channel.capitalize(), 'Espera requerida de %s segundos' % espera)
              time.sleep(int(espera))
 
-             source = read_proxy(url, px)
+             source = read_proxy(url, px, headers)
 
     return source
 
 
-def read_proxy(url, px):
+def read_proxy(url, px, headers):
     source = ''
 
     try:
         source = requests.Session()
         source = requests.get(url, headers=headers, proxies=px, verify=False, timeout=30).content
     except:
-        source = read_proxy2(url, px)
+        source = read_proxy2(url, px, headers)
 
     if source: 
         if '<title>Please Wait... | Cloudflare</title>' in str(source):
             platformtools.dialog_notification(config.__addon_name, 'Verificando [B][COLOR %s]reCAPTCHA[/COLOR][/B]' % color_alert)
-            source = read_proxy2(url, px)
+            source = read_proxy2(url, px, headers)
+
+        elif '<title>You are being redirected...</title>' in str(source) or '<title>Just a moment...</title>' in str(source):
+            platformtools.dialog_notification(config.__addon_name, 'Verificando [B][COLOR %s]Protection[/COLOR][/B]' % color_alert)
+            source = read_proxy2(url, px, headers)
+
+        if '<title>Just a moment...</title>' in str(source):
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+            source = ''
 
         return source
 
     new_url = scrapertools.find_single_match(source, 'window.location.href.*?"(.*?)"')
+
     if new_url:
         try:
            source = requests.Session()
            source = requests.get(new_url, headers=headers, proxies=px, verify=False, timeout=30).content
         except:
            logger.error('[COLOR red]Error read proxy location[/COLOR]')
-           return ''
+           source = ''
 
     return source
 
 
-def read_proxy2(url, px):
+def read_proxy2(url, px, headers):
     data = ''
 
     try:
-        headers = {'User-Agent': 'Mozilla/5.0'}
+        if not headers: headers = {'User-Agent': 'Mozilla/5.0'}
+
         req = requests.request('GET', url, headers=headers, proxies=px)
+
+        resp = scrapertools.find_single_match(str(req), '<Response(.*?)>')
+        resp = resp.replace('[', '').replace(']', '').strip()
+        if not resp: return data
+
+        if not resp == '200': return data
+
         if PY3:
-            data = urlopen(req).read().decode('utf-8')
+            _proxy = scrapertools.find_single_match(str(px), "'http': '(.*?)'")
+
+            if not _proxy: return data
+
+            Proxy = urllib3.ProxyManager("http://" + _proxy)
+            r = Proxy.request('GET', url)
+            data = r.data.decode('utf-8')
+
         else:
-            data = urlopen(req).read()
+            _proxy = urllib2.ProxyHandler(px)
+            opener = urllib2.build_opener(_proxy)
+            urllib2.install_opener(opener)
+
+            sock = urllib2.urlopen(url) 
+            htmlSource = sock.read()                            
+            sock.close()
+            data = htmlSource
+
     except:
         logger.error('[COLOR red]Error read proxy2[/COLOR]')
-        return ''
+        data = ''
 
     return data 
 
 
-def read_data(url):
+def read_data(url, headers):
     data = ''
 
     try:
         data = requests.Session()
         data = requests.get(url, headers=headers, verify=False, timeout=30).content
     except:
-        data = read_data2(url)
+        data = read_data2(url, headers)
 
     if data:
-       if '<title>Please Wait... | Cloudflare</title>' in str(data):
-           platformtools.dialog_notification(config.__addon_name, 'Verificando [B][COLOR %s]reCAPTCHA[/COLOR][/B]' % color_alert)
-           data = read_data2(url)
+        if '<title>Please Wait... | Cloudflare</title>' in str(data):
+            platformtools.dialog_notification(config.__addon_name, 'Verificando [B][COLOR %s]reCAPTCHA[/COLOR][/B]' % color_alert)
+            data = read_data2(url, headers)
 
-       return data
+        elif '<title>You are being redirected...</title>' in str(data) or '<title>Just a moment...</title>' in str(data):
+            platformtools.dialog_notification(config.__addon_name, 'Verificando [B][COLOR %s]Protection[/COLOR][/B]' % color_alert)
+            data = read_data2(url, headers)
+
+        if '<title>Just a moment...</title>' in str(data):
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+            data = ''
+
+        return data
 
     new_url = scrapertools.find_single_match(data, 'window.location.href.*?"(.*?)"')
+
     if new_url:
         try:
            data = requests.Session()
            data = requests.get(new_url, headers=headers, verify=False, timeout=30).content
         except:
            logger.error('[COLOR red]Error read data location[/COLOR]')
-           return ''
+           data = ''
 
     return data
 
 
-def read_data2(url):
+def read_data2(url, headers):
     data = ''
 
     try:
-        headers={'User-Agent': 'Mozilla/5.0'}
+        if not headers: headers={'User-Agent': 'Mozilla/5.0'}
+
         req = requests.request('GET', url, headers=headers)
+
+        resp = scrapertools.find_single_match(str(req), '<Response(.*?)>')
+        resp = resp.replace('[', '').replace(']', '').strip()
+        if not resp: return data
+
+        if not resp == '200': return data
+
         if PY3:
-            data = urlopen(req).read().decode('utf-8')
+            http = urllib3.PoolManager()
+            r = http.request('GET', url)
+            data = r.data.decode('utf-8')
         else:
-            data = urlopen(req).read()
+            sock = urllib2.urlopen(url) 
+            htmlSource = sock.read()                            
+            sock.close()
+            data = htmlSource
+
     except:
         logger.error('[COLOR red]Error read data2[/COLOR]')
-        return ''
+        data = ''
 
     return data
 

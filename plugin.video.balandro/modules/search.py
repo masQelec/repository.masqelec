@@ -125,7 +125,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='', title= '[B]Configuración:[/B]', folder=False, text_color='goldenrod' ))
 
-    itemlist.append(item.clone( channel='actions', title= ' - Ajustes categorías [COLOR yellowgreen]proxies y buscar[/COLOR]', action = 'open_settings',
+    itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] categorías ([COLOR red][B]Proxies[/B][/COLOR] y [COLOR yellow][B]Buscar[/B][/COLOR])', action = 'open_settings',
                                 thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información búsquedas[/B][/COLOR]', thumbnail=config.get_thumb('help') ))
@@ -379,16 +379,24 @@ def do_search(item, tecleado):
         c_item = Item( channel=ch['id'], action='search', search_type=item.search_type, title='Buscar en ' + ch['name'], thumbnail=ch['thumbnail'] )
 
         if item.search_special == 'anime':
-            if not str(ch['clusters']) == "['anime']":
-                if not str(ch['clusters']) == "['current', 'anime']":
-                    num_canales = num_canales - 1
-                    continue
+            if 'anime' in ch['clusters']:
+                if not str(ch['clusters']) == "['anime']":
+                    if not str(ch['clusters']) == "['current', 'anime']":
+                        if not str(ch['clusters']) == "['current', 'notice', 'anime']":
+                            if not str(ch['clusters']) == "['notice', 'anime']":
+                                num_canales = num_canales - 1
+                                continue
+            else: continue
 
         if item.search_special == 'dorama':
-            if not str(ch['clusters']) == "['dorama']":
-                if not str(ch['clusters']) == "['current', 'dorama']":
-                    num_canales = num_canales - 1
-                    continue
+            if 'dorama' in ch['clusters']:
+                if not str(ch['clusters']) == "['dorama']":
+                    if not str(ch['clusters']) == "['current', 'dorama']":
+                        if not str(ch['clusters']) == "['current', 'notice', 'dorama']":
+                            if not str(ch['clusters']) == "['notice', 'dorama']":
+                                num_canales = num_canales - 1
+                                continue
+            else: continue
 
         if not PY3:
             if 'mismatched' in ch['clusters']:
@@ -577,14 +585,22 @@ def do_search(item, tecleado):
                     titulo = '%s [COLOR plum]No se ha buscado' % ch['name']
 
                     if item.search_special == 'anime':
-                        if not str(ch['clusters']) == "['anime']":
-                            if not str(ch['clusters']) == "['current', 'anime']":
-                                continue
+                        if 'anime' in ch['clusters']:
+                            if not str(ch['clusters']) == "['anime']":
+                               if not str(ch['clusters']) == "['current', 'anime']":
+                                   if not str(ch['clusters']) == "['current', 'notice', 'anime']":
+                                       if not str(ch['clusters']) == "['notice', 'anime']":
+                                           continue
+                        else: continue
 
                     if item.search_special == 'dorama':
-                        if not str(ch['clusters']) == "['dorama']":
-                            if not str(ch['clusters']) == "['current', 'dorama']":
-                                continue
+                        if 'dorama' in ch['clusters']:
+                            if not str(ch['clusters']) == "['dorama']":
+                               if not str(ch['clusters']) == "['current', 'dorama']":
+                                   if not str(ch['clusters']) == "['current', 'notice', 'dorama']":
+                                       if not str(ch['clusters']) == "['notice', 'dorama']":
+                                           continue
+                        else: continue
 
                     if not PY3:
                         if 'mismatched' in ch['clusters']:

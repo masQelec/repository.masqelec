@@ -1,1 +1,0 @@
-define([],function(){"use strict";var sounds={};function play(options){var path=options.path,sound=sounds[path];sound||(sound=new Howl({src:[path],volume:.3}),sounds[path]=sound),sound.play()}return{play:function(options){window.Howl?play(options):require(["howler"],function(howler){play(options)})}}});

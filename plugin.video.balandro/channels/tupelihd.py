@@ -205,26 +205,28 @@ def puntuar_calidad(txt):
     txt = txt.replace(' ', '').replace('-', '').lower()
 
     orden = [
-	'cam',
-	'hdcam',
-	'webscreener',
-	'tsscreener',
-	'hdtcscreener',
-	'brscreener',
-	'hdtv',
-	'hdtv720p',
-	'microhd',
-	'dvdrip',
-	'bluraymicrohd',
-	'blurayrip',
-	'bdremux',
-	'hdrip',
-	'hd720',
-	'hd1080',
-	'4kuhdmicro',
-	'4kuhdrip',
-	'4kuhdremux'
-	]
+          'cam',
+          'hdcam',
+          'webscreener',
+          'tsscreener',
+          'hdtcscreener',
+          'brscreener',
+          'hdtv',
+          'hdtv720p',
+          'microhd',
+          'dvdrip',
+          'blurayrip1080p',
+          'bluraymicrohd',
+          'blurayrip',
+          'bdremux',
+          'hdrip',
+          'hd720',
+          'hd1080',
+          '4kwebrip',
+          '4kuhdmicro',
+          '4kuhdrip',
+          '4kuhdremux'
+          ]
 
     if txt not in orden: return 0
     else: return orden.index(txt) + 1

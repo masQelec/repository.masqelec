@@ -121,10 +121,6 @@ def do_make_login_logout(url, post=None):
     # ~ data = httptools.downloadpage(url, post=post, raise_weberror=False).data
     data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
 
-    if 'id="captcha-bypass"' in data:
-        platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]Dominio hidden CAPTCHA[/B][/COLOR]')
-        return ''
-
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
@@ -135,6 +131,10 @@ def do_make_login_logout(url, post=None):
                 data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
         except:
             pass
+
+    if '<title>Just a moment...</title>' in data:
+        platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -192,6 +192,7 @@ def login(item):
     url = '%slogin' %(domain)
 
     data = do_make_login_logout(url)
+    if not data: return False
 
     sid = scrapertools.find_single_match(data, '__csrf_magic.*?value="(.*?)"')
     if sid:
@@ -209,6 +210,8 @@ def login(item):
     post = {'username': username, 'password': password}
 
     data = do_make_login_logout(url, post=post)
+    if not data: return False
+
     jdata = jsontools.load(data)
 
     if jdata:
@@ -719,9 +722,9 @@ def temporadas(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     # ~  Temporadas ocultas pero son accesibles en la mayoria de los casos
-    if matches:
-        seasons_hiden = False
+    seasons_hiden = False
 
+    if matches:
         total_temporadas = len(matches)
 
         try:
@@ -798,18 +801,19 @@ def temporadas(item):
                 if not any: any = '-'
 
                 last_tempo = int(numtempo)
-                last_url = scrapertools.find_single_match(url, '(.*?)-')
+                last_url = scrapertools.find_single_match(url, '(.*?)/temporada-')
 
                 try:
                     while last_tempo <= 99:
                         last_tempo = last_tempo + 1
 
                         post = 'action=season&show=%s&season=%s' % (sid, str(last_tempo))
+
                         data = jsontools.load(do_downloadpage(dominio + 'a/episodes', post=post, referer=item.url))
 
                         if not data: break
 
-                        url = last_url + '-' + str(last_tempo)
+                        url = last_url + '/temporada-' + str(last_tempo)
                         title = 'Temporada ' + str(last_tempo)
 
                         itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,

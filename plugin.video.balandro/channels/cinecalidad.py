@@ -317,13 +317,14 @@ def temporadas(item):
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.data_serie = data_serie
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, data_serie = data_serie,
+        itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0, data_serie = data_serie,
                                     contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
@@ -480,7 +481,7 @@ def findvideos(item):
             elif servidor == 'ok': servidor = 'okru'
 
             elif servidor == 'sbanh' or servidor == 'sblanh': servidor = 'streamsb'
-            elif servidor == 'sbspeed': servidor = 'streamsb'
+            elif servidor == 'sbspeed' or servidor == 'sbchill': servidor = 'streamsb'
 
             elif 'fembedhd' in servidor: servidor = 'fembed'
             elif 'femlat' in servidor: servidor = 'fembed'

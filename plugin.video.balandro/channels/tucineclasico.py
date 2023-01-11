@@ -81,6 +81,9 @@ def list_all(item):
         if '<h2>' in data: data = data.split('<h2>')[1] # descartar destacadas
         if '<div class="dt_mainmeta">' in data: data = data.split('<div class="dt_mainmeta">')[0] # descartar más vistas
 
+    elif '/lanzamiento/' in item.url:
+        if '>Mas Populares</h2>' in data: data = data.split('>Mas Populares</h2>')[0] # descartar mas populares
+
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
 
     num_matches = len(matches)

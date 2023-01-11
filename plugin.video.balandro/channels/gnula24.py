@@ -7,13 +7,23 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www3.gnula24.xyz/'
+host = 'https://ww2.gnula24.xyz/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www.gnula24.xyz/', 'https://www3.gnula24.xyz/']
+
+
+domain = config.get_setting('dominio', 'gnula24', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'gnula24')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'gnula24')
+    else: host = domain
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.gnula24.xyz/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -23,6 +33,32 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'gnula24', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_gnula24', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='gnula24', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_gnula24', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     return mainlist_series(item)
 
@@ -30,6 +66,8 @@ def mainlist(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -231,13 +269,14 @@ def temporadas(item):
 
         if len(seasons) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.data_id = data_id
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, data_id = data_id, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, data_id = data_id, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 

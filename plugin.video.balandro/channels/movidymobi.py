@@ -167,6 +167,8 @@ def findvideos(item):
         ses += 1
 
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
+        elif '/player.cuevana.ac' in url: continue
+
         elif '/gounlimited.' in url: continue
         elif '/jetload.' in url: continue
         elif '/vidcloud.' in url: continue
@@ -189,6 +191,7 @@ def findvideos(item):
 
             for link in links:
                 if '/hqq.' in link or '/waaw.' in link or '/netu.' in link: continue
+                elif '/player.cuevana.ac' in link: continue
 
                 servidor = servertools.get_server_from_url(link)
                 servidor = servertools.corregir_servidor(servidor)

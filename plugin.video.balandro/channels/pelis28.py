@@ -289,9 +289,8 @@ def findvideos(item):
         servidor = scrapertools.find_single_match(match, '<span>(.*?)</span>').lower()
 
         if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
-        elif servidor == 'powvideo': continue
-        elif servidor == 'pouvideo': continue
-        elif servidor == 'powvibeo': continue
+        elif servidor == 'powvideo' or servidor == 'pouvideo' or servidor == 'powvibeo' or servidor == 'povvldeo': continue
+
         elif servidor == 'stemplay': continue
         elif servidor == 'streamango': continue
         elif servidor == 'servidor vip': continue

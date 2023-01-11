@@ -1,1 +1,0 @@
-define(["dom","fullscreenManager"],function(dom,fullscreenManager){"use strict";dom.addEventListener(document.querySelector(".skinHeader"),"dblclick",function(e){!function(target){return!dom.parentWithTag(target,["BUTTON","INPUT","TEXTAREA"])}(e.target)||(fullscreenManager.isFullScreen()?fullscreenManager.exitFullscreen():fullscreenManager.requestFullscreen())},{passive:!0})});

@@ -38,6 +38,17 @@ notification_d_ok = config.get_setting('notification_d_ok', default=True)
 color_adver = config.get_setting('notification_adver_color', default='violet')
 
 
+_useragent = ''
+_chrome_version = ''
+
+ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
+if ver_stable_chrome:
+    cfg_last_ver_chrome = config.get_setting('chrome_last_version', default='')
+    if cfg_last_ver_chrome:
+        _chrome_version = cfg_last_ver_chrome
+        _useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36" % _chrome_version
+
+
 class login_dialog(xbmcgui.WindowDialog):
     def __init__(self):
         avis = True
@@ -105,8 +116,11 @@ def do_make_login_logout(url, post=None, headers=None):
     # ~ 11/12/2022
     # ~ headers = {}
 
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 pddkit/2023", "Authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
-  
+    if _useragent:
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + _chrome_version + " Safari/537.36 pddkit/2023", "authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
+    else:
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 pddkit/2023", "Authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
+
     add_referer = True
 
     if '/user/' in url: add_referer = False
@@ -124,6 +138,10 @@ def do_make_login_logout(url, post=None, headers=None):
                 data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False).data
         except:
             pass
+
+    if '<title>Just a moment...</title>' in data:
+        platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -149,6 +167,7 @@ def login(item):
 
     try:
        data = do_make_login_logout(host)
+       if not data: return False
 
        user = scrapertools.find_single_match(data, username).strip()
 
@@ -175,6 +194,7 @@ def login(item):
 
     try:
        data = do_make_login_logout(host + 'ajax.php', post=post)
+       if not data: return False
 
        jdata = jsontools.load(data)
 
@@ -209,6 +229,7 @@ def login(item):
 
     try:
        data = do_make_login_logout(host + 'ajax.php', post=post)
+       if not data: return False
     except:
        platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]PlayDede Sin acceso al Login[/B][/COLOR]')
        return False
@@ -283,7 +304,10 @@ def do_downloadpage(url, post=None, referer=None):
     # ~ 11/12/2022
     # ~ headers = {}
 
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 pddkit/2023", "Authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx", "Referer": referer}
+    if _useragent:
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + _chrome_version + " Safari/537.36 pddkit/2023", "authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
+    else:
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 pddkit/2023", "Authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx", "Referer": referer}
 
     timeout = None
     if '?genre=' in url: timeout = 30

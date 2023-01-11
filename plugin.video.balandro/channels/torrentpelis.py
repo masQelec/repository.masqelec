@@ -9,11 +9,11 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www2.torrentpelis.com/'
+host = 'https://torrentpelis.org/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://torrentpelis.com/', 'https://www1.torrentpelis.com/']
+ant_hosts = ['https://torrentpelis.com/', 'https://www1.torrentpelis.com/', 'https://www2.torrentpelis.com/']
 
 
 domain = config.get_setting('dominio', 'torrentpelis', default='')

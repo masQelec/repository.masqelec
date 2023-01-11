@@ -48,7 +48,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('seriesmovil', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
-    if '<title>You are being redirected...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
@@ -156,13 +156,14 @@ def temporadas(item):
 
         if len(seasons) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.url = url
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 

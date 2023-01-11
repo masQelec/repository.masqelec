@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww1.cuevana3.ai/'
+host = 'https://cuevana3.be/'
 
 
 # ~ por si viene de enlaces guardados
@@ -29,7 +29,8 @@ ant_hosts = ['http://www.cuevana3.co/', 'https://cuevana3.co/', 'https://cuevana
              'https://y2.cuevana3.me/', 'https://f3.cuevana3.me/', 'https://h3.cuevana3.me/',
              'https://j3.cuevana3.me/', 'https://l3.cuevana3.me/', 'https://y4.cuevana3.me/',
              'https://b4.cuevana3.me/', 'https://u4.cuevana3.me/', 'https://r4.cuevana3.me/',
-             'https://cuevana3.ai/']
+             'https://cuevana3.ai/', 'https://ww1.cuevana3.ai/', 'https://ww2.cuevana3.ai/',
+             'https://www1.cuevana3.ai/', 'https://www2.cuevana3.ai/', 'https://www4.cuevana3.ai/']
 
 
 domain = config.get_setting('dominio', 'cuevana3', default='')
@@ -282,12 +283,13 @@ def temporadas(item):
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo ))
 
     tmdb.set_infoLabels(itemlist)
 

@@ -146,7 +146,7 @@ def list_all(item):
             thumb if "http" in thumb else "https:" + thumb
 
             itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, thumbnail=thumb,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': "-"} ))
+                                        contentType='movie', contentTitle=titulo, infoLabels={'year': "-"} ))
 
     elif item.search_type== 'tvshow':
         matches = re.compile(r"<a href='([^']+)'>([^<]+)").findall(data)

@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Filemoon,  Mvidoo,  Ninjastream,  Rutube,  Streamhub,  Tubeload,  Videovard,  Videowood,  Yandex)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Filemoon,  Mvidoo,  Ninjastream,  Rutube,  Streamhide,  Streamhub,  Tubeload,  Uploadever,  Videovard,  Videowood,  Yandex)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -58,6 +58,14 @@
       },
       {
         "pattern": "(https://streamhub.to/watch/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://streamhide.to/(?:e|d|w)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://uploadever.(?:com|in)/[A-z0-9]+)",
         "url": "\\1"
       },
       {
