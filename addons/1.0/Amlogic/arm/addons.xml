@@ -1841,7 +1841,7 @@ v5.2.14 (2017-01-23)
   <extension library="lib" point="xbmc.python.module" />
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="2.5.5" provider-name="Balandro Team">
+<addon id="plugin.video.balandro" name="Balandro" version="3.0.0" provider-name="Balandro Team">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -1857,7 +1857,7 @@ v5.2.14 (2017-01-23)
       <fanart>fanart.png</fanart>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]2.5.5[/COLOR][COLOR red]  Enero 2023[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]3.0.0[/COLOR][COLOR red]  Febrero de 2023[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers Soportados[/COLOR][COLOR plum]  20.x,  19.x,  18.x  y  17.x[/B][/COLOR]
 
@@ -1865,7 +1865,7 @@ v5.2.14 (2017-01-23)
 
     [COLOR limegreen][B]Contacto:[/B][/COLOR]
         Foro  mimediacenter.info/foro/
-        Telegram  t.me/@balandro_asesor
+        Telegram  t.me/balandro_asesor
 
     [COLOR blue][B]Agradecimientos:[/B][/COLOR]
         Cita destacada a los miembros de Balandro Team
