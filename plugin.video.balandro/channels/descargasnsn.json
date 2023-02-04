@@ -3,7 +3,7 @@
   "name": "DescargasNsn",
   "thumbnail": "descargasnsn.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["torrents", "languages", "producers", "vos"],
 
-  "notes": "Canal con enlaces Streaming y Torrent. Películas por géneros, idiomas."
+  "notes": "Web CERRADA. Canal con enlaces Streaming y Torrent. Películas por géneros, idiomas."
 }

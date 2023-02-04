@@ -128,6 +128,22 @@
       {
         "pattern": "(?:sblongvu.com)/([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbchill.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbchill.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbrity.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbrity.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
       }
     ]
   }

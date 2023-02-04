@@ -84,18 +84,15 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'browse', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host, search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=4',
-                                search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=2',
-                                search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=4', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=3',
-                                search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=2', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=3', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por categorías', action = 'categorias', search_type = 'tvshow' ))
 
@@ -228,6 +225,8 @@ def last_epis(item):
     matches = re.compile(patron, re.DOTALL).findall(bloque)
 
     for url, thumb, episode, title in matches:
+        if not url or not title: continue
+
         epis = episode.replace('Episodio', '').strip()
 
         episode = episode.replace('Episodio', 'epis.')

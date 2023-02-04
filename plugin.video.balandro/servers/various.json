@@ -49,6 +49,10 @@
         "url": "\\1"
       },
       {
+        "pattern": "(https://filemoon.link/(?:e|d|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
         "pattern": "(https://disk.yandex.(?:ru|com)/(?:d|i|)/[A-z0-9]+)",
         "url": "\\1"
       },

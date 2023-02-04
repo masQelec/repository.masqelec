@@ -46,6 +46,8 @@ def list_all(item):
 
         title = re.sub(r' \((\d{4})\)$', '', title)
 
+        title = title.replace("&#8217;", "'")
+
         titulo = title
 
         if 'Audio Latino' in titulo:  titulo = titulo.split('Audio Latino')[0]

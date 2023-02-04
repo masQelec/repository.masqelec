@@ -62,28 +62,20 @@ def list_all(item):
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
 
         title = scrapertools.find_single_match(article, '<h3 class="jeg_post_title">.*?<a href=".*?">(.*?)</a>')
-        if not title:
-            title = scrapertools.find_single_match(article, 'alt="(.*?)"')
+        if not title:  title = scrapertools.find_single_match(article, 'alt="(.*?)"')
 
         lang = ''
-        if 'latino' in title.lower():
-            lang = 'Lat'
-        elif 'español' in title.lower():
-            lang = 'Esp'
+        if 'latino' in title.lower(): lang = 'Lat'
+        elif 'español' in title.lower(): lang = 'Esp'
 
-        if not '-' in title:
-            title = title.replace('&#8211;', '-')
-        else:
-            title = title.replace('&#8211;', '')
+        if not '-' in title: title = title.replace('&#8211;', '-')
+        else: title = title.replace('&#8211;', '')
 
         if not '/documentales/' in item.url:
-            if '-' in title:
-                title = scrapertools.find_single_match(title, '(.*?)-')
+            if '-' in title: title = scrapertools.find_single_match(title, '(.*?)-')
 
-        if 'pelicula' in title:
-            title = scrapertools.find_single_match(title.lower(), '(.*?)pelicula')
-        elif 'película' in title:
-            title = scrapertools.find_single_match(title.lower(), '(.*?)película')
+        if 'pelicula' in title: title = scrapertools.find_single_match(title.lower(), '(.*?)pelicula')
+        elif 'película' in title: title = scrapertools.find_single_match(title.lower(), '(.*?)película')
 
         title = title.replace('Pelicula', '').replace('Película', '').replace('Online', '').replace('online', '')
         title = title.replace('Latino', '').replace('latino', '').replace('Español', '').replace('español', '').replace('completa en', '')
@@ -121,16 +113,14 @@ def findvideos(item):
 
             links = scrapertools.find_multiple_matches(data, patron)
 
-    if not links:
-        links = scrapertools.find_multiple_matches(data, '<div class="jeg_video_container">.*?src="(.*?)"')
+    if not links: links = scrapertools.find_multiple_matches(data, '<div class="jeg_video_container">.*?src="(.*?)"')
 
     ses = 0
 
     for url in links:
         ses += 1
 
-        if not url.startswith('http'):
-            url = 'https' + url
+        if not url.startswith('http'): url = 'https' + url
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

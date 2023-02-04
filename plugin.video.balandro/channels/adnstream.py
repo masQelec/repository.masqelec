@@ -19,7 +19,7 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Destacados', action = 'list_all', url = host + 'canal/Grandes-documentales/', search_type = 'documentary' ))
     itemlist.append(item.clone( title = 'Viajes', action = 'list_all', url = host + 'canal/Viajes/', search_type = 'documentary' ))
 
-    itemlist.append(item.clone( title = '[B]Películas:[/B]', folder=False, text_color='aquamarine' ))
+    itemlist.append(item.clone( title = '[B]Películas:[/B]', folder=False, text_color='deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Cine de ayer y siempre', action = 'list_all', url = host + 'canal/Cine-de-ayer-y-siempre/', search_type = 'movie' ))
 

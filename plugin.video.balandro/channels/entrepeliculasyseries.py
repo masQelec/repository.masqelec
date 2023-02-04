@@ -67,7 +67,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
-    if '<title>You are being redirected...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
@@ -175,7 +175,13 @@ def generos(item):
            if '/peliculas-' in url: continue
            elif '/documentales' in url: continue
 
+           if title == 'Series Documentales': title = 'Documentales'
+
         itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+
+    if itemlist:
+        if item.search_type == 'movie':
+            itemlist.append(item.clone( action = 'list_all', title = 'Western', url = host + 'peliculas-de-western/' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -232,16 +238,14 @@ def list_all(item):
 
     for match in matches[item.page * perpage:]:
         title = scrapertools.find_single_match(match, '<h3>(.*?)</h3>').strip()
-        if not title:
-            title = scrapertools.find_single_match(match, '<h2>(.*?)</h2>').strip()
-
-        thumb = scrapertools.find_single_match(match, 'src="([^"]+)"')
+        if not title: title = scrapertools.find_single_match(match, '<h2>(.*?)</h2>').strip()
 
         url = scrapertools.find_single_match(match, 'href="([^"]+)"')
-        if url == '#':
-            url =  scrapertools.find_single_match(match, '<div class="title">.*?href="([^"]+)"')
+        if url == '#': url =  scrapertools.find_single_match(match, '<div class="title">.*?href="([^"]+)"')
 
         if not title or not url: continue
+
+        thumb = scrapertools.find_single_match(match, 'src="([^"]+)"')
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
 
@@ -498,26 +502,29 @@ def list_search(item):
     for match in matches:
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
         title = title.replace('ver ', '').replace('Online', '').strip()
-        if not title:
-            title = scrapertools.find_single_match(match, '<h2 class="Title">(.*?)</h2>')
-
-        thumb = scrapertools.find_single_match(match, 'src="([^"]+)"')
+        if not title: title = scrapertools.find_single_match(match, '<h2 class="Title">(.*?)</h2>')
 
         url = scrapertools.find_single_match(match, 'href="([^"]+)"')
 
         if not title or not url: continue
 
+        title = title.replace('Ver ', '').strip()
+
+        thumb = scrapertools.find_single_match(match, 'src="([^"]+)"')
+
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if '/pelicula/' in url:
-            if item.search_type == 'tvshow': continue
+            if not item.search_type == 'all':
+                if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
 
         if '/serie/' in url:
-            if item.search_type == 'movie': continue
+            if not item.search_type == 'all':
+                if item.search_type == 'movie': continue
 
             itemlist.append(item.clone( action ='temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))

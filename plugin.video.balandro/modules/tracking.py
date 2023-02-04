@@ -129,6 +129,13 @@ def mainlist(item):
 
     if (count_movies + count_shows + count_episodes) == 0:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Preferidos[/COLOR][/B]' % color_exec)
+
+        try:
+           preferidos_path = filetools.join(config.get_data_path(), 'tracking_dbs')
+           filetools.rmdirtree(preferidos_path)
+        except:
+           pass
+
     else:
         itemlist.append(item.clone( title = 'Películas (%d)' % count_movies, action = 'mainlist_pelis', thumbnail=config.get_thumb('movie') ))
 
@@ -143,11 +150,11 @@ def mainlist(item):
     itemlist.append(item.clone( channel='actions', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR wheat][B]Preferidos[/B][/COLOR])', action = 'open_settings',
                                 thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( channel='helper', title = '[B]Información[/B] ¿ Cómo funciona ?', action = 'show_help_tracking',
-                                thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] ¿ Cómo funciona ?', action = 'show_help_tracking',
+                                thumbnail=config.get_thumb('help') ))
 
-    itemlist.append(item.clone( channel='helper', title = '[B]Información[/B] Búsqueda automática de [COLOR cyan][B]Nuevos Episodios[/B][/COLOR]',
-                                action = 'show_help_tracking_update', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] Búsqueda automática de [COLOR cyan][B]Nuevos Episodios[/B][/COLOR]',
+                                action = 'show_help_tracking_update', thumbnail=config.get_thumb('help') ))
 
     return itemlist
 
@@ -517,7 +524,7 @@ def acciones_peli(item):
         db.cur.execute('UPDATE movies SET updated=? WHERE tmdb_id=?', (datetime.now(), tmdb_id))
 
     elif acciones[ret] == 'Eliminar película':
-        if not platformtools.dialog_yesno('Eliminar película', '¿Confirma Eliminar la película [COLOR gold[B]]%s[/B][/COLOR] con tmdb_id: %s ?' % (item.contentTitle, tmdb_id)): return False
+        if not platformtools.dialog_yesno('Eliminar película', '¿Confirma Eliminar la película [COLOR gold][B]%s[/B][/COLOR] con tmdb_id: %s ?' % (item.contentTitle, tmdb_id)): return False
         db.delete_movie(tmdb_id)
 
     elif acciones[ret].startswith('Eliminar enlaces del canal '):

@@ -9,7 +9,7 @@ from core import httptools, scrapertools, tmdb, servertools
 
 # ~ 27/10/2022 por los controles que tiene la web necesitara proxies siempre incluso para hacer Play?
 
-host = 'https://wwu.repelishd.de/'
+host = 'https://ww1.repelishd.de/'
 
 
 embeds = 'repelishd.de'
@@ -20,7 +20,7 @@ _player = 'https://players.oceanplay.me/'
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://repelishd.me/', 'https://www1.repelishd.de/', 'https://wwa.repelishd.de/',
-             'https://wwi.repelishd.de/', 'https://wwo.repelishd.de/']
+             'https://wwi.repelishd.de/', 'https://wwo.repelishd.de/', 'https://wwu.repelishd.de/']
 
 domain = config.get_setting('dominio', 'repelishd', default='')
 
@@ -358,6 +358,8 @@ def list_all(item):
             if not title: title = scrapertools.find_single_match(article, 'alt=(.*?)>').strip()
 
         if not url or not title: continue
+
+        title = title.replace("&#8217;", "'")
 
         thumb = scrapertools.find_single_match(article, 'data-src=(.*?) alt=').strip()
         if thumb.startswith('//'): thumb = 'https:' + thumb

@@ -162,7 +162,7 @@ def list_all(item):
     matches = re.compile('<div class="post-preview-styling">.*?<a href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(data)
 
     for url, title, thumb in matches:
-        title = title.replace('&#8211;', '&').replace('&#038;', '&')
+        title = title.replace('&#8217;', '').replace('&#8211;', '&').replace('&#038;', '&')
 
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie',
                                     contentTitle = title, contentExtra='adults') )

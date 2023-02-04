@@ -80,17 +80,15 @@ def list_all(item):
         title = title.replace('Ver', '').replace('en (Castellano)', '').replace('en Castellano', '').replace('Online', '').strip()
 
         year = scrapertools.find_single_match(title, '.*?(\d{4})$')
-        if year:
-            title = title.replace(year, '').strip()
-        else:
-            year = '-'
+        if year: title = title.replace(year, '').strip()
+        else: year = '-'
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         lang = 'Esp'
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb, languages = lang,
-                                            contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+                                    contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
         if len(itemlist) >= perpage: break
 
@@ -147,8 +145,7 @@ def findvideos(item):
             if 'codigo' in href: url = onlines[iden]
             else: url = "%s%s" %(href, onlines[iden])
 
-            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-                continue
+            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -161,10 +158,11 @@ def findvideos(item):
     if url:
         ses += 1
 
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
+        if not '/fikper.' in url:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, quality = qlty, language = lng ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, quality = qlty, language = lng ))
 
     if not itemlist:
         if not ses == 0:

@@ -33,13 +33,16 @@ PY2 = False
 
 if sys.version_info[0] >= 3:
     PY3 = True
+
     from urllib.request import urlopen, Request
     from urllib.parse import unquote_plus, urlparse
 else:
     PY2 = True
+
     from urllib2 import urlopen, Request
     from urlparse import urlparse
     from urllib import unquote_plus
+
 
 class Downloader:
     @property
@@ -144,10 +147,17 @@ class Downloader:
         if self._state == self.states.downloading:
             # Detenemos la descarga
             self._state = self.states.stopped
-            for t in self._threads:
-                if t.isAlive(): t.join()
 
-            if self._save_thread.isAlive(): self._save_thread.join()
+            for t in self._threads:
+                if PY3:
+                    if t.is_alive(): t.join()
+                else:
+                    if t.isAlive(): t.join()
+
+            if PY3:
+                if self._save_thread.is_alive(): self._save_thread.join()
+            else:
+                if self._save_thread.isAlive(): self._save_thread.join()
 
             if self._seekable:
                 # Guardamos la info al final del archivo

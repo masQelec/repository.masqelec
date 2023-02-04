@@ -481,7 +481,7 @@ def findvideos(item):
             elif servidor == 'ok': servidor = 'okru'
 
             elif servidor == 'sbanh' or servidor == 'sblanh': servidor = 'streamsb'
-            elif servidor == 'sbspeed' or servidor == 'sbchill': servidor = 'streamsb'
+            elif servidor == 'sbspeed' or servidor == 'sbchill' or 'sbrity': servidor = 'streamsb'
 
             elif 'fembedhd' in servidor: servidor = 'fembed'
             elif 'femlat' in servidor: servidor = 'fembed'

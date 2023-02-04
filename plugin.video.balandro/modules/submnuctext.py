@@ -449,17 +449,11 @@ def _dominios(item):
     elif item.from_channel == 'playdede':
         domains.manto_domain_playdede(item)
 
-    elif item.from_channel == 'repelis24':
-        domains.manto_domain_repelis24(item)
-
     elif item.from_channel == 'repelishd':
         domains.manto_domain_repelishd(item)
 
     elif item.from_channel == 'series24':
         domains.manto_domain_series24(item)
-
-    elif item.from_channel == 'seriesanimadas':
-        domains.manto_domain_seriesanimadas(item)
 
     elif item.from_channel == 'seriesyonkis':
         domains.manto_domain_seriesyonkis(item)
@@ -592,17 +586,11 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'playdede':
         domains.manto_domain_playdede(item)
 
-    elif item.from_channel == 'repelis24':
-        domains.manto_domain_repelis24(item)
-
     elif item.from_channel == 'repelishd':
         domains.manto_domain_repelishd(item)
 
     elif item.from_channel == 'series24':
         domains.manto_domain_series24(item)
-
-    elif item.from_channel == 'seriesanimadas':
-        domains.manto_domain_seriesanimadas(item)
 
     elif item.from_channel == 'seriesyonkis':
         domains.manto_domain_seriesyonkis(item)
@@ -791,10 +779,25 @@ def _proxies(item):
         item.channel = 'gnula'
         gnula.configurar_proxies(item)
 
+    elif item.from_channel == 'gnula24':
+        from channels import gnula24
+        item.channel = 'gnula24'
+        gnula24.configurar_proxies(item)
+
+    elif item.from_channel == 'gnula24h':
+        from channels import gnula24h
+        item.channel = 'gnula24h'
+        gnula24h.configurar_proxies(item)
+
     elif item.from_channel == 'grantorrent':
         from channels import grantorrent
         item.channel = 'grantorrent'
         grantorrent.configurar_proxies(item)
+
+    elif item.from_channel == 'grantorrents':
+        from channels import grantorrents
+        item.channel = 'grantorrents'
+        grantorrents.configurar_proxies(item)
 
     elif item.from_channel == 'hdfull':
         from channels import hdfull
@@ -926,11 +929,6 @@ def _proxies(item):
         item.channel = 'reinventorrent'
         reinventorrent.configurar_proxies(item)
 
-    elif item.from_channel == 'repelis24':
-        from channels import repelis24
-        item.channel = 'repelis24'
-        repelis24.configurar_proxies(item)
-
     elif item.from_channel == 'repelishd':
         from channels import repelishd
         item.channel = 'repelishd'
@@ -966,10 +964,25 @@ def _proxies(item):
         item.channel = 'subtorrents'
         subtorrents.configurar_proxies(item)
 
+    elif item.from_channel == 'todotorrents':
+        from channels import todotorrents
+        item.channel = 'todotorrents'
+        todotorrents.configurar_proxies(item)
+
+    elif item.from_channel == 'tomadivx':
+        from channels import tomadivx
+        item.channel = 'tomadivx'
+        tomadivx.configurar_proxies(item)
+
     elif item.from_channel == 'torrentdivx':
         from channels import torrentdivx
         item.channel = 'torrentdivx'
         torrentdivx.configurar_proxies(item)
+
+    elif item.from_channel == 'torrentpelis':
+        from channels import torrentpelis
+        item.channel = 'torrentpelis'
+        torrentpelis.configurar_proxies(item)
 
     elif item.from_channel == 'tupelihd':
         from channels import tupelihd

@@ -164,6 +164,8 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
+            title = title.replace('&#8211;', '')
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year, 'plot': plot} ))
 
@@ -468,6 +470,8 @@ def findvideos(item):
            if url.endswith('.js') == True: continue
 
            if url.startswith('//') == True: url = 'https:' + url
+
+           url = url.replace('\\', '/')
 
            servidor = servertools.get_server_from_url(url)
            servidor = servertools.corregir_servidor(servidor)

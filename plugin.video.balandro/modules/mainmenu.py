@@ -786,6 +786,10 @@ def channels(item):
     for ch in ch_list:
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
+        if not item.extra == 'all':
+            if config.get_setting('search_extra_trailers', default=False):
+                if str(ch['clusters']) == "['trailers']": continue
+
         if item.extra == 'problematics':
             if not 'problematic' in ch['clusters']: continue
         else:

@@ -54,12 +54,14 @@ def submnu_center(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='', title='[B]Media Center:[/B]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
+    itemlist.append(item.clone( action='', title='[B]MEDIA CENTER[/B]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
 
-    itemlist.append(item.clone( channel='helper', action='show_plataforma', title=' - Información Plataforma', thumbnail=config.get_thumb('computer') ))
+    itemlist.append(item.clone( channel='helper', action='show_plataforma', title='Información [B]Plataforma[/B]', thumbnail=config.get_thumb('computer'), text_color='green' ))
 
-    itemlist.append(item.clone( channel='helper', action='show_log', title=' - Ver el Log de su Media Center', thumbnail=config.get_thumb('computer') ))
-    itemlist.append(item.clone( channel='helper', action='copy_log', title= ' - Obtener una Copia del fichero LOG de su Media Center', thumbnail=config.get_thumb('folder') ))
+    itemlist.append(item.clone( action='', title='Archivo Log:', thumbnail=config.get_thumb('computer'), text_color='pink' ))
+
+    itemlist.append(item.clone( channel='helper', action='show_log', title=' - Ver', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
+    itemlist.append(item.clone( channel='helper', action='copy_log', title=' - Obtener una Copia', thumbnail=config.get_thumb('folder'), text_color='yellowgreen' ))
 
     presentar = False
 
@@ -73,8 +75,10 @@ def submnu_center(item):
 
     if existe: presentar = True
     if presentar:
-        itemlist.append(item.clone( channel='helper', action='show_advs', title=' - Ver AdvancedSettings', thumbnail=config.get_thumb('quote'), text_color='yellow' ))
-        itemlist.append(item.clone( channel='actions', action='manto_advs', title=' - Eliminar AdvancedSettings', thumbnail=config.get_thumb('quote'), text_color='red' ))
+        itemlist.append(item.clone( action='', title='Archivo advancedsettings:', thumbnail=config.get_thumb('computer'), text_color='pink' ))
+
+        itemlist.append(item.clone( channel='helper', action='show_advs', title=' - Ver', thumbnail=config.get_thumb('quote'), text_color='yellow' ))
+        itemlist.append(item.clone( channel='actions', action='manto_advs', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('quote'), text_color='red' ))
 
     path_cache = translatePath(os.path.join('special://temp/archive_cache', ''))
     existe_cache = filetools.exists(path_cache)
@@ -84,9 +88,19 @@ def submnu_center(item):
 
     if caches: presentar = True
     if presentar:
-        itemlist.append(item.clone( action='show_addons', title=' - Ver archivos Caché', addons = caches, tipo = 'Caché', thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+        itemlist.append(item.clone( action='', title='Archivos en Caché:', thumbnail=config.get_thumb('computer'), text_color='pink' ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_caches', title=' - Eliminar arhivos de Caché', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+        itemlist.append(item.clone( action='show_addons', title=' - Ver', addons = caches, tipo = 'Caché', thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_caches', title=' - Eliminar [B][COLOR cyan](Si ejecuta es Obligatorio Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+
+    path_thumbs = translatePath(os.path.join('special://home/userdata/Thumbnails', ''))
+    existe_thumbs = filetools.exists(path_thumbs)
+
+    if existe_thumbs:
+        itemlist.append(item.clone( action='', title='Archivos en Thumbnails:', thumbnail=config.get_thumb('computer'), text_color='pink' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_thumbs', title=' - Eliminar [B][COLOR cyan](Si ejecuta es Obligatorio Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     return itemlist
 
@@ -113,19 +127,21 @@ def submnu_addons(item):
     elif temps: presentar = True
 
     if presentar:
-        itemlist.append(item.clone( action='', title='[B]Addons:[/B]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
+        itemlist.append(item.clone( action='', title='[B]ADDONS[/B]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
 
         if packages:
-            itemlist.append(item.clone( action='show_addons', title=' - Ver Packages', addons = packages, tipo = 'Packages',
-                                        thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+            itemlist.append(item.clone( action='', title='Archivos en Packages:', thumbnail=config.get_thumb('computer'), text_color='yellowgreen' ))
 
-            itemlist.append(item.clone( channel='actions', action='manto_addons_packages', title=' - Eliminar Packages', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+            itemlist.append(item.clone( action='show_addons', title=' - Ver', addons = packages, tipo = 'Packages', thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+
+            itemlist.append(item.clone( channel='actions', action='manto_addons_packages', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
         if temps:
-            itemlist.append(item.clone( action='show_addons', title=' - Ver Temp', addons = temps, tipo = 'Temp',
-                                        thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+            itemlist.append(item.clone( action='', title='Archivos en Temp:', thumbnail=config.get_thumb('computer'), text_color='yellowgreen' ))
 
-            itemlist.append(item.clone( channel='actions', action='manto_addons_temp', title=' - Eliminar Temp', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+            itemlist.append(item.clone( action='show_addons', title=' - Ver', addons = temps, tipo = 'Temp', thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+
+            itemlist.append(item.clone( channel='actions', action='manto_addons_temp', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     return itemlist
 
@@ -134,10 +150,10 @@ def submnu_sistema(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='', title='[B]Sistema:[/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+    itemlist.append(item.clone( action='', title='[B]SISTEMA[/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
-    itemlist.append(item.clone( channel='actions', action = 'test_internet', title= ' - Comprobar el estado de su [COLOR gold][B]Internet[/B][/COLOR]', thumbnail=config.get_thumb('crossroads') ))
-    itemlist.append(item.clone( channel='helper', action='show_test', title= ' - Test [COLOR gold][B]Status[/B][/COLOR] del sistema', thumbnail=config.get_thumb('addon') ))
+    itemlist.append(item.clone( channel='actions', action = 'test_internet', title= 'Comprobar el estado de su [COLOR gold][B]Internet[/B][/COLOR]', thumbnail=config.get_thumb('crossroads') ))
+    itemlist.append(item.clone( channel='helper', action='show_test', title= 'Test [COLOR gold][B]Status[/B][/COLOR] del sistema', thumbnail=config.get_thumb('addon') ))
 
     presentar = False
 
@@ -146,8 +162,10 @@ def submnu_sistema(item):
     existe = filetools.exists(path)
     if existe: presentar = True
     if presentar:
-        itemlist.append(item.clone( channel='helper', action='show_last_fix', title= ' - [COLOR green][B]Información[/B][/COLOR] último Fix instalado', thumbnail=config.get_thumb('news') ))
-        itemlist.append(item.clone( channel='actions', action='manto_last_fix', title= " - Eliminar el fichero de control 'Fix'", thumbnail=config.get_thumb('news'), text_color='red' ))
+        itemlist.append(item.clone( action='', title='Archivo Fix:', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+
+        itemlist.append(item.clone( channel='helper', action='show_last_fix', title= ' - Información [B]Fix instalado[/B]', thumbnail=config.get_thumb('news'), text_color='green' ))
+        itemlist.append(item.clone( channel='actions', action='manto_last_fix', title= " - Eliminar fichero control 'Fix'", thumbnail=config.get_thumb('news'), text_color='red' ))
 
     presentar = False
 
@@ -156,7 +174,9 @@ def submnu_sistema(item):
     existe = filetools.exists(path)
     if existe: presentar = True
     if presentar:
-        itemlist.append(item.clone( channel='actions', action='manto_cookies', title= " - Eliminar fichero de 'Cookies'", thumbnail=config.get_thumb('computer'), text_color='red' ))
+        itemlist.append(item.clone( action='', title='Archivo Cookies:', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_cookies', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
 
     presentar = False
 
@@ -165,32 +185,45 @@ def submnu_sistema(item):
     existe = filetools.exists(path)
     if existe: presentar = True
     if presentar:
-        itemlist.append(item.clone( channel='actions', action='manto_folder_cache', title= " - Eliminar carpeta 'Caché'", thumbnail=config.get_thumb('computer'), text_color='red' ))
+        itemlist.append(item.clone( action='', title='Carpeta Caché:', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_folder_cache', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
 
     presentar = False
 
     downloadpath = config.get_setting('downloadpath', default='')
 
     if downloadpath: path = downloadpath
-    else: path = os.path.join(config.get_data_path(), 'downloads')
+    else: path = filetools.join(config.get_data_path(), 'downloads')
 
     existe = filetools.exists(path)
     if existe: presentar = True
     if presentar:
-        itemlist.append(item.clone( action='', title=' - Hay Descargas', thumbnail=config.get_thumb('computer'), text_color='goldenrod' ))
+        itemlist.append(item.clone( action='', title='Contenido Descargas:', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_folder_downloads', title= " - Eliminar 'Todo' el contenido de Descargas", thumbnail=config.get_thumb('computer'), text_color='red' ))
+        itemlist.append(item.clone( channel='actions', action='manto_folder_downloads', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
 
     presentar = False
 
-    path = os.path.join(config.get_data_path(), 'tracking_dbs')
+    path = filetools.join(config.get_data_path(), 'tracking_dbs')
 
     existe = filetools.exists(path)
     if existe: presentar = True
     if presentar:
-        itemlist.append(item.clone( action='', title=' - Hay Preferidos', thumbnail=config.get_thumb('computer'), text_color='goldenrod' ))
+        itemlist.append(item.clone( action='', title='Contenido Preferidos:', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_tracking_dbs', title= " - Eliminar 'Todo' el contenido de Preferidos", thumbnail=config.get_thumb('computer'), text_color='red' ))
+        itemlist.append(item.clone( channel='actions', action='manto_tracking_dbs', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
+
+    presentar = False
+
+    path = filetools.join(config.get_data_path(), 'tmdb.sqlite')
+
+    existe = filetools.exists(path)
+    if existe: presentar = True
+    if presentar:
+        itemlist.append(item.clone( action='', title='Archivo Tmdb Sqlite:', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_tmdb_sqlite', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
 
     presentar = False
 
@@ -199,7 +232,9 @@ def submnu_sistema(item):
     existe = filetools.exists(path)
     if existe: presentar = True
     if presentar:
-        itemlist.append(item.clone( channel='actions', action='manto_folder_addon', title= " - Eliminar 'Todos' los Datos Personalizados de la Configuración", thumbnail=config.get_thumb('computer'), text_color='red' ))
+        itemlist.append(item.clone( action='', title='Ajustes Configuración:', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_folder_addon', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
 
     return itemlist
 
@@ -215,22 +250,24 @@ def submnu_logs(item):
     elif os.path.exists(os.path.join(config.get_data_path(), 'proxies.log')): presentar = True
 
     if presentar:
-        itemlist.append(item.clone( action='', title='[B]Logs:[/B]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
+        itemlist.append(item.clone( action='', title='[B]LOGS[/B]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'servers_todo.log')):
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Log de Servidores',
-                                        todo = 'servers_todo.log', thumbnail=config.get_thumb('crossroads') ))
+            itemlist.append(item.clone( action='', title='Log de Servidores:', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
+
+            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'servers_todo.log', thumbnail=config.get_thumb('crossroads'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'qualities_todo.log')):
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Log de Calidades',
-                                        todo = 'qualities_todo.log', thumbnail=config.get_thumb('quote') ))
+            itemlist.append(item.clone( action='', title='Log de Calidades:', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
+
+            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'qualities_todo.log', thumbnail=config.get_thumb('quote', text_color='yellow') ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'proxies.log')):
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Log de Proxies',
-                                        todo = 'proxies.log', thumbnail=config.get_thumb('dev') ))
+            itemlist.append(item.clone( action='', title='Log de Proxies:', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_temporales', title=' - Eliminar Logs', _logs = True,
-                                    thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'proxies.log', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_temporales', title='Eliminar', _logs = True, thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     return itemlist
 
@@ -246,26 +283,42 @@ def submnu_temporales(item):
     elif os.path.exists(os.path.join(config.get_data_path(), 'm3u8hls.m3u8')): presentar = True
     elif os.path.exists(os.path.join(config.get_data_path(), 'test_logs')): presentar = True
     elif os.path.exists(os.path.join(config.get_data_path(), 'temp_updates.zip')): presentar = True
+    elif os.path.exists(os.path.join(config.get_data_path(), 'tempfile_mkdtemp')): presentar = True
 
     if presentar:
-        itemlist.append(item.clone( action='', title='[B]Temporales:[/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+        itemlist.append(item.clone( action='', title='[B]TEMPORALES[/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'info_channels.csv')):
+            itemlist.append(item.clone( action='', title='Ficheros Info Channels:', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+
             itemlist.append(item.clone( action='', title=' - Hay Info channels', thumbnail=config.get_thumb('dev'), text_color='goldenrod' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'temp.torrent')):
+            itemlist.append(item.clone( action='', title='Fichero Torrent:', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+
             itemlist.append(item.clone( action='', title=' - Hay Torrent', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'm3u8hls.m3u8')):
-            itemlist.append(item.clone( action='', title=' - Hay M3u8hls', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
+            itemlist.append(item.clone( action='', title='Fichero M3u8hls:', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+
+            itemlist.append(item.clone( action='', title=' - Hay M3u8hls M3u8', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'test_logs')):
+            itemlist.append(item.clone( action='', title='Ficheros Test logs:', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+
             itemlist.append(item.clone( action='', title=' - Hay Test logs', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'temp_updates.zip')):
+            itemlist.append(item.clone( action='', title='Fichero Updates Zip:', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+
             itemlist.append(item.clone( action='', title=' - Hay Updates Zip', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_temporales', title=' - Eliminar Temporales', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+        if os.path.exists(os.path.join(config.get_data_path(), 'tempfile_mkdtemp')):
+            itemlist.append(item.clone( action='', title='Ficheros Mkdtemp:', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+
+            itemlist.append(item.clone( action='', title=' - Hay Mkdtemp', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_temporales', title='Eliminar', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     return itemlist
 

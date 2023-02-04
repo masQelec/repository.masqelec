@@ -10,13 +10,14 @@ def get_video_url(page_url, url_referer=''):
     logger.info("url=" + page_url)
     video_urls = []
 
-    if page_url.startswith('https://okru.link/embed.html'):
-       page_url = page_url.replace('/embed.html?t=', '/details.php?v=')
+    if '/embed.html' in page_url or  '/embed_vf.html' in page_url:
+       if '/embed.html' in page_url: new_page_url = page_url.replace('/embed.html?t=', '/details.php?v=')
+       else: new_page_url = page_url.replace('/v2/embed_vf.html?t=', '/details.php?v=')
 
-       post = scrapertools.find_single_match(page_url, "v=(.*?)$")
+       post = scrapertools.find_single_match(new_page_url, "v=(.*?)$")
 
        if post:
-           data = httptools.downloadpage(page_url, post = {'v': post}).data
+           data = httptools.downloadpage(new_page_url, post = {'v': post}).data
 
            video = scrapertools.find_single_match(data, '"file":"(.*?)"')
            video = video.replace('\\/', '/')

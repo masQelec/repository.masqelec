@@ -116,6 +116,8 @@ def list_all(item):
             title_alt = scrapertools.find_single_match(title_alt, '(.*?) #').strip()
         else: title_alt = title
 
+        if ' (' in title_alt: title_alt = title_alt.split(' (')[0]
+
         plot = scrapertools.find_single_match(article, '<div class="texto">(.*?)</div>')
         if not plot: plot = scrapertools.find_single_match(article, '<div class="contenido"><p>(.*?)</p>')
 

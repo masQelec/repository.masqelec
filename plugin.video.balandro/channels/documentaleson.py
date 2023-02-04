@@ -49,6 +49,8 @@ def list_all(item):
         title = scrapertools.find_single_match(match, 'title="(.*?)"')
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
+        title = title.replace('&#8211', '')
+
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
         plot = scrapertools.find_single_match(match, ' <p>(.*?)</p>')
 

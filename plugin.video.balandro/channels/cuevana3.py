@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cuevana3.be/'
+host = 'https://www3.cuevana3.ai/'
 
 
 # ~ por si viene de enlaces guardados
@@ -30,7 +30,8 @@ ant_hosts = ['http://www.cuevana3.co/', 'https://cuevana3.co/', 'https://cuevana
              'https://j3.cuevana3.me/', 'https://l3.cuevana3.me/', 'https://y4.cuevana3.me/',
              'https://b4.cuevana3.me/', 'https://u4.cuevana3.me/', 'https://r4.cuevana3.me/',
              'https://cuevana3.ai/', 'https://ww1.cuevana3.ai/', 'https://ww2.cuevana3.ai/',
-             'https://www1.cuevana3.ai/', 'https://www2.cuevana3.ai/', 'https://www4.cuevana3.ai/']
+             'https://www1.cuevana3.ai/', 'https://www2.cuevana3.ai/', 'https://www4.cuevana3.ai/',
+             'https://cuevana3.be/']
 
 
 domain = config.get_setting('dominio', 'cuevana3', default='')
@@ -81,10 +82,13 @@ def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_he
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    # ~ resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers)
-    resp = httptools.downloadpage_proxy('cuevana3', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers)
+    timeout = 30
+
+    # ~ resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, timeout=timeout)
+    resp = httptools.downloadpage_proxy('cuevana3', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, timeout=timeout)
 
     if only_headers: return resp.headers
+
     return resp.data
 
 
@@ -182,7 +186,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host)
+    data = do_downloadpage(host + 'inicio')
 
     matches = re.compile('/(category/[^ >]+)>([^<]+)</a></li>', re.DOTALL).findall(data)
 
@@ -227,6 +231,8 @@ def list_all(item):
 
         if '/pagina-ejemplo' in url: continue
 
+        title = title.replace("&#8217;", "'")
+
         thumb = scrapertools.find_single_match(article, 'data-src=([^ >]+)')
         if not thumb: thumb = scrapertools.find_single_match(article, ' src=(?:"|)([^ >"]+)')
 
@@ -248,6 +254,7 @@ def list_all(item):
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
+
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, 
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
@@ -405,6 +412,7 @@ def findvideos(item):
 
     # Enlaces descarga
     patron = 'Uptobox</td><td>([^<]*)</td><td><span>([^<]*)</span></td><td><a\s*rel=nofollow target=_blank href="([^"]+)" class="Button STPb">Descargar</a>'
+
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for lang, qlty, url in matches:
@@ -419,14 +427,15 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', other = 'D', server = 'uptobox', title = '', url = url, referer = item.url,
                               language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty) ))
 
+
     itemlist = servertools.get_servers_itemlist(itemlist)
 
     # Dejar desconocidos como directos
     for it in itemlist:
         if it.server == 'desconocido' and ('//api.cuevana3' in it.url or '//apialfa' in it.url or '//damedamehoy.' in it.url or '//tomatomatela.' in it.url or '//apialfa.' in it.url):
             it.server = 'fembed' if '/fembed/?' in it.url else 'directo' if '//damedamehoy.' in it.url or '//tomatomatela.' or '//apialfa.' in it.url else ''
-        elif it.server == 'desconocido' and 'openloadpremium.com/' in it.url:
-            it.server = 'm3u8hls'
+
+        elif it.server == 'desconocido' and 'openloadpremium.com/' in it.url: it.server = 'm3u8hls'
 
     if not itemlist:
         if not ses == 0:
@@ -460,38 +469,59 @@ def play(item):
     if '//api.cuevana3' in item.url or '//apialfa' in item.url:
         if 'file=' in item.url:
             fid = scrapertools.find_single_match(item.url, "file=([^&]+)").replace('\\/', '/')
-            url = 'https://api.cuevana3.me/stream/plugins/gkpluginsphp.php'
-            data = do_downloadpage(url, post={'link': fid})
 
-            enlaces = scrapertools.find_multiple_matches(data, '"link":"([^"]+)"([^}]*)')
-            for url, resto in enlaces:
-                if 'player.php?id=' in url:
-                    url = url.replace('player.php?id=', 'index/').replace('&hlsfe=yes', '.m3u8')
-                    data = do_downloadpage(url)
-                    matches = scrapertools.find_multiple_matches(data, 'RESOLUTION=\d+x(\d+)\s*(.*?\.m3u8)')
-                    if matches:
-                        for res, url in sorted(matches, key=lambda x: int(x[0]), reverse=True):
-                            itemlist.append(item.clone(url = url, server = 'm3u8hls'))
-                            break
+            if fid:
+                data = do_downloadpage('https://api.cuevana3.me/stream/plugins/gkpluginsphp.php', post={'link': fid})
+
+                enlaces = scrapertools.find_multiple_matches(data, '"link":"([^"]+)"([^}]*)')
+
+                for url, resto in enlaces:
+                    if 'player.php?id=' in url:
+                        url = url.replace('player.php?id=', 'index/').replace('&hlsfe=yes', '.m3u8')
+                        data = do_downloadpage(url)
+
+                        matches = scrapertools.find_multiple_matches(data, 'RESOLUTION=\d+x(\d+)\s*(.*?\.m3u8)')
+
+                        if matches:
+                            for res, url in sorted(matches, key=lambda x: int(x[0]), reverse=True):
+                                itemlist.append(item.clone(url = url, server = 'm3u8hls'))
+                                break
+
                         return itemlist
 
-                elif 'openloadpremium.com/embed/' in url:
-                    url = '' # no encontrado ningún ejemplo válido
+                    elif 'openloadpremium.com/embed/' in url:  url = '' # no encontrado ningún ejemplo válido
 
-                else:
-                    lbl = scrapertools.find_single_match(resto, '"label":"([^"]+)')
-                    if not lbl: lbl = scrapertools.find_single_match(resto, '"type":"([^"]+)')
-                    if not lbl: lbl = 'mp4'
-                    itemlist.append([lbl, url])
+                    else:
+                        lbl = scrapertools.find_single_match(resto, '"label":"([^"]+)')
+                        if not lbl: lbl = scrapertools.find_single_match(resto, '"type":"([^"]+)')
+                        if not lbl: lbl = 'mp4'
+                        itemlist.append([lbl, url])
 
-            itemlist.sort(key=lambda it: int(it[0].replace('p','')) if it[0].endswith('p') else it[0])
+                itemlist.sort(key=lambda it: int(it[0].replace('p','')) if it[0].endswith('p') else it[0])
 
         elif 'h=' in item.url:
             fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
-            if 'https://api.cuevana3.me/sc/index.php?h=' in item.url:
+
+            if '/apialfa.tomatomatela.club/ir/player.php?h=' in item.url:
+                api_url = 'https://apialfa.tomatomatela.club/ir/rd.php'
+                api_post = 'url=' + fid
+            elif '/apialfa.tomatomatela.club/sc/index.php?h=' in item.url:
+                api_url = 'https://apialfa.tomatomatela.club/sc/r.php'
+                api_post = 'h=' + fid
+            elif '/apialfa.tomatomatela.club/ir/goto_ddh.php' in item.url:
+                api_url = 'https://apialfa.tomatomatela.club/ir/redirect_ddh.php'
+                api_post = 'url=' + fid
+            elif '/apialfa.tomatomatela.club/ir/rd.php' in item.url:
+                api_url = 'https://apialfa.tomatomatela.club/ir/rd.php'
+                api_post = 'url=' + fid
+
+            elif '/api.cuevana3.me/ir/player.php?h=' in item.url:
+                api_url = 'https://api.cuevana3.me//ir/rd.php'
+                api_post = 'url=' + fid
+            elif '/api.cuevana3.me/sc/index.php?h=' in item.url:
                 api_url = 'https://api.cuevana3.me/sc/r.php'
                 api_post = 'h=' + fid
-            elif 'https://api.cuevana3.me/ir/goto_ddh.php' in item.url:
+            elif '/api.cuevana3.me/ir/goto_ddh.php' in item.url:
                 api_url = 'https://api.cuevana3.me/ir/redirect_ddh.php'
                 api_post = 'url=' + fid
             else:
@@ -501,13 +531,17 @@ def play(item):
             url = do_downloadpage(api_url, post=api_post, headers={'Referer': item.url}, follow_redirects=False, only_headers=True).get('location', '')
 
             if url.startswith('//'): url = 'https:' + url
- 
+
             if 'h=' in url:
                 fid = scrapertools.find_single_match(url, "h=([^&]+)")
-                if 'https://api.cuevana3.me/sc/index.php?h=' in url:
+
+                if '/api.cuevana3.me/ir/player.php?h=' in item.url:
+                    api_url = 'https://api.cuevana3.me//ir/rd.php'
+                    api_post = 'url=' + fid
+                elif '/api.cuevana3.me/sc/index.php?h=' in url:
                     api_url = 'https://api.cuevana3.me/sc/r.php'
                     api_post = 'h=' + fid
-                elif 'https://api.cuevana3.me/ir/goto_ddh.php' in url:
+                elif '/api.cuevana3.me/ir/goto_ddh.php' in url:
                     api_url = 'https://api.cuevana3.me/ir/redirect_ddh.php'
                     api_post = 'url=' + fid
                 else:
@@ -525,6 +559,7 @@ def play(item):
                 url = resuelve_dame_toma(url)
                 if url:
                     itemlist.append(['mp4', url])
+
             else:
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
@@ -540,6 +575,7 @@ def play(item):
 
     elif 'openloadpremium.com/' in item.url and '/player.php?' in item.url:
         data = do_downloadpage(item.url, headers={'Referer': item.referer})
+
         url = scrapertools.find_single_match(data, '"file": "([^"]+)')
         if url:
             if 'openloadpremium.com/mp4/' in url and 'hash=' in url: 

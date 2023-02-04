@@ -219,6 +219,8 @@ def list_all(item):
             title = title.replace('[', '{').replace(']', '}')
             title = scrapertools.find_single_match(title, '(.*?){').strip()
 
+        title = title.replace("&#8217;", "'")
+
         qlty = scrapertools.find_single_match(match, '<span class="calidad2">(.*?)</span>')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')

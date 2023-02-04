@@ -123,6 +123,8 @@ def list_all(item):
     for video_id, thumb, time, title in matches:
         url = host + 'watch/%s' % (video_id)
 
+        title = title.replace('&quot;', '').replace('[', '').replace(']', '').strip()
+
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,

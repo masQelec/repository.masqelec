@@ -205,6 +205,7 @@ def news(item):
 
               if name == 'AÑOS 80-90': name = name.replace('AÑOS 80-90', 'SAGAS A&Ntilde;OS 80 Y 90')
               elif name == 'años 80-90': name = name.replace('años 80-90', 'SAGAS A&Ntilde;OS 80 Y 90')
+
               elif name == 'Paco Martínez Soria': name = name.replace('Paco Martínez Soria', 'PACO MART&Iacute;NEZ SORIA')
               elif name == 'Sissi': name = name.replace('Sissi', 'SISSI')
               elif name == 'JOAN CROWFORD': name = name.replace('JOAN CROWFORD', 'JOAN CRAWFORD')
@@ -526,7 +527,8 @@ def pelis(item):
            else:
               if not '&ordm;' in title: continue
 
-        title = title.replace('&ordm;', 'ª').replace('Ó', 'ó').replace('Á', 'á')
+        title = title.replace('&ordm;', 'ª').replace('Á', 'á').replace('É', 'é').replace('Í', 'í').replace('Ó', 'ó').replace('Ú', 'ú')
+
         title = title.lower()
         title = title.capitalize()
 
@@ -577,6 +579,8 @@ def pelis(item):
            elif title == 'Clásico': continue
 
         if 'ª' in title: title = title.replace('ª', 'ª - L')
+
+        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'i').replace('&oacute;', 'o').replace('&uacute;', 'u').replace('&ntilde;', 'ñ')
 
         i +=1
 

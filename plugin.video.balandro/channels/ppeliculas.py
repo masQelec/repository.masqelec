@@ -172,6 +172,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title = title.replace('&#038;', '').replace("&#8217;", "'")
+
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         qlty = scrapertools.find_single_match(match, '<span class="quality">(.*?)</span>')

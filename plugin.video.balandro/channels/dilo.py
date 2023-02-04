@@ -10,7 +10,7 @@ from core import httptools, scrapertools, tmdb, jsontools, servertools
 host = 'https://www.dilo.nu/'
 
 
-host_catalogue = host + 'catalogue'
+h_catalogue = host + 'catalogue'
 
 IDIOMAS = {'la': 'Lat', 'es': 'Esp', 'en_es': 'Vose', 'en': 'VO'}
 
@@ -89,17 +89,17 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host_catalogue, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = h_catalogue, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_episodes', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_epis', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Las de la semana', action = 'list_all', url = host_catalogue+'?sort=mosts-week', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Actualizadas', action = 'list_all', url = host_catalogue+'?sort=latest', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Las de la semana', action = 'list_all', url = h_catalogue+'?sort=mosts-week', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Actualizadas', action = 'list_all', url = h_catalogue+'?sort=latest', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host_catalogue+'?status=0', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Finalizadas', action = 'list_all', url = host_catalogue+'?status=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = h_catalogue+'?status=0', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Finalizadas', action = 'list_all', url = h_catalogue+'?status=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host_catalogue + '?genre[]=pelicula', group ='pelis', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = h_catalogue + '?genre[]=pelicula', group ='pelis', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -114,7 +114,7 @@ def generos(item):
 
     descartar_xxx = config.get_setting('descartar_xxx', default=False)
 
-    data = do_downloadpage(host_catalogue)
+    data = do_downloadpage(h_catalogue)
 
     patron = '<input type="checkbox" class="[^"]+" id="[^"]+" value="([^"]+)" name="genre\[\]">'
     patron += '\s*<label class="custom-control-label" for="[^"]+">([^<]+)</label>'
@@ -125,7 +125,7 @@ def generos(item):
         if titulo == 'Libros': continue
         elif titulo == 'Pelicula': continue
 
-        itemlist.append(item.clone( title = titulo.strip(), url = host_catalogue + '?genre[]=' + valor, action = 'list_all' ))
+        itemlist.append(item.clone( title = titulo.strip(), url = h_catalogue + '?genre[]=' + valor, action = 'list_all' ))
 
     if not descartar_xxx:
         itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'search?s=adultos' ))
@@ -142,7 +142,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1970, -1):
-        itemlist.append(item.clone( title = str(x), url = host_catalogue + '?year[]=' + str(x), action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = h_catalogue + '?year[]=' + str(x), action = 'list_all' ))
 
     return itemlist
 
@@ -227,7 +227,7 @@ def paises(item):
         elif x[1] == 'Espa\xc3\xb1a': title = 'España'
         elif x[1] == 'Turqu\xc3\xada': title = 'Turquía'
 
-        itemlist.append(item.clone( title = title, url = host_catalogue + '?country[]=' + x[0], action = 'list_all' ))
+        itemlist.append(item.clone( title = title, url = h_catalogue + '?country[]=' + x[0], action = 'list_all' ))
 
     return itemlist
 
@@ -248,26 +248,113 @@ def list_all(item):
 
         if not url or not title: continue
 
+        if descartar_xxx and ('/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url): continue
+
         year = scrapertools.find_single_match(article, '<div class="txt-gray-200 txt-size-\d+">(\d+)</div>')
-        if not year: year = '-'
+        if year:
+            title = title.replace('(' + year + ')', '').strip()
+        else: year = '-'
 
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
 
-        if descartar_xxx and ('/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url): continue
+        title = title.replace('&amp;', '&')
+
+        SerieName = title
 
         title_alt = ''
         if item.group == 'pelis': title_alt = title
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
-                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year}, contentTitleAlt = title_alt))
+                                    contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': year}, contentTitleAlt = title_alt))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<li class="page-item"><a href="([^"]+)" aria-label="(?:Netx|Next)"')
         if next_page:
-            itemlist.append(item.clone( title='Siguientes ...', url = host_catalogue + next_page, action='list_all',
-                                        group = item.group, text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', url = h_catalogue + next_page, action='list_all',  group = item.group, text_color='coral' ))
+
+    return itemlist
+
+
+def last_epis(item):
+    logger.info()
+    itemlist = []
+
+    descartar_xxx = config.get_setting('descartar_xxx', default=False)
+
+    if not item.page: item.page = 0
+
+    perpage = 25
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '>Nuevos episodios<(.*?)>Nuevas series<')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<a class="media"(.*?)</a>')
+
+    num_matches = len(matches)
+
+    for match in matches[item.page * perpage:]:
+        url = scrapertools.find_single_match(match, ' href="([^"]+)"')
+
+        title = scrapertools.find_single_match(match, ' title="([^"]+)"')
+        title = title.replace(' Online sub español', '').strip()
+
+        if not url or not title: continue
+
+        if descartar_xxx and ('/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url): continue
+
+        if '/va-' in url or '-pc-' in url: continue
+
+        thumb = scrapertools.find_single_match(match, ' src="([^"]+)"')
+
+        title = title.replace('&amp;', '&')
+
+        name = scrapertools.find_single_match(match, ' style="max-width.*?">(.*?)</div>')
+
+        name = name.replace('&amp;', '&')
+
+        if " - " in name: SerieName = name.split(" - ")[0]
+        elif " ( " in name: SerieName = name.split(" ( ")[0]
+        else: SerieName = name
+
+        temp_epis = scrapertools.find_single_match(match, '</div><div>(.*?)</div>')
+
+        season = scrapertools.find_single_match(temp_epis, '(.*?)x')
+        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$')
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentSerieName=SerieName,
+                                    contentType='episode', contentSeason=season, contentEpisodeNumber=episode, infoLabels={'year': '-'} ))
+
+        if len(itemlist) >= perpage:
+            break
+
+    tmdb.set_infoLabels(itemlist)
+
+    for new_item in itemlist:
+        if not new_item.infoLabels['tmdb_id']:
+           if new_item.infoLabels['season'] == 1 and new_item.infoLabels['episode'] == 1:
+               new_item.title = new_item.title
+
+               new_item.contentType = 'movie'
+               new_item.contentTitle = new_item.title = new_item.contentSerieName
+               new_item.infoLabels['year'] = '-'
+
+               del new_item.contentSerieName
+               del new_item.contentSeason
+               del new_item.contentEpisodeNumber
+
+               del new_item.infoLabels['season']
+               del new_item.infoLabels['episode']
+               del new_item.infoLabels['tvshowtitle']
+
+               tmdb.set_infoLabels_item(new_item)
+
+    if itemlist:
+        if num_matches > ((item.page + 1) * perpage):
+            itemlist.append(item.clone( title="Siguientes ...", action="last_epis", page=item.page + 1, text_color='coral' ))
 
     return itemlist
 
@@ -279,9 +366,10 @@ def temporadas(item):
     data = do_downloadpage(item.url)
 
     item_id = scrapertools.find_single_match(data, 'data-json=\'\{"item_id": "([^"]+)')
-    url = 'https://www.dilo.nu/api/web/seasons.php'
+
     post = 'item_id=%s' % item_id
-    data = jsontools.load(do_downloadpage(url, post=post))
+
+    data = jsontools.load(do_downloadpage(host + 'api/web/seasons.php', post=post))
 
     # cuantas temporadas
     tot_temp = 0
@@ -326,9 +414,9 @@ def episodios(item):
         data = do_downloadpage(item.url)
         item.item_id = scrapertools.find_single_match(data, 'data-json=\'\{"item_id": "([^"]+)')
 
-    url = 'https://www.dilo.nu/api/web/episodes.php'
     post = 'item_id=%s&season_number=%s' % (item.item_id, item.contentSeason)
-    data = jsontools.load(do_downloadpage(url, post=post))
+
+    data = jsontools.load(do_downloadpage(host + 'api/web/episodes.php', post=post))
 
     title_peli = ''
     if item.group == 'pelis':
@@ -368,16 +456,20 @@ def episodios(item):
 
     for epi in data[item.page * item.perpage:]:
         titulo = '%sx%s %s' % (epi['season_number'], epi['number'], epi['name'])
+
         plot = epi['description']
+
         langs = re.findall('languajes/([^.]+).png', epi['audio'])
-        if langs: titulo += ' [COLOR %s]%s[/COLOR]' % (color_lang, ','.join([IDIOMAS.get(lang, lang) for lang in langs]))
+
+        if langs: titulo += ' [COLOR %s]%s[/COLOR]' % (color_lang, ', '.join([IDIOMAS.get(lang, lang) for lang in langs]))
+
         thumb = '' if 'picture' not in epi or not epi['picture'] else 'https://cdn.dilo.nu/resize/episode/220x125@' + epi['picture']
 
         if title_peli:
             titulo = title_peli
             thumb = item.thumbnail
 
-        itemlist.append(item.clone( action='findvideos', url=host+epi['permalink']+'/', title=titulo, plot=plot, thumbnail=thumb,
+        itemlist.append(item.clone( action='findvideos', url= host + epi['permalink'] + '/', title = titulo, plot = plot, thumbnail = thumb,
                                     contentType='episode', contentSeason=epi['season_number'], contentEpisodeNumber=epi['number'] ))
 
         if len(itemlist) >= item.perpage:
@@ -392,56 +484,6 @@ def episodios(item):
     return itemlist
 
 
-def last_episodes(item):
-    logger.info()
-    itemlist = []
-
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
-    if not item.page: item.page = 0
-
-    perpage = 25
-
-    data = do_downloadpage(item.url)
-
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    bloque = scrapertools.find_single_match(data, '>Nuevos episodios<(.*?)>Nuevas series<')
-    matches = scrapertools.find_multiple_matches(bloque, '<a class="media"(.*?)</a>')
-
-    num_matches = len(matches)
-
-    for match in matches[item.page * perpage:]:
-        if descartar_xxx and ('/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url): continue
-
-        url = scrapertools.find_single_match(match, ' href="([^"]+)"')
-
-        title = scrapertools.find_single_match(match, ' title="([^"]+)"')
-        titulo = title.replace(' Online sub español', '').strip()
-
-        thumb = scrapertools.find_single_match(match, ' src="([^"]+)"')
-        name = scrapertools.find_single_match(match, ' style="max.*?">(.*?)</div>')
-
-        temp_epis = scrapertools.find_single_match(match, '</div><div>(.*?)</div>')
-
-        season = scrapertools.find_single_match(temp_epis, '(.*?)x')
-        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$')
-
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=name,
-                                   contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
-
-        if len(itemlist) >= perpage:
-            break
-
-    tmdb.set_infoLabels(itemlist)
-
-    if itemlist:
-        if num_matches > ((item.page + 1) * perpage):
-            itemlist.append(item.clone( title="Siguientes ...", action="last_episodes", page=item.page + 1, text_color='coral' ))
-
-    return itemlist
-
-
 def findvideos(item):
     logger.info()
     itemlist = []
@@ -449,11 +491,12 @@ def findvideos(item):
     data = do_downloadpage(item.url)
 
     patron = '<a href="#" class="[^"]*" data-link="([^"]+)".*?\?domain=([^."]+).*?/languajes/([^.]+).png'
+
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     ses = 0
 
-    for url, servidor, language in matches:
+    for url, servidor, lang in matches:
         ses += 1
 
         if '/download?' in url:
@@ -463,7 +506,7 @@ def findvideos(item):
             server = scrapertools.find_single_match(url, '/servers/([^.]+)')
             server = servertools.corregir_servidor(server)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = IDIOMAS.get(language, language) ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
 
     if not itemlist:
         if not ses == 0:

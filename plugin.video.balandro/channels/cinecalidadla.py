@@ -396,6 +396,8 @@ def findvideos(item):
             elif servidor == 'cloudemb': servidor = 'streamsb'
             elif servidor == 'sblongvu': servidor = 'streamsb'
 
+            elif servidor == 'google': servidor = 'gvideo'
+
             qlty = '1080'
 
             itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = item.url, data_url = data_url,
@@ -469,7 +471,7 @@ def play(item):
 
         url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
 
-        if not url: return itemllist
+        if not url: return itemlist
 
         if url.startswith('//'): url = 'https:' + url
 
@@ -495,6 +497,8 @@ def play(item):
         elif 'magnet:?' in url:
             itemlist.append(item.clone( url = url, server = 'torrent' ))
             return itemlist
+
+        if '/acortalink.me/' in url: return itemlist
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

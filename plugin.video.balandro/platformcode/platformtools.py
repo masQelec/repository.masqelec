@@ -6,6 +6,7 @@ import xbmc, xbmcgui, xbmcplugin, xbmcvfs
 from platformcode import config, logger
 from core.item import Item
 
+
 if sys.version_info[0] >= 3:
     PY3 = True
 
@@ -192,8 +193,6 @@ def render_items(itemlist, parent_item):
 
     # Recorremos el itemlist
     for item in itemlist:
-        #logger.debug(item)
-
         # Si no hay action o es findvideos/play, folder=False pq no se va a devolver ningún listado
         if item.action in ['findvideos', 'play', '']: item.folder = False
 
@@ -443,8 +442,7 @@ def set_context_commands(item, parent_item, colores):
 
     # Buscar trailer
     if item.contentType in ['movie', 'tvshow'] and item.infoLabels['tmdb_id']:
-        context_commands.append( ('[B][COLOR %s]Buscar Tráiler[/COLOR][/B]' % colores['trailer'], config.build_RunPlugin(
-            item.clone(channel="actions", action="search_trailers"))) )
+        context_commands.append( ('[B][COLOR %s]Buscar Tráiler[/COLOR][/B]' % colores['trailer'], config.build_RunPlugin(item.clone(channel="actions", action="search_trailers"))) )
 
     # ~ # Mostrar info haciendo una nueva llamada a tmdb para recuperar más datos
     # ~ if item.contentType in ['movie', 'tvshow', 'season', 'episode'] and item.contentExtra != 'documentary':
@@ -590,31 +588,34 @@ def developer_mode_check_findvideos(itemlist, parent_item):
             txt_log_qualities += os.linesep
 
     # Guardar en ficheros de log
-    avisar = False
+    loglevel = config.get_setting('debug', 0) # 0 (error), 1 (error+info), 2 (error+info+debug)
 
-    if txt_log_servers != '':
-        avisar = True
+    if loglevel == 2:
+        avisar = False
 
-        dev_log = os.path.join(config.get_data_path(), 'servers_todo.log')
-        if PY3 and not isinstance(txt_log_servers, bytes): txt_log_servers = txt_log_servers.encode('utf-8')
-        with open(dev_log, 'wb') as f: f.write(txt_log_servers); f.close()
+        if txt_log_servers != '':
+            avisar = True
 
-    if txt_log_qualities != '':
-        avisar = True
+            dev_log = os.path.join(config.get_data_path(), 'servers_todo.log')
+            if PY3 and not isinstance(txt_log_servers, bytes): txt_log_servers = txt_log_servers.encode('utf-8')
+            with open(dev_log, 'wb') as f: f.write(txt_log_servers); f.close()
 
-        dev_log = os.path.join(config.get_data_path(), 'qualities_todo.log')
-        if PY3 and not isinstance(txt_log_qualities, bytes): txt_log_qualities = txt_log_qualities.encode('utf-8')
-        with open(dev_log, 'wb') as f: f.write(txt_log_qualities); f.close()
+        if txt_log_qualities != '':
+            avisar = True
 
-    if avisar: dialog_notification(config.__addon_name, '[B][COLOR %s]Revisar Logs Servers y/ó Qualities[/COLOR][/B]' % color_exec)
+            dev_log = os.path.join(config.get_data_path(), 'qualities_todo.log')
+            if PY3 and not isinstance(txt_log_qualities, bytes): txt_log_qualities = txt_log_qualities.encode('utf-8')
+            with open(dev_log, 'wb') as f: f.write(txt_log_qualities); f.close()
 
-    if os.path.isfile(os.path.join(config.get_runtime_path(), 'core', 'developertools.py')):
-        try:
-           from core import developertools
+        if avisar: dialog_notification(config.__addon_name, '[B][COLOR %s]Revisar Logs Servers y/ó Qualities[/COLOR][/B]' % color_exec)
 
-           developertools.developer_mode_check_findvideos(itemlist, parent_item)
-        except:
-           pass
+        if os.path.isfile(os.path.join(config.get_runtime_path(), 'core', 'developertools.py')):
+            try:
+               from core import developertools
+
+               developertools.developer_mode_check_findvideos(itemlist, parent_item)
+            except:
+               pass
 
 
 # Reproducción

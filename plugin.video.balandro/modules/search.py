@@ -138,8 +138,8 @@ def show_help_parameters(item):
     txt += '[CR][CR]'
 
     txt += ' - [B][COLOR gold]Canales[/COLOR][/B] que nunca intervienen en las busquedas:'
-    txt += '[CR][COLOR darkorange][B]    CineDeAntes,  CineLibreOnline,  Frozenlayer,  MovidyTv,  PepeCineCo,'
-    txt += '[CR]    SeoDiv,  SigloXX,  TvSeries[/B][/COLOR]'
+    txt += '[CR][COLOR darkorange][B]    CineDeAntes,  CineLibreOnline,  Frozenlayer,  MovidyTv,'
+    txt += '[CR]    SeoDiv,  SigloXX,  Trailers,  TvSeries[/B][/COLOR]'
 
     if not config.get_setting('mnu_documentales', default=True):
         txt += '[CR][CR] - Los canales de [B][COLOR cyan]Documentales[/COLOR][/B] jamás intervendrán en las busquedas'
@@ -374,7 +374,7 @@ def do_search(item, tecleado):
     for i, ch in enumerate(ch_list):
         perc = int(i / num_canales * 100)
 
-        progreso.update(perc, 'Analizar %s  en el canal %s ' % (tecleado, ch['name']))
+        progreso.update(perc, 'Analizar %s en el canal %s ' % (tecleado, ch['name']))
 
         c_item = Item( channel=ch['id'], action='search', search_type=item.search_type, title='Buscar en ' + ch['name'], thumbnail=ch['thumbnail'] )
 
@@ -497,19 +497,26 @@ def do_search(item, tecleado):
         if progreso.iscanceled(): break
 
     if multithread:
-        pendent = [a for a in threads if a.isAlive()]
+        if PY3:
+            pendent = [a for a in threads if a.is_alive()]
+        else:
+            pendent = [a for a in threads if a.isAlive()]
+
         while len(pendent) > 0:
             hechos = num_canales - len(pendent)
             perc = int(hechos / num_canales * 100)
             mensaje = ', '.join([a.getName() for a in pendent])
 
-            progreso.update(perc, 'Buscando %d de %d canales. Quedan %d : %s' % (hechos, num_canales, len(pendent), mensaje))
+            progreso.update(perc, 'Buscando en el %d de %d canales. Quedan %d : %s' % (hechos, num_canales, len(pendent), mensaje))
 
             if progreso.iscanceled(): break
 
             time.sleep(0.5)
 
-            pendent = [a for a in threads if a.isAlive()]
+            if PY3:
+                pendent = [a for a in threads if a.is_alive()]
+            else:
+               pendent = [a for a in threads if a.isAlive()]
 
     if item.from_channel != '': 
         # Búsqueda exacta en otros/todos canales de una peli/serie : mostrar sólo las coincidencias exactas

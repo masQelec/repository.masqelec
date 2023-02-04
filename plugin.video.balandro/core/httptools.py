@@ -30,7 +30,7 @@ import os, inspect, gzip, time
 from io import BytesIO
 from threading import Lock
 
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 from platformcode.config import WebErrorException
 
 try:
@@ -48,8 +48,8 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.5304.122 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.99 Safari/537.36"
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.99 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.5414.120 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -69,6 +69,13 @@ default_headers["Accept-Encoding"] = "gzip"
 
 HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = config.get_setting('httptools_timeout', default=15)
 if HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT == 0: HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = None
+
+
+color_alert = config.get_setting('notification_alert_color', default='red')
+color_infor = config.get_setting('notification_infor_color', default='pink')
+color_adver = config.get_setting('notification_adver_color', default='violet')
+color_avis = config.get_setting('notification_avis_color', default='yellow')
+color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 
 def get_user_agent():
@@ -203,11 +210,13 @@ def downloadpage_proxy(canal,
                 break
 
     if not proxy_ok: 
-        from platformcode import platformtools
-        if use_proxy == None: txt = 'Configure los proxies del canal.'
-        else: txt = 'Ningún proxy ha funcionado.' if len(proxies) > 1 else 'El proxy no ha funcionado.'
+        if use_proxy == None:
+            txt = '[B][COLOR %s]Configure los proxies del canal.[/B][/COLOR]' % color_adver
+        else:
+           txt = 'Ningún proxy ha funcionado.' if len(proxies) > 1 else 'El proxy no ha funcionado.'
+           col = '[B][COLOR %s]' % color_exec
+           txt =  col + txt + '[/B][/COLOR]'
 
-        color_alert = config.get_setting('notification_alert_color', default='red')
         el_canal = ('Sin respuesta en [B][COLOR %s]') % color_alert
         el_canal += ('%s[/B][/COLOR]') % canal.capitalize()
         platformtools.dialog_notification(el_canal, txt)

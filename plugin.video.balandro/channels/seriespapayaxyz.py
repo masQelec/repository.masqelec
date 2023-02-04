@@ -219,6 +219,8 @@ def list_all(item):
 
         thumb if thumb.startswith('http') else "https:" + thumb
 
+        title = title.replace("&#8217;", "'")
+
         if tipo == 'tvshow':
             if not item.search_type == 'all':
                 if item.search_type == 'movie': continue

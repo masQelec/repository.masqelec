@@ -294,6 +294,7 @@ def findvideos(item):
         elif 'zippy' in servidor: servidor = 'zippyshare'
         elif 'sblanh' in servidor: servidor = 'streamsb'
         elif 'sblongvu' in servidor: servidor = 'streamsb'
+        elif 'sbchill' in servidor: servidor = 'streamsb'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose' ))
 

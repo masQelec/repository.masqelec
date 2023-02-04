@@ -13,7 +13,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://mejortorrent.cc'
+host = 'https://mejortorrent.se'
 
 
 perpage = 30
@@ -53,7 +53,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True, timeout=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://mejortorrent.nz']
+    ant_hosts = ['https://mejortorrent.nz', 'https://mejortorrent.cc']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -157,7 +157,7 @@ def list_all(item):
 
         title = title.replace('[720p]', '').strip()
 
-        title = title.replace('&#215;', 'x')
+        title = title.replace('&#215;', 'x').replace("&#8217;", "'")
 
         titulo = title.split('-')[0].strip()
 

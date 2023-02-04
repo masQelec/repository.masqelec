@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import os, re, xbmcgui
 
 from platformcode import config, logger, platformtools
@@ -125,8 +124,10 @@ def do_make_login_logout(url, post=None, headers=None):
 
     if '/user/' in url: add_referer = False
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False).data
-    data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False).data
+    timeout = 30
+
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False, timeout=timeout).data
+    data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -135,7 +136,7 @@ def do_make_login_logout(url, post=None, headers=None):
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
                 # ~ data = httptools.downloadpage(url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False).data
-                data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False).data
+                data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False, timeout=timeout).data
         except:
             pass
 
@@ -312,7 +313,7 @@ def do_downloadpage(url, post=None, referer=None):
     timeout = None
     if '?genre=' in url: timeout = 30
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
     data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
 
     if "data-showform='login'" in data:

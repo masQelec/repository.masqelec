@@ -599,6 +599,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
         else:
            if '| 502: Bad gateway</title>' in response.data:  txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
            elif '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
+           elif '<title>Just a moment...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR][COLOR red][B] Protection[/B][/COLOR]'
            elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
            elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
            else:
@@ -646,11 +647,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + '/es/' or new_web == '/home':
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + '/es/' or new_web == '/home':
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
-                    txt += '[CR]login: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
+                    txt += '[CR]inicial: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
                     new_web = ''
 
                     if response.code == 301 or response.code == 302 or response.code == 307 or response.code == 308:
@@ -669,6 +670,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
                     else:
                        if channel_id in str(channels_despised):
                            txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR][COLOR pink][B] (Falso)[/B][/COLOR]'
+                           txt += "[CR]comprobar: [COLOR yellow][B]Podría estar Correcto [/B][/COLOR][COLOR pink][B]el host:[/B][/COLOR] ó [COLOR limegreen][B]quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
                        else:
                            txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
             else:
@@ -1026,6 +1028,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
     if response.sucess == False:
         if '| 502: Bad gateway</title>' in response.data:  txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
         elif '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
+        elif '<title>Just a moment...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR[COLOR red][B] Protection[/B][/COLOR]'
         elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
         elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
         else:

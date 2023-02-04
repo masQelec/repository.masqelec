@@ -150,7 +150,7 @@ def last_epis(item):
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, ' href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
         title = scrapertools.find_single_match(match, ' title="(.*?)"')
 
@@ -316,6 +316,7 @@ def findvideos(item):
 
     # embeds
     matches = scrapertools.find_multiple_matches(data, 'data-title="Opción.*?src="(.*?)"')
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
     for url in matches:
         url = url.strip()

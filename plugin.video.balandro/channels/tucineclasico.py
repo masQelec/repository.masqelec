@@ -92,7 +92,10 @@ def list_all(item):
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
         title = scrapertools.find_single_match(article, '<h4>(.*?)</h4>')
         if not title: title = scrapertools.find_single_match(article, ' alt="([^"]+)"')
+
         if not url or not title: continue
+
+        title = title.replace('&#8230;', '')
 
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         year = scrapertools.find_single_match(article, '<span>(\d{4})</span>')

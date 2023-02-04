@@ -131,6 +131,8 @@ def list_all(item):
                tipo = 'tvshow'
                title = title.replace('Capitulo', '').strip()
 
+        title = title.replace("&#8217;", "'")
+
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':

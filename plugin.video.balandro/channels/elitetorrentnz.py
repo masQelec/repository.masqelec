@@ -7,12 +7,12 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www.elitetorrent.ac/'
+host = 'https://www.elitetorrent.wf/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.elitetorrent.nz/']
+    ant_hosts = ['https://www.elitetorrent.nz/', 'https://www.elitetorrent.ac/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

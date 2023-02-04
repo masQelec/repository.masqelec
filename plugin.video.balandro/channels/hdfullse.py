@@ -6,8 +6,6 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 
-from lib import balandroresolver
-
 
 # ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
 # ~ web 0)-'https://hdfull.pm'
@@ -438,9 +436,18 @@ def findvideos(item):
         keys = scrapertools.find_multiple_matches(data_js, 'JSON.*?\]\((0x[0-9a-f]+)\)\);')
         if keys: 
             for i, key in enumerate(keys): keys[i] = int(key, 16)
+
         else: keys = scrapertools.find_multiple_matches(data_js, 'JSON.*?\]\(([0-9]+)\)\);')
 
     data_js = do_downloadpage(host + '/static/js/providers.js')
+
+    try:
+       from lib import balandroresolver
+    except:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+       except:
+          return itemlist
 
     try:
         provs = balandroresolver.hdfull_providers(data_js)
@@ -452,16 +459,12 @@ def findvideos(item):
 
     data_obf = scrapertools.find_single_match(data, "var ad\s*=\s*'(.*?)'")
 
-    data_decrypt = ''
-
     for key in keys:
         try:
            data_decrypt = jsontools.load(balandroresolver.obfs(base64.b64decode(data_obf), 126 - int(key)))
            if data_decrypt: break
         except:
            break
-
-    if not data_decrypt: return itemlist
 
     matches = []
     for match in data_decrypt:
@@ -480,6 +483,7 @@ def findvideos(item):
 
         if embed == 'd' and 'uptobox' not in url: continue
         elif 'onlystream.tv' in url: url = url.replace('onlystream.tv', 'upstream.to')
+        elif 'vev.io' in url: url = url.replace('vev.io', 'streamtape.com/e')
 
         try:
             calidad = unicode(calidad, 'utf8').upper().encode('utf8')

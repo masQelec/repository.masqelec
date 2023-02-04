@@ -211,6 +211,8 @@ def list_all(item):
         tipo = 'movie' if '/peliculas/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
+        title = title.replace("&#8217;", "'")
+
         titulo = title
 
         titulo = titulo.replace('(720)', '').replace('(720p)', '').replace('(1080)', '').replace('(1080p)', '').replace('(microHD)', '').replace('(BR-Line)', '').strip()

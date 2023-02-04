@@ -161,6 +161,7 @@ def findvideos(item):
 
         if 'fireload' in server: continue
         elif 'megaupload' in server: continue
+        elif 'mediafire' in server: continue
         elif server == 'soon': continue
 
         if url.startswith('//'): url = 'https:' + url

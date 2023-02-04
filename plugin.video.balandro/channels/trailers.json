@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["lat", "cast", "vose", "vo"],
 
-  "clusters": ["suggested", "trailers"],
+  "clusters": ["trailers"],
 
   "notes": "Web dedicada exclusivamente a los tráilers"
 }

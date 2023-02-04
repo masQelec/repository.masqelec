@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -58,7 +58,6 @@ def generos(item):
         itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
 
     return sorted(itemlist, key=lambda x: x.title)
-
 
 
 def anios(item):
@@ -183,6 +182,10 @@ def play(item):
 
         url = httptools.downloadpage('https://player.cuevana2.io/r.php', post = post, follow_redirects=False).headers.get('location', '')
 
+        if url.endswith('r.php'):
+            new_url = httptools.downloadpage(url, post = post, follow_redirects=False).headers.get('location', '')
+            if new_url: url = new_url
+
     elif '/sc/?h=' in url:
         hash = scrapertools.find_single_match(url, 'h=(.*?)$')
 
@@ -190,16 +193,21 @@ def play(item):
 
         url = httptools.downloadpage('https://player.cuevana2.io/sc/r.php', post = post, follow_redirects=False).headers.get('location', '')
 
+        if url.endswith('r.php'):
+            new_url = httptools.downloadpage(url, post = post, follow_redirects=False).headers.get('location', '')
+            if new_url: url = new_url
+
     elif '/irgoto.php?v=2&url=' in url:
         if url.startswith('//'): new_url = 'https:' + url
         else: new_url = url
 
         data = do_downloadpage(new_url, headers = {'Referer': host})
 
-        url = scrapertools.find_single_match(data, "location.href='(.*?)'")
+        new_url = scrapertools.find_single_match(data, "location.href='(.*?)'")
 
-    elif '/index.php?file=' in url:
-        url = ''
+        if new_url: url = new_url
+
+    elif '/index.php?file=' in url: url = ''
 
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:

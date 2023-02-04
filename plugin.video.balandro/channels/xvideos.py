@@ -73,6 +73,12 @@ def list_all(item):
             title = title.replace('_', ' ').strip()
             title = title.capitalize()
 
+        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'e').replace('&oacute;', 'o').replace('&uacute;', 'u')
+
+        title = title.replace('&aacuate;', 'a').replace('&eacuate;', 'e').replace('&iacuate;', 'e').replace('&oacuate;', 'o').replace('&uacuate;', 'u')
+
+        title = title.replace("&#039;", "'").replace('&quot;', '').replace('&iexcl;', '').replace('&ndash;', '').replace('&ntilde;', 'ñ').replace("&rsquo;", "'")
+
         itemlist.append(item.clone( action = 'findvideos', url = url if url.startswith('http') else host[:-1] + url,
                                     title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 

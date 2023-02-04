@@ -14,7 +14,7 @@ else:
 import os, xbmc
 
 from platformcode import config, logger, platformtools
-from core import httptools, scrapertools, filetools, jsontools
+from core import channeltools, httptools, scrapertools, filetools, jsontools
 
 from modules import tester
 
@@ -31,8 +31,8 @@ channels_currents = [
         'pelispedia', 'pelispediaws',
         'pelisplus', 'pelisplushd', 'pelisplushdlat',
         'playdede',
-        'repelis24', 'repelishd',
-        'series24', 'seriesanimadas', 'seriesyonkis', 'subtorrents', 'torrentdivx', 'torrentpelis'
+        'repelishd',
+        'series24', 'seriesyonkis', 'subtorrents', 'torrentdivx', 'torrentpelis'
         ]
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -75,6 +75,11 @@ def manto_domain_animefenix(item):
 def test_domain_animefenix(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('animefenix')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -115,6 +120,11 @@ def manto_domain_animeflv(item):
 
 def test_domain_animeflv(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('animeflv')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -157,6 +167,11 @@ def manto_domain_caricaturashd(item):
 def test_domain_caricaturashd(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('caricaturashd')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -197,6 +212,11 @@ def manto_domain_cinecalidad(item):
 
 def test_domain_cinecalidad(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('cinecalidad')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -239,6 +259,11 @@ def manto_domain_cinecalidadla(item):
 def test_domain_cinecalidadla(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('cinecalidadla')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -279,6 +304,11 @@ def manto_domain_cinecalidadlol(item):
 
 def test_domain_cinecalidadlol(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('cinecalidadlol')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -321,6 +351,11 @@ def manto_domain_cinetux(item):
 def test_domain_cinetux(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('cinetux')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -361,6 +396,11 @@ def manto_domain_cuevana3(item):
 
 def test_domain_cuevana3(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('cuevana3')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -403,6 +443,11 @@ def manto_domain_cuevana3video(item):
 def test_domain_cuevana3video(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('cuevana3video')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -443,6 +488,11 @@ def manto_domain_divxtotal(item):
 
 def test_domain_divxtotal(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('divxtotal')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -571,6 +621,11 @@ def manto_domain_dontorrents(item):
 def test_domain_dontorrents(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('dontorrents')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -611,6 +666,11 @@ def manto_domain_elifilms(item):
 
 def test_domain_elifilms(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('elifilms')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -653,6 +713,11 @@ def manto_domain_elitetorrent(item):
 def test_domain_elitetorrent(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('elitetorrent')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -693,6 +758,11 @@ def manto_domain_entrepeliculasyseries(item):
 
 def test_domain_entrepeliculasyseries(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('entrepeliculasyseries')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -735,6 +805,11 @@ def manto_domain_gnula24(item):
 def test_domain_gnula24(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('gnula24')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -776,6 +851,11 @@ def manto_domain_grantorrent(item):
 def test_domain_grantorrent(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('grantorrent')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -816,6 +896,11 @@ def manto_domain_grantorrents(item):
 
 def test_domain_grantorrents(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('grantorrents')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -930,6 +1015,19 @@ def last_domain_hdfull(item):
 
            latest_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
 
+           if not latest_domain:
+               operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
+
+               if not operative_domains:
+                   operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
+
+                   if operative_domains_unescape:
+                       operative_domains_unescape = unquote(str(operative_domains_unescape))
+
+                       operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
+
+                   latest_domain = operative_domains[0]
+
            if latest_domain:
                latest_domain = latest_domain.replace('login', '')
                if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
@@ -947,6 +1045,19 @@ def last_domain_hdfull(item):
            data = httptools.downloadpage(host_domain).data
 
            last_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
+
+           if not last_domain:
+               operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
+
+               if not operative_domains:
+                   operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
+
+                   if operative_domains_unescape:
+                       operative_domains_unescape = unquote(str(operative_domains_unescape))
+
+                       operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
+
+                   last_domain = operative_domains[0]
 
            if last_domain:
                last_domain = last_domain.replace('login', '')
@@ -1115,6 +1226,10 @@ def operative_domains_hdfull(item):
         platformtools.dialog_notification(config.__addon_name + ' - HdFull', '[B][COLOR %s]Error Comprobación Dominio[/B][/COLOR]' % color_alert)
         return
 
+    if domain == sel_domain:
+        platformtools.dialog_notification(config.__addon_name + ' - HdFull', '[B][COLOR %s]Dominio correcto[/B][/COLOR]' % color_infor)
+        return
+
     if platformtools.dialog_yesno(config.__addon_name + ' - HdFull', '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Seleccionado:   [COLOR cyan][B]' + sel_domain + '[/B][/COLOR]'): 
         config.set_setting('dominio', sel_domain, 'hdfull')
 
@@ -1171,6 +1286,11 @@ def manto_domain_hdfull(item):
 
 def test_domain_hdfull(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('hdfull')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     domain = config.get_setting('dominio', 'hdfull', default='')
 
@@ -1419,6 +1539,11 @@ def manto_domain_hdfullse(item):
 def test_domain_hdfullse(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('hdfullse')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -1459,6 +1584,11 @@ def manto_domain_inkapelis(item):
 
 def test_domain_inkapelis(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('inkapelis')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -1501,6 +1631,11 @@ def manto_domain_kindor(item):
 def test_domain_kindor(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('kindor')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -1541,6 +1676,11 @@ def manto_domain_pelis28(item):
 
 def test_domain_pelis28(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('pelis28')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -1583,6 +1723,11 @@ def manto_domain_pelisflix(item):
 def test_domain_pelisflix(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('pelisflix')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -1623,6 +1768,11 @@ def manto_domain_pelishouse(item):
 
 def test_domain_pelishouse(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('pelishouse')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -1665,6 +1815,11 @@ def manto_domain_pelismaraton(item):
 def test_domain_pelismaraton(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('pelismaraton')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -1705,6 +1860,11 @@ def manto_domain_pelispedia(item):
 
 def test_domain_pelispedia(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('pelispedia')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -1747,6 +1907,11 @@ def manto_domain_pelispediaws(item):
 def test_domain_pelispediaws(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('pelispediaws')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -1787,6 +1952,11 @@ def manto_domain_pelisplus(item):
 
 def test_domain_pelisplus(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('pelisplus')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -1829,6 +1999,11 @@ def manto_domain_pelisplushd(item):
 def test_domain_pelisplushd(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('pelisplushd')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -1869,6 +2044,11 @@ def manto_domain_pelisplushdlat(item):
 
 def test_domain_pelisplushdlat(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('pelisplushdlat')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -1926,53 +2106,17 @@ def manto_domain_playdede(item):
 def test_domain_playdede(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('playdede')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
         tester.test_channel('PlayDede')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
-def manto_domain_repelis24(item):
-    logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando RePelis24[/B][/COLOR]' % color_exec)
-
-    channel_json = 'repelis24.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] RePelis24') % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    id = params['id']
-    name = params['name']
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_repelis24(item):
-    logger.info()
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('RePelis24')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - RePelis24', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_repelishd(item):
@@ -2007,6 +2151,11 @@ def manto_domain_repelishd(item):
 
 def test_domain_repelishd(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('repelishd')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -2049,53 +2198,17 @@ def manto_domain_series24(item):
 def test_domain_series24(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('series24')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
         tester.test_channel('Series24')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - Series24', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
-def manto_domain_seriesanimadas(item):
-    logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SeriesAnimadas[/B][/COLOR]' % color_exec)
-
-    channel_json = 'seriesanimadas.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] SeriesAnimadas') % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    id = params['id']
-    name = params['name']
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_seriesanimadas(item):
-    logger.info()
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('SeriesAnimadas')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - SeriesAnimadas', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_seriesyonkis(item):
@@ -2130,6 +2243,11 @@ def manto_domain_seriesyonkis(item):
 
 def test_domain_seriesyonkis(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('seriesyonkis')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -2172,6 +2290,11 @@ def manto_domain_subtorrents(item):
 def test_domain_subtorrents(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('subtorrents')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -2213,6 +2336,11 @@ def manto_domain_torrentdivx(item):
 def test_domain_torrentdivx(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('torrentdivx')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     config.set_setting('developer_test_channels', '')
 
     try:
@@ -2253,6 +2381,11 @@ def manto_domain_torrentpelis(item):
 
 def test_domain_torrentpelis(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('torrentpelis')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     config.set_setting('developer_test_channels', '')
 
@@ -2617,16 +2750,6 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://playdede.': return
 
-    elif id == 'repelis24':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio RePelis24  -->  [COLOR %s]https://??.repelis24.??/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://': return
-
     elif id == 'repelishd':
         config.set_setting('user_test_channel', '')
 
@@ -2643,16 +2766,6 @@ def manto_domain_common(item, id, name):
         if not domain: domain = 'https://'
 
         new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Series24  -->  [COLOR %s]https://??.series24.??/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://': return
-
-    elif id == 'seriesanimadas':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio SeriesAnimadas  -->  [COLOR %s]https://??.animedesho.??/[/COLOR]' % color_avis)
 
         if new_domain is None: return
         elif new_domain == 'https://': return

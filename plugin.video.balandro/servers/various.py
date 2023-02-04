@@ -45,7 +45,11 @@ def get_video_url(page_url, url_referer=''):
         elif 'ninjastream' in page_url: txt_server = 'Ninjastream'
         elif 'rutube' in page_url: txt_server = 'Rutube'
         elif 'videovard' in page_url: txt_server = 'Videovard'
-        elif 'filemoon' in page_url: txt_server = 'Filemoon'
+
+        elif 'filemoon' in page_url:
+              txt_server = 'Filemoon'
+              page_url = page_url.replace('/filemoon.link/', '/filemoon.sx/')
+
         elif 'streamhide' in page_url: txt_server = 'Streamhide'
         elif 'streamhub' in page_url: txt_server = 'Streamhub'
         elif 'uploadever' in page_url: txt_server = 'Uploadever'
