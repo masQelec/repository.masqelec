@@ -124,15 +124,17 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas-subtituladas/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Versión original:', folder=False, text_color='aquamarine' ))
 
-    itemlist.append(item.clone( title = 'Catálogo subtitulado', action = 'list_all',
-                                url = host + 'peliculas-subtituladas/?filtro=audio-latino', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'peliculas-subtituladas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Estrenos', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos subtitulado', action = 'list_all',
-                               url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino', search_type = 'movie', ))
+    itemlist.append(item.clone( title = 'Otros idiomas:', folder=False, text_color='aquamarine' ))
+
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=audio-latino', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = ' - Estrenos', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino', search_type = 'movie', ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
@@ -189,8 +191,7 @@ def list_all(item):
         elif lang.endswith("512.png"): lang = "Lat"
         else: lang = "Vose"
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, qualities=qlty, languages=lang,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, qualities=qlty, languages=lang, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -222,8 +223,7 @@ def list_series(item):
 
         if not host in url: url = host + url
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail = thumb,
-                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail = thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -346,8 +346,7 @@ def findvideos(item):
         url_torrent = item.url
 
     if url_torrent:
-         itemlist.append(Item( channel = item.channel, action='play', title='', url=url_torrent, server='torrent',
-                               quality=item.qualityes, language=item.languages))
+         itemlist.append(Item( channel = item.channel, action='play', title='', url=url_torrent, server='torrent', quality=item.qualityes, language=item.languages))
 
     return itemlist
 
@@ -426,16 +425,14 @@ def list_search(item):
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, fmt_sufijo=sufijo, 
-                                        contentType='movie', contentTitle=title_clean, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, fmt_sufijo=sufijo, contentType='movie', contentTitle=title_clean, infoLabels={'year': year} ))
 									
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, fmt_sufijo=sufijo,
-                                        contentType='tvshow', contentSerieName=title_clean, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, fmt_sufijo=sufijo, contentType='tvshow', contentSerieName=title_clean, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

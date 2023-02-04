@@ -147,7 +147,7 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
 	</extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="2.5.5" provider-name="Balandro Team">
+<addon id="plugin.video.balandro" name="Balandro" version="3.0.0" provider-name="Balandro Team">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -163,7 +163,7 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
       <fanart>fanart.png</fanart>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]2.5.5[/COLOR][COLOR red]  Enero 2023[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]3.0.0[/COLOR][COLOR red]  Febrero de 2023[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers Soportados[/COLOR][COLOR plum]  20.x,  19.x,  18.x  y  17.x[/B][/COLOR]
 
@@ -171,7 +171,7 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
 
     [COLOR limegreen][B]Contacto:[/B][/COLOR]
         Foro  mimediacenter.info/foro/
-        Telegram  t.me/@balandro_asesor
+        Telegram  t.me/balandro_asesor
 
     [COLOR blue][B]Agradecimientos:[/B][/COLOR]
         Cita destacada a los miembros de Balandro Team

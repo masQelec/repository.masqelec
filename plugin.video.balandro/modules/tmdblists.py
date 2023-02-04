@@ -35,6 +35,9 @@ def mainlist(item):
     if presentar:
         itemlist.append(item.clone( title = '[B]Películas:[/B]', thumbnail=config.get_thumb('movie'), action = '', text_color='deepskyblue' ))
 
+        if config.get_setting('search_extra_trailers', default=False):
+            itemlist.append(item.clone( channel='trailers', action='search', title=' - Buscar en [COLOR darkgoldenrod]Tráilers[/COLOR] ...', thumbnail=config.get_thumb('search') ))
+
         itemlist.append(item.clone( action='listado', search_type='movie', extra = 'now_playing', title='   - En cartelera' ))
         itemlist.append(item.clone( action='listado', search_type='movie', extra = 'popular', title='   - Más populares' ))
         itemlist.append(item.clone( action='listado', search_type='movie', extra = 'top_rated', title='   - Mejor valoradas' ))

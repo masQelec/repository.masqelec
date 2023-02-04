@@ -108,6 +108,8 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
+        title = title.replace("&#8217;", "'").replace("&#8211;", "").replace("&#038;", "")
+
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                     contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 

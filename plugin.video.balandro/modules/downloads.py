@@ -71,13 +71,30 @@ def mainlist(item):
 
         itemlist.append(it)
 
+
     if not itemlist:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Descargas[/COLOR][/B]' % color_exec)
+
+        try:
+           filetools.rmdirtree(download_path)
+        except:
+           pass
+
+        # por si varió el path y quedaron descargas huerfanas en el path default
+        if download_path:
+           try:
+              path = filetools.join(config.get_data_path(), 'downloads')
+              filetools.rmdirtree(path)
+           except:
+              pass
+
 
     itemlist.append(item.clone( channel='actions', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR seagreen][B]Descargas[/B][/COLOR])',
                                 action = 'open_settings', thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( title = '[B]Ubicación actual de las[/B] [COLOR seagreen][B]Descargas[/B][/COLOR]', action = 'show_folder_downloads', thumbnail=config.get_thumb('downloads') ))
+
+    itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] ¿ Cómo funcionan ?', action = 'show_help_descargas', thumbnail=config.get_thumb('help') ))
 
     itemlist.append(item.clone( channel='helper', action = 'show_help_usb', title = '¿ [B]Se puede Descargar directamente en una[/B] [COLOR goldenrod][B]Unidad USB[/B][/COLOR] ?', thumbnail=config.get_thumb('usb') ))
 
@@ -118,7 +135,7 @@ def acciones_enlace(item):
         return False # pedido cancel
 
     elif acciones[ret] == 'Eliminar descarga':
-        if not platformtools.dialog_yesno('Eliminar descarga', '[COLOR red][B]¿ Confirma Eliminar la descarga %s ?[/B][/COLOR]' % item.title, 'Se eliminará el fichero %s y su json con la información.' % item.downloadFilename): 
+        if not platformtools.dialog_yesno('Eliminar descarga', '¿ [COLOR red][B]Confirma Eliminar la descarga[/B][/COLOR] %s ?' % item.title, 'Se eliminará el fichero %s y su json con la información.' % item.downloadFilename): 
             return False
 
         path_video = filetools.join(download_path, item.downloadFilename)

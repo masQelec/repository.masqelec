@@ -847,19 +847,22 @@ def _buscar_proxies(canal, url, provider, procesar):
 
 
     if config.get_setting('developer_mode', default=False):
-        proxies_log = os.path.join(config.get_data_path(), 'proxies.log')
+        loglevel = config.get_setting('debug', 0) # 0 (error), 1 (error+info), 2 (error+info+debug)
 
-        txt_log = os.linesep + '%s Buscar proxies en %s para %s' % (time.strftime("%Y-%m-%d %H:%M"), nom_provider, url) + os.linesep
-        if provider != '': txt_log += provider + os.linesep
+        if loglevel == 2:
+            proxies_log = os.path.join(config.get_data_path(), 'proxies.log')
 
-        num_ok = 0
-        for proxy, info in proxies_info:
-            txt_log += '%s ~ %s ~ %.2f segundos ~ %s ~ %d bytes' % (proxy, info['ok'], info['time'], info['code'], info['len']) + os.linesep
-            if info['ok']: num_ok += 1
+            txt_log = os.linesep + '%s Buscar proxies en %s para %s' % (time.strftime("%Y-%m-%d %H:%M"), nom_provider, url) + os.linesep
+            if provider != '': txt_log += provider + os.linesep
 
-        txt_log += 'Búsqueda finalizada. Proxies válidos: %d' % (num_ok) + os.linesep
+            num_ok = 0
+            for proxy, info in proxies_info:
+                txt_log += '%s ~ %s ~ %.2f segundos ~ %s ~ %d bytes' % (proxy, info['ok'], info['time'], info['code'], info['len']) + os.linesep
+                if info['ok']: num_ok += 1
 
-        with open(proxies_log, 'wb') as f: f.write(txt_log if not PY3 else txt_log.encode('utf-8')); f.close()
+            txt_log += 'Búsqueda finalizada. Proxies válidos: %d' % (num_ok) + os.linesep
+
+            with open(proxies_log, 'wb') as f: f.write(txt_log if not PY3 else txt_log.encode('utf-8')); f.close()
 
     if not provider == private_list:
         if len(selected) == 0: sin_news_proxies(nom_provider, proxies_actuales, procesar)
@@ -1480,7 +1483,11 @@ def testear_lista_proxies(canal, provider, url, proxies=[]):
             return []
 
     if proceso_test:
-        pendent = [a for a in threads if a.isAlive()]
+        if PY3:
+            pendent = [a for a in threads if a.is_alive()]
+        else:
+            pendent = [a for a in threads if a.isAlive()]
+
         maxValidos = config.get_setting('proxies_memory', default=5)
         proxies_validos = config.get_setting('proxies_validos', default=True)
 
@@ -1489,7 +1496,7 @@ def testear_lista_proxies(canal, provider, url, proxies=[]):
             perc = int(hechos / num_proxies * 100)
             validos = sum([1 for proxy in proxies if proxies_info[proxy]['ok']])
 
-            progreso.update(perc, 'Comprobando %d de %d proxies. Válidos %d. Cancelar si tarda demasiado o si ya hay más de uno válido.' % (hechos, num_proxies, validos))
+            progreso.update(perc, 'Comprobando el %d de %d proxies. Válidos %d. Cancelar si tarda demasiado o si ya hay más de uno válido.' % (hechos, num_proxies, validos))
 
             if proxies_limit:
                 if validos >= 10: break # si todos los 10 más rápidos
@@ -1499,7 +1506,11 @@ def testear_lista_proxies(canal, provider, url, proxies=[]):
             if progreso.iscanceled(): break
 
             time.sleep(0.5)
-            pendent = [a for a in threads if a.isAlive()]
+
+            if PY3:
+                pendent = [a for a in threads if a.is_alive()]
+            else:
+                pendent = [a for a in threads if a.isAlive()]
 
     progreso.close()
 

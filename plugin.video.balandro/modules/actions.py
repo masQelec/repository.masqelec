@@ -357,10 +357,8 @@ def manto_params(item):
         config.set_setting('channel_playdede_playdede_password', '')
         config.set_setting('channel_playdede_playdede_username', '')
 
-        config.set_setting('channel_repelis24_dominio', '')
         config.set_setting('channel_repelishd_dominio', '')
         config.set_setting('channel_series24_dominio', '')
-        config.set_setting('channel_seriesanimadas_dominio', '')
         config.set_setting('channel_seriesyonkis_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
         config.set_setting('channel_torrentdivx_dominio', '')
@@ -386,7 +384,7 @@ def manto_params(item):
 
         config.set_setting('downloadpath', '')
 
-        config.set_setting('chrome_last_version', '108.0.5359.99')
+        config.set_setting('chrome_last_version', '109.0.5414.120')
 
         config.set_setting('debug', '0')
 
@@ -492,18 +490,6 @@ def manto_temporales(item):
         if existe: hay_temporales = True
 
     else:
-        path = os.path.join(config.get_data_path(), 'servers_todo.log')
-        existe = filetools.exists(path)
-        if existe: hay_temporales = True
-
-        path = os.path.join(config.get_data_path(), 'qualities_todo.log')
-        existe = filetools.exists(path)
-        if existe: hay_temporales = True
-
-        path = os.path.join(config.get_data_path(), 'proxies.log')
-        existe = filetools.exists(path)
-        if existe: hay_temporales = True
-
         path = os.path.join(config.get_data_path(), 'info_channels.csv')
         existe = filetools.exists(path)
         if existe: hay_temporales = True
@@ -521,6 +507,10 @@ def manto_temporales(item):
         if existe: hay_temporales = True
 
         path = os.path.join(config.get_data_path(), 'temp_updates.zip')
+        existe = filetools.exists(path)
+        if existe: hay_temporales = True
+
+        path = os.path.join(config.get_data_path(), 'tempfile_mkdtemp')
         existe = filetools.exists(path)
         if existe: hay_temporales = True
 
@@ -551,18 +541,6 @@ def manto_temporales(item):
             if existe: filetools.remove(path)
 
         else:
-            path = os.path.join(config.get_data_path(), 'servers_todo.log')
-            existe = filetools.exists(path)
-            if existe: filetools.remove(path)
-
-            path = os.path.join(config.get_data_path(), 'qualities_todo.log')
-            existe = filetools.exists(path)
-            if existe: filetools.remove(path)
-
-            path = os.path.join(config.get_data_path(), 'proxies.log')
-            existe = filetools.exists(path)
-            if existe: filetools.remove(path)
-
             path = os.path.join(config.get_data_path(), 'info_channels.csv')
             existe = filetools.exists(path)
             if existe: filetools.remove(path)
@@ -582,6 +560,10 @@ def manto_temporales(item):
             path = os.path.join(config.get_data_path(), 'temp_updates.zip')
             existe = filetools.exists(path)
             if existe: filetools.remove(path)
+
+            path = os.path.join(config.get_data_path(), 'tempfile_mkdtemp')
+            existe = filetools.exists(path)
+            if existe: filetools.rmdirtree(path)
 
         if item._logs:
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Ficheros Logs eliminados[/B][/COLOR]' % color_infor)
@@ -649,10 +631,30 @@ def manto_caches(item):
         platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Ficheros Caché de su Media Center eliminados[/B][/COLOR]', '[B][COLOR yellow]Debe Abandonar obligatoriamente su Media Center e Ingresar de nuevo en el.[/B][/COLOR]')
 
 
+def manto_thumbs(item):
+    logger.info()
+
+    path = translatePath(os.path.join('special://home/userdata/Thumbnails', ''))
+
+    hay_thumbs = False
+
+    existe = filetools.exists(path)
+    if existe: hay_thumbs = True
+
+    if hay_thumbs == False:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros de Thumbnails en su Media Center[/COLOR][/B]' % color_alert)
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar Todos los ficheros de Thumbnails de su Media Center ?[/B][/COLOR]', '[COLOR yellow][B]Atención: el Proceso podría durar un cierto tiempo considerable, en función del numero de archivos existentes.[/B][/COLOR]'):
+        filetools.rmdirtree(path)
+
+        platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Ficheros Thumbnails de su Media Center eliminados[/B][/COLOR]', '[B][COLOR yellow]Debe Abandonar obligatoriamente su Media Center e Ingresar de nuevo en el.[/B][/COLOR]')
+
+
 def manto_tracking_dbs(item):
     logger.info()
 
-    path = os.path.join(config.get_data_path(), 'tracking_dbs')
+    path = filetools.join(config.get_data_path(), 'tracking_dbs')
 
     existe = filetools.exists(path)
     if existe == False:
@@ -664,15 +666,28 @@ def manto_tracking_dbs(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Contenido Preferidos eliminado[/B][/COLOR]' % color_infor)
 
 
+def manto_tmdb_sqlite(item):
+    logger.info()
+
+    path = filetools.join(config.get_data_path(), 'tmdb.sqlite')
+
+    existe = filetools.exists(path)
+    if existe == False:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Tmdb Sqlite[/COLOR][/B]' % color_exec)
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Tmdb Sqlite ?[/B][/COLOR]'):
+        filetools.remove(path)
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Tmdb Sqlite eliminado[/B][/COLOR]' % color_infor)
+
+
 def manto_folder_downloads(item):
     logger.info()
 
     downloadpath = config.get_setting('downloadpath', default='')
 
-    if downloadpath:
-        path = downloadpath
-    else:
-        path = os.path.join(config.get_data_path(), 'downloads')
+    if downloadpath: path = downloadpath
+    else: path = filetools.join(config.get_data_path(), 'downloads')
 
     existe = filetools.exists(path)
     if existe == False:
@@ -685,7 +700,7 @@ def manto_folder_downloads(item):
         # por si varió el path y quedaron descargas huerfanas en el path default
         if downloadpath:
            try:
-              path = os.path.join(config.get_data_path(), 'downloads')
+              path = filetools.join(config.get_data_path(), 'downloads')
               filetools.rmdirtree(path)
            except:
               pass

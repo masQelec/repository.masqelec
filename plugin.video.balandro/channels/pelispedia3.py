@@ -131,6 +131,8 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
+        title = title.replace('&#8217;', '').replace('&#8211;', '')
+
         if " | " in title: SerieName = title.split(" | ")[0]
         else: SerieName = title
 
@@ -184,7 +186,9 @@ def last_episodes(item):
         titulo = temp_epis + '  ' + title
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=title,
-                                   contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+                                   contentType='episode', contentSeason=season, contentEpisodeNumber=episode, infoLabels={'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if '<span class="current">' in data:

@@ -14,12 +14,13 @@ else:
     translatePath = xbmc.translatePath
 
 
-import os, time, xbmcaddon
+import os, re, time, xbmcaddon
+
 import xbmc, xbmcgui, platform
 
 from platformcode import config, logger, platformtools, updater
-from core import filetools
 from core.item import Item
+from core import channeltools, filetools, servertools, httptools, scrapertools
 
 from modules import filters
 
@@ -194,39 +195,76 @@ def submnu_avisinfo_channels(item):
 
     itemlist.append(item.clone( action='', title= '[B]AVISOS INFORMACIÓN CANALES:[/B]', text_color='gold', folder=False, thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='show_help_animefenix', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal [COLOR yellow][B]AnimeFenix[/B][/COLOR]',
-                                thumbnail=config.get_thumb('animefenix', 'thumb', 'channels') ))
+    datos = channeltools.get_channel_parameters('animefenix')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_animefenix', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal [COLOR yellow][B]AnimeFenix[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('animefenix', 'thumb', 'channels') ))
 
-    itemlist.append(item.clone( action='show_help_animeonline', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal [COLOR yellow][B]AnimeOnline[/B][/COLOR]',
-                                thumbnail=config.get_thumb('animeonline', 'thumb', 'channels') ))
+    datos = channeltools.get_channel_parameters('animeonline')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_animeonline', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal [COLOR yellow][B]AnimeOnline[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('animeonline', 'thumb', 'channels') ))
 
-    itemlist.append(item.clone( action='show_help_dilo', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal [COLOR yellow][B]Dilo[/B][/COLOR]',
-                                thumbnail=config.get_thumb('dilo', 'thumb', 'channels') ))
+    datos = channeltools.get_channel_parameters('cuevana3video')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_cuevana3video', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal [COLOR yellow][B]Cuevana3Video[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('cuevana3video', 'thumb', 'channels') ))
 
-    itemlist.append(item.clone( action='show_help_hdfull', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HdFull[/B][/COLOR]',
-                                thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
+    datos = channeltools.get_channel_parameters('dilo')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_dilo', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal [COLOR yellow][B]Dilo[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('dilo', 'thumb', 'channels') ))
 
-    itemlist.append(item.clone( action='show_help_henaojara', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HenaOjara[/B][/COLOR]',
-                                thumbnail=config.get_thumb('henaojara', 'thumb', 'channels') ))
+    datos = channeltools.get_channel_parameters('hdfull')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_hdfull', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HdFull[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
 
-    itemlist.append(item.clone( action='show_help_inkapelis', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]InkaPelis[/B][/COLOR]',
-                                thumbnail=config.get_thumb('inkapelis', 'thumb', 'channels') ))
+    datos = channeltools.get_channel_parameters('henaojara')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_henaojara', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HenaOjara[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('henaojara', 'thumb', 'channels') ))
 
-    itemlist.append(item.clone( action='show_help_pelisyseries', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]PelisySeries[/B][/COLOR]',
-                                thumbnail=config.get_thumb('pelisyseries', 'thumb', 'channels') ))
+    datos = channeltools.get_channel_parameters('homecine')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_homecine', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HomeCine[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('homecine', 'thumb', 'channels') ))
 
-    itemlist.append(item.clone( action='show_help_playdede', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]PlayDede[/B][/COLOR]',
-                                thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+    datos = channeltools.get_channel_parameters('inkapelis')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_inkapelis', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]InkaPelis[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('inkapelis', 'thumb', 'channels') ))
 
-    itemlist.append(item.clone( action='show_help_repelis24', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]RePelis24[/B][/COLOR]',
-                                thumbnail=config.get_thumb('repelis24', 'thumb', 'channels') ))
+    datos = channeltools.get_channel_parameters('pelisforte')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_pelisforte', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]PelisForte[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('pelisforte', 'thumb', 'channels') ))
 
-    itemlist.append(item.clone( action='show_help_repelishd', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]RePelisHd[/B][/COLOR]',
-                                thumbnail=config.get_thumb('repelishd', 'thumb', 'channels') ))
+    datos = channeltools.get_channel_parameters('pelisyseries')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_pelisyseries', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]PelisySeries[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('pelisyseries', 'thumb', 'channels') ))
+
+    datos = channeltools.get_channel_parameters('playdede')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_playdede', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]PlayDede[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+
+    datos = channeltools.get_channel_parameters('repelishd')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_repelishd', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]RePelisHd[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('repelishd', 'thumb', 'channels') ))
+
+    datos = channeltools.get_channel_parameters('torrentpelis')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_torrentpelis', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal [COLOR yellow][B]TorrentPelis[/B][/COLOR]',
+                                    thumbnail=config.get_thumb('torrentpelis', 'thumb', 'channels') ))
 
     if config.get_setting('mnu_adultos', default=True):
-        itemlist.append(item.clone( action='show_help_yespornplease', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal [COLOR yellow][B]YesPornPlease[/B][/COLOR]',
-                                    thumbnail=config.get_thumb('yespornplease', 'thumb', 'channels') ))
+        datos = channeltools.get_channel_parameters('yespornplease')
+        if datos['active']:
+            itemlist.append(item.clone( action='show_help_yespornplease', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal [COLOR yellow][B]YesPornPlease[/B][/COLOR]',
+                                        thumbnail=config.get_thumb('yespornplease', 'thumb', 'channels') ))
 
     return itemlist
 
@@ -446,6 +484,7 @@ def submnu_descargas(item):
 
     itemlist.append(item.clone( action='', title='[B]DESCARGAS:[/B]', folder=False, text_color='seagreen', thumbnail=config.get_thumb('download') ))
 
+    itemlist.append(item.clone( action='show_help_descargas', title= ' - [COLOR green][B]Información[/B][/COLOR] ¿ Cómo funcionan ?', thumbnail=config.get_thumb('tools') ))
     itemlist.append(item.clone( channel='actions', action='show_ubicacion', title= ' - ¿ Donde se ubican las [COLOR seagreen][B]Descargas[/B][/COLOR] ?', thumbnail=config.get_thumb('tools') ))
     itemlist.append(item.clone( action='show_help_usb', title= ' - ¿ Se puede Descargar directamente en una [COLOR goldenrod][B]Unidad USB[/B][/COLOR] ?', thumbnail=config.get_thumb('usb') ))
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR seagreen][B]Descargas[/B][/COLOR])', thumbnail=config.get_thumb('settings') ))
@@ -772,6 +811,11 @@ def show_help_register(item):
 def show_help_animefenix(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('animefenix')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     txt = '[B][COLOR aquamarine]El webmaster de AnimeFenix, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
 
     txt += '[CR][COLOR aquamarine]  Desconocemos si será Temporal ó Definitivo.[CR]'
@@ -787,6 +831,11 @@ def show_help_animefenix(item):
 def show_help_animeonline(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('animeonline')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     txt = '[B][COLOR aquamarine]El webmaster de AnimeOnline, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
 
     txt += '[CR][COLOR aquamarine]  Desconocemos si será Temporal ó Definitivo.[CR]'
@@ -799,8 +848,33 @@ def show_help_animeonline(item):
     platformtools.dialog_textviewer('Información canal AnimeOnline', txt)
 
 
+def show_help_cuevana3video(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('cuevana3video')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    txt = '[B][COLOR aquamarine]El webmaster de Cuevana3Video, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
+
+    txt += '[CR][COLOR aquamarine]  Desconocemos si será Temporal ó Definitivo.[CR]'
+
+    txt += '[CR]  Por ello, si no os funciona, pues hay que tener paciencia,'
+    txt += '[CR]  e ir probando uno a uno, los Proveedores de proxies, con [COLOR red]Configurar proxies a usar ...[CR]'
+
+    txt += '[CR][COLOR aquamarine][B]Ó bien prescindir/desactivar el canal hasta que se estabilize posiblemente en un futuro.[/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Información canal Cuevana3Video', txt)
+
+
 def show_help_dilo(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('dilo')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     txt = '[B][COLOR aquamarine]El webmaster de Dilo, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
 
@@ -816,6 +890,11 @@ def show_help_dilo(item):
 
 def show_help_hdfull(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('hdfull')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     txt = '[B][COLOR aquamarine]El webmaster de HdFull, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
 
@@ -834,6 +913,11 @@ def show_help_hdfull(item):
 def show_help_henaojara(item):
     logger.info()
 
+    datos = channeltools.get_channel_parameters('henaojara')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     txt = '[B][COLOR aquamarine]El webmaster de HenaOjara, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
 
     txt += '[CR][COLOR aquamarine]  Desconocemos si será Temporal ó Definitivo.[CR]'
@@ -846,8 +930,33 @@ def show_help_henaojara(item):
     platformtools.dialog_textviewer('Información canal HenaOjara', txt)
 
 
+def show_help_homecine(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('homecine')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    txt = '[B][COLOR aquamarine]El webmaster de HomeCine, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
+
+    txt += '[CR][COLOR aquamarine]  Desconocemos si será Temporal ó Definitivo.[CR]'
+
+    txt += '[CR]  Por ello, si no os funciona, pues hay que tener paciencia,'
+    txt += '[CR]  e ir probando uno a uno, los Proveedores de proxies, con [COLOR red]Configurar proxies a usar ...[CR]'
+
+    txt += '[CR][COLOR aquamarine][B]Ó bien prescindir/desactivar el canal hasta que se estabilize posiblemente en un futuro.[/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Información canal HomeCine', txt)
+
+
 def show_help_inkapelis(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('inkapelis')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     txt = '[B][COLOR aquamarine]El webmaster de InkaPelis, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
 
@@ -861,8 +970,33 @@ def show_help_inkapelis(item):
     platformtools.dialog_textviewer('Información canal InkaPelis', txt)
 
 
+def show_help_pelisforte(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('pelisforte')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    txt = '[B][COLOR aquamarine]El webmaster de PelisForte, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
+
+    txt += '[CR][COLOR aquamarine]  Desconocemos si será Temporal ó Definitivo.[CR]'
+
+    txt += '[CR]  Por ello, si no os funciona, ó no [COLOR gold][B]encuentra enlaces[/B][/COLOR], ó no efectua el [COLOR gold][B]Play[/B][/COLOR][COLOR aquamarine], pues hay que tener paciencia,'
+    txt += '[CR]  e ir probando uno a uno, los Proveedores de proxies, con [COLOR red]Configurar proxies a usar ...[CR]'
+
+    txt += '[CR][COLOR aquamarine][B]Ó bien prescindir/desactivar el canal hasta que se estabilize posiblemente en un futuro.[/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Información canal PelisForte', txt)
+
+
 def show_help_pelisyseries(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('pelisyseries')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     txt = '[CR]Si no os funciona, ó no [COLOR gold][B]encuentra enlaces[/B][/COLOR], ó no efectua el [COLOR gold][B]Play[/B][/COLOR][COLOR aquamarine], pues hay que tener paciencia,'
     txt += '[CR]  e ir probando uno a uno, los Proveedores de proxies, con [COLOR red]Configurar proxies a usar ...[CR]'
@@ -874,6 +1008,11 @@ def show_help_pelisyseries(item):
 
 def show_help_playdede(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('playdede')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     txt = '[B][COLOR aquamarine]El webmaster de PlayDede, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[CR]'
 
@@ -891,25 +1030,13 @@ def show_help_playdede(item):
     platformtools.dialog_textviewer('Información canal PlayDede', txt)
 
 
-def show_help_repelis24(item):
-    logger.info()
-
-    txt = '[B][COLOR aquamarine]El webmaster de RePelis24, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[CR]'
-
-    txt += '[COLOR aquamarine][CR]También ha añadido un control contra robots [COLOR red][B]reCAPTCHA[/B][COLOR aquamarine] oculto.[CR]'
-
-    txt += '[CR]  Desconocemos si será Temporal ó Definitivo.[CR]'
-
-    txt += '[CR]  Por ello, si no os funciona, ó no [COLOR gold][B]encuentra enlaces[/B][/COLOR], ó no efectua el [COLOR gold][B]Play[/B][/COLOR][COLOR aquamarine], pues hay que tener paciencia,'
-    txt += '[CR]  e ir probando uno a uno, los Proveedores de proxies, con [COLOR red]Configurar proxies a usar ...[CR]'
-
-    txt += '[CR][COLOR aquamarine][B]Ó bien prescindir/desactivar el canal hasta que se estabilize posiblemente en un futuro.[/B][/COLOR]'
-
-    platformtools.dialog_textviewer('Información canal RePelis24', txt)
-
-
 def show_help_repelishd(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('repelishf')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     txt = '[B][COLOR aquamarine]El webmaster de RePelisHd, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
 
@@ -923,8 +1050,33 @@ def show_help_repelishd(item):
     platformtools.dialog_textviewer('Información canal RePelisHd', txt)
 
 
+def show_help_torrentpelis(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('torrentpelis')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    txt = '[B][COLOR aquamarine]El webmaster de TorrentPelis, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
+
+    txt += '[CR][COLOR aquamarine]  Desconocemos si será Temporal ó Definitivo.[CR]'
+
+    txt += '[CR]  Por ello, si no os funciona, pues hay que tener paciencia,'
+    txt += '[CR]  e ir probando uno a uno, los Proveedores de proxies, con [COLOR red]Configurar proxies a usar ...[CR]'
+
+    txt += '[CR][COLOR aquamarine][B]Ó bien prescindir/desactivar el canal hasta que se estabilize posiblemente en un futuro.[/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Información canal TorrentPelis', txt)
+
+
 def show_help_yespornplease(item):
     logger.info()
+
+    datos = channeltools.get_channel_parameters('yespornplease')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     txt = '[B][COLOR aquamarine]El webmaster de YesPornPlease, ha activado un nivel mas de protección con [COLOR yellow]CloudFlare[/B][CR]'
 
@@ -941,6 +1093,10 @@ def show_help_yespornplease(item):
 def show_help_gamovideo(item):
     logger.info()
 
+    if not servertools.is_server_available('gamovideo'):
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El servidor está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
     txt = '*) Consideraciones si [COLOR gold][B]Jamás[/COLOR][/B] reproduce este servidor en ningún Canal.[CR]'
 
     txt = '*) Si su Media Center opera bajo alguna de las siguientes opciones:[CR]'
@@ -954,13 +1110,23 @@ def show_help_gamovideo(item):
 def show_help_mega(item):
     logger.info()
 
-    txt = '*) Si su Media Center es una versión anterior a [COLOR gold][B]19.x[/COLOR][/B] y opera bajo el sistema operativo [COLOR gold][B]Windows[/COLOR][/B], en determinadas ocasiones, puede fallar la Reproducción.'
+    if not servertools.is_server_available('mega'):
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El servidor está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    txt = '*) Si su Media Center es una versión anterior a [COLOR gold][B]19.x[/COLOR][/B] y opera bajo el sistema operativo [COLOR gold][B]Windows[/COLOR][/B], en determinadas ocasiones, puede fallar la Reproducción.[CR][CR]'
+
+    txt += '*) Para cualquier plataforma de ejecución [COLOR gold][B](Windows, Android, Rasperri, etc.)[/COLOR][/B] deben existir Obligatoriamente los modulos necesarios de [COLOR yellow][B]Cryptografía[/COLOR][/B] ya integrados en su Equipo, si no existieran, puede fallar la Reproducción.'
 
     platformtools.dialog_textviewer('Información servidor Mega', txt)
 
 
 def show_help_uptobox(item):
     logger.info()
+
+    if not servertools.is_server_available('uptobox'):
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El servidor está Inactivo[/B][/COLOR]' % color_avis)
+        return
 
     txt = '*) Determinados servidores obligan a registrarse para permitir su acceso.'
 
@@ -1010,7 +1176,7 @@ def show_help_settings(item):
     logger.info()
 
     txt = '*) Las opciones para los [COLOR gold]listados de canales[/COLOR] se usan si marcas canales como preferidos ó desactivados.'
-    txt += ' Esto lo puedes hacer desde el menú contextual en los listados de canales.'
+    txt += ' Esto lo puedes hacer desde el [COLOR yellow][B]Menú Contextual[/B][/COLOR] en los listados de canales.'
 
     txt += '[CR][CR]*) En [COLOR gold]Búsquedas[/COLOR] el parámetro [COLOR gold]Resultados previsualizados por canal[/COLOR] sirve para limitar el número de coincidencias que se muestran en la pantalla de búsqueda global.'
     txt += ' Es para que no salga un listado demasiado largo ya que algunos canales son más sensibles que otros y pueden devolver bastantes resultados.'
@@ -1050,15 +1216,15 @@ def show_help_settings(item):
 def show_help_tips(item):
     logger.info()
 
-    txt = '*) Es importante usar el [B][COLOR gold]menú contextual[/COLOR][/B] para acceder a acciones que se pueden realizar sobre los elementos de los listados.'
+    txt = '*) Es importante usar el [B][COLOR gold]Menú Contextual[/COLOR][/B] para acceder a acciones que se pueden realizar sobre los elementos de los listados.'
     txt += ' Si dispones de un teclado puedes acceder a él pulsando la tecla C, en dispositivos táctiles manteniendo pulsado un elemento, y en mandos de tv-box manteniendo pulsado el botón de selección.'
-    txt += ' Si usas un mando de TV es recomendable configurar una de sus teclas con [COLOR gold]ContextMenu[/COLOR] (menú contextual).'
+    txt += ' Si usas un mando de TV es recomendable configurar una de sus teclas con [COLOR gold][B]ContextMenu[/B][/COLOR] (Menú Contextual).'
 
-    txt += '[CR][CR]*) En los listados de canales puedes usar el menú contextual para marcarlos como Desactivado/Activo/Preferido.'
+    txt += '[CR][CR]*) En los listados de canales puedes usar el [COLOR yellow][B]Menú Contextual[/B][/COLOR] para marcarlos como Desactivado/Activo/Preferido.'
     txt += ' De esta manera podrás tener tus [COLOR gold]canales preferidos[/COLOR] al inicio y quitar ó mover al final los que no te interesen.'
     txt += ' Los canales desactivados son accesibles pero no forman parte de las búsquedas.'
 
-    txt += '[CR][CR]*) Si en algún canal encuentras una película/serie que te interesa pero fallan sus enlaces, accede al menú contextual y selecciona'
+    txt += '[CR][CR]*) Si en algún canal encuentras una película/serie que te interesa pero fallan sus enlaces, accede al [COLOR yellow][B]Menú Contextual[/B][/COLOR] y selecciona'
     txt += ' [COLOR gold]buscar en otros canales[/COLOR] para ver si está disponible en algún otro canal.'
 
     txt += '[CR][CR]*) Desde cualquier pantalla desplázate hacia el lateral izquierdo para desplegar algunas [COLOR gold]opciones standard de su Media Center[/COLOR].'
@@ -1066,12 +1232,12 @@ def show_help_tips(item):
     txt += ' Entre Lista, Cartel, Mays., Muro de información, Lista amplia, Muro, Fanart, escoge como prefieres ver la información.'
 
     txt += '[CR][CR]*) Algunos canales de series tienen un listado de [COLOR gold]últimos episodios[/COLOR]. En función de las características de las webs, los enlaces llevan'
-    txt += ' a ver el capítulo ó a listar las temporadas de la serie. Cuando es posible, desde el enlace se ve el episodio y desde el menú contextual'
+    txt += ' a ver el capítulo ó a listar las temporadas de la serie. Cuando es posible, desde el enlace se ve el episodio y desde el [COLOR yellow][B]Menú Contextual[/B][/COLOR]'
     txt += ' se puede acceder a la temporada concreta ó la lista de temporadas.'
 
-    txt += '[CR][CR]*) Para seguir series es recomendable usar la opción [COLOR gold]Preferidos[/COLOR]. Busca la serie que te interese en cualquiera de los canales y desde el menú contextual guárdala.'
-    txt += ' Luego ves a [COLOR gold]Preferidos[/COLOR] donde podrás gestionar lo necesario para la serie. Además puedes usar [COLOR gold]Buscar en otros canales[/COLOR] y desde el listado de resultados con el menú'
-    txt += ' contextual también los puedes guardar y se añadirán a los enlaces que ya tenías. De esta manera tendrás alternativas en diferentes enlaces por si algún día falla alguno ó desaparece.'
+    txt += '[CR][CR]*) Para seguir series es recomendable usar la opción [COLOR gold]Preferidos[/COLOR]. Busca la serie que te interese en cualquiera de los canales y desde el [COLOR yellow][B]Menú Contextual[/B][/COLOR] guárdala.'
+    txt += ' Luego ves a [COLOR gold]Preferidos[/COLOR] donde podrás gestionar lo necesario para la serie. Además puedes usar [COLOR gold]Buscar en otros canales[/COLOR] y desde el listado de resultados con el'
+    txt += ' [COLOR yellow][B]Menú Contextual[/B][/COLOR] también los puedes guardar y se añadirán a los enlaces que ya tenías. De esta manera tendrás alternativas en diferentes enlaces por si algún día falla alguno ó desaparece.'
 
     platformtools.dialog_textviewer('Trucos y consejos varios', txt)
 
@@ -1083,7 +1249,7 @@ def show_help_use(item):
     txt += 'Accede por ejemplo a Películas ó Series desde el menú principal, entra en alguno de los canales y navega por sus diferentes opciones hasta encontrar una película que te interese.'
     txt += ' Al entrar en la película se mostrará un diálogo con diferentes opciones de vídeos encontrados.'
     txt += ' Prueba con el primero y si el enlace es válido empezará a reproducirse. Sino, prueba con alguno de los otros enlaces disponibles.'
-    txt += ' Si ninguno funcionara, desde el enlace de la película accede al menú contextual y selecciona [COLOR gold]Buscar en otros canales[/COLOR].'
+    txt += ' Si ninguno funcionara, desde el enlace de la película accede al [COLOR yellow][B]Menú Contextual[/B][/COLOR] y selecciona [COLOR gold]Buscar en otros canales[/COLOR].'
 
     txt += '[CR][CR][COLOR gold][B]Uso modo DIRECTO:[/B][/COLOR][CR]'
     txt += 'Si quieres ver una película/serie concreta, accede a [COLOR gold]Buscar[/COLOR] desde el menú principal y escribe el título en el buscador.'
@@ -1091,14 +1257,14 @@ def show_help_use(item):
 
     txt += '[CR][CR][COLOR gold][B]Uso modo PLANIFICADOR (Guardar en Preferidos):[/B][/COLOR][CR]'
     txt += 'Navega por los diferentes canales y ves apuntando las películas/series que te puedan interesar.'
-    txt += ' Para ello accede al menú contextual desde cualquier película/serie y selecciona [COLOR gold]Guardar enlace[/COLOR].'
+    txt += ' Para ello accede al [COLOR yellow][B]Menú Contextual[/B][/COLOR] desde cualquier película/serie y selecciona [COLOR gold]Guardar enlace[/COLOR].'
     txt += ' Cuando quieras ver una película/serie, accede a [COLOR gold]Preferidos[/COLOR] desde el menú principal donde estará todo lo guardado.'
 
     txt += '[CR][CR][COLOR gold][B]Uso modo ASEGURADOR (Descargas):[/B][/COLOR][CR]'
     txt += 'Descarga algunas películas para tener listas para ver sin depender de la saturación de la red/servidores en momentos puntuales.'
-    txt += ' Desde cualquier película/episodio, tanto en los canales como en [COLOR gold]Preferidos[/COLOR], accede al menú contextual y [COLOR gold]Descargar vídeo[/COLOR].'
+    txt += ' Desde cualquier película/episodio, tanto en los [COLOR gold][B]Canales[/B][/COLOR] como en [COLOR gold]Preferidos[/COLOR], accede al [COLOR yellow][B]Menú Contextual[/B][/COLOR] y [COLOR gold]Descargar vídeo[/COLOR].'
     txt += ' Selecciona alguno de los enlaces igual que cuando se quiere reproducir y empezará la descarga.'
-    txt += ' Para ver lo descargado, accede a [COLOR gold]Descargas[/COLOR] desde el menú principal.'
+    txt += ' Para ver lo descargado, accede a [COLOR seagreen][B]Descargas[/B][/COLOR] desde el menú principal.'
 
     txt += '[CR][CR][COLOR gold][B]Uso modo COLECCIONISTA (Menú Preferidos):[/B][/COLOR][CR]'
     txt += 'Desde [COLOR gold]Preferidos[/COLOR] accede a [COLOR gold]Gestionar listas[/COLOR], donde puedes crear diferentes listas para organizarte las películas y series que te interesen.'
@@ -1112,13 +1278,17 @@ def show_help_faq(item):
 
     txt = '[COLOR gold][B]¿ De dónde viene Balandro ?[/B][/COLOR][CR]'
     txt += 'Balandro es desde el año [COLOR cyan][B]2018[/B][/COLOR] un addon derivado de [COLOR gold]Pelisalacarta y Alfa[/COLOR], optimizado a nivel interno de código y a nivel funcional para el usuario.'
-    txt += ' Puede ser útil en dispositivos poco potentes como las Raspberry Pi u otros TvBox y para usuarios que no se quieran complicaciones.'
+    txt += ' Puede ser útil en dispositivos poco potentes como las [COLOR yellow][B]Raspberry Pi[/B][/COLOR] u otros [COLOR yellow][B]TvBox[/B][/COLOR] y para usuarios que no quieran complicaciones.'
     txt += ' Al ser un addon de tipo navegador, tiene el nombre de un velero ya que Balandro era una embarcación ligera y maniobrable, muy apreciada por los piratas.'
 
     txt += '[CR][CR][COLOR gold][B]¿ Qué características tiene Balandro ?[/B][/COLOR][CR]'
-    txt += 'Principalmente permite acceder a los contenidos de webs con vídeos de películas y series para reproducirlos y/o guardarlos, y'
-    txt += ' dispone de unos Preferidos propios donde poder apuntar todas las Películas y Series que interesen al usuario.'
+    txt += 'Principalmente permite acceder a los contenidos de webs con vídeos de películas y series para reproducirlos y/ó guardarlos, y'
+    txt += ' dispone de unos [COLOR wheat][B]Preferidos[/B][/COLOR] propios donde poder apuntar todas las Películas y Series que interesen al usuario.'
     txt += ' Se pueden configurar múltiples opciones, por ejemplo la preferencia de idioma, la reproducción automática, los colores para los listados, los servidores preferidos, excluir canales en las búsquedas, etc.'
+
+    txt += '[CR][CR][COLOR gold][B]¿ Almacena Balandro algún tipo de contenido?[/B][/COLOR][CR]'
+    txt += 'NO, este Add-On es tan solo un mero Ejercicio de Aprendizaje del Lenguaje de Programación Python y se distribuye sin Ningún Contenido Multimedia adjunto al mismo.'
+    txt += '[COLOR red][B][I] En consecuencia solo Las Webs son plenamente Responsables de los Contenidos que Publiquen [/I][/B][/COLOR].'
 
     txt += '[CR][CR][COLOR gold][B]¿ Qué particularidades tienen los Canales [/COLOR][COLOR darkgoldenrod]Problemáticos[/COLOR][COLOR gold] ?[/B][/COLOR][CR]'
     txt += 'Son aquellos canales en los que Predominan Referencias/Elementos Sin enlaces Disponibles, enlaces Inválidos y/ó enlaces a servidores No Soportados.'
@@ -1242,7 +1412,7 @@ def show_help_tracking(item):
     logger.info()
 
     txt = '[COLOR gold]¿ Cómo se guardan las películas ó series ?[/COLOR][CR]'
-    txt += 'Desde cualquiera de los canales donde se listen películas ó series, accede al menú contextual y selecciona [COLOR gold]Guardar película/serie[/COLOR].'
+    txt += 'Desde cualquiera de los canales donde se listen películas ó series, accede al [COLOR yellow][B]Menú Contextual[/B][/COLOR] y selecciona [COLOR gold]Guardar película/serie[/COLOR].'
     txt += ' En el caso de películas es casi instantáneo, y para series puede demorarse unos segundos si tiene muchas temporadas/episodios.'
     txt += ' Para ver y gestionar todo lo que tengas, accede a [COLOR gold]Preferidos[/COLOR] desde el menú principal del addon.'
     txt += ' También puedes guardar una temporada ó episodios concretos.'
@@ -1266,7 +1436,7 @@ def show_help_tracking(item):
     txt += ' Estas marcas están en la base de datos de su Media Center pero no en las propias de Balandro.'
 
     txt += '[CR][CR][COLOR gold]¿ Qué pasa si un enlace guardado deja de funcionar ?[/COLOR][CR]'
-    txt += 'A veces las webs desaparecen ó cambian de estructura y/o de enlaces, y eso provoca que en Preferidos dejen de ser válidos.'
+    txt += 'A veces las webs desaparecen ó cambian de estructura y/ó de enlaces, y eso provoca que en Preferidos dejen de ser válidos.'
     txt += ' Al acceder a un enlace que da error, se muestra un diálogo para escoger si se quiere [COLOR gold]Buscar en otros canales[/COLOR] ó [COLOR gold]Volver a buscar en el mismo canal[/COLOR].'
     txt += ' Si la web ha dejado de funcionar deberás buscar en otros canales, pero si ha sufrido cambios puedes volver a buscar en ella.'
 
@@ -1276,11 +1446,11 @@ def show_help_tracking(item):
 
     txt += '[CR][CR][COLOR gold]¿ Cómo invertir el orden de los episodios ?[/COLOR][CR]'
     txt += 'Por defecto los episodios dentro de una temporada se muestran en orden ascendente, del primero al último.'
-    txt += ' Si prefieres que sea al revés, desde el menú contextual de una temporada selecciona [COLOR gold]Invertir el orden de los episodios[/COLOR] y'
+    txt += ' Si prefieres que sea al revés, desde el [COLOR yellow][B]Menú Contextual[/B][/COLOR] de una temporada selecciona [COLOR gold]Invertir el orden de los episodios[/COLOR] y'
     txt += ' tu preferencia quedará guardada para esa temporada.'
 
     txt += '[CR][CR][COLOR gold]¿ Hay alguna límitación en los episodios a guardar por cada temporada ?[/COLOR][CR]'
-    txt += 'Si, no se almacenarán más de [COLOR red]50 episodios por temporada [/COLOR], si fuera necesario, debe gestionar esa serie y/o temporada'
+    txt += 'Si, no se almacenarán más de [COLOR red]50 episodios por temporada [/COLOR], si fuera necesario, debe gestionar esa serie y/ó temporada'
     txt += ' a través de los [COLOR gold]favoritos/videoteca genérica[/COLOR] de su Media Center.'
 
     txt += '[CR][CR][COLOR gold]¿ Cómo integrar los Preferidos en la Videoteca de su Media Center? ?[/COLOR][CR]'
@@ -1297,10 +1467,10 @@ def show_help_tracking_update(item):
     txt += 'El servicio es un proceso de Balandro que se ejecuta al iniciarse su Media Center, y se encarga de comprobar cuando hay que buscar actualizaciones.'
     txt += ' En la configuración dentro de [COLOR gold]Actualizar[/COLOR] puedes indicar cada cuanto tiempo deben hacerse las comprobaciones.'
     txt += ' Por defecto es dos veces al día, cada 12 horas, pero puedes cambiarlo.'
-    txt += ' Si lo tienes desactivado, puedes ejecutar manualmente la misma búsqueda desde el menú contextual de [COLOR gold]Series[/COLOR] dentro de [COLOR gold]Preferidos[/COLOR].'
+    txt += ' Si lo tienes desactivado, puedes ejecutar manualmente la misma búsqueda desde el [COLOR yellow][B]Menú Contextual[/B][/COLOR] de [COLOR gold]Series[/COLOR] dentro de [COLOR gold]Preferidos[/COLOR].'
 
     txt += '[CR][CR][COLOR gold]¿ Cómo se activa la búsqueda de nuevos episodios para series ?[/COLOR][CR]'
-    txt += 'Desde el listado de series dentro de [COLOR gold]Preferidos[/COLOR] accede a [COLOR gold]Gestionar serie[/COLOR] desde el menú contextual.'
+    txt += 'Desde el listado de series dentro de [COLOR gold]Preferidos[/COLOR] accede a [COLOR gold]Gestionar serie[/COLOR] desde el [COLOR yellow][B]Menú Contextual[/B][/COLOR].'
     txt += ' Al seleccionar [COLOR gold]Programar búsqueda automática de nuevos episodios[/COLOR] podrás definir el seguimiento que quieres darle a la serie'
     txt += ' e indicar cada cuanto tiempo hay que hacer la comprobación de si hay nuevos episodios.'
 
@@ -1320,6 +1490,20 @@ def show_help_tracking_update(item):
 
     platformtools.dialog_textviewer('Búsqueda automática de nuevos episodios', txt)
 
+def show_help_descargas(item):
+    logger.info()
+
+    txt = '[CR][CR][COLOR cyan][B]Uso[/B][/COLOR] [COLOR seagreen][B]Descargas:[/B][/COLOR][CR][CR]'
+    txt += 'Descarga algunas películas para tener listas para ver sin depender de la saturación de la red/servidores en momentos puntuales.'
+    txt += ' Desde cualquier película/episodio, tanto en los [COLOR gold][B]Canales[/B][/COLOR] como en [COLOR wheat][B]Preferidos[/B][/COLOR], accede al [COLOR yellow][B]Menú Contextual[/B][/COLOR] y [COLOR gold]Descargar vídeo[/COLOR].'
+    txt += ' Selecciona alguno de los enlaces igual que cuando se quiere reproducir y empezará la descarga.'
+    txt += ' Para ver lo descargado, accede a [COLOR seagreen][B]Descargas[/B][/COLOR] desde el menú principal.'
+
+    txt += '[CR][CR][COLOR cyan][B]Restricciones[/B][/COLOR] en las [COLOR seagreen][B]Descargas:[/B][/COLOR][CR][CR]'
+    txt += ' - Descargar [COLOR gold]Todos[/COLOR] los Capítulos de una Temporada alunísono[CR]'
+    txt += ' - Descargas formatos de ficheros NO admitidos [COLOR gold]m3u8, mpd, rtmp, rar, torrent[/COLOR][CR][CR]'
+
+    platformtools.dialog_textviewer('Descargas y su Funcionamiento', txt)
 
 def show_help_usb(item):
     logger.info()
@@ -1349,7 +1533,7 @@ def show_help_proxies(item):
 
     txt += '[CR][CR][COLOR gold][B]¿ Se pueden descartar los canales que requieren proxies ?[/B][/COLOR][CR]'
     txt += 'Sí, desde la opción dentro de buscar [COLOR goldenrod][B]Excluir canales en las búsquedas[/B][/COLOR].'
-    txt += 'También, desde el listado de canales de películas y/o series, en el menú contextual se pueden desactivar los canales deseados.'
+    txt += 'También, desde el listado de canales de películas y/ó series, en el [COLOR yellow][B]Menú Contextual[/B][/COLOR] se pueden desactivar los canales deseados.'
     txt += ' De esta manera quedarán descartados para las búsquedas globales, se evitarán sus mensajes relacionados con los proxies'
     txt += ' y se acelerará la búsqueda.'
 
@@ -1373,7 +1557,7 @@ def show_help_proxies(item):
     txt += '[CR][CR] - Por defecto, los tres proxies más rápidos entre los válidos se guardarán en la configuración del canal.'
 
     txt += '[CR][CR][COLOR gold][B]¿ Como quitar los proxies en un canal determinado ?[/B][/COLOR][CR]'
-    txt += 'Pulsación sostenida sobre el texto [COLOR goldenrod][B]Configurar proxies a usar ... [/B][/COLOR]dentro del canal y ahí aparecerá un menú contextual con esa opción,'
+    txt += 'Pulsación sostenida sobre el texto [COLOR goldenrod][B]Configurar proxies a usar ... [/B][/COLOR]dentro del canal y ahí aparecerá un [COLOR yellow][B]Menú Contextual[/B][/COLOR] con esa opción,'
     txt += ' ó bien dentro del proceso de buscar proxies, en la consola de resultados la opción [COLOR goldenrod][B]Quitar proxies[/B][/COLOR].'
 
     txt += '[CR][CR][COLOR gold][B]¿ Se ralentizan los canales si se utilizan proxies ?[/B][/COLOR][CR]'
@@ -1474,10 +1658,10 @@ def _menu_parameters():
         txt_disableds += ' - [B][COLOR crimson]Menú Simplificado:[/B][/COLOR][CR]'
 
         txt_disableds += '   - No se presentará [COLOR gold]Jamás[/COLOR] la opción del Menú principal [B][COLOR wheat]Preferidos[/COLOR][/B][CR]'
-        txt_disableds += '     Además no se mostrará en los Menús Contextuales la opción [COLOR darkorange][B]Guardar en Preferidos[/B][/COLOR][CR][CR]'
+        txt_disableds += '     Además no se mostrará en los [COLOR yellow][B]Menús Contextuales[/B][/COLOR] la opción [COLOR darkorange][B]Guardar en Preferidos[/B][/COLOR][CR][CR]'
 
         txt_disableds += '   - No se presentará [COLOR gold]Jamás[/COLOR] la opción del Menú principal [B][COLOR seagreen]Descargas[/COLOR][/B][CR]'
-        txt_disableds += '     Además no se mostrará en los Menús Contextuales la opción [COLOR darkorange][B]Descargar Vídeo[/B][/COLOR][CR][CR]'
+        txt_disableds += '     Además no se mostrará en los [COLOR yellow][B]Menús Contextuales[/B][/COLOR] la opción [COLOR darkorange][B]Descargar Vídeo[/B][/COLOR][CR][CR]'
 
         txt_disableds += '   - No se presentarán [COLOR gold][B]Nunca[/B][/COLOR] las opciónes de:[CR]'
         txt_disableds += '      - [B][COLOR deepskyblue]Películas[/COLOR][/B][CR]'
@@ -1584,12 +1768,12 @@ def _menu_parameters():
         if not config.get_setting('mnu_preferidos', default=True):
             txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR wheat]Preferidos[/COLOR][/B][CR][CR]'
 
-            txt_disableds += '   Además NO se mostrará en los Menús Contextuales la opción [COLOR darkorange][B]Guardar en Preferidos[/B][/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrará en los [COLOR yellow][B]Menús Contextuales[/B][/COLOR] la opción [COLOR darkorange][B]Guardar en Preferidos[/B][/COLOR][CR][CR]'
 
         if not config.get_setting('mnu_desargas', default=True):
             txt_disableds += ' - Tiene [COLOR coral]Des-habilitada[/COLOR] la opción del Menú principal [B][COLOR seagreen]Descargas[/COLOR][/B][CR][CR]'
 
-            txt_disableds += '   Además NO se mostrará en los Menús Contextuales la opción [COLOR darkorange][B]Descargar Vídeo[/B][/COLOR][CR][CR]'
+            txt_disableds += '   Además NO se mostrará en los [COLOR yellow][B]Menús Contextuales[/B][/COLOR] la opción [COLOR darkorange][B]Descargar Vídeo[/B][/COLOR][CR][CR]'
 
     return txt_disableds
 
@@ -1679,7 +1863,7 @@ def show_help_providers(item):
 
     txt += '[COLOR aquamarine]Proveedores habituales:[/COLOR][CR]'
 
-    txt += ' - [COLOR yellow]clarketm[/COLOR][CR]'
+    txt += ' - [COLOR yellow]clarketm[/COLOR]  Recomendado[CR]'
     txt += ' - [COLOR yellow]dailyproxylists.com[/COLOR][CR]'
     txt += ' - [COLOR yellow]free-proxy-list[/COLOR][CR]'
     txt += ' - [COLOR yellow]google-proxy.net[/COLOR][CR]'
@@ -1689,20 +1873,20 @@ def show_help_providers(item):
     txt += ' - [COLOR yellow]proxy-list.download[/COLOR][CR]'
     txt += ' - [COLOR yellow]proxydb.net[/COLOR][CR]'
     txt += ' - [COLOR yellow]proxynova.com[/COLOR][CR]'
-    txt += ' - [COLOR yellow]proxyscrape.com[/COLOR][CR]'
+    txt += ' - [COLOR yellow]proxyscrape.com[/COLOR]  Recomendado[CR]'
     txt += ' - [COLOR yellow]proxyservers.pro[/COLOR][CR]'
     txt += ' - [COLOR yellow]proxysource.org[/COLOR][CR]'
     txt += ' - [COLOR yellow]silverproxy.xyz[/COLOR][CR]'
     txt += ' - [COLOR yellow]spys.me[/COLOR][CR]'
     txt += ' - [COLOR yellow]spys.one[/COLOR][CR]'
     txt += ' - [COLOR yellow]sslproxies.org[/COLOR][CR]'
-    txt += ' - [COLOR yellow]us-proxy.org[/COLOR][CR]'
+    txt += ' - [COLOR yellow]us-proxy.org[/COLOR]  Recomendado[CR]'
 
     txt += '[CR][COLOR cyan]Lista ampliada de proveedores:[/COLOR][CR]'
 
     txt += ' - [COLOR gold]coderduck[/COLOR][CR]'
     txt += ' - [COLOR gold]echolink[/COLOR][CR]'
-    txt += ' - [COLOR gold]free-proxy-list.anon[/COLOR][CR]'
+    txt += ' - [COLOR gold]free-proxy-list.anon[/COLOR]  Recomendado[CR]'
     txt += ' - [COLOR gold]free-proxy-list.com[/COLOR][CR]'
     txt += ' - [COLOR gold]free-proxy-list.uk[/COLOR][CR]'
     txt += ' - [COLOR gold]opsxcq[/COLOR][CR]'
@@ -2116,14 +2300,11 @@ def show_license(item):
 
 
 def show_test(item):
-    from core import httptools, channeltools, scrapertools
-
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Cargando información sistema[/B][/COLOR]' % color_infor)
 
     your_ip = ''
 
     try:
-       import re
        data = httptools.downloadpage('http://httpbin.org/ip').data
        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
        your_ip = scrapertools.find_single_match(str(data), '.*?"origin".*?"(.*?)"')
@@ -2219,200 +2400,264 @@ def show_test(item):
 
     tex_dom = ''
 
-    animefenix_dominio = config.get_setting('channel_animefenix_dominio', default='')
-    if animefenix_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + animefenix_dominio
-       else: tex_dom = animefenix_dominio
+    datos = channeltools.get_channel_parameters('animefenix')
+    if datos['active']:
+        animefenix_dominio = config.get_setting('channel_animefenix_dominio', default='')
+        if animefenix_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + animefenix_dominio
+           else: tex_dom = animefenix_dominio
 
-    animeflv_dominio = config.get_setting('channel_animeflv_dominio', default='')
-    if animeflv_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + animeflv_dominio
-       else: tex_dom = animeflv_dominio
+    datos = channeltools.get_channel_parameters('animeflv')
+    if datos['active']:
+        animeflv_dominio = config.get_setting('channel_animeflv_dominio', default='')
+        if animeflv_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + animeflv_dominio
+           else: tex_dom = animeflv_dominio
 
-    caricaturashd_dominio = config.get_setting('channel_caricaturashd_dominio', default='')
-    if caricaturashd_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + caricaturashd_dominio
-       else: tex_dom = caricaturashd_dominio
+    datos = channeltools.get_channel_parameters('caricaturashd')
+    if datos['active']:
+        caricaturashd_dominio = config.get_setting('channel_caricaturashd_dominio', default='')
+        if caricaturashd_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + caricaturashd_dominio
+           else: tex_dom = caricaturashd_dominio
 
-    cinecalidad_dominio = config.get_setting('channel_cinecalidad_dominio', default='')
-    if cinecalidad_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + cinecalidad_dominio
-       else: tex_dom = cinecalidad_dominio
+    datos = channeltools.get_channel_parameters('cinecalidad')
+    if datos['active']:
+        cinecalidad_dominio = config.get_setting('channel_cinecalidad_dominio', default='')
+        if cinecalidad_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + cinecalidad_dominio
+           else: tex_dom = cinecalidad_dominio
 
-    cinecalidadla_dominio = config.get_setting('channel_cinecalidadla_dominio', default='')
-    if cinecalidadla_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + cinecalidadla_dominio
-       else: tex_dom = cinecalidadla_dominio
+    datos = channeltools.get_channel_parameters('cinecalidadla')
+    if datos['active']:
+        cinecalidadla_dominio = config.get_setting('channel_cinecalidadla_dominio', default='')
+        if cinecalidadla_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + cinecalidadla_dominio
+           else: tex_dom = cinecalidadla_dominio
 
-    cinecalidadlol_dominio = config.get_setting('channel_cinecalidadlol_dominio', default='')
-    if cinecalidadlol_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + cinecalidadlol_dominio
-       else: tex_dom = cinecalidadlol_dominio
+    datos = channeltools.get_channel_parameters('cinecalidadlol')
+    if datos['active']:
+        cinecalidadlol_dominio = config.get_setting('channel_cinecalidadlol_dominio', default='')
+        if cinecalidadlol_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + cinecalidadlol_dominio
+           else: tex_dom = cinecalidadlol_dominio
 
-    cinetux_dominio = config.get_setting('channel_cinetux_dominio', default='')
-    if cinetux_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + cinetux_dominio
-       else: tex_dom = cinetux_dominio
+    datos = channeltools.get_channel_parameters('cinetux')
+    if datos['active']:
+        cinetux_dominio = config.get_setting('channel_cinetux_dominio', default='')
+        if cinetux_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + cinetux_dominio
+           else: tex_dom = cinetux_dominio
 
-    cuevana3_dominio = config.get_setting('channel_cuevana3_dominio', default='')
-    if cuevana3_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + cuevana3_dominio
-       else: tex_dom = cuevana3_dominio
+    datos = channeltools.get_channel_parameters('cuevana3')
+    if datos['active']:
+        cuevana3_dominio = config.get_setting('channel_cuevana3_dominio', default='')
+        if cuevana3_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + cuevana3_dominio
+           else: tex_dom = cuevana3_dominio
 
-    cuevana3video_dominio = config.get_setting('channel_cuevana3video_dominio', default='')
-    if cuevana3video_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + cuevana3video_dominio
-       else: tex_dom = cuevana3video_dominio
+    datos = channeltools.get_channel_parameters('cuevana3video')
+    if datos['active']:
+        cuevana3video_dominio = config.get_setting('channel_cuevana3video_dominio', default='')
+        if cuevana3video_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + cuevana3video_dominio
+           else: tex_dom = cuevana3video_dominio
 
-    divxtotal_dominio = config.get_setting('channel_divxtotal_dominio', default='')
-    if divxtotal_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + divxtotal_dominio
-       else: tex_dom = divxtotal_dominio
+    datos = channeltools.get_channel_parameters('divxtotal')
+    if datos['active']:
+        divxtotal_dominio = config.get_setting('channel_divxtotal_dominio', default='')
+        if divxtotal_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + divxtotal_dominio
+           else: tex_dom = divxtotal_dominio
 
-    dontorrents_dominio = config.get_setting('channel_dontorrents_dominio', default='')
-    if dontorrents_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + dontorrents_dominio
-       else: tex_dom = dontorrents_dominio
+    datos = channeltools.get_channel_parameters('dontorrents')
+    if datos['active']:
+        dontorrents_dominio = config.get_setting('channel_dontorrents_dominio', default='')
+        if dontorrents_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + dontorrents_dominio
+           else: tex_dom = dontorrents_dominio
 
-    elifilms_dominio = config.get_setting('channel_elifilms_dominio', default='')
-    if elifilms_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + elifilms_dominio
-       else: tex_dom = elifilms_dominio
+    datos = channeltools.get_channel_parameters('elifilms')
+    if datos['active']:
+        elifilms_dominio = config.get_setting('channel_elifilms_dominio', default='')
+        if elifilms_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + elifilms_dominio
+           else: tex_dom = elifilms_dominio
 
-    elitetorrent_dominio = config.get_setting('channel_elitetorrent_dominio', default='')
-    if elitetorrent_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + elitetorrent_dominio
-       else: tex_dom = elitetorrent_dominio
+    datos = channeltools.get_channel_parameters('elitetorrent')
+    if datos['active']:
+        elitetorrent_dominio = config.get_setting('channel_elitetorrent_dominio', default='')
+        if elitetorrent_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + elitetorrent_dominio
+           else: tex_dom = elitetorrent_dominio
 
-    entrepeliculasyseries_dominio = config.get_setting('channel_entrepeliculasyseries_dominio', default='')
-    if entrepeliculasyseries_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + entrepeliculasyseries_dominio
-       else: tex_dom = entrepeliculasyseries_dominio
+    datos = channeltools.get_channel_parameters('entrepeliculasyseries')
+    if datos['active']:
+        entrepeliculasyseries_dominio = config.get_setting('channel_entrepeliculasyseries_dominio', default='')
+        if entrepeliculasyseries_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + entrepeliculasyseries_dominio
+           else: tex_dom = entrepeliculasyseries_dominio
 
-    gnula24_dominio = config.get_setting('channel_gnula24_dominio', default='')
-    if gnula24_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + gnula24_dominio
-       else: tex_dom = gnula24_dominio
+    datos = channeltools.get_channel_parameters('gnula24')
+    if datos['active']:
+        gnula24_dominio = config.get_setting('channel_gnula24_dominio', default='')
+        if gnula24_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + gnula24_dominio
+           else: tex_dom = gnula24_dominio
 
-    grantorrent_dominio = config.get_setting('channel_grantorrent_dominio', default='')
-    if grantorrent_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + grantorrent_dominio
-       else: tex_dom = grantorrent_dominio
+    datos = channeltools.get_channel_parameters('grantorrent')
+    if datos['active']:
+        grantorrent_dominio = config.get_setting('channel_grantorrent_dominio', default='')
+        if grantorrent_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + grantorrent_dominio
+           else: tex_dom = grantorrent_dominio
 
-    grantorrents_dominio = config.get_setting('channel_grantorrents_dominio', default='')
-    if grantorrents_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + grantorrents_dominio
-       else: tex_dom = grantorrents_dominio
+    datos = channeltools.get_channel_parameters('grantorrents')
+    if datos['active']:
+        grantorrents_dominio = config.get_setting('channel_grantorrents_dominio', default='')
+        if grantorrents_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + grantorrents_dominio
+           else: tex_dom = grantorrents_dominio
 
-    hdfull_dominio = config.get_setting('channel_hdfull_dominio', default='')
-    if hdfull_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + hdfull_dominio
-       else: tex_dom = hdfull_dominio
+    datos = channeltools.get_channel_parameters('hdfull')
+    if datos['active']:
+        hdfull_dominio = config.get_setting('channel_hdfull_dominio', default='')
+        if hdfull_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + hdfull_dominio
+           else: tex_dom = hdfull_dominio
 
-    hdfullse_dominio = config.get_setting('channel_hdfullse_dominio', default='')
-    if hdfullse_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + hdfullse_dominio
-       else: tex_dom = hdfullse_dominio
+    datos = channeltools.get_channel_parameters('hdfullse')
+    if datos['active']:
+        hdfullse_dominio = config.get_setting('channel_hdfullse_dominio', default='')
+        if hdfullse_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + hdfullse_dominio
+           else: tex_dom = hdfullse_dominio
 
-    inkapelis_dominio = config.get_setting('channel_inkapelis_dominio', default='')
-    if inkapelis_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + inkapelis_dominio
-       else: tex_dom = inkapelis_dominio
+    datos = channeltools.get_channel_parameters('inkapelis')
+    if datos['active']:
+        inkapelis_dominio = config.get_setting('channel_inkapelis_dominio', default='')
+        if inkapelis_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + inkapelis_dominio
+           else: tex_dom = inkapelis_dominio
 
-    kindor_dominio = config.get_setting('channel_kindor_dominio', default='')
-    if kindor_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + kindor_dominio
-       else: tex_dom = kindor_dominio
+    datos = channeltools.get_channel_parameters('kindor')
+    if datos['active']:
+        kindor_dominio = config.get_setting('channel_kindor_dominio', default='')
+        if kindor_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + kindor_dominio
+           else: tex_dom = kindor_dominio
 
-    pelis28_dominio = config.get_setting('channel_pelis28_dominio', default='')
-    if pelis28_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + pelis28_dominio
-       else: tex_dom = pelis28_dominio
+    datos = channeltools.get_channel_parameters('pelis28')
+    if datos['active']:
+        pelis28_dominio = config.get_setting('channel_pelis28_dominio', default='')
+        if pelis28_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + pelis28_dominio
+           else: tex_dom = pelis28_dominio
 
-    pelisflix_dominio = config.get_setting('channel_pelisflix_dominio', default='')
-    if pelisflix_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + pelisflix_dominio
-       else: tex_dom = pelisflix_dominio
+    datos = channeltools.get_channel_parameters('pelisflis')
+    if datos['active']:
+        pelisflix_dominio = config.get_setting('channel_pelisflix_dominio', default='')
+        if pelisflix_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + pelisflix_dominio
+           else: tex_dom = pelisflix_dominio
 
-    pelishouse_dominio = config.get_setting('channel_pelishouse_dominio', default='')
-    if pelishouse_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + pelishouse_dominio
-       else: tex_dom = pelishouse_dominio
+    datos = channeltools.get_channel_parameters('pelishouse')
+    if datos['active']:
+        pelishouse_dominio = config.get_setting('channel_pelishouse_dominio', default='')
+        if pelishouse_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + pelishouse_dominio
+           else: tex_dom = pelishouse_dominio
 
-    pelismaraton_dominio = config.get_setting('channel_pelismaraton_dominio', default='')
-    if pelismaraton_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + pelismaraton_dominio
-       else: tex_dom = pelismaraton_dominio
+    datos = channeltools.get_channel_parameters('pelismaraton')
+    if datos['active']:
+        pelismaraton_dominio = config.get_setting('channel_pelismaraton_dominio', default='')
+        if pelismaraton_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + pelismaraton_dominio
+           else: tex_dom = pelismaraton_dominio
 
-    pelispedia_dominio = config.get_setting('channel_pelispedia_dominio', default='')
-    if pelispedia_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + pelispedia_dominio
-       else: tex_dom = pelispedia_dominio
+    datos = channeltools.get_channel_parameters('pelispedia')
+    if datos['active']:
+        pelispedia_dominio = config.get_setting('channel_pelispedia_dominio', default='')
+        if pelispedia_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + pelispedia_dominio
+           else: tex_dom = pelispedia_dominio
 
-    pelispediaws_dominio = config.get_setting('channel_pelispediaws_dominio', default='')
-    if pelispediaws_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + pelispediaws_dominio
-       else: tex_dom = pelispediaws_dominio
+    datos = channeltools.get_channel_parameters('pelispediaws')
+    if datos['active']:
+        pelispediaws_dominio = config.get_setting('channel_pelispediaws_dominio', default='')
+        if pelispediaws_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + pelispediaws_dominio
+           else: tex_dom = pelispediaws_dominio
 
-    pelisplus_dominio = config.get_setting('channel_pelisplus_dominio', default='')
-    if pelisplus_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + pelisplus_dominio
-       else: tex_dom = pelisplus_dominio
+    datos = channeltools.get_channel_parameters('pelisplus')
+    if datos['active']:
+        pelisplus_dominio = config.get_setting('channel_pelisplus_dominio', default='')
+        if pelisplus_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + pelisplus_dominio
+           else: tex_dom = pelisplus_dominio
 
-    pelisplushd_dominio = config.get_setting('channel_pelisplushd_dominio', default='')
-    if pelisplushd_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + pelisplushd_dominio
-       else: tex_dom = pelisplushd_dominio
+    datos = channeltools.get_channel_parameters('pelisplushd')
+    if datos['active']:
+        pelisplushd_dominio = config.get_setting('channel_pelisplushd_dominio', default='')
+        if pelisplushd_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + pelisplushd_dominio
+           else: tex_dom = pelisplushd_dominio
 
-    pelisplushdlat_dominio = config.get_setting('channel_pelisplushdlat_dominio', default='')
-    if pelisplushdlat_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + pelisplushdlat_dominio
-       else: tex_dom = pelisplushdlat_dominio
+    datos = channeltools.get_channel_parameters('pelisplushdlat')
+    if datos['active']:
+        pelisplushdlat_dominio = config.get_setting('channel_pelisplushdlat_dominio', default='')
+        if pelisplushdlat_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + pelisplushdlat_dominio
+           else: tex_dom = pelisplushdlat_dominio
 
-    playdede_dominio = config.get_setting('channel_playdede_dominio', default='')
-    if playdede_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + playdede_dominio
-       else: tex_dom = playdede_dominio
+    datos = channeltools.get_channel_parameters('playdede')
+    if datos['active']:
+        playdede_dominio = config.get_setting('channel_playdede_dominio', default='')
+        if playdede_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + playdede_dominio
+           else: tex_dom = playdede_dominio
 
-    repelis24_dominio = config.get_setting('channel_repelis24_dominio', default='')
-    if repelis24_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + repelis24_dominio
-       else: tex_dom = repelis24_dominio
+    datos = channeltools.get_channel_parameters('repelishd')
+    if datos['active']:
+        repelishd_dominio = config.get_setting('channel_repelishd_dominio', default='')
+        if repelishd_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + repelishd_dominio
+           else: tex_dom = repelishd_dominio
 
-    repelishd_dominio = config.get_setting('channel_repelishd_dominio', default='')
-    if repelishd_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + repelishd_dominio
-       else: tex_dom = repelishd_dominio
+    datos = channeltools.get_channel_parameters('series24')
+    if datos['active']:
+        series24_dominio = config.get_setting('channel_series24_dominio', default='')
+        if series24_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + series24_dominio
+           else: tex_dom = series24_dominio
 
-    series24_dominio = config.get_setting('channel_series24_dominio', default='')
-    if series24_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + series24_dominio
-       else: tex_dom = series24_dominio
+    datos = channeltools.get_channel_parameters('seriesyonkis')
+    if datos['active']:
+        seriesyonkis_dominio = config.get_setting('channel_seriesyonkis_dominio', default='')
+        if seriesyonkis_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + seriesyonkis_dominio
+           else: tex_dom = seriesyonkis_dominio
 
-    seriesanimadas_dominio = config.get_setting('channel_seriesanimadas_dominio', default='')
-    if seriesanimadas_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + seriesanimadas_dominio
-       else: tex_dom = seriesanimadas_dominio
+    datos = channeltools.get_channel_parameters('subtorrents')
+    if datos['active']:
+        subtorrents_dominio = config.get_setting('channel_subtorrents_dominio', default='')
+        if subtorrents_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + subtorrents_dominio
+           else: tex_dom = subtorrents_dominio
 
-    seriesyonkis_dominio = config.get_setting('channel_seriesyonkis_dominio', default='')
-    if seriesyonkis_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + seriesyonkis_dominio
-       else: tex_dom = seriesyonkis_dominio
+    datos = channeltools.get_channel_parameters('torrentdivx')
+    if datos['active']:
+        torrentdivx_dominio = config.get_setting('channel_torrentdivx_dominio', default='')
+        if torrentdivx_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + torrentdivx_dominio
+           else: tex_dom = torrentdivx_dominio
 
-    subtorrents_dominio = config.get_setting('channel_subtorrents_dominio', default='')
-    if subtorrents_dominio:
-       if tex_dom: tex_dom = tex_dom + '  '  + subtorrents_dominio
-       else: tex_dom = subtorrents_dominio
-
-    torrentdivx_dominio = config.get_setting('channel_torrentdivx_dominio', default='')
-    if torrentdivx_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + torrentdivx_dominio
-       else: tex_dom = torrentdivx_dominio
-
-    torrentpelis_dominio = config.get_setting('channel_torrentpelis_dominio', default='')
-    if torrentpelis_dominio:
-       if tex_dom: tex_dom = tex_dom + '  ' + torrentpelis_dominio
-       else: tex_dom = torrentpelis_dominio
+    datos = channeltools.get_channel_parameters('torrentpelis')
+    if datos['active']:
+        torrentpelis_dominio = config.get_setting('channel_torrentpelis_dominio', default='')
+        if torrentpelis_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + torrentpelis_dominio
+           else: tex_dom = torrentpelis_dominio
 
     if tex_dom:
         txt += ' - [COLOR gold]Dominios:[/COLOR]  [COLOR springgreen]%s[/COLOR][CR][CR]' % str(tex_dom).replace('https://', '').replace('/', '')
@@ -2477,7 +2722,7 @@ def show_test(item):
     if cliente_torrent == 'Ninguno': tex_tor = '[COLOR moccasin]Ninguno[/COLOR]'
     elif cliente_torrent == 'Seleccionar':  tex_tor = 'Seleccionar'
     else:
-      tex_tor = cliente_torrent
+      tex_tor = ' ' + cliente_torrent
       cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
       if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent): tex_tor += '  Instalado'
       else: tex_tor += '  [COLOR red][B]No instalado[/B][/COLOR]'
@@ -2489,12 +2734,12 @@ def show_test(item):
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'): tex_yt = '  Instalado'
     else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
 
-    txt += '[CR][CR] - [COLOR gold]YouTube addon:[/COLOR]  %s' % tex_yt
+    txt += '[CR][CR] - [COLOR gold]YouTube Addon:[/COLOR]  %s' % tex_yt
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'): tex_yt = '  Instalado'
     else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
 
-    txt += '[CR][CR] - [COLOR gold]ResolveUrl script:[/COLOR]  %s' % tex_yt
+    txt += '[CR][CR] - [COLOR gold]ResolveUrl Script:[/COLOR]  %s' % tex_yt
 
     loglevel = config.get_setting('debug', 0)
     if loglevel == 0: tex_niv = 'Solo Errores'
@@ -2532,6 +2777,44 @@ def get_plataforma(txt):
     txt += '[CR][CR][COLOR fuchsia]PLATAFORMA[/COLOR][CR]'
 
     txt += ' - [COLOR gold]Media center:[/COLOR]  [COLOR coral]%s[/COLOR][CR][CR]' % str(xbmc.getInfoLabel('System.BuildVersion'))
+
+    if '14.' in txt: ver = '14 - Helix  NO soportado'
+    elif '15.' in txt: ver = '15 - Isengard  NO soportado'
+    elif '16.' in txt: ver = '16 - Jarvis  NO soportado'
+    elif '17.' in txt: ver = '17 - Krypton'
+    elif '18.' in txt: ver = '18 - Leia'
+    elif '19.' in txt: ver = '19 - Matrix'
+    elif '20.' in txt: ver = '20 - Nexus'
+    elif '21.' in txt: ver = '21 - Omega'
+    else: ver = 'Desconocido'
+
+    txt += ' - [COLOR gold]Versión:[/COLOR]  ' + ver + '[CR][CR]'
+
+    try:
+       if xbmc.getCondVisibility("System.Platform.Android"): plat = 'Android'
+       elif xbmc.getCondVisibility("System.Platform.Windows"): plat = 'Windows'
+       elif xbmc.getCondVisibility("System.Platform.UWP"): plat = 'Windows'
+       elif xbmc.getCondVisibility("System.Platform.Linux"): plat = 'Linux'
+       elif xbmc.getCondVisibility("system.platform.Linux.RaspberryPi"): plat = 'Raspberry'
+       elif xbmc.getCondVisibility("System.Platform.OSX"): plat = 'Osx'
+       elif xbmc.getCondVisibility("System.Platform.IOS"): plat = 'Ios'
+       elif xbmc.getCondVisibility("System.Platform.Darwin"): plat = 'Darwin'
+       elif xbmc.getCondVisibility("System.Platform.Xbox"): plat = 'Xbox'
+       elif xbmc.getCondVisibility("System.Platform.Tvos"): plat = 'Tvos'
+       elif xbmc.getCondVisibility("System.Platform.Atv2"): plat = 'Atv2'
+       else: plat = 'Desconocida'
+    except:
+        plat = '?'
+
+    txt += ' - [COLOR gold]Plataforma:[/COLOR]  ' + plat + '[CR][CR]'
+
+    txt += ' - [COLOR gold]Release:[/COLOR]  ' + str(platform.release()) + '[CR][CR]'
+
+    txt += ' - [COLOR gold]Procesador:[/COLOR]  ' + str(platform.machine()) + '[CR][CR]'
+
+    txt += ' - [COLOR gold]Language:[/COLOR]  ' + str(xbmc.getInfoLabel('System.Language')) + '[CR][CR]'
+
+    txt += ' - [COLOR gold]Uso CPU:[/COLOR]  ' + str(xbmc.getInfoLabel('System.CpuUsage')) + '[CR][CR]'
 
     plataforma = platform.uname()
 

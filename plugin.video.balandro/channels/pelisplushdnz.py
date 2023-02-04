@@ -174,6 +174,8 @@ def list_all(item):
             if ' (' in title: title = title.replace(' (' + year + ')', '').strip()
             elif ' [' in title: title = title.replace(' [' + year + ']', '').strip()
 
+        title = title.replace("&#039;", "'")
+
         if '/pelicula/' in url:
             if item.search_type == 'tvshow': continue
 

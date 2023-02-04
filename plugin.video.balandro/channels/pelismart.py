@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://smartpeli.com/'
+host = 'https://smartpeli.tv/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://pelismart.tv/']
+    ant_hosts = ['https://pelismart.tv/', 'https://smartpeli.com/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

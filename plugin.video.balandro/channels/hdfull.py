@@ -11,7 +11,18 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 
-from lib import balandroresolver
+
+BR2 = False
+
+try:
+   from lib import balandroresolver
+except:
+   try:
+      from lib import balandroresolver2 as balandroresolver
+
+      BR2 = True
+   except:
+      BR2 = None
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
@@ -19,33 +30,25 @@ from lib import balandroresolver
 
 
 dominios = [
+         'https://hdfull.store/',
          'https://hdfull.life/',
          'https://hdfull.digital/',
-         'https://hdfull.work/',
-         'https://hdfull.video/',
-         'https://hdfull.cloud/',
          'https://hdfull.one/',
          'https://hdfull.org/',
-         'https://hdfull.gdn/',
-         'https://hdfull.wtf/',
-         'https://hdfull.vip/',
-         'https://hdfull.top/',
-         'https://hdfull.fun/',
-         'https://hdfull.lol/',
-         'https://hdfull.link/',
-         'https://hdfull.click/',
-         'https://hdfull.stream/',
          'https://new.hdfull.one/'
          ]
 
 
 host = config.get_setting('dominio', 'hdfull', default=dominios[0])
 
-ant_hosts = ['https://hdfull.sh/', 'https://hdfull.ch/', 'https://hdfull.im/',
-             'https://hdfull.in/', 'https://hdfull.pro/', 'https://hdfull.la/',
-             'https://hdfull.tv/', 'https://hd-full.cc/', 'https://www2.hdfull.cx/',
-             'https://hdfull.me/', 'https://hdfull.io/', 'https://hdfull.lv/',
-             'https://hdfullcdn.cc/']
+ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
+             'https://hdfull.pro/', 'https://hdfull.la/', 'https://hdfull.tv/',
+             'https://hd-full.cc/', 'https://hdfull.me/', 'https://hdfull.io/',
+             'https://hdfull.lv/', 'https://hdfullcdn.cc/', 'https://hdfull.stream/',
+             'https://hdfull.click/', 'https://hdfull.link/', 'https://hdfull.lol/',
+             'https://hdfull.fun/', 'https://hdfull.top/', 'https://hdfull.vip/',
+             'https://hdfull.wtf/', 'https://hdfull.gdn/', 'https://hdfull.cloud/',
+             'https://hdfull.video/', 'https://hdfull.work/']
 
 
 login_ok = '[COLOR chartreuse]HdFull Login correcto[/COLOR]'
@@ -123,7 +126,7 @@ def do_make_login_logout(url, post=None):
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
-            from lib import balandroresolver
+            # ~ from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
@@ -471,18 +474,18 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( action='list_all', title='Últimas', url = dominio + 'series/date', search_type='tvshow' ))
 
+        itemlist.append(item.clone( action='list_all', title='Más valoradas', url= dominio + 'series/imdb_rating', search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_all', title='Doramas', url= dominio + 'tags-tv/dorama', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_all', title='Novelas', url= dominio + 'tags-tv/soap', search_type = 'tvshow' ))
+
         itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='aquamarine' ))
 
         itemlist.append(item.clone( action='list_episodes', title=' - Estreno', opcion = 'premiere', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_episodes', title=' - Anime ', opcion = 'anime', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_episodes', title=' - Últimos', opcion = 'latest', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_episodes', title=' - Actualizados', opcion = 'updated', search_type = 'tvshow' ))
-
-        itemlist.append(item.clone( action='list_all', title='Más valoradas', url= dominio + 'series/imdb_rating', search_type = 'tvshow' ))
-
-        itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow' ))
-        itemlist.append(item.clone( action='list_all', title='Doramas', url= dominio + 'tags-tv/dorama', search_type = 'tvshow' ))
-        itemlist.append(item.clone( action='list_all', title='Novelas', url= dominio + 'tags-tv/soap', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( action='series_abc', title='Por letra (A - Z)', search_type = 'tvshow' ))
 

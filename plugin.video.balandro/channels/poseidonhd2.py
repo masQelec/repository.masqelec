@@ -332,6 +332,7 @@ def findvideos(item):
                    other = ''
 
                    if srv == 'drive': srv ='gvideo'
+                   elif srv == 'ok-ru': srv ='okru'
                    elif srv == 'voex': srv ='voe'
                    elif srv == 'videovard': other = srv
                    elif srv == 'player' or srv == 'embed':

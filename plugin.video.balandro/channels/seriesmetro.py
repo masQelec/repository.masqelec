@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://seriesmetro.net/'
+host = 'https://metroseries.net/'
 
 
 perpage = 30
@@ -15,7 +15,7 @@ perpage = 30
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://seriesmetro.com/']
+    ant_hosts = ['https://seriesmetro.com/', 'https://seriesmetro.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -182,9 +182,11 @@ def last_epis(item):
         titulo = '%sx%s %s' % (season, episode, title)
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail = thumb,
-                                    contentType='episode', contentSerieName=title, contentSeason=season, contentEpisodeNumber=episode ))
+                                    contentType='episode', contentSerieName=title, contentSeason=season, contentEpisodeNumber=episode, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         buscar_next = True

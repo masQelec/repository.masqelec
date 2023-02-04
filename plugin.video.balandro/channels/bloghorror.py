@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -171,7 +171,11 @@ def findvideos(item):
 
     if not matches: matches = re.compile('<em>(.*?)</em>.*?<a href="(.*?)"', re.DOTALL).findall(bloque)
 
+    ses = 0
+
     for qlty, url in matches:
+        ses += 1
+
         if 'www.subdivx' in url: continue
 
         if '</div>' in idioma: idioma = scrapertools.find_single_match(idioma, '(.*?)</div>').strip()
@@ -200,8 +204,14 @@ def findvideos(item):
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
-                              language = lang, quality = qlty, other = other ))
+        if not servidor == 'directo':
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
+                                  language = lang, quality = qlty, other = other ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

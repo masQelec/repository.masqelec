@@ -57,6 +57,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title = title.replace('&#8220;', '').replace('&#8221;', '')
+
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '</h3><span>(.*?)</span>')

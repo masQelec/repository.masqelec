@@ -233,6 +233,8 @@ def list_all(item):
             title = title.split('|')[0]
             title = title.strip()
 
+        title = title.replace('&#8217;', '')
+
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)')
         if not thumb: thumb = scrapertools.find_single_match(article, ' src=([^ >]+)')
 

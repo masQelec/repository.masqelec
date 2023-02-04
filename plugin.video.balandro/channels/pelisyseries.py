@@ -419,6 +419,8 @@ def findvideos(item):
 
         qlty = scrapertools.find_single_match(match, "<strong class='quality'>(.*?)</strong>")
 
+        if qlty == 'Subtitulos': continue
+
         lang = scrapertools.find_single_match(match, "</strong>.*?</td><td>(.*?)</td>")
 
         if 'Latino' in lang: lang = 'Lat'
@@ -536,10 +538,13 @@ def play(item):
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-        if url.startswith('magnet:') or url.endswith('.torrent'):
+        if url.endswith('.torrent'):
             if PY3:
-                from core import requeststools
-                data = requeststools.read(url, 'pelisyseries')
+                if config.get_setting('channel_pelisyseries_proxies', default=''):
+                    from core import requeststools
+                    data = requeststools.read(url, 'pelisyseries')
+                else:
+                    data = do_downloadpage(url)
             else:
                 data = do_downloadpage(url)
 

@@ -347,6 +347,8 @@ def list_all(item):
         if not thumb: thumb = scrapertools.find_single_match(article, ' src=(.*?)>').strip()
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
+        title = title.replace("&#8217;", "'")
+
         title_alt = title.split('(')[0].strip() if ' (' in title else ''
 
         year = scrapertools.find_single_match(article, '<span class="year">(\d+)</span>')

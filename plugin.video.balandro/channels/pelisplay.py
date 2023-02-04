@@ -165,6 +165,8 @@ def list_pelis(item):
         if year: title = title.replace('(%s)' % year, '').strip()
         else: year = '-'
 
+        title = title.replace("&#039;", "'")
+
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, 
                                     contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
 
@@ -200,6 +202,8 @@ def list_series(item):
 
         year = scrapertools.find_single_match(article, 'Año: (\d{4})')
         if not year: year = '-'
+
+        title = title.replace("&#039;", "'")
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
                                     contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))

@@ -100,6 +100,8 @@ def list_all(item):
     for url, title, thumb, year, qlty in matches:
         title = re.sub(r' \((\d{4})\)$', '', title)
 
+        title = title.replace("&#8217;", "'")
+
         if not year: year = '-'
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, 

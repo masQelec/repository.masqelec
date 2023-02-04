@@ -35,7 +35,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Magazine', action = 'list_all', url = host, group = 'magazine', page = 1))
 
-    itemlist.append(item.clone( title = 'Video club', action = 'list_all', url = host + 'tag/cinematte-videoclub/' ))
+    itemlist.append(item.clone( title = 'Videoclub', action = 'list_all', url = host + 'tag/cinematte-videoclub/' ))
 
     itemlist.append(item.clone( title = 'Obras maestras', action = 'list_all', url = host + 'tag/cinematte-obras-maestras/' ))
 
@@ -119,7 +119,7 @@ def list_all(item):
 
         if not title: continue
 
-        title = title.lower().replace('ver ', '').replace('videoclub gratuito ', '').replace('videoclub online ', '').replace('videoclub ', '').replace('y descargar ', '').strip()
+        title = title.lower().replace('ver ', '').replace('videoclub gratuito ', '').replace('videoclub gratis ', '').replace('videoclub online ', '').replace('videoclub ', '').replace('y descargar ', '').strip()
 
         if title.startswith('|'):
             title = title.split("|")[1]
@@ -130,10 +130,12 @@ def list_all(item):
 
         title = title.capitalize()
 
-        title = title.replace('Á', 'á').replace('É', 'é').replace('Í', 'í').replace('Ó', 'ó').replace('Ú', 'ú').replace('Ñ', 'ñ').replace('Ü', 'ú')
+        title = title.replace('Á', 'á').replace('É', 'é').replace('Í', 'í').replace('Ó', 'ó').replace('Ú', 'ú').replace('Ñ', 'ñ')
 
         if not year == '-':
             title = title.replace('(' + year + ')', '').strip()
+
+        title = title.replace('&#8211;', '')
 
         if capitulos:
             datos_cap = do_downloadpage(url)
@@ -153,9 +155,6 @@ def list_all(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="(.*?)"')
-        ################if not next_page: next_page = scrapertools.find_single_match(data, '<nav class="pagination group">.*?<li class="next right">.*?href="(.*?)"')
-
-        ##################if not next_page: next_page = scrapertools.find_single_match(data, '<nav class="pagination group">.*?href="(.*?)"')
 
         if next_page:
             if '/page/' in next_page:
@@ -226,8 +225,6 @@ def findvideos(item):
         return itemlist
 
     data = do_downloadpage(item.url)
-
-    logger.info("check-00-flix: %s" % data)
 
     links = scrapertools.find_multiple_matches(data, '<div class="jetpack-video-wrapper">.*?src="(.*?)"')
     links = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')

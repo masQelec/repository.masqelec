@@ -299,6 +299,8 @@ def list_all(item):
             year = scrapertools.find_single_match(match, '</h3>.*?<span>(\d+)</span>')
             if not year: year = '-'
 
+            title = title.replace('&#8211;', '')
+
             title = title.strip()
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty,
@@ -316,6 +318,8 @@ def list_all(item):
             if not year: year = '-'
 
             title = scrapertools.find_single_match(title, '(.*?) Serie.*?nline') or title
+
+            title = title.replace('&#8211;', '')
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))

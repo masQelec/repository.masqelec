@@ -73,10 +73,10 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie-completa/', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + 'ver-serie-online/', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings/', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + 'ver-serie-online/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Novelas', action = 'list_all', url = host + 'series-genero/novelas/', search_type = 'tvshow' ))
 
@@ -172,11 +172,19 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="imdb".*?</span>.*?<span>(.*?)</span>')
+        if not year: year = scrapertools.find_single_match(match, '</span> <span>(.*?)</span>')
+
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
+        title = title.replace('&#038;', '').replace('&#8211;', '').replace("&#8217;", "'")
+
+        titulo = title
+
+        if " | " in titulo: titulo = titulo.split(" | ")[0]
+
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+                                    contentType = 'tvshow', contentSerieName = titulo, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -203,7 +211,6 @@ def last_episodes(item):
 
     matches = scrapertools.find_multiple_matches(bloque, 'data-ids=(.*?)</article>')
 
-
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
 
@@ -222,10 +229,16 @@ def last_episodes(item):
 
         title = title.replace('( ' + str(season) + ' x ' + str(episode) + ' )', '').strip()
 
-        titulo = temp_epis + '  ' + title
+        titulo = temp_epis + ' ' + title
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=title,
-                                   contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+        SerieName = title
+
+        if ": " in SerieName: SerieName = SerieName.split(": ")[0]
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=SerieName,
+                                    contentType='episode', contentSeason=season, contentEpisodeNumber=episode, infoLabels={'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
 
     if itemlist:
          if '<span class="current">' in data:
@@ -390,6 +403,7 @@ def findvideos(item):
         elif 'streamango' in servidor: continue
         elif 'verystream' in servidor: continue
         elif 'vidtodo' in servidor: continue
+        elif 'flix555' in servidor: continue
 
         lang = scrapertools.find_single_match(match, " src='.*?/flags/(.*?).png'")
 
@@ -417,6 +431,7 @@ def findvideos(item):
         elif 'streamango' in url: continue
         elif 'verystream' in url: continue
         elif 'vidtodo' in url: continue
+        elif 'flix555' in url: continue
 
         elif 'ul.to' in url: continue
         elif 'katfile' in url: continue
@@ -424,6 +439,7 @@ def findvideos(item):
         elif 'rockfile' in url: continue
         elif 'nitroflare' in url: continue
         elif '1fichier' in url: continue
+        elif '.oboom.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
