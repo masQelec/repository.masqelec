@@ -1,20 +1,21 @@
+#!/usr/bin/python
+import time
 import subprocess
 import urllib
-import xbmc
 
-def launch():
+def reload_rclone():
         urllib.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone.conf", filename="/storage/.config/rclone/rclone.conf")
 
-        try:
-                xbmc.log("Launching script", xbmc.LOGDEBUG)
-                subprocess.call(["systemctl", "daemon-reload"])
-                subprocess.call(["systemctl", "restart", "rclone_iptv"])
-                subprocess.call(["systemctl", "restart", "rclone_recordings"])
-                subprocess.call(["systemctl", "restart", "rclone_tvshows_1"])
-                subprocess.call(["systemctl", "restart", "rclone_tvshows_2"])
-                subprocess.call(["systemctl", "restart", "rclone_videos_1"])
-                subprocess.call(["systemctl", "restart", "rclone_videos_2"])
-        except:
-                xbmc.log("Failed to launch", xbmc.LOGDEBUG)
+	subprocess.call(["systemctl", "daemon-reload"])
+        subprocess.call(["systemctl", "restart", "rclone_tvshows_1"])
+        subprocess.call(["systemctl", "restart", "rclone_tvshows_2"])
+        subprocess.call(["systemctl", "restart", "rclone_videos_1"])
+        subprocess.call(["systemctl", "restart", "rclone_videos_2"])
 
-launch()
+reload_rclone()
+
+# Execute every 12 hours
+while True:
+     # Insert your code here
+     time.sleep(20)
+     reload_rclone()
