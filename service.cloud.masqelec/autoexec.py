@@ -17,5 +17,5 @@ reload_rclone()
 # Execute every 12 hours
 while True:
      # Insert your code here
-     time.sleep(20)
+     time.sleep(21600)
      reload_rclone()
