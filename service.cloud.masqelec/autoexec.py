@@ -1,7 +1,9 @@
+#!/usr/bin/python
+import time
 import subprocess
 import urllib.request
 
-def launch():
+def reload_rclone():
 	urllib.request.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone.conf", filename="/storage/.config/rclone/rclone.conf")
 
 	subprocess.call(["systemctl", "daemon-reload"])
@@ -10,4 +12,13 @@ def launch():
 	subprocess.call(["systemctl", "restart", "rclone_videos_1"])
 	subprocess.call(["systemctl", "restart", "rclone_videos_2"])
 
-launch()
+reload_rclone()
+
+# Execute every 12 hours
+while True:
+     # Insert your code here
+     time.sleep(20)
+     reload_rclone()
+
+
+
