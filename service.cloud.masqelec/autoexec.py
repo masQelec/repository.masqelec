@@ -4,6 +4,7 @@ import subprocess
 import urllib
 
 def reload_rclone():
+    try:
         urllib.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone.conf",filename="rclone.conf")
 
         subprocess.call(["systemctl", "daemon-reload"])
