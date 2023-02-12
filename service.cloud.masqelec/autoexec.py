@@ -6,7 +6,7 @@ import urllib.request
 def reload_rclone():
     try:
         urllib.request.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone.conf",
-                                   filename="rclone.conf")
+                                   filename="/storage/.config/rclone/rclone.conf")
 
         subprocess.call(["systemctl", "daemon-reload"])
         subprocess.call(["systemctl", "restart", "rclone_tvshows_1"])
