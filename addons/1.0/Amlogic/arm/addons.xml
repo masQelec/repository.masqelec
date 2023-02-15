@@ -133,7 +133,7 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
     </extension>
 </addon>
 
-<addon id="service.cloud.masqelec" name="Cloud masQelec" version="0.0.9" provider-name="Cloud masQelec">
+<addon id="service.cloud.masqelec" name="Cloud masQelec" version="1.0.0" provider-name="Cloud masQelec">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0"/>
 	</requires>
@@ -144,6 +144,9 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
 		<description lang="es_ES">Cloud masQelec mantiene actualizada tu biblioteca.</description>
 		<platform>all</platform>
 		<license>GNU GENERAL PUBLIC LICENSE Version 2</license>
+		<assets>
+      			<icon>icon.png</icon>
+   		</assets>
 	</extension>
 </addon>
 
