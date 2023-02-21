@@ -15,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www4.cuevana3.ch'
+host = 'https://www5.cuevana3.ch'
 
 
 # ~ por si viene de enlaces guardados
@@ -25,7 +25,7 @@ ant_hosts = ['https://www1.cuevana3.video', 'https://www2.cuevana3.video', 'http
              'https://www1.cuevana3.pe', 'https://www2.cuevana3.pe', 'https://cuevana3.vc',
              'https://www1.cuevana3.vc', 'https://cuevana3.fm', 'https://www1.cuevana3.fm',
              'https://cuevana3.ch/', 'https://www1.cuevana3.ch', 'https://www2.cuevana3.ch',
-             'https://www3.cuevana3.ch']
+             'https://www3.cuevana3.ch', 'https://www4.cuevana3.ch']
 
 
 domain = config.get_setting('dominio', 'cuevana3video', default='')
@@ -506,7 +506,7 @@ def findvideos(item):
                 if hay_pelisplay: url = ''
                 else:
                    new_url = url.replace('/download', '/play')
-	
+
                    data2 = do_downloadpage(new_url)
 
                    links2 = scrapertools.find_multiple_matches(data2, '<li class="linkserver".*?data-status="1".*?data-video="(.*?)"')
@@ -678,8 +678,29 @@ def play(item):
 
     elif item.other == 'apialfa':
         fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
+
         if fid:
+            if '/sc/' in item.url:
+                post = {'h': fid}
+
+                vid = item.url.replace('https://apialfa.tomatomatela.club/sc/index.php', 'https://apialfa.tomatomatela.club/sc/r.php')
+
+                data = httptools.downloadpage_proxy('cuevana3video', vid, post=post).data
+
+                url = scrapertools.find_single_match(data, '<meta name="og:url" content="(.*?)"')
+
+                if url:
+                    servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.corregir_servidor(servidor)
+
+                    url = servertools.normalize_url(servidor, url)
+
+                    itemlist.append(item.clone(url=url, server=servidor))
+
+                return itemlist
+
             vid = item.url.replace('https://apialfa.tomatomatela.club/ir/player.php', 'https://apialfa.tomatomatela.club/ir/rd.php')
+
             post = {'url': fid}
 
             try:
@@ -695,28 +716,51 @@ def play(item):
                 vid = scrapertools.find_single_match(data, 'value="(.*?)"')
 
                 if vid:
-                    post = {'url': vid}
-
                     try:
-                        # ~ url = httptools.downloadpage('https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
-                        url = httptools.downloadpage_proxy('cuevana3video', 'https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
+                        # ~ new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                        new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
                     except:
-                        url = ''
+                        new_url = ''
 
-                    if url:
-                        if '//damedamehoy.' in url or '//tomatomatela.' in url :
-                            url = resuelve_dame_toma(url)
+                if new_url:
+                    servidor = servertools.get_server_from_url(new_url)
+                    servidor = servertools.corregir_servidor(servidor)
 
-                            if url: itemlist.append(item.clone(url=url, server='directo'))
-                            return itemlist
-
-                        servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
-
-                        url = servertools.normalize_url(servidor, url)
+                    if servidor and servidor != 'directo':
+                        url = servertools.normalize_url(servidor, new_url)
 
                         itemlist.append(item.clone(url=url, server=servidor))
+
+                    return itemlist
+
+            else:
+
+                try:
+                    # ~ url = httptools.downloadpage('https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
+                    url = httptools.downloadpage_proxy('cuevana3video', 'https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
+                except:
+                    url = ''
+
+                if url:
+                    if '//damedamehoy.' in url or '//tomatomatela.' in url :
+                        url = resuelve_dame_toma(url)
+
+                        if url: itemlist.append(item.clone(url=url, server='directo'))
                         return itemlist
+
+                    servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.corregir_servidor(servidor)
+
+                    url = servertools.normalize_url(servidor, url)
+
+                    itemlist.append(item.clone(url=url, server=servidor))
+                    return itemlist
+
+    if url:
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

@@ -31,6 +31,11 @@ txt_checs = '[COLOR tomato][B]Compruebe su Internet y/ó el Canal, a través de 
 txt_coffs = '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
 
 
+timeout = config.get_setting('httptools_timeout', default=15)
+
+espera = config.get_setting('servers_waiting', default=6)
+
+
 _useragent = ''
 _chrome_version = ''
 
@@ -61,11 +66,6 @@ servers_poe = [
         ]
 
 
-timeout = 30
-
-espera = 3
-
-
 def test_channel(channel_name):
     logger.info()
 
@@ -88,7 +88,7 @@ def test_channel(channel_name):
             platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
             return
 
-    if channel_id == 'hdfull' or channel_id == 'inkapelis' or channel_id == 'pelishouse' or channel_id == 'pelishouseonline' or channel_id == 'playdede':
+    if channel_id == 'hdfull' or channel_id == 'inkapelis' or channel_id == 'pelishouse' or channel_id == 'playdede':
         el_canal = ('Cargando Info [B][COLOR %s]' + channel_name) % color_infor
         platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
 
@@ -521,7 +521,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
         response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
 
         if 'Checking if the site connection is secure' in response.data:
-            platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]' + channel_name.capitalize() + '[/B][/COLOR] requiere esperar %s segundos' % espera)
+            platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]Requiere esperar %s segundos[/B][/COLOR]' % espera)
             time.sleep(int(espera))
 
             response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, timeout=timeout, raise_weberror=False, bypass_cloudflare=False)

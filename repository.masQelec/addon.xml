@@ -15,7 +15,7 @@
 		<description lang="es">El repositorio de complementos masQelec contiene clientes y servidores Kodi PVR, protectores de pantalla, visualizaciones y más. Los complementos en este repositorio son mantenidos y respaldados por el personal de masQelec y USTED la comunidad. Si encuentra un complemento roto o que no funciona, infórmelo a través de los foros o ayude enviando soluciones a través de GitHub.</description>
             <platform>all</platform>
 	    <assets>
-      			<icon>icon.png</icon>
+      		<icon>icon.png</icon>
    	    </assets>
     </extension>
 </addon>

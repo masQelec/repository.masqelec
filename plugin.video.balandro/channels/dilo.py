@@ -285,7 +285,7 @@ def last_epis(item):
 
     if not item.page: item.page = 0
 
-    perpage = 25
+    perpage = 24
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -306,7 +306,36 @@ def last_epis(item):
 
         if descartar_xxx and ('/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url): continue
 
-        if '/va-' in url or '-pc-' in url: continue
+        if '/va-' in url: continue
+        elif '/cocina-' in url: continue
+        elif '/coches-' in url: continue
+        elif '/motos-' in url: continue
+        elif '/car-' in url: continue
+        elif '/ebook-' in url: continue
+        elif '/mp3tag-' in url: continue
+        elif '/gadget-' in url: continue
+        elif '/mastermix-' in url: continue
+        elif '/computer-' in url: continue
+        elif '/mega-' in url: continue
+        elif '/cinemania-' in url: continue
+        elif '/diez-' in url: continue
+        elif '/lecturas-' in url: continue
+        elif '/gran-' in url: continue
+        elif '/various-' in url: continue
+
+        elif '-pc-' in url: continue
+        elif '-magazine-' in url: continue
+        elif '-pack-' in url: continue
+        elif '-cocina-' in url: continue
+        elif '-recetas-' in url: continue
+        elif '-motor-' in url: continue
+        elif '-pdf-' in url: continue
+        elif '-portable-' in url: continue
+        elif '-flac-' in url: continue
+        elif '-mp3-' in url: continue
+        elif '-remix-' in url: continue
+        elif '-dance-' in url: continue
+        elif '-hits-' in url: continue
 
         thumb = scrapertools.find_single_match(match, ' src="([^"]+)"')
 
@@ -318,6 +347,8 @@ def last_epis(item):
 
         if " - " in name: SerieName = name.split(" - ")[0]
         elif " ( " in name: SerieName = name.split(" ( ")[0]
+        elif ": " in name: SerieName = name.split(": ")[0]
+        elif " (" in name: SerieName = name.split(" (")[0]
         else: SerieName = name
 
         temp_epis = scrapertools.find_single_match(match, '</div><div>(.*?)</div>')
@@ -354,7 +385,7 @@ def last_epis(item):
 
     if itemlist:
         if num_matches > ((item.page + 1) * perpage):
-            itemlist.append(item.clone( title="Siguientes ...", action="last_epis", page=item.page + 1, text_color='coral' ))
+            itemlist.append(item.clone( title="Siguientes ...", action = "last_epis", page = item.page + 1, text_color='coral' ))
 
     return itemlist
 

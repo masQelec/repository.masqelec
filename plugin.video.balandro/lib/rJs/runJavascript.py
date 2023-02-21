@@ -35,7 +35,7 @@ class runJs:
     ## Run JS String ##
     def runJsString(self, jsString, strictFilter):
         libJs = ''
-        with open(os.path.dirname(__file__) + '\lib.js', 'r') as fileLib:
+        with open(os.path.dirname(__file__) + '/lib.js', 'r') as fileLib:
             libJs = fileLib.read()
             dataJs = self.__filterJsFile(jsString, strictFilter)
             bb = libJs + dataJs

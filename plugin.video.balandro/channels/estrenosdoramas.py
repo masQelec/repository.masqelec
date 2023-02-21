@@ -44,6 +44,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/peliculas/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Últimas', action = 'last_pelis', url = host, search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
@@ -59,7 +61,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/doramas-online/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_episodes', url = host + 'category/ultimos-capitulos-online/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'last_series', url = host, search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Capítulos recientes', action = 'last_news', url = host, search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host + 'category/ultimos-capitulos-online/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'tvshow' ))
 
@@ -162,7 +168,114 @@ def list_all(item):
     return itemlist
 
 
-def last_episodes(item):
+def last_pelis(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '>Últimas Peliculas<(.*?) Peliculas')
+
+    matches = re.compile('<div class="" id="post-(.*?)</div>').findall(bloque)
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
+        if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
+
+        if not url or not title: continue
+
+        title = title.replace("&#8217;", "'")
+
+        title = title.replace('Pelicula', '').strip()
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+def last_series(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '>Últimas Series<(.*?) Doramas')
+
+    matches = re.compile('<div class="" id="post-(.*?)</div>').findall(bloque)
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
+        if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
+
+        if not url or not title: continue
+
+        title = title.replace("&#8217;", "'")
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+def last_news(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '>Últimos Capítulos<(.*?) Capítulos')
+
+    matches = re.compile('id="post-(.*?)</div>').findall(bloque)
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
+        if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
+
+        if not url or not title: continue
+
+        title = title.replace("&#8217;", "'")
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        season = 1
+
+        epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
+        if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
+        if not epis: epis = 0
+
+        title_serie = scrapertools.find_single_match(title, '(.*?)Capitulo').strip()
+        if not title_serie: title_serie = scrapertools.find_single_match(title, '(.*?)Capítulo').strip()
+
+        title_serie = title_serie.replace("&#8217;", "'")
+
+        titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
+                                    contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis,
+                                    infoLabels={'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+def last_epis(item):
     logger.info()
     itemlist = []
 
@@ -187,9 +300,15 @@ def last_episodes(item):
         season = 1
 
         epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
+        if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
         if not epis: epis = 0
 
+
         title_serie = scrapertools.find_single_match(title, '(.*?)Capitulo').strip()
+        if not title_serie: title_serie = scrapertools.find_single_match(title, '(.*?)Capítulo').strip()
+
+        title_serie = title_serie.replace("&#8217;", "'")
+
         titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
@@ -204,7 +323,7 @@ def last_episodes(item):
 
             if next_url:
                 if '/page/' in next_url:
-                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'last_episodes', text_color = 'coral' ))
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'last_epis', text_color = 'coral' ))
 
     return itemlist
 
@@ -275,6 +394,7 @@ def episodios(item):
         if not 'Capitulo' in title: continue
 
         epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
+        if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
 
         if not epis: continue
 
@@ -343,6 +463,9 @@ def play(item):
     itemlist = []
 
     url = item.url
+
+    if '/odysee.com/' in item.url:
+        return '[COLOR tan]Servidor No Soportado[/COLOR]'
 
     if item.server == 'directo':
         if '.php' in item.url:
@@ -444,19 +567,20 @@ def play(item):
 
                         _json = jsontools.load(_result)
 
-                        urlremoto_matches = re.compile("file:'(.*?)'", re.DOTALL).findall(_json['urlremoto'])
+                        if _json['urlremoto']:
+                            urlremoto_matches = re.compile("file:'(.*?)'", re.DOTALL).findall(_json['urlremoto'])
 
-                        if len(urlremoto_matches) == 1:
-                            url = urlremoto_matches[0]
+                            if len(urlremoto_matches) == 1:
+                                url = urlremoto_matches[0]
 
-                            if not 'https:' in str(url): url = 'https:' + str(url)
+                                if not 'https:' in str(url): url = 'https:' + str(url)
 
-                            servidor = servertools.get_server_from_url(url)
-                            servidor = servertools.corregir_servidor(servidor)
+                                servidor = servertools.get_server_from_url(url)
+                                servidor = servertools.corregir_servidor(servidor)
 
-                            url = servertools.normalize_url(servidor, url)
+                                url = servertools.normalize_url(servidor, url)
 
-                            itemlist.append(item.clone(server = servidor, url = url))
+                                itemlist.append(item.clone(server = servidor, url = url))
 
                 return itemlist
 
@@ -520,7 +644,7 @@ def decrypt(data, index=0):
 
     if len(matches) > 0:
         for w,i,s,e in matches:
-            if not i and not s and not e: secret = decodeone(w)
+            if not i and not s and not e: secret = decode_one(w)
             else:
                secret = decode(w,i,s,e)
                if "jwplayer" in secret:
@@ -591,7 +715,7 @@ def decode(w, i, s, e):
     return ''.join(l1ll)
 
 
-def decodeone(w):
+def decode_one(w):
     i = ''
 
     for s in range(0,len(w),2):

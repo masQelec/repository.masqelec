@@ -144,6 +144,14 @@
       {
         "pattern": "(?:sbrity.com)/([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbhight.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbhight.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
       }
     ]
   }

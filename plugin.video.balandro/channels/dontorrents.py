@@ -12,7 +12,9 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://dontorrent.how/'
+# ~ web alternativa  donproxies.com
+
+host = 'https://8ca7-don.mirror.pm/'
 
 
 # ~ por si viene de enlaces guardados
@@ -39,7 +41,7 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.gs/', 'https://dontorrent.gy/', 'https://dontorrent.click/',
              'https://dontorrent.fail/', 'https://dontorrent.futbol/', 'https://dontorrent.mba/',
              'https://dontorrent.army/', 'https://dontorrent.blue/', 'https://dontorrent.beer/',
-             'https://dontorrent.surf/']
+             'https://dontorrent.surf/', 'https://dontorrent.how/', 'https://dontorrent.casa/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')

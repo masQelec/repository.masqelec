@@ -9,13 +9,13 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www1.grantorrent.co/'
+host = 'https://grantorrent.lat/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://grantorrents.org/', 'https://grantorrents.pro/', 'https://grantorrent.co/',
              'https://grantorrent.plus/', 'https://grantorrent.uk/', 'https://grantorrent.win/',
-             'https://grantorrent.lat/', 'https://grantorrent.co/']
+             'https://grantorrent.lat/', 'https://grantorrent.co/', 'https://www1.grantorrent.co/']
 
 
 domain = config.get_setting('dominio', 'grantorrents', default='')
@@ -200,6 +200,8 @@ def list_all(item):
         if not url or not title: continue
 
         title = title.replace('Descargar', '').replace('en torrent', '').replace('torrent', '').strip()
+
+        title = title.replace('&#8217;', "'")
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 

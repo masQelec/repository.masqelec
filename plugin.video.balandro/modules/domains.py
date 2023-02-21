@@ -27,12 +27,12 @@ channels_currents = [
         'divxtotal', 'dontorrents', 'elifilms', 'elitetorrent', 'entrepeliculasyseries',
         'gnula24', 'grantorrent', 'grantorrents',
         'hdfull', 'hdfullse',
-        'inkapelis', 'kindor', 'pelis28', 'pelisflix', 'pelishouse', 'pelismaraton',
+        'inkapelis', 'kindor', 'pelis28', 'pelishouse', 'pelismaraton',
         'pelispedia', 'pelispediaws',
         'pelisplus', 'pelisplushd', 'pelisplushdlat',
         'playdede',
         'repelishd',
-        'series24', 'seriesyonkis', 'subtorrents', 'torrentdivx', 'torrentpelis'
+        'series24', 'seriesyonkis', 'subtorrents', 'torrentpelis'
         ]
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -1690,52 +1690,6 @@ def test_domain_pelis28(item):
         platformtools.dialog_notification(config.__addon_name + ' - Pelis28', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def manto_domain_pelisflix(item):
-    logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisFlix[/B][/COLOR]' % color_exec)
-
-    channel_json = 'pelisflix.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] PelisFlix') % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    id = params['id']
-    name = params['name']
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_pelisflix(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('pelisflix')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('PelisFlix')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - PelisFlix', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
 def manto_domain_pelishouse(item):
     logger.info()
 
@@ -2303,52 +2257,6 @@ def test_domain_subtorrents(item):
         platformtools.dialog_notification(config.__addon_name + ' - SubTorrents', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def manto_domain_torrentdivx(item):
-    logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando TorrentDivx[/B][/COLOR]' % color_exec)
-
-    channel_json = 'torrentdivx.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] TorrentDivx') % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    id = params['id']
-    name = params['name']
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_torrentdivx(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('torrentdivx')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('TorrentDivx')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - TorrentDivx', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
 def manto_domain_torrentpelis(item):
     logger.info()
 
@@ -2660,16 +2568,6 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://pelis28.': return
 
-    elif id == 'pelisflix':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://pelisflix.'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio PelisFlix  -->  [COLOR %s]https://pelisflix.??/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://pelisflix.': return
-
     elif id == 'pelishouse':
         config.set_setting('user_test_channel', '')
 
@@ -2789,16 +2687,6 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://www.subtorrents.': return
-
-    elif id == 'torrentdivx':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio TorrentDivx  -->  [COLOR %s]https://??.ditorrent.??/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://': return
 
     elif id == 'torrentpelis':
         config.set_setting('user_test_channel', '')

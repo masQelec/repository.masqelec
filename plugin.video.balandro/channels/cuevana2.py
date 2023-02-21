@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cuevana2espanol.com/'
+host = 'https://ww2.cuevana2.biz/'
 
 
 def item_configurar_proxies(item):
@@ -21,7 +21,7 @@ def item_configurar_proxies(item):
     tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
     context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-    if config.get_setting('channel_cuevana2esp_proxies', default=''):
+    if config.get_setting('channel_cuevana2_proxies', default=''):
         tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
         context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
 
@@ -44,7 +44,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False, raise_weberror=True):
     # ~ resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
-    resp = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
+    resp = httptools.downloadpage_proxy('cuevana2', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
 
     if '<title>You are being redirected...</title>' in resp.data:
         try:
@@ -53,7 +53,7 @@ def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_he
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
                 # ~ resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
-                resp = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
+                resp = httptools.downloadpage_proxy('cuevana2', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
         except:
             pass
 
@@ -84,12 +84,12 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'archives/movies', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'archives/movies/releases', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas/estrenos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'archives/movies/top/day', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'archives/movies/top/week', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'peliculas/top/day', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'peliculas/top/week', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -104,16 +104,17 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'archives/series', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'archives/series/releases', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'series/estrenos', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'archives/episodes', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'episodios', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'archives/series/top/day', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'archives/series/top/week', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'series/top/day', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series/top/week', search_type = 'tvshow' ))
 
     return itemlist
+
 
 def generos(item):
     logger.info()
@@ -141,7 +142,7 @@ def generos(item):
        ]
 
     for genero in generos:
-        url = host + 'genres/' + genero
+        url = host + 'genero/' + genero
 
         itemlist.append(item.clone( action = 'list_all', title = genero.capitalize(), url = url ))
 
@@ -179,7 +180,7 @@ def list_all(item):
         year = scrapertools.find_single_match(article, '<span>(\d{4})</span>')
         if not year: year = '-'
 
-        tipo = 'movie' if '/movies/' in url else 'tvshow'
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
@@ -313,28 +314,28 @@ def episodios(item):
 
         if tvdb_id:
             if sum_parts > 50:
-                platformtools.dialog_notification('Cuevana2Esp', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                platformtools.dialog_notification('Cuevana2', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('Cuevana2Esp', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    platformtools.dialog_notification('Cuevana2', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
                     item.perpage = 500
 
             elif sum_parts >= 500:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('Cuevana2Esp', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    platformtools.dialog_notification('Cuevana2', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
                     item.perpage = 250
 
             elif sum_parts >= 250:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('Cuevana2Esp', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
+                    platformtools.dialog_notification('Cuevana2', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
                     item.perpage = 100
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
-                    platformtools.dialog_notification('Cuevana2Esp', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    platformtools.dialog_notification('Cuevana2', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
 
     for thumb, season, epis, in matches[item.page * item.perpage:]:
@@ -344,7 +345,9 @@ def episodios(item):
            i = i - 1
            continue
 
-        url = item.url + '/seasons/' + season + '/episodes/' + epis
+        url = item.url.replace('/serie/', '/episodio/')
+
+        url = url + '-' + season + 'x' + epis
 
         titulo = season + 'x' + epis + ' ' + item.contentSerieName
 

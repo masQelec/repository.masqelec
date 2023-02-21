@@ -15,12 +15,61 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://www.pelisplus.lat/'
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_pelispluslat_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ 10/2/2023
+    timeout = None
+
+    if '/player/auto.php?' in url: timeout = 20
+
     if not headers: headers = {'Referer': host}
 
     if '/release/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+    data = httptools.downloadpage_proxy('pelispluslat', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                data = httptools.downloadpage_proxy('pelispluslat', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        except:
+            pass
 
     return data
 
@@ -28,6 +77,8 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -43,6 +94,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -61,6 +114,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -81,6 +136,8 @@ def mainlist_series(item):
 def mainlist_animes(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
@@ -175,16 +232,14 @@ def list_all(item):
         if '/pelicula/' in url:
             if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
         else:
             if item.search_type == 'movie': continue
 
             if item.group == 'animes':
                 if not '/anime/' in url: continue
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
-                                        contentType = 'season', contentSerieName = title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'season', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -356,10 +411,12 @@ def findvideos(item):
             url = base64.b64decode(url)
             if PY3 and isinstance(url, bytes): url = "".join(chr(x) for x in bytes(url))
 
-            if not 'http' in url: url = host + url
+            if not url: continue
 
-            if '/player.moovies.in/' in url: continue
+            elif '/player.moovies.in/' in url: continue
             elif 'mystream.to' in url: continue
+
+            if not 'http' in url: url = host[:-1] + url
 
             if 'pelisplus.lat' in url:
                 prv = do_downloadpage(url, headers={'Referer': item.url})
@@ -370,7 +427,7 @@ def findvideos(item):
 
                 if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
-                if not url.startswith('http'): url = 'https:' + url
+                if not url.startswith('http'): url = host[:-1] + url
 
             if url.startswith('/fembed.php?url='): url = url.replace('/fembed.php?url=', 'https://feurl.com/v/')
             elif (host + 'fembed.php') in url: url = url.replace(host + 'fembed.php?url=', 'https://feurl.com/v/')

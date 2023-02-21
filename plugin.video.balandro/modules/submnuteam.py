@@ -216,6 +216,17 @@ def submnu_sistema(item):
 
     presentar = False
 
+    path = filetools.join(config.get_data_path(), 'tmdb.sqlite-journal')
+
+    existe = filetools.exists(path)
+    if existe: presentar = True
+    if presentar:
+        itemlist.append(item.clone( action='', title='Archivo Tmdb Sqlite Journal:', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_tmdb_sqlite', title= " - Eliminar", journal = 'journal', thumbnail=config.get_thumb('computer'), text_color='red' ))
+
+    presentar = False
+
     path = filetools.join(config.get_data_path(), 'tmdb.sqlite')
 
     existe = filetools.exists(path)
@@ -334,7 +345,7 @@ def submnu_gestionar(item):
     elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): presentar = True
 
     if presentar:
-        itemlist.append(item.clone( action='', title='[B]Gestionar:[/B]', thumbnail=config.get_thumb('tools'), text_color='teal' ))
+        itemlist.append(item.clone( action='', title='[B]GESTIONAR[/B]', thumbnail=config.get_thumb('tools'), text_color='teal' ))
 
         if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')):
             itemlist.append(item.clone( channel='developergenres', action='mainlist', title=' - Géneros', thumbnail=config.get_thumb('genres') ))
@@ -353,7 +364,7 @@ def submnu_canales(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='', title='[B]Tests Canales:[/B]', thumbnail=config.get_thumb('tools'), text_color='gold' ))
+    itemlist.append(item.clone( action='', title='[B]TESTS CANALES[/B]', thumbnail=config.get_thumb('tools'), text_color='gold' ))
 
     itemlist.append(item.clone( channel='actions', action='show_latest_domains', title=' - [COLOR cyan][B]Últimos Cambios dominios[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
@@ -369,7 +380,7 @@ def submnu_servidores(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='', title='[B]Tests Servidores:[/B]', thumbnail=config.get_thumb('tools'), text_color='fuchsia' ))
+    itemlist.append(item.clone( action='', title='[B]TESTS SERVIDORES[/B]', thumbnail=config.get_thumb('tools'), text_color='fuchsia' ))
     itemlist.append(item.clone( action='test_all_srvs', title=' - Insatisfactorios', thumbnail=config.get_thumb('flame'), unsatisfactory = True ))
     itemlist.append(item.clone( action='test_all_srvs', title=' - Todos', thumbnail=config.get_thumb('flame') ))
 

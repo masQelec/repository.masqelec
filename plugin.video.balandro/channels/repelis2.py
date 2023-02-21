@@ -10,9 +10,42 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://www.repelis2.co/'
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_repelis2_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
 
 def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage_proxy('repelis2', url, post=post, headers=headers).data
+
     return data
 
 
@@ -23,6 +56,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -99,22 +134,19 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    logger.info("check-1-data: %s" % data)
+    data = data.replace('</div></div></div></div></div></div>', '</div></div></div><div></div></div></div>')
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="opt">(.*?)</div></div></div>')
-
-    logger.info("check-1-matches: %s" % matches)
+    matches = scrapertools.find_multiple_matches(data, '<div class="opt">(.*?)</div></div></div><div>')
 
     ses = 0
 
     for match in matches:
+        match = match.replace('</div> </div></div>', '</div></div></div>')
         match = match + '</div></div></div>'
-
-        logger.info("check-1-match: %s" % match)
 
         servers = scrapertools.find_multiple_matches(match, '<div class="server(.*?)</div></div></div>')
 
-        logger.info("check-1-servers: %s" % servers)
+        lang = scrapertools.find_single_match(match, '<div class="lang-name">(.*?)</div>')
 
         for srvs in servers:
             ses += 1
@@ -126,8 +158,6 @@ def findvideos(item):
 
             qlty = scrapertools.find_single_match(srvs, '<div class="s-quality">(.*?)$')
 
-            lang = scrapertools.find_single_match(srvs, '<div class="lang-name">(.*?)</div>')
-
             if lang == 'Latino': lang = 'Lat'
             elif lang == 'Español': lang = 'Esp'
             elif lang == 'Subtitulado': lang = 'Vose'
@@ -135,8 +165,8 @@ def findvideos(item):
             hash = scrapertools.find_single_match(srvs, 'data-hash="(.*?)"')
 
             if hash:
-               itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', hash = hash,
-                                     quality = qlty, language = lang, other = srv.capitalize() ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', hash = hash,
+                                      quality = qlty, language = lang, other = srv.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -164,10 +194,8 @@ def play(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        if servidor and not servidor == 'directo':
+        if not servidor == 'directo':
             url = servertools.normalize_url(servidor, url)
-
-            if '.zplayer.' in url: url = url + "|https://player.cuevana2.io/"
 
             itemlist.append(item.clone( url=url, server=servidor ))
 

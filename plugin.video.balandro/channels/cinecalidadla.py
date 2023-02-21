@@ -392,9 +392,8 @@ def findvideos(item):
             elif servidor == 'vip': continue
 
             if servidor == 'ok': servidor = 'okru'
-            elif servidor == 'sbanh': servidor = 'streamsb'
-            elif servidor == 'cloudemb': servidor = 'streamsb'
-            elif servidor == 'sblongvu': servidor = 'streamsb'
+
+            elif servidor == 'sbanh' or servidor == 'cloudemb' or servidor == 'sblongvu' or servidor == 'sbhight': servidor = 'streamsb'
 
             elif servidor == 'google': servidor = 'gvideo'
 
