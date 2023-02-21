@@ -325,7 +325,7 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(str(data), '<h2>Añadido(.*?)© DMCA Pelishouse')
+    bloque = scrapertools.find_single_match(str(data), '<h2>Añadido(.*?)<footer class="main">')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
@@ -506,7 +506,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    patron = "<li id='player-option-\d+' class='dooplay_player_option' data-type='([^']+)'.*?data-post='([^']+)' data-nume='([^'])+'>.*?<span class='title'>([^<]+)</span>"
+    patron = "<li id='player-option-\d+' class='dooplay_player_option' data-type='([^']+)'.*?data-post='([^']+)'.*?data-nume='([^'])+'>.*?<span class='title'>([^<]+)</span>"
 
     matches = scrapertools.find_multiple_matches(data, patron)
 

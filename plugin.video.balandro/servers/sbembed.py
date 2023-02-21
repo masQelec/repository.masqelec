@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import xbmc
+import xbmc, time
 
-from core import httptools, scrapertools, servertools
 from platformcode import config, logger, platformtools
+from core import httptools, scrapertools, servertools
+
 from lib import jsunpack
 
+
+espera = config.get_setting('servers_waiting', default=6)
 
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
@@ -51,10 +54,6 @@ def get_video_url(page_url, url_referer=''):
         return 'El fichero no existe o ha sido borrado'
 
     if not "text/javascript'>(eval" in data:
-        import time
-        from platformcode import platformtools
-        espera = 5
-
         platformtools.dialog_notification('Cargando Sbembed', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
 

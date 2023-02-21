@@ -471,6 +471,7 @@ def play(item):
     itemlist = []
 
     servidor = item.server
+
     url = item.url
 
     if item.other:
@@ -500,24 +501,83 @@ def play(item):
 
         elif item.other == 'apialfa':
             fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
+
             if fid:
+                if '/sc/' in item.url:
+                    post = {'h': fid}
+
+                    vid = item.url.replace('https://apialfa.tomatomatela.club/sc/index.php', 'https://apialfa.tomatomatela.club/sc/r.php')
+
+                    data = httptools.downloadpage_proxy('cliversite', vid, post=post).data
+
+                    url = scrapertools.find_single_match(data, '<meta name="og:url" content="(.*?)"')
+
+                    if url:
+                        servidor = servertools.get_server_from_url(url)
+                        servidor = servertools.corregir_servidor(servidor)
+
+                        url = servertools.normalize_url(servidor, url)
+
+                        itemlist.append(item.clone(url=url, server=servidor))
+
+                    return itemlist
+
                 vid = item.url.replace('https://apialfa.tomatomatela.club/ir/player.php', 'https://apialfa.tomatomatela.club/ir/rd.php')
+
                 post = {'url': fid}
 
                 try:
-                    # ~ url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
-                    url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                    # ~ new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                    new_url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
                 except:
-                    url = ''
+                    new_url = ''
 
-                if url:
-                    servidor = servertools.get_server_from_url(url)
-                    servidor = servertools.corregir_servidor(servidor)
+                if new_url:
+                    if new_url.startswith('//'): new_url = 'https:' + new_url
 
-                    url = servertools.normalize_url(servidor, url)
+                    data = do_downloadpage(new_url)
+                    vid = scrapertools.find_single_match(data, 'value="(.*?)"')
 
-                    itemlist.append(item.clone(url=url, server=servidor))
-                    return itemlist
+                    if vid:
+                        try:
+                            # ~ new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                            new_url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                        except:
+                            new_url = ''
+
+                    if new_url:
+                        servidor = servertools.get_server_from_url(new_url)
+                        servidor = servertools.corregir_servidor(servidor)
+
+                        if servidor and servidor != 'directo':
+                            url = servertools.normalize_url(servidor, new_url)
+
+                            itemlist.append(item.clone(url=url, server=servidor))
+
+                        return itemlist
+
+                else:
+
+                    try:
+                        # ~ url = httptools.downloadpage('https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
+                        url = httptools.downloadpage_proxy('cliversite', 'https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
+                    except:
+                        url = ''
+
+                    if url:
+                        if '//damedamehoy.' in url or '//tomatomatela.' in url :
+                            url = resuelve_dame_toma(url)
+
+                            if url: itemlist.append(item.clone(url=url, server='directo'))
+                            return itemlist
+
+                        servidor = servertools.get_server_from_url(url)
+                        servidor = servertools.corregir_servidor(servidor)
+
+                        url = servertools.normalize_url(servidor, url)
+
+                        itemlist.append(item.clone(url=url, server=servidor))
+                        return itemlist
 
         elif item.other == 'super':
             if '/pelisplay.ccplay?' in item.url:

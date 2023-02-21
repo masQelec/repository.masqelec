@@ -209,6 +209,10 @@ def mainlist(item):
         itemlist.append(item.clone( title = ' - Audio solo en Latino', action = 'ch_groups', group = 'lat', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
         itemlist.append(item.clone( title = ' - Audio solo en Vose', action = 'ch_groups', group = 'vose', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
         itemlist.append(item.clone( title = ' - Audio solo en VO', action = 'ch_groups', group = 'vo', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
+
+        if item.mnu_lang:
+            itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR fuchsia][B]Play[/B][/COLOR])', thumbnail=config.get_thumb('settings') ))
+
     else:
         if config.get_setting('mnu_idiomas', default=True):
             itemlist.append(item.clone( title = ' - [B]Audios[/B]', action = 'submnu_audios', thumbnail=config.get_thumb('idiomas'), text_color='violet' ))
@@ -819,8 +823,8 @@ def ch_groups(item):
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominios'})
 
         if 'register' in ch['clusters']:
-            cfg_user_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_username'
-            cfg_pass_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_password'
+            cfg_user_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_username'
+            cfg_pass_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_password'
 
             if not config.get_setting(cfg_user_channel, default='') or not config.get_setting(cfg_pass_channel, default=''):
                 tit = '[COLOR green][B]Información para Registrarse[/B][/COLOR]'
@@ -829,7 +833,7 @@ def ch_groups(item):
                 tit = '[COLOR teal][B]Credenciales Cuenta[/B][/COLOR]'
                 context.append({'title': tit, 'channel': item.channel, 'action': '_credenciales'})
             else:
-               cfg_login_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_login'
+               cfg_login_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_login'
 
                presentar = True
                if 'dominios' in ch['notes'].lower():
@@ -878,12 +882,12 @@ def ch_groups(item):
                 else: color = color_list_proxies
 
         if 'register' in ch['clusters']:
-            cfg_user_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_username'
-            cfg_pass_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_password'
+            cfg_user_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_username'
+            cfg_pass_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_password'
             if not config.get_setting(cfg_user_channel, default='') or not config.get_setting(cfg_pass_channel, default=''):
                titulo += '[I][COLOR teal] (cuenta)[/COLOR][/I]'
             else:
-               cfg_login_channel = 'channel_' + ch['id'] + '_' + ch['id'] +'_login'
+               cfg_login_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_login'
 
                if config.get_setting(cfg_login_channel, default=False):
                    presentar = True

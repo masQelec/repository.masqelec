@@ -201,23 +201,28 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Castellano': 'Esp', 'Dual-LAT': 'Lat (dual)', 'Español latino': 'Lat', 'Subtitulado': 'Vose'}
+    IDIOMAS = {'Castellano': 'Esp', 'Latino': 'Lat', 'Dual-LAT': 'Lat (dual)', 'Español latino': 'Lat', 'Subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
 
     link = scrapertools.find_single_match(data, "id='link-.*?<a href='(.*?)'")
 
-    links = scrapertools.find_multiple_matches(data, "<tr id='link-.*?<a href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?<td>(.*?)</td>.*?<td>(.*?)</td>")
+    links = scrapertools.find_multiple_matches(data, "<tr id='link-.*?href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?src='(.*?)'.*?<strong class='quality'>(.*?)</strong>")
 
-    linksd =  scrapertools.find_multiple_matches(data, "<tr class='downloads'.*?id='.*?<a href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?<td>(.*?)</td>.*?<td>(.*?)</td>")
+    linksd =  scrapertools.find_multiple_matches(data, "<tr class='downloads'.*?id='.*?<a href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?src='(.*?)'.*?<strong class='quality'>(.*?)</strong>")
 
     links = links + linksd
 
     for url, qlty, lang, size in links:
         if url == 'https://adfly.mobi/directlinkg': url = link
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
-                              language = IDIOMAS.get(lang, lang), quality = qlty, other = size))
+        if '.png' in lang:
+            if 'Espanol' in lang: lang = 'Castellano'
+            elif 'Latino' in lang: lang = 'Latino'
+            elif 'Vose' in lang: lang = 'Subtitulado'
+            else: lamg = '?'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = IDIOMAS.get(lang, lang), quality = qlty, other = size))
 
     return itemlist
 
@@ -240,6 +245,10 @@ def play(item):
         else:
             data = do_downloadpage(urlb64)
             url = scrapertools.find_single_match(data, '<a id="link".*?href="(.*?)"')
+
+    elif '/enlaces/' in url:
+        # ~ url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+        url = httptools.downloadpage_proxy('torrentpelis', url, follow_redirects=False).headers['location']
 
     if url.startswith('magnet:'):
         itemlist.append(item.clone( url = url, server = 'torrent' ))

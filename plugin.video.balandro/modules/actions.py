@@ -180,6 +180,7 @@ def search_trailers(item):
 
     tipo = 'movie' if item.contentType == 'movie' else 'tv'
     nombre = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
+
     if item.infoLabels['tmdb_id']:
         tmdb_search = Tmdb(id_Tmdb=item.infoLabels['tmdb_id'], tipo=tipo, idioma_busqueda='es')
     else:
@@ -201,7 +202,7 @@ def search_trailers(item):
             platformtools.dialog_notification(nombre, '[B][COLOR %s]Sin tráiler en TMDB[/COLOR][/B]' % color_alert)
     else:
         while not xbmc.Monitor().abortRequested():
-            ret = xbmcgui.Dialog().select('Tráilers para %s' % nombre, opciones, useDetails=True)
+            ret = xbmcgui.Dialog().select('Tráilers para [B][COLOR yellow]%s[/B][/COLOR]' % nombre, opciones, useDetails=True)
             if ret == -1: break
 
             platformtools.dialog_notification(resultados[ret]['name'], 'Cargando tráiler ...', time=3000, sound=False)
@@ -266,7 +267,7 @@ def manto_proxies(item):
 
     from core import channeltools
 
-    filtros = {'searchable': True}
+    filtros = {'active': True}
 
     ch_list = channeltools.get_channels_list(filtros=filtros)
 
@@ -343,7 +344,6 @@ def manto_params(item):
         config.set_setting('channel_inkapelis_dominio', '')
         config.set_setting('channel_kindor_dominio', '')
         config.set_setting('channel_pelis28_dominio', '')
-        config.set_setting('channel_pelisflix_dominio', '')
         config.set_setting('channel_pelishouse_dominio', '')
         config.set_setting('channel_pelismaraton_dominio', '')
         config.set_setting('channel_pelispedia_dominio', '')
@@ -361,7 +361,6 @@ def manto_params(item):
         config.set_setting('channel_series24_dominio', '')
         config.set_setting('channel_seriesyonkis_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
-        config.set_setting('channel_torrentdivx_dominio', '')
         config.set_setting('channel_torrentpelis_dominio', '')
 
         config.set_setting('channels_proxies_memorized', '')
@@ -382,9 +381,10 @@ def manto_params(item):
         config.set_setting('search_last_documentary', '')
         config.set_setting('search_last_person', '')
 
-        config.set_setting('downloadpath', '')
+        download_path = filetools.join(config.get_data_path(), 'downloads')
+        config.set_setting('downloadpath', download_path)
 
-        config.set_setting('chrome_last_version', '109.0.5414.120')
+        config.set_setting('chrome_last_version', '110.0.5481.63')
 
         config.set_setting('debug', '0')
 
@@ -393,6 +393,8 @@ def manto_params(item):
         config.set_setting('developer_test_servers', '')
 
         config.set_setting('user_test_channel', '')
+
+        manto_proxies(item)
 
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Parámetros restablecidos[/B][/COLOR]' % color_infor)
 
@@ -669,16 +671,28 @@ def manto_tracking_dbs(item):
 def manto_tmdb_sqlite(item):
     logger.info()
 
-    path = filetools.join(config.get_data_path(), 'tmdb.sqlite')
+    if not item.journal:
+        path = filetools.join(config.get_data_path(), 'tmdb.sqlite')
 
-    existe = filetools.exists(path)
-    if existe == False:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Tmdb Sqlite[/COLOR][/B]' % color_exec)
-        return
+        existe = filetools.exists(path)
+        if existe == False:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Tmdb Sqlite[/COLOR][/B]' % color_exec)
+      
+        if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Tmdb Sqlite ?[/B][/COLOR]'):
+            filetools.remove(path)
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Tmdb Sqlite eliminado[/B][/COLOR]' % color_infor)
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Tmdb Sqlite ?[/B][/COLOR]'):
-        filetools.remove(path)
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Tmdb Sqlite eliminado[/B][/COLOR]' % color_infor)
+    else:
+
+        path = filetools.join(config.get_data_path(), 'tmdb.sqlite-journal')
+
+        existe = filetools.exists(path)
+        if existe == False:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Tmdb Sqlite Journal[/COLOR][/B]' % color_exec)
+      
+        if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Tmdb Sqlite Journal?[/B][/COLOR]'):
+            filetools.remove(path)
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Tmdb Sqlite Journal eliminado[/B][/COLOR]' % color_infor)
 
 
 def manto_folder_downloads(item):
@@ -821,6 +835,16 @@ def show_ubicacion(item):
         path = os.path.join(config.get_data_path(), 'downloads')
 
     platformtools.dialog_textviewer('Ubicación de las Descargas', path)
+
+
+def show_servers_alternatives(item):
+    logger.info()
+
+    from modules import filters
+
+    item.tipo = 'alternativos'
+
+    filters.show_servers_list(item)
 
 
 def test_internet(item):

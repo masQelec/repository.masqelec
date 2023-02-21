@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www3.pelisplus.ph/'
+host = 'https://www4.pelisplus.ph/'
 
 
 # ~ por si viene de enlaces guardados
@@ -15,7 +15,7 @@ ant_hosts = ['https://pelisplus.so/', 'https://www1.pelisplus.so/', 'https://www
              'https://pelisplus.sh/', 'https://pelisplus.ac/', 'https://pelisplus.pe/',
              'https://www1.pelisplus.pe/', 'https://pelisplus.cx/', 'https://www1.pelisplus.cx/',
              'https://www2.pelisplus.cx/', 'https://www3.pelisplus.cx/', 'https://pelisplus.ph/',
-             'https://www1.pelisplus.ph/', 'https://www2.pelisplus.ph/']
+             'https://www1.pelisplus.ph/', 'https://www2.pelisplus.ph/', 'https://www3.pelisplus.ph/']
 
 
 domain = config.get_setting('dominio', 'pelisplus', default='')
@@ -26,6 +26,38 @@ if domain:
     else: host = domain
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_pelisplus_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
@@ -33,7 +65,19 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     if '/peliculas-' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    data = httptools.downloadpage_proxy('pelisplus', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                data = httptools.downloadpage_proxy('pelisplus', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        except:
+            pass
 
     return data
 
@@ -58,6 +102,8 @@ def acciones(item):
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_pelisplus', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     platformtools.itemlist_refresh()
 
@@ -177,13 +223,11 @@ def list_all(item):
         if '/serie/' in url:
             if item.search_type == 'movie': continue
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
         else:
             if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -300,14 +344,14 @@ def episodios(item):
             tab_epis.append([ord_epis, url, titulo, episode])
         else:
             itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=episode, orden = ord_epis ))
+                                        contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=episode, orden = ord_epis ))
 
     if num_matches > 50:
         tab_epis = sorted(tab_epis, key=lambda x: x[0])
 
         for orden, url, tit, epi in tab_epis[item.page * item.perpage:]:
             itemlist.append(item.clone( action = 'findvideos', url = url, title = tit,
-                                    orden = orden, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
+                                        orden = orden, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
 
             if len(itemlist) >= item.perpage:
                 break
@@ -397,6 +441,8 @@ def play(item):
     logger.info()
     itemlist = []
 
+    servidor = item.server
+
     url = item.url
 
     if url.startswith('//'): url = 'https:' + url
@@ -410,24 +456,84 @@ def play(item):
 
     elif item.other == 'apialfa':
         fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
+
         if fid:
+            if '/sc/' in item.url:
+                post = {'h': fid}
+
+                vid = item.url.replace('https://apialfa.tomatomatela.club/sc/index.php', 'https://apialfa.tomatomatela.club/sc/r.php')
+
+                data = httptools.downloadpage_proxy('pelisplus', vid, post=post).data
+
+                url = scrapertools.find_single_match(data, '<meta name="og:url" content="(.*?)"')
+
+                if url:
+                    servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.corregir_servidor(servidor)
+
+                    url = servertools.normalize_url(servidor, url)
+
+                    itemlist.append(item.clone(url=url, server=servidor))
+
+                return itemlist
+
             vid = item.url.replace('https://apialfa.tomatomatela.club/ir/player.php', 'https://apialfa.tomatomatela.club/ir/rd.php')
+
             post = {'url': fid}
 
             try:
-                # ~ url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
-                url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                # ~ new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                new_url = httptools.downloadpage_proxy('pelisplus', vid, post=post, follow_redirects=False).headers['location']
             except:
-                url = ''
+                new_url = ''
 
-            if url:
-                servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
+            if new_url:
+                if new_url.startswith('//'): new_url = 'https:' + new_url
 
-                url = servertools.normalize_url(servidor, url)
+                data = do_downloadpage(new_url)
+                vid = scrapertools.find_single_match(data, 'value="(.*?)"')
 
-                itemlist.append(item.clone(url=url, server=servidor))
-                return itemlist
+                if vid:
+                    try:
+                        # ~ new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                        new_url = httptools.downloadpage_proxy('pelisplus', vid, post=post, follow_redirects=False).headers['location']
+                    except:
+                        new_url = ''
+
+                if new_url:
+                    servidor = servertools.get_server_from_url(new_url)
+                    servidor = servertools.corregir_servidor(servidor)
+
+                    if servidor and servidor != 'directo':
+                        url = servertools.normalize_url(servidor, new_url)
+
+                        itemlist.append(item.clone(url=url, server=servidor))
+
+                    return itemlist
+
+            else:
+
+                try:
+                    # ~ url = httptools.downloadpage('https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
+                    url = httptools.downloadpage_proxy('pelisplus', 'https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
+                except:
+                    url = ''
+
+                if url:
+                    if '//damedamehoy.' in url or '//tomatomatela.' in url :
+                        url = resuelve_dame_toma(url)
+
+                        if url: itemlist.append(item.clone(url=url, server='directo'))
+                        return itemlist
+
+                    servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.corregir_servidor(servidor)
+
+                    url = servertools.normalize_url(servidor, url)
+
+                    itemlist.append(item.clone(url=url, server=servidor))
+                    return itemlist
+
 
     elif item.server == 'directo':
         data = do_downloadpage(url)

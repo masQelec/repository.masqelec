@@ -9,6 +9,7 @@ from core import httptools, scrapertools, servertools, tmdb
 
 host = 'https://seriesflix.video/'
 
+
 perpage = 24
 
 
@@ -48,6 +49,22 @@ def do_downloadpage(url, post=None, headers=None, follow_redirects=False):
     # ~ data = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects).data
     data = httptools.downloadpage_proxy('seriesflixvideo', url, post=post, headers=headers, follow_redirects=follow_redirects).data
 
+    if '<title>You are being redirected...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                # ~ data = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects).data
+                data = httptools.downloadpage_proxy('seriesflixvideo', url, post=post, headers=headers, follow_redirects=follow_redirects).data
+        except:
+            pass
+
+    if '<title>Just a moment...</title>' in data:
+        if not '?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -59,6 +76,8 @@ def mainlist_series(item):
     itemlist = []
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_seriesflixvideo', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 

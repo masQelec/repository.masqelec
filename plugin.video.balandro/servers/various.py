@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import xbmc
+import xbmc, time
 
-from core import scrapertools
 from platformcode import config, logger, platformtools
+from core import scrapertools
+
+
+espera = config.get_setting('servers_waiting', default=6)
 
 
 def import_libs(module):
@@ -35,9 +38,6 @@ def get_video_url(page_url, url_referer=''):
     video_urls = []
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        import time
-        espera = 3
-
         txt_server = ''
 
         if 'tubeload' in page_url: txt_server = 'Tubeload'

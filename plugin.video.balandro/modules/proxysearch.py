@@ -310,7 +310,7 @@ def proxysearch_all(item):
            cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
            if not config.get_setting(cfg_proxies_channel, default=''):
-               platformtools.dialog_ok(config.__addon_name + '[COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[COLOR red][B]Se ha ignorado este canal, deberá Configurar los proxies, en el caso de necesitarlos, dentro del propio canal[/COLOR][/B]')
+               platformtools.dialog_ok(config.__addon_name + '[COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[COLOR red][B]Se ha ignorado este canal, porqué NO interviene en las BÚSQUEDAS, deberá Configurar los proxies, en el caso de necesitarlos, dentro del propio canal[/COLOR][/B]')
 
     if config.get_setting('memorize_channels_proxies', default=True):
        txt = 'Revise los canales Memorizados, porque podría ser que algún canal no los necesite ó viceversa. '

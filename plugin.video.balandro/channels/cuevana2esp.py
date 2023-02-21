@@ -186,14 +186,12 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                                 contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
         if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
-
-            sufijo = '' if item.search_type != 'all' else 'tvshow'
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
@@ -211,6 +209,54 @@ def list_all(item):
                next_url = host[:-1] + next_url
 
                itemlist.append(item.clone( title='Siguientes ...', url=next_url, page=0, action='list_all', text_color='coral' ))
+
+    return itemlist
+
+
+def last_epis(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = re.compile('Últimos(.*?)Top de la semana').findall(data)
+
+    matches = re.compile('<article(.*?)</article>').findall(str(bloque))
+
+    for match in matches:
+        title = scrapertools.find_single_match(match, ' alt="(.*?)"').strip()
+
+        url = scrapertools.find_single_match(match, ' href="([^"]+)"')
+
+        url = host[:-1] + url
+
+        thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
+        thumb = host[:-1] + thumb
+
+        temp_epis = scrapertools.find_single_match(match, '</h2></a><span>(.*?)</span>')
+        temp_epis = temp_epis.replace('<!-- -->', '')
+
+        season = scrapertools.find_single_match(temp_epis, '(.*?)x')
+        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$')
+
+        name = title.replace(temp_epis, '').strip() 
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                    contentSerieName=name, contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if 'current' in 'data':
+            next_url = scrapertools.find_single_match(data, '<a class="page-link".*?current.*?href="(.*?)"')
+        else:
+            next_url = scrapertools.find_single_match(data, '<a class="page-link".*?href="(.*?)"')
+
+        if next_url:
+            if '/page/' in next_url:
+               next_url = host[:-1] + next_url
+               itemlist.append(item.clone( title="Siguientes ...", action="last_epis", url = next_url, text_color='coral' ))
 
     return itemlist
 
@@ -313,54 +359,6 @@ def episodios(item):
     if itemlist:
         if i > ((item.page + 1) * item.perpage):
             itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
-
-    return itemlist
-
-
-def last_epis(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    bloque = re.compile('Últimos(.*?)Top de la semana').findall(data)
-
-    matches = re.compile('<article(.*?)</article>').findall(str(bloque))
-
-    for match in matches:
-        title = scrapertools.find_single_match(match, ' alt="(.*?)"').strip()
-
-        url = scrapertools.find_single_match(match, ' href="([^"]+)"')
-
-        url = host[:-1] + url
-
-        thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
-        thumb = host[:-1] + thumb
-
-        temp_epis = scrapertools.find_single_match(match, '</h2></a><span>(.*?)</span>')
-        temp_epis = temp_epis.replace('<!-- -->', '')
-
-        season = scrapertools.find_single_match(temp_epis, '(.*?)x')
-        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$')
-
-        name = title.replace(temp_epis, '').strip() 
-
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                    contentSerieName=name, contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
-
-    tmdb.set_infoLabels(itemlist)
-
-    if itemlist:
-        if 'current' in 'data':
-            next_url = scrapertools.find_single_match(data, '<a class="page-link".*?current.*?href="(.*?)"')
-        else:
-            next_url = scrapertools.find_single_match(data, '<a class="page-link".*?href="(.*?)"')
-
-        if next_url:
-            if '/page/' in next_url:
-               next_url = host[:-1] + next_url
-               itemlist.append(item.clone( title="Siguientes ...", action="last_epis", url = next_url, text_color='coral' ))
 
     return itemlist
 

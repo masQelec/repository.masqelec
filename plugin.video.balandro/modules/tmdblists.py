@@ -6,6 +6,9 @@ from core.item import Item
 from core import tmdb
 
 
+thumbs = 'https://image.tmdb.org/'
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -38,10 +41,14 @@ def mainlist(item):
         if config.get_setting('search_extra_trailers', default=False):
             itemlist.append(item.clone( channel='trailers', action='search', title=' - Buscar en [COLOR darkgoldenrod]Tráilers[/COLOR] ...', thumbnail=config.get_thumb('search') ))
 
+        itemlist.append(item.clone( action='search', title=' - Buscar [COLOR deepskyblue]Titulo[/COLOR] ...', search_type='movie', thumbnail=config.get_thumb('search') ))
+
         itemlist.append(item.clone( action='listado', search_type='movie', extra = 'now_playing', title='   - En cartelera' ))
         itemlist.append(item.clone( action='listado', search_type='movie', extra = 'popular', title='   - Más populares' ))
         itemlist.append(item.clone( action='listado', search_type='movie', extra = 'top_rated', title='   - Mejor valoradas' ))
+
         # ~ itemlist.append(item.clone( action='listado', search_type='movie', url = 'movie/upcoming', title='   - Próximas' ))
+
         itemlist.append(item.clone( action='generos', search_type='movie', title='   - Por género' ))
         itemlist.append(item.clone( action='networks', search_type='movie', title='   - Por productora' ))
         itemlist.append(item.clone( action='anios', search_type='movie', title='   - Por año' ))
@@ -55,10 +62,14 @@ def mainlist(item):
     if presentar:
         itemlist.append(item.clone( title = '[B]Series:[/B]', thumbnail=config.get_thumb('tvshow'), action = '', text_color='hotpink' ))
 
+        itemlist.append(item.clone( action='search', title=' - Buscar [COLOR hotpink]Titulo[/COLOR] ...', search_type='tvshow', thumbnail=config.get_thumb('search') ))
+
         itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'on_the_air', title='   - En emisión' ))
         itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'popular', title='   - Más populares' ))
         itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'top_rated', title='   - Mejor valoradas' ))
+
         # ~ itemlist.append(item.clone( action='listado', search_type='tvshow', url = 'tv/airing_today', title='   - Que se emiten Hoy' ))
+
         itemlist.append(item.clone( action='generos', search_type='tvshow', title='   - Por género' ))
         itemlist.append(item.clone( action='anios', search_type='tvshow', title='   - Por año' ))
 
@@ -253,7 +264,7 @@ def personas(item):
                         if 'first_air_date' in detalle:info += ' (TV %s)' % detalle['first_air_date'][:4]
 
                 thumb = ''
-                if elemento['profile_path']: thumb = 'https://image.tmdb.org/t/p/w235_and_h235_face%s' % elemento['profile_path']
+                if elemento['profile_path']: thumb = thumbs + 't/p/w235_and_h235_face%s' % elemento['profile_path']
 
                 opciones.append(platformtools.listitem_to_select(elemento['name'], info, thumb))
                 opciones_ids.append(elemento['id'])
@@ -265,7 +276,7 @@ def personas(item):
             item.person_id = opciones_ids[ret]
             item.category = opciones[ret].getLabel()
 
-    # Listar pelis y series de la persona
+    # ~ Listar pelis y series de la persona
     if not item.page: item.page = 1
 
     elementos = tmdb.get_person_credits(item.person_id, item.search_type)
@@ -321,7 +332,7 @@ def listado_personas(item):
             else: info += '%s (TV %s)' % (detalle['name'], detalle['first_air_date'][:4])
 
         thumb = ''
-        if elemento['profile_path']: thumb = 'https://image.tmdb.org/t/p/w235_and_h235_face%s' % elemento['profile_path']
+        if elemento['profile_path']: thumb = thumbs + 't/p/w235_and_h235_face%s' % elemento['profile_path']
 
         itemlist.append(item.clone( action = 'personas', person_id = elemento['id'], search_type = 'cast', page = 1, 
                                     title = elemento['name'], thumbnail = thumb, plot = info, category = elemento['name'] ))
@@ -330,3 +341,47 @@ def listado_personas(item):
         itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, text_color='coral' ))
 
     return itemlist
+
+
+def search(item, texto):
+    logger.info()
+    itemlist = []
+
+    if texto:
+        tmdb_info = tmdb.Tmdb(texto_buscado=texto, tipo=item.search_type.replace('show', ''))
+
+        results = tmdb_info.results
+
+        for result in results:
+            result = tmdb_info.get_infoLabels(result, origen=result)
+
+            if item.search_type == 'movie':
+                search_type = 'movie'
+
+                title = result['title']
+                contentTitle = title
+                contentSerieName = ''
+            else:
+                search_type = 'tvshow'
+
+                title = result['name']
+
+                contentSerieName = title
+                contentTitle = ''
+
+            thumb = ''
+            if result['poster_path']: thumb = thumbs + 't/p/original%s' % result['poster_path']
+
+            tmdb_id = result['id']
+
+            new_item = Item( channel='search', action='search', title=title, buscando=title, thumbnail=thumb,
+                                               search_type=search_type, contentTitle=contentTitle, contentSerieName=contentSerieName,
+                                               from_channel=item.channel, infoLabels = {'tmdb_id': tmdb_id} )
+
+            itemlist.append(new_item)
+
+    if itemlist:
+        tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+

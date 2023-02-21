@@ -420,7 +420,7 @@ def set_context_commands(item, parent_item, colores):
                     item.clone(channel="tracking", action="addFavourite", from_channel=item.channel, from_action=item.action))) )
 
     # Buscar misma peli/serie en otros canales
-    if item.contentType in ['movie', 'tvshow'] and parent_item.channel not in ['tmdblists', 'filmaffinitylists']:
+    if item.contentType in ['movie', 'tvshow'] and parent_item.channel not in ['tmdblists', 'filmaffinitylists', 'search']:
         buscando = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
         if not item.contentExtra in ['documentary', 'adults']:
             infolabels = {'tmdb_id': item.infoLabels['tmdb_id']} if item.infoLabels['tmdb_id'] else {}
@@ -686,7 +686,7 @@ def play_from_itemlist(itemlist, parent_item):
     if autoplay:
         esperar_seleccion = False
         num_opciones = float(len(itemlist))
-        p_dialog = dialog_progress_bg('Reproducción con AutoPlay', 'Espere por favor...')
+        p_dialog = dialog_progress_bg('Reproducción con Auto Play', 'Espere por favor...')
         ok_play = False
 
         for i, it in enumerate(itemlist):
@@ -695,7 +695,7 @@ def play_from_itemlist(itemlist, parent_item):
                 break
 
             perc = int(i / num_opciones * 100)
-            p_dialog.update(perc, 'Reproducción con AutoPlay', '%d/%d: %s' % (i+1, num_opciones, it.title))
+            p_dialog.update(perc, 'Reproducción con Auto Play', '%d/%d: %s' % (i+1, num_opciones, it.title))
 
             # Si el canal tiene play propio interpretar el itemlist que devuelve (Item o list)
             canal_play = __import__('channels.' + it.channel, fromlist=[''])
@@ -716,18 +716,18 @@ def play_from_itemlist(itemlist, parent_item):
                 ok_play = play_video(it, parent_item, autoplay=autoplay)
 
             if ok_play: 
-                logger.debug('Autoplay, resuelto %s con url %s' % (it.server, it.url))
+                logger.debug('Auto Play, resuelto %s con url %s' % (it.server, it.url))
                 break
             else:
                 erroneos.append(i)
-                logger.debug('Autoplay, falla %s con url %s' % (it.server, it.url))
+                logger.debug('Auto Play, falla %s con url %s' % (it.server, it.url))
 
             if xbmc.Monitor().abortRequested(): break
 
         p_dialog.close()
         if not ok_play:
             if esperar_seleccion: # si se ha llegado al límite de enlaces a intentar y todavía quedan, se muestra diálogo para selección del usuario
-                dialog_notification('Autoplay sin éxito', 'Fallaron los %d primeros enlaces' % autoplay_max_links, time=3000)
+                dialog_notification('Auto Play sin éxito', 'Fallaron los %d primeros enlaces' % autoplay_max_links, time=3000)
             else:
                 play_fake()
                 txt = 'el enlace' if len(itemlist) == 1 else 'ningún enlace'
@@ -737,8 +737,8 @@ def play_from_itemlist(itemlist, parent_item):
                     el_txt = ('[B][COLOR %s]No se pudo reproducir ' + txt) % color_exec
                     dialog_notification(config.__addon_name, el_txt + '[/COLOR][/B]')
         else:
-            if len(itemlist) == 1: dialog_notification('Autoplay resuelto', it.title, time=2000, sound=False)
-            else: dialog_notification('Autoplay resuelto', it.title)
+            if len(itemlist) == 1: dialog_notification('Auto Play resuelto', it.title, time=2000, sound=False)
+            else: dialog_notification('Auto Play resuelto', it.title)
 
     # Diálogo hasta que el usuario cancele o play ok
     if esperar_seleccion:

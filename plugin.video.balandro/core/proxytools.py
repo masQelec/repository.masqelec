@@ -32,6 +32,8 @@ proxies_totales_limit = config.get_setting('proxies_totales_limit', default=500)
 proxies_extended = config.get_setting('proxies_extended', default=False)
 proxies_search_extended = config.get_setting('proxies_search_extended', default=False)
 
+proxies_recommended = config.get_setting('proxies_recommended', default=False)
+
 
 opciones_provider = [
         'spys.one',
@@ -71,6 +73,14 @@ if proxies_extended:
     opciones_provider.append('z-xroxy')
     opciones_provider.append('z-socks')
     opciones_provider.append('z-squidproxyserver')
+
+
+opciones_recommended = [
+        default_provider,
+        'us-proxy.org',
+        'clarketm',
+        'z-free-proxy-list.anon'
+        ]
 
 
 opciones_tipo = ['Cualquier tipo', 'Elite', 'Anonymous', 'Transparent']
@@ -242,7 +252,8 @@ def configurar_proxies_canal(canal, url):
         elif ret == 0:
             new_proxies = platformtools.dialog_input(default=proxies, heading='Indicar el proxy a utilizar o varios separados por comas')
             if new_proxies:
-                if not '.' in new_proxies or not ':' in new_proxies:
+                if '.' in new_proxies and ':' in new_proxies: pass
+                else:
                     platformtools.dialog_notification(canal, 'Formato proxy incorrecto')
                     new_proxies = ''
 
@@ -302,7 +313,7 @@ def _settings_proxies_canal(canal, opciones_provider):
             provider_fijo = opciones_provider[proxies_provider]
 
             if not provider == provider_fijo:
-                if not platformtools.dialog_yesno(config.__addon_name, 'Tiene seleccionado un proveedor que no es el asignado en su configuración de proxies [COLOR cyan]' + provider.capitalize() + '[/COLOR]', '¿ Desea asignar este proveedor para este canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR] ?'):
+                if platformtools.dialog_yesno(config.__addon_name, 'Tiene seleccionado un proveedor que no es el asignado en su configuración de proxies [COLOR cyan]' + provider.capitalize() + '[/COLOR]', '¿ Desea asignar este proveedor para este canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR] ?'):
                     provider = provider_fijo
                     config.set_setting('proxytools_provider', provider, canal)
 
@@ -392,7 +403,9 @@ def _buscar_proxies(canal, url, provider, procesar):
     if extended:
         if search_provider or provider == 'z-echolink':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not 'echolink' in providers_preferred: searching = False
 
             if searching:
@@ -404,7 +417,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-free-proxy-list.uk':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not '.uk' in providers_preferred: searching = False
 
             if searching:
@@ -416,7 +431,11 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-free-proxy-list.anon':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended:
+               if not 'z-free-proxy-list.anon' in opciones_recommended: searching = False
+
+            elif providers_preferred:
                 if not '.anon' in providers_preferred: searching = False
 
             if searching:
@@ -428,7 +447,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-opsxcq':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not 'opsxcq' in providers_preferred: searching = False
 
             if searching:
@@ -440,7 +461,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-proxy-daily':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not 'proxy-daily' in providers_preferred: searching = False
 
             if searching:
@@ -452,7 +475,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-proxy-list.org':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not 'proxy-list.org' in providers_preferred: searching = False
 
             if searching:
@@ -464,7 +489,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-proxyhub':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not 'proxyhub' in providers_preferred: searching = False
 
             if searching:
@@ -476,7 +503,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-proxyranker':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not 'proxyranker' in providers_preferred: searching = False
 
             if searching:
@@ -488,7 +517,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-squidproxyserver':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not 'squidproxyserver' in providers_preferred: searching = False
 
             if searching:
@@ -500,7 +531,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-socks':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not 'socks' in providers_preferred: searching = False
 
             if searching:
@@ -512,7 +545,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-free-proxy-list.com':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not '.com' in providers_preferred: searching = False
 
             if searching:
@@ -524,7 +559,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-xroxy':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not 'xroxy' in providers_preferred: searching = False
 
             if searching:
@@ -536,7 +573,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
         if search_provider or provider == 'z-coderduck':
             searching = True
-            if providers_preferred:
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
                 if not 'coderduck' in providers_preferred: searching = False
 
             if searching:
@@ -549,7 +588,11 @@ def _buscar_proxies(canal, url, provider, procesar):
     # ~ Providers segun settings
     if search_provider or provider == 'clarketm':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended:
+           if not 'clarketm' in opciones_recommended: searching = False
+
+        elif providers_preferred:
             if not 'clarketm' in providers_preferred: searching = False
 
         if searching:
@@ -561,7 +604,11 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == default_provider:
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended:
+           if not default_provider in opciones_recommended: searching = False
+
+        elif providers_preferred:
             if not 'proxyscrape' in providers_preferred: searching = False
 
         if searching:
@@ -573,7 +620,11 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'us-proxy.org':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended:
+           if not 'us-proxy.org' in opciones_recommended: searching = False
+
+        elif providers_preferred:
             if not 'us-proxy' in providers_preferred: searching = False
 
         if searching:
@@ -585,7 +636,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'free-proxy-list':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'free-proxy-list' in providers_preferred: searching = False
 
         if searching:
@@ -597,7 +650,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'google-proxy.net':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'google' in providers_preferred: searching = False
 
         if searching:
@@ -609,7 +664,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'hidemy.name':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'hidemy' in providers_preferred: searching = False
 
         if searching:
@@ -621,7 +678,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'ip-adress.com':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'ip' in providers_preferred: searching = False
 
         if searching:
@@ -633,7 +692,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'dailyproxylists.com':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'dailyproxylists' in providers_preferred: searching = False
 
         if searching:
@@ -645,7 +706,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'proxysource.org':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'proxysource' in providers_preferred: searching = False
 
         if searching:
@@ -657,7 +720,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'spys.one':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'spys.one' in providers_preferred: searching = False
 
         if searching:
@@ -670,7 +735,9 @@ def _buscar_proxies(canal, url, provider, procesar):
     # ~ Providers secundarios
     if search_provider or provider == 'sslproxies.org':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'sslproxies' in providers_preferred: searching = False
 
         if searching:
@@ -682,7 +749,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'httptunnel.ge':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'httptunnel' in providers_preferred: searching = False
 
         if searching:
@@ -695,7 +764,9 @@ def _buscar_proxies(canal, url, provider, procesar):
     # ~ Providers resto
     if search_provider or provider == 'proxy-list.download':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'proxy-list' in providers_preferred: searching = False
 
         if searching:
@@ -708,7 +779,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'spys.me':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'spys.me' in providers_preferred: searching = False
 
         if searching:
@@ -720,7 +793,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'proxynova.com':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'proxynova' in providers_preferred: searching = False
 
         if searching:
@@ -732,7 +807,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'proxyservers.pro':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'proxyservers' in providers_preferred: searching = False
 
         if searching:
@@ -744,7 +821,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'silverproxy.xyz':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'silverproxy' in providers_preferred: searching = False
 
         if searching:
@@ -756,7 +835,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     if search_provider or provider == 'proxydb.net':
         searching = True
-        if providers_preferred:
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
             if not 'proxydb' in providers_preferred: searching = False
 
         if searching:

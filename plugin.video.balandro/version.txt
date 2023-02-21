@@ -1,5 +1,5 @@
-[COLOR coral][B]Balandro[/COLOR][COLOR red]  1 de Febrero de 2023[/B][/COLOR]
-   [COLOR yellow][B]Version 3.0.0[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR][COLOR red]  11 de Febrero de 2023[/B][/COLOR]
+   [COLOR yellow][B]Version 3.0.1[/B][/COLOR]
 
    [COLOR yellow]CONTACTO:[/COLOR]
       Foro  mimediacenter.info/foro/  Instalaciones, Novedades, Sugerencias, etc.
@@ -41,7 +41,8 @@
       [B][COLOR cyan]Que canales estan Temporalmente Inactivos:[/COLOR][/B]
          [COLOR coral]Son los pendientes de su situacion, para evaluar su Re-activacion o Anulacion.[/COLOR]
          DocumaniaTv,  DescargaCineClasico,  FelizEstreno,
-         NewPct,  NewPct1,  PanDrama,  PeliSeries
+         NewPct,  NewPct1,  PanDrama,  PeliSeries,
+         TorrentDivx
 
    [COLOR yellow]SERVIDORES CON VIAS ALTERNATIVAS:[/COLOR]
       [B][COLOR tan]Servidores con Vias Alternativas:[/COLOR][/B]
@@ -53,36 +54,36 @@
          script.module.resolveurl
 
    [COLOR yellow]RESUMEN TOTALES DE CANALES:[/COLOR]
-       263 [COLOR darkorange]Canales[/COLOR]
+       264 [COLOR darkorange]Canales[/COLOR]
 
-         74 [COLOR coral]Inactivos[/COLOR]
-           7 [COLOR cyan]Temporalmente Inactivos[/COLOR]
+         78 [COLOR coral]Inactivos[/COLOR]
+           8 [COLOR cyan]Temporalmente Inactivos[/COLOR]
 
            1 [COLOR violet]Con probable Incompatibilidad[/COLOR]
            3 [COLOR plum]Inestables[/COLOR]
          10 [COLOR darkgoldenrod]Problematicos[/COLOR]
-         61 [COLOR red]Pueden Usar Proxies[/COLOR]
+         64 [COLOR red]Pueden Usar Proxies[/COLOR]
 
            2 [COLOR teal]Requieren Cuenta[/COLOR]
            1 [COLOR green]Con varios Dominios[/COLOR]
-         38 [COLOR goldenrod]Con gestion ultimo dominio Vigente[/COLOR]
+         35 [COLOR goldenrod]Con gestion ultimo dominio Vigente[/COLOR]
 
          44 [COLOR fuchsia]No Intervendran en busquedas[/COLOR]
 
-       180 [COLOR gold]Disponibles[/COLOR]
+       178 [COLOR gold]Disponibles[/COLOR]
 
    [COLOR yellow]DISTRIBUCION CANALES DISPONIBLES:[/COLOR]
          29 de [COLOR moccasin]Sugeridos[/COLOR]
 
-       115 de [COLOR deepskyblue]Peliculas[/COLOR]
-         90 de [COLOR hotpink]Series[/COLOR]
-         77 de [COLOR yellow]Peliculas y Series[/COLOR]
+       112 de [COLOR deepskyblue]Peliculas[/COLOR]
+         88 de [COLOR hotpink]Series[/COLOR]
+         75 de [COLOR yellow]Peliculas y Series[/COLOR]
 
          26 de [COLOR thistle]Generos[/COLOR]
            8 de [COLOR cyan]Documentales[/COLOR]
            9 de [COLOR lightyellow]Infantiles[/COLOR]
            9 de [COLOR limegreen]Novelas[/COLOR]
-         43 de [COLOR blue]Torrents[/COLOR]
+         41 de [COLOR blue]Torrents[/COLOR]
            8 de [COLOR firebrick]Doramas[/COLOR]
          14 de [COLOR springgreen]Animes[/COLOR]
          17 de [COLOR orange]Adultos[/COLOR]
