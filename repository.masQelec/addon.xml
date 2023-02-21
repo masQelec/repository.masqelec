@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-    <addon id="repository.masQelec" name="masQelec Repository" version="1.0.0" provider-name="masQelec">
+    <addon id="repository.masQelec" name="masQelec Repository" version="1.0.1" provider-name="masQelec">
         <requires>
             <import addon="xbmc.addon" version="12.0.0"/>
         </requires>
@@ -14,5 +14,8 @@
 		<description lang="en">The masQelec add-on repository contains Kodi PVR Clients and Servers, Screensavers, Visualisations, and more. Add-ons in this repository are maintained and supported by masQelec staff and YOU the community. If you find a broken or non-working add-on please report it via the forums, or help by submitting fixes via GitHub.</description>
 		<description lang="es">El repositorio de complementos masQelec contiene clientes y servidores Kodi PVR, protectores de pantalla, visualizaciones y más. Los complementos en este repositorio son mantenidos y respaldados por el personal de masQelec y USTED la comunidad. Si encuentra un complemento roto o que no funciona, infórmelo a través de los foros o ayude enviando soluciones a través de GitHub.</description>
             <platform>all</platform>
+	    <assets>
+      			<icon>icon.png</icon>
+   	    </assets>
     </extension>
 </addon>
