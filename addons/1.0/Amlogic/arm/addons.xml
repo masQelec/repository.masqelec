@@ -150,7 +150,7 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
 	</extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="3.0.0" provider-name="Balandro Team">
+<addon id="plugin.video.balandro" name="Balandro" version="3.0.1" provider-name="Balandro Team">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -166,7 +166,7 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
       <fanart>fanart.png</fanart>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]3.0.0[/COLOR][COLOR red]  Febrero de 2023[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]3.0.1[/COLOR][COLOR red]  Febrero de 2023[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers Soportados[/COLOR][COLOR plum]  20.x,  19.x,  18.x  y  17.x[/B][/COLOR]
 
@@ -218,7 +218,7 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
 		<description lang="es">El repositorio de complementos masQelec contiene clientes y servidores Kodi PVR, protectores de pantalla, visualizaciones y más. Los complementos en este repositorio son mantenidos y respaldados por el personal de masQelec y USTED la comunidad. Si encuentra un complemento roto o que no funciona, infórmelo a través de los foros o ayude enviando soluciones a través de GitHub.</description>
             <platform>all</platform>
 	    <assets>
-      			<icon>icon.png</icon>
+      		<icon>icon.png</icon>
    	    </assets>
     </extension>
 </addon>
