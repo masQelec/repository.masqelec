@@ -9,7 +9,7 @@ from core import httptools, scrapertools, tmdb, servertools
 
 host = 'https://www.pelisxd.com/'
 
-# En la web: Solo hay 42 series se desetiman  /series-y-novelas/
+# ~ En la web: Solo hay 42 series se desetiman  /series-y-novelas/
 
 
 def item_configurar_proxies(item):
@@ -45,19 +45,29 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('pelisxd', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('pelisxd', url, post=post, headers=headers).data
 
-    if '<title>You are being redirected...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
             from lib import balandroresolver
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-                data = httptools.downloadpage_proxy('pelisxd', url, post=post, headers=headers).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers).data
+                else:
+                    data = httptools.downloadpage_proxy('pelisxd', url, post=post, headers=headers).data
         except:
             pass
+
+    if '<title>Just a moment...</title>' in data:
+        if not '?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -93,7 +103,7 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
 
     for url, title in matches:
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -104,11 +114,11 @@ def alfabetico(item):
 
     url_letra = host + 'letter/'
 
-    for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#':
+    for letra in '#ABCDEFGHIJKLMNOPQRSTUVWXYZ':
         if letra == '#': url = url_letra + '0-9/'
         else: url = url_letra + letra + '/'
 
-        itemlist.append(item.clone( title = letra, action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = letra, action = 'list_all', url = url, text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -141,8 +151,7 @@ def list_all(item):
 
         quality = scrapertools.find_single_match(article, '<span class="Qlty">(.*?)</span>')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=','.join(langs), qualities=quality,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=','.join(langs), qualities=quality, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -176,10 +185,10 @@ def findvideos(item):
         else:
             lang = item.languages
 
-        servidor = servidor.strip()
         servidor = servertools.corregir_servidor(servidor)
 
-        if servidor == 'embed': servidor = 'mystream'
+        if servidor == 'embed': continue
+
         elif servidor == 'player': servidor = 'directo'
 
         bloque = scrapertools.find_single_match(data, '<div id="options-' + str(option) + '"(.*?)</div>')
@@ -188,8 +197,7 @@ def findvideos(item):
         if not url: url = scrapertools.find_single_match(str(bloque), '<iframe data-src="(.*?)"')
 
         if url:
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
-                                  language = IDIOMAS.get(lang, lang) ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
 
     return itemlist
 
@@ -222,6 +230,7 @@ def play(item):
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
         itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist

@@ -65,8 +65,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if '/fecha-estreno/' in url: raise_weberror = False
     elif '/etiqueta/' in url: raise_weberror = False
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpage_proxy('pelis28', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('pelis28', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -115,10 +117,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'news', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Amazon prime video', action = 'list_all', url = host + 'categoria/amazon-prime-video/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'categoria/netflix/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Amazon prime video', action = 'list_all', url = host + 'categoria/amazon-prime-video/', search_type = 'movie', text_color='tan' ))
+    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'categoria/netflix/', search_type = 'movie', text_color='tan' ))
 
-    itemlist.append(item.clone( title = 'Sagas', action = 'sagas', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Sagas', action = 'sagas', search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -152,7 +154,7 @@ def sagas(item):
     matches = scrapertools.find_multiple_matches(bloque, '<li id="menu-item-.*?<a href="(.*?)">(.*?)</a>')
 
     for url, title in matches:
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color='moccasin' ))
 
     return itemlist
 
@@ -178,7 +180,7 @@ def generos(item):
         elif 'Amazon Prime Video' in title: continue
         elif 'Próximos Estrenos' in title: continue
 
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -193,7 +195,7 @@ def anios(item):
     for x in range(current_year, 1969, -1):
         url = host + 'ver-pelicula/fecha-estreno/' + str(x) + '/'
 
-        itemlist.append(item.clone( title = str(x), url = url, action='list_all' ))
+        itemlist.append(item.clone( title = str(x), url = url, action='list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -203,12 +205,14 @@ def list_all(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = scrapertools.find_multiple_matches(data, 'id="mt-(.*?)</div><div')
-    if not matches: matches = scrapertools.find_multiple_matches(data, 'id="mt-(.*?)</div>')
+    if '</div><div' in data: matches = scrapertools.find_multiple_matches(data, 'id="mt-(.*?)</div><div')
+    else: matches = scrapertools.find_multiple_matches(data, 'id="mt-(.*?)</div>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
         title = scrapertools.find_single_match(match, 'title="(.*?)"')
 
         if not url or not title: continue
@@ -219,7 +223,11 @@ def list_all(item):
             title = title.replace('[', '{').replace(']', '}')
             title = scrapertools.find_single_match(title, '(.*?){').strip()
 
-        title = title.replace("&#8217;", "'")
+        title = title.replace("&#8217;", "'").replace("&#8211;", '').replace("&#8230;", '').replace("Online Completa", '').strip()
+
+        contentTitle = title
+
+        if ':' in title: contentTitle = contentTitle.split(':')[0]
 
         qlty = scrapertools.find_single_match(match, '<span class="calidad2">(.*?)</span>')
 
@@ -228,13 +236,13 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, '<noscript>.*?<img style=".*?src="(.*?)"')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=(qlty),
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=(qlty), contentType='movie', contentTitle=contentTitle, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<link rel="next" href="(.*?)"')
+
         if next_url:
             if '/page/' in next_url:
                 itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
@@ -265,6 +273,9 @@ def findvideos(item):
             itemlist.append(Item( channel = item.channel, action = 'play', url = _id, server = servidor, title = '', language = '?' ))
             return itemlist
 
+    if '/video.breaktime.tv/' in _id: return itemlist
+    elif '/myfiles.cyou/' in _id: return itemlist
+
     headers = {'Referer': host}
 
     data = do_downloadpage(_id, headers = headers)
@@ -291,18 +302,13 @@ def findvideos(item):
         servidor = scrapertools.find_single_match(match, '<span>(.*?)</span>').lower()
 
         if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
-        elif servidor == 'powvideo' or servidor == 'pouvideo' or servidor == 'powvibeo' or servidor == 'povvldeo': continue
-
-        elif servidor == 'stemplay': continue
-        elif servidor == 'streamango': continue
         elif servidor == 'servidor vip': continue
         elif servidor == 'pelis': continue
 
         other = ''
 
         if servidor == 'dood': servidor = 'doodstream'
-        elif servidor == 'suzihaza': servidor = 'fembed'
-        elif servidor == 'vanfem': servidor = 'fembed'
+        elif servidor == 'suzihaza' or servidor == 'vanfem' or servidor == 'femax20': servidor = 'fembed'
         elif servidor == 'ok': servidor = 'okru'
 
         elif servidor == 'app':
@@ -312,6 +318,13 @@ def findvideos(item):
         elif 'damedamehoy' in servidor or 'tomatomatela' in servidor:
              servidor = 'directo'
              other = 'Dame'
+
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servertools.is_server_available(servidor):
+            if not servertools.is_server_enabled(servidor): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
 
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = lang, other = other ))
 

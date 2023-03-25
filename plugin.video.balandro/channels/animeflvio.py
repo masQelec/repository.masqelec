@@ -102,7 +102,7 @@ def generos(item):
 
         url = url + '?page=1'
 
-        itemlist.append(item.clone( title = title.capitalize(), action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = title.capitalize(), action = 'list_all', url = url, text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -117,7 +117,7 @@ def anios(item):
     for x in range(current_year, 1999, -1):
         url = host + 'peliculas-' + str(x) + '?page=1'
 
-        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -248,8 +248,7 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=episode ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=episode ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -274,8 +273,6 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<li role="presentation".*?data-video="(.*?)"')
 
-    lang = 'Vose'
-
     ses = 0
 
     for url in matches:
@@ -292,7 +289,7 @@ def findvideos(item):
 
         if servidor == 'directo': continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = lang ))
+        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Vose' ))
 
     if not itemlist:
         if not ses == 0:

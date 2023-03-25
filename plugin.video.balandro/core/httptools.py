@@ -7,11 +7,13 @@ if sys.version_info[0] >= 3:
     PY3 = True
 
     unicode = str
+
     from urllib.parse import quote, urlencode, urlparse
     from urllib.response import addinfourl
     from http.cookiejar import MozillaCookieJar, Cookie
-    from urllib.error import HTTPError
     from urllib.request import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler
+    from urllib.error import HTTPError
+
 else:
     PY2 = True
     PY3 = False
@@ -48,8 +50,8 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.5414.120 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.63 Safari/537.36"
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.63 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.65 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -81,6 +83,7 @@ color_exec = config.get_setting('notification_exec_color', default='cyan')
 def get_user_agent():
     return default_headers["User-Agent"]
 
+
 def get_url_headers(url):
     if "|" in url: return url
 
@@ -102,11 +105,11 @@ def load_cookies():
     cookies_lock.acquire()
 
     if os.path.isfile(ficherocookies):
-        logger.info("Leyendo fichero cookies")
+        logger.info("Leyendo cookies")
         try:
             cj.load(ficherocookies, ignore_discard=True)
         except:
-            logger.info("El fichero de cookies existe pero es ilegible, se borra")
+            logger.info("Fichero cookies ilegible, se borra")
             os.remove(ficherocookies)
 
     cookies_lock.release()
@@ -114,7 +117,7 @@ def load_cookies():
 
 def save_cookies():
     cookies_lock.acquire()
-    logger.info("Guardando cookies...")
+    logger.info("Guardando cookies")
     cj.save(ficherocookies, ignore_discard=True)
     cookies_lock.release()
 
@@ -162,12 +165,12 @@ def downloadpage_proxy(canal,
 
         if (type(resp.code) == int and (resp.code < 200 or resp.code > 399)) or not resp.sucess: 
             if proxy != '':
-                logger.info('El proxy %s NO responde adecuadamente. %s' % (proxy, resp.code))
+                logger.info('Proxy %s NO responde %s' % (proxy, resp.code))
                 if (type(resp.code) == int and (resp.code == 500)):
                     if len(resp.data) > 1000:
-                        logger.info('El proxy (error 500 y data > 1000) %s SI responde adecuadamente. %s' % (proxy, resp.code))
+                        logger.info('Proxy (error 500 y data > 1000) %s SI responde %s' % (proxy, resp.code))
                         proxy_ok = True
-                        if proxy != '': logger.info('El proxy %s parece válido.' % proxy)
+                        if proxy != '': logger.info('Proxy %s parece válido.' % proxy)
                         if n > 0: # guardar el proxy que ha funcionado como primero de la lista si no lo está
                             del proxies[n]
                             new_proxies = proxy + ', ' + ', '.join(proxies)
@@ -176,33 +179,33 @@ def downloadpage_proxy(canal,
 
                 if (type(resp.code) == int and (resp.code == 404)):
                     if len(resp.data) > 1000:
-                        logger.info('El proxy (error 404 y data > 1000) %s SI responde adecuadamente. %s' % (proxy, resp.code))
+                        logger.info('Proxy (error 404 y data > 1000) %s SI responde %s' % (proxy, resp.code))
                         proxy_ok = True
                         break
 
                     if 'file not found' in resp.data.lower():
-                        logger.info('El proxy (error 404 y data = File not found) %s SI responde adecuadamente. %s' % (proxy, resp.code))
+                        logger.info('Proxy (error 404 y data = File not found) %s SI responde %s' % (proxy, resp.code))
                         proxy_ok = True
                         break
 
             else:
                 if (type(resp.code) == int and (resp.code == 404)):
                     if len(resp.data) > 1000:
-                        logger.info('Sin proxy (error 404 y data > 1000) %s SI responde adecuadamente. %s' % (proxy, resp.code))
+                        logger.info('Sin proxies (error 404 y data > 1000) %s' % resp.code)
                         proxy_ok = True
                         break
 
                     if 'file not found' in resp.data.lower():
-                        logger.info('El proxy (error 404 y data = File not found) %s SI responde adecuadamente. %s' % (proxy, resp.code))
+                        logger.info('Sin proxies (error 404 y File not found) %s' % resp.code)
                         proxy_ok = True
                         break
 
         else:
             if 'ERROR 404 - File not found' in str(resp.data) or 'HTTP Error 404: Not Found' in str(resp.data) or '<title>Site Blocked</title>' in str(resp.data) or 'HTTP/1.1 400 Bad Request' in str(resp.data):
-                logger.info('Respuesta insuficiente con el proxy %s' % proxy)
+                logger.info('Proxy respuesta insuficiente %s' % proxy)
             else:
                 proxy_ok = True
-                if proxy != '': logger.info('El proxy %s parece válido.' % proxy)
+                if proxy != '': logger.info('Proxy %s parece válido.' % proxy)
                 if n > 0: # guardar el proxy que ha funcionado como primero de la lista si no lo está
                     del proxies[n]
                     new_proxies = proxy + ', ' + ', '.join(proxies)
@@ -290,7 +293,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
                 response["url"] = url
                 with open(cache_file, 'r') as f: response["data"] = f.read()
                 response["time"] = time.time() - time_now
-                logger.info("Recuperado de caché %s la url %s" % (cache_md5url, url))
+                logger.info("Caché %s url %s" % (cache_md5url, url))
                 return type('HTTPResponse', (), response)
 
     # Headers por defecto, si no se especifica nada
@@ -319,18 +322,22 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     logger.info("----------------------------------------------")
     logger.info(" Balandro: " + __version  + '  Page')
     logger.info("----------------------------------------------")
+
     if use_proxy: logger.info("Proxy: %s" % use_proxy)
     logger.info("Timeout: %s" % timeout)
-    logger.info("URL: " + url)
+    logger.info("Url: " + url)
     logger.info("Dominio: " + urlparse(url)[1])
+
     if post is not None:
-        logger.info("Peticion: POST")
+        logger.info("Peticion: Post")
         logger.info(post)
     else:
-        logger.info("Peticion: GET")
+        logger.info("Peticion: Get")
+
     logger.info("Usar Cookies: %s" % cookies)
-    logger.info("Descargar Pagina: %s" % (not only_headers))
-    logger.info("Fichero de Cookies: " + ficherocookies)
+    logger.info("Descarga Página: %s" % (not only_headers))
+    logger.info("Fichero Cookies: " + ficherocookies)
+
     logger.info("Headers:")
     for header in request_headers:
         logger.info("- %s: %s" % (header, request_headers[header]))
@@ -339,7 +346,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
         domain = urlparse(url)[1]
         domain_cookies = cj._cookies.get("." + domain, {}).get("/", {})
         cks = "; ".join(["%s=%s" % (c.name, c.value) for c in domain_cookies.values()])
-        if cks != '': logger.info('Cookies .' + domain + ' : ' + cks)
+        if cks != '': logger.info('Cookies ' + domain + ' : ' + cks)
         domain_cookies = cj._cookies.get(domain, {}).get("/", {})
         cks = "; ".join(["%s=%s" % (c.name, c.value) for c in domain_cookies.values()])
         if cks != '': logger.info('Cookies ' + domain + ' : ' + cks)
@@ -357,8 +364,6 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
         handlers.append(ProxyHandler(use_proxy))
 
     opener = build_opener(*handlers)
-
-    logger.info("Realizando Peticion")
 
     # Contador
     inicio = time.time()
@@ -406,11 +411,13 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
         response["url"] = handle.geturl()
 
     response['headers'] = dict([(k.lower(), v) for k, v in response['headers'].items()])
-    logger.info("Terminado en %.2f segundos" % (response["time"]))
+
+    logger.info("Finalizado: %.2f segundos" % (response["time"]))
     logger.info("Response sucess: %s" % (response["sucess"]))
     logger.info("Response code: %s" % (response["code"]))
     logger.info("Response error: %s" % (response["error"]))
-    logger.info("Response data length: %s" % (len(response["data"])))
+    logger.info("Response length: %s" % (len(response["data"])))
+
     logger.info("Response headers:")
     for header in response["headers"]:
         logger.info("- %s: %s" % (header, response["headers"][header]))
@@ -438,6 +445,13 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
         if lanzar_error:
             raise WebErrorException(urlparse(url)[1])
 
+    # ~ 15/2/2023  Nexus  Response error: property 'status' of 'addinfourl' object has no setter
+    if PY3:
+        if "'addinfourl'" in str(response['error']):
+            loglevel = config.get_setting('debug', 0) # 0 (error), 1 (error+info), 2 (error+info+debug)
+            if loglevel >= 2:
+                if config.get_setting('developer_mode', default=False): platformtools.dialog_notification('ERROR PY3', 'addinfourl')
+
     if cookies:
         save_cookies()
 
@@ -446,19 +460,19 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     if response["headers"].get('content-encoding') == 'gzip':
         try:
             response["data"] = gzip.GzipFile(fileobj=BytesIO(response["data"])).read()
-            logger.info("Descomprimido Gzip")
+            logger.info("Gzip descomprimido")
         except:
             response["data"] = ""
-            logger.info("No se pudo descomprimir Gzip")
+            logger.info("Gzip NO se pudo descomprimir")
 
     elif response["headers"].get('content-encoding') == 'br':
         try:
             from lib.br import brotlidec
             response["data"] = brotlidec(response["data"], [])
-            logger.info("Descomprimido Br")
+            logger.info("Br descomprimido")
         except:
             response["data"] = ""
-            logger.info("No se pudo descomprimir Br")
+            logger.info("Br NO se pudo descomprimir")
     else:
         logger.info("No se debe ó No se pudo descomprimir")
         logger.info("Encoding: %s" % (response["headers"].get('content-encoding')))
@@ -472,9 +486,9 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
             cf = Cloudflare(response)
             if cf.is_cloudflare:
                 count_retries += 1
-                logger.info("cloudflare detectado, esperando %s segundos..." % cf.wait_time)
+                logger.info("cloudflare, espera %s segundos" % cf.wait_time)
                 auth_url = cf.get_url()
-                logger.info("Autorizando... intento %d url: %s" % (count_retries, auth_url))
+                logger.info("Autorizando, intento %d url: %s" % (count_retries, auth_url))
                 # ~ debug_file = os.path.join(config.get_data_path(), 'cloudflare-info.txt')
                 # ~ with open(debug_file, 'a') as myfile: myfile.write("Url: %s Intento %d auth_url: %s\n\n" % (url, count_retries, auth_url))
                 if not '&s=' in auth_url and 'jschl_answer=' in auth_url:
@@ -487,17 +501,17 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
                 else: request_headers['Referer'] = url
 
                 resp_auth = downloadpage(auth_url, post=post_cf, headers=request_headers, replace_headers=True, count_retries=count_retries,
-                                     use_proxy=use_proxy, raise_weberror=False)
+                                         use_proxy=use_proxy, raise_weberror=False)
 
                 if count_retries == 1 and type(resp_auth.code) == int and resp_auth.code == 403: # repetir desde inicio con cookies recargadas
                     load_cookies()
                     return downloadpage(url, post=post, headers=headers, timeout=timeout, follow_redirects=follow_redirects, cookies=cookies,
-                                    replace_headers=replace_headers, add_referer=add_referer, only_headers=only_headers, 
-                                    bypass_cloudflare=bypass_cloudflare, count_retries=1, raise_weberror=raise_weberror, 
-                                    use_proxy=use_proxy, use_cache=use_cache, cache_duration=cache_duration)
+                                        replace_headers=replace_headers, add_referer=add_referer, only_headers=only_headers, 
+                                        bypass_cloudflare=bypass_cloudflare, count_retries=1, raise_weberror=raise_weberror, 
+                                        use_proxy=use_proxy, use_cache=use_cache, cache_duration=cache_duration)
 
                 if resp_auth.sucess:
-                    logger.info("Autorización correcta, descargando página")
+                    logger.info("Autorizado")
                     resp = downloadpage(url=response["url"], post=post, headers=headers, timeout=timeout,
                                     follow_redirects=follow_redirects,
                                     cookies=cookies, replace_headers=replace_headers, add_referer=add_referer, 
@@ -510,7 +524,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
                     response["time"] = resp.time
                     response["url"] = resp.url
                 else:
-                    logger.info("No se pudo autorizar")
+                    logger.info("NO se pudo autorizar")
 
         except: pass
 
@@ -541,7 +555,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
        and 'HTTP/1.1 400 Bad Request' not in str(response['data']) \
        and ('href=' in str(response['data']) or str(response['data']).startswith('{')):
         with open(cache_file, 'wb') as f: f.write(str(response['data'])); f.close()
-        logger.info("Guardado en caché %s la url %s" % (cache_md5url, url))
+        logger.info("Guardado caché %s url %s" % (cache_md5url, url))
 
     try:
         if isinstance(response['data'], bytes):
@@ -575,8 +589,11 @@ class NoRedirectHandler(HTTPRedirectHandler):
 
     http_error_300 = http_error_302
     http_error_301 = http_error_302
+    http_error_302 = http_error_302
     http_error_303 = http_error_302
+    http_error_304 = http_error_302
     http_error_307 = http_error_302
+    http_error_308 = http_error_302
 
 
 # Devuelve un diccionario con las cookies set-cookie en headers de descarga
@@ -613,4 +630,5 @@ def get_cookie(url, name, follow_redirects=False):
     for cookie in cj:
         if cookie.name == name and domain in cookie.domain:
             return cookie.value
+
     return False

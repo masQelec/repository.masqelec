@@ -15,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www5.cuevana3.ch'
+host = 'https://www6.cuevana3.ch'
 
 
 # ~ por si viene de enlaces guardados
@@ -25,7 +25,7 @@ ant_hosts = ['https://www1.cuevana3.video', 'https://www2.cuevana3.video', 'http
              'https://www1.cuevana3.pe', 'https://www2.cuevana3.pe', 'https://cuevana3.vc',
              'https://www1.cuevana3.vc', 'https://cuevana3.fm', 'https://www1.cuevana3.fm',
              'https://cuevana3.ch/', 'https://www1.cuevana3.ch', 'https://www2.cuevana3.ch',
-             'https://www3.cuevana3.ch', 'https://www4.cuevana3.ch']
+             'https://www3.cuevana3.ch', 'https://www4.cuevana3.ch', 'https://www5.cuevana3.ch']
 
 
 domain = config.get_setting('dominio', 'cuevana3video', default='')
@@ -76,8 +76,10 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -85,8 +87,11 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-                data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers).data
+                else:
+                    data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers).data
         except:
             pass
 
@@ -189,7 +194,7 @@ def generos(item):
         url = scrapertools.find_single_match(match,'<a href="(.*?)">')
         title = scrapertools.find_single_match(match,'>(.*?)</a>')
 
-        itemlist.append(item.clone( title = title, url = host + url, action = 'list_all', search_type = item.search_type ))
+        itemlist.append(item.clone( title = title, url = host + url, action = 'list_all', search_type = item.search_type, text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -329,7 +334,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action='episodios', title=title, page = 0, contentType='season', contentSeason=tempo ))
+        itemlist.append(item.clone( action='episodios', title=title, page = 0, contentType='season', contentSeason=tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -399,8 +404,7 @@ def episodios(item):
 
         url = host + url
 
-        itemlist.append(item.clone( action='findvideos', title = title, thumbnail=thumb, url = url,
-                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+        itemlist.append(item.clone( action='findvideos', title = title, thumbnail=thumb, url = url, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -524,8 +528,7 @@ def findvideos(item):
                            if not config.get_setting('developer_mode', default=False):
                                if link_other == 'hydrax': continue
 
-                           itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url,
-                                                 quality = 'HD', other = link_other ))
+                           itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url, quality = 'HD', other = link_other ))
 
                            continue
 
@@ -542,8 +545,7 @@ def findvideos(item):
                 if link_other == 'hydrax': link_other = ''
 
             if link_other:
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url,
-                                      quality = 'HD', other = link_other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url, quality = 'HD', other = link_other ))
 
     if not itemlist:
         if not ses == 0:
@@ -685,7 +687,10 @@ def play(item):
 
                 vid = item.url.replace('https://apialfa.tomatomatela.club/sc/index.php', 'https://apialfa.tomatomatela.club/sc/r.php')
 
-                data = httptools.downloadpage_proxy('cuevana3video', vid, post=post).data
+                if not vid.startswith(host):
+                    data = httptools.downloadpage(vid, post=post).data
+                else:
+                    data = httptools.downloadpage_proxy('cuevana3video', vid, post=post).data
 
                 url = scrapertools.find_single_match(data, '<meta name="og:url" content="(.*?)"')
 
@@ -704,8 +709,10 @@ def play(item):
             post = {'url': fid}
 
             try:
-                # ~ new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
-                new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
+                if not vid.startswith(host):
+                    new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                else:
+                    new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
             except:
                 new_url = ''
 
@@ -717,8 +724,10 @@ def play(item):
 
                 if vid:
                     try:
-                        # ~ new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
-                        new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
+                        if not vid.startswith(host):
+                            new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                        else:
+                            new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
                     except:
                         new_url = ''
 
@@ -734,10 +743,12 @@ def play(item):
                     return itemlist
 
             else:
-
+                vid = 'https://apialfa.tomatomatela.club/ir/redirect_ddh.php'
                 try:
-                    # ~ url = httptools.downloadpage('https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
-                    url = httptools.downloadpage_proxy('cuevana3video', 'https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
+                    if not vid.startswith(host):
+                        url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                    else:
+                        url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
                 except:
                     url = ''
 

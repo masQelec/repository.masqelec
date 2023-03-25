@@ -39,8 +39,9 @@ def get_video_url(page_url, url_referer=''):
     if url:
         url = httptools.downloadpage(url, headers={'Referer': 'https://www.burstcloud.co/'}, follow_redirects=False).headers.get('location', '')
 
-        if url: url = url + '|referer=https://www.burstcloud.co/'
+        if url:
+            url = url + '|referer=https://www.burstcloud.co/'
 
-        video_urls.append(['mp4', url])
+            video_urls.append(['mp4', url])
 
     return video_urls

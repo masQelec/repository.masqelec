@@ -121,8 +121,10 @@ class login_dialog(xbmcgui.WindowDialog):
 
 
 def do_make_login_logout(url, post=None):
-    # ~ data = httptools.downloadpage(url, post=post, raise_weberror=False).data
-    data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, raise_weberror=False).data
+    else:
+        data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -130,8 +132,11 @@ def do_make_login_logout(url, post=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, raise_weberror=False).data
-                data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, raise_weberror=False).data
+                else:
+                    data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
         except:
             pass
 
@@ -318,8 +323,10 @@ def do_downloadpage(url, post=None, referer=None):
     if referer: headers = {'Referer': referer}
     else: headers = {'Referer': domain}
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
-    data = httptools.downloadpage_proxy('hdfull', url, post=post, headers=headers, raise_weberror=False).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+    else:
+        data = httptools.downloadpage_proxy('hdfull', url, post=post, headers=headers, raise_weberror=False).data
 
     if '<div id="popup_login_result"></div>' in data:
         if not config.get_setting('hdfull_login', 'hdfull', default=False):
@@ -395,21 +402,21 @@ def mainlist(item):
     if config.get_setting('hdfull_login', 'hdfull', default=False):
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'all' ))
 
-        itemlist.append(item.clone( title = '[B]Listas populares[/B]', action = 'list_listas', target_action = 'top', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', target_action = 'top', search_type = 'all', text_color = 'cyan' ))
 
         itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
         itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
         itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-        itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='goldenrod' ))
+        itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
         itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'actor', search_type = 'person',
                                     plot = 'Debe indicarse el nombre y apellido/s del intérprete (lo más exacto posible).'))
         itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
                                     plot = 'Debe indicarse el nombre y apellido/s del director (lo más exacto posible).'))
 
-        itemlist.append(item.clone( title = 'Búsqueda en listas:', action = '', folder=False, text_color='goldenrod' ))
+        itemlist.append(item.clone( title = 'Búsqueda en listas populares:', action = '', folder=False, text_color='tan' ))
         itemlist.append(item.clone( title = ' - Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all',
                                     plot = 'Debe indicarse el título de la lista (ó parte del mismo).'))
 
@@ -432,7 +439,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = '[B]Listas populares[/B]', action = 'list_listas', target_action = 'top', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', target_action = 'top', search_type = 'all', text_color = 'cyan' ))
 
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -466,7 +473,7 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = '[B]Listas populares[/B]', action = 'list_listas', target_action = 'top', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', target_action = 'top', search_type = 'all', text_color = 'cyan' ))
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -476,14 +483,14 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url= dominio + 'series/imdb_rating', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow' ))
-        itemlist.append(item.clone( action='list_all', title='Doramas', url= dominio + 'tags-tv/dorama', search_type = 'tvshow' ))
-        itemlist.append(item.clone( action='list_all', title='Novelas', url= dominio + 'tags-tv/soap', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow', text_color='springgreen' ))
+        itemlist.append(item.clone( action='list_all', title='Doramas', url= dominio + 'tags-tv/dorama', search_type = 'tvshow', text_color='firebrick' ))
+        itemlist.append(item.clone( action='list_all', title='Novelas', url= dominio + 'tags-tv/soap', search_type = 'tvshow', text_color='limegreen' ))
 
-        itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='aquamarine' ))
+        itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='tan' ))
 
         itemlist.append(item.clone( action='list_episodes', title=' - Estreno', opcion = 'premiere', search_type = 'tvshow' ))
-        itemlist.append(item.clone( action='list_episodes', title=' - Anime ', opcion = 'anime', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_episodes', title=' - [COLOR springgreen]Anime[/COLOR]', opcion = 'anime', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_episodes', title=' - Últimos', opcion = 'latest', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_episodes', title=' - Actualizados', opcion = 'updated', search_type = 'tvshow' ))
 
@@ -524,7 +531,7 @@ def mainlist_user(item):
                 if tipo_list == 'movies': continue
 
         itemlist.append(item.clone( title = title, url = domain + url if not url.startswith('/') else domain + url[1:],
-                                    action = 'user_subsections', search_type = item.search_type, tipo_list = tipo_list ))
+                                    action = 'user_subsections', search_type = item.search_type, tipo_list = tipo_list, text_color = 'yellow' ))
 
     return itemlist
 
@@ -532,6 +539,9 @@ def mainlist_user(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     dominio = config.get_setting('dominio', 'hdfull', default=dominios[0])
 
@@ -550,7 +560,7 @@ def generos(item):
 
         if url.startswith('/'): url = dominio + url[1:]
 
-        itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = title, url = url, action = 'list_all', text_color = text_color ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -563,8 +573,8 @@ def series_abc(item):
 
     if not config.get_setting('dominio', 'hdfull'): config.set_setting('dominio', dominio, 'hdfull')
 
-    for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ9':
-        itemlist.append(item.clone( title = letra if letra != '9' else '#', url = dominio + 'series/abc/' + letra, action = 'list_all' ))
+    for letra in '9ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        itemlist.append(item.clone( title = letra if letra != '9' else '#', url = dominio + 'series/abc/' + letra, action = 'list_all', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -625,6 +635,7 @@ def list_all(item):
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
+
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages=', '.join(languages), fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, referer=item.url, infoLabels={'year': '-'} ))
 
@@ -642,6 +653,7 @@ def list_all(item):
 
         if buscar_next:
             next_page_link = scrapertools.find_single_match(data, '<a href="([^"]+)">&raquo;</a>')
+
             if next_page_link:
                 itemlist.append(item.clone( title = 'Siguientes ...', url = next_page_link, page = 0, action = 'list_all', text_color = 'coral' ))
 
@@ -794,7 +806,7 @@ def temporadas(item):
             return itemlist
 
         itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, sid = sid, referer = item.url, page = 0,
-                                    contentType = 'season', contentSeason = numtempo ))
+                                    contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
 
     # ~  Temporadas ocultas No detectadas
     if not seasons_hiden:
@@ -819,17 +831,15 @@ def temporadas(item):
                         url = last_url + '/temporada-' + str(last_tempo)
                         title = 'Temporada ' + str(last_tempo)
 
-                        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
-                                                    page = 0, sid = sid, referer = item.url,
-                                                    contentType = 'season', contentSeason = last_tempo, infoLabels={'year': any} ))
+                        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, page = 0, sid = sid, referer = item.url,
+                                                    contentType = 'season', contentSeason = last_tempo, infoLabels={'year': any}, text_color = 'tan' ))
                 except:
                     pass
 
     # Alguna serie de una sola temporada que no la tiene identificada
     if len(itemlist) == 0:
         itemlist.append(item.clone( action='episodios', url = item.url + '/temporada-1', title = 'Temporada 1',
-                                    sid = sid, referer = item.url, page = 0,
-                                    contentType = 'season', contentSeason = 1 ))
+                                    sid = sid, referer = item.url, page = 0, contentType = 'season', contentSeason = 1, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -1012,8 +1022,7 @@ def findvideos(item):
 
         idioma = idioma.capitalize() if idioma != 'ESPSUB' else 'Vose'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, 
-                              language = idioma, quality = calidad, quality_num = puntuar_calidad(calidad) ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, language = idioma, quality = calidad, quality_num = puntuar_calidad(calidad) ))
 
     if not itemlist:
         if not ses == 0:
@@ -1034,7 +1043,11 @@ def user_subsections(item):
     matches = re.compile('<a data-action="([^"]+)">([^<]+)').findall(data)
 
     for action, title in matches:
-        itemlist.append(item.clone( title = title, target_action = action, action = 'list_user_subsections' if item.tipo_list != 'listas' else 'list_listas' ))
+        if item.search_type == 'movie': text_color = 'deepskyblue'
+        elif item.search_type == 'tvshow': text_color = 'hotpink'
+        else: text_color = 'tan'
+
+        itemlist.append(item.clone( title = title, target_action = action, action = 'list_user_subsections' if item.tipo_list != 'listas' else 'list_listas', text_color = text_color))
 
     return itemlist
 
@@ -1071,8 +1084,10 @@ def list_user_subsections(item):
         episode = scrapertools.find_single_match(str(match), "'episode':.*?'(.*?)'")
 
         epis = False
+
         if season and episode:
             epis = True
+
             show_title = scrapertools.find_single_match(str(match), "'show_title':.*?'es':.*?'(.*?)'")
             if not show_title: show_title = scrapertools.find_single_match(str(match), "'show_title':.*?'en':.*?'(.*?)'")
 
@@ -1089,22 +1104,19 @@ def list_user_subsections(item):
         if item.tipo_list == 'movies':
             url = '%spelicula/%s' % (domain, perma)
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
 
         else:
             if epis:
                 url = '%sserie/%s/temporada-%s/episodio-%s' % (domain, perma, season, episode)
 
-                itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                            contentSerieName = SerieName,
+                itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentSerieName = SerieName,
                                             contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode, infoLabels = {'year': '-'} ))
 
             else:
                 url = '%sserie/%s' % (domain, perma)
 
-                itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, page = 0,
-                                            contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
+                itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, page = 0, contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -1115,8 +1127,7 @@ def list_user_subsections(item):
 
             next_post = 'target=%s&action=%s&start=%s&limit=28' % (item.tipo_list, item.target_action, next_start)
 
-            itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page,
-                                        pageaction = 'list_user_subsections', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, pageaction = 'list_user_subsections', text_color = 'coral' ))
 
     return itemlist
 
@@ -1148,7 +1159,10 @@ def list_listas(item):
         title = match.get('title')
         url = '%slista/%s' % (domain, match.get('permalink'))
 
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url, page = 0 ))
+        if item.target_action == 'top': text_color = 'moccasin'
+        else: text_color = ''
+
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, page = 0, text_color = text_color ))
 
     if itemlist:
         if len(itemlist) >= int(tope):
@@ -1158,8 +1172,7 @@ def list_listas(item):
 
                 next_post = 'target=lists&action=%s&start=%s&limit=28' % (item.target_action, next_start)
 
-                itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, 
-                                            pageaction = 'list_listas', text_color = 'coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, pageaction = 'list_listas', text_color = 'coral' ))
 
     return itemlist
 
@@ -1174,9 +1187,11 @@ def search(item, texto):
     try:
         if item.group:
             item.url = dominio + 'buscar' + '/' + item.group + '/' + texto
+
         elif item.target_action:
             item.post = 'target=lists&action=search&search=%s&start=0&limit=99' % texto.replace(' ','+')
             return list_listas(item)
+
         else:
             data = do_downloadpage(dominio)
 

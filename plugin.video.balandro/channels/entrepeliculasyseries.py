@@ -64,8 +64,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     if '/peliculas-del' in url: raise_weberror = False
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -73,10 +75,18 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-                data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
+
+    if '<title>Just a moment...</title>' in data:
+        if not '?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -103,6 +113,8 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='manto_domain_entrepeliculasyseries', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_entrepeliculasyseries', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     platformtools.itemlist_refresh()
 
@@ -133,7 +145,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'peliculas-de-netflix/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'peliculas-de-netflix/', search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -153,7 +165,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimas recientes', action = 'list_all', url = host + 'series-recientes/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por productora', action = 'categorias', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por productora', action = 'categorias', search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -163,6 +175,9 @@ def mainlist_series(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     data = do_downloadpage(host)
 
@@ -177,11 +192,11 @@ def generos(item):
 
            if title == 'Series Documentales': title = 'Documentales'
 
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = text_color ))
 
     if itemlist:
         if item.search_type == 'movie':
-            itemlist.append(item.clone( action = 'list_all', title = 'Western', url = host + 'peliculas-de-western/' ))
+            itemlist.append(item.clone( action = 'list_all', title = 'Western', url = host + 'peliculas-de-western/', text_color = text_color ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -196,7 +211,7 @@ def anios(item):
     for x in range(current_year, 2008, -1):
         url = host + 'peliculas-del-' + str(x) + '/'
 
-        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -218,7 +233,7 @@ def categorias(item):
     for opc, tit in productoras:
         url = host + 'series-de-' + opc + '/'
 
-        itemlist.append(item.clone( title = tit, action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = tit, action = 'list_all', url = url, text_color='hotpink' ))
 
     return itemlist
 
@@ -300,7 +315,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = nro_season ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = nro_season, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -412,6 +427,8 @@ def findvideos(item):
 
             language = language.strip()
 
+            if '</td>' in language: language = scrapertools.find_single_match(language, '(.*?)</td>')
+
             if language == 'Subtitulado': language = 'Vose'
             elif language == 'Latino': language = 'Lat'
             elif language == 'Castellano': language = 'Esp'
@@ -420,12 +437,10 @@ def findvideos(item):
 
             servidor = servertools.corregir_servidor(servidor)
 
-            if servidor:
-                if servidor == '1fitchier': continue
+            if servidor == '1fitchier': continue
 
-                if servidor:
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = language,
-                                          quality = qlty, other = 'D' ))
+            if servidor:
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = language, quality = qlty, other = 'D' ))
 
     if not itemlist:
         if not ses == 0:
@@ -475,8 +490,12 @@ def play(item):
                ref = url.replace('.html', '')
                headers = {'Referer': ref}
 
-               # ~ url = httptools.downloadpage(host + 'r.php', post = post, headers= headers, follow_redirects=False).headers.get('location', '')
-               url = httptools.downloadpage_proxy('entrepeliculasyseries', host + 'r.php', post = post, headers= headers, follow_redirects=False).headers.get('location', '')
+               vid = host + 'r.php'
+
+               if not vid.startswith(host):
+                   url = httptools.downloadpage(vid, post = post, headers= headers, follow_redirects=False).headers.get('location', '')
+               else:
+                   url = httptools.downloadpage_proxy('entrepeliculasyseries', vid, post = post, headers= headers, follow_redirects=False).headers.get('location', '')
 
                if url:
                    servidor = servertools.get_server_from_url(url)

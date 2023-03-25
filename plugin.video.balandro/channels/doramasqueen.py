@@ -43,7 +43,7 @@ def mainlist_series(item):
     itemlist.append(item.clone ( title = 'Finalizados', action = 'list_lst',
                                  post = {"countries": "", "generos": "", "years": "", "emition": "[\"No\"]", "submit": ""}, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone ( title = 'Películas', action = 'list_all', url = host + 'peliculas.php', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = 'Películas', action = 'list_all', url = host + 'peliculas.php', search_type = 'movie', text_color='deepskyblue' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone ( title = 'Por país', action = 'paises', search_type = 'tvshow' ))
@@ -70,7 +70,7 @@ def generos(item):
 
         post = {"countries": "", "generos": genre, "years": "", "emition": "", "submit": ""}
 
-        itemlist.append(item.clone( title = tit, post = post, action = 'list_lst' ))
+        itemlist.append(item.clone( title = tit, post = post, action = 'list_lst', text_color = 'firebrick' ))
 
     return itemlist
 
@@ -92,7 +92,7 @@ def paises(item):
 
         post = {"countries": pais, "generos": "", "years": "", "emition": "", "submit": ""}
 
-        itemlist.append(item.clone( title = tit, post = post, action = 'list_lst' ))
+        itemlist.append(item.clone( title = tit, post = post, action = 'list_lst', text_color='moccasin' ))
 
     return itemlist
 
@@ -109,7 +109,7 @@ def anios(item):
 
         post = {"countries": "", "generos": "", "years": any, "emition": "", "submit": ""}
 
-        itemlist.append(item.clone( title = str(x), post = post, action = 'list_lst' ))
+        itemlist.append(item.clone( title = str(x), post = post, action = 'list_lst', text_color = 'firebrick' ))
 
     return itemlist
 
@@ -214,8 +214,7 @@ def list_lst(item):
 
         if titulo: title = titulo
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -327,8 +326,7 @@ def episodios(item):
 
     if itemlist:
         if len(matches) > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page=item.page + 1, perpage = item.perpage,
-                                        text_color='coral', orden = '10000' ))
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page=item.page + 1, perpage = item.perpage, text_color='coral', orden = '10000' ))
 
     return sorted(itemlist, key=lambda i: i.orden)
 
@@ -370,8 +368,7 @@ def findvideos(item):
         other = ''
         if servidor == 'directo': other = '?'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, ref = item.url,
-                              language = lang, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, ref = item.url, language = lang, other = other ))
 
     return itemlist
 
@@ -419,8 +416,7 @@ def list_search(item):
 
         thumb = host + 'admin/uploads/doramas/' + thumb
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

@@ -55,6 +55,8 @@ opciones_provider = [
         'google-proxy.net',
         'ip-adress.com',
         'proxydb.net',
+        'hidester.com',
+        'geonode.com',
         private_list
         ]
 
@@ -250,7 +252,7 @@ def configurar_proxies_canal(canal, url):
         if ret == -1: break
 
         elif ret == 0:
-            new_proxies = platformtools.dialog_input(default=proxies, heading='Indicar el proxy a utilizar o varios separados por comas')
+            new_proxies = platformtools.dialog_input(default=proxies, heading='Indicar el proxy a utilizar ó varios separados por comas')
             if new_proxies:
                 if '.' in new_proxies and ':' in new_proxies: pass
                 else:
@@ -762,6 +764,20 @@ def _buscar_proxies(canal, url, provider, procesar):
                 if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     # ~ Providers resto
+    if search_provider or provider == 'geonode.com':
+        searching = True
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
+            if not 'geonode.com' in providers_preferred: searching = False
+
+        if searching:
+            if len(all_providers_proxies) < proxies_totales_limit:
+                if search_provider: platformtools.dialog_notification('Buscar en Geonode', msg_txt % color_infor)
+
+                proxies = _geonode(url, tipo_proxy, pais_proxy, max_proxies)
+                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
     if search_provider or provider == 'proxy-list.download':
         searching = True
 
@@ -845,6 +861,20 @@ def _buscar_proxies(canal, url, provider, procesar):
                 if search_provider: platformtools.dialog_notification('Buscar en Proxydb', msg_txt % color_infor)
 
                 proxies = _proxydb_net(url, tipo_proxy, pais_proxy, max_proxies)
+                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
+    if search_provider or provider == 'hidester.com':
+        searching = True
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
+            if not 'hidester.com' in providers_preferred: searching = False
+
+        if searching:
+            if len(all_providers_proxies) < proxies_totales_limit:
+                if search_provider: platformtools.dialog_notification('Buscar en Hidester', msg_txt % color_infor)
+
+                proxies = _hidester(url, tipo_proxy, pais_proxy, max_proxies)
                 if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     # fichero personal de proxies en userdata (separados por comas o saltos de línea)
@@ -1396,6 +1426,46 @@ def _us_proxy_org(url, tipo_proxy, pais_proxy, max_proxies):
     return proxies
 
 
+def _hidester(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    url_provider = 'https://hidester.com/proxydata/php/data.php?mykey=data&offset=0&limit=50&orderBy=latest_check&sortOrder=DESC&country=&port=&type=undefined&anonymity=undefined&ping=undefined&gproxy=2'
+
+    resp = httptools.downloadpage(url_provider, headers={'referer': 'https://hidester.com/proxylist/'}, raise_weberror=False)
+
+    proxies = []
+
+    enlaces = scrapertools.find_multiple_matches(str(resp.data), '"IP":"(.*?)".*?"PORT":(.*?)"')
+
+    for prox, puerto in enlaces:
+        if puerto:
+            puerto = puerto.replace(',', '')
+
+            proxies.append(prox + ':' + puerto)
+
+    return proxies
+
+
+def _geonode(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    url_provider = 'https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc'
+
+    resp = httptools.downloadpage(url_provider, raise_weberror=False)
+
+    proxies = []
+
+    enlaces = scrapertools.find_multiple_matches(str(resp.data), '"ip":"(.*?)".*?"port":"(.*?)"')
+
+    for prox, puerto in enlaces:
+        if puerto:
+            puerto = puerto.replace(',', '')
+
+            proxies.append(prox + ':' + puerto)
+
+    return proxies
+
+
 def _proxy_list_download(url, tipo_proxy, pais_proxy, max_proxies):
     logger.info()
 
@@ -1517,7 +1587,7 @@ def do_test_proxy(url, proxy, info):
     except: return
 
     info['ok'] = (type(resp.code) == int and resp.code >= 200 and resp.code < 400)
-    if 'ERROR 404 - File not found' in resp.data or 'HTTP/1.1 400 Bad Request' in resp.data  or '<title>Site Blocked</title>' in resp.data or len(resp.data) < 100:
+    if 'ERROR 404 - File not found' in str(resp.data) or 'HTTP/1.1 400 Bad Request' in str(resp.data) or '<title>Site Blocked</title>' in str(resp.data) or len(resp.data) < 100:
         info['ok'] = False
 
     info['time'] = resp.time
@@ -1535,7 +1605,7 @@ def testear_lista_proxies(canal, provider, url, proxies=[]):
 
     num_proxies = float(len(proxies)) # float para calcular porcentaje
 
-    progreso = platformtools.dialog_progress('Test proxies ' + '[COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR] con [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '%d proxies a comprobar. Cancelar si tarda demasiado.' % num_proxies)
+    progreso = platformtools.dialog_progress('Test proxies ' + '[COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR] con [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '%d proxies a comprobar. [COLOR yellowgreen][B]Cancelar si tarda demasiado[/B][/COLOR].' % num_proxies)
 
     repeated = 0
 
@@ -1577,7 +1647,7 @@ def testear_lista_proxies(canal, provider, url, proxies=[]):
             perc = int(hechos / num_proxies * 100)
             validos = sum([1 for proxy in proxies if proxies_info[proxy]['ok']])
 
-            progreso.update(perc, 'Comprobando el %d de %d proxies. Válidos %d. Cancelar si tarda demasiado o si ya hay más de uno válido.' % (hechos, num_proxies, validos))
+            progreso.update(perc, 'Comprobando el %d de %d proxies. Válidos %d. [COLOR yellowgreen][B]Cancelar si tarda demasiado[/B][/COLOR] ó si ya hay más de uno válido.' % (hechos, num_proxies, validos))
 
             if proxies_limit:
                 if validos >= 10: break # si todos los 10 más rápidos

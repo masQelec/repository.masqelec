@@ -55,14 +55,14 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'categoria/anime', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Caricaturas', action = 'list_all', url = host + 'categoria/caricaturas', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Cortos', action = 'list_all', url = host + 'categoria/corto', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'categoria/especial', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Live action', action = 'list_all', url = host + 'categoria/live-action', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Onas', action = 'list_all', url = host + 'categoria/ona', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'categoria/ova', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'categoria/pelicula', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'categoria/anime', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Caricaturas', action = 'list_all', url = host + 'categoria/caricaturas', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Cortos', action = 'list_all', url = host + 'categoria/corto', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'categoria/especial', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Live action', action = 'list_all', url = host + 'categoria/live-action', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Onas', action = 'list_all', url = host + 'categoria/ona', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'categoria/ova', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'categoria/pelicula', search_type = 'tvshow', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -83,14 +83,16 @@ def list_all(item):
 
         thumb = thumb.replace("200/", "800/").replace("280/", "1120/")
 
+        title = title.replace('&#039;', "'")
+
         SerieName = title
 
-        if 'Movie' in title: SerieName = title.split("Movie")[0]
+        if 'Movie' in SerieName: SerieName = SerieName.split("Movie")[0]
+        if ':' in SerieName: SerieName = SerieName.split(":")[0]
 
         SerieName = SerieName.strip()
 
-        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
-                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -119,15 +121,24 @@ def last_epis(item):
     matches = re.compile(patron, re.DOTALL).findall(bloque)
 
     for url, thumb, epis, title in matches:
+        title = title.replace('&#039;', "'")
+
+        SerieName = title
+
+        if 'Movie' in SerieName: SerieName = SerieName.split("Movie")[0]
+        if ':' in SerieName: SerieName = SerieName.split(":")[0]
+
+        SerieName = SerieName.strip()
+
         titulo = '%s - %s' % (title, epis)
 
         thumb = thumb.replace("290/", "840/").replace("165/", "480/")
 
-        episode =  scrapertools.find_single_match(epis, 'Episodio(.*?)$').strip()
+        episode = scrapertools.find_single_match(epis, 'Episodio(.*?)$').strip()
         if not episode: episode = 1
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
-                                            contentSerieName = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode,
+                                            contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode,
                                             infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -189,8 +200,7 @@ def episodios(item):
 
         url = '%sver/%s-capitulo-%s' % (host, anime_info[0], epis)
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, language='Vose',
-                        contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -240,7 +250,7 @@ def findvideos(item):
             url = servertools.normalize_url(servidor, url)
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose' ))
 
     # ~ descargas
     bloque = scrapertools.find_single_match(data, '<table class="table">(.*?)</table>')
@@ -256,7 +266,7 @@ def findvideos(item):
         url = servertools.normalize_url(servidor, url)
 
         if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose' ))
 
 
     if not itemlist:

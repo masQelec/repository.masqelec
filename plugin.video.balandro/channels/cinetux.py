@@ -61,8 +61,11 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('cinetux', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('cinetux', url, post=post, headers=headers).data
+
     return data
 
 
@@ -97,6 +100,7 @@ def acciones(item):
 def mainlist(item):
     return mainlist_pelis(item)
 
+
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
@@ -121,9 +125,9 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='peliculas', title='Español', url= host + 'idioma/espanol/' ))
-    itemlist.append(item.clone( action='peliculas', title='Latino', url= host + 'idioma/latino/' ))
-    itemlist.append(item.clone( action='peliculas', title='Subtitulado', url= host + 'idioma/subtitulado/' ))
+    itemlist.append(item.clone( action='peliculas', title='Español', url= host + 'idioma/espanol/', text_color='moccasin' ))
+    itemlist.append(item.clone( action='peliculas', title='Latino', url= host + 'idioma/latino/', text_color='moccasin' ))
+    itemlist.append(item.clone( action='peliculas', title='Subtitulado', url= host + 'idioma/subtitulado/', text_color='moccasin' ))
 
     return itemlist
 
@@ -139,16 +143,16 @@ def generos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, ' href="/([^"]+)">([^<]+)')
 
-    for scrapedurl, scrapedtitle in matches:
-        if '/estrenos/' in scrapedurl: continue
+    for url, title in matches:
+        if '/estrenos/' in url: continue
 
-        if descartar_xxx and scrapertools.es_genero_xxx(scrapedtitle): continue
+        if descartar_xxx and scrapertools.es_genero_xxx(title): continue
 
-        itemlist.append(item.clone( action='peliculas', title=scrapedtitle.strip(), url=host + scrapedurl ))
+        itemlist.append(item.clone( action='peliculas', title=title.strip(), url=host + url, text_color='deepskyblue' ))
 
     if itemlist:
         if 'genero/belica/' not in bloque:
-            itemlist.append(item.clone( action='peliculas', title='Bélica', url=host + 'genero/belica/' ))
+            itemlist.append(item.clone( action='peliculas', title='Bélica', url=host + 'genero/belica/', text_color='deepskyblue' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -161,7 +165,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for ano in range(current_year, 1938, -1):
-        itemlist.append(item.clone( action = 'peliculas', title = str(ano), url = host + 'ano/' + str(ano) + '/' ))
+        itemlist.append(item.clone( action = 'peliculas', title = str(ano), url = host + 'ano/' + str(ano) + '/', text_color='deepskyblue' ))
 
     return itemlist
 
@@ -280,8 +284,8 @@ def findvideos(item):
 
 
     matches = scrapertools.find_multiple_matches(data, '<li id="player-option-\d+"(.*?)</li>')
-    if matches:
-        entrecomillado = '"([^"]+)'
+
+    if matches: entrecomillado = '"([^"]+)'
     else:
         matches = scrapertools.find_multiple_matches(data, "<li id='player-option-\d+'(.*?)</li>")
         entrecomillado = "'([^']+)"
@@ -295,6 +299,7 @@ def findvideos(item):
 
         tds = scrapertools.find_multiple_matches(enlace, 'data-lazy-src=".*?/assets/img/([^\.]+)')
         if not tds: tds = scrapertools.find_multiple_matches(enlace, " src='.*?/assets/img/([^\.]+)")
+
         if len(tds) != 2 or not dtype or not dpost or not dnume: continue
 
         lang = tds[0].replace('3', '')
@@ -303,6 +308,7 @@ def findvideos(item):
 
         if servidor == 'cinetuxm': continue
         elif servidor == 'desconocido': continue
+
         elif servidor == 'videozerr': servidor = 'directo'
 
         servidor = corregir_servidor(servidor.strip().lower())
@@ -323,12 +329,10 @@ def extraer_video(item, data):
 
     idvideo = scrapertools.find_single_match(data, 'src="([^"]+)').split('#')
     if len(idvideo) == 2:
-        if 'ok.ru/videoembed/' in data:
-            itemlist.append(item.clone( url='https://ok.ru/videoembed/' + idvideo[1], server='okru' ))
-        elif 'drive.google.com' in data:
-            itemlist.append(item.clone( url='https://docs.google.com/get_video_info?docid=' + idvideo[1], server='gvideo' ))
-        else:
-            itemlist.append(item.clone( url='https://' + idvideo[1], server='gvideo' ))
+        if 'ok.ru/videoembed/' in data: itemlist.append(item.clone( url='https://ok.ru/videoembed/' + idvideo[1], server='okru' ))
+        elif 'drive.google.com' in data: itemlist.append(item.clone( url='https://docs.google.com/get_video_info?docid=' + idvideo[1], server='gvideo' ))
+        else: itemlist.append(item.clone( url='https://' + idvideo[1], server='gvideo' ))
+
     return itemlist
 
 
@@ -341,6 +345,7 @@ def play(item):
         new_url = scrapertools.find_single_match(data, '<a id="link"[^>]* href="([^"]+)')
         if new_url:
             if '&url=' in new_url: new_url = new_url.split('&url=')[1]
+
             if 'cinetux.me' in new_url:
                 data = do_downloadpage(new_url)
                 new_url = scrapertools.find_single_match(data, "<a class='cta' href='([^']+)")
@@ -359,13 +364,16 @@ def play(item):
 
         new_url = scrapertools.find_single_match(data, "src='([^']+)'")
         if not new_url: new_url = scrapertools.find_single_match(data, 'src="([^"]+)"')
+
         if new_url:
             new_url = new_url.replace('videozerr.', '')
+
             if 'cinetux.me' in new_url:
                 data = do_downloadpage(new_url)
 
                 if data:
                    url = scrapertools.find_single_match(str(data), '<script>window.*?"(.*?)"')
+
                    if url:
                        servidor = servertools.get_server_from_url(url)
                        servidor = servertools.corregir_servidor(servidor)
@@ -405,6 +413,7 @@ def busqueda(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<link rel="next" href="([^"]+)')
+
         if next_page:
             itemlist.append(item.clone( action='busqueda', title='Siguientes ...', url=next_page, text_color='coral' ))
 

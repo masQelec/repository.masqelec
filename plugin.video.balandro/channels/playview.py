@@ -46,10 +46,13 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, follow_redirects=True, only_headers=False):
-    # ~ resp = httptools.downloadpage(url, post=post, follow_redirects=follow_redirects, only_headers=only_headers)
-    resp = httptools.downloadpage_proxy('playview', url, post=post, follow_redirects=follow_redirects, only_headers=only_headers)
+    if not url.startswith(host):
+        resp = httptools.downloadpage(url, post=post, follow_redirects=follow_redirects, only_headers=only_headers)
+    else:
+        resp = httptools.downloadpage_proxy('playview', url, post=post, follow_redirects=follow_redirects, only_headers=only_headers)
 
     if only_headers: return resp.headers
+
     return resp.data
 
 
@@ -95,8 +98,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-online', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animadas', action = 'list_all', url = host + 'series-animadas-online', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Anime', action = 'list_all', url = host + 'anime-online', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Animadas', action = 'list_all', url = host + 'series-animadas-online', search_type = 'tvshow', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'Anime', action = 'list_all', url = host + 'anime-online', search_type = 'tvshow', text_color='springgreen' ))
 
     return itemlist
 
@@ -128,7 +132,7 @@ def generos(item):
     for url, title in matches:
         title = title.replace('&aacute;', 'á').replace('&eacute;', 'é').replace('&iacute;', 'í').replace('&oacute;', 'ó').replace('&uacute;', 'ú')
 
-        itemlist.append(item.clone( action="list_all", title=title.strip(), url=url ))
+        itemlist.append(item.clone( action="list_all", title=title.strip(), url=url, text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -141,7 +145,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1935, -1):
-        itemlist.append(item.clone( title = str(x), url = host + 'estrenos-' + str(x), action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = host + 'estrenos-' + str(x), action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -198,6 +202,7 @@ def list_all(item):
 
             if season:
                 titulo = '%s [COLOR gray](Temporada %s)[/COLOR]' % (title, season)
+
                 itemlist.append(item.clone( action='episodios', url=url, title=titulo, thumbnail=thumb, qualities=quality, fmt_sufijo=sufijo, 
                                             contentType='season', contentSerieName=title, contentSeason=season, infoLabels={'year': year} ))
             else:
@@ -218,6 +223,7 @@ def list_all(item):
 
         if buscar_next:
             next_page = scrapertools.find_single_match(data, '<a href="([^"]+)" class="page-link" aria-label="Next"')
+
             if next_page:
                 itemlist.append(item.clone( title='Siguientes ...', url=next_page, page=0, action='list_all', text_color='coral' ))
 
@@ -261,7 +267,7 @@ def temporadas(item):
         if num_matches > 9:
             if len(season) == 1: season = '0' + season
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = season ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = season, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -287,6 +293,7 @@ def episodios(item):
     patron += '.*?url\(([^)]+)\)'
     patron += '.*?<p class="ellipsized">(.*?)</p>'
     patron += '.*?<div class="episodeSynopsis">(.*?)</div>'
+
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     if item.page == 0:
@@ -341,8 +348,7 @@ def episodios(item):
             title = re.sub('^\d+\s*-', '', title).strip()
             titulo = '%sx%s %s' % (item.contentSeason, episode, title)
 
-            itemlist.append(item.clone( action='findvideos', title=titulo, dataid=dataid, datatype=datatype,
-                                        contentType='episode', contentEpisodeNumber=episode ))
+            itemlist.append(item.clone( action='findvideos', title=titulo, dataid=dataid, datatype=datatype, contentType='episode', contentEpisodeNumber=episode ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -354,15 +360,9 @@ def episodios(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAM', 'HC-CAM', 'TS', 'TSHQ', 'SD', 'DVDRip', 'HDTC', 'HDLine', 'HDLine 720p', 'HD 720p', 'HD 1080p']
+    orden = ['CAM', 'HC-CAM', 'HDCAM', 'TS', 'TSHQ', 'SD', 'DVDRip', 'HDTC', 'HDLine', 'HDLine 720p', 'HD 720p', 'HD 1080p']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
-
-
-def corregir_servidor(servidor):
-    servidor = servertools.corregir_servidor(servidor)
-    if servidor == 'youtvgratis': return 'fembed'
-    return servidor
 
 
 def findvideos(item):
@@ -401,22 +401,24 @@ def findvideos(item):
             ses += 1
 
             servidor = servidor.replace('https://', '').replace('http://', '').replace('www.', '').lower()
+
             servidor = servidor.split('.', 1)[0]
 
-            servidor = corregir_servidor(servidor)
-
-            if servidor == 'desiupload': continue
-            elif servidor == 'dropapk': continue
-            elif servidor == 'embedo': continue
+            if servidor == 'embedo': continue
             elif servidor == 'protonvideo': continue
             elif servidor == 'fastclick': continue
-            elif servidor == 'userload': continue
             elif servidor == 'embedgram': continue
-            elif servidor == 'uppit': continue
 
             elif servidor == 'anonfile': servidor = 'anonfiles'
 
             calidad = calidad.replace('(', '').replace(')', '').strip()
+
+            servidor = servertools.corregir_servidor(servidor)
+
+            if servertools.is_server_available(servidor):
+                if not servertools.is_server_enabled(servidor): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '',
                                   linkid = linkid, linktype = tipo, linkepi = item.contentEpisodeNumber if item.dataid else -1,

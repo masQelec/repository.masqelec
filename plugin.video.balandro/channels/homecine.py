@@ -45,8 +45,10 @@ def configurar_proxies(item):
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if '/release-year/' in url: raise_weberror = False
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpage_proxy('homecine', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('homecine', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -54,8 +56,11 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-                data = httptools.downloadpage_proxy('homecine', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage_proxy('homecine', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -80,7 +85,7 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='goldenrod' ))
+    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
     itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'stars', search_type = 'person',
                                 plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
@@ -105,6 +110,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + '/top-imdb/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
 
@@ -126,8 +132,9 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + '/ver/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por estudio', action = 'estudios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Por estudio', action = 'estudios', search_type = 'tvshow', text_color='moccasin' ))
 
     return itemlist
 
@@ -135,6 +142,9 @@ def mainlist_series(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     matches = [
         ['/animacion/', 'Animación'],
@@ -160,10 +170,10 @@ def generos(item):
     for url, title in matches:
         url = host + '/genre' + url
 
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = text_color ))
 
     if itemlist:
-        itemlist.append(item.clone( action = "list_all", title = 'Documentales', url = host + '/genre/documentales/' ))
+        itemlist.append(item.clone( action = "list_all", title = 'Documentales', url = host + '/genre/documentales/', text_color = text_color ))
 
     return sorted(itemlist, key = lambda it: it.title)
 
@@ -178,7 +188,7 @@ def anios(item):
     for x in range(current_year, 1939, -1):
         url = host + '/release-year/' + str(x) + '/'
 
-        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -253,7 +263,7 @@ def paises(item):
 
         url = url = host + '/country/' + pais + '/'
 
-        itemlist.append(item.clone( title = title, url = url, action ='list_all' ))
+        itemlist.append(item.clone( title = title, url = url, action ='list_all', text_color='moccasin' ))
 
     return sorted(itemlist, key = lambda it: it.title)
 
@@ -347,7 +357,7 @@ def plataformas(item):
 
         url = host + '/networks/' + x[0] + '/'
 
-        itemlist.append(item.clone( title = title, url = url, action ='list_all' ))
+        itemlist.append(item.clone( title = title, url = url, action ='list_all', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -412,7 +422,7 @@ def estudios(item):
 
         url = host + '/studio/' + x[0] + '/'
 
-        itemlist.append(item.clone( title = title, url = url, action ='list_all' ))
+        itemlist.append(item.clone( title = title, url = url, action ='list_all', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -531,7 +541,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = season ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = season, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -610,7 +620,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Latino': 'Lat', 'Castellano': 'Esp', 'Subtitulado': 'Vose', 'Ingles': 'VO', 'Español Latino': 'Lat', 'Español Castellano': 'Esp'}
+    IDIOMAS = {'Latino': 'Lat', 'Castellano': 'Esp', 'Subtitulado': 'Vose', 'Ingles': 'VO', 'Español Latino': 'Lat', 'Español Castellano': 'Esp', 'Español Espellano': 'Esp'}
 
     data = do_downloadpage(item.url)
 
@@ -715,7 +725,10 @@ def play(item):
     referer = host + '/'
     headers = {'Referer': referer}
 
-    url = httptools.downloadpage(item.url, headers = headers, follow_redirects = False, only_headers = True).headers.get('location', '')
+    if not item.url.startswith(host):
+        url = httptools.downloadpage(item.url, headers = headers, follow_redirects = False, only_headers = True).headers.get('location', '')
+    else:
+        url = httptools.downloadpage_proxy('homecine', item.url, headers = headers, follow_redirects = False, only_headers = True).headers.get('location', '')
 
     if url:
         data = do_downloadpage(url, headers = headers, raise_weberror = False)

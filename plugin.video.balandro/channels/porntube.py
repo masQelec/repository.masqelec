@@ -38,8 +38,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host + 'videos?sort=duration&hl=es' ))
 
-    itemlist.append(item.clone( title = 'Por canal', action = 'canales',
-                                url = host + 'api/channel/list?filter=%7B%7D&order=rating&ssr=false&orientation=straigh' ))
+    itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host + 'api/channel/list?filter=%7B%7D&order=rating&ssr=false&orientation=straigh' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
@@ -59,11 +58,12 @@ def canales(item):
 
     for can in data:
         title = can['name']
+
         thumb = can['thumbUrl']
 
         url = host + 'channels/%s?hl=es' % can['slug']
 
-        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all' ))
+        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all', text_color = 'orange' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -87,7 +87,7 @@ def categorias(item):
 
         url = host + 'tags/%s?hl=es' % cat['slug']
 
-        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all' ))
+        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all', text_color='tan' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -103,11 +103,12 @@ def pornstars(item):
 
     for pns in data:
         title = pns['name']
+
         thumb = pns['thumbUrl']
 
         url = host + 'pornstars/%s?hl=es' % pns['slug']
 
-        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all' ))
+        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all', text_color='moccasin' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -127,8 +128,7 @@ def list_all(item):
     for title, url in matches:
         if url.startswith('/'): url = host + url[1:]
 
-        new_item = item.clone( action = 'findvideos', title = title, url = url, contentType = 'movie',
-                               contentTitle = title, contentExtra='adults', pos = i )
+        new_item = item.clone( action = 'findvideos', title = title, url = url, contentType = 'movie', contentTitle = title, contentExtra='adults', pos = i )
 
         t = Thread(target = get_embed, args = [new_item, itemlist])
 
@@ -144,6 +144,7 @@ def list_all(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<li class="pagination-item next"><a href="([^"]+)"')
+
         if next_page:
             if next_page.startswith('/'): next_page = host + next_page[1:]
 

@@ -73,11 +73,11 @@ def generos(item):
     for url, title in matches:
         url = host[:-1] + url
 
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'deepskyblue' ))
 
     if itemlist:
         if item.search_type == 'movie':
-            itemlist.append(item.clone(action = 'list_all', title = 'Western', url = host + 'genero/western' ))
+            itemlist.append(item.clone(action = 'list_all', title = 'Western', url = host + 'genero/western', text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key = lambda it: it.title)
 
@@ -180,7 +180,7 @@ def last_epis(item):
         epis = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$')
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
-                                   contentType = 'episode', contentSerieName = title, contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
+                                    contentType = 'episode', contentSerieName = title, contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -216,7 +216,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = season ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = season, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -323,11 +323,7 @@ def findvideos(item):
                 srv = scrapertools.find_single_match(srv, '<!-- -->. <!-- -->(.*?)<!-- -->').strip()
 
                 if srv:
-                   srv = srv.lower()
-
-                   srv = normalize_server(srv)
-
-                   if not srv: continue
+                   if srv == 'hqq' or srv ==  'waaw' or srv ==  'netu': continue
 
                    other = ''
 
@@ -339,8 +335,15 @@ def findvideos(item):
                       other = srv
                       srv = ''
 
-                   itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url, language = lang, quality = qlty,
-                                         other = other.capitalize() ))
+                   if srv:
+                       srv = servertools.corregir_servidor(srv)
+
+                       if servertools.is_server_available(srv):
+                           if not servertools.is_server_enabled(srv): continue
+                       else:
+                           if not config.get_setting('developer_mode', default=False): continue
+
+                   itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url, language = lang, quality = qlty, other = other.capitalize() ))
 
     # ~ download
     matches = scrapertools.find_multiple_matches(data, '<span class="Num">#(.*?)</td></tr>')
@@ -351,11 +354,15 @@ def findvideos(item):
         srv = scrapertools.find_single_match(match, '</span>(.*?)</td>').strip()
         srv = srv.replace('<!-- -->', '').strip()
 
-        srv = normalize_server(srv)
+        if srv == 'hqq' or srv ==  'waaw' or srv ==  'netu': continue
+        elif srv == '1fichier': continue
 
-        if not srv: continue
+        srv = servertools.corregir_servidor(srv)
 
-        if srv == '1fichier': continue
+        if servertools.is_server_available(srv):
+            if not servertools.is_server_enabled(srv): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
 
         lang = scrapertools.find_single_match(match, '<td>(.*?)</td>')
 
@@ -375,34 +382,6 @@ def findvideos(item):
             return
 
     return itemlist
-
-
-def normalize_server(server):
-    server = servertools.corregir_servidor(server)
-
-    if server == 'netu': server = ''
-    elif server == 'powvideo': server = ''
-    elif server == 'streamplay': server = ''
-    elif server == 'uploadedto': server = ''
-
-    elif server == 'jetload': server = ''
-    elif server == 'vidcloud': server = ''
-    elif server == 'openload': server = ''
-    elif server == 'clicknupload': server = ''
-    elif server == 'onlystream': server = ''
-    elif server == 'rapidvideo': server = ''
-    elif server == 'rapidvid': server = ''
-    elif server == 'streamango': server = ''
-    elif server == 'streamcherry': server = ''
-    elif server == 'streamcloud': server = ''
-    elif server == 'streamix': server = ''
-    elif server == 'thevideo': server = ''
-    elif server == 'thevid': server = ''
-    elif server == 'uploadmp4': server = ''
-    elif server == 'verystream': server = ''
-    elif server == 'vidcloud': server = ''
-
-    return server
 
 
 def play(item):

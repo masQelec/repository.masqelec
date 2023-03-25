@@ -55,7 +55,10 @@ def repertorios(item):
     for url, thumb, title, vid in matches:
         vid = vid.lower()
         vid = vid.replace('videos', '').strip()
-        titulo = '%s (%s)' % (title, vid)
+
+        title = title.lower().capitalize()
+
+        titulo = '[COLOR orange]%s[/COLOR] (%s)' % (title, vid)
 
         itemlist.append(item.clone( action = 'list_all', url = url, thumbnail = thumb, title = titulo, page = 1 ))
 
@@ -88,9 +91,13 @@ def canales(item):
 
     for url, thumb, title, vid in matches:
         url = host + url + '?show=channels'
+
         vid = vid.lower()
         vid = vid.replace('videos', '').strip()
-        titulo = '%s (%s)' % (title, vid)
+
+        titulo = '[COLOR orange]%s[/COLOR] (%s)' % (title, vid)
+
+        if not thumb.startswith('http'): thumb = 'https:' + thumb
 
         itemlist.append(item.clone( action = 'list_all', url = url, title = titulo, thumbnail = thumb, page = 1 ))
 
@@ -125,7 +132,7 @@ def categorias(item):
 
         if not thumb.startswith('http'): thumb = 'https:' + thumb
 
-        itemlist.append(item.clone( action = 'list_all', url = url, title = title, thumbnail = thumb, page = 1 ))
+        itemlist.append(item.clone( action = 'list_all', url = url, title = title, thumbnail = thumb, page = 1, text_color='orange' ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
@@ -157,14 +164,17 @@ def pornstars(item):
 
     for url, thumb, title, vid in matches:
         url = host + url
+
         vid = vid.lower()
         vid = vid.replace('videos', '').strip()
-        titulo = '%s (%s)' % (title, vid)
+
+        titulo = '[COLOR orange]%s[/COLOR] (%s)' % (title, vid)
 
         itemlist.append(item.clone( action = 'list_all', url = url, thumbnail = thumb, title = titulo, page = 1 ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
+
         if next_url:
             next_url = host + next_url
 
@@ -201,6 +211,7 @@ def list_all(item):
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
+
         if next_url:
             next_url = host + next_url
 

@@ -42,8 +42,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'cartelera-peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'genero/marvel/', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     return itemlist
@@ -66,6 +64,9 @@ def generos(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     data = do_downloadpage(host)
 
     bloque = scrapertools.find_single_match(data, '>Generos<(.*?)</ul>')
@@ -78,10 +79,7 @@ def generos(item):
 
         title = title.replace('&amp;', '&')
 
-        itemlist.append(item.clone( action='list_all', title=title, url=url ))
-
-    if itemlist:
-        itemlist.append(item.clone( action ='list_all', title ='Categoria', url= host + 'genero/categoria/' ))
+        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = text_color ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -117,20 +115,19 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
         if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?href="(.*?)"')
+
         if next_page:
             if '/page/' in next_page:
                  itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral'))
@@ -157,7 +154,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -222,8 +219,7 @@ def episodios(item):
 
         episode = scrapertools.find_single_match(s_e, ".*?x(.*?)$")
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=episode ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=episode ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -252,10 +248,7 @@ def findvideos(item):
         if '-latino' in idioma: lang = 'Lat'
         elif '-castellano' in idioma: lang = 'Esp'
         elif '-vose' in idioma: lang = 'Vose'
-        else:
-           lang = idioma
-
-        servidor = 'directo'
+        else: lang = idioma
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = lang ))
 

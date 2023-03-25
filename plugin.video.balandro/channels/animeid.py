@@ -7,7 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://animeid.to/'
+host = 'https://animeid.live/'
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://animeid.to/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
 
 
 def mainlist(item):
@@ -37,7 +49,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'popular', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'movies', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'movies', search_type = 'movie', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -46,7 +58,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<h3(.*?)<div class="clr"></div>')
@@ -97,7 +109,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '>Lista de episodios<(.*?)<div class="clr"></div>')
@@ -167,7 +179,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     link = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
@@ -176,7 +188,7 @@ def findvideos(item):
 
     if not link.startswith("http"): link = "https:" + link
 
-    data = httptools.downloadpage(link).data
+    data = do_downloadpage(link)
 
     ses = 0
 

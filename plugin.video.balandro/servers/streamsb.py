@@ -45,24 +45,49 @@ def get_video_url(page_url, url_referer=''):
 
     ini_page_url = page_url
 
-    page_url = page_url.replace('//cloudemb.com/e/', '//streamsb.net/play/').replace('//cloudemb.com/d/', '//streamsb.net/play/')
+    if '//streamsb.com/' in page_url:
+        page_url = page_url.replace('//streamsb.com/e/', '//streamsb.net/play/').replace('//streamsb.com/d/', '//streamsb.net/play/')
+    elif '//streamsb.net/' in page_url:
+        page_url = page_url.replace('//streamsb.net/e/', '//streamsb.net/play/').replace('//streamsb.net/d/', '//streamsb.net/play/')
 
-    if '//tubesb.com/' in page_url:
+    elif '//cloudemb.com/' in page_url:
+        page_url = page_url.replace('//cloudemb.com/e/', '//streamsb.net/play/').replace('//cloudemb.com/d/', '//streamsb.net/play/')
+    elif '//tubesb.com/' in page_url:
         page_url = page_url.replace('//tubesb.com/e/', '//streamsb.net/play/').replace('//tubesb.com/d/', '//streamsb.net/play/')
+    elif '//embedsb.com/' in page_url:
+        page_url = page_url.replace('//embedsb.com/e/', '//streamsb.net/play/').replace('//embedsb.com/d/', '//streamsb.net/play/')
+    elif '//playersb.com/' in page_url:
+        page_url = page_url.replace('//playersb.com/e/', '//streamsb.net/play/').replace('//playersb.com/d/', '//streamsb.net/play/')
+    elif '//sbcloud1.com/' in page_url:
+        page_url = page_url.replace('//sbcloud1.com/e/', '//streamsb.net/play/').replace('//sbcloud1.com/d/', '//streamsb.net/play/')
     elif '//watchsb.com/' in page_url:
         page_url = page_url.replace('//watchsb.com/e/', '//streamsb.net/play/').replace('//watchsb.com/d/', '//streamsb.net/play/')
     elif '//viewsb.com/' in page_url:
         page_url = page_url.replace('//viewsb.com/e/', '//streamsb.net/play/').replace('//viewsb.com/d/', '//streamsb.net/play/')
-    elif '//sbfast.com/' in page_url:
-        page_url = page_url.replace('//sbfast.com/e/', '//streamsb.net/play/').replace('//sbfast.com/d/', '//streamsb.net/play/')
+    elif '//watchmo.icu/' in page_url:
+        page_url = page_url.replace('//watchmo.icu/e/', '//streamsb.net/play/').replace('//watchmo.icu/d/', '//streamsb.net/play/')
     elif '//sbfull.com/' in page_url:
         page_url = page_url.replace('//sbfull.com/e/', '//streamsb.net/play/').replace('//sbfull.com/d/', '//streamsb.net/play/')
     elif '//sbspeed.com/' in page_url:
         page_url = page_url.replace('//sbspeed.com/e/', '//streamsb.net/play/').replace('//sbspeed.com/d/', '//streamsb.net/play/')
+    elif '//streamsss.net/' in page_url:
+        page_url = page_url.replace('//streamsss.net/e/', '//streamsb.net/play/').replace('//streamsss.net/d/', '//streamsb.net/play/')
     elif '//sblanh.com/' in page_url:
         page_url = page_url.replace('//sblanh.com/e/', '//streamsb.net/play/').replace('//sblanh.com/d/', '//streamsb.net/play/')
     elif '//sbanh.com/' in page_url:
         page_url = page_url.replace('//sbanh.com/e/', '//streamsb.net/play/').replace('//sbanh.com/d/', '//streamsb.net/play/')
+    elif '//sbfast.com/' in page_url:
+        page_url = page_url.replace('//sbfast.com/e/', '//streamsb.net/play/').replace('//sbfast.com/d/', '//streamsb.net/play/')
+    elif '//sblongvu.com/' in page_url:
+        page_url = page_url.replace('//sblongvu.com/e/', '//streamsb.net/play/').replace('//sblongvu.com/d/', '//streamsb.net/play/')
+    elif '//sbchill.com/' in page_url:
+        page_url = page_url.replace('//sbchill.com/e/', '//streamsb.net/play/').replace('//sbchill.com/d/', '//streamsb.net/play/')
+    elif '//sbrity.com/' in page_url:
+        page_url = page_url.replace('//sbrity.com/e/', '//streamsb.net/play/').replace('//sbrity.com/d/', '//streamsb.net/play/')
+    elif '//sbhight.com/' in page_url:
+        page_url = page_url.replace('//sbhight.com/e/', '//streamsb.net/play/').replace('//sbhight.com/d/', '//streamsb.net/play/')
+    elif '//sbbrisk.com/' in page_url:
+        page_url = page_url.replace('//sbbrisk.com/e/', '//streamsb.net/play/').replace('//sbbrisk.com/d/', '//streamsb.net/play/')
 
     data = httptools.downloadpage(page_url).data
 
@@ -73,7 +98,7 @@ def get_video_url(page_url, url_referer=''):
         platformtools.dialog_notification('Cargando Streamsb', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
 
-        data = httptools.downloadpage(page_url).data
+        data = httptools.downloadpage(page_url, headers={'Referer': page_url}).data
 
     if not "text/javascript'>(eval" in data:
         media_url = scrapertools.find_single_match(str(data), 'sources:.*?file.*?"(.*?)"')
@@ -103,9 +128,10 @@ def get_video_url(page_url, url_referer=''):
                 extension = scrapertools.get_filename_from_url(video_url)[-4:]
                 if extension in ('.png`', '.jpg'): continue
 
-                if extension == '.mpd':
-                    video_urls.append(['mpd', url])
+                if extension == '.mpd': video_urls.append(['mpd', url])
                 else:
+                    if not sub: sub = 'mp4'
+
                     video_urls.append([sub, url])
 
     if not video_urls:
@@ -118,7 +144,7 @@ def get_video_url(page_url, url_referer=''):
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
-                    video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
+                    video_urls.append(['mp4', resuelto])
                     return video_urls
 
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)

@@ -49,8 +49,11 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('pelisplanet', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('pelisplanet', url, post=post, headers=headers).data
+
     return data
 
 
@@ -66,11 +69,25 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
+
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'genero/estrenos/' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
+
+    return itemlist
+
+
+def idiomas(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'idioma/castellano/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'idioma/latino/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulada', action = 'list_all', url = host + 'idioma/subtitulada/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'idioma/subtitulado/', text_color='moccasin' ))
 
     return itemlist
 
@@ -116,19 +133,7 @@ def generos(item):
     ]
 
     for opc, tit in opciones:
-        itemlist.append(item.clone( title=tit, url= host + 'genero/' + opc + '/', action = 'list_all' ))
-
-    return itemlist
-
-
-def idiomas(item):
-    logger.info()
-    itemlist = []
-
-    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'idioma/castellano/' ))
-    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'idioma/latino/' ))
-    itemlist.append(item.clone( title = 'Subtitulada', action = 'list_all', url = host + 'idioma/subtitulada/' ))
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'idioma/subtitulado/' ))
+        itemlist.append(item.clone( title=tit, url= host + 'genero/' + opc + '/', action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -141,7 +146,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1920, -1):
-        itemlist.append(item.clone( title = str(x), url= host + 'fecha-estreno/' + str(x) + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url= host + 'fecha-estreno/' + str(x) + '/', action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -164,13 +169,13 @@ def list_all(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, qlty, year, title, thumb in matches:
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a class="nextpostslink" rel="next" href="([^"]+)">')
+
         if next_page:
             itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', text_color='coral' ))
 
@@ -199,22 +204,24 @@ def findvideos(item):
 
         servidor = servidor.lower().strip()
 
-        if servidor == 'streamvips': continue
+        if url.startswith('ttps://') == True: continue
+        elif servidor == 'streamvips': continue
         elif servidor == 'ultrastream': continue
 
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-        elif '.mystream' in url: continue
-        elif '.rapidvideo' in url: continue
-        elif 'streamango.' in url: continue
-        elif 'openload.' in url: continue
 
-        if url.startswith('ttps://') == True: continue
+        elif '.mystream' in url: continue
 
         servidor = servertools.get_server_from_url(url)
+
         servidor = servertools.corregir_servidor(servidor)
 
-        if servidor:
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
+        if servertools.is_server_available(servidor):
+            if not servertools.is_server_enabled(servidor): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
 
     if not itemlist:
         if not ses == 0:
@@ -224,7 +231,7 @@ def findvideos(item):
     return itemlist
 
 
-def sub_search(item):
+def list_search(item):
     logger.info()
     itemlist = []
 
@@ -246,7 +253,7 @@ def search(item, texto):
         texto = texto.replace(" ", "+")
         item.url = host + 'search/' + texto +'/'
 
-        return sub_search(item)
+        return list_search(item)
     except:
         import sys
         for line in sys.exc_info():

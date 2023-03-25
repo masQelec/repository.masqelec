@@ -41,8 +41,10 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('ppeliculas', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('ppeliculas', url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
@@ -50,8 +52,11 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-                data = httptools.downloadpage_proxy('ppeliculas', url, post=post, headers=headers).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers).data
+                else:
+                    data = httptools.downloadpage_proxy('ppeliculas', url, post=post, headers=headers).data
         except:
             pass
 
@@ -145,7 +150,7 @@ def generos(item):
     ]
 
     for opc, tit in opciones:
-        itemlist.append(item.clone( title=tit, url= host + 'genre/' + opc + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title=tit, url= host + 'genre/' + opc + '/', action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -190,11 +195,9 @@ def list_all(item):
         if not year: year = '-'
 
         if '/pelicula/' in url:
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
         else:
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
-                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -235,11 +238,9 @@ def list_top(item):
         thumb = scrapertools.find_single_match(match, "src='(.*?)'")
 
         if '/pelicula/' in url:
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
         else:
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
-                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -252,7 +253,7 @@ def last_epis(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, 'recientemente</h2(.*?)</a></div></div>')
+    bloque = scrapertools.find_single_match(data, 'recientemente</h2(.*?)<div class="pagination">')
 
     i = 0
 
@@ -307,8 +308,14 @@ def temporadas(item):
 
     matches = scrapertools.find_multiple_matches(data, "<span class='se-t.*?'>(.*?)</span>")
 
+    tot_tempo = len(matches)
+
     for numtempo in matches:
-        title = 'Temporada ' + numtempo
+        nro_tempo = numtempo
+        if tot_tempo >= 10:
+            if int(numtempo) < 10: nro_tempo = '0' + numtempo
+
+        title = 'Temporada ' + nro_tempo
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
@@ -318,7 +325,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -390,6 +397,18 @@ def episodios(item):
     return itemlist
 
 
+def corregir_servidor(servidor):
+     logger.info()
+
+     servidor = servidor.lower()
+
+     servidor = servidor.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
+     servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.xx', '')
+     servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
+
+     return servidor
+	 
+
 def findvideos(item):
     logger.info()
     itemlist = []
@@ -425,41 +444,26 @@ def findvideos(item):
             qlty = qlty_lang
             lang = '?'
 
-        other = _server.lower()
-        other = other.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-        other = other.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.xx', '')
-        other = other.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
+        other = corregir_servidor(_server)
 
         if 'youtube' in other: continue
 
-        elif 'waaw' in other or 'hqq' in other or 'netu' in other: continue
-
-        elif 'powvideo' in other or 'pomvideo' in other: continue
-
-        elif 'openload' in other: continue
-        elif 'streamplay' in other: continue
-        elif 'rapidvideo' in other: continue
-        elif 'streamango' in other: continue
-        elif 'verystream' in other: continue
-        elif 'vidtodo' in other: continue
-        elif 'stormo' in other: continue
-        elif 'streamcherry' in other: continue
-        elif 'biter' in other: continue
+        if 'waaw' in other or 'hqq' in other or 'netu' in other: continue
 
         elif 'pepeliculas' in other: continue
-
-        elif 'uploaded' in other: continue
         elif 'earn4files' in other: continue
-        elif 'uploadrive' in other: continue
         elif 'uploadbuzz' in other: continue
-        elif 'mediafire' in other: continue
-        elif 'drive.google' in other: continue
-        elif 'fileflares' in other: continue
 
         if other == qlty: qlty = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url,
-                                                      other = other.capitalize(), language = lang, quality = qlty ))
+        servidor = servertools.corregir_servidor(other)
+
+        if servertools.is_server_available(other):
+            if not servertools.is_server_enabled(other): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url, other = other.capitalize(), language = lang, quality = qlty ))
 
     # ~ orden type
 
@@ -486,41 +490,26 @@ def findvideos(item):
             qlty = qlty_lang
             lang = '?'
 
-        other = _server.lower()
-        other = other.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-        other = other.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.sx', '')
-        other = other.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
+        other = corregir_servidor(_server)
 
         if 'youtube' in other: continue
 
-        elif 'waaw' in other or 'hqq' in other or 'netu' in other: continue
-
-        elif 'powvideo' in other or 'pomvideo' in other: continue
-
-        elif 'openload' in other: continue
-        elif 'streamplay' in other: continue
-        elif 'rapidvideo' in other: continue
-        elif 'streamango' in other: continue
-        elif 'verystream' in other: continue
-        elif 'vidtodo' in other: continue
-        elif 'stormo' in other: continue
-        elif 'streamcherry' in other: continue
-        elif 'biter' in other: continue
+        if 'waaw' in other or 'hqq' in other or 'netu' in other: continue
 
         elif 'pepeliculas' in other: continue
-
-        elif 'uploaded' in other: continue
         elif 'earn4files' in other: continue
-        elif 'uploadrive' in other: continue
         elif 'uploadbuzz' in other: continue
-        elif 'mediafire' in other: continue
-        elif 'drive.google' in other: continue
-        elif 'fileflares' in other: continue
 
         if other == qlty: qlty = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url,
-                                                      other = other.capitalize(), language = lang, quality = qlty ))
+        servidor = servertools.corregir_servidor(other)
+
+        if servertools.is_server_available(other):
+            if not servertools.is_server_enabled(other): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url, other = other.capitalize(), language = lang, quality = qlty ))
 
     # ~ Ver
 
@@ -535,43 +524,31 @@ def findvideos(item):
 
             if not tipo == 'Ver en línea': continue
 
-            servidor = domain.lower()
-            servidor = servidor.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.sx', '')
-            servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
+            servidor = corregir_servidor(domain)
 
-            servidor = servertools.corregir_servidor(servidor)
-
-            if 'waaw' in servidor or  'hqq' in servidor or 'netu' in servidor: continue
-
-            elif 'powvideo' in servidor or 'pomvideo' in servidor: continue
-
-            elif 'openload' in servidor: continue
-            elif 'streamplay' in servidor: continue
-            elif 'rapidvideo' in servidor: continue
-            elif 'streamango' in servidor: continue
-            elif 'verystream' in servidor: continue
-            elif 'vidtodo' in servidor: continue
-            elif 'stormo' in servidor: continue
-            elif 'streamcherry' in servidor: continue
-            elif 'biter' in servidor: continue
+            if 'waaw' in servidor or 'hqq' in servidor or 'netu' in servidor: continue
 
             elif 'pepeliculas' in servidor: continue
-
-            elif 'uploaded' in servidor: continue
             elif 'earn4files' in servidor: continue
-            elif 'uploadrive' in servidor: continue
             elif 'uploadbuzz' in servidor: continue
-            elif 'mediafire' in servidor: continue
-            elif 'drive.google' in servidor: continue
 
             if lang == 'Latino': lang = 'Lat'
             elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
             elif lang == 'Subtitulado' or lang == 'VOSE': lang = 'Vose'
             else: lang = '?'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, ref = item.url,
-                                                          other = 'v', language = lang, quality = qlty ))
+            servidor = servertools.get_server_from_url(url, disabled_servers=True)
+
+            if servidor is None: continue
+
+            servidor = servertools.corregir_servidor(servidor)
+
+            if servertools.is_server_available(servidor):
+                if not servertools.is_server_enabled(servidor): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, ref = item.url, other = 'v', language = lang, quality = qlty ))
 
     # ~ Descargas
 
@@ -586,52 +563,35 @@ def findvideos(item):
 
             if not tipo == 'Descarga': continue
 
-            servidor = domain.lower()
-            servidor = servidor.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-            servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.sx', '')
-            servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
-
-            servidor = servertools.corregir_servidor(servidor)
+            servidor = corregir_servidor(domain)
 
             if 'waaw' in servidor or 'hqq' in servidor or 'netu' in servidor: continue
 
-            elif 'powvideo' in servidor or 'pomvideo' in servidor: continue
-
-            elif 'openload' in servidor: continue
-            elif 'streamplay' in servidor: continue
-            elif 'rapidvideo' in servidor: continue
-            elif 'streamango' in servidor: continue
-            elif 'verystream' in servidor: continue
-            elif 'vidtodo' in servidor: continue
-            elif 'stormo' in servidor: continue
-            elif 'streamcherry' in servidor: continue
-            elif 'biter' in servidor: continue
-
             elif 'pepeliculas' in servidor: continue
-
-            elif 'uploaded' in servidor: continue
             elif 'earn4files' in servidor: continue
-            elif 'uploadrive' in servidor: continue
             elif 'uploadbuzz' in servidor: continue
-            elif 'mediafire' in servidor: continue
-            elif 'drive.google' in servidor: continue
-
-            elif '1fichier' in servidor: continue
-            elif 'ddownload' in servidor: continue
-            elif 'fastclick' in servidor: continue
             elif 'nitro.download' in servidor: continue
             elif 'multiup' in servidor: continue
-            elif 'fileflares' in servidor: continue
 
-            if servidor == 'filemoon': servidor = 'various'
+            elif servidor == 'filemoon': servidor = 'various'
 
             if lang == 'Latino': lang = 'Lat'
             elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
             elif lang == 'Subtitulado' or lang == 'VOSE': lang = 'Vose'
             else: lang = '?'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, ref = item.url,
-                                                          other = 'd', language = lang, quality = qlty ))
+            servidor = servertools.get_server_from_url(url, disabled_servers=True)
+
+            if servidor is None: continue
+
+            servidor = servertools.corregir_servidor(servidor)
+
+            if servertools.is_server_available(servidor):
+                if not servertools.is_server_enabled(servidor): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, ref = item.url, other = 'd', language = lang, quality = qlty ))
 
     if not itemlist:
         if not ses == 0:
@@ -648,7 +608,11 @@ def play(item):
     url = item.url
 
     if item.other == 'v' or item.other == 'd':
-        resp = httptools.downloadpage_proxy('ppeliculas', item.url, follow_redirects=False)
+        if not item.url.startswith(host):
+            resp = httptools.downloadpage(item.url, follow_redirects=False)
+        else:
+            resp = httptools.downloadpage_proxy('ppeliculas', item.url, follow_redirects=False)
+
         if 'location' in resp.headers: url = resp.headers['location']
 
     else:

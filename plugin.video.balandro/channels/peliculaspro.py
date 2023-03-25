@@ -46,8 +46,10 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -55,8 +57,11 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-                data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -120,7 +125,7 @@ def generos(item):
     for url, title in matches:
         if title == 'Estrenos': continue
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -203,7 +208,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, dpost = url, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, dpost = url, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -256,8 +261,7 @@ def episodios(item):
                     item.perpage = sum_parts
 
     for epis, title, url, in matches[item.page * item.perpage:]:
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -332,6 +336,7 @@ def play(item):
 
     if url.startswith('https://streamcrypt.net/'):
         url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
+
         if url:
             url = url.replace('?id=', '?p=2&id=')
             url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')

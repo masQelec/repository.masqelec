@@ -81,6 +81,9 @@ def generos(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     opciones = {
         'accion': 'Acción',
         'animacion': 'Animación',
@@ -105,7 +108,7 @@ def generos(item):
         }
 
     for opc in sorted(opciones):
-        itemlist.append(item.clone( title=opciones[opc], url=host + 'categoria/' + opc + '/', action='list_all' ))
+        itemlist.append(item.clone( title=opciones[opc], url=host + 'categoria/' + opc + '/', action='list_all', text_color = text_color ))
 
     return itemlist
 
@@ -114,11 +117,14 @@ def anios(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     from datetime import datetime
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1949, -1):
-        itemlist.append(item.clone( title = str(x), url = host + 'categoria/' + str(x) + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = host + 'categoria/' + str(x) + '/', action = 'list_all', text_color = text_color ))
 
     return itemlist
 
@@ -127,12 +133,12 @@ def calidades(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title='En 4K', url=host + 'categoria/4k-2/', action='list_all' ))
-    itemlist.append(item.clone( title='En BluRay', url=host + 'categoria/BluRay-1080p/', action='list_all' ))
-    itemlist.append(item.clone( title='En Dvd Rip', url=host + 'categoria/dvdrip/', action='list_all' ))
-    itemlist.append(item.clone( title='En HD Rip', url=host + 'categoria/HDRip-2/', action='list_all' ))
-    itemlist.append(item.clone( title='En Micro HD', url=host + 'categoria/MicroHD-1080p/', action='list_all' ))
-    itemlist.append(item.clone( title='En 3D', url=host + 'categoria/3D/', action='list_all' ))
+    itemlist.append(item.clone( title='En 4K', url=host + 'categoria/4k-2/', action='list_all', text_color='moccasin' ))
+    itemlist.append(item.clone( title='En BluRay', url=host + 'categoria/BluRay-1080p/', action='list_all', text_color='moccasin' ))
+    itemlist.append(item.clone( title='En Dvd Rip', url=host + 'categoria/dvdrip/', action='list_all', text_color='moccasin' ))
+    itemlist.append(item.clone( title='En HD Rip', url=host + 'categoria/HDRip-2/', action='list_all', text_color='moccasin' ))
+    itemlist.append(item.clone( title='En Micro HD', url=host + 'categoria/MicroHD-1080p/', action='list_all', text_color='moccasin' ))
+    itemlist.append(item.clone( title='En 3D', url=host + 'categoria/3D/', action='list_all', text_color='moccasin' ))
 
     return itemlist
 
@@ -304,8 +310,7 @@ def findvideos(item):
 
         other = peso.replace('&#8230;', '').strip()
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
-                              language = lang, quality = qlty, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, quality = qlty, other = other ))
 
     return itemlist
 

@@ -58,8 +58,11 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     url = url.replace('pelisplay.co/ver-peliculas', 'pelisplay.co/peliculas')
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpage_proxy('pelisplay', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('pelisplay', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
     return data
 
 
@@ -88,8 +91,9 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_pelis', url = host + 'peliculas', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_pelis', url = host + 'peliculas/estrenos', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Netflix', action = 'list_pelis', url = host + 'peliculas/netflix', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_pelis', url = host + 'peliculas?filtro=visitas', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Netflix', action = 'list_pelis', url = host + 'peliculas/netflix', search_type = 'movie', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -107,8 +111,9 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_series', url = host + 'series', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_series', url = host + 'series/estrenos', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Netflix', action = 'list_series', url = host + 'series/netflix', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_series', url = host + 'series?filtro=visitas', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Netflix', action = 'list_series', url = host + 'series/netflix', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -118,6 +123,9 @@ def mainlist_series(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     descartar_xxx = config.get_setting('descartar_xxx', default=False)
 
@@ -135,9 +143,9 @@ def generos(item):
         if descartar_xxx and scrapertools.es_genero_xxx(title): continue
 
         if item.search_type == 'movie':
-            itemlist.append(item.clone( action="list_pelis", title='%s (%s)' % (title, cantidad), url=url ))
+            itemlist.append(item.clone( action="list_pelis", title='%s (%s)' % (title, cantidad), url=url, text_color = text_color ))
         else:
-            itemlist.append(item.clone( action="list_series", title='%s (%s)' % (title, cantidad), url=url ))
+            itemlist.append(item.clone( action="list_series", title='%s (%s)' % (title, cantidad), url=url, text_color = text_color ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -167,8 +175,7 @@ def list_pelis(item):
 
         title = title.replace("&#039;", "'")
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, 
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -205,8 +212,7 @@ def list_series(item):
 
         title = title.replace("&#039;", "'")
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -239,7 +245,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = numtempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -345,8 +351,9 @@ def findvideos(item):
         if 'data-lang="Publicidad"' in enlace: continue
 
         tds = scrapertools.find_multiple_matches(enlace, '<td[^>]*>(.*?)</td>')
+
         if len(tds) != 6: continue
-        if 'data-player=' not in tds[0]: continue
+        elif 'data-player=' not in tds[0]: continue
 
         calidad = tds[1].capitalize()
         lang = tds[2]

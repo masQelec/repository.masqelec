@@ -90,7 +90,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=4', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=2', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=2', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=3', search_type = 'tvshow' ))
 
@@ -116,7 +116,7 @@ def categorias(item):
         url = '%s?order=%s' %(url_cat, categorie_id)
         title = title.strip()
 
-        itemlist.append(item.clone( action = "list_all", url = url, title = title))
+        itemlist.append(item.clone( action = "list_all", url = url, title = title, text_color='springgreen' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -134,7 +134,7 @@ def generos(item):
     for genre_id, title in matches:
         url = '%s?genres=%s' %(url_genre, genre_id)
 
-        itemlist.append(item.clone( action = "list_all", url = url, title = title))
+        itemlist.append(item.clone( action = "list_all", url = url, title = title, text_color='springgreen' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -151,7 +151,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, tope_year, -1):
-        itemlist.append(item.clone( title = str(x), url = '%s?year=%s' % (url_anio, str(x)), action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = '%s?year=%s' % (url_anio, str(x)), action = 'list_all', text_color='springgreen' ))
 
     return itemlist
 
@@ -343,7 +343,7 @@ def findvideos(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose' ))
 
     if not itemlist:
         if not ses == 0:

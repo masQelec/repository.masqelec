@@ -47,6 +47,31 @@ def mainlist_animes(item):
     return itemlist
 
 
+def categorias(item):
+    logger.info()
+    itemlist = []
+
+    url_cat = host + '/animes'
+
+    data = httptools.downloadpage(url_cat).data
+
+    bloque = scrapertools.find_single_match(data, '<select name="categoria">(.*?)</select>')
+
+    matches = re.compile('<option value="(.*?)">(.*?)</option>').findall(bloque)
+
+    for cat, title in matches:
+        title = title.strip()
+
+        if title == 'Categoría': continue
+        elif title == 'PREESTRENO': continue
+
+        url = host + '/animes?categoria=%s&genero=false&letra=false' % cat
+
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='moccasin' ))
+
+    return sorted(itemlist,key=lambda x: x.title)
+
+
 def generos(item):
     logger.info()
     itemlist = []
@@ -70,7 +95,7 @@ def generos(item):
 
         url = host + '/animes?categoria=false&genero=%s&fecha=false&letra=false' % gen
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -85,34 +110,9 @@ def anios(item):
     for x in range(current_year, 1951, -1):
         url = host + '/animes?categoria=false&genero=false&fecha=%s&letra=false' % str(x)
 
-        itemlist.append(item.clone( title = str(x), url = url, action='list_all' ))
+        itemlist.append(item.clone( title = str(x), url = url, action='list_all', text_color='springgreen' ))
 
     return itemlist
-
-
-def categorias(item):
-    logger.info()
-    itemlist = []
-
-    url_cat = host + '/animes'
-
-    data = httptools.downloadpage(url_cat).data
-
-    bloque = scrapertools.find_single_match(data, '<select name="categoria">(.*?)</select>')
-
-    matches = re.compile('<option value="(.*?)">(.*?)</option>').findall(bloque)
-
-    for cat, title in matches:
-        title = title.strip()
-
-        if title == 'Categoría': continue
-        elif title == 'PREESTRENO': continue
-
-        url = host + '/animes?categoria=%s&genero=false&letra=false' % cat
-
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
-
-    return sorted(itemlist,key=lambda x: x.title)
 
 
 def list_all(item):
@@ -144,8 +144,7 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
         if not thumb: thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                    infoLabels={'year': '-'}, contentType = 'tvshow', contentSerieName = SerieName ))
+        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, infoLabels={'year': '-'}, contentType = 'tvshow', contentSerieName = SerieName ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -250,8 +249,7 @@ def episodios(item):
 
         title = title.replace('Sub Español', '').strip()
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
-                                    contentType = 'episode', contentSeason = 1, contentEpisodeNumber=i ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=i ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -282,19 +280,26 @@ def findvideos(item):
         servidor = servidor.lower()
 
         if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
+
         elif servidor == 'puj': continue
 
         elif servidor == 'ok': servidor = 'okru'
         elif servidor == 'zeus': servidor = 'directo'
+        elif servidor == 'anonfile': servidor = 'anonfiles'
+        elif servidor == 'zippy': servidor = 'zippyshare'
+        elif servidor == 'drive': servidor = 'gvideo'
+        elif servidor == 'senvid': servidor = 'sendvid'
+
+        elif servidor == 'sbanh' or servidor == 'sblanh' or servidor == 'sbspeed' or servidor == 'sbchill' or servidor == 'sblongvu' or servidor == 'sbrity' or servidor == 'sbhight': servidor = 'streamsb'
 
         elif 'fembed' in servidor: servidor = 'fembed'
-        elif 'senvid' in servidor: servidor = 'sendvid'
-        elif 'drive' in servidor: servidor = 'gvideo'
-        elif 'anonfile' in servidor: servidor = 'anonfiles'
-        elif 'zippy' in servidor: servidor = 'zippyshare'
-        elif 'sblanh' in servidor: servidor = 'streamsb'
-        elif 'sblongvu' in servidor: servidor = 'streamsb'
-        elif 'sbchill' in servidor: servidor = 'streamsb'
+
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servertools.is_server_available(servidor):
+            if not servertools.is_server_enabled(servidor): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose' ))
 
@@ -308,12 +313,16 @@ def findvideos(item):
 
         srv = srv.lower().strip()
 
-        if srv == '1fichier': continue
-        elif srv == 'fireload': continue
-        elif srv == 'mediafire': continue
+        if srv == 'anonfile': srv = 'anonfiles'
+        elif srv == 'zippy': srv = 'zippyshare'
 
-        elif 'anonfile' in srv: srv = 'anonfiles'
-        elif 'zippy' in srv: srv = 'zippyshare'
+        elif srv == 'ok':
+          if '/mega.nz/' in url: srv = 'mega'
+
+        if servertools.is_server_available(srv):
+            if not servertools.is_server_enabled(srv): continue
+        else:
+           if not config.get_setting('developer_mode', default=False): continue
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url, language = 'Vose', other = 'D' ))
 

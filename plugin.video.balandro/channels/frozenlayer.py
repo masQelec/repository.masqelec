@@ -25,44 +25,37 @@ def mainlist_series(item):
         if actions.adults_password(item) == False:
             return itemlist
 
-    itemlist.append(item.clone( title = 'Buscar anime, ova, dorama, manga ...', action = 'search', search_type = 'tvshow', text_color = 'plum' ))
+    itemlist.append(item.clone( title = 'Buscar anime, ova, dorama, manga ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo general', action = 'list_all', url = host + '/descargas/detallada/bittorrent', search_type = 'tvshow' ))
 
     if not descartar_anime:
-        itemlist.append(item.clone( title = 'Animes:', folder=False, text_color='plum' ))
+        itemlist.append(item.clone( title = 'Animes:', folder=False, text_color='moccasin' ))
 
-        itemlist.append(item.clone( title = ' - Catálogo', action = 'list_lst', url = host + '/buscar/anime/tv?&categoria=tv&detallada=true',
-                                    search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - Catálogo', action = 'list_lst', url = host + '/buscar/anime/tv?&categoria=tv&detallada=true', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = ' - Estrenos', action = 'list_lst', url = host + '/animes/lista?sort=anio&direction=desc&detallada=true',
-                                    search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - Estrenos', action = 'list_lst', url = host + '/animes/lista?sort=anio&direction=desc&detallada=true', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = ' - Más valorados', action = 'list_lst', url = host + '/animes/lista?sort=rating&direction=desc&detallada=true',
-                                    search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - Más valorados', action = 'list_lst', url = host + '/animes/lista?sort=rating&direction=desc&detallada=true', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = ' - Películas', action = 'list_lst', url = host + '/buscar/anime/pelicula?&categoria=pelicula&detallada=true',
-                                    search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - [COLOR deepskyblue]Películas [/COLOR]', action = 'list_lst', url = host + '/buscar/anime/pelicula?&categoria=pelicula&detallada=true', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/anime',
-                                    search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/anime', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = ' - Por categoría', action = 'categorias', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = ' - Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Ovas:', folder=False, text_color='plum' ))
+        itemlist.append(item.clone( title = 'Ovas:', folder=False, text_color='moccasin' ))
 
-        itemlist.append(item.clone( title = ' - Catálogo', action = 'list_lst', url = host + '/buscar/anime/ova?&categoria=ova&detallada=true',
-                                    search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - Catálogo', action = 'list_lst', url = host + '/buscar/anime/ova?&categoria=ova&detallada=true', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/anime-OVA',
-                                    search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/anime-OVA', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Doramas:', folder=False, text_color='plum' ))
+    itemlist.append(item.clone( title = 'Doramas:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/dorama', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Mangas:', folder=False, text_color='plum' ))
+    itemlist.append(item.clone( title = 'Mangas:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/manga', search_type = 'tvshow' ))
 
     return itemlist
@@ -89,7 +82,7 @@ def categorias(item):
 
         url = host + url + '?&detallada=true'
 
-        itemlist.append(item.clone( title = title.capitalize(), action = 'list_lst', url = url ))
+        itemlist.append(item.clone( title = title.capitalize(), action = 'list_lst', url = url, text_color = 'hotpink' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -101,7 +94,7 @@ def alfabetico(item):
     for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0':
         url = host + '/animes/lista/letra/' + letra + '?&detallada=true'
 
-        itemlist.append(item.clone( title = letra, action = 'list_lst', url = url ))
+        itemlist.append(item.clone( title = letra, action = 'list_lst', url = url, text_color = 'hotpink' ))
 
     return itemlist
 
@@ -199,8 +192,7 @@ def list_lst(item):
 
             SerieName = SerieName.strip()
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': '-'} ))
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

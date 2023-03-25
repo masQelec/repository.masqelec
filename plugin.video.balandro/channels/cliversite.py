@@ -52,8 +52,10 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('cliversite', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('cliversite', url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
@@ -61,8 +63,11 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-                data = httptools.downloadpage_proxy('cliversite', url, post=post, headers=headers).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers).data
+                else:
+                    data = httptools.downloadpage_proxy('cliversite', url, post=post, headers=headers).data
         except:
             pass
 
@@ -128,6 +133,9 @@ def generos(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     url = host if item.search_type == 'movie' else host + '/series'
 
     data = do_downloadpage(url)
@@ -141,11 +149,11 @@ def generos(item):
 
         url = host + url
 
-        itemlist.append(item.clone( action="list_all", title=title, url=url, pagina = 1 ))
+        itemlist.append(item.clone( action="list_all", title=title, url=url, pagina = 1, text_color = text_color ))
 
     if itemlist:
         if item.search_type == 'movie':
-            itemlist.append(item.clone( action="list_all", title='Guerra', url=host + '/peliculas/genero/guerra', pagina = 1 ))
+            itemlist.append(item.clone( action="list_all", title='Guerra', url=host + '/peliculas/genero/guerra', pagina = 1, text_color = text_color ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -153,6 +161,9 @@ def generos(item):
 def anios(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     from datetime import datetime
     current_year = int(datetime.today().year)
@@ -164,7 +175,7 @@ def anios(item):
         if item.search_type == 'movie': url = host + '/peliculas/anio/' + str(ano)
         else: url = host + '/series/anio/' + str(ano)
 
-        itemlist.append(item.clone( action="list_all", title=str(ano), url=url, pagina = 1 ))
+        itemlist.append(item.clone( action="list_all", title=str(ano), url=url, pagina = 1, text_color = text_color ))
 
     return itemlist
 
@@ -279,7 +290,7 @@ def temporadas(item):
 
            title = 'Temporada ' + nro_temp
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -372,7 +383,7 @@ def episodios(item):
 
         for orden, url, tit, epi in tab_epis[item.page * item.perpage:]:
             itemlist.append(item.clone( action = 'findvideos', url = url, title = tit,
-                                    orden = orden, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
+                                        orden = orden, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
 
             if len(itemlist) >= item.perpage:
                 break
@@ -426,8 +437,7 @@ def findvideos(item):
                 if not link_other: continue
             else: link_other = ''
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  language = IDIOMAS.get(lang, lang), other = link_other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang), other = link_other ))
 
     if not itemlist:
         if not ses == 0:
@@ -508,7 +518,10 @@ def play(item):
 
                     vid = item.url.replace('https://apialfa.tomatomatela.club/sc/index.php', 'https://apialfa.tomatomatela.club/sc/r.php')
 
-                    data = httptools.downloadpage_proxy('cliversite', vid, post=post).data
+                    if not vid.startswith(host):
+                        data = httptools.downloadpage(vid, post=post).data
+                    else:
+                        data = httptools.downloadpage_proxy('cliversite', vid, post=post).data
 
                     url = scrapertools.find_single_match(data, '<meta name="og:url" content="(.*?)"')
 
@@ -527,8 +540,10 @@ def play(item):
                 post = {'url': fid}
 
                 try:
-                    # ~ new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
-                    new_url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                    if not vid.startswith(host):
+                        new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                    else:
+                        new_url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
                 except:
                     new_url = ''
 
@@ -540,8 +555,10 @@ def play(item):
 
                     if vid:
                         try:
-                            # ~ new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
-                            new_url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                            if not vid.startswith(host):
+                                new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                            else:
+                                new_url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
                         except:
                             new_url = ''
 
@@ -557,10 +574,13 @@ def play(item):
                         return itemlist
 
                 else:
+                    vid = 'https://apialfa.tomatomatela.club/ir/redirect_ddh.php'
 
                     try:
-                        # ~ url = httptools.downloadpage('https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
-                        url = httptools.downloadpage_proxy('cliversite', 'https://apialfa.tomatomatela.club/ir/redirect_ddh.php', post=post, follow_redirects=False).headers['location']
+                        if not vid.startswith(host):
+                            url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
+                        else:
+                            url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
                     except:
                         url = ''
 
@@ -581,9 +601,12 @@ def play(item):
 
         elif item.other == 'super':
             if '/pelisplay.ccplay?' in item.url:
-                resp = httptools.downloadpage(item.url)
-                if not resp.data:
-                    return itemlist
+                if not item.url.startswith(host):
+                    resp = httptools.downloadpage(item.url)
+                else:
+                    resp = httptools.downloadpage_proxy('cliversite', item.url)
+
+                if not resp.data: return itemlist
             else:
                 data = do_downloadpage(item.url)
 

@@ -9,6 +9,7 @@ from core import httptools, scrapertools, servertools, tmdb
 
 host = 'https://pelisencastellano.net/'
 
+
 perpage = 20
 
 
@@ -54,7 +55,7 @@ def generos(item):
     for url, tit in matches:
         if "#" in tit: continue
 
-        itemlist.append(item.clone( title = tit, url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -75,6 +76,7 @@ def list_all(item):
     for match in matches[item.page * perpage:]:
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
         title = scrapertools.find_single_match(match, '<div class="card-title">(.*?)</div>')
+
         if not url or not title: continue
 
         title = title.replace('Ver', '').replace('en (Castellano)', '').replace('en Castellano', '').replace('Online', '').strip()
@@ -87,8 +89,7 @@ def list_all(item):
 
         lang = 'Esp'
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb, languages = lang,
-                                    contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb, languages = lang, contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
         if len(itemlist) >= perpage: break
 
@@ -99,15 +100,16 @@ def list_all(item):
         if num_matches > perpage:
             hasta = (item.page * perpage) + perpage
             if hasta < num_matches:
-                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
+                itemlist.append(item.clone( title='Siguientes ...', page = item.page + 1, action = 'list_all', text_color='coral' ))
                 buscar_next = False
 
         if buscar_next:
             if '<div class="pagination">' in data:
                 next_url = scrapertools.find_single_match(data, "<span class=.*?is-.*?href='(.*?)'")
+
                 if next_url:
                     if '/page/' in next_url:
-                        itemlist.append(item.clone( title='Siguientes ...', url=next_url, page=0, action='list_all', text_color='coral' ))
+                        itemlist.append(item.clone( title='Siguientes ...', url = next_url, page = 0, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -124,7 +126,7 @@ def findvideos(item):
 
     qlty = scrapertools.find_single_match(data, '<strong>Calidad: </strong> (\d+)p<').strip()
 
-    outputs = scrapertools.find_single_match(data, 'var output = "(.*?)output ').replace('\\', '')
+    outputs = scrapertools.find_single_match(data, 'var output = "(.*?)output').replace('\\', '')
     outputs = outputs.split(';')
 
     onlines = scrapertools.find_single_match(data, '<div class="centradito"><script>[A-z0-9]+ \(([^\)]+)')
@@ -135,7 +137,7 @@ def findvideos(item):
 
         if 'href' in elem:
             href = scrapertools.find_single_match(elem, 'href="([^"]+)"')
-            if 'no.html'in href: continue
+            if 'no.html' in href: continue
 
             iden = scrapertools.find_single_match(elem, 'codigo(\d+)')
             if not iden: continue

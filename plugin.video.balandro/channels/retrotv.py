@@ -48,8 +48,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     return itemlist
@@ -58,6 +58,9 @@ def mainlist_series(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     data = httptools.downloadpage(host).data
    
@@ -68,7 +71,7 @@ def generos(item):
     for url, title in matches:
         title = title.replace('&amp;', '&')
 
-        itemlist.append(item.clone( action = "list_all", title = title, url = url ))
+        itemlist.append(item.clone( action = "list_all", title = title, url = url, text_color = text_color ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -83,7 +86,7 @@ def anios(item):
     current_year = current_year - 10
 
     for x in range(current_year, 1954, -1):
-        itemlist.append(item.clone( title = str(x), url = host + '?s=trfilter&trfilter=1&years%5B%5D=' + str(x), action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = host + '?s=trfilter&trfilter=1&years%5B%5D=' + str(x), action = 'list_all', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -97,7 +100,7 @@ def alfabetico(item):
 
         url = host + 'letter/' + letras + '/'
 
-        itemlist.append(item.clone( action = 'list_alfa', title = letra, url = url ))
+        itemlist.append(item.clone( action = 'list_alfa', title = letra, url = url, text_color = 'hotpink' ))
 
     return itemlist
 
@@ -191,8 +194,7 @@ def list_alfa(item):
         year = scrapertools.find_single_match(match, '<strong>.*?</td><td>Serie</td><td>(\d{4})</span>')
         if not year: year = '-'
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -262,7 +264,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -384,7 +386,7 @@ def findvideos(item):
 
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = link_other ))
 
-    # Descargas
+    # ~ Descargas
     matches = scrapertools.find_multiple_matches(data, '<span class="Num">(.*?)</tr>')
 
     for match in matches:

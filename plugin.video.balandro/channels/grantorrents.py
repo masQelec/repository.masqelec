@@ -15,7 +15,7 @@ host = 'https://grantorrent.lat/'
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://grantorrents.org/', 'https://grantorrents.pro/', 'https://grantorrent.co/',
              'https://grantorrent.plus/', 'https://grantorrent.uk/', 'https://grantorrent.win/',
-             'https://grantorrent.lat/', 'https://grantorrent.co/', 'https://www1.grantorrent.co/']
+             'https://grantorrent.co/', 'https://www1.grantorrent.co/']
 
 
 domain = config.get_setting('dominio', 'grantorrents', default='')
@@ -65,8 +65,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     if '/fechas/' in url: raise_weberror = False
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpage_proxy('grantorrents', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('grantorrents', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -154,6 +156,9 @@ def generos(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     data = do_downloadpage(host)
 
     bloque = scrapertools.find_single_match(data, '>GÉNEROS<(.*?)</ul>')
@@ -163,7 +168,7 @@ def generos(item):
     for url, title in matches:
         if 'Estrenos' in title: continue
 
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = text_color ))
 
     return itemlist
 
@@ -172,11 +177,14 @@ def anios(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     from datetime import datetime
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1949, -1):
-        itemlist.append(item.clone( title = str(x), url = host + 'fechas/' + str(x) + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = host + 'fechas/' + str(x) + '/', action = 'list_all', text_color = text_color ))
 
     return itemlist
 
@@ -223,7 +231,7 @@ def list_all(item):
             if ' castellano ' in title: title = title.replace(' castellano ', '').strip()
             if 'HD' in title: title = title.replace('HD', '').strip()
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages = lang,
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages=lang,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
         elif '/temporadas/' in url:
@@ -237,9 +245,8 @@ def list_all(item):
             tempo = scrapertools.find_single_match(url, '-temporada-(.*?)-')
             if not tempo: tempo = 1
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, languages = lang,
-                                        contentSerieName = SerieName, contentType = 'season', contentSeason = tempo,
-                                        infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, languages=lang,
+                                        contentSerieName = SerieName, contentType = 'season', contentSeason = tempo, infoLabels={'year': year} ))
 
         else:
             if " castellano" in title: titulo = title.split(" castellano")[0]
@@ -248,7 +255,7 @@ def list_all(item):
             if ' castellano ' in title: title = title.replace(' castellano ', '').strip()
             if 'HD' in title: title = title.replace('HD', '').strip()
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = lang,
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang,
                                         contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -282,7 +289,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -367,8 +374,7 @@ def findvideos(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, quality, peso in matches:
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
-                              language = lang, quality = quality, other = peso ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, quality = quality, other = peso ))
 
     return itemlist
 
@@ -383,8 +389,10 @@ def play(item):
         new_url = scrapertools.find_single_match(item.url, "&urlb64=(.*?)$")
         url = base64.b64decode(new_url).decode("utf-8")
 
-        # ~ url = httptools.downloadpage(url, follow_redirects=False).headers['location']
-        url = httptools.downloadpage_proxy('grantorrents', url, follow_redirects=False).headers['location']
+        if not url.startswith(host):
+            url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+        else:
+            url = httptools.downloadpage_proxy('grantorrents', url, follow_redirects=False).headers['location']
 
     if not item.url.endswith('.torrent'):
         host_torrent = host[:-1]
@@ -404,9 +412,11 @@ def play(item):
 
         url = url.replace('https://vk.com/away.php?to=', '').strip()
 
-        if '/grantorrents.pro/' in url: url = url.replace('https://grantorrents.pro/', host)
+        # ~ por si viene de enlaces antiguos en la web
+        for ant in ant_hosts:
+            url = url.replace(ant, host)
 
-        elif '/dl.grantorrents.com/' in url: url = url.replace('/dl.grantorrents.com/', '/dl.grantorrent.lat/')
+        if '/dl.grantorrents.com/' in url: url = url.replace('/dl.grantorrents.com/', '/dl.grantorrent.lat/')
 
         itemlist.append(item.clone( url = url, server = 'torrent' ))
 

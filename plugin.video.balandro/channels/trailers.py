@@ -58,8 +58,7 @@ def list_all(item):
 
         thumb = re.sub('/(\d+)_th.jpg', '/f\\1.jpg', thumb)
 
-        itemlist.append(item.clone( action = 'findvideos', title = titulo, url = url, thumbnail = thumb, search_type = 'movie',
-                                    contentTitle = title, infoLabels = {'plot': plot} ))
+        itemlist.append(item.clone( action = 'findvideos', title = titulo, url = url, thumbnail = thumb, search_type = 'movie', contentTitle = title, infoLabels = {'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 

@@ -56,7 +56,7 @@ def generos(item):
     for valor, title in matches:
         url = host + 'anime/' + '?genre%5B%5D=' + valor + '&status=&type=&sub=&order='
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
 
     return itemlist
 
@@ -82,8 +82,7 @@ def list_all(item):
         titulo = title.replace('(Pelicula)', '').replace('(Sub Español)', '').replace('(Audio Latino)', '').replace('Audio castellano', '').strip()
 
         if '/pelicula/' in url:
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                        contentType='movie', contentTitle=titulo, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=titulo, infoLabels={'year': '-'} ))
         else:
             SerieName = titulo
 
@@ -92,8 +91,7 @@ def list_all(item):
 
             SerieName = SerieName.strip()
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -222,7 +220,7 @@ def findvideos(item):
             other = ''
             if servidor == 'directo': other = url
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose', other = other ))
 
     if not itemlist:
         if not ses == 0:

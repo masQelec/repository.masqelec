@@ -16,7 +16,7 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://seriespapaya.club/'
 
 
-# ~ 23/5/2022 Solo funciona TODO en k19 el resto hay enlaces q si y otros que no
+# ~ 23/5/2022 Solo funciona TODO en k19 el resto hay enlaces que si y otros que no
 
 notification_d_ok = config.get_setting('notification_d_ok', default=True)
 
@@ -55,17 +55,21 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, headers=None):
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://seriespapaya.xyz/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    if '&years%5B%5D=' in url: raise_weberror=False
+
     headers = {'Referer': host}
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -73,8 +77,11 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-                data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -135,6 +142,9 @@ def generos(item):
     logger.info()
     itemlist=[]
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     opciones = [
         ('Acción', 'accion'),
         ('Aventura', 'aventura'),
@@ -163,7 +173,7 @@ def generos(item):
         if item.search_type == 'tvshow': url = url + '?tr_post_type=2'
         else: url = url + '?tr_post_type=1'
 
-        itemlist.append(item.clone( title = tit, action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = tit, action = 'list_all', url = url, text_color = text_color ))
 
     return itemlist
 
@@ -171,6 +181,9 @@ def generos(item):
 def anios(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     from datetime import datetime
     current_year = int(datetime.today().year)
@@ -184,7 +197,27 @@ def anios(item):
         if item.search_type == 'tvshow': url = url + '&tr_post_type=2'
         else: url = url + '&tr_post_type=1'
 
-        itemlist.append(item.clone( title = str(x), action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = str(x), action = 'list_all', url = url, text_color = text_color ))
+
+    return itemlist
+
+
+def alfabetico(item):
+    logger.info()
+    itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
+    for letra in '0ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        title = '0-9' if letra == '0' else letra
+
+        url = host + 'letter/' + title  + '/'
+
+        if item.search_type == 'tvshow': url = url + '?tr_post_type=2'
+        else: url = url + '?tr_post_type=1'
+
+        itemlist.append(item.clone( action='por_letra', title = title, url = url, text_color = text_color ))
 
     return itemlist
 
@@ -246,23 +279,6 @@ def list_all(item):
     return itemlist
 
 
-def alfabetico(item):
-    logger.info()
-    itemlist = []
-
-    for letra in '0ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-        title = '0-9' if letra == '0' else letra
-
-        url = host + 'letter/' + title  + '/'
-
-        if item.search_type == 'tvshow': url = url + '?tr_post_type=2'
-        else: url = url + '?tr_post_type=1'
-
-        itemlist.append(item.clone( action='por_letra', title = title, url = url ))
-
-    return itemlist
-
-
 def por_letra(item):
     logger.info()
     itemlist = []
@@ -288,13 +304,11 @@ def por_letra(item):
         if item.search_type == 'movie':
             if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb, contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
         else:
             if item.search_type == 'movie': continue
 
-            itemlist.append(item.clone( action = 'temporadas', url= url, title = title, thumbnail = thumb,
-                                        contentType = 'tvshow', contentSerieName = title,  infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'temporadas', url= url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title,  infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -343,7 +357,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = season, sin_epis = sin_epis ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = season, sin_epis = sin_epis, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -494,15 +508,13 @@ def findvideos(item):
 
                  url = servertools.normalize_url(servidor, link)
 
-                 itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = 'Paste',
-                                                language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
+                 itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = 'Paste', language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
 
              continue
 
         servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                       language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
+        itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
 
     # ~ Descargas
     if 'data-tplayernv="Opt' in data:
@@ -535,8 +547,7 @@ def findvideos(item):
 
                     url = servertools.normalize_url(servidor, link)
 
-                    itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = 'Paste',
-                                                   language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
+                    itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = 'Paste', language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
 
                 continue
 
@@ -551,8 +562,7 @@ def findvideos(item):
             if url:
                 url= url.replace('&amp;#038;', '&').replace('&amp;', '&')
 
-                itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                     language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
+                itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang), quality = quality.upper(), quality_num = puntuar_calidad(quality) ))
 
     if not itemlist:
         if not ses == 0:
@@ -573,15 +583,20 @@ def play(item):
 
         url = ''
 
-        # ~ resp = httptools.downloadpage(item.url, follow_redirects=False, headers=headers)
-        resp = httptools.downloadpage_proxy('seriespapayaxyz', item.url, follow_redirects=False, headers=headers)
-        if 'location' in resp.headers: 
-            url = resp.headers['location']
+        if not item.url.startswith(host):
+            resp = httptools.downloadpage(item.url, follow_redirects=False, headers=headers)
+        else:
+            resp = httptools.downloadpage_proxy('seriespapayaxyz', item.url, follow_redirects=False, headers=headers)
+
+        if 'location' in resp.headers: url = resp.headers['location']
 
         if not url:
             headers = {'Referer': host, 'Connection': 'keep-alive'}
-            # ~ data = httptools.downloadpage(item.url, headers=headers).data
-            data = httptools.downloadpage_proxy('seriespapayaxyz', item.url, headers=headers).data
+
+            if not item.url.startswith(host):
+                data = httptools.downloadpage(item.url, headers=headers).data
+            else:
+                data = httptools.downloadpage_proxy('seriespapayaxyz', item.url, headers=headers).data
 
             url = scrapertools.find_single_match(data, 'src="(.*?)"')
             if not url: url = scrapertools.find_single_match(data, 'SRC="(.*?)"')
@@ -596,11 +611,18 @@ def play(item):
         ouo_code = item.url.replace('https://ouo.io/go/', '')
         headers = {'Referer': item.url.replace('/go/', '/')}
 
-        data = httptools.downloadpage(item.url).data
+        if not item.url.startswith(host):
+            data = httptools.downloadpage(item.url).data
+        else:
+            data = httptools.downloadpage_proxy('seriespapayaxyz', item.url).data
 
         _action, _id, _token = scrapertools.find_single_match(data, '<form method="POST" action="(.*?)".*?id="(.*?)".*?name="_token" type="hidden" value="(.*?)"')
         post = {'action': _action, 'id': _id, '_token': _token }
-        datos_post = httptools.downloadpage(item.url, post = post, headers = headers).data
+
+        if not item.url.startswith(host):
+            datos_post = httptools.downloadpage(item.url, post = post, headers = headers).data
+        else:
+            datos_post = httptools.downloadpage_proxy('seriespapayaxyz', item.url, post = post, headers = headers).data
 
         try:
            _action2, _id2, _token2 = scrapertools.find_single_match(datos_post, '<form method="POST" action="(.*?)".*?id="(.*?)".*?name="_token" type="hidden" value="(.*?)"')
@@ -616,7 +638,10 @@ def play(item):
  
         post = {'action': _action, 'id': _id, '_token': _token }
 
-        url = httptools.downloadpage(item.url, post = post, headers = headers, follow_redirects=False, only_headers=True).headers.get('location', '')
+        if not item.url.startswith(host):
+            url = httptools.downloadpage(item.url, post = post, headers = headers, follow_redirects=False, only_headers=True).headers.get('location', '')
+        else:
+            url = httptools.downloadpage_proxy('seriespapayaxyz', item.url, post = post, headers = headers, follow_redirects=False, only_headers=True).headers.get('location', '')
 
         if url:
             if url.startswith('//') == True: url = 'https:' + url
@@ -626,6 +651,7 @@ def play(item):
 
             if servidor:
                 url = servertools.normalize_url(servidor, url)
+
                 itemlist.append(item.clone(url = url, server = servidor))
 
     elif item.other == 'Paste':
@@ -635,7 +661,10 @@ def play(item):
         itemlist.append(item.clone(url = item.url, server = servidor))
 
     else:
-        data = httptools.downloadpage(item.url).data
+        if not item.url.startswith(host):
+            data = httptools.downloadpage(item.url).data
+        else:
+            data = httptools.downloadpage_proxy('seriespapayaxyz', item.url).data
 
         new_url = scrapertools.find_single_match(data, "location.href='([^']+)")
         if new_url:

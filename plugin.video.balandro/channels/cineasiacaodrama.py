@@ -53,13 +53,13 @@ def list_all(item):
         if 'Audio Latino' in titulo:  titulo = titulo.split('Audio Latino')[0]
         if 'y subtitulada' in titulo:  titulo = titulo.split('y subtitulada')[0]
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                    contentType='tvshow', contentSerieName=titulo, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=titulo, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, "<span class='current'>" + '.*?href="(.*?)"')
+
         if next_page:
             itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
 
@@ -153,8 +153,7 @@ def episodios(item):
 
     if itemlist:
         if len(matches) > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page=item.page + 1, perpage = item.perpage,
-                                        text_color='coral', orden = '10000' ))
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page=item.page + 1, perpage = item.perpage, text_color='coral', orden = '10000' ))
 
     return sorted(itemlist, key=lambda i: i.orden)
 
@@ -163,7 +162,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Castellano': 'Esp', 'Spanish': 'Vose', 'Latino': 'Lat', 'Subtitulado': 'Vose', 'Subitulado': 'Vose'}
+    IDIOMAS = {'Castellano': 'Esp', 'Spanish': 'Vose', 'Latino': 'Lat', 'Subtitulado': 'Vose', 'Subitulado': 'Vose', 'English': 'Ing'}
 
     data = do_downloadpage(item.url)
 

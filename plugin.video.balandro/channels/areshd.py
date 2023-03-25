@@ -66,10 +66,11 @@ def generos(item):
     for url, title in matches:
         url = host[:-1] + url
 
-        itemlist.append(item.clone( title = title.capitalize(), action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = title.capitalize(), action = 'list_all', url = url, text_color = 'deepskyblue' ))
 
     if itemlist:
-        itemlist.append(item.clone( title = 'Documental', action = 'list_all', url = host + 'genero/documental' ))
+        itemlist.append(item.clone( title = 'Documental', action = 'list_all', url = host + 'genero/documental', text_color = 'deepskyblue' ))
+        itemlist.append(item.clone( title = 'Western', action = 'list_all', url = host + 'genero/western', text_color = 'deepskyblue' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -149,7 +150,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -263,8 +264,7 @@ def findvideos(item):
              if 'youtube' in srv: continue
              elif 'waaw' in srv or 'hqq' in srv or 'netu' in srv: continue
 
-             itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link,
-                                   language = lang, other = srv.capitalize() ))
+             itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, language = lang, other = srv.capitalize() ))
 
          i += 1
 

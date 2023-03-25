@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Filemoon,  Mvidoo,  Ninjastream,  Rutube,  Streamhide,  Streamhub,  Tubeload,  Uploadever,  Videovard,  Videowood,  Yandex)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Filemoon,  Mvidoo,  Ninjastream,  Rutube,  Streamhub,  Tubeload,  Uploadever,  Videovard,  Videowood,  Yandex)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -49,7 +49,31 @@
         "url": "\\1"
       },
       {
+        "pattern": "(https://filemoon.in/(?:e|d|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://filemoon.nl/(?:e|d|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://filemoon.wf/(?:e|d|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://filemoon.eu/(?:e|d|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://filemoon.art/(?:e|d|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
         "pattern": "(https://filemoon.link/(?:e|d|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://filemoon.top/(?:e|d|)/[A-z0-9]+)",
         "url": "\\1"
       },
       {
@@ -61,19 +85,19 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://streamhub.to/watch/[A-z0-9]+)",
-        "url": "\\1"
-      },
-      {
-        "pattern": "(https://streamhide.to/(?:e|d|w)/[A-z0-9]+)",
-        "url": "\\1"
-      },
-      {
         "pattern": "(https://uploadever.(?:com|in)/[A-z0-9]+)",
         "url": "\\1"
       },
       {
         "pattern": "(?:videowood.tv)/(?:embed/|video/)([0-9a-z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://streamhub.to(?:/e|)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://streamhub.to/watch/[A-z0-9]+)",
         "url": "\\1"
       }
     ]

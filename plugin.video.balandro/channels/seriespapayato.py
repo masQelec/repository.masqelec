@@ -55,7 +55,7 @@ def generos(item):
 
         title = title.replace('&amp;', '&').strip()
 
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'hotpink' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -69,9 +69,9 @@ def alfabetico(item):
 
         url = host + 'letra/' + letras + '/'
 
-        itemlist.append(item.clone( action = 'list_letra', title = letra, url = url ))
+        itemlist.append(item.clone( action = 'list_letra', title = letra, url = url, text_color = 'hotpink' ))
 
-    itemlist.append(item.clone(action = "list_letra", url = host + 'letra/0-9/', title = '0-9'))
+    itemlist.append(item.clone(action = "list_letra", url = host + 'letra/0-9/', title = '0-9', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -97,8 +97,7 @@ def list_all(item):
         year = scrapertools.find_single_match(match, ' <span class="Date">(.*?)</span>')
         if not year: year = '-'
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -132,8 +131,7 @@ def list_letra(item):
         year = scrapertools.find_single_match(match, ' <td>Serie.*?<td>(.*?)</td>')
         if not year: year = '-'
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -167,7 +165,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -266,8 +264,7 @@ def findvideos(item):
 
         url = host + '?trembed=' + data_key + '&trid=' + data_id + '&trtype=2'
 
-        itemlist.append(Item(channel = item.channel, action = 'play', server='directo', title = '', url = url,
-                                                     language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = other ))
+        itemlist.append(Item(channel = item.channel, action = 'play', server='directo', title = '', url = url, language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = other ))
 
     return itemlist
 

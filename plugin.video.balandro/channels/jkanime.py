@@ -34,15 +34,15 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host, search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'genero/latino/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'tipo/ova/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'tipo/pelicula/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'tipo/pelicula/', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
@@ -63,7 +63,7 @@ def generos(item):
         elif title == "Ovas": continue
         elif title == "Peliculas": continue
 
-        itemlist.append(item.clone( action = "list_all", title = title, url = host[:-1] + url))
+        itemlist.append(item.clone( action = "list_all", title = title, url = host[:-1] + url, text_color='springgreen' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -77,7 +77,7 @@ def alfabetico(item):
     matches = re.compile('li><a class="letra-link" href="([^"]+)".*?">([^<]+)').findall(data)
 
     for url, title in matches:
-        itemlist.append(item.clone( action = "list_all", title = title, url = host[:-1] + url))
+        itemlist.append(item.clone( action = "list_all", title = title, url = host[:-1] + url, text_color='springgreen' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -110,13 +110,11 @@ def list_all(item):
 
                 SerieName = SerieName.strip()
 
-                itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                            contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-'} ))
+                itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-'} ))
             else:
                 url = url + 'pelicula/'
 
-                itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                            contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+                itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
             if len(itemlist) >= perpage: break
 
@@ -132,6 +130,7 @@ def list_all(item):
 
         if buscar_next:
             next_url = scrapertools.find_single_match(data, '<a class="text nav-next".*?href="(.*?)".*?">Resultados')
+
             if next_url:
                 itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
 
@@ -161,8 +160,7 @@ def list_last(item):
 
         SerieName = SerieName.strip()
 
-        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-'} ))
+        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -260,8 +258,7 @@ def episodios(item):
 
                url = item.url + nro
 
-               itemlist.append(item.clone( action='findvideos', url = url, title = title,
-                                           contentType = 'episode', contentSeason = 1, contentEpisodeNumber=nro ))
+               itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=nro ))
     except:
        url = host + 'ajax/pagination_episodes/%s/%s/' %(id_serie, str(item.page))
        data = httptools.downloadpage(url).data
