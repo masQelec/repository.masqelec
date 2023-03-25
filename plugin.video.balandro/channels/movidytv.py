@@ -50,8 +50,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
         headers = {'Referer': url}
         raise_weberror = False
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpage_proxy('movidytv', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('movidytv', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
@@ -59,8 +61,11 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-                data = httptools.downloadpage_proxy('movidytv', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage_proxy('movidytv', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -85,7 +90,7 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='goldenrod' ))
+    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
     itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'actor', search_type = 'person',
                                 plot = 'Debe indicarse el nombre y apellido/s del intérprete. Separando estos por un guión'))
@@ -143,6 +148,9 @@ def generos(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     genres = [
        'Acción',
        'Animación',
@@ -179,7 +187,7 @@ def generos(item):
 
         url = url_gen + genre + '&estreno[]='
 
-        itemlist.append(item.clone( action = "list_all", title = genre, url = url ))
+        itemlist.append(item.clone( action = "list_all", title = genre, url = url, text_color = text_color ))
 
     return itemlist
 
@@ -187,6 +195,9 @@ def generos(item):
 def anios(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     from datetime import datetime
     current_year = int(datetime.today().year)
@@ -200,7 +211,7 @@ def anios(item):
     for x in range(current_year, limit_year, -1):
         url = url_any + '&estreno[]=' + str(x)
 
-        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = text_color ))
 
     return itemlist
 
@@ -274,6 +285,7 @@ def list_all(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]*>Pagina siguiente')
+
         if next_page:
             next_page = next_page.replace('#038;', '')
             if '/page/' in next_page:
@@ -301,7 +313,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -326,8 +338,7 @@ def episodios(item):
          bloque = scrapertools.find_single_match(data, '<div class="season temporada-' + str(item.contentSeason) + '(.*?)' + final)
     else:
          bloque = scrapertools.find_single_match(data, '<div class="season temporada-' + str(item.contentSeason) + '(.*?)<div class="season temporada-')
-         if not bloque:
-             bloque = scrapertools.find_single_match(data, '<div class="season temporada-' + str(item.contentSeason) + '(.*?)' + final)
+         if not bloque: bloque = scrapertools.find_single_match(data, '<div class="season temporada-' + str(item.contentSeason) + '(.*?)' + final)
 
     patron = '<a href="(.*?)".*?data-echo="(.*?)".*?<h2>(.*?)</h2>.*?<span>(.*?)</span>.*?<span>(.*?)</span>'
 
@@ -406,6 +417,7 @@ def corregir_servidor(servidor):
 
     if servidor == 'pro': return 'fembed'
     if servidor in ['beta', 'bot', 'soap']: return 'directo'
+
     return servidor
 
 
@@ -443,7 +455,6 @@ def findvideos(item):
         elif 'subtitulado' in opt: lang = 'Vose'
         elif 'ingles' in opt: lang = 'VO'
 
-        servidor = servidor.lower()
         servidor = corregir_servidor(servidor)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url,
@@ -462,6 +473,7 @@ def findvideos(item):
         url = host[:-1] + url
 
         servidor = servidor.split('.', 1)[0]
+
         servidor = corregir_servidor(servidor)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url,
@@ -483,6 +495,7 @@ def findvideos(item):
         elif '/mixloads.' in url: continue
 
         servidor = servidor.split('.', 1)[0]
+
         servidor = corregir_servidor(servidor)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, referer = item.url,

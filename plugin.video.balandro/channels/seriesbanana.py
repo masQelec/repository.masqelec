@@ -44,7 +44,7 @@ def generos(item):
     for url, title in matches:
         title = title.replace('&#038;', '&').strip()
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, genre = title ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, genre = title, text_color = 'hotpink' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -66,8 +66,7 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
         thumb if thumb.startswith('http') else "https:" + thumb
 
-        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
-                                    contentType = 'tvshow', contentSerieName = title,  infoLabels = {'year': '-'} ))
+        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title,  infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -101,7 +100,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = season ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = season, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -221,8 +220,7 @@ def findvideos(item):
            servidor = servertools.get_server_from_url(url)
            servidor = servertools.corregir_servidor(servidor)
 
-           itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                language = IDIOMAS.get(lang,lang), other = other ))
+           itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang,lang), other = other ))
 
     return itemlist
 

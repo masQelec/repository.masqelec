@@ -63,8 +63,13 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('cinecalidad', url, post=post, headers=headers).data
+    raise_weberror = True
+    if '/fecha/' in url: raise_weberror = False
+
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('cinecalidad', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -119,17 +124,18 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='aquamarine' ))
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'espana/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'espana/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='aquamarine' ))
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'estrenos/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'peliculas-populares/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + '4k/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Estrenos', action = 'list_all', url = host + 'estrenos/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Más populares', action = 'list_all', url = host + 'peliculas-populares/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + '4k/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie' ))
 
     return itemlist
 
@@ -148,7 +154,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series-populares/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes/', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'tvshow' ))
 
@@ -158,6 +164,9 @@ def mainlist_series(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     opciones = [
         ('accion','Acción'),
@@ -187,7 +196,22 @@ def generos(item):
     url_gen = host + 'categoria/'
 
     for opc, tit in opciones:
-        itemlist.append(item.clone( title = tit, url = url_gen + opc + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title = tit, url = url_gen + opc + '/', action = 'list_all', text_color = text_color ))
+
+    return itemlist
+
+
+def anios(item):
+    logger.info()
+    itemlist = []
+
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 1969, -1):
+        url = host + 'fecha/' + str(x) + '/'
+
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -207,8 +231,7 @@ def list_all(item):
 
     for match in matches:
         title = scrapertools.find_single_match(match, '<h2>.*?">(.*?)</h2>')
-        if not title:
-            title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+        if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
@@ -225,6 +248,10 @@ def list_all(item):
             year = m.group(2)
         else:
             year = '-'
+
+        if year == '-': year = scrapertools.find_single_match(match, '6px;">(.*?)</div>')
+
+        if not year: year = '-'
 
         title = title.replace('&#8211;', '')
 
@@ -257,6 +284,7 @@ def list_all(item):
 
     if itemlist:
         next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers".*?href="(.*?)"')
+
         if next_page_link:
             itemlist.append(item.clone( title='Siguientes ...', url = next_page_link, action = 'list_all', text_color='coral' ))
 
@@ -327,7 +355,7 @@ def temporadas(item):
             return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0, data_serie = data_serie,
-                                    contentType = 'season', contentSeason = tempo ))
+                                    contentType = 'season', contentSeason = tempo, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -460,43 +488,38 @@ def findvideos(item):
             servidor = servidor.lower().strip()
 
             if servidor == "trailer": continue
+
             elif servidor == 'veri': continue
             elif servidor == 'netu': continue
             elif servidor == 'player': continue
             elif servidor == 'vip': continue
 
-            elif servidor == 'gounlimited': continue
-            elif servidor == 'jetload': continue
-            elif servidor == '1fichier': continue
-            elif servidor == 'turbobit': continue
-            elif servidor == 'mediafire': continue
-            elif servidor == 'google': continue
-            elif servidor == 'google drive': continue
-
             elif servidor == 'latmax': servidor = 'fembed'
-            elif servidor == 'maxplay': servidor = 'voe'
-            elif servidor == 'ccplay': servidor = 'streamsb'
-
-            elif servidor == 'doos': servidor = 'doodstream'
-            elif servidor == 'dood': servidor = 'doodstream'
-
-            elif servidor == 'ok': servidor = 'okru'
-
-            elif servidor == 'sbanh' or servidor == 'sblanh': servidor = 'streamsb'
-            elif servidor == 'sbspeed' or servidor == 'sbchill' or servidor == 'sbrity' or servidor == 'sbhight': servidor = 'streamsb'
-
             elif 'fembedhd' in servidor: servidor = 'fembed'
             elif 'femlat' in servidor: servidor = 'fembed'
 
-            elif 'doostream' in servidor: servidor = 'doodstream'
             elif 'voesx' in servidor: servidor = 'voe'
+            elif servidor == 'maxplay': servidor = 'voe'
+
+            elif servidor == 'doos' or servidor == 'dood': servidor = 'doodstream'
+            elif 'doostream' in servidor: servidor = 'doodstream'
+
+            elif servidor == 'ok': servidor = 'okru'
+
+            elif servidor == 'google drive': servidor = 'gvideo'
+
+            elif servidor == 'sbanh' or servidor == 'sblanh' or servidor == 'sbspeed' or servidor == 'sbchill' or servidor == 'sblongvu' or servidor == 'sbrity' or servidor == 'sbhight' or servidor == 'sbbrisk': servidor = 'streamsb'
+            elif servidor == 'ccplay': servidor = 'streamsb'
             elif 'watchsb' in servidor: servidor = 'streamsb'
-            elif 'sblongvu' in servidor: servidor = 'streamsb'
+
+            if servertools.is_server_available(servidor):
+                if not servertools.is_server_enabled(servidor): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
 
             qlty = '1080'
 
-            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', data_url = data_url, data_lmt = data_lmt,
-                                  quality = qlty, language = lang ))
+            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', data_url = data_url, data_lmt = data_lmt, quality = qlty, language = lang ))
 
     hay_descargas = False
 
@@ -522,24 +545,26 @@ def findvideos(item):
                servidor = servidor.replace('4k', '').replace('4K', '').strip()
 
             if servidor == "subtítulos" or servidor == 'subtitulos': continue
+
             elif servidor == 'veri': continue
             elif servidor == 'netu': continue
-            elif servidor == 'gounlimited': continue
-            elif servidor == 'jetload': continue
-            elif servidor == '1fichier': continue
-            elif servidor == 'turbobit': continue
-            elif servidor == 'mediafire': continue
-            elif servidor == 'google': continue
-            elif servidor == 'google drive': continue
 
             elif servidor == 'bittorrent': servidor = 'torrent'
 
             elif 'bittorrent' in servidor: servidor = 'torrent'
             elif 'fembed' in servidor: servidor = 'fembed'
-            elif 'voesx' in servidor: servidor = 'voe'
 
-            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', data_url = data_url, data_lmt = data_lmt,
-                                  quality = qlty, language = lang ))
+            elif 'voesx' in servidor: servidor = 'voe'
+            elif servidor == 'maxplay': servidor = 'voe'
+
+            elif servidor == 'google drive': servidor = 'gvideo'
+
+            if servertools.is_server_available(servidor):
+                if not servertools.is_server_enabled(servidor): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', data_url = data_url, data_lmt = data_lmt, quality = qlty, language = lang ))
 
     # ~ es por las series
     if not hay_descargas:
@@ -555,22 +580,24 @@ def findvideos(item):
                 servidor = servidor.lower().strip()
 
                 if servidor == "subtítulos" or servidor == 'subtitulos': continue
+
                 elif servidor == 'veri': continue
                 elif servidor == 'netu': continue
-                elif servidor == 'gounlimited': continue
-                elif servidor == 'jetload': continue
-                elif servidor == '1fichier': continue
-                elif servidor == 'turbobit': continue
-                elif servidor == 'mediafire': continue
-                elif servidor == 'google': continue
-                elif servidor == 'google drive': continue
-                elif servidor == 'subtitulos': continue
 
                 elif servidor == 'bittorrent': servidor = 'torrent'
 
                 elif 'bittorrent' in servidor: servidor = 'torrent'
                 elif 'fembed' in servidor: servidor = 'fembed'
+
                 elif 'voesx' in servidor: servidor = 'voe'
+                elif servidor == 'maxplay': servidor = 'voe'
+
+                elif servidor == 'google drive': servidor = 'gvideo'
+
+                if servertools.is_server_available(servidor):
+                    if not servertools.is_server_enabled(servidor): continue
+                else:
+                    if not config.get_setting('developer_mode', default=False): continue
 
                 url = item.url + _url
 
@@ -640,10 +667,15 @@ def play(item):
                if url.startswith('#'): url = 'https://mega.nz/' + url
                elif not url.startswith('http'): url = 'https://mega.nz/file/' + url
 
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
+            if not url:
+                if '/acortalink.' in data:
+                    return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
-        url = servertools.normalize_url(servidor, url)
+        if url:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            url = servertools.normalize_url(servidor, url)
 
     if '/protect/v.php' in url or '/protect/v2.php' in url:
         enc_url = scrapertools.find_single_match(url, "i=([^&]+)")
@@ -652,6 +684,9 @@ def play(item):
         if not 'magnet' in url: url = url.replace('/file/', '/embed#!')
 
     if url:
+        if '/acortalink.' in url:
+            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
+
         if url.startswith('https://pelisplushd.net/fembed.php?'):
             url = url.replace('https://pelisplushd.net/fembed.php?url=', 'https://feurl.com/v/')
 
@@ -672,8 +707,7 @@ def play(item):
         if servidor == 'directo':
             if not url.startswith('http'): return itemlist
 
-        elif servidor == 'zplayer':
-            url = url + '|' + host
+        elif servidor == 'zplayer': url = url + '|' + host
 
         itemlist.append(item.clone(url = url, server = servidor))
 

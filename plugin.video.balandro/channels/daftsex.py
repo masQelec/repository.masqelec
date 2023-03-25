@@ -60,6 +60,33 @@ def mainlist_pelis(item):
     return itemlist
 
 
+def listas(item):
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    matches = re.compile('<div class="video-title"[^>]+>([^<]+)<.*?a href="([^"]+).*?data-thumb="([^"]+)"').findall(data)
+
+    for title, url, thumb in matches:
+        itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url,
+                                    thumbnail = thumb if thumb.startswith('http') else host[:-1] + thumb, title = title, text_color='orange' ))
+
+    if itemlist:
+        next_url = scrapertools.find_single_match(data, '<li><a href="([^"]+)" title="Next page"')
+
+        if next_url:
+            next_url = next_url.replace('&amp;', '&')
+
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
+                                        action = 'listas', page = item.page + 1, text_color = 'coral' ))
+
+    return itemlist
+
+
 def categorias(item):
     logger.info()
     itemlist = []
@@ -71,9 +98,10 @@ def categorias(item):
 
     for url, thumb, title in matches:
         url = host + url if not url.startswith('/') else host[:-1] + url
+
         thumb = host + thumb if not url.startswith('/') else host[:-1] + thumb
 
-        itemlist.append(item.clone( action = 'list_all', url = url, title = title, thumbnail = thumb ))
+        itemlist.append(item.clone( action = 'list_all', url = url, title = title, thumbnail = thumb, text_color='orange' ))
 
     return sorted(itemlist, key=lambda i: i.title)
 
@@ -93,7 +121,7 @@ def pornstars(item):
 
     for url, thumb, title in matches:
         itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url,
-                                    thumbnail = thumb if thumb.startswith('http') else host[:-1] + thumb, title = title))
+                                    thumbnail = thumb if thumb.startswith('http') else host[:-1] + thumb, title = title, text_color='orange' ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<li><a href="([^"]+)" title="Next page"')
@@ -127,8 +155,7 @@ def list_all(item):
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
-                                    contentType = 'movie', contentTitle = title, contentExtra='adults' ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<li><a href="([^"]+)" title="Next page"')
@@ -138,33 +165,6 @@ def list_all(item):
                                         action = 'list_all', page = item.page + 1, text_color = 'coral' ))
         else:    
             itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', page = item.page + 1, text_color = 'coral' ))
-
-    return itemlist
-
-
-def listas(item):
-    logger.info()
-    itemlist = []
-
-    if not item.page: item.page = 0
-
-    data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    matches = re.compile('<div class="video-title"[^>]+>([^<]+)<.*?a href="([^"]+).*?data-thumb="([^"]+)"').findall(data)
-
-    for title, url, thumb in matches:
-        itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url,
-                                    thumbnail = thumb if thumb.startswith('http') else host[:-1] + thumb, title = title))
-
-    if itemlist:
-        next_url = scrapertools.find_single_match(data, '<li><a href="([^"]+)" title="Next page"')
-
-        if next_url:
-            next_url = next_url.replace('&amp;', '&')
-
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
-                                        action = 'listas', page = item.page + 1, text_color = 'coral' ))
 
     return itemlist
 

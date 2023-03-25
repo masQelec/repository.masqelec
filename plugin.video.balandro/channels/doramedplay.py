@@ -58,16 +58,32 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(host).data
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
-    bloque = scrapertools.find_single_match(data, '>Géneros<(.*?)>DoramedPlay.com<')
+    opciones = [
+       ('accion', 'Acción'),
+       ('action-adventure', 'Acción Aventura'),
+       ('animacion', 'Animación'),
+       ('aventura', 'Aventura'),
+       ('belica', 'Bélica'),
+       ('ciencia-ficcion', 'Ciencia ficción'),
+       ('comedia', 'Comedia'),
+       ('crimen', 'Crimen'),
+       ('drama', 'Drama'),
+       ('familia', 'Familia'),
+       ('fantasia', 'Fantasía'),
+       ('historia', 'Historia'),
+       ('misterio', 'Misterio'),
+       ('musica', 'Música'),
+       ('romance', 'Romance'),
+       ('sci-fi-fantasy', 'Sci-Fi & Fantasy'),
+       ('suspense', 'Suspense'),
+       ('terror', 'Terror')
+    ]
 
-    matches = re.compile('<a href="(.*?)">(.*?)</a>').findall(bloque)
-
-    for url, title in matches:
-        if title == 'doramed': title = 'Doramed'
-
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
+    for opc, tit in opciones:
+        itemlist.append(item.clone( title=tit, url= host + 'genre/' + opc + '/', action = 'list_all', text_color = text_color ))
 
     return itemlist
 
@@ -78,8 +94,10 @@ def list_all(item):
 
     data = httptools.downloadpage(item.url).data
 
-    if '>Tendencias<' in data: bloque = scrapertools.find_single_match(data, '>Tendencias<(.*?)>DoramedPlay.com<')
-    elif '>Ratings<' in data: bloque = scrapertools.find_single_match(data, '>Ratings<(.*?)>DoramedPlay.com<')
+    if '-2/' in item.url:
+        if '>Tendencias<' in data: bloque = scrapertools.find_single_match(data, '>Tendencias<(.*?)>DoramedPlay.com<')
+        elif '>Ratings<' in data: bloque = scrapertools.find_single_match(data, '>Ratings<(.*?)>DoramedPlay.com<')
+        else: bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>DoramedPlay.com<')
     else: bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>DoramedPlay.com<')
 
     matches = re.compile('<article id="(.*?)</article>').findall(bloque)
@@ -101,16 +119,14 @@ def list_all(item):
         if '/movies/' in url:
             if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
         else:
             if item.search_type == 'movie': continue
 
             if '(En Emisión)' in title: SerieName = title.split("(En Emisión)")[0]
             else: SerieName = title
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':year} ))
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -144,7 +160,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = int(tempo), page = 0 ))
+        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = int(tempo), page = 0, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 

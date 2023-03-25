@@ -51,7 +51,7 @@ def generos(item):
 
         title = title.replace('ver películas de', '').strip()
 
-        itemlist.append(item.clone( action='list_all', title = title, url = url ))
+        itemlist.append(item.clone( action='list_all', title = title, url = url, text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -60,9 +60,9 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'repelis/castellano/' ))
-    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'repelis/latino/' ))
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'repelis/subtituladas/' ))
+    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'repelis/castellano/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'repelis/latino/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'repelis/subtituladas/', text_color='moccasin' ))
 
     return itemlist
 
@@ -86,8 +86,7 @@ def list_all(item):
     num_matches = len(matches)
 
     for url, qlty, year, thumb, title in matches[item.page * perpage:]:
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
         if len(itemlist) >= perpage: break
 
@@ -136,8 +135,7 @@ def findvideos(item):
         if '/hqq.' in url or '/waaw.' in url or '/netu' in url: continue
 
         if servidor:
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
-                                  language = IDIOMAS.get(lang, lang), quality = qlty ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang), quality = qlty ))
 
     if not itemlist:
         if not ses == 0:

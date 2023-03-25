@@ -45,8 +45,10 @@ def configurar_proxies(item):
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if not headers: headers = {'Referer': host}
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpage_proxy('seriesmovil', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('seriesmovil', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -54,8 +56,11 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-                data = httptools.downloadpage_proxy('seriesmovil', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage_proxy('seriesmovil', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -100,7 +105,7 @@ def generos(item):
     for genero in generos:
         url = host + 'category/' + genero + '/'
 
-        itemlist.append(item.clone( action = 'list_all', title = genero.capitalize(), url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = genero.capitalize(), url = url, text_color = 'hotpink' ))
 
     return itemlist
 
@@ -125,8 +130,7 @@ def list_all(item):
         year = scrapertools.find_single_match(match, '<span class="Date">(.*?)</span>')
         if not year: year = '-'
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year } ))
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year } ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -163,7 +167,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -261,16 +265,14 @@ def findvideos(item):
 
             if 'hqq' in other or 'waaw' in other or 'netu' in other: continue
 
-            elif 'openload' in other: continue
-            elif 'powvideo' in other: continue
-            elif 'streamplay' in other: continue
-            elif 'rapidvideo' in other: continue
-            elif 'streamango' in other: continue
-            elif 'verystream' in other: continue
-            elif 'vidtodo' in other: continue
+            other = servertools.corregir_servidor(other)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url,
-                                                          language = IDIOMAS.get(lang, lang), quality = qlty, other = other.capitalize() ))
+            if servertools.is_server_available(other):
+                if not servertools.is_server_enabled(other): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = IDIOMAS.get(lang, lang), quality = qlty, other = other.capitalize() ))
 
     # ~ Descargas
     bloque = scrapertools.find_single_match(data, '<div class="OptionBx on">(.*?)</section>')
@@ -284,8 +286,7 @@ def findvideos(item):
 
         lang = lang.lower()
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url,
-                                                     language = IDIOMAS.get(lang, lang), quality = qlty, other = srv  + ' d' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = IDIOMAS.get(lang, lang), quality = qlty, other = srv  + ' d' ))
 
     if not itemlist:
         if not ses == 0:
@@ -304,8 +305,10 @@ def play(item):
     url = url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
     if '?trdownload=' in url:
-        # ~ new_url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
-        new_url = httptools.downloadpage_proxy('seriesmovil', url, follow_redirects=False).headers.get('location', '')
+        if not url.startswith(host):
+            new_url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
+        else:
+            new_url = httptools.downloadpage_proxy('seriesmovil', url, follow_redirects=False).headers.get('location', '')
     else:
         data = do_downloadpage(url)
 

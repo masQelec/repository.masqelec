@@ -85,8 +85,10 @@ def do_downloadpage(url, post=None, headers=None):
 
     raise_weberror = False if '/fecha/' in url else True
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpage_proxy('inkapelis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host) and not embeds in url:
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('inkapelis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -94,8 +96,11 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-                data = httptools.downloadpage_proxy('inkapelis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+                if not url.startswith(host) and not embeds in url:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage_proxy('inkapelis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -166,12 +171,12 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'calidad/hd/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Superheroes', action = 'list_all', url = host + 'seccion/superheroes/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Superheroes', action = 'list_all', url = host + 'seccion/superheroes/', search_type = 'movie', text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = 'Infantiles', action = 'list_all', url = host + 'seccion/infantil/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Infantiles', action = 'list_all', url = host + 'seccion/infantil/', search_type = 'movie', text_color='moccasin' ))
 
     if not descartar_anime:
-        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'seccion/animes/', search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'seccion/animes/', search_type = 'movie', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
@@ -193,12 +198,12 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host + 'episodio/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Últimas temporadas', action = 'last_temps', url = host + 'temporada/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Superheroes', action = 'list_all', url = host + 'seccion/superheroes/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Superheroes', action = 'list_all', url = host + 'seccion/superheroes/', search_type = 'tvshow', text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = 'Infantiles', action = 'list_all', url = host + 'seccion/infantil/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Infantiles', action = 'list_all', url = host + 'seccion/infantil/', search_type = 'tvshow', text_color='moccasin' ))
 
     if not descartar_anime:
-        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'seccion/animes/', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'seccion/animes/', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -211,9 +216,9 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'idioma/castellano/' ))
-    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'idioma/latino/' ))
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'idioma/subtituladas/' ))
+    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'idioma/castellano/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'idioma/latino/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'idioma/subtituladas/', text_color='moccasin' ))
 
     return itemlist
 
@@ -221,6 +226,9 @@ def idiomas(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     if item.search_type == 'movie': url_gen = host + 'pelicula/'
     else: url_gen = host + 'serie/'
@@ -239,8 +247,8 @@ def generos(item):
 
         title = title.replace('&amp;', '&')
 
-        if item.search_type == 'tvshow': titulo = title
-        else: titulo = '%s (%s)' % (title, num)
+        if item.search_type == 'tvshow': titulo = '[COLOR ' + text_color + ']' + title + '[/COLOR]'
+        else: titulo = '[COLOR %s]%s[/COLOR] (%s)' % (text_color, title, num)
 
         itemlist.append(item.clone( action='list_all', title=titulo, url=url ))
 
@@ -255,7 +263,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1938, -1):
-        itemlist.append(item.clone( title=str(x), url= host + 'fecha/' + str(x) + '/', action='list_all' ))
+        itemlist.append(item.clone( title=str(x), url= host + 'fecha/' + str(x) + '/', action='list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -312,7 +320,7 @@ def plataformas(item):
     url = host + 'network/'
 
     for x in productoras:
-        itemlist.append(item.clone( title = x[1], url = url + str(x[0]) + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title = x[1], url = url + str(x[0]) + '/', action = 'list_all', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -372,8 +380,7 @@ def list_all(item):
             if '<div class="latino">' in article: langs.append('Lat')
             if '<div class="subtitulado">' in article: langs.append('Vose')
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty,
-                                        languages = ', '.join(langs), fmt_sufijo = sufijo, 
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages = ', '.join(langs), fmt_sufijo = sufijo, 
                                         contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot}, contentTitleAlt = title_alt ))
 
         if tipo == 'tvshow':
@@ -416,7 +423,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -531,6 +538,7 @@ def last_epis(item):
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
         title = title.replace('&#215;', ' ')
+
         if ":" in title: title = title.split(":")[0]
 
         titulo = season + 'x' + episode + ' ' + title.strip()
@@ -607,6 +615,7 @@ def corregir_servidor(servidor):
     elif servidor == 'playstp': return 'streamtape'
     elif servidor == 'stp': return 'streamtape'
     elif servidor == 'playsl': return 'streamlare'
+    elif servidor == 'fem': return 'fembed'
     elif servidor == 'playsb': return 'streamsb'
     elif servidor == 'str': return 'doodstream'
     elif servidor == 'vip': return 'directo'
@@ -739,8 +748,7 @@ def findvideos(item):
                 for lnk in links:
                     if lnk[0].startswith('/'): lnk[0] = dom + lnk[0]
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = lnk[0], referer = url,
-                                          language = IDIOMAS.get(lang, lang) ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = lnk[0], referer = url, language = IDIOMAS.get(lang, lang) ))
 
     if not itemlist:
         if not ses == 0:
@@ -768,11 +776,12 @@ def play(item):
             if '/go.megaplay.cc/' in item.url: url_post = 'https://go.megaplay.cc/r.php'
             elif '/gcs.megaplay.cc/' in item.url: url_post = 'https://gcs.megaplay.cc/r.php'
             elif '/plays.megaplay.cc' in item.url: url_post = 'https://plays.megaplay.cc/r.php'
-            else: url_post = 'https://players.oceanplay.me/r.php'
+            else: url_post = _player + 'r.php'
 
-            # ~ vurl = httptools.downloadpage(url_post, post={key: value}, follow_redirects=False).headers['location']
-            vurl = httptools.downloadpage_proxy('repelishd', url_post, post={key: value}, follow_redirects=False).headers['location']
-
+            if not url_post.startswith(host) and not embeds in url_post:
+                vurl = httptools.downloadpage(url_post, post={key: value}, follow_redirects=False).headers['location']
+            else:
+                vurl = httptools.downloadpage_proxy('inkapelis', url_post, post={key: value}, follow_redirects=False).headers['location']
         except:
             vurl = scrapertools.find_single_match(data, 'location.href = "(.*?)"')
 
@@ -791,8 +800,10 @@ def play(item):
         item.url = item.url.replace(embeds + '/fplayer?url=', embeds + '/redirector.php?url=')
 
     if 'playerd.xyz/' in item.url or embeds in item.url:
-        # ~ resp = httptools.downloadpage(item.url, headers={'Referer': item.referer if item.referer else item.url}, follow_redirects=False)
-        resp = httptools.downloadpage_proxy('inkapelis', item.url, headers={'Referer': item.referer if item.referer else item.url}, follow_redirects=False)
+        if not item.url.startswith(host) and not embeds in item.url:
+            resp = httptools.downloadpage(item.url, headers={'Referer': item.referer if item.referer else item.url}, follow_redirects=False)
+        else:
+            resp = httptools.downloadpage_proxy('inkapelis', item.url, headers={'Referer': item.referer if item.referer else item.url}, follow_redirects=False)
 
         if 'refresh' in resp.headers: vurl = scrapertools.find_single_match(resp.headers['refresh'], ';\s*(.*)')
         elif 'location' in resp.headers: vurl = resp.headers['location']
@@ -804,8 +815,11 @@ def play(item):
 
             if 'playerd.xyz/' in url or embeds in url:
                 url = url.replace('iframe?url=', 'redirect?url=')
-                # ~ resp = httptools.downloadpage(url, headers={'Referer': item.url}, follow_redirects=False)
-                resp = httptools.downloadpage_proxy('inkapelis', url, headers={'Referer': item.url}, follow_redirects=False)
+
+                if not url.startswith(host) and not embeds in url:
+                    resp = httptools.downloadpage(url, headers={'Referer': item.url}, follow_redirects=False)
+                else:
+                    resp = httptools.downloadpage_proxy('inkapelis', url, headers={'Referer': item.url}, follow_redirects=False)
 
                 if 'refresh' in resp.headers: vurl = scrapertools.find_single_match(resp.headers['refresh'], ';\s*(.*)')
                 elif 'location' in resp.headers: vurl = resp.headers['location']
@@ -841,14 +855,20 @@ def play(item):
                                 post = {'h': hash}
 
                                 try:
-                                    # ~ url = httptools.downloadpage(_player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
-                                    url = httptools.downloadpage_proxy('inkapelis', _player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                                    vid = _player + 'r.php'
+
+                                    if not vid.startswith(host) and not embeds in vid:
+                                        url = httptools.downloadpage(vid, post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                                    else:
+                                        url = httptools.downloadpage_proxy('inkapelis', vid, post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
                                 except:
                                     url = ''
                         if not url:
                             try:
-                               # ~ url = httptools.downloadpage(url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
-                               url = httptools.downloadpage_proxy('inkapelis', url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
+                               if not url_play.startswith(host) and not embeds in url_play:
+                                   url = httptools.downloadpage(url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
+                               else:
+                                   url = httptools.downloadpage_proxy('inkapelis', url_play, headers={'Referer': url_play}, follow_redirects=False).headers['location']
                             except:
                                url = ''
 
@@ -875,8 +895,10 @@ def play(item):
         vurl = item.url
 
     if vurl and '/playdir' in vurl:
-        # ~ resp = httptools.downloadpage(vurl, headers={'Referer': item.url}, follow_redirects=False)
-        resp = httptools.downloadpage_proxy('inkapelis', vurl, headers={'Referer': item.url}, follow_redirects=False)
+        if not vurl.startswith(host) and not embeds in vurl:
+            resp = httptools.downloadpage(vurl, headers={'Referer': item.url}, follow_redirects=False)
+        else:
+            resp = httptools.downloadpage_proxy('inkapelis', vurl, headers={'Referer': item.url}, follow_redirects=False)
 
         if 'refresh' in resp.headers: vurl = scrapertools.find_single_match(resp.headers['refresh'], ';\s*(.*)')
         elif 'location' in resp.headers: vurl = resp.headers['location']
@@ -884,8 +906,10 @@ def play(item):
 
     if vurl:
         if 'player.php?id=' in vurl:
-            # ~ resp = httptools.downloadpage(vurl, headers={'Referer': item.url}, follow_redirects=False)
-            resp = httptools.downloadpage_proxy('inkapelis', vurl, headers={'Referer': item.url}, follow_redirects=False)
+            if not vurl.startswith(host) and not embeds in vurl:
+                resp = httptools.downloadpage(vurl, headers={'Referer': item.url}, follow_redirects=False)
+            else:
+                resp = httptools.downloadpage_proxy('inkapelis', vurl, headers={'Referer': item.url}, follow_redirects=False)
 
             dom = '/'.join(vurl.split('/')[:3])
             links = get_sources(resp.data)
@@ -902,8 +926,12 @@ def play(item):
             post = {'h': hash}
 
             try:
-                # ~ vurl = httptools.downloadpage(_player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
-                vurl = httptools.downloadpage_proxy('inkapelis', _player + 'r.php', post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                vid = _player + 'r.php'
+
+                if not vid.startswith(host) and not embeds in vid:
+                    vurl = httptools.downloadpage(vid, post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
+                else:
+                    vurl = httptools.downloadpage_proxy('inkapelis', vid, post = post, headers={'Referer': item.url}, follow_redirects = False, only_headers = True, raise_weberror=False).headers.get('location', '')
             except:
                 vurl = ''
 

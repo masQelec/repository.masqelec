@@ -48,9 +48,8 @@ def get_video_url(page_url, url_referer=''):
 
         elif 'filemoon' in page_url:
               txt_server = 'Filemoon'
-              page_url = page_url.replace('/filemoon.link/', '/filemoon.sx/')
+              page_url = page_url.replace('/filemoon.top/', '/filemoon.sx/')
 
-        elif 'streamhide' in page_url: txt_server = 'Streamhide'
         elif 'streamhub' in page_url: txt_server = 'Streamhub'
         elif 'uploadever' in page_url: txt_server = 'Uploadever'
         elif 'videowood' in page_url: txt_server = 'Videowood'
@@ -70,7 +69,7 @@ def get_video_url(page_url, url_referer=''):
             resuelto = resolveurl.resolve(page_url)
 
             if resuelto:
-                video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
+                video_urls.append(['mp4', resuelto])
                 return video_urls
 
             color_exec = config.get_setting('notification_exec_color', default='cyan')

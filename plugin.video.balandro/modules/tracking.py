@@ -147,14 +147,11 @@ def mainlist(item):
 
         itemlist.append(item.clone( title='Gestionar listas', action='mainlist_listas' )) 
 
-    itemlist.append(item.clone( channel='actions', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR wheat][B]Preferidos[/B][/COLOR])', action = 'open_settings',
-                                thumbnail=config.get_thumb('settings') ))
+    itemlist.append(item.clone( channel='actions', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR wheat][B]Preferidos[/B][/COLOR])', action = 'open_settings', thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] ¿ Cómo funciona ?', action = 'show_help_tracking',
-                                thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] ¿ Cómo funciona ?', action = 'show_help_tracking', thumbnail=config.get_thumb('help') ))
 
-    itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] Búsqueda automática de [COLOR cyan][B]Nuevos Episodios[/B][/COLOR]',
-                                action = 'show_help_tracking_update', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] Búsqueda automática de [COLOR cyan][B]Nuevos Episodios[/B][/COLOR]', action = 'show_help_tracking_update', thumbnail=config.get_thumb('help') ))
 
     return itemlist
 
@@ -178,7 +175,8 @@ def mainlist_pelis(item):
 
     for tmdb_id, infolabels in rows:
         title = valor_infolabel('title', infolabels)
-        if tracking_order == 2: title += '  [COLOR gray](%s)[/COLOR]' % valor_infolabel_informado(['release_date','year'], infolabels)
+        if tracking_order == 1: title += '  [COLOR gray](%s)[/COLOR]' % valor_infolabel_informado(['release_date', 'year'], infolabels)
+        else: title += '  [COLOR gray](%s)[/COLOR]' % valor_infolabel_informado(['year'], infolabels)
 
         context = [ {'title': 'Gestionar película', 'channel': item.channel, 'action': 'acciones_peli'} ]
 
@@ -213,7 +211,8 @@ def mainlist_series(item):
 
     for tmdb_id, infolabels in rows:
         title = valor_infolabel('tvshowtitle', infolabels)
-        if tracking_order == 2: title += '  [COLOR gray](%s)[/COLOR]' % valor_infolabel_informado(['aired','year'], infolabels)
+        if tracking_order == 1: title += '  [COLOR gray](%s)[/COLOR]' % valor_infolabel_informado(['aired', 'year'], infolabels)
+        else: title += '  [COLOR gray](%s)[/COLOR]' % valor_infolabel_informado(['year'], infolabels)
 
         # ~ if db.tracking_show_exists(tmdb_id): title += ' [COLOR gold](*)[/COLOR]'
 
@@ -253,6 +252,7 @@ def mainlist_episodios(item):
         titulo = '%s %dx%02d' % (infolabels['tvshowtitle'], infolabels['season'], infolabels['episode'])
         subtitulo = valor_infolabel('episodio_titulo', infolabels)
         if subtitulo != '': titulo += ' ' + subtitulo
+
         if tracking_order == 1: titulo += '  [COLOR gray]%s[/COLOR]' % valor_infolabel('aired', infolabels)
 
         thumbnail = valor_infolabel_informado(['episodio_imagen','thumbnail'], infolabels)
@@ -374,8 +374,7 @@ def findvideos(item):
             elif ch_parms['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
 
             cfg_proxies_channel = 'channel_' + ch_parms['id'] + '_proxies'
-            if config.get_setting(cfg_proxies_channel, default=''):
-                info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+            if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
             tipos = ch_parms['search_types']
             tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')

@@ -62,12 +62,12 @@ def paises(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Americanas', action = 'list_all', url = host + 'novelas-americanas/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Brasileñas', action = 'list_all', url = host + 'novelas-brasilenas/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Chilenas', action = 'list_all', url = host + 'novelas-chilenas/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Colombianas', action = 'list_all', url = host + 'novelas-colombianas/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Mexicanas', action = 'list_all', url = host + 'novelas-mexicanas/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Turcas', action = 'list_all', url = host + 'novelas-turcas/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Americanas', action = 'list_all', url = host + 'novelas-americanas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Brasileñas', action = 'list_all', url = host + 'novelas-brasilenas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Chilenas', action = 'list_all', url = host + 'novelas-chilenas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Colombianas', action = 'list_all', url = host + 'novelas-colombianas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Mexicanas', action = 'list_all', url = host + 'novelas-mexicanas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Turcas', action = 'list_all', url = host + 'novelas-turcas/', text_color='moccasin' ))
 
     return itemlist
 
@@ -121,8 +121,7 @@ def list_all(item):
 
         title = title.capitalize()
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, ref_serie = ref_serie,
-                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, ref_serie = ref_serie, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
         if len(itemlist) >= perpage: break
 
@@ -228,7 +227,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -293,8 +292,7 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + epis + ' ' + item.contentSerieName
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -314,7 +312,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    # embeds
+    # ~ embeds
     matches = scrapertools.find_multiple_matches(data, 'data-title="Opción.*?src="(.*?)"')
     if not matches: matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 

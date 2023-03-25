@@ -54,20 +54,20 @@ def generos(item):
 
     descartar_xxx = config.get_setting('descartar_xxx', default=False)
 
-    itemlist.append(item.clone( title = 'Análisis y estudios', url = host + 'category/analisis-y-estudios/', action = 'list_all' ))
-    itemlist.append(item.clone( title = 'Artículos de cine', url = host + 'category/articulos-de-cine/', action = 'list_all' ))
+    itemlist.append(item.clone( title = 'Análisis y estudios', url = host + 'category/analisis-y-estudios/', action = 'list_all', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Artículos de cine', url = host + 'category/articulos-de-cine/', action = 'list_all', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Cinematte', url = host + 'category/cinematte-flix/', action = 'list_all' ))
-    itemlist.append(item.clone( title = 'Críticas', url = host + 'category/critica/', action = 'list_all' ))
-    itemlist.append(item.clone( title = 'Contemporaneo', url = host + 'category/actualidad/', action = 'list_all' ))
+    itemlist.append(item.clone( title = 'Cinematte', url = host + 'category/cinematte-flix/', action = 'list_all', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Críticas', url = host + 'category/critica/', action = 'list_all', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Contemporaneo', url = host + 'category/actualidad/', action = 'list_all', text_color = 'deepskyblue' ))
 
     if not descartar_xxx:
-        itemlist.append(item.clone( title = 'Erotismo', url = host + 'category/erotismo/', action = 'list_all' ))
+        itemlist.append(item.clone( title = 'Erotismo', url = host + 'category/erotismo/', action = 'list_all', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Imprescindibles', url = host + 'category/imprescindibles/', action = 'list_all' ))
-    itemlist.append(item.clone( title = 'Lecciones de cine', url = host + 'category/lecciones-de-cine/', action = 'list_all' ))
-    itemlist.append(item.clone( title = 'Operas primas', url = host + 'category/obras-maestras/', action = 'list_all' ))
-    itemlist.append(item.clone( title = 'Uncategorized', url = host + 'category/uncategorized/', action = 'list_all' ))
+    itemlist.append(item.clone( title = 'Imprescindibles', url = host + 'category/imprescindibles/', action = 'list_all', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Lecciones de cine', url = host + 'category/lecciones-de-cine/', action = 'list_all', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Operas primas', url = host + 'category/obras-maestras/', action = 'list_all', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Uncategorized', url = host + 'category/uncategorized/', action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -132,10 +132,9 @@ def list_all(item):
 
         title = title.replace('Á', 'á').replace('É', 'é').replace('Í', 'í').replace('Ó', 'ó').replace('Ú', 'ú').replace('Ñ', 'ñ')
 
-        if not year == '-':
-            title = title.replace('(' + year + ')', '').strip()
+        if not year == '-': title = title.replace('(' + year + ')', '').strip()
 
-        title = title.replace('&#8211;', '')
+        title = title.replace('&#8211;', '').replace('&#8221;', '').replace('&#215;', '')
 
         if capitulos:
             datos_cap = do_downloadpage(url)

@@ -46,7 +46,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'episodes/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por productora', action = 'categorias', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por productora', action = 'categorias', search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', url = host, search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
@@ -71,7 +71,7 @@ def categorias(item):
     for opc, tit in productoras:
         url = host + 'network/' + opc + '/'
 
-        itemlist.append(item.clone( title = tit, action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = tit, action = 'list_all', url = url, text_color = 'hotpink' ))
 
     return itemlist
 
@@ -79,6 +79,9 @@ def categorias(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     opciones = [
        ('accion', 'Acción'),
@@ -118,7 +121,7 @@ def generos(item):
             elif opc == 'soap': continue
             elif opc == 'war-politics': continue
 
-        itemlist.append(item.clone( title = tit, url= host + 'genre/' + opc + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title = tit, url= host + 'genre/' + opc + '/', action = 'list_all', text_color = text_color  ))
 
     return itemlist
 
@@ -127,8 +130,11 @@ def alfabetico(item):
     logger.info()
     itemlist = []
 
-    for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#':
-        itemlist.append(item.clone( title = letra, action = 'list_letra', letra = letra.lower() ))
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
+    for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        itemlist.append(item.clone( title = letra, action = 'list_letra', letra = letra.lower(), text_color = text_color  ))
 
     return itemlist
 
@@ -515,12 +521,14 @@ def search_results(item):
         plot = scrapertools.htmlclean(plot)
 
         if '/movies/' in url:
-            if item.search_type == 'tvshow': continue
+            if item.search_type != 'all':
+                if item.search_type == 'tvshow': continue
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year, 'plot': plot} ))
         else:
-            if item.search_type == 'movie': continue
+            if item.search_type != 'all':
+                if item.search_type == 'movie': continue
 
             itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year, 'plot': plot} ))

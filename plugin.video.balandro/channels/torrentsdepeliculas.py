@@ -49,7 +49,7 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
 
     for url, title in matches:
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -64,7 +64,7 @@ def anios(item):
     for x in range(current_year, 1979, -1):
         url = host + 'year/' + str(x) + '/'
 
-        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', group = 'anio' ))
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', group = 'anio', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -93,8 +93,7 @@ def list_all(item):
         year = year.replace('Documentales', '').strip()
         if not year: year = '-'
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

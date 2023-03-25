@@ -87,7 +87,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie', tipo = 'genero' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     return itemlist
 
@@ -109,10 +109,10 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'idioma/castellano-17-1/' ))
-    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'idioma/espanol-latino-11-1/' ))
-    itemlist.append(item.clone( title = 'Inglés', action = 'list_all', url = host + 'idioma/ingles/' ))
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'idioma/vose-3-1/' ))
+    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'idioma/castellano-17-1/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'idioma/espanol-latino-11-1/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Inglés', action = 'list_all', url = host + 'idioma/ingles/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'idioma/vose-3-1/', text_color='moccasin' ))
 
     return itemlist
 
@@ -121,12 +121,12 @@ def calidades(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'En 720', action = 'list_all', url = host + 'calidad/720p-2/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'En 1080', action = 'list_all', url = host + 'calidad/1080p-10-1/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'En DVD Rip', action = 'list_all', url = host + 'calidad/dvdrip-1/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'En HD Rip', action = 'list_all', url = host + 'calidad/hdrip-1/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En 720', action = 'list_all', url = host + 'calidad/720p-2/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En 1080', action = 'list_all', url = host + 'calidad/1080p-10-1/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En DVD Rip', action = 'list_all', url = host + 'calidad/dvdrip-1/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En HD Rip', action = 'list_all', url = host + 'calidad/hdrip-1/', text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = 'En Micro HD', action = 'list_all', url = host + 'peliculas-microhd-9/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En Micro HD', action = 'list_all', url = host + 'peliculas-microhd-9/', text_color='moccasin' ))
 
     return itemlist
 
@@ -146,7 +146,7 @@ def generos(item):
 
         if '/animacion-2' in url: title = title + '-2'
 
-        itemlist.append(item.clone( action='list_all', title=title, url=url ))
+        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

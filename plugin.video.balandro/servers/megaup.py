@@ -74,7 +74,7 @@ def get_video_url(page_url, url_referer=''):
                     resuelto = resolveurl.resolve(page_url)
 
                     if resuelto:
-                        video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
+                        video_urls.append(['mp4', resuelto])
                         return video_urls
 
                     platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
@@ -96,7 +96,7 @@ def get_video_url(page_url, url_referer=''):
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
-                    video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
+                    video_urls.append(['mp4', resuelto])
                     return video_urls
 
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)

@@ -21,6 +21,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
         url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
     return data
 
 
@@ -50,42 +51,31 @@ def generos(item):
     itemlist = []
 
     opciones = [
-        ('genero-accion', 'Acción'),
-        ('accion', 'Acción (bis)'),
+        ('accion', 'Acción'),
         ('action-adventure', 'Action & Adventure'),
         ('aventura', 'Aventura'),
         ('animacion', 'Animación'),
-        ('genero-animes', 'Anime'),
-        ('genero-ciencia-ficcion', 'Ciencia ficción'),
-        ('ciencia-ficcion', 'Ciencia ficción (bis)'),
+        ('ciencia-ficcion', 'Ciencia ficción'),
         ('comedia', 'Comedia'),
-        ('genero-comedia', 'Comedia (bis)'),
         ('crimen', 'Crimen'),
-        ('genero-dibujos', 'Dibujos'),
         ('documental', 'Documental'),
-        ('genero-documental', 'Documental (bis)'),
-        ('genero-drama', 'Drama'),
-        ('drama', 'Drama (bis)'),
+        ('drama', 'Drama'),
         ('familia', 'Familia'),
         ('fantasia', 'Fantasía'),
-        ('genero-fantastico', 'Fantástico'),
         ('kids', 'Kids'),
         ('misterio', 'Misterio'),
         ('musica', 'Música'),
         ('reality', 'Reality'),
-        ('genero-romance', 'Romance'),
-        ('romance', 'Romance (bis)'),
+        ('romance', 'Romance'),
         ('sci-fi-fantasy', 'Sci-Fi & Fantasy'),
         ('talk', 'Talk'),
-        ('genero-telenovela', 'Telenovela'),
-        ('genero-thriller', 'Thriller'),
         ('terror', 'Terror'),
         ('war-politics', 'War & Politics'),
         ('western', 'Western')
         ]
 
     for opc, tit in opciones:
-        itemlist.append(item.clone( title=tit, url=host + 'ver/' + opc + '/', action='list_all' ))
+        itemlist.append(item.clone( title=tit, url=host + 'ver/' + opc + '/', action='list_all', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -95,7 +85,7 @@ def alfabetico(item):
     itemlist = []
 
     for letra in '#ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-        itemlist.append(item.clone ( title = letra, url = host + 'letter/%s/' % (letra.replace('#', '0-9')), action = 'list_all' ))
+        itemlist.append(item.clone ( title = letra, url = host + 'letter/%s/' % (letra.replace('#', '0-9')), action = 'list_all', text_color = 'hotpink' ))
 
     return itemlist
 
@@ -114,6 +104,7 @@ def list_all(item):
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)" class="lnk-blk"')
         title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
+
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
@@ -125,8 +116,7 @@ def list_all(item):
         plot = scrapertools.find_single_match(article, '<p><p>(.*?)</p>')
         plot = scrapertools.htmlclean(plot)
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, 
-                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -198,6 +188,7 @@ def last_epis(item):
 
         if buscar_next:
             next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination".*?class="page-numbers current">.*?href="([^"]+)"')
+
             if next_page:
                 if '/page/' in next_page:
                     itemlist.append(item.clone (url = next_page, page = 0, title = 'Siguientes ...', action = 'last_epis', text_color='coral' ))
@@ -232,8 +223,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, dobject = dobject, dpost = dpost,
-                                    contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, dobject = dobject, dpost = dpost, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -265,8 +255,10 @@ def episodios(item):
 
     for i in range(pages):
         matches = scrapertools.find_multiple_matches(data, '<li><a href="([^"]+)"[^>]*>([^<]+)')
+
         for url, title in matches:
             s_e = scrapertools.find_single_match(title, '(\d+)(?:x|X)(\d+)')
+
             if not s_e: continue
 
             season = int(s_e[0])
@@ -275,6 +267,7 @@ def episodios(item):
             itemlist.append(item.clone( action='findvideos', url=url, title=title, contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
 
         next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="[^"]*page/(\d+)/')
+
         if next_page:
             post = {'action': 'action_pagination_ep', 'object': item.dobject, 'season': item.contentSeason, 'page': next_page}
             data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post)
@@ -309,8 +302,7 @@ def findvideos(item):
     matches = scrapertools.find_multiple_matches(data, '<a data-opt="([^"]+)".*?<span class="option">(?:Cload|CinemaUpload) - ([^<]*)')
 
     for dopt, lang in matches:
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', dterm = dterm, dopt = dopt, url = item.url, 
-                                                      language = IDIOMAS.get(lang, lang) ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', dterm = dterm, dopt = dopt, url = item.url, language = IDIOMAS.get(lang, lang) ))
 
     return itemlist
 
@@ -370,6 +362,7 @@ def play(item):
 
         if servidor and servidor != 'directo':
             url = servertools.normalize_url(servidor, url)
+
             itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist

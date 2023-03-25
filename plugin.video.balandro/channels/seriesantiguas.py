@@ -63,8 +63,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -119,8 +118,7 @@ def temporadas(item):
                 itemlist = episodios(item)
                 return itemlist
 
-            itemlist.append(item.clone( action = 'episodios', title = title, url = url, old = 'old', page = 0,
-                                        contentType = 'season', contentSeason = numtempo ))
+            itemlist.append(item.clone( action = 'episodios', title = title, url = url, old = 'old', page = 0, contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
 
     else:
 
@@ -138,7 +136,7 @@ def temporadas(item):
                 itemlist = episodios(item)
                 return itemlist
 
-            itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = numtempo ))
+            itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -217,8 +215,7 @@ def episodios(item):
         thumb = scrapertools.find_single_match(epis, 'src="(.*?)"')
         if not thumb: thumb = scrapertools.find_single_match(epis, "src='(.*?)'")
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                    contentType = 'episode', contentEpisodeNumber = episode ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'episode', contentEpisodeNumber = episode ))
 
         if len(itemlist) >= item.perpage:
             break

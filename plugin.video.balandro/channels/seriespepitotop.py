@@ -53,7 +53,7 @@ def generos(item):
     for genero in generos:
         url = host + 'category/' + genero + '/'
 
-        itemlist.append(item.clone( action = 'list_all', title = genero.capitalize(), url = url ))
+        itemlist.append(item.clone( action = 'list_all', title = genero.capitalize(), url = url, text_color = 'hotpink' ))
 
     return itemlist
 
@@ -79,8 +79,7 @@ def list_all(item):
         year = scrapertools.find_single_match(match, '<span class="Date">(.*?)</span>')
         if not year: year = '-'
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year } ))
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year } ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -117,7 +116,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -215,16 +214,14 @@ def findvideos(item):
 
             if 'hqq' in other or 'waaw' in other or 'netu' in other: continue
 
-            elif 'openload' in other: continue
-            elif 'powvideo' in other: continue
-            elif 'streamplay' in other: continue
-            elif 'rapidvideo' in other: continue
-            elif 'streamango' in other: continue
-            elif 'verystream' in other: continue
-            elif 'vidtodo' in other: continue
+            other = servertools.corregir_servidor(other)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url,
-                                  language = IDIOMAS.get(lang, lang), quality = qlty, other = other.capitalize() ))
+            if servertools.is_server_available(other):
+                if not servertools.is_server_enabled(other): continue
+            else:
+               if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = IDIOMAS.get(lang, lang), quality = qlty, other = other.capitalize() ))
 
     # ~ Descargas
     bloque = scrapertools.find_single_match(data, '<div class="OptionBx on">(.*?)</section>')
@@ -238,8 +235,7 @@ def findvideos(item):
 
         lang = lang.lower()
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url,
-                              language = IDIOMAS.get(lang, lang), quality = qlty, other = srv  + ' d' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = IDIOMAS.get(lang, lang), quality = qlty, other = srv  + ' d' ))
 
     if not itemlist:
         if not ses == 0:

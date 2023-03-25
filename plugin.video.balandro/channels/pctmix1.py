@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import re
 
 from platformcode import config, logger
@@ -66,7 +65,7 @@ def generos(item):
         }
 
     for opc in sorted(opciones):
-        itemlist.append(item.clone( title = opciones[opc], url = host + 'genre/' + opc + '/', action ='list_all' ))
+        itemlist.append(item.clone( title = opciones[opc], url = host + 'genre/' + opc + '/', action ='list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -81,7 +80,7 @@ def anios(item):
     for x in range(current_year, 1999, -1):
         url = host + 'release-year/' + str(x) + '/'
 
-        itemlist.append(item.clone( title = str(x), url = url, action='list_all' ))
+        itemlist.append(item.clone( title = str(x), url = url, action='list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -110,8 +109,7 @@ def list_all(item):
 
         title = title.replace("&#8217;", "'").replace("&#8211;", "").replace("&#038;", "")
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -147,8 +145,7 @@ def findvideos(item):
         other = ''
         if 'magnet' in url: other = 'magnet'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
-                              quality = qlty, language = lang, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', quality = qlty, language = lang, other = other ))
 
     return itemlist
 

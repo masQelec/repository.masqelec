@@ -56,6 +56,9 @@ def generos(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     data = httptools.downloadpage(host).data
 
     bloque = scrapertools.find_single_match(data, '>Dramas por Genero<(.*?)</ul>')
@@ -68,7 +71,7 @@ def generos(item):
         if item.search_type == 'movie': url = url + '?tr_post_type=1'
         else: url = url + '?tr_post_type=2'
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = text_color ))
 
     return itemlist
 
@@ -122,6 +125,7 @@ def list_all(item):
     if itemlist:
         if '<div class="wp-pagenavi">' in data:
             next_url = scrapertools.find_single_match(data, '<div class="wp-pagenavi">.*?class="page-numbers current">.*?href="(.*?)"')
+
             if next_url:
                 if '/page/' in next_url:
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
@@ -149,7 +153,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = int(tempo), page = 0 ))
+        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = int(tempo), page = 0, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 

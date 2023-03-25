@@ -17,6 +17,7 @@ perpage = 28
 
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post).data
+
     return data
 
 
@@ -36,9 +37,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Al azar', action = 'list_all', url = host + '?orderby=rand', search_type = 'movie'))
 
-    itemlist.append(item.clone( title = 'Por alfabético (Z - A)', action = 'list_all', url = host + '?orderby=title', search_type = 'movie'))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por alfabético (Z - A)', action = 'list_all', url = host + '?orderby=title', search_type = 'movie'))
 
     return itemlist
 
@@ -54,7 +55,7 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<option value="(.*?)" >(.*?)</option>')
 
     for genre, title in matches:
-        itemlist.append(item.clone( action = 'list_all', title = title, url = host + genre + '/' ))
+        itemlist.append(item.clone( action = 'list_all', title = title, url = host + genre + '/', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -127,8 +128,7 @@ def list_all(item):
             SerieName = scrapertools.find_single_match(titulo, "(.*?)T:").strip()
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, fmt_sufijo=sufijo,
-                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = temp, contentEpisodeNumber = epis,
-                                        infoLabels={'year': year} ))
+                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = temp, contentEpisodeNumber = epis, infoLabels={'year': year} ))
 
         if tipo == 'movie':
             if not item.search_type == 'all':

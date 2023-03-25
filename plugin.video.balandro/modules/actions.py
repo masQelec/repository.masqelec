@@ -318,6 +318,7 @@ def manto_params(item):
 
         config.set_setting('channel_animefenix_dominio', '')
         config.set_setting('channel_animeflv_dominio', '')
+
         config.set_setting('channel_caricaturashd_dominio', '')
         config.set_setting('channel_cinecalidad_dominio', '')
         config.set_setting('channel_cinecalidadla_dominio', '')
@@ -325,8 +326,10 @@ def manto_params(item):
         config.set_setting('channel_cinetux_dominio', '')
         config.set_setting('channel_cuevana3_dominio', '')
         config.set_setting('channel_cuevana3video_dominio', '')
+
         config.set_setting('channel_divxtotal_dominio', '')
         config.set_setting('channel_dontorrents_dominio', '')
+
         config.set_setting('channel_elifilms_dominio', '')
         config.set_setting('channel_elitetorrent_dominio', '')
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
@@ -339,10 +342,10 @@ def manto_params(item):
         config.set_setting('channel_hdfull_hdfull_login', False)
         config.set_setting('channel_hdfull_hdfull_password', '')
         config.set_setting('channel_hdfull_hdfull_username', '')
-
         config.set_setting('channel_hdfullse_dominio', '')
+
         config.set_setting('channel_inkapelis_dominio', '')
-        config.set_setting('channel_kindor_dominio', '')
+
         config.set_setting('channel_pelis28_dominio', '')
         config.set_setting('channel_pelishouse_dominio', '')
         config.set_setting('channel_pelismaraton_dominio', '')
@@ -351,16 +354,16 @@ def manto_params(item):
         config.set_setting('channel_pelisplus_dominio', '')
         config.set_setting('channel_pelisplushd_dominio', '')
         config.set_setting('channel_pelisplushdlat_dominio', '')
-
         config.set_setting('channel_playdede_dominio', '')
         config.set_setting('channel_playdede_playdede_login', False)
         config.set_setting('channel_playdede_playdede_password', '')
         config.set_setting('channel_playdede_playdede_username', '')
 
-        config.set_setting('channel_repelishd_dominio', '')
         config.set_setting('channel_series24_dominio', '')
+        config.set_setting('channel_serieskao_dominio', '')
         config.set_setting('channel_seriesyonkis_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
+
         config.set_setting('channel_torrentpelis_dominio', '')
 
         config.set_setting('channels_proxies_memorized', '')
@@ -384,7 +387,7 @@ def manto_params(item):
         download_path = filetools.join(config.get_data_path(), 'downloads')
         config.set_setting('downloadpath', download_path)
 
-        config.set_setting('chrome_last_version', '110.0.5481.63')
+        config.set_setting('chrome_last_version', '111.0.5563.65')
 
         config.set_setting('debug', '0')
 
@@ -583,6 +586,12 @@ def manto_addons_packages(item):
     existe = filetools.exists(path)
     if existe: hay_temporales = True
 
+    if existe:
+        packages = []
+        packages = os.listdir(path)
+
+        if not packages: hay_temporales = False
+
     if hay_temporales == False:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros en Addons/Packages[/COLOR][/B]' % color_alert)
         return
@@ -602,6 +611,12 @@ def manto_addons_temp(item):
 
     existe = filetools.exists(path)
     if existe: hay_temporales = True
+
+    if existe:
+        temps = []
+        temps = os.listdir(path)
+
+        if not temps: hay_temporales = False
 
     if hay_temporales == False:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros en Addons/Temp[/COLOR][/B]' % color_alert)

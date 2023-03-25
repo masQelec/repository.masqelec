@@ -66,7 +66,6 @@ def mainlist(item):
         itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php' ))
 
         itemlist.append(item.clone( title = ' - Premios Oscar', action = 'oscars', url = host + 'oscar_data.php' ))
-
         itemlist.append(item.clone( title = ' - Sagas y colecciones', action = 'sagas', url = host + 'movie-groups-all.php', page = 1 ))
 
         itemlist.append(item.clone( title = ' - Las mejores', action = 'list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1' ))
@@ -120,14 +119,14 @@ def plataformas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Amazon prime', action = 'list_all', url = host + 'cat_new_amazon_es.html' ))
-    itemlist.append(item.clone( title = 'Apple TV+', action = 'list_all', url = host + 'cat_apple_tv_plus.html' ))
-    itemlist.append(item.clone( title = 'Disney+', action = 'list_all', url = host + 'cat_disneyplus.html' ))
-    itemlist.append(item.clone( title = 'Filmin', action = 'list_all', url = host + 'cat_new_filmin.html' ))
-    itemlist.append(item.clone( title = 'HBO', action = 'list_all', url = host + 'cat_new_hbo_es.html' ))
-    itemlist.append(item.clone( title = 'Movistar+', action = 'list_all', url = host + 'cat_new_movistar_f.html' ))
-    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'cat_new_netflix.html' ))
-    itemlist.append(item.clone( title = 'Rakuten TV', action = 'list_all', url = host + 'cat_new_rakuten.html' ))
+    itemlist.append(item.clone( title = 'Amazon prime', action = 'list_all', url = host + 'cat_new_amazon_es.html', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Apple TV+', action = 'list_all', url = host + 'cat_apple_tv_plus.html', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Disney+', action = 'list_all', url = host + 'cat_disneyplus.html', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Filmin', action = 'list_all', url = host + 'cat_new_filmin.html', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'HBO', action = 'list_all', url = host + 'cat_new_hbo_es.html', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Movistar+', action = 'list_all', url = host + 'cat_new_movistar_f.html', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'cat_new_netflix.html', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Rakuten TV', action = 'list_all', url = host + 'cat_new_rakuten.html', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -136,12 +135,12 @@ def oscars(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Películas con Más Oscars', action = 'list_oscars', url = item.url, grupo = 'Películas con más Oscars' ))
-    itemlist.append(item.clone( title = 'Películas con Más Nominaciones (sin Oscar a la mejor película)', action = 'list_oscars', url = item.url, grupo = 'Películas con más nominaciones' ))
-    itemlist.append(item.clone( title = 'Películas con Más Nominaciones y Ningún Oscar', action = 'list_oscars', url = item.url, grupo = 'Películas con más nominaciones y ningún Oscar' ))
-    itemlist.append(item.clone( title = 'Películas Ganadoras de los 5 Oscars principales', action = 'list_oscars', url = item.url, grupo = 'Películas ganadoras de los 5 Oscars principales' ))
-    itemlist.append(item.clone( title = 'Últimas Películas Ganadoras del Oscar principal', action = 'list_oscars', url = item.url, grupo = 'Últimas películas ganadoras del Oscar principal' ))
-    itemlist.append(item.clone( title = 'Ediciones Premios Oscar', action = 'oscars_ediciones', url = host + 'award_data.php?award_id=academy_awards' ))
+    itemlist.append(item.clone( title = 'Películas con Más Oscars', action = 'list_oscars', url = item.url, grupo = 'Películas con más Oscars', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Películas con Más Nominaciones (sin Oscar a la mejor película)', action = 'list_oscars', url = item.url, grupo = 'Películas con más nominaciones', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Películas con Más Nominaciones y Ningún Oscar', action = 'list_oscars', url = item.url, grupo = 'Películas con más nominaciones y ningún Oscar', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Películas Ganadoras de los 5 Oscars principales', action = 'list_oscars', url = item.url, grupo = 'Películas ganadoras de los 5 Oscars principales', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Últimas Películas Ganadoras del Oscar principal', action = 'list_oscars', url = item.url, grupo = 'Últimas películas ganadoras del Oscar principal', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Ediciones Premios Oscar', action = 'oscars_ediciones', url = host + 'award_data.php?award_id=academy_awards', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -186,25 +185,31 @@ def listas(item):
 
         if '(Serie de TV)' in title or '(Miniserie de TV)' in title:
             _search_type = 'tvshow'
+
             if item.search_type == 'documentary': _search_type = 'all'
 
             name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '')
 
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type,
-                                        name = name, contentSerieName = name, infoLabels = {'year': '-'} ))
+            title = title.replace('(Serie de TV)', '(TV)').replace('(Miniserie de TV)', '(TV)')
+
+            if '(TV)' in title: title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentSerieName = name, infoLabels = {'year': '-'} ))
         else:
             _search_type = 'movie'
+            if '(TV)' in title:
+                title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+                _search_type = 'tvshow'
+
             if item.search_type == 'documentary': _search_type = 'all'
 
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type,
-                                        name = title, contentTitle = title, infoLabels = {'year': '-'} ))
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = title, contentTitle = title, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if num_matches > hasta:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, tecleado = item.tecleado, stype = item.stype,
-                                        action = 'listas', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, tecleado = item.tecleado, stype = item.stype, action = 'listas', text_color='coral' ))
 
     return itemlist
 
@@ -231,11 +236,18 @@ def list_all(item):
         if '(Serie de TV)' in title or '(Miniserie de TV)' in title:
             name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '')
 
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow',
-                                        name = name, contentSerieName = name ))
+            title = title.replace('(Serie de TV)', '(TV)').replace('(Miniserie de TV)', '(TV)')
+
+            if '(TV)' in title: title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', name = name, contentSerieName = name ))
         else:
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'movie',
-                                        name = title, contentTitle = title, infoLabels = {'year': '-'} ))
+            _search_type = 'movie'
+            if '(TV)' in title:
+                title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+                _search_type = 'tvshow'
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = title, contentTitle = title, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -279,7 +291,7 @@ def generos(item):
         if not genero[0] == 'Serie de TV': url = url + '&notvse=1'
         elif not genero[0] == 'Documental': url = url + '&nodoc=1'
 
-        itemlist.append(item.clone ( title = genero[0], action = 'list_sel', url = url, cod_genre = genero[1] ))
+        itemlist.append(item.clone ( title = genero[0], action = 'list_sel', url = url, cod_genre = genero[1], text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -337,7 +349,7 @@ def paises(item):
           ]
 
     for pais in labels_paises:
-        itemlist.append(item.clone ( title = pais[0], action = 'list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', cod_country = pais[1] ))
+        itemlist.append(item.clone ( title = pais[0], action = 'list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', cod_country = pais[1], text_color='moccasin' ))
 
     return itemlist
 
@@ -349,7 +361,7 @@ def anios(item):
     for x in range(current_year, 1909, -1):
         anyo = str(x)
 
-        itemlist.append(item.clone( title = anyo, action='list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', fromyear = anyo, toyear = anyo  ))
+        itemlist.append(item.clone( title = anyo, action='list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', fromyear = anyo, toyear = anyo, text_color = 'deepskyblue'  ))
 
     return itemlist
 
@@ -385,7 +397,7 @@ def temas(item):
         elif title == 'Serie [Pesadillas y alucinaciones]': search_type = 'tvshow'
         elif title == 'Serie [What a Cartoon!]': search_type = 'tvshow'
 
-        itemlist.append(item.clone( action = 'list_temas', title = title, url = url, page = 1, search_type = search_type))
+        itemlist.append(item.clone( action = 'list_temas', title = title, url = url, page = 1, search_type = search_type, text_color = 'tan' ))
 
     if itemlist:
         if num_matches > hasta:
@@ -416,19 +428,27 @@ def list_temas(item):
         thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
 
         if item.search_type == 'tvshow':
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = item.search_type,
-                                        name = title, contentSerieName = title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = item.search_type, name = title, contentSerieName = title, infoLabels={'year': year} ))
+
         elif item.search_type == 'documentary':
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = item.search_type,
-                                        name = title, contentSerieName = title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = item.search_type, name = title, contentSerieName = title, infoLabels={'year': year} ))
+
         elif '(Serie de TV)' in title or '(Miniserie de TV)' in title:
             name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '')
 
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow',
-                                        name = name, contentSerieName = name, infoLabels={'year': year} ))
+            title = title.replace('(Serie de TV)', '(TV)').replace('(Miniserie de TV)', '(TV)')
+
+            if '(TV)' in title: title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', name = name, contentSerieName = name, infoLabels={'year': year} ))
+
         else:
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = item.search_type,
-                                        name = title, contentTitle = title, infoLabels={'year': year} ))
+            _search_type = 'movie'
+            if '(TV)' in title:
+                title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+                _search_type = 'tvshow'
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = title, contentTitle = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -443,8 +463,7 @@ def list_temas(item):
                url = url.replace(prev_page, '')
 
                next_page = item.page + 1
-               itemlist.append(item.clone( title = 'Siguientes ...', url = url + '&p=' + str(next_page), action = 'list_temas',
-                                           page = next_page, text_color='coral' ))
+               itemlist.append(item.clone( title = 'Siguientes ...', url = url + '&p=' + str(next_page), action = 'list_temas', page = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -468,8 +487,7 @@ def list_oscars(item):
         if len(premios) == 2: titulo = '[COLOR tan][B]' + premios + '[/B][/COLOR]  ' + title
         else: titulo = '[COLOR tan][B]  ' + premios + '[/B][/COLOR]  ' + title
 
-        itemlist.append(item.clone( action = 'find_search', title = titulo, search_type = 'movie', name = title, contentType='movie',
-                                    contentTitle = title, infoLabels = {'year': year} ))
+        itemlist.append(item.clone( action = 'find_search', title = titulo, search_type = 'movie', name = title, contentType='movie', contentTitle = title, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -488,7 +506,7 @@ def oscars_ediciones(item):
         title = title.strip()
         if not title: title = 'Premios Oscars ' + anyo
 
-        itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo ))
+        itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo, text_color = 'tan' ))
 
     return sorted(itemlist, key = lambda it: it.anyo, reverse = True)
 
@@ -516,11 +534,18 @@ def list_premios_anyo(item):
             if '(Serie de TV)' in title or '(Miniserie de TV)' in title:
                 name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '')
 
-                itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow',
-                                            name = name, contentSerieName = name, infoLabels = {'year': item.anyo} ))
+                title = title.replace('(Serie de TV)', '(TV)').replace('(Miniserie de TV)', '(TV)')
+
+                if '(TV)' in title: title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+
+                itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', name = name, contentSerieName = name, infoLabels = {'year': item.anyo} ))
             else:
-                itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'movie',
-                                            name = title, contentTitle = title, infoLabels = {'year': item.anyo} ))
+                _search_type = 'movie'
+                if '(TV)' in title:
+                    title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+                    _search_type = 'tvshow'
+
+                itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = title, contentTitle = title, infoLabels = {'year': item.anyo} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -540,7 +565,7 @@ def emmy_ediciones(item):
         title = title.strip()
         if not title: title = 'Premios Emmy ' + anyo
 
-        itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo ))
+        itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo, text_color = 'hotpink' ))
 
     return sorted(itemlist, key = lambda it: it.anyo, reverse = True)
 
@@ -555,6 +580,8 @@ def sagas(item):
 
     for url, title, thumb, count in matches:
         thumb = thumb.replace('-med', '-large') + '|User-Agent=Mozilla/5.0'
+
+        title = '[COLOR moccasin]' + title + '[/COLOR]'
 
         count = count.replace('películas', '').strip()
         if count: count = '  (' + count + ')'
@@ -571,8 +598,7 @@ def sagas(item):
             url = url.replace(prev_page, '')
 
             next_page = item.page + 1
-            itemlist.append(item.clone( title = 'Siguientes ...', url = url + '?p=' + str(next_page), action = 'sagas',
-                                        page = next_page, text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', url = url + '?p=' + str(next_page), action = 'sagas', page = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -583,7 +609,7 @@ def list_sagas(item):
 
     data = httptools.downloadpage(item.url).data
 
-    patron = '<div class="movie-card.*?movie-card-0" data-movie-id=".*?src="(.*?)".*?title="(.*?)">.*?</a>[^\d+]+(\d+)[^<]+'
+    patron = '<div class="movie-card.*?movie-card-.*?data-movie-id=".*?src="(.*?)".*?title="(.*?)">.*?</a>[^\d+]+(\d+)[^<]+'
 
     matches = scrapertools.find_multiple_matches(data, patron)
 
@@ -605,11 +631,18 @@ def list_sagas(item):
         if '(Serie de TV)' in title or '(Miniserie de TV)' in title:
             name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '')
 
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', 
-                                        name = name, contentSerieName = name, infoLabels={'year': year} ))
+            title = title.replace('(Serie de TV)', '(TV)').replace('(Miniserie de TV)', '(TV)')
+
+            if '(TV)' in title: title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', name = name, contentSerieName = name, infoLabels={'year': year} ))
         else:
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'movie',
-                                        name = title, contentTitle = title, infoLabels={'year': year} ))
+            _search_type = 'movie'
+            if '(TV)' in title:
+                title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+                _search_type = 'tvshow'
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = title, contentTitle = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -672,14 +705,22 @@ def list_sel(item):
         if '(Serie de TV)' in title or '(Miniserie de TV)' in title or cod_genre == 'TV_SE':
             name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '')
 
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', 
-                                        name = name, contentSerieName = name, infoLabels={'year': year} ))
+            title = title.replace('(Serie de TV)', '(TV)').replace('(Miniserie de TV)', '(TV)')
+
+            if '(TV)' in title: title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', name = name, contentSerieName = name, infoLabels={'year': year} ))
+
         elif '&genre=DO&' in url:
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'documentary',
-                                        name = title, contentTitle = title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'documentary', name = title, contentTitle = title, infoLabels={'year': year} ))
+
         else:
-            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'movie',
-                                        name = title, contentTitle = title, infoLabels={'year': year} ))
+            _search_type = 'movie'
+            if '(TV)' in title:
+                title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+                _search_type = 'tvshow'
+
+            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = title, contentTitle = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

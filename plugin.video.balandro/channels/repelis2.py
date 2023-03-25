@@ -43,8 +43,10 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('repelis2', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('repelis2', url, post=post, headers=headers).data
 
     return data
 
@@ -80,7 +82,7 @@ def generos(item):
     matches = re.compile('<a href="(.*?)">(.*?)</a>').findall(bloque)
 
     for url, title in matches:
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -113,8 +115,7 @@ def list_all(item):
         year = scrapertools.find_single_match(match, '<div class="year">(.*?)</div>').strip()
         if not year: year = '-'
 
-        itemlist.append(item.clone( action='findvideos', url=url, title = title, thumbnail = thumb, languages = ', '.join(langs),
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title = title, thumbnail = thumb, languages = ', '.join(langs), contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -165,8 +166,7 @@ def findvideos(item):
             hash = scrapertools.find_single_match(srvs, 'data-hash="(.*?)"')
 
             if hash:
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', hash = hash,
-                                      quality = qlty, language = lang, other = srv.capitalize() ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', hash = hash, quality = qlty, language = lang, other = srv.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

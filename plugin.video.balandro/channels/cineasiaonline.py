@@ -50,7 +50,7 @@ def paises(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title=.*?">(.*?)</a>')
 
     for url, tit in matches:
-        itemlist.append(item.clone( title = tit, url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -65,7 +65,7 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title=.*?">(.*?)</a>')
 
     for url, tit in matches:
-        itemlist.append(item.clone( title = tit, url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -82,7 +82,7 @@ def anios(item):
     for anio in matches:
         url = host + 'fecha-estreno/' + anio + '/'
 
-        itemlist.append(item.clone( title = anio, url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = anio, url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -111,6 +111,7 @@ def list_all(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a class="nextpostslink" rel="next" href="([^"]+)"')
+
         if next_page:
             itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
 

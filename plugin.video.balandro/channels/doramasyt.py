@@ -31,7 +31,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'doramas?categoria=pelicula', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
@@ -52,7 +51,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'emision', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
     return itemlist
@@ -61,6 +59,9 @@ def mainlist_series(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     genres = [
        ['policial', 'Policial'],
@@ -118,7 +119,7 @@ def generos(item):
     for genero in genres:
         url = url_gen + genero[0]
 
-        itemlist.append(item.clone( title = genero[1], action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = genero[1], action = 'list_all', url = url, text_color = text_color ))
 
     return sorted(itemlist, key=lambda i: i.title)
 
@@ -126,6 +127,9 @@ def generos(item):
 def anios(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     from datetime import datetime
     current_year = int(datetime.today().year)
@@ -136,7 +140,7 @@ def anios(item):
     for x in range(current_year, 1981, -1):
         url = url_any + str(x)
 
-        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = text_color ))
 
     return itemlist
 
@@ -193,6 +197,7 @@ def list_all(item):
     if itemlist:
         if '<ul class="pagination">' in data:
             bloque = scrapertools.find_single_match(data, '<ul class="pagination">(.*?)</nav>')
+
             next_url = scrapertools.find_single_match(bloque, '<li class="page-item active".*?href="(.*?)"')
 
             if next_url:
@@ -344,6 +349,11 @@ def findvideos(item):
 
         srv = srv.replace('com/', '')
 
+        if servertools.is_server_available(srv):
+            if not servertools.is_server_enabled(srv): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
+
         if url:
             url = base64.b64decode(url).decode("utf-8")
 
@@ -364,11 +374,15 @@ def findvideos(item):
             srv = srv.lower()
 
             if not srv: continue
-            elif srv == '1fichier': continue
-            elif srv == 'mediafire': continue
-            elif srv == 'fireload': continue
 
             elif srv == 'ok': srv = 'mega'
+
+            if servertools.is_server_available(srv):
+                if not servertools.is_server_enabled(srv): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+                if srv == 'mediafire': continue
 
             servidor = servertools.corregir_servidor(srv)
 

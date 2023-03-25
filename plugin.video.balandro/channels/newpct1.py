@@ -11,12 +11,14 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+
 # ~ Dominio 8/10/2022
 
 host = 'https://atomohd.vg/'
 
 
 clon_name = 'Atomix'
+
 
 perpage = 20
 
@@ -196,6 +198,7 @@ def mainlist_series(item):
     for clone in CLONES:
         if 'tvshow' in clone[2]:
             thumb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', clone[3])
+
             url = clone[1]
 
             color = 'white'
@@ -234,8 +237,7 @@ def mainlist_series_clon(item):
 
 
 def limpiar_titulo(title, quitar_sufijo=''):
-    prefijos = ['Ver en linea ', 'Ver online ', 'Descarga Gratis ', 'Descarga Serie HD ',
-                'Descargar Estreno ', 'Descargar Pelicula ', 'Descargar torrent ']
+    prefijos = ['Ver en linea ', 'Ver online ', 'Descarga Gratis ', 'Descarga Serie HD ', 'Descargar Estreno ', 'Descargar Pelicula ', 'Descargar torrent ']
 
     for prefijo in prefijos:
         if title.startswith(prefijo): title = title[len(prefijo):]
@@ -320,6 +322,7 @@ def list_all(item):
 
         if buscar_next:
             next_page = scrapertools.find_single_match(data, '<li><a href="([^"]+)">Next</a>')
+
             if next_page:
                 itemlist.append(item.clone( title='Siguientes ...', url=next_page, page=0, text_color='coral' ))
 
@@ -330,6 +333,7 @@ def tracking_all_episodes(item):
     itemlist = episodios(item)
     while itemlist[-1].title == 'Siguientes ...':
         itemlist = itemlist[:-1] + episodios(itemlist[-1])
+
     return itemlist
 
 
@@ -401,13 +405,13 @@ def episodios(item):
 
         titulo = '%sx%s %s' % (season, episode, show)
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
-                                    contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<li><a href="([^"]+)">Next</a>')
+
         if next_page:
             itemlist.append(item.clone( title='Siguientes ...', url=next_page, text_color='coral', contentSeason=1000, contentEpisodeNumber=10000 ))
 
@@ -508,7 +512,7 @@ def findvideos(item):
                     if not url.endswith('.torrent'): url = url + '.torrent'
 
             itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', ref = item.url,
-                                                      language = idioma, quality = calidad, other = tamano ))
+                                                         language = idioma, quality = calidad, other = tamano ))
 
     # Ver online
     patron = '<div class="box2">(.*?)</div>.*?<div class="box3">(.*?)</div>.*?<div class="box4">(.*?)</div>.*?<div class="box5">.*?'
@@ -559,8 +563,7 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         if not servidor == 'directo':
-            itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = servidor,
-                                                         language = extrae_idioma(idioma), quality = calidad ))
+            itemlist.append(Item(channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = extrae_idioma(idioma), quality = calidad ))
 
     if not itemlist:
         if not ses == 0:
@@ -625,6 +628,7 @@ def list_search(item):
     itemlist = []
 
     post = 'categoryIDR=&categoryID=&idioma=&calidad=&ordenar=Fecha&inon=Descendente&s=%s&pg=%d' % (item.busca_texto, item.busca_pagina)
+
     data = do_downloadpage(item, item.url, post=post)
 
     data = data.replace('\\/', '/')
@@ -640,7 +644,9 @@ def list_search(item):
         thumb = dominio + timg[1:]
 
         is_tvshow = '/serie' in url or '/descargar-serie' in url
+
         if (item.search_type == 'tvshow' and not is_tvshow) or (item.search_type == 'movie' and is_tvshow): continue
+
         if url in [it.url for it in itemlist]: continue
 
         title = tname

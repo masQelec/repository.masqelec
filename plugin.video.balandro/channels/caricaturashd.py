@@ -5,11 +5,11 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://homecine.io/'
+host = 'https://homecine.top/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://caricaturashd.net/', 'https://gnulaseries.net/']
+ant_hosts = ['https://caricaturashd.net/', 'https://gnulaseries.net/', 'https://homecine.io/']
 
 
 domain = config.get_setting('dominio', 'caricaturashd', default='')
@@ -59,8 +59,10 @@ def do_downloadpage(url, post=None, headers=None):
 
     headers = {'Referer': host}
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('caricaturashd', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('caricaturashd', url, post=post, headers=headers).data
 
     return data
 
@@ -141,6 +143,9 @@ def generos(item):
     logger.info()
     itemlist=[]
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     data = do_downloadpage(host)
 
     bloque = scrapertools.find_single_match(data, '>Generos<(.*?)</ul>')
@@ -150,7 +155,7 @@ def generos(item):
     for url, title in matches:
         title = title.replace('&amp;', '&').strip()
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, genre = title ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, genre = title, text_color = text_color ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -225,7 +230,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = season ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = season, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 

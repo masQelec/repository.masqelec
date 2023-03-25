@@ -89,9 +89,11 @@ def do_downloadpage(url, post=None, headers=None):
     elif '/categoria/' in url: timeout = 30
 
     headers = {'Referer': host}
-   
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-    data = httptools.downloadpage_proxy('grantorrent', url, post=post, headers=headers, timeout=timeout).data
+
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+    else:
+        data = httptools.downloadpage_proxy('grantorrent', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
@@ -99,8 +101,11 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-                data = httptools.downloadpage_proxy('grantorrent', url, post=post, headers=headers, timeout=timeout).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage_proxy('grantorrent', url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -183,7 +188,7 @@ def generos(item):
         }
 
     for opc in sorted(opciones):
-        itemlist.append(item.clone( title = opciones[opc], url = host + 'categoria/' + opc + '/', action ='list_all' ))
+        itemlist.append(item.clone( title = opciones[opc], url = host + 'categoria/' + opc + '/', action ='list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -206,7 +211,7 @@ def calidades(item):
 
         url = host + 'tag/' + value.replace(' ', '-').lower() + '/'
 
-        itemlist.append(item.clone( title=title, url=url, action='list_all' ))
+        itemlist.append(item.clone( title=title, url=url, action='list_all', text_color='moccasin' ))
 
     return itemlist
 

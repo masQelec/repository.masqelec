@@ -41,17 +41,17 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action = 'list_all', title = 'Abejas', url = host + 'tema/abejas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Cine alemán', url = host + 'tema/cine-alemania/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Cine Usa', url = host + 'tema/cine-usa/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Contaminación', url = host + 'tema/contaminacion/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Coronavirus', url = host + 'tema/coronavirus/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Documental', url = host + 'tema/documental/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Kids en castellano', url = host + 'seccion/kids/kids-espanol/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Kids en VO', url = host + 'seccion/kids/kids-english/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Rugby', url = host + 'tema/rugby/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Segunda guerra mundial', url = host + 'tema/segunda-guerra-mundial/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Toc', url = host + 'tema/toc/' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Abejas', url = host + 'tema/abejas/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Cine alemán', url = host + 'tema/cine-alemania/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Cine Usa', url = host + 'tema/cine-usa/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Contaminación', url = host + 'tema/contaminacion/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Coronavirus', url = host + 'tema/coronavirus/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Documental', url = host + 'tema/documental/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Kids en castellano', url = host + 'seccion/kids/kids-espanol/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Kids en VO', url = host + 'seccion/kids/kids-english/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Rugby', url = host + 'tema/rugby/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Segunda guerra mundial', url = host + 'tema/segunda-guerra-mundial/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Toc', url = host + 'tema/toc/', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -60,19 +60,19 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Árabe', action = 'list_all', url = host + 'seccion/cine/arabic/' ))
-    itemlist.append(item.clone( title = 'Alemán', action = 'list_all', url = host + 'seccion/cine/deutsche/' ))
-    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'seccion/cine/cine-espanol/' ))
-    itemlist.append(item.clone( title = 'Chino', action = 'list_all', url = host + 'seccion/cine/chinese/' ))
-    itemlist.append(item.clone( title = 'Francés', action = 'list_all', url = host + 'seccion/cine/cine-francais/' ))
-    itemlist.append(item.clone( title = 'Hindú', action = 'list_all', url = host + 'seccion/cine/hindi/' ))
-    itemlist.append(item.clone( title = 'Inglés', action = 'list_all', url = host + 'seccion/cine/cine-english/' ))
-    itemlist.append(item.clone( title = 'Italiano', action = 'list_all', url = host + 'seccion/cine/cine-italiano/' ))
-    itemlist.append(item.clone( title = 'Japonés', action = 'list_all', url = host + 'seccion/cine/japanese/' ))
-    itemlist.append(item.clone( title = 'Portugués', action = 'list_all', url = host + 'seccion/cine/portugues/' ))
+    itemlist.append(item.clone( title = 'Árabe', action = 'list_all', url = host + 'seccion/cine/arabic/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Alemán', action = 'list_all', url = host + 'seccion/cine/deutsche/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'seccion/cine/cine-espanol/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Chino', action = 'list_all', url = host + 'seccion/cine/chinese/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Francés', action = 'list_all', url = host + 'seccion/cine/cine-francais/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Hindú', action = 'list_all', url = host + 'seccion/cine/hindi/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Inglés', action = 'list_all', url = host + 'seccion/cine/cine-english/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Italiano', action = 'list_all', url = host + 'seccion/cine/cine-italiano/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Japonés', action = 'list_all', url = host + 'seccion/cine/japanese/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Portugués', action = 'list_all', url = host + 'seccion/cine/portugues/', text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = 'Subtitulado Vose', action = 'list_all', url = host + 'tema/subtitulos/' ))
-    itemlist.append(item.clone( title = 'Subtitulado VO', action = 'list_all', url = host + 'tema/subtitles/' ))
+    itemlist.append(item.clone( title = 'Subtitulado Vose', action = 'list_all', url = host + 'tema/subtitulos/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulado VO', action = 'list_all', url = host + 'tema/subtitles/', text_color='moccasin'))
 
     return itemlist
 
@@ -95,7 +95,7 @@ def generos(item):
 
         if 'eng' in url: tit = tit + ' (Eng)'
 
-        itemlist.append(item.clone( title = tit, url = url, action = 'list_all' ))
+        itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -139,13 +139,14 @@ def list_all(item):
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb, languages = lang,
-                                            contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+                                    contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if '<nav class="navigation pagination"' in data:
             next_url = scrapertools.find_single_match(data, '<nav class="navigation pagination".*?class="page-numbers current">.*?href="(.*?)"')
+
             if next_url:
                 if '/page/' in next_url:
                     itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))

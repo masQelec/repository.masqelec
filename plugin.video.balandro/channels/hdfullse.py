@@ -70,8 +70,10 @@ def do_downloadpage(url, post = None, referer = None):
     if not referer: referer = host
     headers = {'Referer': referer}
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('hdfullse', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('hdfullse', url, post=post, headers=headers).data
 
     return data
 
@@ -121,7 +123,7 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='goldenrod' ))
+    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
     itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'star', search_type = 'person', 
                                 plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
@@ -165,9 +167,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( action = 'list_all', title = 'Más valoradas', url= host + '/tv-shows/imdb_rating', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( action = 'list_all', title = 'Animes', url = host + '/tv-tags/anime', search_type = 'tvshow' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Doramas', url = host + '/tv-tags/dorama', search_type = 'tvshow' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Novelas', url = host + '/tv-tags/soap', search_type = 'tvshow' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Animes', url = host + '/tv-tags/anime', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Doramas', url = host + '/tv-tags/dorama', search_type = 'tvshow', text_color='firebrick' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Novelas', url = host + '/tv-tags/soap', search_type = 'tvshow', text_color='limegreen' ))
 
     itemlist.append(item.clone( action = 'list_all', title = 'Por alfabético', url = host + '/tv-shows/abc', search_type = 'tvshow' ))
 
@@ -180,7 +182,10 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host)
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
+    data = do_downloadpage(host + '/movies')
 
     tipo = 'TV' if item.search_type == 'tvshow' else 'Películas'
     bloque = scrapertools.find_single_match(data, '<b class="caret"></b>&nbsp;&nbsp;%s</a>\s*<ul class="dropdown-menu">(.*?)</ul>' % tipo)
@@ -190,7 +195,7 @@ def generos(item):
     for url, title in matches:
         if title == 'All': continue
 
-        itemlist.append(item.clone( title = title, url = host + url, action = 'list_all' ))
+        itemlist.append(item.clone( title = title, url = host + url, action = 'list_all', text_color = text_color ))
 
     return sorted(itemlist, key = lambda it: it.title)
 
@@ -203,7 +208,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1919, -1):
-        itemlist.append(item.clone( title = str(x), url = host + '/search/year/' + str(x) + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = host + '/search/year/' + str(x) + '/', action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -242,15 +247,13 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, 
-                                        languages = ', '.join(languages), fmt_sufijo = sufijo,
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = ', '.join(languages), fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
 
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, 
-                                        languages = ', '.join(languages), fmt_sufijo = sufijo,
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, languages = ', '.join(languages), fmt_sufijo = sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
 
         if len(itemlist) >= perpage: break
@@ -268,6 +271,7 @@ def list_all(item):
 
         if buscar_next:
             next_page_link = scrapertools.find_single_match(data, '<a class="current">.*?href="(.*?)">')
+
             if next_page_link:
                 url = host + next_page_link
                 itemlist.append(item.clone( title = 'Siguientes ...', url = url, page = 0, action = 'list_all', text_color='coral' ))
@@ -333,11 +337,11 @@ def temporadas(item):
             return itemlist
 
         itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, referer = item.url, page = 0,
-                                    contentType = 'season', contentSeason = numtempo ))
+                                    contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
 
     if len(itemlist) == 0:
         itemlist.append(item.clone( action = 'episodios', url = item.url + '/season-1', title = 'Temporada 1', referer = item.url, page = 0,
-                                    contentType = 'season', contentSeason = 1 ))
+                                    contentType = 'season', contentSeason = 1, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 

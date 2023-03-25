@@ -45,8 +45,10 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-    data = httptools.downloadpage_proxy('tomadivx', url, post=post, headers=headers).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        data = httptools.downloadpage_proxy('tomadivx', url, post=post, headers=headers).data
 
     return data
 
@@ -151,7 +153,7 @@ def generos(item):
        ]
 
     for genre in genres:
-        itemlist.append(item.clone( action = "call_post", title = genre, url = host + 'peliculas/buscar', tipo='genero', genre=genre ))
+        itemlist.append(item.clone( action = "call_post", title = genre, url = host + 'peliculas/buscar', tipo='genero', genre=genre, text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -160,8 +162,12 @@ def alfabetico(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    elif item.search_type == 'tvshow': text_color = 'hotpink'
+    else: text_color = 'cyan'
+
     for letra in string.ascii_uppercase:
-        itemlist.append(item.clone(action="call_post", title=letra, letra=letra, tipo='letra'))
+        itemlist.append(item.clone(action="call_post", title=letra, letra=letra, tipo='letra', text_color = text_color ))
 
     return itemlist
 
@@ -187,8 +193,7 @@ def list_all(item):
 
             thumb if "http" in thumb else "https:" + thumb
 
-            itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, thumbnail=thumb,
-                                        contentType='movie', contentTitle=titulo, infoLabels={'year': "-"} ))
+            itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, thumbnail=thumb, contentType='movie', contentTitle=titulo, infoLabels={'year': "-"} ))
 
     elif item.search_type== 'tvshow':
         matches = re.compile(r"<a href='([^']+)'>([^<]+)").findall(data)
@@ -197,8 +202,7 @@ def list_all(item):
             if " - " in title: SerieName = title.split(" - ")[0]
             else: SerieName = title
 
-            itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, 
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':"-"} ))
+            itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':"-"} ))
 
     else:
         matches = re.compile(r"<a href='([^']+)'>([^<]+)").findall(data)
@@ -209,13 +213,13 @@ def list_all(item):
 
             titulo = titulo.strip()
 
-            itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title,
-                                        contentType = 'movie', contentTitle = titulo, contentExtra = 'documentary', infoLabels={'year': "-"} ))
+            itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title, contentType = 'movie', contentTitle = titulo, contentExtra = 'documentary', infoLabels={'year': "-"} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)">Siguiente')
+
         if next_url:
             next_url = host[:-1] + next_url
 
@@ -242,14 +246,12 @@ def list_last(item):
             if "(" in title: titulo = titulo.split("(")[0]
             else: titulo = title
 
-            itemlist.append(item.clone( action='findvideos', url=host + url, title=title,
-                                        contentType=item.search_type, contentTitle=titulo, infoLabels={'year': "-"} ))
+            itemlist.append(item.clone( action='findvideos', url=host + url, title=title, contentType=item.search_type, contentTitle=titulo, infoLabels={'year': "-"} ))
         else:
             if " - " in title: SerieName = title.split(" - ")[0]
             else: SerieName = title
 
-            itemlist.append(item.clone( action='episodios', url=host + url, title=title, 
-                                        contentType=item.search_type, contentSerieName=SerieName, infoLabels={'year':"-"} ))
+            itemlist.append(item.clone( action='episodios', url=host + url, title=title, contentType=item.search_type, contentSerieName=SerieName, infoLabels={'year': "-"} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -267,12 +269,19 @@ def call_post(item):
 
         item.post = "campo=%s&valor=%s&valor2=&valor3=&valor4=&pagina=%s" % ('anyo', val, str(item.page))
 
+        item.contentType = item.search_type
+
     elif item.tipo == 'genero':
         item.post = "campo=%s&valor=&valor2=%s&valor3=&valor4=&pagina=%s" % ('genero', item.genre, str(item.page))
+
+        item.contentType = item.search_type
 
     elif item.tipo == 'letra':
         if item.search_type == 'movie':
             item.post = "campo=%s&valor=&valor2=&valor3=%s&valor4=&pagina=%s" % ('letra', item.letra, str(item.page))
+
+            item.contentType = item.search_type
+
         else:
             if item.search_type == "tvshow": tipo = "series"
             else: tipo = "documentales"
@@ -301,13 +310,14 @@ def list_post(item):
         else: titulo = title
 
         itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, thumbnail=thumb if "http" in thumb else "https:" + thumb,
-                                            contentType=item.contentType, contentTitle=titulo, infoLabels={'year': "-", 'plot': info} ))
+                                    contentType=item.contentType, contentTitle=titulo, infoLabels={'year': "-", 'plot': info} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if item.post:
             next_page = scrapertools.find_single_match(item.post, '(.*?)pagina=')
+
             if next_page:
                 item.page = item.page + 1
                 exist_page = scrapertools.find_single_match(data, "<option value='" + str(item.page) + "'")
@@ -379,6 +389,7 @@ def findvideos(item):
             if item.contentType == 'documentary' or item.contentExtra == 'documentary':
                 patron = '<b class="bold">Formato:</b>.*?'
                 patron += "href='([^']+)'.*?download>Descargar</a>"
+
                 url = scrapertools.find_single_match(data, patron)
 
         if url:
@@ -400,8 +411,7 @@ def findvideos(item):
               servidor = 'directo'
               if '/ttlinks.live/' in url: other = 'ttlinks'
 
-           itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, quality = qlty, url = url,
-                                 server = servidor, other = other))
+           itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, quality = qlty, url = url, server = servidor, other = other))
 
     return itemlist
 

@@ -61,8 +61,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     if '/release/' in url: raise_weberror = False
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-    data = httptools.downloadpage_proxy('pelispedia', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('pelispedia', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -120,6 +122,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
+
     itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
@@ -143,6 +146,9 @@ def mainlist_series(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     opciones = [
         ('Acción', 'accion'),
@@ -193,7 +199,7 @@ def generos(item):
            elif tit == 'Terror': continue
            elif tit == 'Western': continue
 
-        itemlist.append(item.clone( title = tit, url = host + opc + '/', action='list_all' ))
+        itemlist.append(item.clone( title = tit, url = host + opc + '/', action='list_all', text_color = text_color ))
 
     return itemlist
 
@@ -206,7 +212,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1949, -1):
-        itemlist.append(item.clone( title=str(x), url= host + 'release/' + str(x) + '/', action='list_all' ))
+        itemlist.append(item.clone( title=str(x), url= host + 'release/' + str(x) + '/', action='list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -271,6 +277,7 @@ def list_all(item):
 
             prev_page = ''
             if 'Anterior' in bloque: prev_page = 'Anterior.*?'
+
             next_page = scrapertools.find_single_match(bloque, prev_page + '<a href="(.*?)"')
 
             if '/page/' in next_page:
@@ -299,8 +306,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0, nrotemp = nro_temp, 
-                                    contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0, nrotemp = nro_temp, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -366,8 +372,7 @@ def episodios(item):
 
         titulo = '%sx%s %s' % (season, episode, title)
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
-                                    contentType='episode', contentSeason=item.contentSeason, contentEpisodeNumber=episode ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentType='episode', contentSeason=item.contentSeason, contentEpisodeNumber=episode ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -440,8 +445,7 @@ def findvideos(item):
 
         if not '//' in url: server = 'directo'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, referer = item.url, title = '', url = url, 
-                              language = IDIOMAS.get(lang, lang), quality = qlty ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, referer = item.url, title = '', url = url, language = IDIOMAS.get(lang, lang), quality = qlty ))
 
     if not itemlist:
         if not ses == 0:
@@ -464,15 +468,18 @@ def play(item):
 
         url_b64 = url_b64.replace('&#038;', '&').replace('&amp;', '&')
 
-        data = httptools.downloadpage(url_b64, raise_weberror = False).data
+        if not url_b64.startswith(host):
+            data = httptools.downloadpage(url_b64, raise_weberror = False).data
+        else:
+            data = httptools.downloadpage_proxy('pelispedia', url_b64, raise_weberror = False).data
 
         if '/privatelink.de/' in data or '/www.privatelink.de/' in data: return itemlist
 
         if '.bayfiles.' in data or '.anonfiles.' in data:
             new_url = scrapertools.find_single_match(data, '<a type="button" id="download-url".*?href="(.*?)"')
             if new_url:
-               itemlist.append(item.clone(server = 'directo', url = new_url))
-               return itemlist
+                itemlist.append(item.clone(server = 'directo', url = new_url))
+                return itemlist
 
         new_url = scrapertools.find_single_match(data, '<h1 class.*?<a href="(.*?)"')
         if not new_url: new_url = scrapertools.find_single_match(data, ' src="(.*?)"')
@@ -486,6 +493,7 @@ def play(item):
                 if not fid: return itemlist
 
                 url = 'https://stream-mx.com/player.php?id=%s&v=2&ver=si' % fid
+
                 data = httptools.downloadpage(url, headers={'Referer': new_url}).data
 
                 bloque = scrapertools.find_single_match(data, '"sources":\s*\[(.*?)\]')
@@ -497,8 +505,8 @@ def play(item):
                     if v_type == 'hls':
                        itemlist.append(item.clone(url = v_url, server = 'm3u8hls'))
                     else:
-                      v_lbl = scrapertools.find_single_match(enlace, '"label":\s*"([^"]+)')
-                      itemlist.append([v_lbl, v_url])
+                       v_lbl = scrapertools.find_single_match(enlace, '"label":\s*"([^"]+)')
+                       itemlist.append([v_lbl, v_url])
 
                 return itemlist
 
@@ -515,14 +523,16 @@ def play(item):
 
     if '/o.php?l=' in item.url:
         url = scrapertools.find_single_match(item.url, "/o\.php\?l=(.*)")
+
         for i in range(9): # range(5)
             url = base64.b64decode(url)
             if url.startswith('http'): break
 
-        if not url.startswith('http'): url = None
+        if not url.startswith('http'): url = ''
 
     elif url.startswith('https://streamcrypt.net/'):
         url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
+
         if url:
             url = url.replace('?id=', '?p=2&id=')
             url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
@@ -532,7 +542,12 @@ def play(item):
 
     else:
         item.url = item.url.replace('&#038;', '&').replace('&amp;', '&')
-        resp = httptools.downloadpage(item.url, headers={'Referer': item.referer}, follow_redirects=False)
+
+        if not item.url.startswith(host):
+            resp = httptools.downloadpage(item.url, headers={'Referer': item.referer}, follow_redirects=False)
+        else:
+            resp = httptools.downloadpage_proxy('pelispedia', item.url, headers={'Referer': item.referer}, follow_redirects=False)
+
         if 'location' in resp.headers: 
             url = resp.headers['location']
         else:

@@ -71,8 +71,10 @@ def do_downloadpage(url, post=None, headers=None):
 
     timeout = 30
 
-    # ~ data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-    data = httptools.downloadpage_proxy('pelishouse', url, post=post, headers=headers, timeout=timeout).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+    else:
+        data = httptools.downloadpage_proxy('pelishouse', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -80,8 +82,11 @@ def do_downloadpage(url, post=None, headers=None):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
-                data = httptools.downloadpage_proxy('pelishouse', url, post=post, headers=headers).data
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage_proxy('pelishouse', url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -142,11 +147,12 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'genre/mas-vistas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'genre/peliculas-marvel-online/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'genre/peliculas-marvel-online/', search_type = 'movie', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'En 3D', action = 'list_3d', url = host + 'quality/3d/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
 
@@ -175,15 +181,18 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     if item.search_type == 'movie':
-       itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'genre/espanol-castellano/' ))
-       itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'genre/espanol-latino-online/' ))
-       itemlist.append(item.clone( title = 'En inglés', action = 'list_all', url = host + 'genre/peliculas-en-ingles/' ))
-       itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'genre/peliculas-online-subtituladas/' ))
+       itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'genre/espanol-castellano/', text_color = text_color ))
+       itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'genre/espanol-latino-online/', text_color = text_color ))
+       itemlist.append(item.clone( title = 'En inglés', action = 'list_all', url = host + 'genre/peliculas-en-ingles/', text_color = text_color ))
+       itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'genre/peliculas-online-subtituladas/', text_color = text_color ))
     else:
-       itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'genre/series-en-espanol-castellano/' ))
-       itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'genre/series-en-espanol-latino-hd/' ))
-       itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'genre/series-subtituladas/' ))
+       itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'genre/series-en-espanol-castellano/', text_color = text_color ))
+       itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'genre/series-en-espanol-latino-hd/', text_color = text_color ))
+       itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'genre/series-subtituladas/', text_color = text_color ))
 
     return itemlist
 
@@ -191,6 +200,9 @@ def idiomas(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     opciones = [
        ('accion', 'Acción'),
@@ -242,12 +254,12 @@ def generos(item):
            elif tit == 'Descargacineclasico tv': continue
            elif 'Películas' in tit: continue
 
-        itemlist.append(item.clone( title=tit, url= host + 'genre/' + opc + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title=tit, url= host + 'genre/' + opc + '/', action = 'list_all', text_color = text_color))
 
     if itemlist:
         if item.search_type == 'movie':
             if not descartar_xxx:
-                itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'genre/peliculas-18/' ))
+                itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'genre/peliculas-18/', text_color = text_color ))
 
     return itemlist
 
@@ -260,7 +272,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1938, -1):
-        itemlist.append(item.clone( title = str(x), url = host + 'release/' + str(x) + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title = str(x), url = host + 'release/' + str(x) + '/', action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -288,32 +300,32 @@ def paises(item):
 
         itemlist.append(item.clone( title = title, url = url, action = 'list_all' ))
 
-    itemlist.append(item.clone( action = 'list_all', title = 'Australianas', url = host + 'genre/peliculas-australianas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Bolivianas', url = host + 'genre/peliculas-bolivianas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Brasileñas', url = host + 'genre/peliculas-brasilenas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Canadienses', url = host + 'genre/peliculas-canadienses/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Chinas', url = host + 'genre/peliculas-china/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Colombianas', url = host + 'genre/peliculas-colombianas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Coreanas', url = host + 'genre/peliculas-coreanas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Españolas', url = host + 'genre/peliculas-espanolas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Estadounidenses', url = host + 'genre/peliculas-estadounidenses/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Francesas', url = host + 'genre/peliculas-francesas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Indias', url = host + 'genre/peliculas-indias/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Italianas', url = host + 'genre/peliculas-italianas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Japonesas', url = host + 'genre/peliculas-japonesas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Noruegas', url = host + 'genre/peliculas-noruegas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Panameñas', url = host + 'genre/peliculas-panamenas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Peruanas', url = host + 'genre/peliculas-peruanas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Tailandesas', url = host + 'genre/peliculas-tailandesa/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Taiwanesas', url = host + 'genre/peliculas-taiwanesas/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Uruguayas', url = host + 'genre/peliculas-uruguayas/' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Australianas', url = host + 'genre/peliculas-australianas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Bolivianas', url = host + 'genre/peliculas-bolivianas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Brasileñas', url = host + 'genre/peliculas-brasilenas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Canadienses', url = host + 'genre/peliculas-canadienses/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Chinas', url = host + 'genre/peliculas-china/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Colombianas', url = host + 'genre/peliculas-colombianas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Coreanas', url = host + 'genre/peliculas-coreanas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Españolas', url = host + 'genre/peliculas-espanolas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Estadounidenses', url = host + 'genre/peliculas-estadounidenses/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Francesas', url = host + 'genre/peliculas-francesas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Indias', url = host + 'genre/peliculas-indias/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Italianas', url = host + 'genre/peliculas-italianas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Japonesas', url = host + 'genre/peliculas-japonesas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Noruegas', url = host + 'genre/peliculas-noruegas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Panameñas', url = host + 'genre/peliculas-panamenas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Peruanas', url = host + 'genre/peliculas-peruanas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Tailandesas', url = host + 'genre/peliculas-tailandesa/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Taiwanesas', url = host + 'genre/peliculas-taiwanesas/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Uruguayas', url = host + 'genre/peliculas-uruguayas/', text_color='moccasin' ))
 
-    itemlist.append(item.clone( action = 'list_all', title = 'Checas', url = host + 'genre/peliculas-de-chequia/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Guatemaltecas', url = host + 'genre/peliculas-de-guatemala/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Islandesas', url = host + 'genre/peliculas-de-islandia/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Inglesas', url = host + 'genre/peliculas-de-reino-unido/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Rusas', url = host + 'genre/peliculas-de-rusia/' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Sudafricanas', url = host + 'genre/peliculas-de-sudafrica/' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Checas', url = host + 'genre/peliculas-de-chequia/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Guatemaltecas', url = host + 'genre/peliculas-de-guatemala/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Islandesas', url = host + 'genre/peliculas-de-islandia/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Inglesas', url = host + 'genre/peliculas-de-reino-unido/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Rusas', url = host + 'genre/peliculas-de-rusia/', text_color='moccasin' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Sudafricanas', url = host + 'genre/peliculas-de-sudafrica/', text_color='moccasin' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -332,6 +344,7 @@ def list_all(item):
     if item.search_type == 'movie':
         for match in matches:
             url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
             if 'tvshows' in url: continue
 
             thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
@@ -339,32 +352,37 @@ def list_all(item):
             qlty = scrapertools.find_single_match(match, 'class="quality">(.*?)</span>')
 
             year = scrapertools.find_single_match(match, '</h3>.*?<span>(\d+)</span>')
+
             if not year: year = '-'
+            else:
+               if '(' + year + ')' in title: title = title.replace('(' + year + ')', '').strip()
+               elif year in title:  title = title.replace(year, '').strip()
 
-            title = title.replace('&#8211;', '')
+            title = title.replace('&#8211;', '').replace('&#8230;', '').strip()
 
-            title = title.strip()
-
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     else:
         for match in matches:
             url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
             if 'movies' in url: continue
 
             thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
             title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
             year = scrapertools.find_single_match(match, '</h3>.*?<span>(\d+)</span>')
+
             if not year: year = '-'
+            else:
+               if '(' + year + ')' in title: title = title.replace('(' + year + ')', '').strip()
+               elif year in title:  title = title.replace(year, '').strip()
 
             title = scrapertools.find_single_match(title, '(.*?) Serie.*?nline') or title
 
-            title = title.replace('&#8211;', '')
+            title = title.replace('&#8211;', '').replace('&#8230;', '').replace('Ver ', '').strip()
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
-                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -396,12 +414,15 @@ def list_3d(item):
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
         year = scrapertools.find_single_match(match, '</h3>.*?<span>(\d+)</span>')
+
         if not year: year = '-'
+        else:
+           if '(' + year + ')' in title: title = title.replace('(' + year + ')', '').strip()
+           elif year in title:  title = title.replace(year, '').strip()
 
-        title = title.strip()
+        title = title.replace('&#8211;', '').replace('&#8230;', '').strip()
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -427,7 +448,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -485,8 +506,7 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail=thumb,
-                                    contentType = 'episode', contentEpisodeNumber = episode ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail=thumb, contentType = 'episode', contentEpisodeNumber = episode ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -531,22 +551,21 @@ def findvideos(item):
         url = urlparse.urljoin(item.url, url)
 
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/www.jplayer.' in url: continue
-        elif 'rapidvideo.' in url: continue
-        elif '/streamango.' in url: continue
-        elif '/streamplay.' in url: continue
-        elif '/powvideo.' in url: continue
-        elif '/openload.' in url: continue
-        elif '/vidcloud.' in url: continue
-        elif '/gounlimited.' in url: continue
+
         elif '.oceanplay.' in url: continue
         elif '/entrepeliculasyseries.' in url: continue
         elif '/demariquita.' in url: continue
+        elif '/g-nula.top/' in url: continue
 
-        if url:
-            servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = language, quality = qlty ))
+        if servertools.is_server_available(servidor):
+            if not servertools.is_server_enabled(servidor): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = language, quality = qlty ))
 
     # ~ Download
     patron = "<tr id=.*?src='.*?domain=([^']+)'.*?href='(.*?)'.*?class='quality'>(.*?)</strong></td><td>(.*?)</td><td>"
@@ -569,14 +588,19 @@ def findvideos(item):
             elif servidor == 's5': continue
             elif servidor == 'pelipluspeliplus': continue
             elif servidor == 'demariquita': continue
+            elif servidor == 'g-nula': continue
 
             if servidor == 'utorrent': servidor = 'torrent'
             elif servidor == 'uptostream': servidor = 'uptobox'
 
             servidor = servertools.corregir_servidor(servidor)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'd',
-                                  language = language, quality = qlty ))
+            if servertools.is_server_available(servidor):
+                if not servertools.is_server_enabled(servidor): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'd', language = language, quality = qlty ))
 
     if not itemlist:
         if not ses == 0:
@@ -588,6 +612,7 @@ def findvideos(item):
 
 def get_video_url(item, _type, post, nume):
     post = {'action': 'doo_player_ajax', 'post': post, 'nume': nume, 'type': _type}
+
     data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = {'Referer': item.url})
 
     try:
@@ -626,8 +651,7 @@ def detectar_idiomas(tags):
 
        elif 'ingles' in tags: return 'Eng'
        elif 'subtitulado' in tags: return 'Vose'
-       else:
-            return '?'
+       else: return '?'
 
     return languages
 
@@ -650,7 +674,10 @@ def play(item):
 
     if item.server == 'torrent':
         try:
-           url = httptools.downloadpage_proxy('pelishouse', item.url, follow_redirects=False).headers['location']
+           if not item.url.startswith(host):
+               url = httptools.downloadpage(item.url, follow_redirects=False).headers['location']
+           else:
+               url = httptools.downloadpage_proxy('pelishouse', item.url, follow_redirects=False).headers['location']
         except:
            data = do_downloadpage(item.url)
 
@@ -667,10 +694,15 @@ def play(item):
         if item.other == 'd':
             if '/links/' in item.url:
                 try:
-                   url = httptools.downloadpage_proxy('pelishouse', item.url, follow_redirects=False).headers['location']
+                   if not item.url.startswith(host):
+                       url = httptools.downloadpage(item.url, follow_redirects=False).headers['location']
+                   else:
+                       url = httptools.downloadpage_proxy('pelishouse', item.url, follow_redirects=False).headers['location']
                 except:
                    data = do_downloadpage(item.url)
                    url = scrapertools.find_single_match(data, 'href="(.*?)"')
+
+                if '/www.jplayer.net/' in url: url = ''
 
                 if url:
                     servidor = servertools.get_server_from_url(url)
@@ -689,7 +721,9 @@ def play(item):
 
         else:
             data = do_downloadpage(item.url)
+
             url = scrapertools.find_single_match(str(data), '"file":"(.*?)"')
+            if not url: url = scrapertools.find_single_match(str(data), '<source src="(.*?)"')
 
             if url:
                url = url.replace('\\/', '/')
@@ -697,6 +731,7 @@ def play(item):
 
     elif item.url.startswith('https://peliscalidad.top/'):
         video_id = item.url.split('/')[-1]
+
         data = do_downloadpage('https://peliscalidad.top/api/source/%s' % video_id, post={'r': '', 'd': 'peliscalidad.top'})
 
         data = jsontools.load(data)
@@ -706,7 +741,10 @@ def play(item):
 
         if data:
             for video in data['data']:
-                url = httptools.downloadpage(video['file'], follow_redirects=False).headers['location']
+                if not video['file'].startswith(host):
+                    url = httptools.downloadpage(video['file'], follow_redirects=False).headers['location']
+                else:
+                    url = httptools.downloadpage_proxy('pelishouse', video['file'], follow_redirects=False).headers['location']
 
                 itemlist.append(item.clone( url=url, server='directo'))
 
@@ -727,7 +765,10 @@ def play(item):
             api_post = 'url=' + fid
 
         try:
-           url = httptools.downloadpage(api_url, post=api_post, follow_redirects=False).headers['location']
+           if not api_url.startswith(host):
+               url = httptools.downloadpage(api_url, post=api_post, follow_redirects=False).headers['location']
+           else:
+               url = httptools.downloadpage_proxy('pelishouse', api_url, post=api_post, follow_redirects=False).headers['location']
         except:
            url = ''
 
@@ -751,7 +792,10 @@ def play(item):
                     api_post = 'url=' + fid
 
                 try:
-                   url = httptools.downloadpage(api_url, post=api_post, follow_redirects=False).headers['location']
+                   if not api_url.startswith(host):
+                       url = httptools.downloadpage(api_url, post=api_post, follow_redirects=False).headers['location']
+                   else:
+                       url = httptools.downloadpage_proxy('pelishouse', api_url, post=api_post, follow_redirects=False).headers['location']
                 except:
                    url = ''
 
@@ -767,7 +811,10 @@ def play(item):
         api_post = 'url=' + fid
 
         try:
-           url = httptools.downloadpage(api_url, post=api_post, follow_redirects=False).headers['location']
+           if not api_url.startswith(host):
+               url = httptools.downloadpage(api_url, post=api_post, follow_redirects=False).headers['location']
+           else:
+               url = httptools.downloadpage_proxy('pelishouse', api_url, post=api_post, follow_redirects=False).headers['location']
         except:
            url = ''
 
@@ -776,18 +823,8 @@ def play(item):
 
             itemlist.append(item.clone( url=url, server='directo'))
 
-    elif item.url.startswith('https://g-nula.top'):
-        video_id = item.url.split('/')[-1]
-        data = do_downloadpage('https://g-nula.top/api/source/%s' % video_id, post={'r': '', 'd': 'g-nula.top'})
-
-        data = jsontools.load(data)
-
-        for video in data['data']:
-            url = httptools.downloadpage(video['file'], follow_redirects=False).headers['location']
-
-            itemlist.append(item.clone( url=url, server='directo'))
-
     else:
+
         itemlist.append(item.clone( url=item.url, server=item.server))
 
     return itemlist
@@ -818,8 +855,9 @@ def list_search(item):
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo = sufijo,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+            title = title.replace('&#8211;', '').replace('&#8230;', '').strip()
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo = sufijo, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     if item.search_type == 'tvshow' or item.search_type == 'all':
         patron = '<a href="([^"]+)"><img src="([^"]+)" alt="([^"]+)" /><span class="tvshows">TV</span>.*?<span class="year">(\d+)</span>'
@@ -837,8 +875,9 @@ def list_search(item):
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo = sufijo,
-                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
+            title = title.replace('&#8211;', '').replace('&#8230;', '').replace('Ver ', '').strip()
+
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo = sufijo, contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

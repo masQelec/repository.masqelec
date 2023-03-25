@@ -19,6 +19,8 @@ except:
       BR2 = None
 
 
+espera = config.get_setting('servers_waiting', default=6)
+
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
 el_srv += ('ResolveUrl[/B][/COLOR]')
@@ -64,10 +66,13 @@ def get_video_url(page_url, url_referer=''):
     if "Unfortunately, the file you want is not available." in data or "Unfortunately, the video you want to see is not available" in data or "This stream doesn" in data or "Page not found" in data or "Archivo no encontrado" in data:
         return "El archivo no existe o ha sido borrado"
  
-    espera = scrapertools.find_single_match(data, "data-remaining-time='(.*?)'")
+    waiting = scrapertools.find_single_match(data, "data-remaining-time='(.*?)'")
 
-    if espera:
+    if waiting:
         platformtools.dialog_notification(config.__addon_name, "Tiempo de espera indeterminado")
+    else:
+        platformtools.dialog_notification('Cargando Uptobox', 'Espera requerida de %s segundos' % espera)
+        time.sleep(int(espera))
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         try:
@@ -78,7 +83,7 @@ def get_video_url(page_url, url_referer=''):
             resuelto = resolveurl.resolve(page_url)
 
             if resuelto:
-                video_urls.append(['m3u8', resuelto + '|Referer=%s' % page_url])
+                video_urls.append(['m3u8', resuelto])
                 return video_urls
 
             platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
@@ -126,7 +131,7 @@ def get_video_url(page_url, url_referer=''):
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
-                    video_urls.append(['mp4', resuelto + '|Referer=%s' % page_url])
+                    video_urls.append(['mp4', resuelto])
                     return video_urls
 
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)

@@ -41,8 +41,11 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url):
-    # ~ data = httptools.downloadpage(url).data
-    data = httptools.downloadpage_proxy('estrenoscinesaa', url).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url).data
+    else:
+        data = httptools.downloadpage_proxy('estrenoscinesaa', url).data
+
     return data
 
 
@@ -60,10 +63,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'genre/netflix/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'genre/marvel/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'D.C.', action = 'list_all', url = host + 'genre/d-c/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Star wars', action = 'list_all', url = host + 'genre/starwars/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'genre/netflix/', search_type = 'movie', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'genre/marvel/', search_type = 'movie', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'D.C.', action = 'list_all', url = host + 'genre/d-c/', search_type = 'movie', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Star wars', action = 'list_all', url = host + 'genre/starwars/', search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -89,7 +92,8 @@ def generos(item):
         elif '/genre/starwars/' in url: continue
         elif '/sci-fi-fantasy/' in url: continue # son series
 
-        if count: title = title + ' (' + count + ')'
+        if count: title = '[COLOR deepskyblue]' + title + '[/COLOR] (' + count + ')'
+        else: title = '[COLOR deepskyblue]' + title + '[/COLOR]'
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url ))
 
@@ -154,8 +158,10 @@ def findvideos(item):
         if 'youtube.com' in url: continue
 
         servidor = servertools.get_server_from_url(url)
+
         if servidor and servidor != 'directo':
             url = servertools.normalize_url(servidor, url)
+
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Esp' ))
 
     # Descarga
@@ -176,8 +182,7 @@ def findvideos(item):
         quality = 'HD'
         lang = 'Esp'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                              language = lang, quality = quality , other = 'd' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, quality = quality , other = 'd' ))
 
     if not itemlist:
         if not ses == 0:
@@ -185,6 +190,7 @@ def findvideos(item):
             return
 
     return itemlist
+
 
 def play(item):
     logger.info()

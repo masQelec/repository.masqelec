@@ -7,7 +7,6 @@ if sys.version_info[0] < 3:
 else:
     import urllib.parse as urllib
 
-
 import re
 
 from platformcode import config, logger, platformtools
@@ -33,15 +32,32 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action ='list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Live action', action ='list_all', url = host + 'liveaction', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo por alfabético (A - Z)', action ='list_lst', url = host + 'lista.php?or=abc', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo por alfabético (Z - A)', action ='list_lst', url = host + 'lista.php?or=cba', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Live action', action ='list_liv', url = host + 'liveaction', search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Más populares', action ='list_lst', url = host + 'lista.php?or=mas', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más antiguas', action ='list_lst', url = host + 'lista.php?or=ler', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más actuales', action ='list_lst', url = host + 'lista.php?or=rel', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más impopulares', action ='list_lst', url = host + 'lista.php?or=sam', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Catálogo por alfabético (A - Z)', action ='list_lst', url = host + 'lista.php?or=abc', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Catálogo por alfabético (Z - A)', action ='list_lst', url = host + 'lista.php?or=cba', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def alfabetico(item):
+    logger.info()
+    itemlist = []
+
+    for letra in '#ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        if letra == '#': letter = '0'
+        else: letter = letra.lower()
+
+        url = host + 'lista.php?or=abc'
+
+        itemlist.append(item.clone( title = letra, action = 'list_abc', url = host + 'lista.php?or=abc', letra = letter, text_color='hotpink' ))
 
     return itemlist
 
@@ -67,8 +83,7 @@ def list_all(item):
 
         if not thumb.startswith('http'): thumb = host[:-1] + thumb
 
-        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,  contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -87,6 +102,31 @@ def list_all(item):
                         next_page = host + next_page
 
                         itemlist.append(item.clone( title='Siguientes ...', url = next_page, page = 0, action = 'list_all', text_color='coral' ))
+
+    return itemlist
+
+
+def list_liv(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)$')
+
+    matches = re.compile('<a href="(.*?)".*?src="(.*?)".*?title="(.*?)"', re.DOTALL).findall(bloque)
+
+    for url, thumb, title in matches:
+        if item.filtro:
+           if not item.filtro.lower() in title.lower(): continue
+
+        if not url.startswith('http'): url = host[:-1] + url
+
+        if not thumb.startswith('http'): thumb = host[:-1] + thumb
+
+        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,  contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -112,14 +152,48 @@ def list_lst(item):
 
         if not thumb.startswith('http'): thumb = host[:-1] + thumb
 
-        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, 
-                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if num_matches > hasta:
             itemlist.append(item.clone( title='Siguientes ...', page = item.page + 1, action = 'list_lst', text_color='coral' ))
+
+    return itemlist
+
+
+def list_abc(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+
+    matches = re.compile('data-original="(.*?)">.*?<a href="(.*?)".*?<h2>(.*?)</h2></a><span>(.*?)</span>', re.DOTALL).findall(data)
+
+    for thumb, url, title, year in matches:
+        title_letra = title[0]
+
+        if item.letra:
+            if item.letra == '0':
+                if not title_letra == '¡':
+                    if not title_letra == '¿':
+                       if not title_letra in '0123456789': continue
+            else:
+                if not title_letra.lower() == item.letra:  continue
+
+        if item.filtro:
+           if not item.filtro.lower() in title.lower(): continue
+
+        if not year: year = '-'
+
+        if not url.startswith('http'): url = host[:-1] + '/' + url
+
+        if not thumb.startswith('http'): thumb = host[:-1] + thumb
+
+        itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -143,7 +217,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action='episodios', title = title, page = 0, contentType = 'season', contentSeason = n + 1 ))
+        itemlist.append(item.clone( action='episodios', title = title, page = 0, contentType = 'season', contentSeason = n + 1, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -214,10 +288,11 @@ def episodios(item):
             if season > 1 and num_epi > last_epi: titulo += ' (%s)' % epi
 
             itemlist.append(item.clone( action='findvideos', url= host + url, title = titulo, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
-        if num_epi: last_epi = num_epi
 
-        if len(itemlist) >= item.perpage:
-            break
+            if num_epi: last_epi = num_epi
+
+            if len(itemlist) >= item.perpage:
+                break
 
     tmdb.set_infoLabels(itemlist)
 
@@ -324,26 +399,52 @@ def play(item):
     return itemlist
 
 
+def sub_search(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url, post = 'k=' + item.filtro ).data
+
+    matches = jsontools.load(data)
+
+    for datos in matches['dt']:
+        if len(datos) < 4: continue
+        elif not datos[1]: continue
+        elif not datos[2]: continue
+
+        year = datos[3]
+        if not year: year = '-'
+
+        itemlist.append(item.clone( title=datos[1], url= host + datos[2], action='temporadas', thumbnail=host + 'tb/' + datos[0] + '.jpg', 
+                                    contentType='tvshow', contentSerieName=datos[1], infoLabels={'year': year} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
 def search(item, texto):
     logger.info()
     itemlist = []
 
     try:
-        data = httptools.downloadpage(host + 'b.php', post='k='+texto.replace(' ', '+')).data
-        matches = jsontools.load(data)
+        item.filtro = texto.replace(" ", "+")
 
-        for datos in matches['dt']:
-            if len(datos) < 4: continue
-            elif not datos[1]: continue
-            elif not datos[2]: continue
+        item.url = host + 'lista.php?or=abc'
+        itemlist = list_abc(item)
 
-            year = datos[3]
-            if not year: year = '-'
+        if not str(itemlist) == '[]': return itemlist
 
-            itemlist.append(item.clone( title=datos[1], url= host + datos[2], action='temporadas', thumbnail=host + 'tb/' + datos[0] + '.jpg', 
-                                        contentType='tvshow', contentSerieName=datos[1], infoLabels={'year': year} ))
+        item.url = host + 'liveaction'
+        itemlist = list_liv(item)
 
-        tmdb.set_infoLabels(itemlist)
+        if not str(itemlist) =='[]': return itemlist
+
+        item.url = host + 'b.php'
+        itemlist = sub_search(item)
+
+        return itemlist
+
     except:
         import sys
         for line in sys.exc_info():

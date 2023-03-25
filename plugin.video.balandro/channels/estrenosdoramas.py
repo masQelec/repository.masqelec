@@ -78,6 +78,9 @@ def generos(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     genres = [
        ['accion', 'Acción'],
        ['boyslove', 'Boys love'],
@@ -94,7 +97,7 @@ def generos(item):
     for genero in genres:
         url = host + 'category/' + genero[0]
 
-        itemlist.append(item.clone( title = genero[1], action = 'list_all', url = url ))
+        itemlist.append(item.clone( title = genero[1], action = 'list_all', url = url, text_color = text_color ))
 
     return itemlist
 
@@ -267,8 +270,7 @@ def last_news(item):
         titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
-                                    contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis,
-                                    infoLabels={'year': '-'} ))
+                                    contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -312,8 +314,7 @@ def last_epis(item):
         titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
-                                    contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis,
-                                    infoLabels={'year': '-'} ))
+                                    contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -400,8 +401,7 @@ def episodios(item):
 
         title = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -447,8 +447,7 @@ def findvideos(item):
             other = scrapertools.find_single_match(data, '<ul class="tabs">.*?<a href="#tab' + str(opt) + '">.*?<b>(.*?)</b>')
             other = other.replace('(', '').replace(')', '')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                              other = other, language = IDIOMAS.get(lang, lang) ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other, language = IDIOMAS.get(lang, lang) ))
 
     if not itemlist:
         if not ses == 0:

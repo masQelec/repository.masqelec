@@ -52,6 +52,7 @@ channels_poe = [
         ]
 
 channels_despised = [
+        ['cuevana3mu'],
         ['hdfullse'],
         ['movidymobi'],
         ['pelispluscc'],
@@ -439,9 +440,10 @@ def info_channel(channel_name, channel_poe, host, dominio, txt):
                        if not 'Parece estar Bloqueado' in txt:
                            if not '<urlopen error' in txt:
                                if not 'timed out' in txt:
-                                   if not 'Denegado' in txt:
-                                       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
-                                       response, txt = acces_channel(channel_name, host, '', dominio, txt, follow_redirects=True)
+                                   if not 'getaddrinfo failed' in txt:
+                                       if not 'Denegado' in txt:
+                                           platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
+                                           response, txt = acces_channel(channel_name, host, '', dominio, txt, follow_redirects=True)
 
     if not dominio:
         dominio = config.get_setting('dominio', channel_id, default='')
@@ -509,7 +511,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
         if proxies:
             proxies = proxies.replace(' ', '')
 
-            if ';' in proxies:  proxies = proxies.replace(',', ';').split(';')
+            if ';' in proxies: proxies = proxies.replace(',', ';').split(';')
             else: proxies = proxies.split(',')
 
             platformtools.dialog_notification(config.__addon_name + '[COLOR red][B] con proxies[/B][/COLOR]', el_canal + '[/COLOR][/B]')
@@ -581,39 +583,46 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
     new_web = scrapertools.find_single_match(str(response.headers), "'location':.*?'(.*?)'")
 
     if response.sucess == False:
-        if '<urlopen error timed out>' in str(response.code) or '<urlopen error' in str(response.code):
-            if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+        if 'getaddrinfo failed' in str(response.code): txt += '[CR]domain: [COLOR darkgoldenrod][B]No se puede acceder a este sitio web.[/B][/COLOR]'
+        elif '| 502: Bad gateway</title>' in str(response.data): txt += '[COLOR darkgoldenrod][B]Host error Bad Gateway[/B][/COLOR]'
 
-            if 'actuales:' in txt:
-                if 'Sin proxies' in txt: txt += txt_proxs
-                else:
-                   if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
-                   txt += txt_provs
-            else:
-               if config.get_setting(cfg_proxies_channel, default=''): txt += '[COLOR red][B]Obtenga nuevos proxies[/B][/COLOR]'
+        elif '<urlopen error timed out>' in str(response.code) or '<urlopen error' in str(response.code):
+             if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
-               txt += txt_coffs
-               txt += txt_checs
-               txt += txt_routs
+             if 'No se puede establecer una conexión' in str(response.code): txt += '[COLOR darkgoldenrod][B]Host error NO responde[/B][/COLOR][CR]'
+             else: txt += '[COLOR orangered][B]Tiempo máximo de acceso excedido[/B][/COLOR][CR]'
+
+             if 'actuales:' in txt:
+                 if 'Sin proxies' in txt: txt += txt_proxs
+                 else:
+                    if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                    txt += txt_provs
+             else:
+                if config.get_setting(cfg_proxies_channel, default=''): txt += '[COLOR red][B]Obtenga nuevos proxies[/B][/COLOR]'
+                else: txt += '[COLOR orangered][B]Tiempo máximo de espera excedido[/B][/COLOR]'
+
+                txt += txt_coffs
+                txt += txt_checs
+                txt += txt_routs
 
         else:
-           if '| 502: Bad gateway</title>' in response.data:  txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
-           elif '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
-           elif '<title>Just a moment...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR][COLOR red][B] Protection[/B][/COLOR]'
-           elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
-           elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
-           else:
-              if len(response.data) > 0:
-                  txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR][CR]'
+            if '| 502: Bad gateway</title>' in response.data or '| 522: Connection timed out</title>' in response.data: txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
+            elif '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
+            elif '<title>Just a moment...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR][COLOR red][B] Protection[/B][/COLOR]'
+            elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
+            elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
+            else:
+               if len(response.data) > 0:
+                   txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR][CR]'
 
-                  txt += '[CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
-                  txt += str(response.headers) + '[CR]'
+                   txt += '[CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
+                   txt += str(response.headers) + '[CR]'
 
-                  if len(response.data) < 1000:
-                      response.data = str(response.data).strip()
-                      if len(response.data) > 0:
-                          txt += '[CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
-                          txt += str(response.data).strip() + '[CR]'
+                   if len(response.data) < 1000:
+                       response.data = str(response.data).strip()
+                       if len(response.data) > 0:
+                           txt += '[CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
+                           txt += str(response.data).strip() + '[CR]'
     else:
         if  '<span class="error-description">Access denied</span>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
 
@@ -621,8 +630,10 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
             if 'Estamos en mantenimiento, por favor inténtelo más tarde' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
 
             if new_web:
-                if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
-                elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
+                    if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                    elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                    else: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio[/B][/COLOR]"
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
@@ -642,7 +653,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
                     txt += '[CR]login: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
                     new_web = ''
 
-                    if response.code == 301 or response.code == 302 or response.code == 307 or response.code == 308:
+                    if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
                         if 'dominios:' in txt: txt += "[CR]obtener: [COLOR yellow][B]Puede Obtener Otro Dominio desde Configurar Dominio a usar ...[/B][/COLOR]"
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
@@ -654,14 +665,17 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
                     txt += '[CR]inicial: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
                     new_web = ''
 
-                    if response.code == 301 or response.code == 302 or response.code == 307 or response.code == 308:
+                    if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]"
 
                 else:
                    if new_web:
                        if not '/cgi-sys/suspendedpage.cgi' in new_web and not '/wp-admin/install.php' in new_web:
-                           if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
-                           elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                           if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
+                               if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                               elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                               else: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio[/B][/COLOR]"
+
                            else: txt += "[CR][CR][COLOR orangered][B]Comprobar Dominio[/B][/COLOR]"
 
                 if new_web:
@@ -793,6 +807,9 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
             elif host_in_data in str(response.data.lower()): falso = False
             elif channel_id in str(response.data.lower()): falso = False
 
+            if not falso:
+                if 'window.location="' in response.data: falso = True
+
             if falso:
                 if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
@@ -800,6 +817,9 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, follow_redirect
                     if not 'nuevo:' in txt: txt += '[COLOR springgreen][B]Sin Información de Datos.[/B][/COLOR][CR]'
                 else:
                     txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
+
+                    if 'This site is being used for fraudulent purposes' in response.data:
+                        txt += '[COLOR red][B]Atención [/COLOR][COLOR fuchsia]sitio Web con propositos Fraudulentos.[/B][/COLOR][CR]'
 
                 if 'Proxies:' in txt:
                     if 'actuales:' in txt:
@@ -986,13 +1006,16 @@ def info_server(server_name, server_poe, url, txt):
     response, txt = acces_server(server_name, url, txt, follow_redirects=False)
 
     if response.sucess == False:
-        if not 'Host error' in txt:
-            if not 'Cloudflare' in txt:
-               if not 'Invisible Captcha' in txt:
-                   if not 'timed out' in txt:
-                       if not 'Denegado' in txt:
-                           platformtools.dialog_notification(config.__addon_name, el_server + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
-                           response, txt = acces_server(server_name, url, txt, follow_redirects=True)
+        if not '<urlopen error timed out>' in txt:
+            if not 'Host error' in txt:
+                if not 'Cloudflare' in txt:
+                   if not 'Invisible Captcha' in txt:
+                       if not '<urlopen error' in txt:
+                           if not 'timed out' in txt:
+                               if not 'getaddrinfo failed' in txt:
+                                   if not 'Denegado' in txt:
+                                       platformtools.dialog_notification(config.__addon_name, el_server + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
+                                       response, txt = acces_server(server_name, url, txt, follow_redirects=True)
 
     return txt
 
@@ -1026,23 +1049,37 @@ def acces_server(server_name, url, txt, follow_redirects=None):
     new_web = scrapertools.find_single_match(str(response.headers), "'location':.*?'(.*?)'")
 
     if response.sucess == False:
-        if '| 502: Bad gateway</title>' in response.data:  txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
-        elif '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
-        elif '<title>Just a moment...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR[COLOR red][B] Protection[/B][/COLOR]'
-        elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
-        elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
+        if 'getaddrinfo failed' in str(response.code): txt += '[CR]domain: [COLOR darkgoldenrod][B]No se puede acceder a este sitio web.[/B][/COLOR]'
+        elif '| 502: Bad gateway</title>' in str(response.data): txt += '[COLOR darkgoldenrod][B]Host error Bad Gateway[/B][/COLOR]'
+
+        elif '<urlopen error timed out>' in str(response.code) or '<urlopen error' in str(response.code):
+             if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
+             if 'No se puede establecer una conexión' in str(response.code): txt += '[COLOR darkgoldenrod][B]Host error NO responde[/B][/COLOR][CR]'
+             else: txt += '[COLOR orangered][B]Tiempo máximo de acceso excedido[/B][/COLOR][CR]'
+
+             txt += txt_coffs
+             txt += txt_checs
+             txt += txt_routs
+
         else:
-           if len(response.data) > 0:
-               txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR][CR]'
+            if '| 502: Bad gateway</title>' in response.data or '| 522: Connection timed out</title>' in response.data: txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
+            elif '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
+            elif '<title>Just a moment...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR[COLOR red][B] Protection[/B][/COLOR]'
+            elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
+            elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
+            else:
+               if len(response.data) > 0:
+                   txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR][CR]'
 
-               txt += '[CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
-               txt += str(response.headers) + '[CR]'
+                   txt += '[CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
+                   txt += str(response.headers) + '[CR]'
 
-               if len(response.data) < 1000:
-                   response.data = str(response.data).strip()
-                   if len(response.data) > 0:
-                       txt += '[CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
-                       txt += str(response.data).strip() + '[CR]'
+                   if len(response.data) < 1000:
+                       response.data = str(response.data).strip()
+                       if len(response.data) > 0:
+                           txt += '[CR][COLOR moccasin][B]Data:[/B][/COLOR][CR]'
+                           txt += str(response.data).strip() + '[CR]'
     else:
         if  '<span class="error-description">Access denied</span>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
 
@@ -1054,12 +1091,14 @@ def acces_server(server_name, url, txt, follow_redirects=None):
                 txt += '[CR]login: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
                 new_web = ''
 
-                if response.code == 301 or response.code == 302 or response.code == 307 or response.code == 308:
+                if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
                     txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]"
 
             elif new_web:
-                if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
-                elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
+                    if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                    elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                    else: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
@@ -1072,8 +1111,11 @@ def acces_server(server_name, url, txt, follow_redirects=None):
 
                 if new_web:
                     if not '/cgi-sys/suspendedpage.cgi' in new_web and not '/wp-admin/install.php' in new_web:
-                        if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
-                        elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                        if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
+                            if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                            elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                            else: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio[/B][/COLOR]"
+
                         else: txt += "[CR][CR][COLOR orangered][B]Comprobar Dominio[/B][/COLOR]"
 
                     if '/cgi-sys/suspendedpage.cgi' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'
@@ -1108,7 +1150,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
         elif response.sucess == False:
             txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
-            txt += '[COLOR gold][B]Puede Descartar el Servidor en la Configuración (categoría Play)[/B][/COLOR][CR]'
+            txt += '[COLOR gold][B]Puede Descartar el Servidor en la Configuración [/COLOR](categoría [COLOR fuchsia]Play[/COLOR])[/B][CR]'
             txt += '[COLOR tomato][B]Compruebe su Internet y/ó el Servidor, a través de un Navegador Web[/B][/COLOR][CR]'
             txt += txt_routs
 

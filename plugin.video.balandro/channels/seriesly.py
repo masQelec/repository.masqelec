@@ -58,6 +58,9 @@ def generos(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     opciones = [
        ('accion', 'Acción'),
        ('animacion', 'Animación'),
@@ -80,7 +83,7 @@ def generos(item):
     ]
 
     for opc, tit in opciones:
-        itemlist.append(item.clone( title=tit, url= host + 'category/' + opc + '/', action = 'list_all' ))
+        itemlist.append(item.clone( title=tit, url= host + 'category/' + opc + '/', action = 'list_all', text_color = text_color ))
 
     return itemlist
 
@@ -159,7 +162,7 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = tempo ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -213,8 +216,7 @@ def episodios(item):
     for epis, url, thumb, title in matches[item.page * item.perpage:]:
         title = str(item.contentSeason) + 'x' + epis + ' ' + title
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -262,14 +264,19 @@ def findvideos(item):
             else: lang = '?'
 
             if 'youtube' in srv: continue
+
             elif 'waaw' in srv or 'hqq' in srv or 'netu' in srv: continue
-            elif 'powvideo' in srv: continue
-            elif 'streamplay' in srv: continue
+
+            srv = servertools.corregir_servidor(srv)
+
+            if servertools.is_server_available(srv):
+                if not servertools.is_server_enabled(srv): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
 
             link = host + '?trembed=' + key + '&trid=' + id + '&trtype=' + '1'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty,
-                                  language = lang, other = srv.capitalize() ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty, language = lang, other = srv.capitalize() ))
 
     else:
 
@@ -286,14 +293,19 @@ def findvideos(item):
             else: lang = '?'
 
             if 'youtube' in srv: continue
+
             elif 'waaw' in srv or 'hqq' in srv or 'netu' in srv: continue
-            elif 'powvideo' in srv: continue
-            elif 'streamplay' in srv: continue
+
+            srv = servertools.corregir_servidor(srv)
+
+            if servertools.is_server_available(srv):
+                if not servertools.is_server_enabled(srv): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
 
             link = host + '?trembed=' + key + '&trid=' + id + '&trtype=' + '2'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty,
-                                  language = lang, other = srv.capitalize() ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty, language = lang, other = srv.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

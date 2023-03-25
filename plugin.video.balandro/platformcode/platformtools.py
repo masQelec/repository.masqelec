@@ -43,10 +43,6 @@ def compat(line1, line2, line3):
         message += '\n' + line3
     return message
 
-# ~  def compat(**kwargs):
-    # ~  message = '\n'.join([line for line in kwargs.values()])
-    # ~  return message
-
 
 def dialog_ok(heading, line1, line2="", line3=""):
     return xbmcgui.Dialog().ok(heading, compat(line1=line1, line2=line2, line3=line3))
@@ -98,11 +94,6 @@ def dialog_progress(heading, line1, line2="", line3=""):
 
     dialog.create(heading, compat(line1, line2, line3))
     return dialog
-
-# ~  def dialog_progress(heading, line1, line2=" ", line3=" "):
-    # ~  dialog = xbmcgui.DialogProgress()
-    # ~  dialog.create(heading, compat(line1=line1, line2=line2, line3=line3))
-    # ~  return dialog
 
 
 def dialog_progress_bg(heading, message=""):
@@ -569,12 +560,14 @@ def developer_mode_check_findvideos(itemlist, parent_item):
                     apuntar = True
 
         if apuntar:
-            txt_log_servers += 'Canal: %s Server: %s Url: %s' % (it.channel, it.server, it.url)
-            if parent_item.contentType == 'movie':
-                txt_log_servers += ' Película: %s' % (parent_item.contentTitle)
-            else:
-                txt_log_servers += ' Serie: %s Temporada %s Episodio %s' % (parent_item.contentSerieName, parent_item.contentSeason, parent_item.contentEpisodeNumber)
-            txt_log_servers += os.linesep
+            if not it.server in ['ddownload', 'dfiles', 'dropapk', 'desiupload', 'fileflares', 'fireload', 'katfile', 'krakenfiles', 'oload', 'pandafiles', 'rockfile', 'turbobit', 'uploadrive', 'uppit', 'userload']:
+                txt_log_servers += 'Canal: %s Server: %s Url: %s' % (it.channel, it.server, it.url)
+
+                if parent_item.contentType == 'movie':
+                    txt_log_servers += ' Película: %s' % (parent_item.contentTitle)
+                else:
+                    txt_log_servers += ' Serie: %s Temporada %s Episodio %s' % (parent_item.contentSerieName, parent_item.contentSeason, parent_item.contentEpisodeNumber)
+                txt_log_servers += os.linesep
 
         # Verificar calidades
         if it.quality == '' or it.quality_num == '': continue # Si no hay calidad o el canal no ha fijado el orden de calidades, nada a comprobar
@@ -750,7 +743,7 @@ def play_from_itemlist(itemlist, parent_item):
                 else:
                     opciones.append(it.title)
 
-            seleccion = dialog_select('Enlaces disponibles en [COLOR yellow]%s[/COLOR]' % itemlist[0].channel.capitalize(), opciones)
+            seleccion = dialog_select('[COLOR fuchsia]Players[/COLOR] disponibles en [COLOR yellow]%s[/COLOR]' % itemlist[0].channel.capitalize(), opciones)
 
             if seleccion == -1:
                 play_fake()
@@ -796,8 +789,6 @@ def play_fake(resuelto=False):
         xbmc.Player().stop()
     else:
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), 'resources', 'subtitle.mp4')) )
-        # recomendable en advancedsettings.xml tener <playlistretries>-1</playlistretries> y <playlisttimeout>-1</playlisttimeout>
-        # para evitar que se muestre diálogo "Playback failed" "Reproducción de lista abortada"
 
 
 # Hacer la reproducción del item recibido. Devuelve False si falla el vídeo, True si ok o cancelado
@@ -830,13 +821,17 @@ def play_video(item, parent_item, autoplay=False):
         return False
 
     opciones = []
+
     for video_url in video_urls:
-        opciones.append("Ver el vídeo" + " " + video_url[0])
+        if '[/B]' in str(video_url):
+           opciones.append('[COLOR fuchsia]Play[COLOR moccasin] ver el vídeo en [B]' + video_url[0] + '[/COLOR]')
+        else:
+           opciones.append('[COLOR fuchsia]Play[COLOR moccasin] ver el vídeo en [B]' + video_url[0] + '[/B][/COLOR]')
 
     # Si hay varias opciones dar a elegir, si sólo hay una reproducir directamente
     if len(opciones) > 1:
         if not autoplay: 
-            seleccion = dialog_select("Elige una opción [B][COLOR yellow]" + item.server.capitalize() + '[/B][/COLOR]', opciones)
+            seleccion = dialog_select("Seleccione una opción para [B][COLOR fuchsia]" + item.server.capitalize() + '[/B][/COLOR]', opciones)
         else:
             seleccion = len(opciones) - 1 # la última es la de más calidad !?
     else:
@@ -1030,17 +1025,17 @@ def dialogo_busquedas_por_fallo_web(item):
     else:
         busqueda = 'la serie [COLOR gold]%s[/COLOR]' % item.contentSerieName
 
-    if dialog_yesno('Error en el canal ' + item.channel, 
+    if dialog_yesno('Error en el canal [COLOR yellow][B]' + item.channel.capitalize() + '[/B][/COLOR]', 
                     'El enlace o la web de la que depende parece no estar disponible.',
-                    '¿ Buscar %s en otros canales ?' % busqueda):
+                    '¿ Buscar %s en [COLOR pink][B]Otros canales[/B][/COLOR] ?' % busqueda):
 
         infolabels = {'tmdb_id': item.infoLabels['tmdb_id']} if item.infoLabels['tmdb_id'] else {}
         item_search = Item(channel='search', action='search', from_channel=item.channel, infoLabels=infolabels)
 
     else:
-        if dialog_yesno('Error en el canal ' + item.channel, 
+        if dialog_yesno('Error en el canal [COLOR yellow][B]' + item.channel.capitalize() + '[/B][/COLOR]', 
                         'Si crees que la web funciona, quizás ha cambiado el enlace.',
-                        '¿ Volver a buscar %s en el mismo canal ?' % busqueda):
+                        '¿ Volver a buscar %s en el[COLOR cyan][B] Mismo canal[/B][/COLOR] ?' % busqueda):
 
             item_search = Item(channel=item.channel, action='search')
 
