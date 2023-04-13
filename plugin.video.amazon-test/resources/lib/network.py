@@ -25,10 +25,10 @@ from .common import Globals, Settings, sleep
 from .metrics import addNetTime
 
 try:
-    from urlparse import urlparse, parse_qs
-    from urllib import urlencode
+    from urlparse import urlparse, parse_qs, urlunparse
+    from urllib import urlencode, quote_plus
 except ImportError:
-    from urllib.parse import urlparse, parse_qs, urlencode
+    from urllib.parse import urlparse, parse_qs, urlencode, quote_plus, urlunparse
 
 domain_regex = r'[^\.]+\.([^/]+)(?:/|$)'
 
@@ -94,21 +94,23 @@ def getTerritory(user):
         user['deviceid'] = uuid4().hex
 
     areas = [{'atvurl': '', 'baseurl': '', 'mid': '', 'pv': False, 'country': ''},
-             {'atvurl': 'https://atv-ps-eu.amazon.de', 'baseurl': 'https://www.amazon.de', 'mid': 'A1PA6795UKMFR9', 'pv': False, 'country': 'de'},
-             {'atvurl': 'https://atv-ps-eu.amazon.co.uk', 'baseurl': 'https://www.amazon.co.uk', 'mid': 'A1F83G8C2ARO7P', 'pv': False, 'country': 'uk'},
-             {'atvurl': 'https://atv-ps.amazon.com', 'baseurl': 'https://www.amazon.com', 'mid': 'ATVPDKIKX0DER', 'pv': False, 'country': 'us'},
-             {'atvurl': 'https://atv-ps-fe.amazon.co.jp', 'baseurl': 'https://www.amazon.co.jp', 'mid': 'A1VC38T7YXB528', 'pv': False, 'country': 'jp'},
-             {'atvurl': 'https://atv-ps-eu.primevideo.com', 'baseurl': 'https://www.primevideo.com', 'mid': 'A3K6Y4MI8GDYMT', 'pv': True, 'country': 'us'},
-             {'atvurl': 'https://atv-ps-eu.primevideo.com', 'baseurl': 'https://www.primevideo.com', 'mid': 'A2MFUE2XK8ZSSY', 'pv': True, 'country': 'us'},
-             {'atvurl': 'https://atv-ps-fe.primevideo.com', 'baseurl': 'https://www.primevideo.com', 'mid': 'A15PK738MTQHSO', 'pv': True, 'country': 'us'},
-             {'atvurl': 'https://atv-ps.primevideo.com', 'baseurl': 'https://www.primevideo.com', 'mid': 'ART4WZ8MWBX2Y', 'pv': True, 'country': 'us'}]
+             {'atvurl': 'https://atv-ps-eu.amazon.de', 'baseurl': 'https://www.amazon.de', 'mid': 'A1PA6795UKMFR9', 'pv': False, 'locale': 'de', 'sidomain': 'amazon.de'},
+             {'atvurl': 'https://atv-ps-eu.amazon.co.uk', 'baseurl': 'https://www.amazon.co.uk', 'mid': 'A1F83G8C2ARO7P', 'pv': False, 'locale': 'uk', 'sidomain': 'amazon.co.uk'},
+             {'atvurl': 'https://atv-ps.amazon.com', 'baseurl': 'https://www.amazon.com', 'mid': 'ATVPDKIKX0DER', 'pv': False, 'locale': 'us', 'sidomain': 'amazon.com'},
+             {'atvurl': 'https://atv-ps-fe.amazon.co.jp', 'baseurl': 'https://www.amazon.co.jp', 'mid': 'A1VC38T7YXB528', 'pv': False, 'locale': 'jp', 'sidomain': 'amazon.co.jp'},
+             {'atvurl': 'https://atv-ps-eu.primevideo.com', 'baseurl': 'https://www.primevideo.com', 'mid': 'A3K6Y4MI8GDYMT', 'pv': True, 'locale': 'us', 'sidomain': 'amazon.com'},
+             {'atvurl': 'https://atv-ps-eu.primevideo.com', 'baseurl': 'https://www.primevideo.com', 'mid': 'A2MFUE2XK8ZSSY', 'pv': True, 'locale': 'us', 'sidomain': 'amazon.com'},
+             {'atvurl': 'https://atv-ps-fe.primevideo.com', 'baseurl': 'https://www.primevideo.com', 'mid': 'A15PK738MTQHSO', 'pv': True, 'locale': 'us', 'sidomain': 'amazon.com'},
+             {'atvurl': 'https://atv-ps.primevideo.com', 'baseurl': 'https://www.primevideo.com', 'mid': 'ART4WZ8MWBX2Y', 'pv': True, 'locale': 'us', 'sidomain': 'amazon.com'}]
     area = areas[Settings().region]
 
-    if area['mid']:
+    if len(user.get('mid', '')) > 0:
+        user.update({k: v for l in areas for k, v in l.items() if l['mid'] == user['mid'] and k not in user})
+    elif area['mid']:
         user.update(area)
     else:
         Log('Retrieve territoral config')
-        data = getURL('https://atv-ps.amazon.com/cdp/usage/v2/GetAppStartupConfig?deviceTypeID=A28RQHJKHM2A2W&deviceID=%s&firmware=1&version=1&format=json'
+        data = getURL('https://atv-ps.amazon.com/cdp/usage/v3/GetAppStartupConfig?deviceTypeID=A28RQHJKHM2A2W&deviceID=%s&firmware=1&version=1&format=json'
                       % user['deviceid'])
         if not hasattr(data, 'keys'):
             return user, False
@@ -120,7 +122,7 @@ def getTerritory(user):
             user['baseurl'] = data['territoryConfig']['primeSignupBaseUrl']
             user['mid'] = data['territoryConfig']['avMarketplace']
             user['pv'] = 'primevideo' in host
-            user['country'] = [a['country'] for a in areas if user['mid'] in a['mid']][0]
+            user.update({k: v for l in areas for k, v in l.items() if l['mid'] == user['mid'] and k in 'locale,sidomain'})
     return user, True
 
 
@@ -243,16 +245,14 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
     duration -= starttime
     addNetTime(duration)
     Log('Download Time: %s' % duration, Log.DEBUG)
+    if s.logHTTP:
+        WriteLog(BeautifulSoup(r.content, 'html.parser').prettify(), 'html', True, comment='<-- {} -->'.format(url))
     return res
 
 
 def getURLData(mode, asin, retformat='json', devicetypeid=g.dtid_web, version=2, firmware='1', opt='', extra=False,
                useCookie=False, retURL=False, vMT='Feature', dRes='PlaybackUrls,SubtitleUrls,ForcedNarratives',
                proxyEndpoint=None, silent=False):
-    try:
-        from urllib.parse import quote_plus
-    except ImportError:
-        from urllib import quote_plus
 
     g = Globals()
     playback_req = 'PlaybackUrls' in dRes or 'Widevine2License' in dRes
@@ -376,7 +376,7 @@ def _sortedResult(result, query):
 
 
 def MechanizeLogin(preferToken=False):
-    if preferToken and g.platform & g.OS_ANDROID:
+    if preferToken:  # and g.platform & g.OS_ANDROID
         token = getToken()
         if token:
             return token
@@ -586,6 +586,7 @@ def LogIn(retToken=False):
         s = Settings()
         Log('Login')
         from .users import loadUser, addUser
+        from .common import getdefaultlocale
         user = getTerritory(loadUser(empty=True))
         if False is user[1]:
             return False
@@ -603,47 +604,65 @@ def LogIn(retToken=False):
             br.set_cookiejar(cj)
             br.session.verify = s.verifySsl
             br.set_verbose(2)
-            clientid = b16encode(user['deviceid'].encode() + b'#' + g.dtid_android.encode()).decode().lower()
-            verifier = urlsafe_b64encode(os.urandom(32)).rstrip(b"=")
-            challenge = urlsafe_b64encode(sha256(verifier).digest()).rstrip(b"=")
-            br.session.headers.update(g.headers_android)
-            params = {
-                "openid.oa2.response_type": "code",
-                "openid.oa2.code_challenge_method": "S256",
-                "openid.oa2.code_challenge": challenge.decode(),
-                "openid.return_to": '{}/ap/maplanding'.format(user['baseurl']),
-                "openid.assoc_handle": "amzn_piv_android_v2_" + user['country'],
-                "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
-                "pageId": "amzn_device_common_dark",
-                "accountStatusPolicy": "P1",
-                "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
-                "openid.mode": "checkid_setup",
-                "openid.ns.oa2": "http://www.amazon.com/ap/ext/oauth/2",
-                "openid.oa2.client_id": "device:{}".format(clientid),
-                "openid.ns.pape": "http://specs.openid.net/extensions/pape/1.0",
-                "openid.oa2.scope": "device_auth_access",
-                "forceMobileLayout": "true",
-                "openid.ns": "http://specs.openid.net/auth/2.0",
-                "openid.pape.max_auth_age": "0"
-            }
-
-            caperr = -5
-            while caperr:
-                Log('Connect to SignIn Page %s attempts left' % -caperr)
-                br.open(user['baseurl'] + ('/ap/signin?' if not user['pv'] else '/auth-redirect/?') + urlencode(params))
-                try:
-                    form = br.select_form('form[name="signIn"]')
-                except mechanicalsoup.LinkNotFoundError:
-                    getUA(True)
-                    caperr += 1
-                    WriteLog(str(br.get_current_page()), 'login-si')
-                    xbmc.sleep(randint(750, 1500))
-                else:
-                    break
+            Log('Connect to SignIn Page')
+            if s.data_source == 0:
+                br.session.headers.update({'User-Agent': getConfig('UserAgent')})
+                br.open(user['baseurl'] + ('/gp/flex/sign-out.html' if not user['pv'] else '/auth-redirect/?signin=1'))
+                Log(br.get_url(), Log.DEBUG)
+                br.session.headers.update({
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                        'Accept-Encoding': 'gzip, deflate',
+                        'Accept-Language': g.userAcceptLanguages,
+                        'Cache-Control': 'max-age=0',
+                        'Connection': 'keep-alive',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Origin': '/'.join(br.get_url().split('/')[0:3]),
+                        'Upgrade-Insecure-Requests': '1'
+                })
             else:
-                g.dialog.ok(getString(30200), getString(30213))
-                return False
+                clientid = b16encode(user['deviceid'].encode() + b'#' + g.dtid_android.encode()).decode().lower()
+                verifier = urlsafe_b64encode(os.urandom(32)).rstrip(b"=")
+                challenge = urlsafe_b64encode(sha256(verifier).digest()).rstrip(b"=")
+                br.session.headers.update(g.headers_android)
+                br.open('https://www.' + user['sidomain'])
+                WriteLog(str(br.get_current_page()), 'bu')
+                br.follow_link(attrs={'class': 'nav-show-sign-in'})
+                up = urlparse(br.get_url())
+                query = {k: v[0] for k, v in parse_qs(up.query).items()}
+                up_rt = urlparse(query['openid.return_to'])
+                up_rt = up_rt._replace(netloc=up.netloc, path='/ap/maplanding', query='')
+                query['openid.assoc_handle'] = 'amzn_piv_android_v2_' + user['locale']
+                query['openid.return_to'] = up_rt.geturl()
+                query.update({
+                    "openid.oa2.response_type": "code",
+                    "openid.oa2.code_challenge_method": "S256",
+                    "openid.oa2.code_challenge": challenge.decode(),
+                    "pageId": "amzn_dv_ios_blue",
+                    "openid.ns.oa2": "http://www.amazon.com/ap/ext/oauth/2",
+                    "openid.oa2.client_id": "device:{}".format(clientid),
+                    "openid.ns.pape": "http://specs.openid.net/extensions/pape/1.0",
+                    "openid.oa2.scope": "device_auth_access",
+                    "language": getdefaultlocale()[0],
+                    "disableLoginPrepopulate": 0
+                })
+                up = up._replace(query=urlencode(query))
+                br.session.headers.update(
+                    {'upgrade-insecure-requests': '1',
+                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                     'x-requested-with': 'com.amazon.avod.thirdpartyclient',
+                     'sec-fetch-site': 'none',
+                     'sec-fetch-mode': 'navigate',
+                     'sec-fetch-user': '?1',
+                     'sec-fetch-dest': 'document',
+                     'accept-language': g.userAcceptLanguages,
+                     'host': up.netloc
+                     }
+                )
+                br.open(up.geturl())
+                Log(up.geturl(), Log.DEBUG)
 
+            form = br.select_form('form[name="signIn"]')
+            WriteLog(str(br.get_current_page()), 'login-si')
             form.set_input({'email': email, 'password': password})
             if 'true' == g.addon.getSetting('rememberme'):
                 try:
@@ -664,7 +683,6 @@ def LogIn(retToken=False):
                 response, soup = _parseHTML(br)
                 WriteLog(response.replace(py2_decode(email), '**@**'), 'login-mfa')
 
-            url = br.get_url()
             if 'accountFixup' in response:
                 Log('Login AccountFixup')
                 skip_link = br.find_link(id='ap-account-fixup-phone-skip-link')
@@ -672,6 +690,7 @@ def LogIn(retToken=False):
                 response, soup = _parseHTML(br)
                 WriteLog(response.replace(py2_decode(email), '**@**'), 'login-fixup')
 
+            url = br.get_url()
             # Some PrimeVideo endpoints still return you to the store, directly
             if url.endswith('?ref_=av_auth_return_redir') or ('action=sign-out' in response) or ('openid.oa2.authorization_code' in url):
                 if 'openid.oa2.authorization_code' in url:
@@ -725,7 +744,7 @@ def LogIn(retToken=False):
 def registerDevice(url, user, verifier, clientid):
     parsed_url = parse_qs(urlparse(url).query)
     auth_code = parsed_url["openid.oa2.authorization_code"][0]
-    domain = re.compile(domain_regex).search(user['baseurl']).group(1)
+    domain = user['sidomain']
 
     data = {
         'auth_data': {
@@ -792,7 +811,7 @@ def getToken(user=None):
 
 
 def refreshToken(user):
-    domain = re.compile(domain_regex).search(user['baseurl']).group(1)
+    domain = user['sidomain']
     token = user['token']
     data = deviceData(user)
     data['requested_token_type'] = 'access_token'
@@ -943,16 +962,18 @@ def GrabJSON(url, postData=None):
 
     def do(url, postData):
         """ Wrapper to facilitate logging """
-
-        if url.startswith('/search/') or url.startswith('/gp/video/search/'):
-            np = urlparse(url)
-            qs = parse_qs(np.query)
+        if re.match(r'/(?:gp/video/)?search(?:Default)?/', url):
+            up = urlparse(url)
+            qs = parse_qs(up.query)
             if 'from' in list(qs):  # list() instead of .keys() to avoid py3 iteration errors
                 qs['startIndex'] = qs['from']
                 del qs['from']
-            np = np._replace(path='/gp/video/api' + np.path.replace('/gp/video', ''), query=urlencode([(k, v) for k, l in qs.items() for v in l]))
-            url = np.geturl()
-
+            if url.startswith('/gp/video'):
+                newPath = '/gp/video' + up.path.replace('/gp/video', '')
+            else:
+                newPath = '/api' + up.path.replace('/search/', '/searchDefault/')
+            up = up._replace(path=newPath, query=urlencode([(k, v) for k, l in qs.items() for v in l]))
+            url = up.geturl()
         r = getURL(FQify(url), silent=True, useCookie=True, rjson=False, postdata=postData)
         if not r:
             return None

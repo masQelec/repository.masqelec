@@ -34,7 +34,7 @@ msgid "Amazon Account"
 msgstr "Conta Amazon"
 
 msgctxt "#30002"
-msgid "Email Adress"
+msgid "Email Address"
 msgstr "Endereço de Email"
 
 msgctxt "#30003"
@@ -387,7 +387,7 @@ msgid "Both"
 msgstr "Ambos"
 
 msgctxt "#30093"
-msgid "Use Web API (beta)"
+msgid "Use Web API (requires restart)"
 msgstr ""
 
 msgctxt "#30094"
@@ -822,4 +822,20 @@ msgid ""
 "You are using an Android device that is not yet registered with Amazon, so at most HD playback is possible.\n"
 "In order to register this device and thus use the UHD playback, they must log in again in the addon with their Amazon credentials.\n"
 "This message will be displayed once."
+msgstr ""
+
+msgctxt "#30273"
+msgid "Data Source"
+msgstr ""
+
+msgctxt "#30274"
+msgid "Log HTTP response content"
+msgstr ""
+
+msgctxt "#30275"
+msgid "Create Logfiles archive"
+msgstr ""
+
+msgctxt "#30276"
+msgid "Clear Logfiles"
 msgstr ""

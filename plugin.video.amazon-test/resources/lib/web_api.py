@@ -51,9 +51,10 @@ class PrimeVideo(Singleton):
             'da_DK': {'deconstruct': r'^(?P<d>[0-9]+)\.?\s+(?P<m>[^\s]+)\s+(?P<y>[0-9]+)',
                       'months': {'januar': 1, 'februar': 2, 'marts': 3, 'april': 4, 'maj': 5, 'juni': 6, 'juli': 7, 'august': 8, 'september': 9, 'oktober': 10,
                                  'november': 11, 'december': 12}},
-            'de_DE': {'deconstruct': r'^(?P<m>[^\s]+)\s+(?P<d>[0-9]+),?\s+(?P<y>[0-9]+)',
+            'de_DE': {'deconstruct': r'^(?P<d>[0-9]+)\.?\s+(?P<m>[^\s]+)\s+(?P<y>[0-9]+)',
                       'months': {'januar': 1, 'februar': 2, 'märz': 3, 'april': 4, 'mai': 5, 'juni': 6, 'juli': 7, 'august': 8, 'september': 9, 'oktober': 10,
-                                 'november': 11, 'dezember': 12}},
+                                 'november': 11, 'dezember': 12, 'jan.': 1, 'feb.': 2, 'mär.': 3, 'apr.': 4, 'jun.': 6, 'jul.': 7, 'aug.': 8, 'sept.': 9, 'okt.': 10,
+                                 'nov.': 11, 'dez.': 12}},
             'en_US': {'deconstruct': r'^(?P<m>[^\s]+)\s+(?P<d>[0-9]+),?\s+(?P<y>[0-9]+)',
                       'months': {'january': 1, 'february': 2, 'march': 3, 'april': 4, 'may': 5, 'june': 6, 'july': 7, 'august': 8, 'september': 9, 'october': 10,
                                  'november': 11, 'december': 12}},
@@ -64,8 +65,8 @@ class PrimeVideo(Singleton):
                       'months': {'tammikuuta': 1, 'helmikuuta': 2, 'maaliskuuta': 3, 'huhtikuuta': 4, 'toukokuuta': 5, 'kesäkuuta': 6, 'heinäkuuta': 7, 'elokuuta': 8,
                                  'syyskuuta': 9, 'lokakuuta': 10, 'marraskuuta': 11, 'joulukuuta': 12}},
             'fr_FR': {'deconstruct': r'^(?P<d>[0-9]+)\s+(?P<m>[^\s]+)\s+(?P<y>[0-9]+)',
-                      'months': {'janvier': 1, 'février': 2, 'mars': 3, 'avril': 4, 'mai': 5, 'juin': 6, 'juillet': 7, 'aout': 8, 'août': 8, 'septembre': 9,
-                                 'octobre': 10, 'novembre': 11, 'décembre': 12}},
+                      'months': {'janvier': 1, 'janv.': 1, 'février': 2, 'févr.': 2, 'mars': 3, 'avril': 4, 'avr.': 4, 'mai': 5, 'juin': 6, 'juillet': 7, 'juil.': 7,
+                                  'aout': 8, 'août': 8, 'septembre': 9, 'sept.': 9, 'octobre': 10, 'oct.': 10, 'novembre': 11, 'nov.': 11, 'décembre': 12, 'déc.': 12}},
             'hi_IN': {'deconstruct': r'^(?P<d>[0-9]+)\s+(?P<m>[^\s]+)\s+(?P<y>[0-9]+)',
                       'months': {'जनवरी': 1, 'फ़रवरी': 2, 'मार्च': 3, 'अप्रैल': 4, 'मई': 5, 'जून': 6, 'जुलाई': 7, 'अगस्त': 8, 'सितंबर': 9, 'अक्तूबर': 10,
                                  'नवंबर': 11, 'दिसंबर': 12}},
@@ -256,23 +257,25 @@ class PrimeVideo(Singleton):
 
     def _UpdateProfiles(self, data):
         data = data.get('lists', data)
-        if 'cerberus' in data:
-            p = data['cerberus']['activeProfile']
-            self._catalog['profiles'] = {'active': p['id']}
-            self._catalog['profiles'][p['id']] = {
-                'title': p.get('name', 'Default').encode('utf-8'),
-                'metadata': {'artmeta': {'thumb': p['avatarUrl']}},
-                'verb': 'pv/profiles/switch/{}'.format(p['id']),
-                'endpoint': p['switchLink'],
-            }
-            if 'otherProfiles' in data['cerberus']:
-                for p in data['cerberus']['otherProfiles']:
-                    self._catalog['profiles'][p['id']] = {
-                        'title': p.get('name', 'Default').encode('utf-8'),
-                        'metadata': {'artmeta': {'thumb': p['avatarUrl']}},
-                        'verb': 'pv/profiles/switch/{}'.format(p['id']),
-                        'endpoint': p['switchLink'],
-                    }
+        pr = data.get('cerberus', data.get('profiles'))
+        if pr is not None:
+            profiles = []
+            if 'activeProfile' in pr:
+                profiles.append(pr['activeProfile'])
+            if 'otherProfiles' in pr:
+                profiles += pr['otherProfiles']
+            if isinstance(pr, list):
+                profiles = pr
+            self._catalog['profiles'] = {}
+            for p in profiles:
+                if p.get('isSelected', False):
+                    self._catalog['profiles']['active'] = p['id']
+                self._catalog['profiles'][p['id']] = {
+                    'title': p.get('name', 'Default').encode('utf-8'),
+                    'metadata': {'artmeta': {'thumb': p['avatarUrl']}},
+                    'verb': 'pv/profiles/switch/{}'.format(p['id']),
+                    'endpoint': p['switchLink'],
+                }
 
     def Route(self, verb, path):
         if 'search' == verb: g.pv.Search()
@@ -282,7 +285,7 @@ class PrimeVideo(Singleton):
         elif 'languageselect' == verb: g.pv.LanguageSelect()
         elif 'clearcache' == verb: g.pv.DeleteCache()
         elif 'wltoogle' == verb: g.pv.Watchlist(path)
-        elif 'ageSettings' == verb: g.dialog.ok(g.__plugin__, 'Age Restrictions are currently unavailable for Primevideo / WebApi users')
+        elif 'ageSettings' == verb: g.dialog.ok(g.__plugin__, 'Age Restrictions are currently unavailable for WebApi users')
         elif 'sethome' == verb: g.pv.SetHome(path)
 
     def Watchlist(self, path):
@@ -384,10 +387,9 @@ class PrimeVideo(Singleton):
             br = StatefulBrowser(soup_config={'features': 'html.parser'})
             br.set_cookiejar(cj)
             br.session.headers.update({'User-Agent': getConfig('UserAgent')})
-            br.open(g.BaseUrl + '/gp/customer-preferences/select-language')
-            form = br.select_form('form[method="post"]')
+            br.open(g.BaseUrl + '/customer-preferences/edit')
             langs = [(elem.label.input.get('value'), elem.get_text(strip=True), elem.label.input.get('checked') is not None)
-                     for elem in br.get_current_page().find_all('div', attrs={'data-a-input-name': 'LOP'})]
+                     for elem in br.get_current_page().find_all('div', attrs={'data-a-input-name': 'lop'})]
             presel = [i for i, x in enumerate(langs) if x[2] is True]
 
         if len(langs) < 1:
@@ -402,8 +404,8 @@ class PrimeVideo(Singleton):
             if self._g.UsePrimeVideo:
                 cj.set('lc-main-av', langs[sel][0], path='/')
             else:
-                form.set_radio({'LOP': langs[sel][0]})
-                br.submit_selected()
+                ck = [k for k, v in cj.items() if 'sess-at-' in k][0].replace('sess-at-', 'lc-')
+                cj.set(ck, langs[sel][0], path='/')
             saveUserCookies(cj)
             self.DeleteCache()
 
@@ -427,72 +429,88 @@ class PrimeVideo(Singleton):
         # Specify `None` instead of just not empty to avoid multiple queries to the same endpoint
         if home is None:
             home = GrabJSON(self._g.BaseUrl + ('' if self._g.UsePrimeVideo else '/gp/video/storefront'))
+            LogJSON(home)
             if not home:
                 return False
             self._UpdateProfiles(home)
         self._catalog['root'] = OrderedDict()
 
         # Insert the watchlist
+        navigation = None
         try:
             watchlist = next((x for x in home['yourAccount']['links'] if '/watchlist/' in x['href']), None)
             self._catalog['root']['Watchlist'] = {'title': watchlist['text'], 'lazyLoadURL': FQify(watchlist['href'])}
         except: pass
         try:
-            watchlist = next((x for x in home['mainMenu']['links'] if 'pv-nav-mystuff' in x['id']), None)
+            navigation = deepcopy(home['mainMenu']['links'] if 'mainMenu' in home else home['lists']['mainMenuLinks'])
+            watchlist = next((x for x in navigation if 'pv-nav-mystuff' in x['id']), None)
             self._catalog['root']['Watchlist'] = {'title': self._BeautifyText(watchlist['text']), 'lazyLoadURL': watchlist['href']}
         except: pass
         try:
-            watchlist = next((x for x in home['lists']['mainMenuLinks'] if 'pv-nav-mystuff' in x['id']), None)
-            self._catalog['root']['Watchlist'] = {'title': self._BeautifyText(watchlist['text']), 'lazyLoadURL': watchlist['href']}
+            navigation = deepcopy(home['nav']['navigationNodes'])
+            watchlist = next((x for x in navigation if 'pv-nav-my-stuff' in x['id']), None)
+            self._catalog['root']['Watchlist'] = {'title': self._BeautifyText(watchlist['label'])}
+            if watchlist['subMenu'][0].get('subNodes') is None:
+                ms = watchlist['url'].rsplit('/', 1)
+                data = {'subNodes': [{'id': 'watchlist', 'label': getString(30245), 'url': '/watchlist/'.join(ms)},
+                                     {'id': 'library', 'label': getString(30100), 'url': '/library/'.join(ms)}]}
+            else:
+                data = watchlist['subMenu'][0]
+            self._catalog['root']['Watchlist']['lazyLoadData'] = data
         except: pass
+
         if 'Watchlist' not in self._catalog['root']:
             Log('Watchlist link not found', Log.ERROR)
 
         # Insert the main sections, in order
-        try:
-            navigation = deepcopy(home['mainMenu']['links'] if self._g.UsePrimeVideo else home['lists']['mainMenuLinks'])
+        if navigation is not None:
             cn = 0
             while navigation:
                 link = navigation.pop(0)
                 mml = 'links' in link
                 # Skip watchlist
-                if 'pv-nav-mystuff' in link['id']:
+                if link['id'] in ['pv-nav-mystuff', 'pv-nav-my-stuff']:
                     continue
                 if self._g.UsePrimeVideo and mml:
                     navigation = link['links'] + navigation
                     continue
                 cn += 1
-                id = 'coll{}_{}'.format(cn, link['text'] + ('_mmlinks' if mml else ''))
-                self._catalog['root'][id] = {'title': self._BeautifyText(link['text']), 'lazyLoadURL': link['href']}
+                title = link.get('text', link.get('label'))
+                id = 'coll{}_{}'.format(cn, title + ('_mmlinks' if mml else ''))
+                self._catalog['root'][id] = {'title': self._BeautifyText(title), 'lazyLoadURL': link.get('href', link.get('url'))}
                 # Avoid unnecessary calls when loading the current page in the future
                 if 'isHighlighted' in link and link['isHighlighted']:
                     self._catalog['root'][id]['lazyLoadData'] = home
                 # Adding main menu categories
                 if mml:
                     self._catalog['root'][id]['lazyLoadData'] = home
-        except:
+        else:
             self._g.dialog.notification(
                 'PrimeVideo error',
-                'You might be unable to access the service: check the website www.primevideo.com for more information'
-                '' if 'cerberus' in home else ''
-                'Unable to find the navigation menu for primevideo.com',
-                xbmcgui.NOTIFICATION_ERROR
+                'You might be unable to access the service: check the website {} for more information'
+                ''.format(self._g.BaseUrl) if 'cerberus' in home else ''
+                'Unable to find the navigation menu', xbmcgui.NOTIFICATION_ERROR
             )
-            Log('Unable to parse the navigation menu for primevideo.com', Log.ERROR)
+            Log('Unable to parse the navigation menu for {}'.format(self._g.BaseUrl), Log.ERROR)
             return False
 
         # Insert the searching mechanism
         if self._g.UsePrimeVideo:
             # Insert the searching mechanism
             try:
-                sfa = home['searchBar']['searchFormAction']
+                if 'nav' in home:
+                    sfa = home['nav']['searchBar']['submitSearchDestructuredEndpoint']
+                    title = home['nav']['searchBar']['searchBarPlaceholderLabel']
+                else:
+                    sfa = home['searchBar']['searchFormAction']
+                    title = home['searchBar']['searchFormPlaceholder']
                 # Build the query parametrization
                 query = ''
                 if 'query' in sfa:
                     query += '&'.join(['{}={}'.format(k, v) for k, v in sfa['query'].items()])
                 query = query if not query else query + '&'
                 self._catalog['root']['Search'] = {
-                    'title': self._BeautifyText(home['searchBar']['searchFormPlaceholder']),
+                    'title': self._BeautifyText(title),
                     'verb': 'pv/search/',
                     'endpoint': '{}?{}phrase={{}}'.format(sfa['partialURL'], query)
                 }
@@ -535,7 +553,7 @@ class PrimeVideo(Singleton):
             self.Refresh(path, busy=False)
         elif export > 3:
             Log('Export of watchlist started')
-            self.Browse(path + '/ALL', export=3)
+            self.Browse(path + '/all', export=3)
             if export == 5:
                 writeConfig('last_wl_export', time.time())
                 xbmc.executebuiltin('UpdateLibrary(video)')
@@ -932,7 +950,7 @@ class PrimeVideo(Singleton):
             bUpdatedVideoData = False
             if bCacheRefresh or (urn not in self._videodata['urn2gti']):
                 # Find the show the season belongs to
-                url += ('&' if '?' in url else '?') + 'episodeListSize=9999'
+                url += ('' if 'episodeListSize' in url else ('&' if '?' in url else '?') + 'episodeListSize=9999')
                 bUpdatedVideoData |= ParseSinglePage(oid, season, bCacheRefresh, url=url)
                 seasonGTI = self._videodata['urn2gti'][urn]
                 try:
@@ -1171,13 +1189,13 @@ class PrimeVideo(Singleton):
 
                 # Title
                 if bCacheRefresh or ('title' not in vd):
-                    if 'seasonNumber' not in item:
-                        vd['title'] = self._BeautifyText(item['title'])
-                    else:
+                    if item['titleType'].lower() == 'season' and 'seasonNumber' in item:
                         try:
                             vd['title'] = data['strings']['AVOD_DP_season_selector'].format(seasonNumber=item['seasonNumber'])
                         except:
                             vd['title'] = '{} {}'.format(getString(30167), item['seasonNumber'])
+                    else:
+                        vd['title'] = self._BeautifyText(item['title'])
                     bUpdated = True
 
                 # Images
@@ -1309,7 +1327,7 @@ class PrimeVideo(Singleton):
 
             # Too many instances to track, append the episode finder to about every query and cross fingers
             if requestURL is not None:
-                requestURL += ('&' if '?' in requestURL else '?') + 'episodeListSize=9999'
+                requestURL += ('' if 'episodeListSize' in requestURL else ('&' if '?' in requestURL else '?') + 'episodeListSize=9999')
 
             # Load content
             bCouldNotParse = False
@@ -1363,80 +1381,108 @@ class PrimeVideo(Singleton):
                             o[lk['id']] = {'title': self._BeautifyText(lk['text']), 'lazyLoadURL': lk['href'], 'pos': len(o)}
                 cnt = ''
             # Categories
-            elif 'collections' in cnt:
-                for collection in cnt['collections']:
-                    if 'text' in collection:
-                        txt = collection['text']
-                        if 'ChartsCarousel' in collection['collectionType'] or 'Hero Carousel' in txt:
-                            # there's no contenttype defined inside, so it looks ugly at addon
-                            continue
-                        if ('Channels' in breadcrumb[-1] or findKey("channelId", collection))\
-                                and 'facet' in collection and collection['facet'].get('alternateText'):
-                            txt = '{} - {}'.format(collection['facet']['alternateText'], txt)
-                        id = txt
-                        o[id] = {'title': self._BeautifyText(txt), 'pos': len(o)}
-                        if 'seeMoreLink' in collection:
-                            o[id]['lazyLoadURL'] = collection['seeMoreLink']['url']
-                        elif 'paginationTargetId' in collection:
-                            q = ['{}={}'.format(k.replace('paginationServiceToken', 'serviceToken'), ','.join(v) if isinstance(v, list) else quote_plus(v))
-                                 for k, v in collection.items() if k in ['collectionType', 'paginationServiceToken', 'paginationTargetId', 'tags']]
-                            q.append('startIndex=0&pageSize=20&pageType=home&pageId=home&facetType=' + collection['facet']['facetType'])
-                            o[id]['lazyLoadURL'] = '/gp/video/api/paginateCollection?' + '&'.join(q)
-                        else:
-                            o[id]['lazyLoadData'] = collection
-                    elif 'items' in collection:
-                        # LiveTV
-                        for item in collection['items']:
-                            AddLiveTV(o, item)
-
+            elif 'collections' in cnt or 'containers' in cnt:
+                var = 'collection' if 'collections' in cnt else 'container'
+                filtered_col = [x for x in cnt[var + 's'] if x[var + 'Type'].lower() not in ['chartscarousel', 'standardhero', 'textcontainer', 'superhero', 'tentpolehero']]
+                if len(filtered_col) > 1:
+                    for collection in filtered_col:
+                        if 'text' in collection:
+                            txt = collection['text']
+                            if ('Channels' in breadcrumb[-1] or findKey("channelId", collection)) \
+                                    and 'facet' in collection and collection['facet'].get('alternateText'):
+                                txt = '{} - {}'.format(collection['facet']['alternateText'], txt)
+                            id = txt
+                            o[id] = {'title': self._BeautifyText(txt), 'pos': len(o)}
+                            if 'seeMoreLink' in collection:
+                                o[id]['lazyLoadURL'] = collection['seeMoreLink']['url']
+                            elif 'paginationTargetId' in collection:
+                                q = ['{}={}'.format(k.replace('paginationServiceToken', 'serviceToken'), ','.join(v) if isinstance(v, list) else quote_plus(v))
+                                     for k, v in collection.items() if k in ['collectionType', 'paginationServiceToken', 'paginationTargetId', 'tags']]
+                                q.append('startIndex=0&pageSize=20&pageType=home&pageId=home')
+                                if 'collectionType' not in q:
+                                    q.append('collectionType=Container')
+                                if var == 'collection':
+                                    q.append('&facetType=' + collection['facet']['facetType'])
+                                o[id]['lazyLoadURL'] = '/gp/video/api/paginateCollection?' + '&'.join(q)
+                            else:
+                                o[id]['lazyLoadData'] = collection
+                        elif 'items' in collection:
+                            # LiveTV
+                            for item in collection['items']:
+                                AddLiveTV(o, item)
+                elif len(filtered_col) == 1:
+                    cnt = filtered_col[0]
             # MyStuff
-            wl_lib = 'legacy-' + breadcrumb[2] if ['root', 'Watchlist'] == breadcrumb[:2] and len(breadcrumb) > 2 else ''
+            wl_lib = 'legacy-' + breadcrumb[2] if ['root', 'Watchlist'] == breadcrumb[:2] and len(breadcrumb) > 2 and not breadcrumb[2].startswith('ms_') else ''
+            vo = ''
             if ['root', 'Watchlist'] == breadcrumb:
-                wl = return_item(cnt, 'viewOutput', 'features', 'view-filter')
-                for f in wl['filters']:
-                    o[f['viewType']] = {'title': f['text'], 'lazyLoadURL': f['apiUrl' if 'apiUrl' in f else 'href'], 'pos': len(o)}
-                    if f.get('active', False):
-                        o[f['viewType']]['lazyLoadData'] = cnt
+                if 'subNodes' in cnt:
+                    for f in cnt['subNodes']:
+                        id = f['id'].replace('pv-nav-my-stuff-', '').lower()
+                        if 'all' not in id:
+                            o[id] = {'title': f['label'], 'lazyLoadURL': f['url'], 'pos': len(o)}
+                elif 'viewOutput' in cnt:
+                    wl = return_item(cnt, 'viewOutput', 'features', 'view-filter')
+                    for f in wl['filters']:
+                        o[f['viewType']] = {'title': f['text'], 'lazyLoadURL': f['apiUrl' if 'apiUrl' in f else 'href'], 'pos': len(o)}
+                        if f.get('active', False):
+                            o[f['viewType']]['lazyLoadData'] = cnt
+                else:
+                    for f in cnt['content']['baseOutput']['containers']:
+                        o['ms_{}'.format(len(o))] = {'title': f['text'], 'lazyLoadURL': f['seeMoreLink']['url'], 'pos': len(o)}
             # MyStuff categories
             elif len(wl_lib) > 0 and len(breadcrumb) == 3:
-                wl = return_item(cnt, 'viewOutput', 'features', wl_lib)
-                try:
-                    for f in wl['filters']:
-                        o[f['id']] = {'title': f['text'], 'lazyLoadURL': f['apiUrl' if 'apiUrl' in f else 'href'], 'pos': len(o)}
-                        if 'applied' in f and f['applied']:
-                            o[f['id']]['lazyLoadData'] = cnt
-                except KeyError: pass  # Empty list
+                if 'viewOutput' in cnt:
+                    wl = return_item(cnt, 'viewOutput', 'features', wl_lib)
+                else:
+                    wl = {'filters': [x['values'] for x in return_item(cnt, 'content', 'baseOutput', 'filters', 'items') if 'OFFER_FILTER' in x['id']][0]}
+                for f in wl.get('filters', []):
+                    id = f['id'].lower()
+                    url = f.get('apiUrl', f.get('href'))
+                    url = ('/' + id + '/').join(requestURL.rsplit('/', 1)) if url is None else url
+                    o[id] = {'title': f['text'], 'lazyLoadURL': url, 'pos': len(o)}
+                    if f.get('applied') or f.get('isCurrentlyApplied'):
+                        o[id]['lazyLoadData'] = cnt
             else:
                 vo = cnt['results'] if 'results' in cnt else return_item(cnt, 'viewOutput', 'features', wl_lib, 'content')
-                if ('items' in vo) or (('content' in vo) and ('items' in vo['content'])):
-                    for item in (vo if 'items' in vo else vo['content'])['items']:
-                        tile = key_exists(item, 'image', 'alternateText')
-                        if 'heading' in item or 'title' in item or tile:
-                            oldk = list(o)
-                            try:
-                                iu = item['href'] if 'href' in item else item['link' if 'link' in item else 'title']['url']
-                            except:
-                                iu = None
-                            try:
-                                wl = 'watchlistAction' if 'watchlistAction' in item else 'watchlistButton'
-                                t = item[wl]['endpoint']['query']['titleType'].lower()
-                            except:
-                                t = ''
-                            if 'station' in item:
-                                AddLiveTV(o, item)
-                            elif tile and iu:
-                                id = 'tile_{}'.format(len(o))
-                                o[id] = {'title': item['image']['alternateText'], 'lazyLoadURL': iu, 'metadata': {'artmeta': {'thumb': item['image']['url']}}}
-                            elif ('liveInfo' in item) or ('event' == t):
-                                AddLiveEvent(o, item, iu)
-                            elif 'season' != t and 'season' not in item:
-                                bUpdatedVideoData |= ParseSinglePage(breadcrumb[-1], o, bCacheRefresh, url=iu)
-                            else:
-                                bUpdatedVideoData |= AddSeason(breadcrumb[-1], o, bCacheRefresh, iu)
+                vo = return_item(vo, 'content', 'baseOutput', 'containers')
+                if isinstance(vo, list):
+                    vo = vo[0]
+                items = vo.get('entities', []) + vo.get('items', []) + vo.get('content', {}).get('items', [])
+                for item in items:
+                    tile = return_value(item, 'image', 'alternateText')
+                    tile_cov = item.get('image', {})
+                    if isinstance(tile, dict) and item.get('widgetType', '').lower() == 'imagetextlink':
+                        tile = item.get('title', item.get('displayTitle'))
+                        tile_cov = item.get('images', {})
+                    else:
+                        tile = None
+                    if 'heading' in item or 'title' in item or tile:
+                        oldk = list(o)
+                        try:
+                            iu = item['href'] if 'href' in item else item['link' if 'link' in item else 'title']['url']
+                        except:
+                            iu = None
+                        try:
+                            wl = 'watchlistAction' if 'watchlistAction' in item else 'watchlistButton'
+                            t = item[wl]['endpoint']['query']['titleType'].lower()
+                        except:
+                            t = ''
+                        if 'station' in item:
+                            AddLiveTV(o, item)
+                        elif tile and iu:
+                            id = 'tile_{}'.format(len(o))
+                            o[id] = {'title': tile, 'lazyLoadURL': iu, 'metadata': {'artmeta': {'thumb': findKey('url', tile_cov)}}}
+                        elif ('liveInfo' in item) or ('event' == t):
+                            AddLiveEvent(o, item, iu)
+                        elif 'season' != t and 'season' not in item:
+                            bUpdatedVideoData |= ParseSinglePage(breadcrumb[-1], o, bCacheRefresh, url=iu)
+                        else:
+                            bUpdatedVideoData |= AddSeason(breadcrumb[-1], o, bCacheRefresh, iu)
 
-                            newitem = list(set(list(o)) - set(oldk))
-                            if newitem:
-                                o[newitem[0]]['pos'] = len(o)
+                        newitem = list(set(list(o)) - set(oldk))
+                        if newitem:
+                            o[newitem[0]]['pos'] = len(o)
 
                 # Single page
                 bSinglePage = False
@@ -1444,7 +1490,8 @@ class PrimeVideo(Singleton):
                     bSinglePage = True
                     bUpdatedVideoData |= ParseSinglePage(breadcrumb[-1], o, bCacheRefresh, data=cnt, url=requestURL)
                 # Pagination
-                if ('pagination' in cnt) or (key_exists(cnt, 'viewOutput', 'features', wl_lib, 'content', 'seeMoreHref')) or ('hasMoreItems' in cnt):
+                if ('pagination' in cnt) or (key_exists(cnt, 'viewOutput', 'features', wl_lib, 'content', 'seeMoreHref'))\
+                        or ('hasMoreItems' in cnt) or ('paginationTargetId' in vo):
                     nextPage = None
                     try:
                         # Dynamic AJAX pagination
@@ -1454,16 +1501,30 @@ class PrimeVideo(Singleton):
                     except:
                         # Classic numbered pagination
                         if 'pagination' in cnt:
-                            if 'apiUrl' in cnt['pagination']:
-                                nextPage = cnt['pagination']['apiUrl']
+                            if 'url' in cnt['pagination'] and cnt['pagination']['url'] != '':
+                                nextPage = cnt['pagination']['url']  # + '&isCrow=0&isElcano=0&isCleanSlateActive=1&isLivePageActive=0&isDiscoverActive=1'
                             elif 'paginator' in cnt['pagination']:
                                 nextPage = next((x['href'] for x in cnt['pagination']['paginator'] if
                                                  (('type' in x) and ('NextPage' == x['type'])) or
                                                  (('*className*' in x) and ('atv.wps.PaginatorNext' == x['*className*'])) or
                                                  (('__type' in x) and ('PaginatorNext' in x['__type']))), None)
+                            elif 'queryParameters' in cnt['pagination']:
+                                q = cnt['pagination']['queryParameters']
+                                q = {k.replace('content', 'page').replace('targetId', 'paginationTargetId') if k in ['contentId', 'contentType', 'targetId']
+                                     else k: v for k, v in q.items()}
+                                if 'collectionType' not in q:
+                                    q['collectionType'] = 'Container'
+                                nextPage = '/gp/video/api/paginateCollection?' + urlencode(q)
                         elif cnt.get('hasMoreItems', False) and 'startIndex=' in requestURL:
                             idx = int(re.search(r'startIndex=(\d*)', requestURL).group(1))
                             nextPage = requestURL.replace('startIndex={}'.format(idx), 'startIndex={}'.format(idx+20))
+                        elif 'paginationTargetId' in vo:
+                            q = ['{}={}'.format(k.replace('paginationServiceToken', 'serviceToken').replace('paginationStartIndex', 'startIndex'), ','.join(v) if isinstance(v, list) else quote_plus(str(v)))
+                                 for k, v in vo.items() if k in ['collectionType', 'paginationServiceToken', 'paginationTargetId', 'tags', 'paginationStartIndex']]
+                            q.append('pageSize=20&pageType=browse&pageId=default')
+                            if 'collectionType' not in q:
+                                q.append('collectionType=Container')
+                            nextPage = '/gp/video/api/paginateCollection?' + '&'.join(q)
 
                     if nextPage:
                         # Determine if we can auto page
@@ -1481,20 +1542,12 @@ class PrimeVideo(Singleton):
                         # Always auto load category lists for pv, on tld load only 10 pages at most, then paginate if appropriate
                         elif (2 < len(breadcrumb) and (p['all'] or p['collections'])) if self._g.UsePrimeVideo else pageNumber >= preloadPages:
                             bAutoPaginate = False
-                            if not self._g.UsePrimeVideo:
-                                try:
-                                    del(cnt['pagination']['page'])
-                                except KeyError: pass
 
                         if bAutoPaginate:
                             requestURLs.append(nextPage)
                         else:
                             # Insert pagination folder
-                            try:
-                                npt = getString(30242).format(cnt['pagination']['page'])
-                            except:
-                                npt = getString(30267)
-                            o['nextPage'] = {'title': npt, 'lazyLoadURL': nextPage, 'metadata': {'artmeta': {'thumb': self._s.NextIcon}}}
+                            o['nextPage'] = {'title': getString(30267), 'lazyLoadURL': nextPage, 'metadata': {'artmeta': {'thumb': self._s.NextIcon}}}
 
             # Notify new page
             if 0 < len(requestURLs):

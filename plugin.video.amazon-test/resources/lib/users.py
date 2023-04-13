@@ -9,7 +9,7 @@ from .common import Globals, Settings
 from .l10n import *
 
 g = Globals()
-def_keys = {'name': '', 'atvurl': '', 'baseurl': '', 'pv': False, 'mid': '', 'cookie': '', 'token': '', 'deviceid': ''}
+def_keys = {'name': '', 'atvurl': '', 'baseurl': '', 'pv': False, 'mid': '', 'cookie': '', 'token': '', 'deviceid': '', 'sidomain': ''}
 
 
 def loadUsers():
@@ -25,7 +25,7 @@ def loadUser(key='', empty=False, cachedUsers=None):
     user = None if empty else [i for i in users if cur_user == i['name']]
     if user:
         user = user[0]
-        if key and key not in user.keys():
+        if len([k for k in def_keys.keys() if k not in user]) > 0:
             from .network import getTerritory
             user = getTerritory(user)
             if False is user[1]:

@@ -43,6 +43,7 @@ class Globals(Singleton):
     library = 'library'
     DBVersion = 1.4
     PayCol = 'FFE95E01'
+    PrimeCol = 'FF00A8E0'
     tmdb = 'b34490c056f0dd9e3ec9af2167a731f4'  # b64decode('YjM0NDkwYzA1NmYwZGQ5ZTNlYzlhZjIxNjdhNzMxZjQ=')
     tvdb = '1D62F2F90030C444'  # b64decode('MUQ2MkYyRjkwMDMwQzQ0NA==')
     langID = {'movie': 30165, 'series': 30166, 'season': 30167, 'episode': 30173, 'tvshow': 30166, 'video': 30173, 'event': 30174}
@@ -75,6 +76,7 @@ class Globals(Singleton):
 
         self._globals['DATA_PATH'] = py2_decode(translatePath(self.addon.getAddonInfo('profile')))
         self._globals['CONFIG_PATH'] = OSPJoin(self._globals['DATA_PATH'], 'config')
+        self._globals['LOG_PATH'] = OSPJoin(self._globals['DATA_PATH'], 'log')
         self._globals['HOME_PATH'] = py2_decode(translatePath('special://home'))
         self._globals['PLUGIN_PATH'] = py2_decode(self._globals['addon'].getAddonInfo('path'))
 
@@ -82,6 +84,9 @@ class Globals(Singleton):
         # and generate/retrieve the device ID
         getConfig.configPath = self._globals['CONFIG_PATH']
         writeConfig.configPath = self._globals['CONFIG_PATH']
+
+        if not xbmcvfs.exists(self._globals['LOG_PATH']):
+            xbmcvfs.mkdirs(self._globals['LOG_PATH'])
 
         self._globals['__plugin__'] = self._globals['addon'].getAddonInfo('name')
         self._globals['__authors__'] = self._globals['addon'].getAddonInfo('author')
@@ -117,11 +122,14 @@ class Globals(Singleton):
         self._globals['ATVUrl'] = atv
         self._globals['UsePrimeVideo'] = pv
         self._globals['deviceID'] = did
+        ds = 0  # int('0' + self._globals['addon'].getSetting('data_source'))
 
-        if self._globals['addon'].getSetting('use_webapi') == 'false' and not self._globals['UsePrimeVideo']:
-            from .atv_api import PrimeVideo
-        else:
+        if ds == 0:
             from .web_api import PrimeVideo
+        elif ds == 1:
+            from .android_api import PrimeVideo
+        elif ds == 2:
+            from .atv_api import PrimeVideo
         if 'pv' not in self._globals:
             self._globals['pv'] = PrimeVideo(self, Settings())
 
@@ -158,6 +166,7 @@ class Settings(Singleton):
         elif 'dumpJSON' == name: return self._gs('json_dump') == 'true'
         elif 'dumpJSONCollisions' == name: return self._gs('json_dump_collisions') == 'true'
         elif 'refineJSON' == name: return self._gs('json_dump_raw') == 'false'
+        elif 'logHTTP' == name: return self._gs('log_http') == 'true'
         elif 'useIntRC' == name: return self._gs('remotectrl') == 'true'
         elif 'RMC_vol' == name: return self._gs('remote_vol') == 'true'
         elif 'ms_mov' == name: ms_mov = self._gs('mediasource_movie'); return ms_mov if ms_mov else 'Amazon Movies'
@@ -193,7 +202,7 @@ class Settings(Singleton):
             return [3600, 21600, 43200, 86400, 259200, 604800, 1296000, 2592000][int(self._gs('catalog_cache_expiry'))]
         elif 'profiles' == name: return self._gs('profiles') == 'true'
         elif 'show_pass' == name: return self._gs('show_pass') == 'true'
-        elif 'useWebApi' == name: return self._gs('use_webapi') == 'true'
+        elif 'data_source' == name: return 0  # int('0' + self._gs('data_source'))
         elif 'uhd' == name: return self._gs('enable_uhd') == 'true'
         elif 'show_recents' == name: return self._gs('show_recents') == 'true'
 
