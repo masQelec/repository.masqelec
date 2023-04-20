@@ -314,11 +314,14 @@ def _poner_no_searchable(item):
 
     config.set_setting('no_searchable', True, item.from_channel)
 
+    _refresh_menu(item)
+
 def _quitar_no_searchable(item):
     platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR violet]Incluyendo en búsquedas[/COLOR][/B]')
 
     config.set_setting('no_searchable', False, item.from_channel)
 
+    _refresh_menu(item)
 
 def _channels_included(item):
     logger.info()
@@ -386,8 +389,8 @@ def _dominios(item):
     elif item.from_channel == 'cinecalidadlol':
         domains.manto_domain_cinecalidadlol(item)
 
-    elif item.from_channel == 'cinetux':
-        domains.manto_domain_cinetux(item)
+    elif item.from_channel == 'cinecalidadmx':
+        domains.manto_domain_cinecalidadmx(item)
 
     elif item.from_channel == 'cuevana3':
         domains.manto_domain_cuevana3(item)
@@ -424,9 +427,6 @@ def _dominios(item):
 
     elif item.from_channel == 'hdfullse':
         domains.manto_domain_hdfullse(item)
-
-    elif item.from_channel == 'inkapelis':
-        domains.manto_domain_inkapelis(item)
 
     elif item.from_channel == 'pelis28':
         domains.manto_domain_pelis28(item)
@@ -477,7 +477,11 @@ def _dominios(item):
 def _dominio_vigente(item):
     from modules import domains
 
-    if item.from_channel == 'hdfull':
+    if item.from_channel == 'dontorrents':
+        item.desde_el_canal = True
+        domains.last_domain_dontorrents(item)
+
+    elif item.from_channel == 'hdfull':
         item.desde_el_canal = True
         domains.last_domain_hdfull(item)
 
@@ -485,9 +489,9 @@ def _dominio_vigente(item):
         item.desde_el_canal = True
         domains.last_domain_hdfullse(item)
 
-    elif item.from_channel == 'dontorrents':
+    elif item.from_channel == 'playdede':
         item.desde_el_canal = True
-        domains.last_domain_dontorrents(item)
+        domains.last_domain_playdede(item)
 
     else:
         platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Efectue Test Web, la comprobación No está permitida[/B][/COLOR]' % color_alert)
@@ -514,8 +518,8 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'cinecalidadlol':
         domains.manto_domain_cinecalidadlol(item)
 
-    elif item.from_channel == 'cinetux':
-        domains.manto_domain_cinetux(item)
+    elif item.from_channel == 'cinecalidadmx':
+        domains.manto_domain_cinecalidadmx(item)
 
     elif item.from_channel == 'cuevana3':
         domains.manto_domain_cuevana3(item)
@@ -552,9 +556,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'hdfullse':
         domains.manto_domain_hdfullse(item)
-
-    elif item.from_channel == 'inkapelis':
-        domains.manto_domain_inkapelis(item)
 
     elif item.from_channel == 'pelis28':
         domains.manto_domain_pelis28(item)
@@ -606,6 +607,9 @@ def _credenciales(item):
     if item.from_channel == 'hdfull':
         _credenciales_hdfull(item)
 
+    elif item.from_channel == 'nextdede':
+        _credenciales_nextdede(item)
+
     elif item.from_channel == 'playdede':
         _credenciales_playdede(item)
 
@@ -644,6 +648,41 @@ def _credenciales_hdfull(item):
     if config.get_setting('hdfull_login', 'hdfull', default=False): hdfull.logout(item)
 
     hdfull.login('')
+
+    _refresh_menu(item)
+
+
+def _credenciales_nextdede(item):
+    logger.info()
+
+    from core import jsontools
+
+    channel_json = 'nextdede.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name + ' - NextDede', el_canal + '[/COLOR][/B]')
+       return
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] NextDede') % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    from channels import nextdede
+
+    item.channel = 'nextdede'
+
+    if config.get_setting('nextdede_login', 'nextdede', default=False): nextdede.logout(item)
+
+    nextdede.login('')
 
     _refresh_menu(item)
 
@@ -715,13 +754,6 @@ def _proxies(item):
         cinecalidad.configurar_proxies(item)
 
         if config.get_setting('channel_cinecalidad_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'cinetux':
-        from channels import cinetux
-        item.channel = 'cinetux'
-        cinetux.configurar_proxies(item)
-
-        if config.get_setting('channel_cinetux_proxies') is None: refrescar = False
 
     elif item.from_channel == 'cliversite':
         from channels import cliversite
@@ -884,12 +916,12 @@ def _proxies(item):
 
         if config.get_setting('channel_homecine_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'inkapelis':
-        from channels import inkapelis
-        item.channel = 'inkapelis'
-        inkapelis.configurar_proxies(item)
+    elif item.from_channel == 'jkanime':
+        from channels import jkanime
+        item.channel = 'jkanime'
+        jkanime.configurar_proxies(item)
 
-        if config.get_setting('channel_inkapelis_proxies') is None: refrescar = False
+        if config.get_setting('channel_jkanime_proxies') is None: refrescar = False
 
     elif item.from_channel == 'lilatorrent':
         from channels import lilatorrent
@@ -918,17 +950,6 @@ def _proxies(item):
         mejortorrentnz.configurar_proxies(item)
 
         if config.get_setting('channel_mejortorrentnz_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'movidytv':
-        from channels import movidytv
-        item.channel = 'movidytv'
-        movidytv.configurar_proxies(item)
-
-        if config.get_setting('channel_movidytv_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'newpct1':
-        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Configurar proxies desde el canal[/COLOR][/B]' % color_adver)
-        refrescar = False
 
     elif item.from_channel == 'peliculaspro':
         from channels import peliculaspro
@@ -986,13 +1007,6 @@ def _proxies(item):
 
         if config.get_setting('channel_pelisplanet_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'pelisplay':
-        from channels import pelisplay
-        item.channel = 'pelisplay'
-        pelisplay.configurar_proxies(item)
-
-        if config.get_setting('channel_pelisplay_proxies') is None: refrescar = False
-
     elif item.from_channel == 'pelisplus':
         from channels import pelisplus
         item.channel = 'pelisplus'
@@ -1048,13 +1062,6 @@ def _proxies(item):
         reinventorrent.configurar_proxies(item)
 
         if config.get_setting('channel_reinventorrent_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'repelis2':
-        from channels import repelis2
-        item.channel = 'repelis2'
-        repelis2.configurar_proxies(item)
-
-        if config.get_setting('channel_repelis2_proxies') is None: refrescar = False
 
     elif item.from_channel == 'rojotorrent':
         from channels import rojotorrent

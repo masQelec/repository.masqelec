@@ -1,5 +1,5 @@
-[COLOR coral][B]Balandro[/COLOR][COLOR cyan]  16 de Marzo de 2023 [/COLOR][COLOR limegreen]  Hora  6:00[/B][/COLOR]
-   [COLOR yellow][B]Version 3.0.2[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR][COLOR cyan]  12 de Abril de 2023 [/COLOR][COLOR limegreen]  Hora  8:00[/B][/COLOR]
+   [COLOR yellow][B]Version 3.0.3[/B][/COLOR]
 
    [COLOR yellow]CONTACTO:[/COLOR]
      Foro  mimediacenter.info/foro/  Instalaciones, Novedades, Sugerencias, etc.
@@ -11,11 +11,8 @@
    [COLOR cyan][B]ULTIMOS CAMBIOS DE DOMINIOS:[/B][/COLOR]
      [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
-   [COLOR cyan][B]CANALES SITUACION:[/B][/COLOR]
-     [B][COLOR moccasin] AnimeFenix [COLOR springgreen] animefenix.tv [COLOR red] CloudFlare[COLOR orangered] Protection[/B][/COLOR]
+   [COLOR cyan][B]SITUACION CANALES:[/B][/COLOR]
      [B][COLOR moccasin] Dilo [COLOR springgreen] www.dilo.nu [COLOR red] CloudFlare[COLOR orangered] Protection[/B][/COLOR]
-     [B][COLOR moccasin] HdFull [COLOR springgreen] hdfull.??? [COLOR red] CloudFlare[COLOR orangered] Protection[/B][/COLOR]
-     [B][COLOR moccasin] HenaOjara [COLOR springgreen] henaojara2.com [COLOR red] CloudFlare[COLOR orangered] Protection[/B][/COLOR]
-     [B][COLOR moccasin] InkaPelis [COLOR springgreen] www1.inkapelis.li [COLOR red] CloudFlare[COLOR orangered] Protection[/B][/COLOR]
-     [B][COLOR moccasin] MovidyTv [COLOR springgreen] movidy.tv [COLOR red] CloudFlare[COLOR orangered] Protection[/B][/COLOR]
-     [B][COLOR moccasin] PlayDede [COLOR springgreen] playdede.nu [COLOR red] CloudFlare[COLOR orangered] Protection [COLOR plum]Level 2[/B][/COLOR]
+
+     [B][COLOR moccasin] HdFull [COLOR springgreen] hdfull.??? [COLOR red] CloudFlare[COLOR orangered] Protection [COLOR plum]Level 2[/B][/COLOR]
+     [B][COLOR moccasin] PlayDede [COLOR springgreen] playdede.to [COLOR red] CloudFlare[COLOR orangered] Protection [COLOR plum]Level 2[/B][/COLOR]

@@ -53,20 +53,18 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    url_genre = host + '/directorio??genero%5B%5D='
+    url_genre = host + '/directorio?genero%5B%5D='
 
     current_year = int(datetime.today().year)
 
-    data = httptools.downloadpage(host).data
+    data = httptools.downloadpage(url_genre).data
 
-    matches = scrapertools.find_multiple_matches(data, '<a href="/directorio(.*?)".*?>(.*?)</a>')
+    bloque = scrapertools.find_single_match(data, '>Genero<(.*?)</select>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<option value="(.*?)">(.*?)</option>')
 
     for genre, title in matches:
-        if not '?genero=' in genre: continue
-
         title = title.replace('&iacute;', 'í').replace('&oacute;', 'ó')
-
-        genre = genre.replace('?genero=', '')
 
         url = url_genre + genre + '&year=1950%2C' + str(current_year) + '&status=2&sort=recent'
 

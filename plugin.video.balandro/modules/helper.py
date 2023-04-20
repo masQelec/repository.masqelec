@@ -38,7 +38,7 @@ descartar_xxx = config.get_setting('descartar_xxx', default=False)
 descartar_anime = config.get_setting('descartar_anime', default=False)
 
 _foro = "[COLOR plum][B][I] mimediacenter.info/foro/ [/I][/B][/COLOR]"
-_source = "[COLOR coral][B][I] balandro-tk.github.io/balandro/ [/I][/B][/COLOR]"
+_source = "[COLOR coral][B][I] https://balandro-tk.github.io/balandro/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 
 _team = "[COLOR hotpink][B][I] t.me/Balandro_team [/I][/B][/COLOR]"
@@ -113,7 +113,7 @@ def submnu_fuente(item):
 
     itemlist.append(item.clone( action='', title= '[B]FUENTE:[/B]', text_color='tomato', folder=False, thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(item.clone( action='', title= ' - Fuente ' + _source + ' Repositorio, Add-On, etc.', thumbnail=config.get_thumb('repo'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Fuente ' + _source + ' Repositorio, Add-On, Scripts', thumbnail=config.get_thumb('repo'), folder=False ))
 
     return itemlist
 
@@ -230,14 +230,6 @@ def submnu_avisinfo_channels(item):
     datos = channeltools.get_channel_parameters('homecine')
     if datos['active']:
         itemlist.append(item.clone( action='show_help_homecine', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HomeCine[/B][/COLOR]', thumbnail=config.get_thumb('homecine', 'thumb', 'channels') ))
-
-    datos = channeltools.get_channel_parameters('inkapelis')
-    if datos['active']:
-        itemlist.append(item.clone( action='show_help_inkapelis', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]InkaPelis[/B][/COLOR]', thumbnail=config.get_thumb('inkapelis', 'thumb', 'channels') ))
-
-    datos = channeltools.get_channel_parameters('movidytv')
-    if datos['active']:
-        itemlist.append(item.clone( action='show_help_movidytv', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]MovidyTv[/B][/COLOR]', thumbnail=config.get_thumb('movidytv', 'thumb', 'channels') ))
 
     datos = channeltools.get_channel_parameters('pelisforte')
     if datos['active']:
@@ -592,7 +584,7 @@ def submnu_desarrollo(item):
     if config.get_setting('developer_mode', default=False):
         itemlist.append(item.clone( channel='submnuteam', action='submnu_team', title = ' - Acceso a la opción de [COLOR darkorange][B]Desarrollo[/B][/COLOR] Team', thumbnail=config.get_thumb('team') ))
 
-    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B]Fuente para Desarrollo:[/B][/COLOR]', folder=False, thumbnail=config.get_thumb('team') ))
+    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B]Fuentes para Desarrollo:[/B][/COLOR]', folder=False, thumbnail=config.get_thumb('team') ))
 
     itemlist.append(item.clone( action='', title= ' - Fuentes [COLOR darkorange][B]github.com/balandro-tk/balandro-addon[/B][/COLOR]', thumbnail=config.get_thumb('telegram'), folder=False ))
 
@@ -767,7 +759,7 @@ def show_help_miscelanea(item):
 
     txt += '[COLOR gold][B]KELEBEK (Add-Ons y Otros Media Centers):[/B][/COLOR][CR]'
 
-    txt += '  Fuente [COLOR yellow]Kelebek[/COLOR]:  [COLOR plum][B]newkelebek.gitgub.io/Newkelebek[/B][/COLOR][CR]'
+    txt += '  Fuente [COLOR yellow]Kelebek[/COLOR]:  [COLOR plum][B]https://newkelebek.gitgub.io/Newkelebek[/B][/COLOR][CR]'
     txt += '  para obtener otros [COLOR yellowgreen]Add-Ons, Scripts, etc.[/COLOR][CR][CR]'
 
     txt += '  [COLOR chartreuse]Telegram[/COLOR] Soporte:  [COLOR lightblue][B]t.me/AprendiendoKodi[/B][/COLOR][CR]'
@@ -775,7 +767,7 @@ def show_help_miscelanea(item):
 
     txt += '[COLOR gold][B]BALANDRO:[/B][/COLOR][CR]'
 
-    txt += '  Fuente:  [COLOR plum][B]balandro-tk.github.io/balandro/[/B][/COLOR][CR]'
+    txt += '  Fuente [COLOR yellow]Balandro[/COLOR]:  [COLOR plum][B]https://balandro-tk.github.io/balandro/[/B][/COLOR][CR]'
     txt += '  para obtener [COLOR yellowgreen]Repositorio, Add-On, Scripts, etc.[/COLOR][CR][CR]'
 
     txt += '  Foro:  [COLOR coral][B]mimediacenter.info/foro/[/B][/COLOR][CR]'
@@ -784,7 +776,7 @@ def show_help_miscelanea(item):
     txt += '  [COLOR chartreuse]Telegram[/COLOR]:  [COLOR lightblue][B]t.me/balandro_asesor[/B][/COLOR][CR]'
     txt += '  para [COLOR yellowgreen]Asesoramiento, Dudas, Consultas, etc.[/COLOR][CR][CR]'
 
-    txt += '  [COLOR firebrick]Desarrollo[/COLOR]:  [COLOR darkorange][B]github.com/balandro-tk/balandro-addon[/B][/COLOR][CR]'
+    txt += '  [COLOR firebrick]Fuentes Desarrollo[/COLOR] [COLOR yellow]Balandro[/COLOR]:  [COLOR darkorange][B]github.com/balandro-tk/balandro-addon[/B][/COLOR][CR]'
     txt += '  para [COLOR orange]Mantenimiento del Add-On, Scripts, etc.[/COLOR][CR]'
 
     platformtools.dialog_textviewer('Información Miscelánea', txt)
@@ -795,21 +787,23 @@ def show_help_register(item):
 
     txt = '*) Determinadas webs obligan a registrarse para permitir su acceso.'
 
-    txt += '[CR][CR] Es importante usar [B][COLOR gold]cuentas secundarias[/COLOR][/B] para registrarse, nunca useis las vuestras personales.'
+    txt += '[CR][CR]  Es importante usar [B][COLOR gold]cuentas secundarias[/COLOR][/B] para registrarse, nunca useis las vuestras personales.'
 
     txt += '[CR][CR]*) Para ello desde otro equipo debeis accecder a la web en cuestión y registraros (darse de alta)'
 
-    txt += '[CR][CR] Si desconoceis el dominio actual de esa web, mediante un navegador localizar su [B][COLOR gold]twitter[/COLOR][/B]'
+    txt += '[CR][CR]  Si desconoceis el dominio actual de esa web, mediante un navegador localizar su [B][COLOR gold]twitter[/COLOR][/B]'
 
-    txt += '[CR][CR] Por ejemplo [B][COLOR gold]HdFull[/COLOR][/B] twitter oficial ó [B][COLOR gold]PlayDede[/COLOR][/B] twitter oficial'
+    txt += '[CR][CR]  Por ejemplo [B][COLOR yellow]HdFull[/COLOR][/B] twitter oficial ó [B][COLOR yellow]PlayDede[/COLOR][/B] twitter oficial'
+
+    txt += '[CR][CR]  ó bien acceder para [COLOR yellow]HdFull[/COLOR] a [B][COLOR cyan]dominioshdfull.com[/COLOR][/B] y para [COLOR yellow]PlayDede[/COLOR] [B][COLOR cyan]dominiosplaydede.com[/COLOR][/B]'
 
     txt += '[CR][CR]*) Imprescindible tomar buena nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para cada web.'
 
     txt += '[CR][CR]*) Una vez tengáis vuestros datos, podéis informarlos en la configuración, ó bien se os solicitará al acceder a ese canal determinado.'
 
-    txt += '[CR][CR]*) Mientras mantengáis las sesiones abiertas via navegador en estos dominios, no tendreis q volver a informar vuestras credenciales.'
+    txt += '[CR][CR]*) Mientras mantengáis las sesiones abiertas via navegador en estos dominios, no tendreis que volver a informar vuestras credenciales.'
 
-    txt += '[CR][CR]*) [B][COLOR gold]Atención[/COLOR][/B]: las [COLOR chartreuse]Sesiones Abiertas[/COLOR] en vuestro Media Center [B][COLOR yellow]No son In Eternum[/COLOR][/B], por ello es conveniente, que procedaís a [COLOR chartreuse]Cerrar vuestra Sesión[/COLOR] cada cierto tiempo, porque podría provocar que no se presentaran resultados.'
+    txt += '[CR][CR]*) [B][COLOR gold]Atención[/COLOR][/B]: las [COLOR chartreuse]Sesiones Abiertas[/COLOR] en vuestro Media Center [B][COLOR greenyellow]No son In Eternum[/COLOR][/B], por ello es conveniente, que procedaís a [COLOR chartreuse]Cerrar vuestra Sesión[/COLOR] cada cierto tiempo, porque podría provocar que no se presentaran resultados.'
 
     platformtools.dialog_textviewer('Información dominios que requieren Registrarse', txt)
 
@@ -841,12 +835,6 @@ def show_help_henaojara(item):
 def show_help_homecine(item):
     show_help_canales('homecine')
 
-def show_help_inkapelis(item):
-    show_help_canales('inkapelis')
-
-def show_help_movidytv(item):
-    show_help_canales('movidytv')
-
 def show_help_pelisforte(item):
     show_help_canales('pelisforte')
 
@@ -876,20 +864,20 @@ def show_help_canales(canal):
 
     txt = '[B][COLOR cyan]El webmaster de [COLOR yellow]' + canal.capitalize() + '[/COLOR] ha activado un nivel más de protección con [COLOR orangered]CloudFlare[/COLOR][/B][CR]'
 
-    if canal == 'playdede':
+    if canal == 'hdfull' or canal == 'playdede':
        txt += '[COLOR gold][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
+
+       if canal == 'hdfull':
+           txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominioshdfull.com[/COLOR][/B][CR]'
+       else:
+           txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominiosplaydede.com[/COLOR][CR]'
 
     txt += '[CR][COLOR goldenrod][B]  Desconocemos si será Temporal ó Definitivo.[/B][/COLOR][CR]'
 
     txt += '[CR][COLOR plum][B]  Ya ocurrió alguna vez en el pasado y al cabo de un cierto tiempo lo retiró.[/B][/COLOR][CR]'
 
-    if canal == 'inkapelis' or canal == 'movidytv':
-        txt += '[CR][COLOR aquamarine][B]  Por ello, si no os funciona correctamente, ó no [COLOR gold]Encuentra Enlaces[/COLOR], ó no efectua el [COLOR fuchsia]Play[/COLOR],'
-        txt += '[CR][COLOR aquamarine]  pues hay que tener paciencia, e ir probando uno a uno, los Proveedores de proxies, en '
-        txt += '[CR][COLOR red]  Configurar proxies a usar ...[/B][/COLOR][CR]'
-    else:
-        txt += '[CR][COLOR aquamarine][B]  Por ello, si no os funciona correctamente, pues hay que tener paciencia,'
-        txt += '[CR]  e ir probando uno a uno, los Proveedores de proxies, en [COLOR red]Configurar proxies a usar ...[/B][/COLOR][CR]'
+    txt += '[CR][COLOR aquamarine][B]  Por ello, si no os funciona correctamente, pues hay que tener paciencia,'
+    txt += '[CR]  e ir probando uno a uno, los Proveedores de proxies, en [COLOR red]Configurar proxies a usar ...[/B][/COLOR][CR]'
 
     txt += '[CR][COLOR yellowgreen][B]Ó bien prescindir/desactivar el canal hasta que se estabilize posiblemente en un futuro.[/B][/COLOR]'
 
@@ -948,14 +936,14 @@ def show_help_uptobox(item):
 
     txt += '[CR][CR]*) Una vez tengáis vuestros datos, se os solicitará al acceder a ese servidor determinado.'
 
-    txt += '[CR][CR]*) Acceder desde otro equipo via navegador a [B][COLOR gold]uptobox.com/pin[/COLOR][/B], solo se gestionan las cuentas [B][COLOR gold]Free[/COLOR][/B]'
+    txt += '[CR][CR]*) Acceder desde otro equipo via navegador a [B][COLOR gold]uptobox.com/pin[/COLOR][/B], solo se gestionan las cuentas [B][COLOR yellow]Free[/COLOR][/B]'
 
     txt += '[CR][CR]*) En el caso de no estar registrados proceder a ello (darse de alta)'
 
     txt += '[CR][CR] Iniciar la sesión con vuestras credenciales'
     txt += ' e introducir el [B][COLOR gold]PIN[/COLOR][/B] que se os mostró en la ventana al intentar reproducir, para tener vinculada vuestra cuenta.'
 
-    txt += '[CR][CR]*) Mientras mantengáis las sesiones abiertas via navegador en ese servidor, no tendreis q volver a informar vuestras credenciales.'
+    txt += '[CR][CR]*) Mientras mantengáis las sesiones abiertas via navegador en ese servidor, no tendreis que volver a informar vuestras credenciales.'
 
     txt += '[CR][CR]*) Hay servidores que limitan el [B][COLOR gold]tiempo máximo de visionado diario[/COLOR][/B] (aprox. 150 minutos).'
 
@@ -1206,7 +1194,8 @@ def show_not_contemplated(item):
     txt += '   - Descargas formatos de ficheros NO admitidos [COLOR gold]m3u8, mpd, rtmp, rar, torrent[/COLOR][CR][CR]'
 
     txt += '[COLOR gold][B] - Servidores:[/B][/COLOR][CR]'
-    txt += '    - Algunos Servidores que dada su complejidad para efectuar Play [COLOR gold]No están Soportados[/COLOR][CR][CR]'
+    txt += '    - Cuentas Premium en el servidor [COLOR darkorange][B]Uptobox[/B][/COLOR][CR]'
+    txt += '    - Algunos Servidores que dada su complejidad para efectuar [COLOR orchid][B]Play[/B][/COLOR] [COLOR gold]No están Soportados[/COLOR][CR][CR]'
 
     txt += '[COLOR cyan][B] - Listas:[/B][/COLOR][CR]'
     txt += '   - Acceder a [COLOR gold]Una Página Concreta[/COLOR] en los listados de las opciones de los canales[CR]'
@@ -2006,7 +1995,7 @@ def show_help_torrents(item):
     txt += '[CR][CR]*) A modo de ejemplo para [COLOR gold]Elementum[/COLOR] puede acceder a su web oficial en [COLOR goldenrod][B]elementum.surge.sh[/B][/COLOR]'
 
     txt += '[CR][CR]*) Existen múltiples sitios webs en donde puede localizar estos add-ons, entre estos sitios le recomendamos,'
-    txt += '   que instale [COLOR cyan][B]Kelebek[/B][/COLOR] desde esta fuente [COLOR gold][B]newkelebek.gitgub.io/Newkelebek[B][/COLOR]'
+    txt += '   que instale [COLOR cyan][B]Kelebek[/B][/COLOR] desde esta fuente [COLOR gold][B]https://newkelebek.gitgub.io/Newkelebek[B][/COLOR]'
 
     txt += '[CR][CR]*) También le sugerimos contactar con este [COLOR chartreuse]Grupo de Telegram[/COLOR], para recibir Soporte al respecto.[CR]'
     txt += '   [COLOR cyan][B]t.me/AprendiendoKodi[/B][/COLOR]'
@@ -2049,7 +2038,7 @@ def show_help_vias(item):
     txt += '    - [COLOR yellow][B]script.module.resolveurl[/B][/COLOR]'
 
     txt += '[CR][CR]*) Puede obtenerlos desde [COLOR chartreuse][B]Nuestra Fuente[/B][/COLOR], carpeta [COLOR gold][B]Scripts[/B][/COLOR].[CR]'
-    txt += '    [COLOR darkorange][B]balandro-tk.github.io/balandro/[/B][/COLOR]'
+    txt += '    [COLOR darkorange][B]https://balandro-tk.github.io/balandro/[/B][/COLOR]'
 
     txt += '[CR][CR]*) Ó bien, le sugerimos contactar con este [COLOR chartreuse]Grupo de Telegram[/COLOR], para recibir Soporte al respecto.[CR]'
     txt += '    [COLOR cyan][B]t.me/AprendiendoKodi[/B][/COLOR]'
@@ -2251,12 +2240,12 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '  ' + cinecalidadlol_dominio
            else: tex_dom = cinecalidadlol_dominio
 
-    datos = channeltools.get_channel_parameters('cinetux')
+    datos = channeltools.get_channel_parameters('cinecalidadmx')
     if datos['active']:
-        cinetux_dominio = config.get_setting('channel_cinetux_dominio', default='')
-        if cinetux_dominio:
-           if tex_dom: tex_dom = tex_dom + '  ' + cinetux_dominio
-           else: tex_dom = cinetux_dominio
+        cinecalidadmx_dominio = config.get_setting('channel_cinecalidadmx_dominio', default='')
+        if cinecalidadmx_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + cinecalidadmx_dominio
+           else: tex_dom = cinecalidadmx_dominio
 
     datos = channeltools.get_channel_parameters('cuevana3')
     if datos['active']:
@@ -2341,13 +2330,6 @@ def show_test(item):
         if hdfullse_dominio:
            if tex_dom: tex_dom = tex_dom + '  '  + hdfullse_dominio
            else: tex_dom = hdfullse_dominio
-
-    datos = channeltools.get_channel_parameters('inkapelis')
-    if datos['active']:
-        inkapelis_dominio = config.get_setting('channel_inkapelis_dominio', default='')
-        if inkapelis_dominio:
-           if tex_dom: tex_dom = tex_dom + '  ' + inkapelis_dominio
-           else: tex_dom = inkapelis_dominio
 
     datos = channeltools.get_channel_parameters('pelis28')
     if datos['active']:
@@ -2512,19 +2494,25 @@ def show_test(item):
     else:
       tex_tor = ' ' + cliente_torrent
       cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
-      if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent): tex_tor += '  Instalado'
+      if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
+          cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+          tex_tor += '  ' + cod_version
       else: tex_tor += '  [COLOR red][B]No instalado[/B][/COLOR]'
 
     if not txt_exc: txt += '[CR]'
 
     txt += '[CR] - [COLOR gold]Cliente/Motor torrent:[/COLOR]  %s' % tex_tor
 
-    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'): tex_yt = '  Instalado'
+    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+        cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+        tex_yt = '  ' + cod_version
     else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
 
     txt += '[CR][CR] - [COLOR gold]YouTube Addon:[/COLOR]  %s' % tex_yt
 
-    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'): tex_yt = '  Instalado'
+    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+        cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+        tex_yt = '  ' + cod_version
     else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
 
     txt += '[CR][CR] - [COLOR gold]ResolveUrl Script:[/COLOR]  %s' % tex_yt

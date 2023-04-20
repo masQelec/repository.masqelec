@@ -7,12 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cinecalidad.run/'
+host = 'https://cinecalidad.cat/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://ww3.cinecalidad.link/',
-             'https://ww2.cinecalidad.link/', 'https://ww5.cinecalidad.link/', 'https://cinecalidad.fan/']
+             'https://ww2.cinecalidad.link/', 'https://ww5.cinecalidad.link/', 'https://cinecalidad.fan/',
+             'https://cinecalidad.run/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')

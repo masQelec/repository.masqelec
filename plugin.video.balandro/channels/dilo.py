@@ -335,6 +335,7 @@ def last_epis(item):
         elif '/lecturas-' in url: continue
         elif '/gran-' in url: continue
         elif '/various-' in url: continue
+        elif '/muy-interesante-' in url: continue
 
         elif '-pc-' in url: continue
         elif '-magazine-' in url: continue

@@ -140,7 +140,7 @@ def generos(item):
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'hotpink' ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda it: it.title)
 
 
 def plataformas(item):

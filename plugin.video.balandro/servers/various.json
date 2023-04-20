@@ -3,102 +3,110 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Filemoon,  Mvidoo,  Ninjastream,  Rutube,  Streamhub,  Tubeload,  Uploadever,  Videovard,  Videowood,  Yandex)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Dropload,  Fastupload,  Filemoon,  Mvidoo,  Rutube,  Streamhub,  Tubeload,  Uploadever,  Videowood,  Yandex)",
 
   "find_videos": {
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(https://tubeload.co/(?:e|f|)/[A-z0-9]+)",
+        "pattern": "(https://tubeload.co/)(?:e/|f/)([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(?:mvidoo.com)/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "https://mvidoo.com/(.*?)/([0-9a-zA-Z]+).mp4.html",
         "url": "\\1"
       },
       {
-        "pattern": "(?:mvidoo.com)/(?:embed-|)/([A-z0-9]+).html",
+        "pattern": "(https://mvidoo.com/)(?:embed-|)([0-9a-zA-Z]+).html",
         "url": "\\1"
       },
       {
-        "pattern": "https://mvidoo.com/(.*?)/([A-z0-9]+).mp4.html",
+        "pattern": "(https://rutube.ru/)(?:play/embed/|video/)([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://ninjastream.to/watch/[A-z0-9]+)",
+        "pattern": "(https://filemoon.sx/(?:e/|d/)[0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://rutube.ru/play/embed/[A-z0-9]+)",
+        "pattern": "(https://filemoon.to/(?:e/|d/)[0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://videovard.sx/(?:e|f|)/[A-z0-9]+)",
+        "pattern": "(https://filemoon.in/(?:e/|d/)[0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://videovard.to/(?:e|f|)/[A-z0-9]+)",
+        "pattern": "(https://filemoon.nl/(?:e/|d/)[0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://filemoon.sx/(?:e|d|)/[A-z0-9]+)",
+        "pattern": "(https://filemoon.wf/(?:e/|d/)[0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://filemoon.to/(?:e|d|)/[A-z0-9]+)",
+        "pattern": "(https://filemoon.eu/(?:e/|d/)[0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://filemoon.in/(?:e|d|)/[A-z0-9]+)",
+        "pattern": "(https://filemoon.art/(?:e/|d/)[0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://filemoon.nl/(?:e|d|)/[A-z0-9]+)",
+        "pattern": "(https://filemoon.link/(?:e/|d/)[0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://filemoon.wf/(?:e|d|)/[A-z0-9]+)",
+        "pattern": "(https://filemoon.top/(?:e/|d/)[0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://filemoon.eu/(?:e|d|)/[A-z0-9]+)",
+        "pattern": "(https://disk.yandex.(?:ru|com)/(?:d/|i/)[A-z0-9]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://filemoon.art/(?:e|d|)/[A-z0-9]+)",
+        "pattern": "(https://yadi.(?:sk|disk)/(?:d/|i/)[A-z0-9]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://filemoon.link/(?:e|d|)/[A-z0-9]+)",
+        "pattern": "(https://uploadever.com/)([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://filemoon.top/(?:e|d|)/[A-z0-9]+)",
+        "pattern": "(https://uploadever.in/)([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://disk.yandex.(?:ru|com)/(?:d|i|)/[A-z0-9]+)",
+        "pattern": "(https://videowood.tv/)(?:embed/|video/)([0-9a-z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://yadi.(?:sk|disk)/(?:d|i|)/[A-z0-9]+)",
+        "pattern": "https://streamhub.to/watch/([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://uploadever.(?:com|in)/[A-z0-9]+)",
+        "pattern": "(https://streamhub.to/)(?:embed-|e/|d/)?([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(?:videowood.tv)/(?:embed/|video/)([0-9a-z]+)",
+        "pattern": "(https://fastupload.io/)([0-9a-zA-Z]+/file)",
+        "url": "https://fastupload.io/\\2"
+      },
+      {
+        "pattern": "(https://fastupload.io/)([0-9a-zA-Z]+)",
+        "url": "https://fastupload.io/\\2"
+      },
+      {
+        "pattern": "(https://fastupload.io/)(?:en/|es/|de/)([0-9a-zA-Z]+/file)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://streamhub.to(?:/e|)/[A-z0-9]+)",
+        "pattern": "(https://fastupload.io/)(?:en/|es/|de/)([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://streamhub.to/watch/[A-z0-9]+)",
-        "url": "\\1"
+        "pattern": "(https://dropload.io/)(?:embed-|e/|d/)?([0-9a-zA-Z]+)",
+        "url": "https://dropload.io/\\2"
       }
     ]
   }

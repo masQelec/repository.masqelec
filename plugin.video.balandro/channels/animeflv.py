@@ -7,12 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www2.animeflv.bz/'
+host = 'https://animeflv.vc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www10.animeflv.cc/', 'https://www3.animeflv.net/', 'https://www3.animeflv.cc/',
-             'https://ww3.animeflv.cc/', 'https://animeflv.bz/', 'https://www1.animeflv.bz/'] 
+             'https://ww3.animeflv.cc/', 'https://animeflv.bz/', 'https://www1.animeflv.bz/',
+             'https://www2.animeflv.bz/', 'https://animeflv.so/'] 
 
 
 domain = config.get_setting('dominio', 'animeflv', default='')
@@ -32,6 +33,7 @@ def do_downloadpage(url, post=None, headers=None):
         url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post).data
+
     return data
 
 
@@ -338,6 +340,8 @@ def findvideos(item):
 
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
+        elif '/moonplayer' in url: continue
+
         if not url.startswith('http'): url = 'https:' + url
 
         servidor = servertools.get_server_from_url(url)
@@ -358,6 +362,7 @@ def play(item):
     itemlist = []
 
     servidor = item.server
+
     url = item.url
 
     if "/v/" in item.url:
@@ -366,26 +371,17 @@ def play(item):
         if 'yandex.ru' in data:
             url = item.url.split('/v/')[0]
             item.url = item.url.replace(url, 'https://fembed.com')
+
             url = item.url
-
-            servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
     if "/streaming.php?" in item.url:
         data = do_downloadpage(item.url)
 
         url = scrapertools.find_single_match(data, '<iframe id="embedvideo".*?</div>.*?src="(.*?)"')
+
         if 'www.googletagmanager.com' in url: url = ''
 
         if not url: url = scrapertools.find_single_match(data, '<li class="linkserver".*?data-video="(.*?)"')
-
-        if url:
-            servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
     if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
@@ -394,6 +390,11 @@ def play(item):
         if not url.startswith("http"): url = "https:" + url
 
         url = url.replace("\\/", "/")
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone(url = url, server = servidor))
 

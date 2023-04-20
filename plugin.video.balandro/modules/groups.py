@@ -924,6 +924,7 @@ def ch_groups(item):
                        if not config.get_setting(cfg_dominio_channel, default=''): presentar = False
 
                    if presentar: titulo += '[I][COLOR teal] (sesion)[/COLOR][/I]'
+               else: titulo += '[I][COLOR teal] (login)[/COLOR][/I]'
 
         if not PY3:
             if 'mismatched' in ch['clusters']: titulo += '[I][COLOR coral] (Incompatible)[/COLOR][/I]'

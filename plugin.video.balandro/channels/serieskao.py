@@ -420,7 +420,7 @@ def play(item):
     logger.info()
     itemlist = []
 
-    if item.server:
+    if not item.server == 'directo':
         servidor = servertools.get_server_from_url(item.url)
         servidor = servertools.corregir_servidor(servidor)
 
