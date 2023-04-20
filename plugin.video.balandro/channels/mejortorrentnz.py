@@ -51,12 +51,14 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, headers=None, raise_weberror=True, timeout=None):
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://mejortorrent.nz', 'https://mejortorrent.cc']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
+
+    timeout = 30
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
@@ -393,9 +395,9 @@ def findvideos(item):
            vid = host + '/download_tv.php'
 
            if not vid.startswith(host):
-               resp = httptools.downloadpage(vid, post = post, headers = {'Referer': item.ref}, raise_weberror=False, timeout = 30)
+               resp = httptools.downloadpage(vid, post = post, headers = {'Referer': item.ref}, raise_weberror=False)
            else:
-               resp = httptools.downloadpage_proxy('mejortorrentnz', vid, post = post, headers = {'Referer': item.ref}, raise_weberror=False, timeout = 30)
+               resp = httptools.downloadpage_proxy('mejortorrentnz', vid, post = post, headers = {'Referer': item.ref}, raise_weberror=False)
 
            data = resp.data
         except:
@@ -426,23 +428,20 @@ def play(item):
     if item.hash:
         url = host + '/torrent_dmbk.php?u=' + item.hash
 
-        try:
-           if not url.startswith(host):
-               link = httptools.downloadpage(url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False, timeout = 30).headers['location']
-           else:
-               link = httptools.downloadpage_proxy('mejortorrentnz', url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False, timeout = 30).headers['location']
-        except:
-           if not url.startswith(host):
-               resp = httptools.downloadpage(url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False, only_headers=True, timeout = 30)
-           else:
-               resp = httptools.downloadpage_proxy('mejortorrentnz', url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False, only_headers=True, timeout = 30)
+        if not url.startswith(host):
+            resp = httptools.downloadpage(url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False)
+        else:
+            resp = httptools.downloadpage_proxy('mejortorrentnz', url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False)
 
-           link = scrapertools.find_single_match(str(resp.headers), "'location': '(.*?)'")
+        link = ''
+
+        if 'location' in resp.headers:
+            link = resp.headers['location']
 
         if not link:
             return 'Archivo [COLOR plum]No localizado[/COLOR]'
 
-        data = do_downloadpage(link, headers={'Referer': host + '/download_torrent.php'}, timeout = 40)
+        data = do_downloadpage(link, headers={'Referer': host + '/download_torrent.php'})
 
         url = link
 

@@ -383,7 +383,16 @@ def play(item):
 
             url = new_url
 
-            if '/player/go.php?v=' in new_url:
+            if '/nyuu.hjstream.xyz' in new_url:
+                data = do_downloadpage(new_url)
+
+                url = scrapertools.find_single_match(data, 'url: "(.*?)"')
+
+                if url:
+                    itemlist.append(item.clone( url=url, server='directo'))
+                    return itemlist
+
+            elif '/player/go.php?v=' in new_url:
                 new_url = new_url.replace('/player/go.php?v=', '/player/go-player.php?v=')
 
                 data = do_downloadpage(new_url)

@@ -208,7 +208,7 @@ def list_all(item):
         matches = re.compile(r"<a href='([^']+)'>([^<]+)").findall(data)
 
         for url, title in matches:
-            if "(" in title: titulo = titulo.split("(")[0]
+            if "(" in title: titulo = title.split("(")[0]
             else: titulo = title
 
             titulo = titulo.strip()
@@ -243,7 +243,7 @@ def list_last(item):
 
     for url, title in matches:
         if item.search_type== 'movie':
-            if "(" in title: titulo = titulo.split("(")[0]
+            if "(" in title: titulo = title.split("(")[0]
             else: titulo = title
 
             itemlist.append(item.clone( action='findvideos', url=host + url, title=title, contentType=item.search_type, contentTitle=titulo, infoLabels={'year': "-"} ))
@@ -306,7 +306,7 @@ def list_post(item):
     matches = re.compile(patron).findall(data)
 
     for url, title, info, thumb in matches:
-        if "(" in title: titulo = titulo.split("(")[0]
+        if "(" in title: titulo = title.split("(")[0]
         else: titulo = title
 
         itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, thumbnail=thumb if "http" in thumb else "https:" + thumb,
@@ -491,7 +491,7 @@ def list_search(item):
                 itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title, fmt_sufijo=sufijo,
                                             contentType = 'movie', contentTitle = title, contentExtra = 'documentary', infoLabels={'year': "-"} ))
             else:
-                if "(" in title: titulo = titulo.split("(")[0]
+                if "(" in title: titulo = title.split("(")[0]
                 else: titulo = title
 
                 itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, fmt_sufijo=sufijo,

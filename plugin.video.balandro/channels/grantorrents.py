@@ -390,11 +390,16 @@ def play(item):
         url = base64.b64decode(new_url).decode("utf-8")
 
         if not url.startswith(host):
-            url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+            resp = httptools.downloadpage(url, follow_redirects=False)
         else:
-            url = httptools.downloadpage_proxy('grantorrents', url, follow_redirects=False).headers['location']
+            resp = httptools.downloadpage_proxy('grantorrents', url, follow_redirects=False)
 
-    if not item.url.endswith('.torrent'):
+        url = ''
+
+        if 'location' in resp.headers:
+            url = resp.headers['location']
+
+    elif not item.url.endswith('.torrent'):
         host_torrent = host[:-1]
         url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
 

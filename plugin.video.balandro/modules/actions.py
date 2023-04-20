@@ -55,7 +55,7 @@ def _marcar_canales(item):
             return
 
     config.set_setting('status', item.estado, item.canal)
-	
+
     el_canal = ('Cambiado a [B][COLOR %s] %s [COLOR %s] ' + item.canal.capitalize() + '[/COLOR][/B]') % (color_exec, new_tipo, color_avis)
     platformtools.dialog_notification(config.__addon_name, el_canal)
 
@@ -323,7 +323,7 @@ def manto_params(item):
         config.set_setting('channel_cinecalidad_dominio', '')
         config.set_setting('channel_cinecalidadla_dominio', '')
         config.set_setting('channel_cinecalidadlol_dominio', '')
-        config.set_setting('channel_cinetux_dominio', '')
+        config.set_setting('channel_cinecalidadmx_dominio', '')
         config.set_setting('channel_cuevana3_dominio', '')
         config.set_setting('channel_cuevana3video_dominio', '')
 
@@ -344,7 +344,10 @@ def manto_params(item):
         config.set_setting('channel_hdfull_hdfull_username', '')
         config.set_setting('channel_hdfullse_dominio', '')
 
-        config.set_setting('channel_inkapelis_dominio', '')
+        config.set_setting('channel_nextdede_nextdede_login', False)
+        config.set_setting('channel_nextdede_nextdede_email', '')
+        config.set_setting('channel_nextdede_nextdede_password', '')
+        config.set_setting('channel_nextdede_nextdede_username', '')
 
         config.set_setting('channel_pelis28_dominio', '')
         config.set_setting('channel_pelishouse_dominio', '')
@@ -378,6 +381,9 @@ def manto_params(item):
 
         config.set_setting('proxysearch_excludes', '')
 
+        config.set_setting('proxysearch_process', '')
+        config.set_setting('proxysearch_process_proxies', '')
+
         config.set_setting('search_last_all', '')
         config.set_setting('search_last_movie', '')
         config.set_setting('search_last_tvshow', '')
@@ -387,7 +393,7 @@ def manto_params(item):
         download_path = filetools.join(config.get_data_path(), 'downloads')
         config.set_setting('downloadpath', download_path)
 
-        config.set_setting('chrome_last_version', '111.0.5563.65')
+        config.set_setting('chrome_last_version', '112.0.5615.50')
 
         config.set_setting('debug', '0')
 
@@ -692,7 +698,7 @@ def manto_tmdb_sqlite(item):
         existe = filetools.exists(path)
         if existe == False:
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Tmdb Sqlite[/COLOR][/B]' % color_exec)
-      
+
         if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Tmdb Sqlite ?[/B][/COLOR]'):
             filetools.remove(path)
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Tmdb Sqlite eliminado[/B][/COLOR]' % color_infor)
@@ -704,7 +710,7 @@ def manto_tmdb_sqlite(item):
         existe = filetools.exists(path)
         if existe == False:
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Tmdb Sqlite Journal[/COLOR][/B]' % color_exec)
-      
+
         if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Tmdb Sqlite Journal?[/B][/COLOR]'):
             filetools.remove(path)
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Tmdb Sqlite Journal eliminado[/B][/COLOR]' % color_infor)
@@ -770,7 +776,7 @@ def adults_password(item):
         if len(password) != 4:
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Pin obligatorio 4 dígitos[/B][/COLOR]' % color_alert)
             return
-        
+
         if str(password) == '0000':
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Pin NO admitido[/COLOR][/B]' % color_avis)
             return
@@ -890,7 +896,7 @@ def test_internet(item):
 
     if your_ip:
         your_info = ''
-		
+
         try:
            your_info = httptools.downloadpage('https://ipinfo.io/json').data
         except:

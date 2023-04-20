@@ -61,9 +61,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/doramas-online/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'last_series', url = host, search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Capítulos recientes', action = 'last_news', url = host, search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Últimas', action = 'last_series', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host + 'category/ultimos-capitulos-online/', search_type = 'tvshow' ))
 

@@ -265,10 +265,14 @@ def list_all(item):
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
 
         if tipo == 'movie':
+            if item.search_type == 'tvshow': continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
 
         if tipo == 'tvshow':
+            if item.search_type == 'movie': continue
+
             itemlist.append(item.clone( action ='temporadas', url = url, title = title, thumbnail = thumb,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
 
@@ -490,16 +494,30 @@ def play(item):
                ref = url.replace('.html', '')
                headers = {'Referer': ref}
 
-               vid = host + 'r.php'
+               vid_url = host + 'r.php'
 
                if not vid.startswith(host):
-                   url = httptools.downloadpage(vid, post = post, headers= headers, follow_redirects=False).headers.get('location', '')
+                   url = httptools.downloadpage(vid_url, post = post, headers= headers, follow_redirects=False).headers.get('location', '')
                else:
-                   url = httptools.downloadpage_proxy('entrepeliculasyseries', vid, post = post, headers= headers, follow_redirects=False).headers.get('location', '')
+                   url = httptools.downloadpage_proxy('entrepeliculasyseries', vid_url, post = post, headers= headers, follow_redirects=False).headers.get('location', '')
 
                if url:
                    servidor = servertools.get_server_from_url(url)
                    servidor = servertools.corregir_servidor(servidor)
+
+       elif '/p.php?' in url:
+             if not url.startswith(host):
+                 resp = httptools.downloadpage(url)
+             else:
+                 resp = httptools.downloadpage_proxy('entrepeliculasyseries', url)
+
+             url = scrapertools.find_single_match(str(resp.headers), 'nofernu=(.*?);')
+
+             if url:
+                 url = url.replace('%3A', ':').replace('%2F', '/')
+
+                 servidor = servertools.get_server_from_url(url)
+                 servidor = servertools.corregir_servidor(servidor)
 
     if url:
         if not url.startswith('http'): url = 'https:' + url

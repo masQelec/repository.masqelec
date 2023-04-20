@@ -37,6 +37,8 @@ def mainlist_animes(item):
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animes?estado%5B%5D=0&order=created', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'animes?estado%5B%5D=1&order=created', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'En Latino', action = 'list_all', url = host + 'animes?genre[]=46&order=created', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por categorías', action = 'categorias', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -68,6 +70,8 @@ def generos(item):
     matches = re.compile("<option value='(.*?)'.*?>(.*?)</option>").findall(bloque)
 
     for value, title in matches:
+        if title == 'Latino/Español': continue
+
         url = host + 'animes?genre%5B%5D=' + value + '&order=created'
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))

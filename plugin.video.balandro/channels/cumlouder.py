@@ -30,6 +30,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all' ))
 
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host +'/2/', page = 1 ))
+
     itemlist.append(item.clone( title = 'Por repertorio', action = 'repertorios' ))
     itemlist.append(item.clone( title = 'Por canal', action = 'canales' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
@@ -206,7 +208,11 @@ def list_all(item):
 
         thumb = thumb.replace('ep1.jpg', 'ep.jpg')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, quality = qlty,
+        durac = durac.replace(' m', '').strip()
+
+        titulo = "[COLOR tan]%s[/COLOR] %s" % (durac, title)
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, quality = qlty,
                                     contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:

@@ -230,6 +230,8 @@ def list_all(item):
 
         if url.startswith('/'): url = host[:-1] + url
 
+        title = title.replace('&#038;', '')
+
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(title, r"(\d{4})")
@@ -256,7 +258,7 @@ def list_all(item):
             if item.group == 'animes':
                 if not '/anime/' in url: continue
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'season', contentSerieName = title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -277,7 +279,10 @@ def temporadas(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    temporadas = re.compile('data-toggle="tab">(.*?)</a>', re.DOTALL).findall(data)
+    bloque = scrapertools.find_single_match(data, '(.*?)>Disqus<')
+
+    temporadas = re.compile('data-toggle="tab">(.*?)</a>', re.DOTALL).findall(bloque)
+    if not temporadas: temporadas = re.compile('data-toggle="tab".*?>(.*?)</a>', re.DOTALL).findall(bloque)
 
     tot_tempo = len(temporadas)
 
@@ -318,7 +323,8 @@ def episodios(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, 'data-toggle="tab">Temporada.*?' + str(item.contentSeason) + '(.*?)<div class="clear"></div>')
-    if not bloque: bloque = scrapertools.find_single_match(data, 'data-toggle="tab">TEMPORADA.*?' + str(item.contentSeason) + '(.*?)<div class="clear"></div>')
+    if not bloque: bloque = scrapertools.find_single_match(data, 'data-toggle="tab".*?">Temporada.*?' + str(item.contentSeason) + '(.*?)<div class="clear"></div>')
+    if not bloque: bloque = scrapertools.find_single_match(data, 'data-toggle="tab".*?">TEMPORADA.*?' + str(item.contentSeason) + '(.*?)<div class="clear"></div>')
 
     if bloque:
         bloque = scrapertools.find_single_match(bloque, 'id="pills-vertical-' + str(item.contentSeason) + '(.*?)</div>')
@@ -411,12 +417,13 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    langs = scrapertools.find_multiple_matches(data, 'data-lang="#([^"]+).*?lngopt">.*?<a>([^<]+)</a>')
+    langs = scrapertools.find_multiple_matches(data, 'data-lang="#(.*?)".*?lngopt">.*?<a>(.*?)</a>')
+    if not langs: langs = scrapertools.find_multiple_matches(data, 'data-lang="#(.*?)".*?">(.*?)</a>')
 
     ses = 0
 
     for lang, idioma in langs:
-        bloque = scrapertools.find_single_match(data, '"%s.*?</a></li></ul></div>' % lang)
+        bloque = scrapertools.find_single_match(data, 'id="%s.*?</a></li></ul></div>' % lang)
 
         lang = IDIOMAS.get(idioma.lower(), 'Vose')
 
@@ -575,6 +582,8 @@ def list_search(item):
         if url.startswith('/'): url = host[:-1] + url
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        title = title.replace('&#038;', '')
 
         year = '-'
 

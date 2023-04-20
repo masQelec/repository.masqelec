@@ -199,6 +199,8 @@ def generos(item):
     matches = re.compile(r'<option value="([^"]+)"\s*>([^<]+)').findall(data)
 
     for genre_id, title in matches:
+        if title == "Ángeles": title = 'Angeles'
+
         url = "%s?genero[]=%s&order=default&page=1" % (url_genre, genre_id)
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
@@ -450,6 +452,7 @@ def play(item):
     item.url = item.url.replace('&amp;', '&')
 
     servidor = item.server
+
     url = item.url
 
     if '/videa.hu/' in url:

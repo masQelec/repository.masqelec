@@ -189,7 +189,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<iframe src="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<iframe.*?-src="(.*?)"', re.DOTALL).findall(data)
 
     for link in matches:
         if host in link:
@@ -206,6 +206,8 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         link = servertools.normalize_url(servidor, link)
+
+        if not 'http' in link: link = 'https:' + link
 
         if not servidor == 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'VO' ))
