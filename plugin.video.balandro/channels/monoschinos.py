@@ -138,6 +138,8 @@ def list_all(item):
         if 'Doblaje' in title: SerieName = title.split("Doblaje")[0]
         if 'La película' in title: SerieName = title.split("La película")[0]
         if 'Season' in title: SerieName = title.split("Season")[0]
+        if 'Castellano' in title: SerieName = title.split("Castellano")[0]
+        if 'Latino' in title: SerieName = title.split("Latino")[0]
 
         SerieName = SerieName.strip()
 
@@ -188,6 +190,8 @@ def last_epis(item):
         if 'Doblaje' in title: SerieName = title.split("Doblaje")[0]
         if 'capitulo' in title: SerieName = title.split("capitulo")[0]
         if 'Season' in title: SerieName = title.split("Season")[0]
+        if 'Castellano' in title: SerieName = title.split("Castellano")[0]
+        if 'Latino' in title: SerieName = title.split("Latino")[0]
 
         SerieName = SerieName.strip()
 
@@ -288,7 +292,7 @@ def findvideos(item):
         elif servidor == 'anonfile': servidor = 'anonfiles'
         elif servidor == 'zippy': servidor = 'zippyshare'
         elif servidor == 'drive': servidor = 'gvideo'
-        elif servidor == 'senvid': servidor = 'sendvid'
+        elif servidor == 'senvid2': servidor = 'sendvid'
 
         elif servidor == 'sbanh' or servidor == 'sblanh' or servidor == 'sbspeed' or servidor == 'sbchill' or servidor == 'sblongvu' or servidor == 'sbrity' or servidor == 'sbhight': servidor = 'streamsb'
 
@@ -319,6 +323,8 @@ def findvideos(item):
         elif srv == 'ok':
           if '/mega.nz/' in url: srv = 'mega'
 
+        if not srv: srv = servertools.get_server_from_url(url)
+
         if servertools.is_server_available(srv):
             if not servertools.is_server_enabled(srv): continue
         else:
@@ -345,6 +351,8 @@ def play(item):
     url = base64.b64decode(item.d_play).decode("utf-8")
 
     if host in url: url = scrapertools.find_single_match(url, 'url=(.*?)$')
+    else:
+       if '?url=' in url: url = scrapertools.find_single_match(url, 'url=(.*?)$')
 
     if url:
         servidor = servertools.get_server_from_url(url)

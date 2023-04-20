@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import re
-
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
@@ -212,6 +210,12 @@ def temporadas(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+
+    # ~ hay redirecionamiento por location
+    if not data:
+        data = do_downloadpage(item.url, follow_redirects = True)
+
+    if not data: return itemlist
 
     patron = '<section class="SeasonBx AACrdn">.*?<a href="(.*?)".*?<span>(.*?)</span>'
 

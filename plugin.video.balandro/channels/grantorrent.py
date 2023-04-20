@@ -324,6 +324,9 @@ def play(item):
                 data = do_downloadpage(item.url)
 
             if data:
+                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data) or '<!doctype' in str(data):
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
                 import os
 
                 file_local = os.path.join(config.get_data_path(), "temp.torrent")

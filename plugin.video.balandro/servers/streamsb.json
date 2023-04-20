@@ -9,7 +9,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(?:streamsb.com|streamsb.net|sbplay.org|sbplay.one|sbplay1.com|sbplay2.com|sbplay2.xyz|pelistop.co|sbfast.com|sbfull.com|ssbstream.net|sbthe.com|sbspeed.com|streamsss.net|sblanh.com|sbanh.com|sblongvu.com|streamsb.top|sbchill.com|sbrity.com|sbhight.com|sbbrisk.com)/(?:embed-|d/|e/)([A-z0-9]+)",
+        "pattern": "(?:streamsb.com|streamsb.net|sbplay.org|sbplay.one|sbplay1.com|sbplay2.com|sbplay2.xyz|pelistop.co|sbfast.com|sbfast.live|sbfull.com|ssbstream.net|sbthe.com|sbspeed.com|streamsss.net|sblanh.com|sbanh.com|sblongvu.com|streamsb.top|sbchill.com|sbrity.com|sbhight.com|sbbrisk.com|sbface.com|view345.com)/(?:embed-|d/|e/)([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -49,6 +49,10 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:cloudemb.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:tubesb.com)/(?:embed-|d/|e/)([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
@@ -61,6 +65,10 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:tubesb.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:embedsb.com)/(?:embed-|d/|e/)([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
@@ -70,6 +78,10 @@
       },
       {
         "pattern": "(?:embedsb.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:embedsb.com)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -97,6 +109,10 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:sbcloud1.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:watchsb.com)/(?:embed-|d/|e/)([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
@@ -106,6 +122,10 @@
       },
       {
         "pattern": "(?:watchsb.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:watchsb.com)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -121,6 +141,10 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:viewsb.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:watchmo.icu)/(?:embed-|d/|e/)([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
@@ -133,11 +157,19 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:watchmo.icu)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:sbfull.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
       },
       {
         "pattern": "(?:sbfull.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbfull.com)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -149,11 +181,19 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:sbspeed.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:streamsss.net)/(?:embed-|d/|e/)([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
       },
       {
         "pattern": "(?:streamsss.net)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:streamsss.net)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -165,11 +205,19 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:sblanh.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:sbanh.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
       },
       {
         "pattern": "(?:sbanh.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbanh.com)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -181,11 +229,31 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:sbfast.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbfast.live)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbfast.live)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbfast.live)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:sblongvu.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
       },
       {
         "pattern": "(?:sblongvu.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sblongvu.com)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -197,11 +265,19 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:sbchill.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:sbrity.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
       },
       {
         "pattern": "(?:sbrity.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbrity.com)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -213,11 +289,43 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:sbhight.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:sbbrisk.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
       },
       {
         "pattern": "(?:sbbrisk.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbbrisk.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbface.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbface.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbface.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:view345.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:view345.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:view345.com)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       }
     ]

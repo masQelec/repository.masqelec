@@ -153,7 +153,7 @@ if tipo_channel != '':
         import traceback
         logger.error(traceback.format_exc())
 
-        if not item.channel == 'mainmenu':
+        if not item.channel in ['mainmenu', 'actions', 'domains', 'downloads', 'favoritos', 'filmaffinitylists', 'filters', 'generos', 'groups', 'helper', 'proxysearch', 'search', 'submnuctext', 'submnuteam', 'tester', 'tmdblists', 'tracking']:
             platformtools.dialog_ok('[COLOR red][B]Error inesperado en [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]',
                                     '[COLOR cyan][B]Puede deberse a un fallo de conexión, ó que la web asociada a este canal ha cambiado su estructura[/B][/COLOR], ó bien ser un error interno del Addon. Para saber más detalles, consulta el fichero Log de su Media Center.')
         else:

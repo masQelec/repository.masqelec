@@ -14,7 +14,7 @@ from core import httptools, scrapertools, tmdb
 
 
 # ~ web alternativa
-# ~ 15/3/2023  'https://edf1-don.mirror.pm/'
+# ~ 28/3/2023  'https://edf1-don.mirror.pm/'
 
 host = 'https://4463-don.mirror.pm/'
 
@@ -59,8 +59,10 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.surf/', 'https://dontorrent.how/', 'https://dontorrent.casa/',
              'https://dontorrent.chat/', 'https://dontorrent.plus/', 'https://dontorrent.ninja/',
              'https://dontorrent.love/', 'https://dontorrent.cloud/', 'https://dontorrent.africa/',
+             'https://dontorrent.pictures/', 'https://dontorrent.ms/', 'https://dontorrent.care/',
 
-             'https://8ca7-don.mirror.pm/', 'https://1b1b-don.mirror.pm', 'https://6b6b-don.mirror.pm']
+             'https://8ca7-don.mirror.pm/', 'https://1b1b-don.mirror.pm', 'https://6b6b-don.mirror.pm',
+             'https://edf1-don.mirror.pm/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -310,7 +312,7 @@ def list_all(item):
         matches = re.compile(r"<a href='([^']+)'>([^<]+)").findall(data)
 
         for url, title in matches:
-            if "(" in title: titulo = titulo.split("(")[0]
+            if "(" in title: titulo = title.split("(")[0]
             else: titulo = title
 
             titulo = titulo.strip()
@@ -346,7 +348,7 @@ def list_last(item):
 
     for url, title in matches:
         if item.search_type== 'movie':
-            if "(" in title: titulo = titulo.split("(")[0]
+            if "(" in title: titulo = title.split("(")[0]
             else: titulo = title
 
             itemlist.append(item.clone( action='findvideos', url=host + url, title=title, contentType=item.search_type, contentTitle=titulo, infoLabels={'year': "-"} ))
@@ -408,7 +410,7 @@ def list_post(item):
     matches = re.compile(patron).findall(data)
 
     for url, title, info, thumb in matches:
-        if "(" in title: titulo = titulo.split("(")[0]
+        if "(" in title: titulo = title.split("(")[0]
         else: titulo = title
 
         itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, thumbnail=thumb if "http" in thumb else "https:" + thumb,
@@ -582,7 +584,7 @@ def list_search(item):
                 itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title, fmt_sufijo=sufijo,
                                             contentType = 'movie', contentTitle = title, contentExtra = 'documentary', infoLabels={'year': "-"} ))
             else:
-                if "(" in title: titulo = titulo.split("(")[0]
+                if "(" in title: titulo = title.split("(")[0]
                 else: titulo = title
 
                 itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, fmt_sufijo=sufijo,

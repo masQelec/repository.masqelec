@@ -155,6 +155,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title = title.replace('&#8211;', '').replace('Latino online', '')
+
         tipo = 'movie' if '/movies/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
@@ -169,8 +171,6 @@ def list_all(item):
         if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
-
-            title = title.replace('&#8211;', '')
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': year, 'plot': plot} ))
@@ -305,7 +305,7 @@ def list_letra(item):
                     if item.search_type == 'tvshow': continue
 
                     itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                            contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+                                                contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
                 else:
                     if item.search_type == 'movie': continue
 
@@ -326,7 +326,7 @@ def temporadas(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, "<div class='se-c'>.*?<span.*?'>(.*?)<.*?class='title'>(.*?)<i>")
+    matches = scrapertools.find_multiple_matches(data, '<div class="se-c">.*?<span.*?">(.*?)<.*?class="title">(.*?)<i>')
 
     for numtempo, title in matches:
         title = title.strip()
@@ -355,9 +355,9 @@ def episodios(item):
 
     data = httptools.downloadpage(item.url).data
 
-    bloque = scrapertools.find_single_match(data, "<span class='se-t.*?'>" + str(item.contentSeason) + "(.*?)</ul></div>")
+    bloque = scrapertools.find_single_match(data, '<span class="se-t.*?">' + str(item.contentSeason) + '(.*?)</ul></div>')
 
-    matches = scrapertools.find_multiple_matches(bloque, "<li class='mark-(.*?)</li>")
+    matches = scrapertools.find_multiple_matches(bloque, '<li class="mark-(.*?)</li>')
 
     if item.page == 0:
         sum_parts = len(matches)
@@ -392,18 +392,18 @@ def episodios(item):
                     item.perpage = sum_parts
 
     for data_epi in matches[item.page * item.perpage:]:
-        url = scrapertools.find_single_match(data_epi, "<a href='(.*?)'")
+        url = scrapertools.find_single_match(data_epi, '<a href="(.*?)"')
 
         if url:
-            thumb = scrapertools.find_single_match(data_epi, "src='(.*?)'")
+            thumb = scrapertools.find_single_match(data_epi, 'src="(.*?)"')
 
-            title = scrapertools.find_single_match(data_epi, "<a href=.*?'>(.*?)</a>")
+            title = scrapertools.find_single_match(data_epi, '<a href=.*?">(.*?)</a>')
             title = title.strip()
 
             episode = title.lower()
             episode = episode.replace('episodio', '').strip()
 
-            numer = scrapertools.find_single_match(data_epi, "<div class='numerando'>(.*?)</div>")
+            numer = scrapertools.find_single_match(data_epi, '<div class="numerando">(.*?)</div>')
             numer = numer.strip()
             if numer:
                 episode = numer.split(' - ')[1]
@@ -437,9 +437,9 @@ def findvideos(item):
 
     if 'subtitulado' in item.title.lower() or 'subtitulada' in item.title.lower(): lang = 'Vose'
 
-    bloque = scrapertools.find_single_match(data, "<ul id='playeroptionsul'(.*?)</ul>")
+    bloque: bloque = scrapertools.find_single_match(data, '<ul id="playeroptionsul"(.*?)</ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, "<li id='player-option-(.*?)</li>")
+    matches = scrapertools.find_multiple_matches(bloque, '<li id="player-option-(.*?)</li>')
 
     ses = 0
 
@@ -448,19 +448,18 @@ def findvideos(item):
 
         if 'youtube' in match: continue
 
-        data_post = scrapertools.find_single_match(match, "data-post='(.*?)'")
-        data_nume = scrapertools.find_single_match(match, "data-nume='(.*?)'")
-        data_type = scrapertools.find_single_match(match, "data-type='(.*?)'")
+        data_post = scrapertools.find_single_match(match, 'data-post="(.*?)"')
+        data_nume = scrapertools.find_single_match(match, 'data-nume="(.*?)"')
+        data_type = scrapertools.find_single_match(match, 'data-type="(.*?)"')
 
         if not data_post or not data_nume or not data_type: continue
 
-        post = {'action': 'doo_player_ajax', 'post': data_post, 'nume': data_nume, 'type': data_type}
         headers = {'Referer': item.url}
 
-        data = httptools.downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers).data
+        data = httptools.downloadpage(host + 'wp-json/dooplayer/v2/' + data_post + '/' + data_type + '/' + data_nume, headers = headers).data
 
         url = scrapertools.find_single_match(str(data), 'src=.*?"(.*?)"')
-        if not url: url = scrapertools.find_single_match(str(data), '"embed_url":"(.*?)"')
+        if not url: url = scrapertools.find_single_match(str(data), '"embed_url":(.*?)"')
 
         if url:
            url = url.replace('\\/', '/')
@@ -508,6 +507,8 @@ def search_results(item):
         title = scrapertools.find_single_match(article, ' alt="(.*?)"').strip()
 
         if not url or not title: continue
+
+        title = title.replace('&#8211;', '').replace('Latino online', '')
 
         tipo = 'tvshow' if 'class="tvshows"' in article else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo

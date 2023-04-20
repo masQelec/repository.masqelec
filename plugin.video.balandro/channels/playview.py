@@ -45,15 +45,13 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, follow_redirects=True, only_headers=False):
+def do_downloadpage(url, post=None, headers=None):
     if not url.startswith(host):
-        resp = httptools.downloadpage(url, post=post, follow_redirects=follow_redirects, only_headers=only_headers)
+        data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
-        resp = httptools.downloadpage_proxy('playview', url, post=post, follow_redirects=follow_redirects, only_headers=only_headers)
+        data = httptools.downloadpage_proxy('playview', url, post=post, headers=headers).data
 
-    if only_headers: return resp.headers
-
-    return resp.data
+    return data
 
 
 def mainlist(item):
@@ -450,7 +448,17 @@ def play(item):
     if not url: url = scrapertools.find_single_match(data, '<iframe src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, 'data-url="([^"]+)')
 
-    if url.startswith(host): url = do_downloadpage(url, follow_redirects=False, only_headers=True).get('location', '')
+    if 'http' not in url: return itemlist
+
+    if not url.startswith(host):
+        resp = httptools.downloadpage(url, follow_redirects=False, timeout = 30)
+    else:
+        resp = httptools.downloadpage_proxy('playview', url, follow_redirects=False, timeout = 30)
+
+    url = ''
+
+    if 'location' in resp.headers:
+        url = resp.headers['location']
 
     if url:
         servidor = servertools.get_server_from_url(url)

@@ -153,6 +153,7 @@ def findvideos(item):
 
     for url in videos:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
+        elif '/vapley.top/' in url: continue
         elif '/megadl.fr/' in url: continue
         elif '/1fichier.com/' in url: continue
 
@@ -161,7 +162,8 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'VO' ))
+        if url:
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'VO' ))
 
     if not itemlist:
         if not ses == 0:

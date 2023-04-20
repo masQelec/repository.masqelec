@@ -31,8 +31,6 @@ except:
 
 dominios = [
          'https://hdfull.store/',
-         'https://hdfull.life/',
-         'https://hdfull.digital/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://new.hdfull.one/'
@@ -48,7 +46,8 @@ ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
              'https://hdfull.click/', 'https://hdfull.link/', 'https://hdfull.lol/',
              'https://hdfull.fun/', 'https://hdfull.top/', 'https://hdfull.vip/',
              'https://hdfull.wtf/', 'https://hdfull.gdn/', 'https://hdfull.cloud/',
-             'https://hdfull.video/', 'https://hdfull.work/']
+             'https://hdfull.video/', 'https://hdfull.work/', 'https://hdfull.life/',
+             'https://hdfull.digital/']
 
 
 login_ok = '[COLOR chartreuse]HdFull Login correcto[/COLOR]'
@@ -65,32 +64,39 @@ class login_dialog(xbmcgui.WindowDialog):
 
         if avis:
             self.login_result = False
-            platformtools.dialog_ok("Recomendación Balandro - [B][COLOR yellow]HdFull[/B][/COLOR]", '[COLOR yellow]Sugerimos crear una nueva cuenta para registrarse en la web, no deberiais indicar ninguna de vuestras cuentas personales.[/COLOR]', 'Para más detalles al respecto, acceda a la Ayuda, apartado Canales, Información dominios que requieren registrarse.')
+            platformtools.dialog_ok("Recomendación [B][COLOR yellow]HdFull[/B][/COLOR]", '[B][COLOR yellowgreen]Mejor crear una NUEVA cuenta para registrarse en la web, no deberíais informar ninguna de vuestras cuentas Personales.[/B][/COLOR]', 'Para más detalles al respecto, acceda a la Ayuda, apartado Canales, Información dominios que requieren registrarse.')
 
         self.background = xbmcgui.ControlImage(250, 150, 800, 355, filename=config.get_thumb('ContentPanel'))
         self.addControl(self.background)
         self.icon = xbmcgui.ControlImage(265, 220, 225, 225, filename=config.get_thumb('hdfull', 'thumb', 'channels'))
         self.addControl(self.icon)
-        self.username = xbmcgui.ControlEdit(530, 320, 400, 120, 'Indicar su usuario: ', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
+
+        self.username = xbmcgui.ControlEdit(530, 320, 400, 120, 'Usuario', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
 
         self.addControl(self.username)
+
         if platformtools.get_kodi_version()[1] >= 18:
-            self.password = xbmcgui.ControlEdit(530, 320, 400, 120, 'Indicar la contraseña: ', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
+            self.password = xbmcgui.ControlEdit(530, 320, 400, 120, 'Contraseña', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
         else:
-            self.password = xbmcgui.ControlEdit(530, 320, 400, 120, 'Indicar la contraseña: ', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'), isPassword=True)
+            self.password = xbmcgui.ControlEdit(530, 320, 400, 120, 'Contraseña', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'), isPassword=True)
 
         self.buttonOk = xbmcgui.ControlButton(588, 460, 125, 25, 'Confirmar', alignment=6, focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
         self.buttonCancel = xbmcgui.ControlButton(720, 460, 125, 25, 'Cancelar', alignment=6, focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
+
         self.addControl(self.password)
         self.password.setVisible(True)
         self.password.controlUp(self.username)
         self.addControl(self.buttonOk)
         self.password.controlDown(self.buttonOk)
-        self.username.setLabel('Indicar su usuario: ')
-        if int(platformtools.get_kodi_version()[1]) >= 18: self.password.setType(xbmcgui.INPUT_TYPE_PASSWORD, 'Indicar la contraseña: ')
 
-        self.password.setLabel('Indicar la contraseña: ')
+        self.username.setLabel('Usuario')
+        if int(platformtools.get_kodi_version()[1]) >= 18: self.username.setType(xbmcgui.INPUT_TYPE_TEXT, 'Indicar el Usuario')
+
+        self.password.setLabel('Contraseña')
+        if int(platformtools.get_kodi_version()[1]) >= 18: self.password.setType(xbmcgui.INPUT_TYPE_PASSWORD, 'Indicar la Contraseña')
+
         self.setFocus(self.username)
+
         self.username.controlUp(self.buttonOk)
         self.username.controlDown(self.password)
         self.buttonOk.controlUp(self.password)
@@ -114,6 +120,14 @@ class login_dialog(xbmcgui.WindowDialog):
             config.set_setting('hdfull_password', self.password.getText(), 'hdfull')
             config.set_setting('hdfull_login', True, 'hdfull')
             self.login_result = True
+        else:
+            avis = True
+            if not self.username.getText():
+                if not self.password.getText(): avis = False
+
+            if avis:
+                platformtools.dialog_notification('HdFull', '[B][COLOR red]Faltan credenciales[/B][/COLOR]')
+                self.login_result = False
 
     def onControl(self, control):
         control = control.getId()
@@ -210,7 +224,7 @@ def login(item):
         if 'Bienvenido %s' % username in data or "<script>window.location='/'" in data or "<script>window.location=''" in data:
             if not status:
                 config.set_setting('hdfull_login', True, 'hdfull')
-                platformtools.dialog_notification(config.__addon_name, login_ok)
+                if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
             else:
                 if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
             return True
@@ -320,8 +334,14 @@ def do_downloadpage(url, post=None, referer=None):
 
     headers = {}
 
-    if referer: headers = {'Referer': referer}
-    else: headers = {'Referer': domain}
+    if '/tags-' in url: headers = {'Referer': domain + 'buscar'}
+    elif '/series/abc/' in url: headers = {'Referer': domain + 'series/abc'}
+    elif '/series/date' in url: headers = {'Referer': domain + 'series/'}
+    elif '/buscar' in url: headers = {'Referer': domain}
+    else:
+        if referer: headers = {'Referer': referer}
+        else:
+           if not url == domain: headers = {'Referer': domain}
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
@@ -366,12 +386,12 @@ def acciones(item):
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
-    itemlist.append(item.clone( channel='domains', action='manto_domain_hdfull', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+    itemlist.append(item.clone( channel='domains', action='manto_domain_hdfull', title=title, desde_el_canal = True, folder=False, thumbnail=config.get_thumb('keyboard'), text_color='darkorange' ))
 
     if not config.get_setting('hdfull_login', 'hdfull', default=False):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login' ))
-            itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', text_color='crimson' ))
+            itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
@@ -1196,6 +1216,8 @@ def search(item, texto):
             data = do_downloadpage(dominio)
 
             magic = scrapertools.find_single_match(data, "name='__csrf_magic'\s*value=\"([^\"]+)")
+            if not magic: return []
+
             item.search_post = '__csrf_magic=%s&menu=search&query=%s' % (magic, texto.replace(' ','+'))
             item.url = dominio + 'buscar'
 

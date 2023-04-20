@@ -352,11 +352,7 @@ def findvideos(item):
 
         if 'trailer' in servidor: continue
 
-        if servertools.is_server_available(servidor):
-            if not servertools.is_server_enabled(servidor): continue
-        else:
-           if not config.get_setting('developer_mode', default=False): continue
-
+        elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
 
         lang = scrapertools.find_single_match(match, " src='.*?/flags/(.*?).png'")
 
@@ -364,6 +360,11 @@ def findvideos(item):
         dnume = scrapertools.find_single_match(match, " data-nume='(.*?)'")
 
         if not dpost or not dnume: continue
+
+        if servertools.is_server_available(servidor):
+            if not servertools.is_server_enabled(servidor): continue
+        else:
+           if not config.get_setting('developer_mode', default=False): continue
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', dpost = dpost, dnume = dnume, other = servidor.capitalize(), language = IDIOMAS.get(lang, lang) ))
 
@@ -374,6 +375,8 @@ def findvideos(item):
         ses += 1
 
         url = scrapertools.find_single_match(match, "<a href='(.*?)'")
+
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

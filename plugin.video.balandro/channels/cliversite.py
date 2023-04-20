@@ -642,7 +642,7 @@ def play(item):
                     return itemlist
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
         itemlist.append(item.clone(url = url, server = servidor))

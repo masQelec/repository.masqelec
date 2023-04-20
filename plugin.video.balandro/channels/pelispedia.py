@@ -510,7 +510,10 @@ def play(item):
 
                 return itemlist
 
-            if '/pelisplayer.xyz/' in new_url:
+            if '/hqq.' in new_url or '/waaw.' in new_url or '/netu.' in new_url:
+                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+            elif '/pelisplayer.xyz/' in new_url:
                 return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
             servidor = servertools.get_server_from_url(new_url)
@@ -557,7 +560,10 @@ def play(item):
             if not url: url = scrapertools.find_single_match(resp.data, '"embed_url":"([^"]+)')
 
     if url:
-        if '/pelisplayer.xyz/' in url:
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+        elif '/pelisplayer.xyz/' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)

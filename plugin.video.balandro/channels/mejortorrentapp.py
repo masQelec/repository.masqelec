@@ -271,7 +271,7 @@ def list_all(item):
                                         contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
 
         else:
-            if "(" in title: titulo = titulo.split("(")[0]
+            if "(" in title: titulo = title.split("(")[0]
             else: titulo = title
 
             titulo = titulo.strip()

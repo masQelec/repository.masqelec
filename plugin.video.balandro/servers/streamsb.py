@@ -76,8 +76,12 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('//sblanh.com/e/', '//streamsb.net/play/').replace('//sblanh.com/d/', '//streamsb.net/play/')
     elif '//sbanh.com/' in page_url:
         page_url = page_url.replace('//sbanh.com/e/', '//streamsb.net/play/').replace('//sbanh.com/d/', '//streamsb.net/play/')
+
     elif '//sbfast.com/' in page_url:
         page_url = page_url.replace('//sbfast.com/e/', '//streamsb.net/play/').replace('//sbfast.com/d/', '//streamsb.net/play/')
+    elif '//sbfast.live/' in page_url:
+        page_url = page_url.replace('//sbfast.live/e/', '//streamsb.net/play/').replace('//sbfast.live/d/', '//streamsb.net/play/')
+
     elif '//sblongvu.com/' in page_url:
         page_url = page_url.replace('//sblongvu.com/e/', '//streamsb.net/play/').replace('//sblongvu.com/d/', '//streamsb.net/play/')
     elif '//sbchill.com/' in page_url:
@@ -88,6 +92,10 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('//sbhight.com/e/', '//streamsb.net/play/').replace('//sbhight.com/d/', '//streamsb.net/play/')
     elif '//sbbrisk.com/' in page_url:
         page_url = page_url.replace('//sbbrisk.com/e/', '//streamsb.net/play/').replace('//sbbrisk.com/d/', '//streamsb.net/play/')
+    elif '//sbface.com/' in page_url:
+        page_url = page_url.replace('//sbface.com/e/', '//streamsb.net/play/').replace('//sbface.com/d/', '//streamsb.net/play/')
+    elif '//view345.com/' in page_url:
+        page_url = page_url.replace('//view345.com/e/', '//streamsb.net/play/').replace('//view345.com/d/', '//streamsb.net/play/')
 
     data = httptools.downloadpage(page_url).data
 

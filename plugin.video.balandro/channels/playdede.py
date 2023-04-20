@@ -7,11 +7,15 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb, jsontools
 
 
-host = 'https://playdede.nu/'
+host = 'https://playdede.to/'
+
+
+# ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
+# ~ webs  0)-'https://dominiosplaydede.com/'
 
 
 # ~ por si viene de enlaces guardados posteriores
-ant_hosts = ['https://playdede.com/', 'https://playdede.org/']
+ant_hosts = ['https://playdede.com/', 'https://playdede.org/', 'https://playdede.nu/']
 
 
 domain = config.get_setting('dominio', 'playdede', default='')
@@ -30,23 +34,12 @@ login_ok = '[COLOR chartreuse]PlayDede Login correcto[/COLOR]'
 login_ko = '[COLOR red][B]PlayDede Login incorrecto[/B][/COLOR]'
 no_login = '[COLOR orangered][B]PlayDede Sin acceso Login[/B][/COLOR]'
 
-datos_ko = 'Quéeeeee'
+datos_ko = '>Registrarme<'
 close_open = '[COLOR cyan][B]Cierre la sesión e Iniciela de nuevo[/B][/COLOR]'
 
 notification_d_ok = config.get_setting('notification_d_ok', default=True)
 
 color_adver = config.get_setting('notification_adver_color', default='violet')
-
-
-_useragent = ''
-_chrome_version = ''
-
-ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
-if ver_stable_chrome:
-    cfg_last_ver_chrome = config.get_setting('chrome_last_version', default='')
-    if cfg_last_ver_chrome:
-        _chrome_version = cfg_last_ver_chrome
-        _useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36" % _chrome_version
 
 
 class login_dialog(xbmcgui.WindowDialog):
@@ -58,31 +51,38 @@ class login_dialog(xbmcgui.WindowDialog):
 
         if avis:
             self.login_result = False
-            platformtools.dialog_ok("Recomendación Balandro - [B][COLOR yellow]PlayDede[/B][/COLOR]", '[COLOR yellow]Sugerimos crear una nueva cuenta para registrarse en la web, no deberiais indicar ninguna de vuestras cuentas personales.[/COLOR]', 'Para más detalles al respecto, acceda a la Ayuda, apartado Canales, Información dominios que requieren registrarse.')
+            platformtools.dialog_ok("Recomendación [B][COLOR yellow]PlayDede[/B][/COLOR]", '[B][COLOR yellowgreen]Mejor crear una NUEVA cuenta para registrarse en la web, no deberíais informar ninguna de vuestras cuentas Personales.[/B][/COLOR]', 'Para más detalles al respecto, acceda a la Ayuda, apartado Canales, Información dominios que requieren registrarse.')
 
         self.background = xbmcgui.ControlImage(250, 150, 800, 355, filename=config.get_thumb('ContentPanel'))
         self.addControl(self.background)
         self.icon = xbmcgui.ControlImage(265, 220, 225, 225, filename=config.get_thumb('playdede', 'thumb', 'channels'))
         self.addControl(self.icon)
-        self.username = xbmcgui.ControlEdit(530, 320, 400, 120, 'Indicar su usuario: ', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
+        self.username = xbmcgui.ControlEdit(530, 320, 400, 120, 'Usuario', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
+
         self.addControl(self.username)
+
         if platformtools.get_kodi_version()[1] >= 18:
-            self.password = xbmcgui.ControlEdit(530, 320, 400, 120, 'Indicar la contraseña: ', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
+            self.password = xbmcgui.ControlEdit(530, 320, 400, 120, 'Contraseña', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
         else:
-            self.password = xbmcgui.ControlEdit(530, 320, 400, 120, 'Indicar la contraseña: ', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'), isPassword=True)
+            self.password = xbmcgui.ControlEdit(530, 320, 400, 120, 'Contraseña', font='font13', textColor='0xDD171717', focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'), isPassword=True)
 
         self.buttonOk = xbmcgui.ControlButton(588, 460, 125, 25, 'Confirmar', alignment=6, focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
         self.buttonCancel = xbmcgui.ControlButton(720, 460, 125, 25, 'Cancelar', alignment=6, focusTexture=config.get_thumb('button-focus'), noFocusTexture=config.get_thumb('black-back2'))
+
         self.addControl(self.password)
         self.password.setVisible(True)
         self.password.controlUp(self.username)
         self.addControl(self.buttonOk)
         self.password.controlDown(self.buttonOk)
-        self.username.setLabel('Indicar su usuario: ')
-        if int(platformtools.get_kodi_version()[1]) >= 18: self.password.setType(xbmcgui.INPUT_TYPE_PASSWORD, 'Indicar la contraseña: ')
 
-        self.password.setLabel('Indicar la contraseña: ')
+        self.username.setLabel('Usuario')
+        if int(platformtools.get_kodi_version()[1]) >= 18: self.username.setType(xbmcgui.INPUT_TYPE_TEXT, 'Indicar el Usuario')
+
+        self.password.setLabel('Contraseña')
+        if int(platformtools.get_kodi_version()[1]) >= 18: self.password.setType(xbmcgui.INPUT_TYPE_PASSWORD, 'Indicar la Contraseña')
+
         self.setFocus(self.username)
+
         self.username.controlUp(self.buttonOk)
         self.username.controlDown(self.password)
         self.buttonOk.controlUp(self.password)
@@ -106,6 +106,15 @@ class login_dialog(xbmcgui.WindowDialog):
             config.set_setting('playdede_password', self.password.getText(), 'playdede')
             config.set_setting('playdede_login', True, 'playdede')
             self.login_result = True
+        else:
+            avis = True
+            avis = True
+            if not self.username.getText():
+                if not self.password.getText(): avis = False
+
+            if avis:
+                platformtools.dialog_notification('PlayDede', '[B][COLOR red]Faltan credenciales[/B][/COLOR]')
+                self.login_result = False
 
     def onControl(self, control):
         control = control.getId()
@@ -113,24 +122,10 @@ class login_dialog(xbmcgui.WindowDialog):
 
 
 def do_make_login_logout(url, post=None, headers=None):
-    # ~ 11/12/2022
-    # ~ headers = {}
-
-    if _useragent:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + _chrome_version + " Safari/537.36 pddkit/2023", "authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
-    else:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 pddkit/2023", "Authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
-
-    add_referer = True
-
-    if '/user/' in url: add_referer = False
-
-    timeout = 30
-
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False, timeout=timeout).data
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
     else:
-        data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False, timeout=timeout).data
+        data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -140,9 +135,9 @@ def do_make_login_logout(url, post=None, headers=None):
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False, timeout=timeout).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
                 else:
-                    data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, add_referer=add_referer, raise_weberror=False, timeout=timeout).data
+                    data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False).data
         except:
             pass
 
@@ -191,7 +186,7 @@ def login(item):
        if 'UserOn' in data:
            if not status:
                config.set_setting('playdede_login', True, 'playdede')
-               platformtools.dialog_notification(config.__addon_name, login_ok)
+               if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
            return True
     except:
        platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]PlayDede Sin acceso Web[/B][/COLOR]')
@@ -200,7 +195,9 @@ def login(item):
     post = {'user': username, 'pass': password, '_method': 'auth/login'}
 
     try:
-       data = do_make_login_logout(host + 'ajax.php', post=post)
+       headers = {'Referer': host + 'login'}
+       data = do_make_login_logout(host + 'ajax.php', post=post, headers=headers)
+
        if not data: return False
 
        jdata = jsontools.load(data)
@@ -209,14 +206,14 @@ def login(item):
            if jdata['reload']:
                if not status:
                    config.set_setting('playdede_login', True, 'playdede')
-                   platformtools.dialog_notification(config.__addon_name, login_ok)
+                   if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
                return True
 
        elif 'alert' in str(jdata):
            if not jdata['alert']:
                if not status:
                    config.set_setting('playdede_login', True, 'playdede')
-                   platformtools.dialog_notification(config.__addon_name, login_ok)
+                   if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
                return True
 
        else:
@@ -233,11 +230,13 @@ def login(item):
     if httptools.get_cookie(host, 'utoken'):
         if not status:
             config.set_setting('playdede_login', True, 'playdede')
-            platformtools.dialog_notification(config.__addon_name, login_ok)
+            if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
         return True
 
     try:
-       data = do_make_login_logout(host + 'ajax.php', post=post)
+       headers = {'Referer': host + 'login'}
+       data = do_make_login_logout(host + 'ajax.php', post=post, headers=headers)
+
        if not data: return False
     except:
        platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]PlayDede Sin acceso al Login[/B][/COLOR]')
@@ -246,7 +245,7 @@ def login(item):
     if httptools.get_cookie(host, 'utoken'):
         if not status:
             config.set_setting('playdede_login', True, 'playdede')
-            platformtools.dialog_notification(config.__addon_name, login_ok)
+            if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
         return True
 
     if not host in str(data): platformtools.dialog_notification(config.__addon_name, no_login)
@@ -303,7 +302,7 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, referer=None):
+def do_downloadpage(url, post=None, headers=None, referer=None):
     # ~ por si viene de enlaces guardados posteriores
     if url.startswith('/'): url = host + url[1:] # ~ solo v. 2.0.0
 
@@ -311,14 +310,6 @@ def do_downloadpage(url, post=None, referer=None):
         url = url.replace(ant, host)
 
     if not referer: referer = host
-
-    # ~ 11/12/2022
-    # ~ headers = {}
-
-    if _useragent:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + _chrome_version + " Safari/537.36 pddkit/2023", "authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx"}
-    else:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 pddkit/2023", "Authorization": "Bearer sST27SZBdLQdYIfAOMeI7slILemTpkLx", "Referer": referer}
 
     timeout = None
     if '?genre=' in url: timeout = 30
@@ -355,17 +346,21 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_playdede', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='playdede', folder=False, text_color='chartreuse' ))
 
+    username = config.get_setting('playdede_username', 'playdede', default='')
+
+    if username:
+        itemlist.append(Item( channel='domains', action='operative_domains_playdede', title='[B]Dominio Operativo Vigente[/B]',
+                              desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='mediumaquamarine' ))
+
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
-    itemlist.append(item.clone( channel='domains', action='manto_domain_playdede', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
-
-    username = config.get_setting('playdede_username', 'playdede', default='')
+    itemlist.append(item.clone( channel='domains', action='manto_domain_playdede', title=title, desde_el_canal = True, folder=False, thumbnail=config.get_thumb('keyboard'), text_color='darkorange' ))
 
     if not config.get_setting('playdede_login', 'playdede', default=False):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login' ))
-            itemlist.append(Item( channel='domains', action='del_datos_playdede', title='[B]Eliminar credenciales cuenta[/B]', text_color='crimson' ))
+            itemlist.append(Item( channel='domains', action='del_datos_playdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
@@ -476,6 +471,8 @@ def mainlist_series(item):
         itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series?orderBy=score', slug = 'series',
                                     nro_pagina = 1, order = '?orderBy=score', search_type = 'tvshow' ))
 
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
+
         itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', slug = 'series', nro_pagina = 1, search_type='tvshow'))
 
         itemlist.append(item.clone( title = 'Por género', action = 'generos', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
@@ -513,6 +510,8 @@ def mainlist_animes(item):
         itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'animes?orderBy=score', slug = 'animes',
                                     nro_pagina = 1, order = '?orderBy=score', search_type = 'tvshow' ))
 
+        itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', group = 'anime', slug = 'animes', nro_pagina = 1, search_type='tvshow'))
+
         itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
 
@@ -527,7 +526,12 @@ def plataformas(item):
     logger.info()
     itemlist = []
 
-    url = url = host + 'series/'
+    if item.slug == 'animes':
+        url = url = host + 'animes/'
+        text_color = 'springgreen'
+    else:
+        url = url = host + 'series/'
+        text_color = 'hotpink'
 
     data = do_downloadpage(url)
     data = re.sub('\\n|\\r|\\t|\\s{2}|&nbsp;', '', data)
@@ -538,7 +542,7 @@ def plataformas(item):
         title = scrapertools.find_single_match(thumb, '/network/(.*?).png')
         title = title.capitalize()
 
-        itemlist.append(item.clone(title = title, action = 'list_plataforma', thumbnail = thumb, url = url, id_network = id_network, text_color = 'hotpink' ))
+        itemlist.append(item.clone(title = title, action = 'list_plataforma', thumbnail = thumb, url = url, id_network = id_network, slug = item.slug, text_color = text_color ))
 
     if not itemlist:
         if datos_ko in str(data):
@@ -552,6 +556,9 @@ def list_plataforma(item):
     logger.info()
     itemlist = []
 
+    if item.slug == 'animes': text_color = 'springgreen'
+    else: text_color = 'hotpink'
+
     data = do_downloadpage(item.url)
     data = re.sub('\\n|\\r|\\t|\\s{2}|&nbsp;', '', data)
 
@@ -561,14 +568,18 @@ def list_plataforma(item):
         title = title.capitalize()
 
         url = url.replace('?orderBy=last_update', '?network=' + item.id_network + '&orderBy=last_update')
+        url = url.replace('?orderBy=airing_today', '?network=' + item.id_network + '&orderBy=airing_today')
+        url = url.replace('?orderBy=popular', '?network=' + item.id_network + '&orderBy=popular')
         url = url.replace('?orderBy=score', '?network=' + item.id_network + '&orderBy=score')
 
         if '=score' in url: order = 'score'
+        elif '=popular' in url: order = 'popular'
+        elif '=airing_today' in url: order = 'airing_today'
         else: order = 'last_update'
 
-        itemlist.append(item.clone(title = title, action = 'list_network', url = url, slug = 'series', order = order ))
+        itemlist.append(item.clone(title = title, action = 'list_network', url = url, order = order, slug = item.slug, text_color = text_color ))
 
-    return sorted(itemlist, key=(lambda x: x.title))
+    return itemlist
 
 
 def generos(item):
@@ -591,6 +602,9 @@ def generos(item):
     matches = re.compile('<li class="cfilter.*?data-type="genre".*?data-value="(.*?)">.*?<b>(.*?)</b>').findall(data)
 
     for genre, title in matches:
+        if item.group == 'anime':
+            if title == 'Documental': continue
+
         genre = '?genre=' + genre
 
         itemlist.append(item.clone( title = title, action = 'list_all', genre = genre, text_color = text_color ))
@@ -600,9 +614,6 @@ def generos(item):
             itemlist.append(item.clone( title = 'Aventura', action = 'list_all', genre = '?genre=aventura', text_color = text_color ))
             itemlist.append(item.clone( title = 'Fantasía', action = 'list_all', genre = '?genre=fantasia', text_color = text_color ))
             itemlist.append(item.clone( title = 'Historia', action = 'list_all', genre = '?genre=historia', text_color = text_color ))
-
-        if not item.group == 'anime':
-            itemlist.append(item.clone( title = 'Documental', action = 'list_all', genre = '?genre=documental', text_color = text_color ))
 
     else:
         if datos_ko in str(data):
@@ -644,10 +655,10 @@ def idiomas(item):
        if item.search_type == 'movie': text_color = 'deepskyblue'
        else: text_color = 'hotpink'
 
-    if item.group == 'anime': url_idiomas = host + 'animes'
+    if item.group == 'anime': url_idiomas = host + 'animes/'
     else:
-        if item.search_type == 'movie': url_idiomas = host + 'peliculas'
-        else: url_idiomas = host + 'series'
+        if item.search_type == 'movie': url_idiomas = host + 'peliculas/'
+        else: url_idiomas = host + 'series/'
 
     data = do_downloadpage(url_idiomas)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -678,10 +689,10 @@ def calidades(item):
        if item.search_type == 'movie': text_color = 'deepskyblue'
        else: text_color = 'hotpink'
 
-    if item.group == 'anime': url_calidades = host + 'animes'
+    if item.group == 'anime': url_calidades = host + 'animes/'
     else:
-        if item.search_type == 'movie': url_calidades = host + 'peliculas'
-        else: url_calidades = host + 'series'
+        if item.search_type == 'movie': url_calidades = host + 'peliculas/'
+        else: url_calidades = host + 'series/'
 
     data = do_downloadpage(url_calidades)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -712,10 +723,10 @@ def paises(item):
        if item.search_type == 'movie': text_color = 'deepskyblue'
        else: text_color = 'hotpink'
 
-    if item.group == 'anime': url_paises = host + 'animes'
+    if item.group == 'anime': url_paises = host + 'animes/'
     else:
-        if item.search_type == 'movie': url_paises = host + 'peliculas'
-        else: url_paises = host + 'series'
+        if item.search_type == 'movie': url_paises = host + 'peliculas/'
+        else: url_paises = host + 'series/'
 
     data = do_downloadpage(url_paises)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -806,9 +817,7 @@ def list_all(item):
 
         if 'Tu directorio de' in title: continue
 
-        id = scrapertools.find_single_match(match, 'data-id="(.*?)"')
-
-        thumb = scrapertools.find_single_match(match, '<img src=(.*?)"')
+        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<p>(.*?)</p>')
         if not year: year = '-'
@@ -886,9 +895,7 @@ def list_last(item):
 
         if 'Tu directorio de' in title: continue
 
-        id = scrapertools.find_single_match(match, 'data-id="(.*?)"')
-
-        thumb = scrapertools.find_single_match(match, '<img src=(.*?)"')
+        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<p>(.*?)</p>')
         if not year: year = '-'
@@ -1063,8 +1070,6 @@ def list_network(item):
 
         title = clean_title(title, url)
 
-        id = scrapertools.find_single_match(match, 'data-id="(.*?)"')
-
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<p>(.*?)</p>')
@@ -1202,6 +1207,16 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+
+    # ~ si se Auto-Cerro la sesion (utoken)
+    if datos_ko in str(data):
+        logout(item)
+        login(item)
+
+        data = do_downloadpage(item.url)
+        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+
     # ~ Reproductor
     patron = '<div class="playerItem.*?data-lang="(.*?)".*?data-loadPlayer="(.*?)".*?<h3>(.*?)</h3>.*?">Calidad:.*?">(.*?)</span>'
 
@@ -1277,7 +1292,7 @@ def findvideos(item):
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
 
-        if datos_ko in str(data):
+        elif datos_ko in str(data):
             platformtools.dialog_notification('PlayDede', close_open)
             return
 
@@ -1294,12 +1309,12 @@ def play(item):
         post = {'_method': 'getPlayer', 'id': item.id}
         data = do_downloadpage(host + 'ajax.php', post=post)
 
-        url = scrapertools.find_single_match(data, r"src='([^']+)")
+        url = scrapertools.find_single_match(data, "src='([^']+)")
         url = url.replace('\\/', '/')
 
         if url:
             data = do_downloadpage(url)
-            url_play = scrapertools.find_single_match(data, r"src='([^']+)")
+            url_play = scrapertools.find_single_match(data, "src='([^']+)")
     else:
         url_play = item.url
 
@@ -1320,7 +1335,9 @@ def clean_title(title, url):
         data = do_downloadpage(url)
         data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-        titulo = scrapertools.find_single_match(data, "<title>(.*?)</title>")
+        titulo = scrapertools.find_single_match(data, "<h1>(.*?)</h1>")
+        if not titulo: titulo = scrapertools.find_single_match(data, "<title>(.*?)</title>")
+
         titulo = titulo.replace('Ver película:', '').replace('Ver serie:', '').replace('Ver anime:', '').strip()
 
         if titulo: title = titulo

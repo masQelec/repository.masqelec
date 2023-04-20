@@ -85,9 +85,14 @@ def get_video_url(page_url, url_referer=''):
 
                     if 'location' in resp.headers: url = resp.headers['location']
 
-                # ~ 13/2/2023
                 if url:
+                    # ~ 20/2/2023
                     url = url.replace('https', 'http')
+
+                    ua = httptools.get_user_agent()
+                    headers = httptools.default_headers.copy()
+                    header_str = "&".join(["%s=%s" % (x, y) for x, y in list(headers.items()) if x!='User-Agent'])
+                    url += "|User-Agent=%s&verifypeer=false&%s" % (ua, header_str)
 
                     lbl = videos['label'] if 'label' in videos and videos['label'] else 'mp4'
 

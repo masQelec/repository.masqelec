@@ -499,10 +499,11 @@ def normalize_server(server):
     if server:
         server = servertools.corregir_servidor(server)
 
-        if servertools.is_server_available(server):
-            if not servertools.is_server_enabled(server): server = ''
-        else:
-           if not config.get_setting('developer_mode', default=False): server = ''
+        if not server == 'desconocido':
+            if servertools.is_server_available(server):
+                if not servertools.is_server_enabled(server): server = ''
+            else:
+               if not config.get_setting('developer_mode', default=False): server = ''
 
     return server
 
@@ -617,7 +618,7 @@ def list_search(item):
 
         plot = scrapertools.htmlclean(scrapertools.find_single_match(match, '<p>(.*?)</p>'))
 
-        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':

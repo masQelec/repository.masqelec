@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+
 import time
 
 from platformcode import config, logger
@@ -137,8 +143,12 @@ def list_all(item):
         threads.append(t)
         i += 1
 
-    while [t for t in threads if t.isAlive()]:
-        time.sleep(0.5)
+    if PY3:
+        while [t for t in threads if t.is_alive()]:
+            time.sleep(0.5)
+    else:
+        while [t for t in threads if t.isAlive()]:
+            time.sleep(0.5)
 
     itemlist = sorted(itemlist, key=lambda x: x.pos)
 

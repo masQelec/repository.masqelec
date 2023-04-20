@@ -7,16 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cinecalidad.ms/'
+host = 'https://www3.cinecalidad.ms/'
 
-
-# ~ 04/2022 la web da error en temporadas de series y animes 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.cinecalidad.eu/', 'https://www.cinecalidad.im/', 'https://www.cinecalidad.is/',
              'https://www.cinecalidad.li/', 'https://www.cine-calidad.com/', 'https://cinecalidad.website/',
              'https://www.cinecalidad.lat/', 'https://cinecalidad3.com/', 'https://www5.cine-calidad.com/',
-             'https://v3.cine-calidad.com/', 'https://cinecalidad.dev/']
+             'https://v3.cine-calidad.com/', 'https://cinecalidad.dev/', 'https://cinecalidad.ms/']
 
 domain = config.get_setting('dominio', 'cinecalidad', default='')
 
@@ -366,27 +364,6 @@ def episodios(item):
     logger.info()
     itemlist = []
 
-    # ~ 04/2022 solo T1
-    i = 0
-
-    if str(item.contentSeason) == '1':
-        data = do_downloadpage(item.url)
-        matches = scrapertools.find_multiple_matches(data, '<li class="mark-(.*?)</li>')
-
-        for match in matches:
-            i +=1
-            titulo = str(item.contentSeason) + 'x' + str(i) + ' ' + item.contentSerieName
-            thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
-            url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-
-            itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
-                                        contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = i ))
-
-        tmdb.set_infoLabels(itemlist)
-
-        return itemlist
-
-
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
@@ -508,7 +485,7 @@ def findvideos(item):
 
             elif servidor == 'google drive': servidor = 'gvideo'
 
-            elif servidor == 'sbanh' or servidor == 'sblanh' or servidor == 'sbspeed' or servidor == 'sbchill' or servidor == 'sblongvu' or servidor == 'sbrity' or servidor == 'sbhight' or servidor == 'sbbrisk': servidor = 'streamsb'
+            elif servidor.startswith('sb'): servidor = 'streamsb'
             elif servidor == 'ccplay': servidor = 'streamsb'
             elif 'watchsb' in servidor: servidor = 'streamsb'
 

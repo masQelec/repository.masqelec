@@ -15,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www6.cuevana3.ch'
+host = 'https://www8.cuevana3.ch'
 
 
 # ~ por si viene de enlaces guardados
@@ -25,7 +25,8 @@ ant_hosts = ['https://www1.cuevana3.video', 'https://www2.cuevana3.video', 'http
              'https://www1.cuevana3.pe', 'https://www2.cuevana3.pe', 'https://cuevana3.vc',
              'https://www1.cuevana3.vc', 'https://cuevana3.fm', 'https://www1.cuevana3.fm',
              'https://cuevana3.ch/', 'https://www1.cuevana3.ch', 'https://www2.cuevana3.ch',
-             'https://www3.cuevana3.ch', 'https://www4.cuevana3.ch', 'https://www5.cuevana3.ch']
+             'https://www3.cuevana3.ch', 'https://www4.cuevana3.ch', 'https://www5.cuevana3.ch',
+             'https://www6.cuevana3.ch', 'https://www7.cuevana3.ch']
 
 
 domain = config.get_setting('dominio', 'cuevana3video', default='')
@@ -768,7 +769,7 @@ def play(item):
                     return itemlist
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
         itemlist.append(item.clone(url = url, server = servidor))

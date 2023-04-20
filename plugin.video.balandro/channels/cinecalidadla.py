@@ -7,13 +7,15 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cinecalidad.st/'
+host = 'https://ww4.cinecalidad.lc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://cinecalidad.la/', 'https://cinecalidad.fo/', 'https://ww22.cinecalidad.fo/',
              'https://ww3.cinecalidad.do/', 'https://ww4.cinecalidad.do/', 'https://cinecalidad.do/',
-             'https://cinecalidad.llc/']
+             'https://cinecalidad.llc/', 'https://cinecalidad.st/', 'https://cinecalidad.vc/',
+             'https://cinecalidad.lc/', 'https://www3.cinecalidad.lc/', 'https://ww1.cinecalidad.lc/',
+             'https://ww2.cinecalidad.lc/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadla', default='')
@@ -114,7 +116,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host + 'serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes/', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'tvshow' ))
 
@@ -193,13 +195,13 @@ def list_all(item):
 
         if not year: year = '-'
 
-        tipo = 'tvshow' if '/serie/' in url or '/animes/' in url else 'movie'
+        tipo = 'tvshow' if '/serie/' in url or '/anime/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if item.search_type == 'movie':
-            if '/serie/' in url or '/animes/' in url: continue
+            if '/serie/' in url or '/anime/' in url: continue
         elif item.search_type == 'tvshow':
-            if not '/serie/' in url and not '/animes/' in url: continue
+            if not '/serie/' in url and not '/anime/' in url: continue
 
         if '/espana/' in item.url:
             if not '?castellano=sp' in item.url: url = url + '?castellano=sp'
@@ -248,7 +250,7 @@ def destacadas(item):
         if not url or not title: continue
 
         if item.search_type == 'movie':
-            if '/serie/' in url or '/animes/' in url: continue
+            if '/serie/' in url or '/anime/' in url: continue
         else:
             if '/pelicula/' in url: continue
 
@@ -397,7 +399,7 @@ def findvideos(item):
 
             if servidor == 'ok': servidor = 'okru'
 
-            elif servidor == 'sbanh' or servidor == 'sblanh' or servidor == 'sbspeed' or servidor == 'sbchill' or servidor == 'sblongvu' or servidor == 'sbrity' or servidor == 'sbhight' or servidor == 'sbbrisk': servidor = 'streamsb'
+            elif servidor.startswith('sb'): servidor = 'streamsb'
             elif servidor == 'cloudemb': servidor = 'streamsb'
 
             elif servidor == 'google': servidor = 'gvideo'

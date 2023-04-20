@@ -965,7 +965,7 @@ def play_torrent(mediaurl, parent_item):
            seleccionado = torrent_clients[ret]
            cliente_torrent = seleccionado['name']
 
-           if dialog_yesno(config.__addon_name, 'Selecionado:  ' + cliente_torrent.capitalize(), '¿ Desea mantener este Cliente/Motor torrent, como motor habitual y no volver a seleccionarlo más ?'): 
+           if dialog_yesno(config.__addon_name, 'Selecionado: [COLOR yellow][B]' + cliente_torrent.capitalize() + '[/B][/COLOR]', '[COLOR greenyellow][B]¿ Desea mantener este Cliente/Motor torrent, como motor habitual y no volver a seleccionarlo más ?[/B][/COLOR]'): 
                config.set_setting('cliente_torrent', cliente_torrent.capitalize())
 
     if cliente_torrent == 'Ninguno':

@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://pelisplushd.nz/'
+host = 'https://ww3.pelisplushd.nz/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://pelisplushd.cx/']
+    ant_hosts = ['https://pelisplushd.cx/', 'https://pelisplushd.nz/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -433,6 +433,8 @@ def play(item):
 
     if item.other == 'plusvip':
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+    elif item.url.startswith('https://plusvip.net/'):
+        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     url = item.url
 
@@ -452,9 +454,14 @@ def play(item):
 
         elif 'api.mycdn.moe/dl/?uptobox=' in url: url = url.replace('api.mycdn.moe/dl/?uptobox=', 'uptobox.com/')
 
-        servidor = servertools.get_server_from_url(url)
+        elif '/dl/?uptobox=' in url:
+              url = scrapertools.find_single_match(url, 'uptobox=(.*?)$')
+              if url: url = 'https://uptobox.com/' + url
 
-        if servidor == 'directo': url = ''
+        if url:
+            servidor = servertools.get_server_from_url(url)
+
+            if servidor == 'directo': url = ''
 
     if url:
         servidor = servertools.get_server_from_url(url)
