@@ -450,6 +450,24 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
   <extension point="xbmc.service" library="services.py" start="login|startup"/>
 </addon>
 
+<addon id="script.module.archive_tool" name="archive_tool" provider-name="Zach Morris" version="2.0.3">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="vfs.libarchive"/>
+    <import addon="vfs.rar" optional="true"/>
+  </requires>
+  <extension point="xbmc.python.module" library="lib" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">Python class for working with file archives</summary>
+    <description lang="en">archive_tool is a set of common tools to work with the Kodi libarchive virtual file system</description>
+    <platform>all</platform>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
+    <license>GNU GENERAL PUBLIC LICENSE V3</license>
+  </extension>
+</addon>
+
 <addon id="repository.slyguy" name="SlyGuy Repository (slyguy.uk)" provider-name="SlyGuy" version="0.0.8">
   <extension point="xbmc.addon.repository" name="SlyGuy Repository (slyguy.uk)">
     <dir>
