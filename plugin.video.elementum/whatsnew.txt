@@ -7,6 +7,13 @@
     - Source is open, so you can fork everything.
     - Some bug fixes or updates can come, to keep things working and have the latest versions.
 
+[B][COLOR red]0.1.87[/COLOR][/B]
+    - Added basic support for running application as a shared library, that can be used on latest Android devices and Xbox devices (that do not allow to fork application).
+    - Fixed repository.elementum xml declaration to run properly on Kodi 20.
+    - Added `logPath`, `profilePath`, `libraryPath`, `torrentsPath` CLI arguments to override values from Kodi.
+    - Added database compression functionality (should compact .db files once in a week).
+    - Different fixes from @nonew-star, @burekas7, @matke-84, @vanadium23.
+
 [B][COLOR red]0.1.84-0.1.86[/COLOR][/B]
     - Added support for downloading missing binary file directly from github.
     - Added setting for configuring Opennic DNS servers list.
