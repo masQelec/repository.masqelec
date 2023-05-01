@@ -23,6 +23,7 @@ var/
 .installed.cfg
 *.egg
 *.zip
+elementum-binaries-master/
 # bin/
 
 # PyInstaller

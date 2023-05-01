@@ -30,6 +30,7 @@ $(ARCHS):
 	$(MAKE) zip ARCHS=$@ ZIP_SUFFIX=$@.zip
 
 $(ZIP_FILE):
+	echo "Zipping $(ZIP_FILE)"
 	git archive --format zip --prefix $(NAME)/ --output $(ZIP_FILE) HEAD
 	mkdir -p $(NAME)/resources/bin
 	for arch in $(ARCHS); do \
@@ -42,11 +43,13 @@ $(ZIP_FILE):
 zip: $(ZIP_FILE)
 
 zipfiles: addon.xml
+	echo "Zipping all platforms"
 	for arch in $(ARCHS); do \
 		$(MAKE) $$arch; \
 	done
 
 upload:
+	echo "Uploading zip files"
 	$(eval EXISTS := $(shell github-release info --user $(GIT_USER) --repo $(GIT_REPOSITORY) --tag v$(VERSION) 1>&2 2>/dev/null; echo $$?))
 ifneq ($(EXISTS),1)
 	github-release release \
@@ -57,6 +60,7 @@ ifneq ($(EXISTS),1)
 		--description "$(VERSION)"
 endif
 
+	sleep 5
 	for arch in $(ARCHS); do \
 		github-release upload \
 			--user $(GIT_USER) \
