@@ -51,8 +51,8 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.116 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.50 Safari/537.36"
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.138 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5672.93 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -328,9 +328,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     # ~ Limitar tiempo de descarga si no se ha pasado timeout y hay un valor establecido en la variable global
     if timeout is None and HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT is not None: timeout = HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT
 
-    logger.info("----------------------------------------------")
-    logger.info(" Balandro:  " + __version  + '  Page')
-    logger.info("----------------------------------------------")
+    logger.info("---------- Balandro: " + __version  + ' Page ----------')
 
     if use_proxy: logger.info("Proxy: %s" % use_proxy)
 

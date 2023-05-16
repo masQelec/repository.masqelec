@@ -9,7 +9,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(?:streamsb.com|streamsb.net|sbplay.org|sbplay.one|sbplay1.com|sbplay2.com|sbplay2.xyz|pelistop.co|sbfast.com|sbfast.live|sbfull.com|ssbstream.net|sbthe.com|sbspeed.com|streamsss.net|sblanh.com|sbanh.com|sblongvu.com|streamsb.top|sbchill.com|sbrity.com|sbhight.com|sbbrisk.com|sbface.com|view345.com)/(?:embed-|d/|e/)([A-z0-9]+)",
+        "pattern": "(?:streamsb.com|streamsb.net|sbplay.org|sbplay.one|sbplay1.com|sbplay2.com|sbplay2.xyz|pelistop.co|sbfast.com|sbfast.live|sbfull.com|ssbstream.net|sbthe.com|sbspeed.com|streamsss.net|sblanh.com|sbanh.com|sblongvu.com|streamsb.top|sbchill.com|sbrity.com|sbhight.com|sbbrisk.com|sbface.com|view345.com|sbone.pro|sbasian.pro|streaamss.com|lvturbo.com)/(?:embed-|d/|e/)([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -326,6 +326,54 @@
       },
       {
         "pattern": "(?:view345.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbone.pro)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbone.pro)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbone.pro)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbasian.pro)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbasian.pro)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbasian.pro)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:streaamss.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:streaamss.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:streaamss.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:lvturbo.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:lvturbo.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:lvturbo.com)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       }
     ]

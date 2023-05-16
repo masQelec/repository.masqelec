@@ -37,7 +37,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action ='list_all', url = host + 'series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ultimos-capitulos/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ultimos-capitulos/', search_type = 'tvshow', text_color = 'olive' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -116,7 +116,8 @@ def list_all(item):
         plot = scrapertools.find_single_match(article, '<p><p>(.*?)</p>')
         plot = scrapertools.htmlclean(plot)
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -202,16 +203,14 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    dobject = scrapertools.find_single_match(data, 'data-object\s*=\s*"([^"]+)')
+    dobject = scrapertools.find_single_match(data, 'data-object ="(.*?)"')
+
     if not dobject: return itemlist
 
     matches = scrapertools.find_multiple_matches(data, '<li class="sel-temp"><a data-post="([^"]+)" data-season="([^"]+)')
 
     for dpost, tempo in matches:
-        if len(matches) >= 10:
-            if int(tempo) <= 9: tempo = '0' + tempo
-
-        title = 'Temporada ' + tempo
+        title = 'Temporada ' + '0' + tempo
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
@@ -223,35 +222,80 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, dobject = dobject, dpost = dpost, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, dobject = dobject, dpost = dpost,
+                                    contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
-    if len(matches) >= 9:
-        return sorted(itemlist, key=lambda x: x.title)
-    else:
-        return itemlist
+    return sorted(itemlist, key=lambda x: x.title)
 
 
-# limitar episodios a mostrar y no hacer paginación automàtica (menos añadiendo a preferidos) !? Ej: El señor de los cielos (74 episodios temp 1)
+# limitar episodios a mostrar y no hacer paginación automàtica (excepto para preferidos)
 def episodios(item): 
     logger.info()
     itemlist = []
 
-    if not item.dobject or not item.dpost or not item.contentSeason: return itemlist
+    tab_epis = []
+
+    if not item.dobject or not item.dpost: return itemlist
+
+    if not item.page: item.page = 0
+    if not item.perpage: item.perpage = 50
 
     post = {'action': 'action_select_season', 'post': item.dpost, 'object': item.dobject, 'season': item.contentSeason}
     data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post)
 
     tot_pages = scrapertools.find_single_match(data, '<a class="page-numbers" href=".*?>(.*?)</a>')
 
-    if not tot_pages: pages = 12
-    else:
-        try:
-           pages = int(tot_pages)
-           if pages > 2: platformtools.dialog_notification('SeriesMetro', '[COLOR blue]Cargando episodios[/COLOR]')
-        except:
-           pages = 12
+    if not tot_pages:
+        matches = scrapertools.find_multiple_matches(data, '<li><a href="([^"]+)"[^>]*>([^<]+)')
+
+        if item.page == 0 and item.perpage == 50:
+            sum_parts = len(matches)
+
+            try:
+                tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+                if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
+            except: tvdb_id = ''
+
+            if tvdb_id:
+                if sum_parts > 50:
+                    platformtools.dialog_notification('SeriesMetro', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+
+            item.perpage = sum_parts
+
+        for url, title in matches[item.page * item.perpage:]:
+            s_e = scrapertools.find_single_match(title, '(\d+)(?:x|X)(\d+)')
+
+            if not s_e: continue
+
+            season = int(s_e[0])
+            episode = int(s_e[1])
+
+            ord_epis = str(episode)
+
+            if len(str(ord_epis)) == 1: ord_epis = '0000' + ord_epis
+            elif len(str(ord_epis)) == 2: ord_epis = '000' + ord_epis
+            elif len(str(ord_epis)) == 3: ord_epis = '00' + ord_epis
+
+            tab_epis.append([ord_epis, url, title, season, episode])
+
+        if tab_epis:
+            tab_epis = sorted(tab_epis, key=lambda x: x[0])
+
+            for orden, url, tit, ses, epi in tab_epis:
+                 itemlist.append(item.clone( action = 'findvideos', url = url, title = tit, contentType = 'episode',
+                                             contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
+
+        tmdb.set_infoLabels(itemlist)
+
+        return itemlist
+
+    try:
+       pages = int(tot_pages)
+       if pages > 2: platformtools.dialog_notification('SeriesMetro', '[COLOR blue]Cargando episodios[/COLOR]')
+    except:
+       pages = 12
 
     for i in range(pages):
         matches = scrapertools.find_multiple_matches(data, '<li><a href="([^"]+)"[^>]*>([^<]+)')
@@ -264,15 +308,28 @@ def episodios(item):
             season = int(s_e[0])
             episode = int(s_e[1])
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+            ord_epis = str(episode)
 
-        next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="[^"]*page/(\d+)/')
+            if len(str(ord_epis)) == 1: ord_epis = '0000' + ord_epis
+            elif len(str(ord_epis)) == 2: ord_epis = '000' + ord_epis
+            elif len(str(ord_epis)) == 3: ord_epis = '00' + ord_epis
 
-        if next_page:
-            post = {'action': 'action_pagination_ep', 'object': item.dobject, 'season': item.contentSeason, 'page': next_page}
-            data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post)
-        else:
-            break
+            tab_epis.append([ord_epis, url, title, season, episode])
+
+        if pages > 0:
+            next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="[^"]*page/(\d+)/')
+
+            if next_page:
+                post = {'action': 'action_pagination_ep', 'object': item.dobject, 'season': item.contentSeason, 'page': next_page}
+                data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post)
+            else:
+                break
+
+    if tab_epis:
+        tab_epis = sorted(tab_epis, key=lambda x: x[0])
+
+        for orden, url, tit, ses, epi in tab_epis:
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = tit, contentType = 'episode', contentSeason = ses, contentEpisodeNumber = epi ))
 
     tmdb.set_infoLabels(itemlist)
 

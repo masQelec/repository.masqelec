@@ -14,7 +14,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://grantorrent.fi/'
+host = 'https://grantorrent.bz/'
 
 
 # ~ por si viene de enlaces guardados
@@ -23,7 +23,7 @@ ant_hosts = ['http://grantorrent.net/', 'https://grantorrent1.com/', 'https://gr
              'https://grantorrent.eu/', 'https://grantorrent.cc/', 'https://grantorrent.li/',
              'https://grantorrent.online/', 'https://grantorrentt.com/', 'https://grantorrent.nl/',
              'https://grantorrent.ch/', 'https://grantorrent.ac/', 'https://grantorrent.re/',
-             'https://grantorrent.se/,' 'https://grantorrent.si/']
+             'https://grantorrent.se/,' 'https://grantorrent.si/', 'https://grantorrent.fi/']
 
 
 domain = config.get_setting('dominio', 'grantorrent', default='')

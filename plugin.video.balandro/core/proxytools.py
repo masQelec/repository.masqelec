@@ -24,8 +24,6 @@ default_provider = 'proxyscrape.com'
 all_providers = 'All-providers'
 private_list = 'Lista-proxies.txt'
 
-tot_all_providers = 20
-
 proxies_totales = config.get_setting('proxies_totales', default=False)
 proxies_totales_limit = config.get_setting('proxies_totales_limit', default=500)
 
@@ -34,6 +32,8 @@ proxies_search_extended = config.get_setting('proxies_search_extended', default=
 
 proxies_recommended = config.get_setting('proxies_recommended', default=False)
 
+
+tot_all_providers = 22
 
 opciones_provider = [
         'spys.one',

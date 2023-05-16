@@ -93,7 +93,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Búsquedas:', action = '', folder=False, text_color='plum' ))
     itemlist.append(item.clone ( title = ' - Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone ( title = ' - Buscar dirección, intérprete ...', action = 'search', grupo = 'agrupa', search_type = 'movie', text_color='salmon' ))
+    itemlist.append(item.clone ( title = ' - Buscar por dirección, intérprete ...', action = 'search', grupo = 'agrupa', search_type = 'movie', text_color='salmon' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host_opts ))
 

@@ -954,23 +954,23 @@ def play_torrent(mediaurl, parent_item):
     torrent_clients = jsontools.get_node_from_file('torrent.json', 'clients', os.path.join(config.get_runtime_path(), 'servers'))
 
     cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
+
+    if cliente_torrent == 'Ninguno':
+        dialog_ok(config.__addon_name, '[COLOR red][B]Ningún Cliente/Motor Torrent asignado en la configuración[/B][/COLOR]')
+        return False
+
     if cliente_torrent == 'Seleccionar':
         from modules import filters
 
         ret = filters.show_clients_torrent(parent_item)
 
-        if ret == -1:
-            cliente_torrent = 'Ninguno'
+        if ret == -1: return False
         else:
-           seleccionado = torrent_clients[ret]
-           cliente_torrent = seleccionado['name']
+           cliente_torrent = ret[0]
 
-           if dialog_yesno(config.__addon_name, 'Selecionado: [COLOR yellow][B]' + cliente_torrent.capitalize() + '[/B][/COLOR]', '[COLOR greenyellow][B]¿ Desea mantener este Cliente/Motor torrent, como motor habitual y no volver a seleccionarlo más ?[/B][/COLOR]'): 
-               config.set_setting('cliente_torrent', cliente_torrent.capitalize())
-
-    if cliente_torrent == 'Ninguno':
-        dialog_ok(config.__addon_name, '[COLOR moccasin][B]Necesitas tener instalado un Cliente/Motor Torrent e indicarlo en la configuración[/B][/COLOR]')
-        return False
+           if xbmc.getCondVisibility('System.HasAddon("%s")' % ret[1]):
+               if dialog_yesno(config.__addon_name, 'Selecionado: [COLOR yellow][B]' + cliente_torrent.capitalize() + '[/B][/COLOR]', '[COLOR greenyellow][B]¿ Desea asignar este Cliente/Motor torrent, como motor habitual para no volver a seleccionarlo más ?[/B][/COLOR]'): 
+                   config.set_setting('cliente_torrent', cliente_torrent.capitalize())
 
     cliente_torrent = cliente_torrent.lower()
 
@@ -980,7 +980,7 @@ def play_torrent(mediaurl, parent_item):
             if xbmc.getCondVisibility('System.HasAddon("%s")' % client['id']):
                 plugin_url = client['url_magnet'] if 'url_magnet' in client and mediaurl.startswith('magnet:') else client['url']
             else:
-                dialog_ok(config.__addon_name, '[COLOR moccasin][B]Necesitas instalar el Cliente/Motor Torrent:[/B][/COLOR] ' + client['name'], client['id'])
+                dialog_ok(config.__addon_name, '[COLOR moccasin][B]Falta instalar el Cliente/Motor Torrent:[/B][/COLOR][COLOR chartreuse][B] ' + client['name'].capitalize() + '[/B][/COLOR]', client['id'])
                 return False
 
     if plugin_url == '':

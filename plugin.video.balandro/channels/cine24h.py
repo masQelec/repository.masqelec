@@ -120,6 +120,8 @@ def list_all(item):
         title = re.sub(r'\((.*)', '', title)
         title = re.sub(r'\[(.*?)\]', '', title)
 
+        title = title.replace('&#8211;', '')
+
         thumb = scrapertools.find_single_match(article, '<img src="(.*?)"')
 
         year = scrapertools.find_single_match(article, '<span class="Year">(.*?)</span>')

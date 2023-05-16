@@ -30,6 +30,7 @@ except:
 
 
 dominios = [
+         'https://hdfull.sbs/',
          'https://hdfull.store/',
          'https://hdfull.one/',
          'https://hdfull.org/',
@@ -319,6 +320,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, referer=None):
+    username = config.get_setting('hdfull_username', 'hdfull', default='')
+
+    if not username:
+        platformtools.dialog_notification('HdFull', '[COLOR red][B]Faltan[COLOR teal][I]Credenciales Cuenta[/I] [/B][/COLOR]')
+        return ''
+
     domain = config.get_setting('dominio', 'hdfull', default=dominios[0])
 
     # ~ por si viene de enlaces guardados posteriores
@@ -334,14 +341,8 @@ def do_downloadpage(url, post=None, referer=None):
 
     headers = {}
 
-    if '/tags-' in url: headers = {'Referer': domain + 'buscar'}
-    elif '/series/abc/' in url: headers = {'Referer': domain + 'series/abc'}
-    elif '/series/date' in url: headers = {'Referer': domain + 'series/'}
-    elif '/buscar' in url: headers = {'Referer': domain}
-    else:
-        if referer: headers = {'Referer': referer}
-        else:
-           if not url == domain: headers = {'Referer': domain}
+    if referer: headers = {'Referer': referer}
+    else: headers = {'Referer': domain}
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
@@ -422,12 +423,16 @@ def mainlist(item):
     if config.get_setting('hdfull_login', 'hdfull', default=False):
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'all' ))
 
-        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', target_action = 'top', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
         itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
         itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+
+        itemlist.append(item.clone( title='Animes', action = 'mainlist_series', text_color = 'springgreen' ))
+        itemlist.append(item.clone( title='Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
+        itemlist.append(item.clone( title='Novelas', action = 'mainlist_series', text_color = 'limegreen' ))
 
         itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
@@ -459,7 +464,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', target_action = 'top', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -493,7 +498,7 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', target_action = 'top', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -890,10 +895,12 @@ def episodios(item):
     except:
         return itemlist
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = len(data)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -901,6 +908,7 @@ def episodios(item):
                 platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -913,14 +921,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for epi in data[item.page * item.perpage:]:
         tit = epi['title']['es'] if 'es' in epi['title'] and epi['title']['es'] else epi['title']['en'] if 'en' in epi['title'] and epi['title']['en'] else ''

@@ -64,16 +64,17 @@ def categorias(item):
 
     if PY3 and isinstance(data, bytes): data = data.decode('utf-8')
 
-    data = scrapertools.find_single_match(data, '<div class="menu-categories-tab"(.*?)<div class="menu-categories-tab"')
-
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|\\", "", data)
+
+    data = scrapertools.find_single_match(data, '<div class="menu-categories-tab"(.*?)<div class="menu-categories-tab"')
 
     matches = re.compile('<a href="([^"]+)" class="[^"]+">([^<]+)<', re.DOTALL).findall(data)
 
     for url, title in matches:
+        title = title.strip()
         url = urlparse.urljoin(item.url, url)
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, contentType = 'movie', text_color = 'orange' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -123,9 +124,8 @@ def findvideos(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    if PY3 and isinstance(data, bytes): data = data.decode('utf-8')
 
-    url = scrapertools.find_single_match(data, 'fileurl = \'([^,\']+)\'')
+    if PY3 and isinstance(data, bytes): data = data.decode('utf-8')
 
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
@@ -134,7 +134,6 @@ def findvideos(item):
     if url:
         itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server = 'directo', language = 'Vo') )
 
-    return itemlist
     return itemlist
 
 

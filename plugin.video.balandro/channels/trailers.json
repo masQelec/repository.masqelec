@@ -9,7 +9,7 @@
   "search_types": ["movie"],
 
   "categories": ["movie"],
-  "language": ["lat", "cast", "vose", "vo"],
+  "language": ["vo"],
 
   "clusters": ["trailers"],
 

@@ -102,7 +102,9 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin Temporadas')
+    if not '[COLOR hotpink]Temporada[/COLOR]' in item.title:
+        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin Temporadas')
+
     item.page = 0
     item.dialog = False
     item.contentType = 'season'
@@ -189,8 +191,6 @@ def findvideos(item):
 
 def search(item, texto):
     logger.info()
-    itemlist = []
-
     try:
         item.url = host + 'index.php?do=' + texto.replace(" ", "+")
         return list_all(item)
@@ -198,5 +198,4 @@ def search(item, texto):
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
-
-    return itemlist
+        return []

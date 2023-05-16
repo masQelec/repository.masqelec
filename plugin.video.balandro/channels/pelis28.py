@@ -229,7 +229,8 @@ def list_all(item):
 
         if ':' in title: contentTitle = contentTitle.split(':')[0]
 
-        qlty = scrapertools.find_single_match(match, '<span class="calidad2">(.*?)</span>')
+        qlty = scrapertools.find_single_match(match, '<span class="calidad2">.*?>(.*?)</span>')
+        qlty = qlty.replace('</font>', '')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
         if not year: year = '-'

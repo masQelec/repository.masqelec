@@ -316,6 +316,11 @@ def manto_params(item):
     if platformtools.dialog_yesno(config.__addon_name, "Se quitarán: 'Logins' en canales, 'Dominios' seleccionados en los canales, 'Canales Incluidos/Excluidos' en búsquedas, 'Canales Excluidos' en buscar proxies global, y se Inicializarán otros 'Parámetros'.", '[COLOR yellow][B]¿ Confirma Restablecer a sus valores por defecto los Parámetros Internos del addon ?[/B][/COLOR]'):
         config.set_setting('adults_password', '')
 
+        config.set_setting('dominio', '', 'test_providers')
+        config.set_setting('channel_test_providers_dominio', '')
+
+        config.set_setting('proxies', '', 'test_providers')
+
         config.set_setting('channel_animefenix_dominio', '')
         config.set_setting('channel_animeflv_dominio', '')
 
@@ -357,6 +362,7 @@ def manto_params(item):
         config.set_setting('channel_pelisplus_dominio', '')
         config.set_setting('channel_pelisplushd_dominio', '')
         config.set_setting('channel_pelisplushdlat_dominio', '')
+        config.set_setting('channel_pelisplushdnz_dominio', '')
         config.set_setting('channel_playdede_dominio', '')
         config.set_setting('channel_playdede_playdede_login', False)
         config.set_setting('channel_playdede_playdede_password', '')
@@ -365,6 +371,7 @@ def manto_params(item):
         config.set_setting('channel_series24_dominio', '')
         config.set_setting('channel_serieskao_dominio', '')
         config.set_setting('channel_seriesyonkis_dominio', '')
+        config.set_setting('channel_srnovelas_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
 
         config.set_setting('channel_torrentpelis_dominio', '')
@@ -393,7 +400,7 @@ def manto_params(item):
         download_path = filetools.join(config.get_data_path(), 'downloads')
         config.set_setting('downloadpath', download_path)
 
-        config.set_setting('chrome_last_version', '112.0.5615.50')
+        config.set_setting('chrome_last_version', '113.0.5672.93')
 
         config.set_setting('debug', '0')
 

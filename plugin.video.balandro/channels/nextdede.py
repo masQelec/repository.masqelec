@@ -211,6 +211,12 @@ def logout(item):
 
 
 def do_downloadpage(url, post=None, headers=None, referer=None):
+    username = config.get_setting('nextdede_username', 'nextdede', default='')
+
+    if not username:
+        platformtools.dialog_notification('NextDede', '[COLOR red][B]Faltan[COLOR teal][I]Credenciales Cuenta[/I] [/B][/COLOR]')
+        return ''
+
     httptools.save_cookie('Auth', _auth, host.replace('https://', ''))
 
     if not headers: headers= {'Referer': host}
@@ -256,7 +262,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('nextdede_login', 'nextdede', default=False):
-        itemlist.append(item.clone( title = 'Listas colecciones', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas colecciones[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -276,7 +282,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('nextdede_login', 'nextdede', default=False):
-        itemlist.append(item.clone( title = 'Listas colecciones', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas colecciones[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -312,7 +318,7 @@ def mainlist_series(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('nextdede_login', 'nextdede', default=False):
-        itemlist.append(item.clone( title = 'Listas colecciones', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas colecciones[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -320,7 +326,7 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Nuevas', action = 'list_all', url = host + '/series', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Últimas agregadas', action = 'list_last', url = host + '/trends', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = 'Últimas agregadas', action = 'list_last', url = host + '/trends', search_type = 'tvshow', text_color = 'olive' ))
 
         itemlist.append(item.clone( title = 'Recientes', action = 'list_all', url = host + '/series?filter={"sorting":"newest"}', search_type = 'tvshow' ))
 
@@ -552,10 +558,12 @@ def episodios(item):
 
     matches = re.compile(patron, re.DOTALL).findall(bloque)
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -563,6 +571,7 @@ def episodios(item):
                 platformtools.dialog_notification('NextDede', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -575,14 +584,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('NextDede', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('NextDede', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('NextDede', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('NextDede', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for url, thumb, temp_epis, name in matches[item.page * item.perpage:]:
         temp_epis = temp_epis.strip()
@@ -620,9 +635,9 @@ def findvideos(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     # ~ Enlaces
-    bloque = scrapertools.find_single_match(data, '<div class="links-modal-body">(.*?)</div></div></div></div>')
+    bloque = scrapertools.find_single_match(data, '<tbody>(.*?)</tbody>')
 
-    matches = re.compile('<tbody>.*?<a href="(.*?)".*?<span class="text-quality">(.*?)</span>.*?title="(.*?)".*?</button>', re.DOTALL).findall(bloque)
+    matches = re.compile('<tr>.*?<a href="(.*?)".*?<span class="text-quality">(.*?)</span>.*?title="(.*?)".*?</tr>', re.DOTALL).findall(bloque)
 
     ses = 0
 
@@ -630,7 +645,8 @@ def findvideos(item):
         ses += 1
 
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-        elif '/powvideo.' in url or '/streamplay.' in url or '/netu.' in url: continue
+
+        elif '/powvideo.' in url or '/streamplay.' in url: continue
 
         lang = IDIOMAS.get(lang, lang)
 
@@ -648,7 +664,7 @@ def findvideos(item):
     # ~ Descargar
     bloque = scrapertools.find_single_match(data, '<div class="links-modal-body"><table>(.*?)</table>')
 
-    matches = re.compile('<a href="(.*?)".*?<span class="text-quality">(.*?)</span>.*?title="(.*?)".*?</button>', re.DOTALL).findall(bloque)
+    matches = re.compile('<tr>.*?<a href="(.*?)".*?<span class="text-quality">(.*?)</span>.*?title="(.*?)".*?</tr>', re.DOTALL).findall(bloque)
 
     for url, qlty, lang in matches:
         ses += 1

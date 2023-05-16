@@ -113,6 +113,8 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
+
         langs = []
         if 'title="Español"' in match: langs.append('Esp')
         if 'title="Latino"' in match: langs.append('Lat')
@@ -287,6 +289,8 @@ def list_search(item):
         year = scrapertools.find_single_match(article, '<span class="year">(\d{4})</span>')
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
+
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
 
         langs = []
         if '/flags/es.png' in article: langs.append('Esp')

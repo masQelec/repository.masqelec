@@ -20,6 +20,10 @@
         "url": "https://streamhide.to/e/\\1"
       },
       {
+        "pattern": "(https://streamhide.com/(?:e|d|w)/[A-z0-9]+)",
+        "url": "https://streamhide.to/e/\\1"
+      },
+      {
         "pattern": "(https://playhide.online/(?:e|d|w)/[A-z0-9]+)",
         "url": "https://streamhide.to/e/\\1"
       },

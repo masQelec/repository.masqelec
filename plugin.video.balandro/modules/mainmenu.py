@@ -269,7 +269,7 @@ def mainlist(item):
                                     only_options_proxies = True, thumbnail=config.get_thumb('flame'), text_color='red' ))
 
     if config.get_setting('sub_mnu_favoritos', default=False):
-        itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), text_color='plum' ))
+        itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), text_color='coral' ))
 
     if current_month == 4:
         itemlist.append(item.clone( channel='filmaffinitylists', action='_oscars', title='[B]Premios Oscar ' + str(current_year) + '[/B]', text_color='greenyellow', thumbnail=config.get_thumb('oscars'), plot = 'Las películas nominadas a los premios Oscars' ))
@@ -573,6 +573,12 @@ def channels(item):
         filtros = {}
 
     elif item.extra == 'torrents':
+        cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
+
+        if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno':
+            itemlist.append(item.clone( channel='actions', action='open_settings', title='[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR blue][B]Torrents)[/B][/COLOR]' + ' [COLOR fuchsia][B]Motor:[/B][/COLOR][COLOR goldenrod][B] ' + cliente_torrent.capitalize() + '[/B][/COLOR]',
+                                        folder=False, thumbnail=config.get_thumb('settings') ))
+
         if config.get_setting('mnu_search_proxy_channels', default=False):
             itemlist.append(item.clone( channel='submnuctext', action='submnu_search', title='[B]Buscar Nuevos Proxies[/B]', context=context_proxy_channels,
                                         only_options_proxies = True, thumbnail=config.get_thumb('flame'), text_color='red' ))
@@ -1006,15 +1012,29 @@ def channels(item):
             if 'mismatched' in ch['clusters']: titulo += '[I][COLOR coral] (Incompatible)[/COLOR][/I]'
 
         if 'inestable' in ch['clusters']:
-            if config.get_setting('channels_list_no_inestables', default=False): continue
+            if config.get_setting('mnu_simple', default=False): continue
+            elif config.get_setting('channels_list_no_inestables', default=False): continue
 
             titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
 
         if 'problematic' in ch['clusters']:
-            if not config.get_setting('mnu_problematicos', default=False):
-                if config.get_setting('channels_list_no_problematicos', default=False): continue
+            if config.get_setting('mnu_simple', default=False): continue
+            elif config.get_setting('mnu_problematicos', default=False): continue
+            elif config.get_setting('channels_list_no_problematicos', default=False): continue
 
             titulo += '[I][COLOR darkgoldenrod] (problemático)[/COLOR][/I]'
+
+        if config.get_setting('mnu_simple', default=False):
+            if 'movie' in ch['categories']:
+                if "tvshow" in ch['categories']:
+                    titulo += '[B][I][COLOR teal] películas, series[/COLOR][/I][/B]'
+                    if 'tales' in ch['clusters']: titulo += '[B][I][COLOR limegreen] novelas[/COLOR][/I][/B]'
+                else: titulo += '[B][I][COLOR deepskyblue] películas[/COLOR][/I][/B]'
+            else:
+                if "tvshow" in ch['categories']:
+                    titulo += '[B][I][COLOR hotpink] series[/COLOR][/I][/B]'
+                    if 'tales' in ch['clusters']: titulo += '[B][I][COLOR limegreen] novelas[/COLOR][/I][/B]'
+                elif "documentary" in ch['categories']: titulo += '[B][I][COLOR cyan] documentales[/COLOR][/I][/B]'
 
         i =+ 1
 

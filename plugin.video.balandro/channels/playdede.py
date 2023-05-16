@@ -303,6 +303,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, referer=None):
+    username = config.get_setting('playdede_username', 'playdede', default='')
+
+    if not username:
+        platformtools.dialog_notification('PlayDede', '[COLOR red][B]Faltan[COLOR teal][I]Credenciales Cuenta[/I] [/B][/COLOR]')
+        return ''
+
     # ~ por si viene de enlaces guardados posteriores
     if url.startswith('/'): url = host + url[1:] # ~ solo v. 2.0.0
 
@@ -388,7 +394,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -409,7 +415,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -449,13 +455,13 @@ def mainlist_series(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Nuevos episodios', action = 'list_last', url = host, _type = 'episodes', nro_pagina = 1, search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = 'Nuevos episodios', action = 'list_last', url = host, _type = 'episodes', nro_pagina = 1, search_type = 'tvshow', text_color = 'olive' ))
 
         itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, _type = 'series', nro_pagina = 1, search_type = 'tvshow' ))
 
@@ -495,7 +501,7 @@ def mainlist_animes(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item.clone( title = 'Listas populares', action = 'list_listas', search_type = 'all', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
@@ -534,7 +540,14 @@ def plataformas(item):
         text_color = 'hotpink'
 
     data = do_downloadpage(url)
-    data = re.sub('\\n|\\r|\\t|\\s{2}|&nbsp;', '', data)
+
+    # ~ si se perdio la sesion (utoken)
+    if datos_ko in str(data):
+        logout(item)
+        login(item)
+        data = do_downloadpage(url)
+
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = re.compile('data-network="(.*?)".*?<img src="(.*?)"').findall(data)
 
@@ -543,11 +556,6 @@ def plataformas(item):
         title = title.capitalize()
 
         itemlist.append(item.clone(title = title, action = 'list_plataforma', thumbnail = thumb, url = url, id_network = id_network, slug = item.slug, text_color = text_color ))
-
-    if not itemlist:
-        if datos_ko in str(data):
-            platformtools.dialog_notification('PlayDede', close_open)
-            return
 
     return sorted(itemlist, key=(lambda x: x.title))
 
@@ -597,6 +605,13 @@ def generos(item):
         else: url_generos = host + 'series/'
 
     data = do_downloadpage(url_generos)
+
+    # ~ si se perdio la sesion (utoken)
+    if datos_ko in str(data):
+        logout(item)
+        login(item)
+        data = do_downloadpage(url_generos)
+
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = re.compile('<li class="cfilter.*?data-type="genre".*?data-value="(.*?)">.*?<b>(.*?)</b>').findall(data)
@@ -614,11 +629,6 @@ def generos(item):
             itemlist.append(item.clone( title = 'Aventura', action = 'list_all', genre = '?genre=aventura', text_color = text_color ))
             itemlist.append(item.clone( title = 'Fantasía', action = 'list_all', genre = '?genre=fantasia', text_color = text_color ))
             itemlist.append(item.clone( title = 'Historia', action = 'list_all', genre = '?genre=historia', text_color = text_color ))
-
-    else:
-        if datos_ko in str(data):
-            platformtools.dialog_notification('PlayDede', close_open)
-            return
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -661,6 +671,13 @@ def idiomas(item):
         else: url_idiomas = host + 'series/'
 
     data = do_downloadpage(url_idiomas)
+
+    # ~ si se perdio la sesion (utoken)
+    if datos_ko in str(data):
+        logout(item)
+        login(item)
+        data = do_downloadpage(url_idiomas)
+
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<ul class="Alenguajes Ageneros">(.*?)<ul class="Acalidades Ageneros">')
@@ -671,11 +688,6 @@ def idiomas(item):
         url = url_idiomas + '?lang=' + idioma
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, lang = idioma, text_color = text_color ))
-
-    if not itemlist:
-        if datos_ko in str(data):
-            platformtools.dialog_notification('PlayDede', close_open)
-            return
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -695,6 +707,13 @@ def calidades(item):
         else: url_calidades = host + 'series/'
 
     data = do_downloadpage(url_calidades)
+
+    # ~ si se perdio la sesion (utoken)
+    if datos_ko in str(data):
+        logout(item)
+        login(item)
+        data = do_downloadpage(url_calidades)
+
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<ul class="Acalidades Ageneros">(.*?)<select id="countries"')
@@ -705,11 +724,6 @@ def calidades(item):
         url = url_calidades + '?qlty=' + calidad
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, qlty = calidad, text_color = text_color ))
-
-    if not itemlist:
-        if datos_ko in str(data):
-            platformtools.dialog_notification('PlayDede', close_open)
-            return
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -729,6 +743,13 @@ def paises(item):
         else: url_paises = host + 'series/'
 
     data = do_downloadpage(url_paises)
+
+    # ~ si se perdio la sesion (utoken)
+    if datos_ko in str(data):
+        logout(item)
+        login(item)
+        data = do_downloadpage(url_paises)
+
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<select id="countries"(.*?)<div class="selDf">')
@@ -743,11 +764,6 @@ def paises(item):
         url = url_paises + '?country=' + pais
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, country = pais, text_color = text_color ))
-
-    if not itemlist:
-        if datos_ko in str(data): 
-            latformtools.dialog_notification('PlayDede', close_open)
-            return
 
     return itemlist
 
@@ -793,6 +809,22 @@ def list_all(item):
         data = do_downloadpage(host + 'ajax.php' + item.order, post=post, referer=item.url)
     else:
         data = do_downloadpage(host + 'ajax.php' + item.genre + item.year, post=post, referer=item.url)
+
+    # ~ si se perdio la sesion (utoken)
+    if datos_ko in str(data):
+        logout(item)
+        login(item)
+
+        if item.lang:
+            data = do_downloadpage(host + 'ajax.php?lang=' + item.lang, post=post, referer=item.url)
+        elif item.qlty:
+            data = do_downloadpage(host + 'ajax.php?qlty=' + item.qlty, post=post, referer=item.url)
+        elif item.country:
+            data = do_downloadpage(host + 'ajax.php?country=' + item.country, post=post, referer=item.url)
+        elif item.order:
+            data = do_downloadpage(host + 'ajax.php' + item.order, post=post, referer=item.url)
+        else:
+            data = do_downloadpage(host + 'ajax.php' + item.genre + item.year, post=post, referer=item.url)
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
@@ -868,6 +900,13 @@ def list_last(item):
     else: post = item.post
 
     data = do_downloadpage(host + 'ajax.php', post=post)
+
+    # ~ si se perdio la sesion (utoken)
+    if datos_ko in str(data):
+        logout(item)
+        login(item)
+        data = do_downloadpage(host + 'ajax.php', post=post)
+
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = data.replace('\\/', '/')
@@ -1010,7 +1049,14 @@ def list_listas(item):
     else: url = item.url
 
     data = do_downloadpage(url)
-    data = re.sub('\\n|\\r|\\t|\\s{2}|&nbsp;', '', data)
+
+    # ~ si se perdio la sesion (utoken)
+    if datos_ko in str(data):
+        logout(item)
+        login(item)
+        data = do_downloadpage(url)
+
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = re.compile('<article>.*?<a href="([^"]+)"[^<]+<h2>([^<]+)</h2>').findall(data)
 
@@ -1107,7 +1153,8 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile("<div class='clickSeason(?: clickAc| )' data-season='(\d+)'", re.DOTALL).findall(data)
+    matches = re.compile('<div class="clickSeason.*?data-season="(.*?)"', re.DOTALL).findall(data)
+    if not matches: matches = re.compile("<div class='clickSeason.*?data-season='(.*?)'", re.DOTALL).findall(data)
 
     if len(matches) > 25: platformtools.dialog_notification('PlayDede', '[COLOR blue][B]Cargando Temporadas[/B][/COLOR]')
 
@@ -1139,18 +1186,21 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    data = scrapertools.find_single_match(data, "<div class='se-c' data-season='%d'(.*?)<\/div><\/div>" % (item.contentSeason))
+    bloque = scrapertools.find_single_match(data, '<div class="se-c".*?data-season="%d"(.*?)<\/div><\/div>' % (item.contentSeason))
+    if not bloque: bloque = scrapertools.find_single_match(data, "<div class='se-c'.*?data-season='%d'(.*?)<\/div><\/div>" % (item.contentSeason))
 
     patron = '<a href="([^"]+)"><div class="imagen">'
     patron += '.*?src="([^"]+)"><\/div>.*?<div class="epst">([^<]+)'
     patron += '<\/div>.*?<div class="numerando">([^<]+)'
 
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile(patron, re.DOTALL).findall(bloque)
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -1158,6 +1208,7 @@ def episodios(item):
                 platformtools.dialog_notification('PlayDede', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -1170,14 +1221,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('PlayDede', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('PlayDede', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('PlayDede', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('PlayDede', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for url, thumb, titulo, name in matches[item.page * item.perpage:]:
         s_e = scrapertools.get_season_and_episode(name)
@@ -1205,36 +1262,41 @@ def findvideos(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-
-    # ~ si se Auto-Cerro la sesion (utoken)
+    # ~ si se perdio la sesion (utoken)
     if datos_ko in str(data):
         logout(item)
         login(item)
-
         data = do_downloadpage(item.url)
-        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     # ~ Reproductor
-    patron = '<div class="playerItem.*?data-lang="(.*?)".*?data-loadPlayer="(.*?)".*?<h3>(.*?)</h3>.*?">Calidad:.*?">(.*?)</span>'
-
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('<div class="playerItem(.*?)</div></div>', re.DOTALL).findall(data)
 
     ses = 0
 
-    for lang, sid, server, qlty in matches:
+    for match in matches:
         ses += 1
+
+        sid = scrapertools.find_single_match(match, 'data-loadPlayer="(.*?)"')
+        if not sid: sid = scrapertools.find_single_match(match, 'data-loadplayer="(.*?)"')
+
+        server = scrapertools.find_single_match(match, '<h3>(.*?)</h3>')
+
+        if not server or not sid: continue
 
         if server == 'alternativo': continue
         elif server == 'userload': continue
 
-        if not server or not sid: continue
+        lang = scrapertools.find_single_match(match, 'data-lang="(.*?)"')
 
         if lang.lower() == 'espsub': lang = 'Vose'
 
         lang = lang.capitalize()
+
+        qlty = scrapertools.find_single_match(match, '">Calidad:.*?">(.*?)</span>')
+
         server = servertools.corregir_servidor(server)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', id = sid, language = lang, quality = qlty ))
@@ -1292,10 +1354,6 @@ def findvideos(item):
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
 
-        elif datos_ko in str(data):
-            platformtools.dialog_notification('PlayDede', close_open)
-            return
-
     return itemlist
 
 
@@ -1314,7 +1372,10 @@ def play(item):
 
         if url:
             data = do_downloadpage(url)
-            url_play = scrapertools.find_single_match(data, "src='([^']+)")
+
+            url_play = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
+            if not url_play: url_play = scrapertools.find_single_match(data, "<iframe src='(.*?)'")
+
     else:
         url_play = item.url
 
@@ -1324,34 +1385,24 @@ def play(item):
     return itemlist
 
 
-def clean_title(title, url):
-    logger.info()
-
-    title = title.replace('\\u00e1', 'a').replace('\\u00c1', 'a').replace('\\u00e9', 'e').replace('\\u00ed', 'i').replace('\\u00f3', 'o').replace('\\u00fa', 'u')
-    title = title.replace('\\u00f1', 'ñ').replace('\\u00bf', '¿').replace('\\u00a1', '¡').replace('\\u00ba', 'º')
-    title = title.replace('\\u00eda', 'a').replace('\\u00f3n', 'o').replace('\\u00fal', 'u').replace('\\u00e0', 'a')
-
-    if '\\u' in title:
-        data = do_downloadpage(url)
-        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-        titulo = scrapertools.find_single_match(data, "<h1>(.*?)</h1>")
-        if not titulo: titulo = scrapertools.find_single_match(data, "<title>(.*?)</title>")
-
-        titulo = titulo.replace('Ver película:', '').replace('Ver serie:', '').replace('Ver anime:', '').strip()
-
-        if titulo: title = titulo
-
-    return title
-
-
 def list_search(item):
     logger.info()
     itemlist = []
 
+    username = config.get_setting('playdede_username', 'playdede', default='')
+
+    if not username: return []
+
     if not item.page: item.page = 0
 
     data = do_downloadpage(item.url)
+
+    # ~ si se perdio la sesion (utoken)
+    if datos_ko in str(data):
+        logout(item)
+        login(item)
+        data = do_downloadpage(item.url)
+
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = re.compile('<article(.*?)</article>').findall(data)
@@ -1417,17 +1468,28 @@ def list_search(item):
                 if next_url:
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_search', page = 0, text_color = 'coral' ))
 
-    if not itemlist:
-        if datos_ko in str(data):
-            avisar = False
-            # ~ Buscar solo de la opcion del canal
-            if item.plot: avisar = True
-            elif config.get_setting('notificar_login', default=False): avisar = True
-
-            if avisar: platformtools.dialog_notification('PlayDede', close_open)
-            return
-
     return itemlist
+
+
+def clean_title(title, url):
+    logger.info()
+
+    title = title.replace('\\u00e1', 'a').replace('\\u00c1', 'a').replace('\\u00e9', 'e').replace('\\u00ed', 'i').replace('\\u00f3', 'o').replace('\\u00fa', 'u')
+    title = title.replace('\\u00f1', 'ñ').replace('\\u00bf', '¿').replace('\\u00a1', '¡').replace('\\u00ba', 'º')
+    title = title.replace('\\u00eda', 'a').replace('\\u00f3n', 'o').replace('\\u00fal', 'u').replace('\\u00e0', 'a')
+
+    if '\\u' in title:
+        data = do_downloadpage(url)
+        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+        titulo = scrapertools.find_single_match(data, "<h1>(.*?)</h1>")
+        if not titulo: titulo = scrapertools.find_single_match(data, "<title>(.*?)</title>")
+
+        titulo = titulo.replace('Ver película:', '').replace('Ver serie:', '').replace('Ver anime:', '').strip()
+
+        if titulo: title = titulo
+
+    return title
 
 
 def search(item, texto):
