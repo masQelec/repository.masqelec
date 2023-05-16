@@ -7,13 +7,24 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cinecalidad.cat/'
+host = 'https://c2.cinecalidad.win/'
+
+
+players = ['https://cinecalidad.', '.cinecalidad.']
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://ww3.cinecalidad.link/',
              'https://ww2.cinecalidad.link/', 'https://ww5.cinecalidad.link/', 'https://cinecalidad.fan/',
-             'https://cinecalidad.run/']
+             'https://cinecalidad.run/', 'https://cinecalidad.cat/', 'https://w1.cinecalidad.cat/',
+             'https://w10.cinecalidad.cat/', 'https://w2.cinecalidad.cat/', 'https://w5.cinecalidad.cat/',
+             'https://w11.cinecalidad.cat/', 'https://w15.cinecalidad.cat/', 'https://w16.cinecalidad.cat/',
+             'https://w17.cinecalidad.cat/', 'https://w18.cinecalidad.cat/', 'https://ww1.cinecalidad.cat/',
+             'https://ww2.cinecalidad.cat/', 'https://c1.cinecalidad.cat/', 'https://c2.cinecalidad.cat/',
+             'https://c3.cinecalidad.cat/', 'https://c4.cinecalidad.cat/', 'https://cinecalidad.win/',
+             'https://w1.cinecalidad.win/', 'https://w2.cinecalidad.win/', 'https://w5.cinecalidad.win/',
+             'https://w6.cinecalidad.win/', 'https://w7.cinecalidad.win/', 'https://w8.cinecalidad.win/',
+             'https://w9.cinecalidad.win/', 'https://c1.cinecalidad.win/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -24,6 +35,38 @@ if domain:
     else: host = domain
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_cinecalidadlol_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
@@ -32,7 +75,29 @@ def do_downloadpage(url, post=None, headers=None):
     raise_weberror = True
     if '/fecha-de-lanzamiento/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('cinecalidadlol', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage_proxy('cinecalidadlol', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        except:
+            pass
+
+    if '<title>Just a moment...</title>' in data:
+        if not '?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -57,6 +122,8 @@ def acciones(item):
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_cinecalidadlol', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     platformtools.itemlist_refresh()
 
@@ -210,7 +277,7 @@ def list_all(item):
             year = scrapertools.find_single_match(match, '</p>.*?<p>(.*?)</p>')
             if not year: year = '-'
 
-        title = title.replace('&#8211;', '')
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
 
         tipo = 'tvshow' if '/ver-serie/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -335,10 +402,12 @@ def episodios(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<li class="mark-.*?data-src="(.*?)".*?<div class="numerando">(.*?)</div>.*?<a href="(.*?)">(.*?)</a')
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -346,6 +415,7 @@ def episodios(item):
                 platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -358,14 +428,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for thumb, temp_epis, url, title in matches[item.page * item.perpage:]:
         epis = scrapertools.find_single_match(temp_epis, '.*?E(.*?)$')
@@ -399,12 +475,27 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+
+    if '>No hay opciones para ver en latino' in data:
+        new_url = scrapertools.find_single_match(data, ">No hay opciones para ver en latino.*?<a href='(.*?)'>Ver en castellano<")
+
+        if new_url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR yellowgreen][B]Sin opciones Play en Latino[/B][/COLOR]')
+
+            item.url = new_url
+
+            data = do_downloadpage(item.url)
+            data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+            if '?ref=es' in item.url: lang = 'Esp'
+
+
     ses = 0
 
     if '>VER ONLINE<' in data:
         bloque = scrapertools.find_single_match(data, '>VER ONLINE<(.*?)>DESCARGAR<')
 
-        matches = scrapertools.find_multiple_matches(bloque, '<li id="player-option-.*?data-option="(.*?)">(.*?)<.*?data-src=.*?/flags/(.*?).png')
+        matches = scrapertools.find_multiple_matches(bloque, '<li id="player-option-.*?data-option="(.*?)">(.*?)<.*?src=.*?/flags/(.*?).png')
 
         for url, srv, idio in matches:
             ses += 1
@@ -496,18 +587,28 @@ def play(item):
 
     servidor = item.server
 
-    if url.startswith(host):
+    # ~ por si esta en ant_hosts
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+
+    if url.startswith(host) or str(players) in url:
         data = do_downloadpage(url)
 
         url = scrapertools.find_single_match(data, 'target="_blank" href="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, 'target="_blank" value="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, '<iframe.*?data-src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
+
+        if '/?id=' in url: url = ''
 
         if url:
             url = url.replace('&amp;', '&')
 
             if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
                 return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+            elif '/cinestart' in url: url = ''
 
             if url:
                 servidor = servertools.get_server_from_url(url)

@@ -15,13 +15,13 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www.divxtotal.wf/'
+host = 'https://www.divxtotal.win/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://www.divxtotal.dev/',
              'https://www.divxtotal.ms/', 'https://www.divxtotal.fi/', 'https://www.divxtotal.cat/',
-             'https://www.divxtotal.pl/']
+             'https://www.divxtotal.pl/', 'https://www.divxtotal.wf/']
 
 
 domain = config.get_setting('dominio', 'divxtotal', default='')
@@ -229,7 +229,10 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, "'(.*?)'")
 
-        if '/peliculas/' in url:
+        tipo = 'movie' if '/peliculas/' in url or '/peliculas-' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
             if not item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
 
@@ -238,7 +241,7 @@ def list_all(item):
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=titulo, infoLabels={'year': "-" } ))
 
-        if '/series/' in url:
+        if tipo == 'tvshow':
             if not item.search_type == 'all':
                 if item.search_type == 'movie': continue
 

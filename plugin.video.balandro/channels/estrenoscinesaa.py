@@ -116,6 +116,11 @@ def list_all(item):
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="([^"]+)')
         title = scrapertools.find_single_match(match, ' alt="([^"]+)').strip()
+
+        if not url or not title: continue
+
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
+
         thumb = scrapertools.find_single_match(match, ' src="([^"]+)')
 
         year = scrapertools.find_single_match(match, '<span>(\d{4})</span>')
@@ -230,6 +235,11 @@ def list_search(item):
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="([^"]+)')
         title = scrapertools.find_single_match(match, ' alt="([^"]+)').strip()
+
+        if not url or not title: continue
+
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
+
         thumb = scrapertools.find_single_match(match, ' src="([^"]+)')
 
         year = scrapertools.find_single_match(match, '<span class="year">(\d{4})</span>')

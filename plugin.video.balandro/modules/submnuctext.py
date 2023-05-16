@@ -7,6 +7,7 @@ from core import filetools
 
 from datetime import datetime
 
+
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
 color_adver = config.get_setting('notification_adver_color', default='violet')
@@ -307,21 +308,25 @@ def _refresh_menu(item):
 
 def _marcar_canal(item):
     config.set_setting('status', item.estado, item.from_channel)
-    _refresh_menu(item)
+
+    if not item.module_search: _refresh_menu(item)
+
 
 def _poner_no_searchable(item):
     platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR violet]Excluyendo de búsquedas[/COLOR][/B]')
 
     config.set_setting('no_searchable', True, item.from_channel)
 
-    _refresh_menu(item)
+    if not item.module_search: _refresh_menu(item)
+
 
 def _quitar_no_searchable(item):
     platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR violet]Incluyendo en búsquedas[/COLOR][/B]')
 
     config.set_setting('no_searchable', False, item.from_channel)
 
-    _refresh_menu(item)
+    if not item.module_search: _refresh_menu(item)
+
 
 def _channels_included(item):
     logger.info()
@@ -452,6 +457,9 @@ def _dominios(item):
     elif item.from_channel == 'pelisplushdlat':
         domains.manto_domain_pelisplushdlat(item)
 
+    elif item.from_channel == 'pelisplushdnz':
+        domains.manto_domain_pelisplushdnz(item)
+
     elif item.from_channel == 'playdede':
         domains.manto_domain_playdede(item)
 
@@ -463,6 +471,9 @@ def _dominios(item):
 
     elif item.from_channel == 'seriesyonkis':
         domains.manto_domain_seriesyonkis(item)
+
+    elif item.from_channel == 'srnovelas':
+        domains.manto_domain_srnovelas(item)
 
     elif item.from_channel == 'subtorrents':
         domains.manto_domain_subtorrents(item)
@@ -581,6 +592,9 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'pelisplushdlat':
         domains.manto_domain_pelisplushdlat(item)
 
+    elif item.from_channel == 'pelisplushdnz':
+        domains.manto_domain_pelisplushdnz(item)
+
     elif item.from_channel == 'playdede':
         domains.manto_domain_playdede(item)
 
@@ -592,6 +606,9 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'seriesyonkis':
         domains.manto_domain_seriesyonkis(item)
+
+    elif item.from_channel == 'srnovelas':
+        domains.manto_domain_srnovelas(item)
 
     elif item.from_channel == 'subtorrents':
         domains.manto_domain_subtorrents(item)
@@ -755,6 +772,13 @@ def _proxies(item):
 
         if config.get_setting('channel_cinecalidad_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'cinecalidadlol':
+        from channels import cinecalidadlol
+        item.channel = 'cinecalidadlol'
+        cinecalidadlol.configurar_proxies(item)
+
+        if config.get_setting('channel_cinecalidadlol_proxies') is None: refrescar = False
+
     elif item.from_channel == 'cliversite':
         from channels import cliversite
         item.channel = 'cliversite'
@@ -838,6 +862,13 @@ def _proxies(item):
         elifilms.configurar_proxies(item)
 
         if config.get_setting('channel_elifilms_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'ennovelas':
+        from channels import ennovelas
+        item.channel = 'ennovelas'
+        ennovelas.configurar_proxies(item)
+
+        if config.get_setting('channel_ennovelas_proxies') is None: refrescar = False
 
     elif item.from_channel == 'entrepeliculasyseries':
         from channels import entrepeliculasyseries
@@ -951,6 +982,13 @@ def _proxies(item):
 
         if config.get_setting('channel_mejortorrentnz_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'naranjatorrent':
+        from channels import naranjatorrent
+        item.channel = 'naranjatorrent'
+        naranjatorrent.configurar_proxies(item)
+
+        if config.get_setting('channel_naranjatorrent_proxies') is None: refrescar = False
+
     elif item.from_channel == 'peliculaspro':
         from channels import peliculaspro
         item.channel = 'peliculaspro'
@@ -964,6 +1002,13 @@ def _proxies(item):
         pelis28.configurar_proxies(item)
 
         if config.get_setting('channel_pelis28_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'pelisencastellano':
+        from channels import pelisencastellano
+        item.channel = 'pelisencastellano'
+        pelisencastellano.configurar_proxies(item)
+
+        if config.get_setting('channel_pelisencastellano_proxies') is None: refrescar = False
 
     elif item.from_channel == 'pelisforte':
         from channels import pelisforte
@@ -999,13 +1044,6 @@ def _proxies(item):
         pelispedia.configurar_proxies(item)
 
         if config.get_setting('channel_pelispedia_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'pelisplanet':
-        from channels import pelisplanet
-        item.channel = 'pelisplanet'
-        pelisplanet.configurar_proxies(item)
-
-        if config.get_setting('channel_pelisplanet_proxies') is None: refrescar = False
 
     elif item.from_channel == 'pelisplus':
         from channels import pelisplus
@@ -1091,6 +1129,13 @@ def _proxies(item):
 
         if config.get_setting('channel_seriesmovil_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'seriespapayato':
+        from channels import seriespapayato
+        item.channel = 'seriespapayato'
+        seriespapayato.configurar_proxies(item)
+
+        if config.get_setting('channel_seriespapayato_proxies') is None: refrescar = False
+
     elif item.from_channel == 'seriespapayaxyz':
         from channels import seriespapayaxyz
         item.channel = 'seriespapayaxyz'
@@ -1104,6 +1149,13 @@ def _proxies(item):
         seriesyonkis.configurar_proxies(item)
 
         if config.get_setting('channel_seriesyonkis_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'srnovelas':
+        from channels import srnovelas
+        item.channel = 'srnovelas'
+        srnovelas.configurar_proxies(item)
+
+        if config.get_setting('channel_srnovelas_proxies') is None: refrescar = False
 
     elif item.from_channel == 'subtorrents':
         from channels import subtorrents
@@ -1161,7 +1213,18 @@ def _proxies(item):
     channels_unsatisfactory = config.get_setting('developer_test_channels', default='')
     if channels_unsatisfactory == 'unsatisfactory': refrescar = False
 
+    if item.module_search: refrescar = False
+
     if refrescar: _refresh_menu(item)
+
+
+def _search_new_proxies(item):
+    if item.channels_new_proxies:
+        if platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow][B]Solo se tendrán en cuenta para las próximas búsquedas[/B][/COLOR]','[COLOR red][B]¿ Desea efectuar una nueva búsqueda de proxies en Todos esos canales ?[/B][/COLOR]'):
+            for channel in item.channels_new_proxies:
+                item.from_channel = channel
+                item.module_search = True
+                _proxies(item)
 
 
 def _quitar_proxies(item):

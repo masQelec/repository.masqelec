@@ -96,6 +96,16 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('//sbface.com/e/', '//streamsb.net/play/').replace('//sbface.com/d/', '//streamsb.net/play/')
     elif '//view345.com/' in page_url:
         page_url = page_url.replace('//view345.com/e/', '//streamsb.net/play/').replace('//view345.com/d/', '//streamsb.net/play/')
+    elif '//sbone.pro/' in page_url:
+        page_url = page_url.replace('//sbone.pro/e/', '//streamsb.net/play/').replace('//sbone.pro/d/', '//streamsb.net/play/')
+
+    elif '//sbasian.pro/' in page_url:
+        page_url = page_url.replace('//sbasian.pro/e/', '//streamsb.net/play/').replace('//sbasian.pro/d/', '//streamsb.net/play/')
+    elif '//streaamss.com/' in page_url:
+        page_url = page_url.replace('//streaamss.com/e/', '//streamsb.net/play/').replace('//streaamss.com/d/', '//streamsb.net/play/')
+
+    elif '//lvturbo.com/' in page_url:
+        page_url = page_url.replace('//lvturbo.com/e/', '//streamsb.net/play/').replace('//lvturbo.com/d/', '//streamsb.net/play/')
 
     data = httptools.downloadpage(page_url).data
 

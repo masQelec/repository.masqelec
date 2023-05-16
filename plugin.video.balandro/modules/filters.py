@@ -947,6 +947,15 @@ def channels_excluded_list(ret, channels_ids, channels_search):
 def show_servers_list(item):
     logger.info()
 
+    servers_preferred = config.get_setting('servers_preferred', default='')
+    if servers_preferred: servers_preferred_list = servers_preferred.lower().replace(' ', '').split(',')
+
+    servers_unfavored = config.get_setting('servers_unfavored', default='')
+    if servers_unfavored: servers_unfavored_list = servers_unfavored.lower().replace(' ', '').split(',')
+
+    servers_discarded = config.get_setting('servers_discarded', default='')
+    if servers_discarded: servers_discarded_list = servers_discarded.lower().replace(' ', '').split(',')
+
     from core import filetools, jsontools
 
     if item.tipo == 'activos':
@@ -972,6 +981,7 @@ def show_servers_list(item):
     path = os.path.join(config.get_runtime_path(), 'servers')
 
     servidores = os.listdir(path)
+    servidores = sorted(servidores)
 
     if not servidores:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin servidores de este tipo[/B][/COLOR]' % color_adver)
@@ -1019,6 +1029,21 @@ def show_servers_list(item):
             if item.tipo == 'activos': continue
 
             info = info + '[COLOR red][B] Inactivo [/B][/COLOR]'
+
+        if servers_preferred:
+            if dict_server['id'] in servers_preferred_list:
+                if info: info = info + '  '
+                info = info + '[COLOR cyan][B] Preferido [/B][/COLOR]'
+
+        if servers_unfavored:
+            if dict_server['id'] in servers_unfavored:
+                if info: info = info + '  '
+                info = info + '[COLOR chartreuse][B] como Última opción [/B][/COLOR]'
+
+        if servers_discarded:
+            if dict_server['id'] in servers_discarded_list:
+                if info: info = info + '  '
+                info = info + '[COLOR indianred][B] Descartado [/B][/COLOR]'
 
         if notes:
             if info: info = info + '  '
@@ -1199,8 +1224,13 @@ def show_channels_list(item):
 def show_clients_torrent(item):
     logger.info()
 
+    cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
+
     from core import jsontools
+
     torrent_clients = jsontools.get_node_from_file('torrent.json', 'clients', os.path.join(config.get_runtime_path(), 'servers'))
+
+    torrent_clients = sorted(torrent_clients, key=lambda x:x['name'])
 
     opciones_torrent = []
     torrents = []
@@ -1211,7 +1241,9 @@ def show_clients_torrent(item):
         client_name = str(client['name']).capitalize()
         client_id = str(client['id'])
 
-        if xbmc.getCondVisibility('System.HasAddon("%s")' % client['id']): exists_torrent = ' [COLOR yellow][B] Instalado [/B]'
+        if xbmc.getCondVisibility('System.HasAddon("%s")' % client['id']):
+            if cliente_torrent.lower() in client['id']: exists_torrent = ' [COLOR yellow][B] Instalado[COLOR greenyellow] Asignado[/B]'
+            else: exists_torrent = ' [COLOR yellow][B] Instalado [/B]'
         else: exists_torrent = ' [COLOR red][B] No instalado [/B]'
 
         if client_name == 'Elementum': client_recommended = '[COLOR limegreen][B]  Recomendado[/B][/COLOR]'
@@ -1223,16 +1255,23 @@ def show_clients_torrent(item):
 
     ret = platformtools.dialog_select('Clientes/Motores externos para [COLOR yellow]Torrents[/COLOR]', opciones_torrent, useDetails=True)
 
-    if not ret == -1:
-         if 'soportados' in item.title:
-            torrent = torrents[ret]
+    if ret == -1: return ret
+	
+    torrent = torrents[ret]
 
-            if 'Instalado' in str(torrent[1]):
+    name = torrent[0]
+
+    sel_ret = [name, 'plugin.video.' + name.lower()]
+
+    if 'soportados' in item.title:
+        if 'Instalado' in str(torrent[1]):
+            if not cliente_torrent == name:
                 platformtools.dialog_ok(torrent[0], torrent[1] + '[/COLOR]', 'Por favor, asignelo como [COLOR coral]Cliente/Motor Torrent Habitual[/COLOR]')
-            else:
-                platformtools.dialog_ok(torrent[0], torrent[1] + '[/COLOR]', '[COLOR crimson]No lo puede Asignar[/COLOR]')
+        else:
+            platformtools.dialog_ok(torrent[0], torrent[1] + '[/COLOR]', '[COLOR yellowgreen][B]No lo puede Asignar, falta instalarlo[/B][/COLOR]')
+            return -1
 
-    return ret
+    return sel_ret
 
 
 def search_new_proxies(canal_0, canal_1, canal_2):
@@ -1247,7 +1286,7 @@ def search_new_proxies(canal_0, canal_1, canal_2):
     return False
 
 def tests_channels(canal_0, canal_1, canal_2):
-    if platformtools.dialog_yesno(canal_0, canal_1, canal_2, '[COLOR darkorange][B]¿ Efectuar Test Web del Canal ?[/B][/COLOR]'):
+    if platformtools.dialog_yesno(canal_0, '[COLOR darkorange][B]¿ Efectuar Test Web del Canal ?[/B][/COLOR]', canal_1, canal_2):
         from modules import tester
 
         config.set_setting('developer_test_channels', '')
@@ -1258,7 +1297,7 @@ def tests_channels(canal_0, canal_1, canal_2):
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 def tests_servers(servidor_0, servidor_1):
-    if platformtools.dialog_yesno(servidor_0, servidor_1, '[COLOR darkorange][B]¿ Efectuar Test Web del Servidor ?[/B][/COLOR]'):
+    if platformtools.dialog_yesno(servidor_0,'[COLOR darkorange][B]¿ Efectuar Test Web del Servidor ?[/B][/COLOR]', servidor_1):
         from modules import tester
 
         config.set_setting('developer_test_servers', '')

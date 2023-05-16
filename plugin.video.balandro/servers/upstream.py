@@ -18,10 +18,13 @@ def get_video_url(page_url, url_referer=''):
         return  "El archivo no existe o ha sido borrado"
     elif '_msg">File was locked by administrator</div>' in data:
         return  "El archivo está bloqueado"
+    elif 'DDoS protection by DDos-Guard' in data:
+        return  "DDos-Guard protection"
 
     if 'sources:' not in data:
         packed = scrapertools.find_single_match(data, "eval\((function\(p,a,c,k,e,d.*?)\)\s*</script>")
         if not packed: return video_urls
+
         data = jsunpack.unpack(packed)
 
     bloque = scrapertools.find_single_match(data, 'sources:\s*\[(.*?)\]')

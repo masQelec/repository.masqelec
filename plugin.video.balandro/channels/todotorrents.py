@@ -9,7 +9,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://todotorrents.net/'
+host = 'https://todotorrents.org/'
 
 
 def item_configurar_proxies(item):
@@ -45,6 +45,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://todotorrents.net/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
@@ -510,6 +516,7 @@ def list_search(item):
                  itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_search', text_color='coral' ))
 
     return itemlist
+
 
 def search(item, texto):
     logger.info()

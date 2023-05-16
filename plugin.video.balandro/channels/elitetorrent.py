@@ -174,6 +174,8 @@ def list_all(item):
         title = title.replace('(720)', '').replace('(720p)', '').replace('(1080)', '').replace('(1080p)', '').replace('(microHD)', '').replace('(BR-Line)', '').strip()
         title = title.replace('(HDR)', '').replace('(HDRip)', '').replace('(DVDRip)', '').replace('(BR-SCREENER)', '').replace('(TS-SCREENER)', '').strip()
 
+        title = title.replace('&#8217;', "'")
+
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         qlty = scrapertools.find_single_match(match, 'style=.*?<i>(.*?)</i>')

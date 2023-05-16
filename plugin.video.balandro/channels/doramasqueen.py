@@ -35,7 +35,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = url_doramas, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone ( title = 'Últimos episodios', action = 'list_all', url = host + 'ultimoscapitulos.php', group = 'last', search_type = 'tvshow' ))
+    itemlist.append(item.clone ( title = 'Últimos episodios', action = 'list_all', url = host + 'ultimoscapitulos.php', group = 'last', search_type = 'tvshow', text_color='olive' ))
 
     itemlist.append(item.clone ( title = 'En emisión', action = 'list_lst',
                                  post = {"countries": "", "generos": "", "years": "", "emition": "[\"Si\"]", "submit": ""}, search_type = 'tvshow' ))
@@ -272,7 +272,9 @@ def episodios(item):
     if item.page == 0:
         sum_parts = len(matches)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -300,6 +302,7 @@ def episodios(item):
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('DoramasQueen', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for match in matches[item.page * item.perpage:]:
         episode += 1
