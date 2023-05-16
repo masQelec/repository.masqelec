@@ -294,6 +294,11 @@
 		<setting id="ch_pelisplushdlat_dominio" type="action" label="[COLOR cyan][B]PelisPlusHdLat[/B][/COLOR] modificar el dominio Memorizado" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_pelisplushdlat)"/>
 		<setting id="channel_pelisplushdlat_dominio" type="text" label="PelisPlusHdLat dominio memorizado" enable="eq(-3,false)" visible="eq(-3,true)" default=""/>
 
+		<setting id="ac_pelisplushdnz" type="bool" label="PelisPlusHdNz" default="false"/>
+		<setting id="ch_pelisplushdnz_test" type="action" label="[COLOR cyan][B]PelisPlusHdNz[/B][/COLOR] efectuar test del dominio" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_pelisplushdnz)"/>
+		<setting id="ch_pelisplushdnz_dominio" type="action" label="[COLOR cyan][B]PelisPlusHdNz[/B][/COLOR] modificar el dominio Memorizado" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_pelisplushdnz)"/>
+		<setting id="channel_pelisplushdnz_dominio" type="text" label="PelisPlusHdNz dominio memorizado" enable="eq(-3,false)" visible="eq(-3,true)" default=""/>
+
 		<setting id="ac_playdede" type="bool" label="PlayDede" default="false"/>
         <setting id="show_help2_playdede" type="action" label="Aviso [COLOR yellow][B]PlayDede[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede)"/>
 		<setting id="ch_playdede_test1" type="action" label="[COLOR cyan][B]PlayDede[/B][/COLOR] efectuar test del dominio" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_playdede)"/>
@@ -316,6 +321,11 @@
 		<setting id="ch_seriesyonkis_test" type="action" label="[COLOR cyan][B]SeriesYonkis[/B][/COLOR] efectuar test del dominio" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_seriesyonkis)"/>
 		<setting id="ch_seriesyonkis_dominio" type="action" label="[COLOR cyan][B]SeriesYonkis[/B][/COLOR] modificar el dominio Memorizado" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_seriesyonkis)"/>
 		<setting id="channel_seriesyonkis_dominio" type="text" label="SeriesYonkis dominio memorizado" enable="eq(-3,false)" visible="eq(-3,true)" default=""/>
+
+		<setting id="ac_srnovelas" type="bool" label="SrNovelas" default="false"/>
+		<setting id="ch_srnovelas_test" type="action" label="[COLOR cyan][B]SrNovelas[/B][/COLOR] efectuar test del dominio" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_srnovelas)"/>
+		<setting id="ch_srnovelas_dominio" type="action" label="[COLOR cyan][B]SrNovelas[/B][/COLOR] modificar el dominio Memorizado" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_srnovelas)"/>
+		<setting id="channel_srnovelas_dominio" type="text" label="SrNovelas dominio memorizado" enable="eq(-3,false)" visible="eq(-3,true)" default=""/>
 
 		<setting id="ac_subtorrents" type="bool" label="SubTorrents" default="false"/>
 		<setting id="ch_subtorrents_test" type="action" label="[COLOR cyan][B]SubTorrents[/B][/COLOR] efectuar test del dominio" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_subtorrents)"/>
@@ -809,11 +819,12 @@
         <setting label="Ajustes Ejecución Balandro:" type="lsep"/>
 
         <setting id="manto_pro" type="bool" label="Opciones" default="false"/>
-        <setting id="ver_stable_chrome" type="bool" label="[COLOR gold][B]Obtener[/B][/COLOR] y Utilizar la versión más Reciente/Estable de Google Chrome" default="true" visible="eq(-1,true)"/>
-        <setting id="httptools_timeout" type="labelenum" label="Valores para el [COLOR gold][B]Timeout[/B][/COLOR] (tiempo máximo de espera en accesos)" values="0|5|10|15|20|25|30" default="15" visible="eq(-2,true)"/>
-        <setting id="notification_d_ok" type="bool" label="Confirmar con el Botón pulsar 'OK' en ciertas [COLOR violet][B]Notificaciones[/B][/COLOR]" default="false" visible="eq(-3,true)"/>
-        <setting id="notification_beep" type="bool" label="Emitir un [COLOR aqua][B]Sonido[/B][/COLOR] al mostrar Avisos/Notificaciones" default="false" visible="eq(-4,true)"/>
-        <setting id="servers_waiting" type="labelenum" label="Valores para el tiempo de espera en el acceso a [COLOR gold][B]Servidores[/B][/COLOR]" values="1|2|3|4|5|6|7|8|9" default="6" visible="eq(-5,true)"/>
+        <setting id="erase_cookies" type="bool" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero de [COLOR yellowgreen][B]Cookies[/B][/COLOR] al [COLOR goldenrod][B]Iniciar[/B][/COLOR] su Media Center" default="false" visible="eq(-1,true)"/>
+        <setting id="ver_stable_chrome" type="bool" label="[COLOR gold][B]Obtener[/B][/COLOR] y Utilizar la versión más Reciente/Estable de Google Chrome" default="true" visible="eq(-2,true)"/>
+        <setting id="httptools_timeout" type="labelenum" label="Valores para el [COLOR gold][B]Timeout[/B][/COLOR] (tiempo máximo de espera en accesos)" values="0|5|10|15|20|25|30" default="15" visible="eq(-3,true)"/>
+        <setting id="notification_d_ok" type="bool" label="Confirmar con el Botón pulsar 'OK' en ciertas [COLOR violet][B]Notificaciones[/B][/COLOR]" default="false" visible="eq(-4,true)"/>
+        <setting id="notification_beep" type="bool" label="Emitir un [COLOR aqua][B]Sonido[/B][/COLOR] al mostrar Avisos/Notificaciones" default="false" visible="eq(-5,true)"/>
+        <setting id="servers_waiting" type="labelenum" label="Valores para el tiempo de espera en el acceso a [COLOR gold][B]Servidores[/B][/COLOR]" values="1|2|3|4|5|6|7|8|9" default="6" visible="eq(-6,true)"/>
 
         <setting label="Depuración Ejecución Balandro:" type="lsep"/>
 
@@ -850,10 +861,10 @@
 
         <setting label="Contactar:" type="lsep"/>
 
-        <setting id="_foro" type="text" label="[COLOR aqua][B]Foro[/B][/COLOR]:  mimediacenter.info/foro/  Instalaciones, Novedades, Sugerencias, etc." enable="false" visible="true"/>
+        <setting id="_foro" type="text" label="[COLOR aqua][B]Foro:  [I]mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc." enable="false" visible="true"/>
 
         <setting type="lsep"/>
-        <setting id="_ases" type="text" label="[COLOR aqua][B]Telegram[/B][/COLOR]:  t.me/@balandro_asesor  Asesoramiento, Dudas, Consultas, etc." enable="false" visible="true"/>
+        <setting id="_ases" type="text" label="[COLOR aqua][B]Telegram:  [I]t.me/balandro_asesor[/I][/B][/COLOR]  Asesoramiento, Dudas, Consultas, etc." enable="false" visible="true"/>
 
         <setting label="Fuente:" type="lsep"/>
 
@@ -877,16 +888,16 @@
         <setting id="team_fon" type="bool" label="Opciones" default="false"/>
 
         <setting id="show_dev_notes" type="action" label="Notas para [COLOR goldenrod][B]Developers[/B][/COLOR] (Desarrolladores)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_dev_notes)"/>
-        <setting id="_dfon" type="text" label="[COLOR aqua][B]Codigo Fuente[/B][/COLOR] para Desarrollo:  github.com/balandro-tk/balandro-addon" visible="eq(-2,true)" enable="false"/>
+        <setting id="_dfon" type="text" label="[COLOR aqua][B]Codigo Fuente para Desarrollo:  [I]github.com/balandro-tk/balandro-addon[/I][/B][/COLOR]" visible="eq(-2,true)" enable="false"/>
 
         <setting label="Balandro Team (Equipo de Desarrollo):" type="lsep"/>
 
-        <setting id="_team" type="text" label="[COLOR aqua][B]Equipo[/B][/COLOR] de Desarrollo Telegram:  t.me/Balandro_team" enable="false" visible="true"/>
-        <setting id="_team2" type="text" label="[COLOR aqua][B]Incorporaciones[/B][/COLOR] con Enlace de Invitación, solicitarlo en Foro ó Telegram" enable="false" visible="true"/>
+        <setting id="_team" type="text" label="[COLOR aqua][B]Equipo de Desarrollo Telegram:  [I]t.me/balandro_team[/I][/B][/COLOR]" enable="false" visible="true"/>
+        <setting id="_team2" type="text" label="[COLOR aqua][B]Incorporaciones con Enlace de Invitación, solicitarlo en Foro ó Telegrams[/B][/COLOR]" enable="false" visible="true"/>
 
         <setting label="Contactar para Unirse a Balandro Team:" type="lsep"/>
-        <setting id="_foro2" type="text" label="[COLOR aqua][B]Foro[/B][/COLOR]:  mimediacenter.info/foro/  Instalaciones, Novedades, Sugerencias, etc." enable="false" visible="true"/>
-        <setting id="_ases2" type="text" label="[COLOR aqua][B]Telegram[/B][/COLOR]:  t.me/@balandro_asesor  Asesoramiento, Dudas, Consultas, etc." enable="false" visible="true"/>
+        <setting id="_foro2" type="text" label="[COLOR aqua][B]Foro:  [I]mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc." enable="false" visible="true"/>
+        <setting id="_ases2" type="text" label="[COLOR aqua][B]Telegram:  [I]t.me/balandro_asesor[/I][/B][/COLOR]  Asesoramiento, Dudas, Consultas, etc." enable="false" visible="true"/>
     </category>
 
     <category label="Legal">

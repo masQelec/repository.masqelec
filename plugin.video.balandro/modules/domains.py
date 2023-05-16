@@ -26,8 +26,8 @@ channels_currents = [
         'elifilms', 'elitetorrent', 'entrepeliculasyseries',
         'gnula24', 'grantorrent', 'grantorrents',
         'hdfull', 'hdfullse',
-        'pelis28', 'pelishouse', 'pelismaraton', 'pelispedia', 'pelispediaws', 'pelisplus', 'pelisplushd', 'pelisplushdlat', 'playdede',
-        'series24', 'serieskao', 'seriesyonkis', 'subtorrents',
+        'pelis28', 'pelishouse', 'pelismaraton', 'pelispedia', 'pelispediaws', 'pelisplus', 'pelisplushd', 'pelisplushdlat', 'pelisplushdnz', 'playdede',
+        'series24', 'serieskao', 'seriesyonkis', 'srnovelas', 'subtorrents',
         'torrentpelis'
         ]
 
@@ -1918,6 +1918,52 @@ def test_domain_pelisplushdlat(item):
         platformtools.dialog_notification(config.__addon_name + ' - PelisPlusHdLat', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
+def manto_domain_pelisplushdnz(item):
+    logger.info()
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlusHdNz[/B][/COLOR]' % color_exec)
+
+    channel_json = 'pelisplushdnz.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] PelisPlusHdNz') % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    id = params['id']
+    name = params['name']
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_pelisplushdnz(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('pelisplushdnz')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('PelisPlusHdNz')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - PelisPlusHdNz', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
 def del_datos_nextdede(item):
     logger.info()
 
@@ -2324,6 +2370,52 @@ def test_domain_seriesyonkis(item):
         tester.test_channel('SeriesYonkis')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - SeriesYonkis', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
+def manto_domain_srnovelas(item):
+    logger.info()
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SrNovelas[/B][/COLOR]' % color_exec)
+
+    channel_json = 'srnovelas.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] SrNovelas') % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    id = params['id']
+    name = params['name']
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_srnovelas(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('srnovelas')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('srnovelas')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - SrNovelas', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_subtorrents(item):
@@ -2737,6 +2829,16 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://': return
 
+    elif id == 'pelisplushdnz':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio PelisPlusHdNz  -->  [COLOR %s]https://???.pelisplushd.??/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://': return
+
     elif id == 'playdede':
         config.set_setting('user_test_channel', '')
 
@@ -2776,6 +2878,16 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://seriesyonkis.': return
+
+    elif id == 'srnovelas':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio SrNovelas  -->  [COLOR %s]https://??????.??/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://': return
 
     elif id == 'subtorrents':
         config.set_setting('user_test_channel', '')

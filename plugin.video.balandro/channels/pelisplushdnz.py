@@ -10,10 +10,21 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://ww3.pelisplushd.nz/'
 
 
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://pelisplushd.cx/', 'https://pelisplushd.nz/']
+
+
+domain = config.get_setting('dominio', 'pelisplushdnz', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'pelisplushdnz')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'pelisplushdnz')
+    else: host = domain
+
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://pelisplushd.cx/', 'https://pelisplushd.nz/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -24,9 +35,37 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'pelisplushdnz', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_pelisplushdnz', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='animeflv', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_animeflv', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -42,6 +81,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -60,6 +101,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -82,6 +125,8 @@ def mainlist_series(item):
 def mainlist_animes(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
@@ -270,10 +315,12 @@ def episodios(item):
 
     num_matches = len(matches)
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = num_matches
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -281,6 +328,7 @@ def episodios(item):
                 platformtools.dialog_notification('PelisPlusHdNz', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -293,14 +341,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('PelisPlusHdNz', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('PelisPlusHdNz', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('PelisPlusHdNz', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('PelisPlusHdNz', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for url, temp_epis, title in matches:
         if url.startswith('/'): url = host[:-1] + url
@@ -533,10 +587,8 @@ def list_search(item):
 
 def search(item, texto):
     logger.info()
-
     try:
        item.url = host + 'search?s=' + texto.replace(" ", "+")
-
        return list_search(item)
     except:
        import sys

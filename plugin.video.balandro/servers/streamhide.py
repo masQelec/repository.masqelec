@@ -28,7 +28,8 @@ def get_video_url(page_url, url_referer=''):
     url = scrapertools.find_single_match(data, 'sources: \[{file:"([^"]+)"')
 
     if not url:
-        packed = scrapertools.find_single_match(data, r"'text/javascript'[^>]*>(eval\(.*?)</script>")
+        packed = scrapertools.find_single_match(data, r'"text/javascript"[^>]*>(eval\(.*?)</script>')
+
         if packed:
            unpacked = jsunpack.unpack(packed)
 

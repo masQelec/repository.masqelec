@@ -43,8 +43,6 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if not config.get_setting('channel_yespornplease_proxies', default=''): raise_weberror=False
-
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     else:
@@ -166,7 +164,7 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<div class="post-preview-styling">.*?<a href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<div class="post-preview-styling">.*?<a href="(.*?)".*?title="(.*?)".*?data-src="(.*?)"', re.DOTALL).findall(data)
 
     for url, title, thumb in matches:
         title = title.replace('&#8217;', '').replace('&#8211;', '&').replace('&#038;', '&')

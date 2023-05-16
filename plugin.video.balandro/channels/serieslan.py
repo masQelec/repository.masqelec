@@ -236,10 +236,12 @@ def episodios(item):
     matches = scrapertools.find_multiple_matches(data, "<div id='ss-(\d+)'>(.*?)</div>")
     if not matches: matches = [(0, data)] # Temporada única
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -247,6 +249,7 @@ def episodios(item):
                 platformtools.dialog_notification('SeriesLan', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -259,14 +262,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('SeriesLan', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('SeriesLan', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('SeriesLan', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('SeriesLan', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     last_epi = 0
 
@@ -342,7 +351,9 @@ def findvideos(item):
             elif not servertools.is_server_enabled(servidor): continue 
 
         other = ''
-        if not servidor: other = srv
+        if not servidor:
+            servidor = 'directo'
+            other = srv
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, language = lang, title = '', url = url,
                                                       slr = item.url, ord_link = ord_link, other = other ))
@@ -425,29 +436,21 @@ def sub_search(item):
 
 def search(item, texto):
     logger.info()
-    itemlist = []
-
     try:
         item.filtro = texto.replace(" ", "+")
 
         item.url = host + 'lista.php?or=abc'
         itemlist = list_abc(item)
-
-        if not str(itemlist) == '[]': return itemlist
+        if itemlist: return itemlist
 
         item.url = host + 'liveaction'
         itemlist = list_liv(item)
-
-        if not str(itemlist) =='[]': return itemlist
+        if itemlist: return itemlist
 
         item.url = host + 'b.php'
-        itemlist = sub_search(item)
-
-        return itemlist
-
+        return sub_search(item)
     except:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
-
-    return itemlist
+        return []

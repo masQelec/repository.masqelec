@@ -15,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www8.cuevana3.ch'
+host = 'https://www11.cuevana3.ch'
 
 
 # ~ por si viene de enlaces guardados
@@ -26,7 +26,8 @@ ant_hosts = ['https://www1.cuevana3.video', 'https://www2.cuevana3.video', 'http
              'https://www1.cuevana3.vc', 'https://cuevana3.fm', 'https://www1.cuevana3.fm',
              'https://cuevana3.ch/', 'https://www1.cuevana3.ch', 'https://www2.cuevana3.ch',
              'https://www3.cuevana3.ch', 'https://www4.cuevana3.ch', 'https://www5.cuevana3.ch',
-             'https://www6.cuevana3.ch', 'https://www7.cuevana3.ch']
+             'https://www6.cuevana3.ch', 'https://www7.cuevana3.ch', 'https://www8.cuevana3.ch',
+             'https://www9.cuevana3.ch', 'https://www10.cuevana3.ch']
 
 
 domain = config.get_setting('dominio', 'cuevana3video', default='')
@@ -175,7 +176,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catalogo', action = 'list_all', url = host + '/serie', filtro = 'tabserie-1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + '/serie', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + '/serie', search_type = 'tvshow', text_color = 'olive' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + '/serie', filtro = 'tabserie-4', search_type = 'tvshow' ))
 
@@ -356,10 +357,12 @@ def episodios(item):
 
     matches = re.compile('<a href="(.*?)">(.*?)</li>', re.DOTALL).findall(data)
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -367,6 +370,7 @@ def episodios(item):
                 platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -379,14 +383,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for url, datos in matches[item.page * item.perpage:]:
         try:
@@ -471,6 +481,8 @@ def findvideos(item):
 
                             url = servertools.normalize_url(servidor, link2)
 
+                            if '/clonamesta' in url or '/moonplayer' in url: continue
+
                             if servidor == 'directo':
                                 link_other = normalize_other(url)
                                 if link_other == '': continue
@@ -488,6 +500,8 @@ def findvideos(item):
                 servidor = servertools.corregir_servidor(servidor)
 
                 url = servertools.normalize_url(servidor, url)
+
+                if '/clonamesta' in url or '/moonplayer' in url: continue
 
                 if servidor == 'directo':
                     link_other = normalize_other(url)
@@ -767,6 +781,9 @@ def play(item):
 
                     itemlist.append(item.clone(url=url, server=servidor))
                     return itemlist
+
+    if url:
+        if '/moonplayer' in url: url = ''
 
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url:

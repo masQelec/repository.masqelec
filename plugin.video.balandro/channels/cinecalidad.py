@@ -251,7 +251,7 @@ def list_all(item):
 
         if not year: year = '-'
 
-        title = title.replace('&#8211;', '')
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
 
         tipo = 'tvshow' if '/serie/' in url or '/animes/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -375,10 +375,12 @@ def episodios(item):
 
     matches = scrapertools.find_multiple_matches(data, '<img(.*?)alt=.*?"episode":"(.*?)".*?"url":"(.*?)"')
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -386,6 +388,7 @@ def episodios(item):
                 platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -398,14 +401,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for thumb, epis, url in matches[item.page * item.perpage:]:
         if not epis: epis = '0'
@@ -488,6 +497,7 @@ def findvideos(item):
             elif servidor.startswith('sb'): servidor = 'streamsb'
             elif servidor == 'ccplay': servidor = 'streamsb'
             elif 'watchsb' in servidor: servidor = 'streamsb'
+            elif 'lvturbo' in servidor: servidor = 'streamsb'
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
@@ -634,6 +644,7 @@ def play(item):
             url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
             if not url: url = scrapertools.find_single_match(data, 'id="btn_enlace">.*?href="(.*?)"')
             if not url: url = scrapertools.find_single_match(data, '<a id="some_link">.*?value="(.*?)"')
+            if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
 
             url = url.replace('&amp;', '&')
 

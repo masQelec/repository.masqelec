@@ -109,6 +109,8 @@ def list_all(item):
 
            if not year: year = '-'
 
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
+
         langs = []
         lngs = scrapertools.find_multiple_matches(match, 'bold;"><img src="(.*?)"')
 

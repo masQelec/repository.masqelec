@@ -379,7 +379,7 @@ def play(item):
                    return itemlist
                elif '<p>Por causas ajenas a ' in str(data):
                    if not config.get_setting('proxies', item.channel, default=''):
-                       return 'Archivo [COLOR cyan]bloqueado[/COLOR] [COLOR red][B]Configure proxies a usar ...[/B][/COLOR]'
+                       return 'Archivo [COLOR cyan]bloqueado[/COLOR] [COLOR red]Configure proxies a usar ...[/COLOR]'
 
                    return 'Archivo [COLOR red]bloqueado[/COLOR]'
             except:
@@ -412,7 +412,7 @@ def play(item):
                    return itemlist
                elif '<p>Por causas ajenas a ' in str(data):
                    if not config.get_setting('proxies', item.channel, default=''):
-                       return 'Archivo [COLOR cyan]bloqueado[/COLOR] [COLOR red][B]Configure proxies a usar ...[/B][/COLOR]'
+                       return 'Archivo [COLOR cyan]bloqueado[/COLOR] [COLOR red]Configure proxies a usar ...[/COLOR]'
 
                    return 'Archivo [COLOR cyan]bloqueado[/COLOR]'
             except:

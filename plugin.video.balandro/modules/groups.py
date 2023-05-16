@@ -204,11 +204,11 @@ def mainlist(item):
     if presentar:
         itemlist.append(item.clone( title = '[B]Audios en los canales:[/B]', action = '', thumbnail=config.get_thumb('idiomas'), text_color='violet' ))
 
-        itemlist.append(item.clone( title = ' - Audio Múltiple', action = 'ch_groups', group = 'all', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
-        itemlist.append(item.clone( title = ' - Audio solo en Castellano', action = 'ch_groups', group = 'cast', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
-        itemlist.append(item.clone( title = ' - Audio solo en Latino', action = 'ch_groups', group = 'lat', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
-        itemlist.append(item.clone( title = ' - Audio solo en Vose', action = 'ch_groups', group = 'vose', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
-        itemlist.append(item.clone( title = ' - Audio solo en VO', action = 'ch_groups', group = 'vo', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
+        itemlist.append(item.clone( title = ' - Audio Múltiple', action = 'ch_groups', group = 'all', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
+        itemlist.append(item.clone( title = ' - Audio solo en Castellano', action = 'ch_groups', group = 'cast', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
+        itemlist.append(item.clone( title = ' - Audio solo en Latino', action = 'ch_groups', group = 'lat', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
+        itemlist.append(item.clone( title = ' - Audio solo en Vose', action = 'ch_groups', group = 'vose', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
+        itemlist.append(item.clone( title = ' - Audio solo en VO', action = 'ch_groups', group = 'vo', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
 
         if item.mnu_lang:
             itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR fuchsia][B]Play[/B][/COLOR])', thumbnail=config.get_thumb('settings') ))
@@ -266,6 +266,12 @@ def submnu_alls(item):
     itemlist = []
 
     itemlist.append(item.clone( title = '[B]PELÍCULAS Y/Ó SERIES[/B]', action = '', thumbnail=config.get_thumb('booklet'), text_color='goldenrod' ))
+
+    cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
+
+    if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno':
+        itemlist.append(item.clone( channel='actions', action='open_settings', title='[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR blue][B]Torrents)[/B][/COLOR]' + ' [COLOR fuchsia][B]Motor:[/B][/COLOR][COLOR goldenrod][B] ' + cliente_torrent.capitalize() + '[/B][/COLOR]',
+                                    folder=False, thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( title = '[B]Canales:[/B]', action = '', thumbnail=config.get_thumb('stack'), text_color='gold' ))
 
@@ -557,11 +563,11 @@ def submnu_audios(item):
 
     itemlist.append(item.clone( title = '[B]AUDIOS EN LOS CANALES:[/B]', action = '', thumbnail=config.get_thumb('idiomas'), text_color='violet' ))
 
-    itemlist.append(item.clone( title = ' - Audio Múltiple', action = 'ch_groups', group = 'all', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( title = ' - Audio solo en Castellano', action = 'ch_groups', group = 'cast', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( title = ' - Audio solo en Latino', action = 'ch_groups', group = 'lat', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( title = ' - Audio solo en Vose', action = 'ch_groups', group = 'vose', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( title = ' - Audio solo en VO', action = 'ch_groups', group = 'vo', extra = 'mixed', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( title = ' - Audio Múltiple', action = 'ch_groups', group = 'all', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
+    itemlist.append(item.clone( title = ' - Audio solo en Castellano', action = 'ch_groups', group = 'cast', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
+    itemlist.append(item.clone( title = ' - Audio solo en Latino', action = 'ch_groups', group = 'lat', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
+    itemlist.append(item.clone( title = ' - Audio solo en Vose', action = 'ch_groups', group = 'vose', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
+    itemlist.append(item.clone( title = ' - Audio solo en VO', action = 'ch_groups', group = 'vo', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
 
     return itemlist
 
@@ -930,14 +936,22 @@ def ch_groups(item):
             if 'mismatched' in ch['clusters']: titulo += '[I][COLOR coral] (Incompatible)[/COLOR][/I]'
 
         if 'inestable' in ch['clusters']:
-            if config.get_setting('channels_list_no_inestables', default=False): continue
+            if config.get_setting('mnu_simple', default=False): continue
+            elif config.get_setting('channels_list_no_inestables', default=False): continue
 
             titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
 
         if 'problematic' in ch['clusters']:
-            if config.get_setting('channels_list_no_problematicos', default=False): continue
+            if config.get_setting('mnu_simple', default=False): continue
+            elif config.get_setting('mnu_problematicos', default=False): continue
+            elif config.get_setting('channels_list_no_problematicos', default=False): continue
 
             titulo += '[I][COLOR darkgoldenrod] (problemático)[/COLOR][/I]'
+
+        if item.langs:
+            langs = str(ch['language'])
+            langs = langs.replace('[', '').replace(']', '').replace('cast', 'esp').replace("'", '').strip()
+            titulo += ' [COLOR coral]' + str(langs) + '[/COLOR]'
 
         i =+ 1
 

@@ -7,7 +7,10 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww4.cinecalidad.lc/'
+host = 'https://w5.cinecalidad.bz/'
+
+
+players = ['https://cinecalidad.', '.cinecalidad.']
 
 
 # ~ por si viene de enlaces guardados
@@ -15,7 +18,13 @@ ant_hosts = ['https://cinecalidad.la/', 'https://cinecalidad.fo/', 'https://ww22
              'https://ww3.cinecalidad.do/', 'https://ww4.cinecalidad.do/', 'https://cinecalidad.do/',
              'https://cinecalidad.llc/', 'https://cinecalidad.st/', 'https://cinecalidad.vc/',
              'https://cinecalidad.lc/', 'https://www3.cinecalidad.lc/', 'https://ww1.cinecalidad.lc/',
-             'https://ww2.cinecalidad.lc/']
+             'https://ww2.cinecalidad.lc/', 'https://ww4.cinecalidad.lc/', 'https://w1.cinecalidad.lc/',
+             'https://w2.cinecalidad.lc/', 'https://w3.cinecalidad.lc/', 'https://w4.cinecalidad.lc/',
+             'https://w5.cinecalidad.lc/', 'https://w6.cinecalidad.lc/', 'https://w7.cinecalidad.lc/',
+             'https://w9.cinecalidad.lc/', 'https://w10.cinecalidad.lc/', 'https://w8.cinecalidad.lc/',
+             'https://w11.cinecalidad.lc/', 'https://w13.cinecalidad.lc/', 'https://c1.cinecalidad.lc/',
+             'https://w14.cinecalidad.lc/', 'https://cinecalidad.bz/', 'https://w1.cinecalidad.bz/', 
+             'https://w2.cinecalidad.bz/', 'https://w3.cinecalidad.bz/', 'https://w4.cinecalidad.bz/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadla', default='')
@@ -195,6 +204,8 @@ def list_all(item):
 
         if not year: year = '-'
 
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
+
         tipo = 'tvshow' if '/serie/' in url or '/anime/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
@@ -314,10 +325,12 @@ def episodios(item):
 
     matches = scrapertools.find_multiple_matches(bloque, 'src="(.*?)".*?<div class="numerando">EP(.*?)</div>.*?<a href="(.*?)"')
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -325,6 +338,7 @@ def episodios(item):
                 platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -337,14 +351,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for thumb, epis, url in matches[item.page * item.perpage:]:
         epis = epis.replace('|', '')
@@ -401,6 +421,7 @@ def findvideos(item):
 
             elif servidor.startswith('sb'): servidor = 'streamsb'
             elif servidor == 'cloudemb': servidor = 'streamsb'
+            elif 'lvturbo' in servidor: servidor = 'streamsb'
 
             elif servidor == 'google': servidor = 'gvideo'
 
@@ -473,6 +494,11 @@ def play(item):
 
     servidor = item.server
 
+    # ~ por si esta en ant_hosts
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+
     if item.data_url:
         url_play = base64.b64decode(item.data_url).decode("utf-8")
 
@@ -481,6 +507,7 @@ def play(item):
         data = do_downloadpage(url)
 
         url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
 
         if not url:
             if '/acortalink.' in data:

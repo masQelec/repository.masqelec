@@ -119,7 +119,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/series', search_type = 'tvshow', tipo = 'index', pagina = 1 ))
 
-    itemlist.append(item.clone( title = 'Series con nuevos capítulos', action = 'list_all', url = host + '/series/tendencias', search_type = 'tvshow', pagina = 1 ))
+    itemlist.append(item.clone( title = 'Series con nuevos capítulos', action = 'list_all', url = host + '/series/tendencias', search_type = 'tvshow', pagina = 1, text_color = 'olive' ))
 
     itemlist.append(item.clone( title = 'Más Vistas', action = 'list_all', url = host + '/series/mas-vistas', search_type = 'tvshow', page = 0, pagina = 1 ))
 
@@ -312,10 +312,12 @@ def episodios(item):
 
     num_matches = len(matches)
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = num_matches
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -323,6 +325,7 @@ def episodios(item):
                 platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -335,14 +338,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for match in matches:
         season = scrapertools.find_single_match(match, 'data-season="([^"]+)')
@@ -388,6 +397,8 @@ def episodios(item):
             if len(itemlist) >= item.perpage:
                 break
 
+        tmdb.set_infoLabels(itemlist)
+
         if itemlist:
             if num_matches > ((item.page + 1) * item.perpage):
                 itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", data_epi = item.data_epi, perpage = item.perpage,
@@ -396,6 +407,8 @@ def episodios(item):
         return itemlist
 
     else:
+        tmdb.set_infoLabels(itemlist)
+
         return sorted(itemlist, key=lambda i: i.orden)
 
 
@@ -652,10 +665,8 @@ def play(item):
 
 def search(item, texto):
     logger.info()
-
-    item.url = host + '/search.html?keyword=' + texto.replace(" ", "+")
-
     try:
+        item.url = host + '/search.html?keyword=' + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

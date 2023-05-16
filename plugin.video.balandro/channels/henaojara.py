@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://henaojara2.com/'
+host = 'https://www1.henaojara.com/'
 
 
 def item_configurar_proxies(item):
@@ -44,18 +44,20 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://henaojara.com/']
+    ant_hosts = ['https://henaojara.com/', 'https://henaojara2.com/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
     timeout = None
-    if host in url: timeout = 50
+    if host in url:
+        if config.get_setting('channel_henaojara_proxies', default=''): timeout = 40
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
         data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
+        if not data: data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -249,10 +251,12 @@ def episodios(item):
 
     matches = re.compile('<tr>(.*?)</tr>', re.DOTALL).findall(bloque)
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -260,6 +264,7 @@ def episodios(item):
                 platformtools.dialog_notification('HenaOjara', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -272,14 +277,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('HenaOjara', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('HenaOjara', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('HenaOjara', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('HenaOjara', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for match in matches[item.page * item.perpage:]:
         epis = scrapertools.find_single_match(match,'<td><span class="Num">(.*?)</span>')
@@ -366,10 +377,14 @@ def play(item):
 
     if '/?trdownload=' in url:
         try:
+           timeout = None
+           if host in url:
+               if config.get_setting('channel_henaojara_proxies', default=''): timeout = 40
+
            if not url.startswith(host):
-               url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+               url = httptools.downloadpage(url, follow_redirects=False, timeout=timeout).headers['location']
            else:
-               url = httptools.downloadpage_proxy('henaojara', url, follow_redirects=False).headers['location']
+               url = httptools.downloadpage_proxy('henaojara', url, follow_redirects=False, timeout=timeout).headers['location']
         except:
            url = ''
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, time
+import xbmc
 
 from platformcode import config, logger, platformtools
 from core import httptools, scrapertools, jsontools

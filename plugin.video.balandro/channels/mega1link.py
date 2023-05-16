@@ -120,7 +120,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<span class=current>.*?<a href=(.*?)class=').strip()
+        next_page = scrapertools.find_single_match(data, '<span class="current">.*?' + "<a href='(.*?)'")
 
         if next_page:
             if '/page/' in next_page:

@@ -7,11 +7,17 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww3.cinecalidad.com.mx/'
+host = 'https://c4.cinecalidad.com.mx/'
+
+
+players = ['https://cinecalidad.', '.cinecalidad.']
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://cinecalidad.com.mx/', 'https://cinecalidad.fit/']
+ant_hosts = ['https://cinecalidad.com.mx/', 'https://cinecalidad.fit/', 'https://ww3.cinecalidad.com.mx/',
+            'https://ww10.cinecalidad.com.mx/', 'https://w5.cinecalidad.com.mx/', 'https://w15.cinecalidad.com.mx/',
+            'https://ww1.cinecalidad.com.mx/', 'https://c1.cinecalidad.com.mx/', 'https://c2.cinecalidad.com.mx/',
+            'https://c3.cinecalidad.com.mx/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadmx', default='')
@@ -184,7 +190,7 @@ def list_all(item):
         plot = scrapertools.find_single_match(match, '<p>.*?">(.*?)</p>').strip()
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        title = title.replace('&#8211;', '').replace('&#8217;', '')
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
 
         m = re.match(r"^(.*?)\((\d+)\)$", title)
         if m:
@@ -315,7 +321,6 @@ def temporadas(item):
     return itemlist
 
 
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -330,10 +335,12 @@ def episodios(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<li class="mark-(.*?)".*?data-src="(.*?)".*?<div class="numerando">(.*?)</div>.*?<a href="(.*?)">(.*?)</a>')
 
-    if item.page == 0:
+    if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
-        try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
         if tvdb_id:
@@ -341,6 +348,7 @@ def episodios(item):
                 platformtools.dialog_notification('CineCalidadMx', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
+            item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
@@ -353,14 +361,20 @@ def episodios(item):
                     item.perpage = 250
 
             elif sum_parts >= 250:
-                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]100[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('CineCalidadMx', '[COLOR cyan]Cargando 100 elementos[/COLOR]')
-                    item.perpage = 100
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidadMx', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('CineCalidadMx', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
                     platformtools.dialog_notification('CineCalidadMx', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
+                else: item.perpage = 50
 
     for ord, thumb, temp_epis, url, title in matches[item.page * item.perpage:]:
         epis = scrapertools.find_single_match(temp_epis, '-E(.*?)$').strip()
@@ -393,12 +407,26 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    if '>No hay opciones para ver en latino' in data:
+        new_url = scrapertools.find_single_match(data, '>No hay opciones para ver en latino.*?<a href="(.*?)">Ver en castellano<')
+
+        if new_url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR yellowgreen][B]Sin opciones Play en Latino[/B][/COLOR]')
+
+            item.url = new_url
+
+            data = do_downloadpage(item.url)
+            data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+            if '?ref=es' in item.url: lang = 'Esp'
+
+
     ses = 0
 
     if '>VER ONLINE<' in data:
         bloque = scrapertools.find_single_match(data, '>VER ONLINE<(.*?)>DESCARGAR<')
 
-        matches = scrapertools.find_multiple_matches(bloque, '<li id="player-option-.*?data-option="(.*?)">(.*?)<span.*?data-src=.*?/flags/(.*?).png')
+        matches = scrapertools.find_multiple_matches(bloque, '<li id="player-option-.*?data-option="(.*?)">(.*?)<span.*?src=.*?/flags/(.*?).png')
  
         for dopt, srv, idio in matches:
             ses += 1
@@ -408,6 +436,7 @@ def findvideos(item):
             if srv == 'netu' or srv == 'waaw' or srv == 'hqq': continue
             elif 'cinecalidad' in srv: continue
             elif 'subtítulo' in srv: continue
+            elif 'cinestart' in srv: continue
 
             qlty = '1080'
 
@@ -470,6 +499,11 @@ def play(item):
 
     servidor = item.server
 
+    # ~ por si esta en ant_hosts
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+
     if not url:
         servidor = servertools.get_server_from_url(item.dopt)
 
@@ -481,6 +515,7 @@ def play(item):
             data = do_downloadpage(item.dopt)
 
             url = scrapertools.find_single_match(data, 'data-src="(.*?)"')
+            if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
 
         if url:
             servidor = servertools.get_server_from_url(url)
@@ -488,10 +523,13 @@ def play(item):
 
             url = servertools.normalize_url(servidor, url)
 
-    elif url.startswith(host):
+    elif url.startswith(host) or str(players) in url:
         data = do_downloadpage(url)
 
         url = scrapertools.find_single_match(data, '<a class="link".*?href="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
+
+        if '/?id=' in url: url = ''
 
         if url:
             servidor = servertools.get_server_from_url(url)
