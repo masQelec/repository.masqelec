@@ -235,6 +235,7 @@ def findvideos(item):
     patron = '''<source src="([^"]+).*?res='([^']+)'''
 
     matches = scrapertools.find_multiple_matches(data, patron)
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<source src="(.*?)".*?res="(.*?)"')
 
     for url, qlty in matches:
         url = url.replace("&amp;", "&")

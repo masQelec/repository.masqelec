@@ -210,10 +210,13 @@ def findvideos(item):
     data = do_downloadpage(item.url)
 
     link = scrapertools.find_single_match(data, "id='link-.*?<a href='(.*?)'")
+    if not link: link = scrapertools.find_single_match(data, 'id="link-.*?<a href="(.*?)"')
 
     links = scrapertools.find_multiple_matches(data, "<tr id='link-.*?href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?src='(.*?)'.*?<strong class='quality'>(.*?)</strong>")
+    if not links: links = scrapertools.find_multiple_matches(data, '<tr id="link-.*?href="(.*?)".*?<strong class="quality">(.*?)</strong>.*?src="(.*?)".*?<strong class="quality">(.*?)</strong>')
 
     linksd =  scrapertools.find_multiple_matches(data, "<tr class='downloads'.*?id='.*?<a href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?src='(.*?)'.*?<strong class='quality'>(.*?)</strong>")
+    if not linksd: linksd =  scrapertools.find_multiple_matches(data, '<tr class="downloads".*?id=".*?<a href="(.*?)".*?<strong class="quality">(.*?)</strong>.*?src="(.*?)".*?<strong class="quality">(.*?)</strong>')
 
     links = links + linksd
 

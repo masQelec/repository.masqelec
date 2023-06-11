@@ -7,12 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www11.pelisplushd.to/'
+host = 'https://www16.pelisplushd.to/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://pelisplushd.lat/', 'https://www1.pelisplushd.lat/', 'https://www2.pelisplushd.lat/',
-             'https://www.pelisplushd.la/', 'https://ww1.pelisplushd.to/', 'https://www9.pelisplushd.to/']
+             'https://www.pelisplushd.la/', 'https://ww1.pelisplushd.to/', 'https://www9.pelisplushd.to/',
+             'https://www11.pelisplushd.to/', 'https://www15.pelisplushd.to/']
 
 
 domain = config.get_setting('dominio', 'pelisplushdlat', default='')
@@ -202,13 +203,18 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    if not item.page: item.page = 1
+    if not item.page:
+        item.page = 1
 
-    data = do_downloadpage(item.url + str(item.page))
+        data = do_downloadpage(item.url)
+    else:
+        data = do_downloadpage(item.url + str(item.page))
+
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<div class="Posters">(.*?)<div class="copyright">')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a(.*?)</div></div>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
@@ -519,10 +525,11 @@ def list_search(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<div class="Posters">(.*?)<div class="copyright">')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a(.*?)</div></div>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, ' href="(.*?)"')

@@ -318,9 +318,9 @@ def findvideos(item):
            if 'hqq' in srv or 'waaw' in srv or 'netu' in srv: continue
 
            elif srv == 'streamz': servidor = srv
-           elif srv == 'peliculaspro': other = 'fembed' + '-' + str(i)
-           elif srv == 'streamcrypt':  other = srv + '-' + str(i)
-           else: other = srv.lower() + '-' + str(i)
+           elif srv == 'peliculaspro': other = 'fembed' + ' ' + str(i)
+           elif srv == 'streamcrypt':  other = srv + ' ' + str(i)
+           else: other = srv.lower() + ' ' + str(i)
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = other, language = idioma ))
 

@@ -69,7 +69,9 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    timeout = 30
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_pelishouse_proxies', default=''): timeout = 30
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
@@ -389,12 +391,15 @@ def list_all(item):
     if itemlist:
         if item.search_type == 'movie':
             next_page = scrapertools.find_single_match(data, '<a class=\'arrow_pag\' href="([^"]+)">')
-            if not next_page: next_page = scrapertools.find_single_match(data, '<span class="current">\d+</span><a href=\'([^\']+)\' class="inactive">')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<span class="current">.*?</span>' + "<a href='(.*?)'" + '.*?class="inactive">')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<span class="current">.*?</span><a href="(.*?)".*?class="inactive">')
         else:
-            next_page = scrapertools.find_single_match(data, '<span class="current">\d+</span><a href=\'([^\']+)\' class="inactive">')
+            next_page = scrapertools.find_single_match(data, '<span class="current">.*?</span>' + "<a href='(.*?)'" + '.*?class="inactive">')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<span class="current">.*?</span><a href="(.*?)".*?class="inactive">')
 
         if next_page:
-            itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
+            if '/page/' in next_page:
+                itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
 
     return itemlist
 
@@ -435,7 +440,8 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, "<span class='se-t[^']*'>(\d+)</span><span class='title'>([^<]+)")
+    matches = scrapertools.find_multiple_matches(data, "<span class='se-t.*?'>(.*?)</span><span class='title'>(.*?)<i>")
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<span class="se-t.*?">(.*?)</span><span class="title">(.*?)<i>')
 
     for numtempo, title in matches:
         title = title.strip()
@@ -464,9 +470,14 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
-    patron = '<li class=\'mark-\d+\'>.*?src=\'([^\']+)\'.*?class=\'numerando\'>(\d+) - (\d+).*?href=\'([^\']+)\'>([^<]+)'
+    patron = "'<li class='mark-.*?src='(.*?)'.*?<div class='numerando'>(\d+) - (\d+).*?href='(.*?)'>(.*?)</a>"
 
     matches = scrapertools.find_multiple_matches(data, patron)
+
+    if not matches:
+        patron = '<li class="mark-.*?src="(.*?)".*?<div class="numerando">(\d+) - (\d+).*?href="(.*?)">(.*?)</a>'
+
+        matches = scrapertools.find_multiple_matches(data, patron)
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -535,9 +546,14 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    patron = "<li id='player-option-\d+' class='dooplay_player_option' data-type='([^']+)'.*?data-post='([^']+)'.*?data-nume='([^'])+'>.*?<span class='title'>([^<]+)</span>"
+    patron = "<li id='player-option-.*?class='dooplay_player_option'.*?data-type='(.*?)'.*?data-post='(.*?)'.*?data-nume='(.*?)'.*?<span class='title'>(.*?)</span>"
 
     matches = scrapertools.find_multiple_matches(data, patron)
+
+    if not matches:
+        patron = '<li id="player-option-.*?class="dooplay_player_option".*?data-type="(.*?)".*?data-post="(.*?)".*?data-nume="(.*?)".*?<span class="title">(.*?)</span>'
+
+        matches = scrapertools.find_multiple_matches(data, patron)
 
     ses = 0
 
@@ -565,6 +581,7 @@ def findvideos(item):
         elif '/entrepeliculasyseries.' in url: continue
         elif '/demariquita.' in url: continue
         elif '/g-nula.top/' in url: continue
+        elif '/media.esplay.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -681,6 +698,8 @@ def play(item):
     logger.info()
     itemlist = []
 
+    url = item.url
+
     if item.server == 'torrent':
         try:
            if not item.url.startswith(host):
@@ -713,20 +732,15 @@ def play(item):
 
                 if '/www.jplayer.net/' in url: url = ''
 
-                if url:
-                    servidor = servertools.get_server_from_url(url)
-                    servidor = servertools.corregir_servidor(servidor)
-
-                    itemlist.append(item.clone( url=url, server=servidor))
             else:
                 data = do_downloadpage(item.url)
                 url = scrapertools.find_single_match(str(data), 'href="(.*?)"')
 
-                if url:
-                    servidor = servertools.get_server_from_url(url)
-                    servidor = servertools.corregir_servidor(servidor)
+            if url:
+                servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
 
-                    itemlist.append(item.clone( url=url, server=servidor))
+                itemlist.append(item.clone( url=url, server=servidor))
 
         else:
             data = do_downloadpage(item.url)
@@ -736,7 +750,11 @@ def play(item):
 
             if url:
                url = url.replace('\\/', '/')
-               itemlist.append(item.clone( url=url, server='directo'))
+
+               servidor = servertools.get_server_from_url(url)
+               servidor = servertools.corregir_servidor(servidor)
+
+               itemlist.append(item.clone( url=url, server=servidor))
 
     elif item.url.startswith('https://peliscalidad.top/'):
         video_id = item.url.split('/')[-1]
@@ -755,7 +773,10 @@ def play(item):
                 else:
                     url = httptools.downloadpage_proxy('pelishouse', video['file'], follow_redirects=False).headers['location']
 
-                itemlist.append(item.clone( url=url, server='directo'))
+                servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
+
+                itemlist.append(item.clone( url=url, server=servidor))
 
     elif item.url.startswith('https://api.cuevana3.io'):
         fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
@@ -811,7 +832,10 @@ def play(item):
             if '//damedamehoy.' in url or '//tomatomatela.' in url: url = resuelve_dame_toma(url)
 
         if url:
-            itemlist.append(item.clone( url=url, server='directo'))
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            itemlist.append(item.clone( url=url, server=servidor))
 
     elif item.url.startswith('https://apialfa.tomatomatela.com'):
         fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
@@ -830,11 +854,17 @@ def play(item):
         if '//damedamehoy.' in url or '//tomatomatela.' in url:
             url = resuelve_dame_toma(url)
 
-            itemlist.append(item.clone( url=url, server='directo'))
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            itemlist.append(item.clone( url=url, server=servidor))
 
     else:
+        if url:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(item.clone( url=item.url, server=item.server))
+            itemlist.append(item.clone( url=item.url, server=servidor))
 
     return itemlist
 

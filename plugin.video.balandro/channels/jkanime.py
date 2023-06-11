@@ -33,7 +33,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = '[B]Configurar proxies a usar[/B] ...  COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar[/B] ...  [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -46,10 +46,18 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_jkanime_proxies', default=''): timeout = 40
+
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers).data
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers).data
+        data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            platformtools.dialog_notification('JKAnime', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+            data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -59,9 +67,9 @@ def do_downloadpage(url, post=None, headers=None):
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                   data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers).data
+                   data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -91,6 +99,8 @@ def mainlist_animes(item):
             return itemlist
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_jkanime', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
@@ -150,9 +160,7 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<h5.*?href="([^"]+)">([^<]+)<\/a></h5></div>.*?div class="[^"]+"><.*?set[^"]+"[^"]+"([^"]+)"'
-
-    matches = re.compile(patron).findall(data)
+    matches = re.compile('<h5.*?href="([^"]+)">([^<]+)<\/a></h5></div>.*?div class="[^"]+"><.*?set[^"]+"[^"]+"([^"]+)"').findall(data)
 
     num_matches = len(matches)
 
@@ -169,7 +177,7 @@ def list_all(item):
 
                 SerieName = SerieName.strip()
 
-                itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-'} ))
+                itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=SerieName, infoLabels={'year':'-'} ))
             else:
                 url = url + 'pelicula/'
 
@@ -204,9 +212,10 @@ def list_last(item):
 
     data = do_downloadpage(item.url)
 
-    data = scrapertools.find_single_match(data, '(?is)Últimos Animes agregados</h4>.*?<div class="col-lg-4 col-md-6 col-sm-8 trending_div">')
+    bloque = scrapertools.find_single_match(data, 'Últimos Animes agregados</h4>.*?<div class="col-lg-4 col-md-6 col-sm-8 trending_div">')
 
-    matches = scrapertools.find_multiple_matches(data, '(?is)data-setbg="(.+?)".*?<a  href="([^"]+)".*?>(.+?)<')
+    matches = scrapertools.find_multiple_matches(bloque, 'data-setbg="(.*?)".*?<a  href="(.*?)">(.*?)</a>')
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, 'data-setbg="(.*?)".*?<a href="(.*?)">(.*?)</a>')
 
     num_matches = len(matches)
 
@@ -219,7 +228,7 @@ def list_last(item):
 
         SerieName = SerieName.strip()
 
-        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-'} ))
+        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=SerieName, infoLabels={'year':'-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -242,9 +251,7 @@ def last_epis(item):
 
     data = do_downloadpage(item.url)
 
-    patron = '<a href="([^"]+)" class="bloqq">.+?\n.+?\n.+?<img src="([^"]+)".+?title="([^"]+)".+?\n.+?\n.+?\n.+?\n.+?h6>.+?\n.+?(\d+).+?</'
-
-    matches = scrapertools.find_multiple_matches(data, patron)
+    matches = scrapertools.find_multiple_matches(data, '<a href="([^"]+)" class="bloqq">.*?<img src="([^"]+)".*?title="([^"]+)".*?\n.*?\n.*?\n.*?\n.*?h6>.*?\n.*?(\d+).*?</')
 
     num_matches = len(matches)
 
@@ -253,10 +260,10 @@ def last_epis(item):
 
         SerieName = SerieName.strip()
 
-        title = 'cap.{} - {}'.format(episode, title)
+        title = 'Cap.{} - {}'.format(episode, title)
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
-                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode ))
+                                    contentSerieName=SerieName, contentType='episode', contentSeason=1, contentEpisodeNumber=episode ))
 
         if len(itemlist) >= perpage: break
 

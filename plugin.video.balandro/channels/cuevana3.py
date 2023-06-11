@@ -422,7 +422,7 @@ def findvideos(item):
                                   language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty) ))
 
     # Enlaces descarga
-    patron = 'Uptobox</td><td>([^<]*)</td><td><span>([^<]*)</span></td><td><a\s*rel=nofollow target=_blank href="([^"]+)" class="Button STPb">Descargar</a>'
+    patron = 'Uptobox</td>.*?<td>(.*?)</td>.*?<td><span>(.*?)</span></td>.*?href="(.*?)".*?>Descargar</a>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 

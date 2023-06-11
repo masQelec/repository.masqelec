@@ -18,6 +18,13 @@ def get_video_url(page_url, url_referer=''):
     page_url = page_url.replace('mixdrop.gl/', 'mixdrop.co/')
     page_url = page_url.replace('mixdrop.club/', 'mixdrop.co/')
 
+    page_url = page_url.replace('mixdroop.to/', 'mixdrop.co/')
+    page_url = page_url.replace('mixdroop.sx/', 'mixdrop.co/')
+    page_url = page_url.replace('mixdroop.bz/', 'mixdrop.co/')
+    page_url = page_url.replace('mixdroop.ch/', 'mixdrop.co/')
+    page_url = page_url.replace('mixdroop.gl/', 'mixdrop.co/')
+    page_url = page_url.replace('mixdroop.club/', 'mixdrop.co/')
+
     page_url = page_url.replace('mixdrp.co/', 'mixdrop.co/')
     page_url = page_url.replace('mixdrp.to/', 'mixdrop.co/')
 

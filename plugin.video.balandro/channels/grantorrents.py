@@ -380,7 +380,13 @@ def findvideos(item):
     data = do_downloadpage(item.url)
 
     patron = "<tr id='link-.*?<a href='(.*?)'.*?<strong class='quality'>(.*?)</strong>.*?<strong class='quality'>(.*?)</strong>"
+
     matches = re.compile(patron, re.DOTALL).findall(data)
+
+    if not matches:
+        patron = '<tr id="link-.*?<a href="(.*?)".*?<strong class="quality">(.*?)</strong>.*?<strong class="quality">(.*?)</strong>'
+
+        matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, quality, peso in matches:
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, quality = quality, other = peso ))

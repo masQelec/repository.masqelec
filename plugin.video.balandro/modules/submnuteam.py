@@ -16,7 +16,7 @@ else:
 
 import os, xbmc, xbmcgui, xbmcaddon
 
-from platformcode import logger, config, platformtools
+from platformcode import logger, config, platformtools, updater
 from core import filetools
 from core.item import Item
 
@@ -37,11 +37,23 @@ _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 _team = "[COLOR hotpink][B][I] t.me/balandro_team [/I][/B][/COLOR]"
 
 
+context_desarrollo = []
+
+tit = '[COLOR goldenrod][B]Miscelánea[/B][/COLOR]'
+context_desarrollo.append({'title': tit, 'channel': 'helper', 'action': 'show_help_miscelanea'})
+
+tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
+context_desarrollo.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
+
+tit = '[COLOR %s]Ajustes categoría Team[/COLOR]' % color_exec
+context_desarrollo.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+
 def submnu_team(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='', title='[B]DESARROLLO:[/B]', thumbnail=config.get_thumb('team'), text_color='darkorange' ))
+    itemlist.append(item.clone( action='', title='[B]DESARROLLO:[/B]', context=context_desarrollo, thumbnail=config.get_thumb('team'), text_color='darkorange' ))
 
     itemlist.append(item.clone( action='submnu_center', title=' - [B]Media Center[/B]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
 
@@ -87,7 +99,15 @@ def submnu_team(item):
 
     itemlist.append(item.clone( action='submnu_developpers', title=' - [B]Developpers[/B]', thumbnail=config.get_thumb('team'), text_color='firebrick' ))
 
-    itemlist.append(item.clone( channel='actions', action = 'open_settings', title='[COLOR chocolate][B]Ajustes [COLOR powderblue]Configuración[/B][/COLOR]', thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
+    try: last_ver = updater.check_addon_version()
+    except: last_ver = True
+
+    if not last_ver: last_ver = '[I][COLOR %s](desfasada)[/COLOR][/I]' % color_adver
+    else: last_ver = ''
+
+    title = '[COLOR chocolate][B]Ajustes [COLOR powderblue]Configuración[/B][/COLOR] (%s)  %s' % (config.get_addon_version(), last_ver)
+
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title=title, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
     return itemlist
 
@@ -746,6 +766,7 @@ def test_all_webs(item):
         try:
             if item.letra:
                 el_canal = ch['id']
+
                 if el_canal[0] < item.letra:
                     i = i - 1
                     continue
@@ -761,7 +782,7 @@ def test_all_webs(item):
         if not txt: continue
 
         if 'code: [COLOR springgreen][B]200' in str(txt):
-            if 'Falso Positivo.' in str(txt):
+            if 'invalid:' in str(txt):
                 platformtools.dialog_textviewer(ch['name'], txt)
 
                 if ' con proxies ' in str(txt):
@@ -776,7 +797,40 @@ def test_all_webs(item):
                             rememorize = True
 
                 elif 'Sin proxies' in str(txt):
-                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
+                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR chartreuse][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
+                        _proxies(item, ch['id'])
+                        txt = tester.test_channel(ch['name'])
+
+                        if not 'code: [COLOR springgreen][B]200' in str(txt):
+                            if 'Sin proxies' in str(txt):
+                                platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
+                        else:
+                            rememorize = True
+
+                if 'invalid:' in str(txt):
+                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '¿ Desea comprobar el Canal de nuevo, [COLOR red][B]por Acceso sin Host Válido en los datos. [/B][/COLOR]?'):
+                        txt = tester.test_channel(ch['name'])
+
+                        if 'code: [COLOR springgreen][B]200' in str(txt):
+                            if 'invalid:' in str(txt):
+                                platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado el Acceso sin Host Válido en los datos.[/B][/COLOR]')
+
+            elif 'Falso Positivo.' in str(txt):
+                platformtools.dialog_textviewer(ch['name'], txt)
+
+                if ' con proxies ' in str(txt):
+                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]¿ Desea Iniciar una nueva Búsqueda de Proxies en el Canal ?[/B][/COLOR]'):
+                        _proxies(item, ch['id'])
+                        txt = tester.test_channel(ch['name'])
+	
+                        if not 'code: [COLOR springgreen][B]200' in str(txt):
+                            if ' con proxies ' in str(txt):
+                                platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
+                        else:
+                            rememorize = True
+
+                elif 'Sin proxies' in str(txt):
+                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR chartreuse][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
                         _proxies(item, ch['id'])
                         txt = tester.test_channel(ch['name'])
 
@@ -787,7 +841,7 @@ def test_all_webs(item):
                             rememorize = True
 
                 if 'Falso Positivo.' in str(txt):
-                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]¿ Desea comprobar el Canal de nuevo por Falso Positivo ?[/B][/COLOR]'):
+                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '¿ Desea comprobar el Canal de nuevo, [COLOR red][B]por Falso Positivo. [/B][/COLOR]?'):
                         txt = tester.test_channel(ch['name'])
 
                         if 'code: [COLOR springgreen][B]200' in str(txt):
@@ -828,7 +882,7 @@ def test_all_webs(item):
                        rememorize = True
 
            elif 'Sin proxies' in str(txt):
-               if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
+               if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR chartreuse][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
                    _proxies(item, ch['id'])
                    txt = tester.test_channel(ch['name'])
 
@@ -928,6 +982,7 @@ def test_all_srvs(item):
             if item.letra:
                 el_servidor = dict_server['name']
                 el_servidor = el_servidor.lower()
+
                 if el_servidor[0] < item.letra:
                     i = i - 1
                     continue

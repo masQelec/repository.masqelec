@@ -415,6 +415,10 @@ def findvideos(item):
 
         other = servertools.corregir_servidor(other)
 
+        if other == 'various':
+            if 'filemoon' in match: other = 'filemoon'
+            elif 'streamwish' in match: other = 'streamwish'
+
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = lng, other = other.capitalize() ))
 
     if not itemlist:

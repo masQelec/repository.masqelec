@@ -132,6 +132,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title = title.replace('&quot;', '')
+
         SerieName = title
 
         if 'OVA' in title: SerieName = title.split("OVA")[0]
@@ -183,6 +185,8 @@ def last_epis(item):
         epis = scrapertools.find_single_match(match, '<p>(.*?)</p>')
 
         if not epis: epis = 1
+
+        title = title.replace('&quot;', '')
 
         SerieName = title
 
@@ -262,7 +266,9 @@ def episodios(item):
 
         title = title.replace('Sub Español', '').strip()
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=i ))
+        titulo = title + ' ' + item.contentSerieName
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=i ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -292,6 +298,8 @@ def findvideos(item):
 
         servidor = servidor.lower()
 
+        other = ''
+
         if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
 
         elif servidor == 'puj': continue
@@ -307,6 +315,10 @@ def findvideos(item):
 
         elif 'fembed' in servidor: servidor = 'fembed'
 
+        elif 'filemoon' in servidor:
+             other = servidor
+             servidor = 'various'
+
         servidor = servertools.corregir_servidor(servidor)
 
         if servertools.is_server_available(servidor):
@@ -314,7 +326,7 @@ def findvideos(item):
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose', other = other.capitalize() ))
 
     # download
     bloque = scrapertools.find_single_match(data, '<div class="downbtns">(.*?)</div>')
@@ -330,7 +342,9 @@ def findvideos(item):
         elif srv == 'zippy': srv = 'zippyshare'
 
         elif srv == 'ok':
-          if '/mega.nz/' in url: srv = 'mega'
+          if '/www.fireload.com/' in url: continue
+
+          elif '/mega.nz/' in url: srv = 'mega'
 
         if not srv: srv = servertools.get_server_from_url(url)
 

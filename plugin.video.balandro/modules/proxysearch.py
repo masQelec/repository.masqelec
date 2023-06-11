@@ -302,6 +302,19 @@ def proxysearch_all(item):
     for ch in ch_list:
         if not 'proxies' in ch['notes'].lower(): continue
 
+        if config.get_setting('mnu_simple', default=False):
+            if 'inestable' in ch['clusters']: continue
+            elif 'problematic' in ch['clusters']: continue
+        else:
+            if not config.get_setting('mnu_torrents', default=False) or config.get_setting('search_no_exclusively_torrents', default=False):
+                if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+
+            if config.get_setting('mnu_problematicos', default=False):
+                if 'problematic' in ch['clusters']: continue
+
+            if config.get_setting('search_no_inestables', default=False):
+                if 'inestable' in ch['clusters']: continue
+
         if channels_excludes:
             channels_preselct = str(channels_excludes).replace('[', '').replace(']', ',')
             if ("'" + ch['id'] + "'") in str(channels_preselct):
@@ -329,43 +342,44 @@ def proxysearch_all(item):
 
 
     # ~ los que No intervienen en el buscar ganeral
-    filtros = {'searchable': False}
+    if not config.get_setting('mnu_simple', default=False):
+        filtros = {'searchable': False}
 
-    channels_list_status = config.get_setting('channels_list_status', default=0)
-    if channels_list_status > 0:
-        if channels_list_status == 1: filtros = {'searchable': False, 'status': 0}
-        else: filtros = {'searchable': False, 'status': 1}
+        channels_list_status = config.get_setting('channels_list_status', default=0)
+        if channels_list_status > 0:
+            if channels_list_status == 1: filtros = {'searchable': False, 'status': 0}
+            else: filtros = {'searchable': False, 'status': 1}
 
-    ch_list = channeltools.get_channels_list(filtros=filtros)
+        ch_list = channeltools.get_channels_list(filtros=filtros)
 
-    if ch_list:
-       for ch in ch_list:
-           if not 'proxies' in ch['notes'].lower(): continue
+        if ch_list:
+           for ch in ch_list:
+               if not 'proxies' in ch['notes'].lower(): continue
 
-           if channels_excludes:
-               channels_preselct = str(channels_excludes).replace('[', '').replace(']', ',')
-               if ("'" + ch['id'] + "'") in str(channels_preselct):
-                   platformtools.dialog_notification(ch['name'], '[B][COLOR %s]Ignorado por excluido[/COLOR][/B]' % color_exec)
-                   continue
+               if channels_excludes:
+                   channels_preselct = str(channels_excludes).replace('[', '').replace(']', ',')
+                   if ("'" + ch['id'] + "'") in str(channels_preselct):
+                       platformtools.dialog_notification(ch['name'], '[B][COLOR %s]Ignorado por excluido[/COLOR][/B]' % color_exec)
+                       continue
 
-           if item.extra:
-               if item.extra == 'movies':
-                   if not 'movie' in ch['search_types']: continue
-               elif item.extra == 'tvshows':
-                   if not 'tvshow' in ch['search_types']: continue
-               elif item.extra == 'mixed':
-                   if not 'all' in ch['search_types']: continue
-               elif item.extra == 'documentaries':
-                   if not 'documentary' in ch['search_types']: continue
-               elif item.extra == 'torrents':
-                   if not 'torrent' in ch['categories']: continue
-               else:
-                   if 'Puede requerir el uso de proxies' in ch['notes']: pass
-                   elif not 'all' in ch['search_types']: continue
+               if item.extra:
+                   if item.extra == 'movies':
+                       if not 'movie' in ch['search_types']: continue
+                   elif item.extra == 'tvshows':
+                       if not 'tvshow' in ch['search_types']: continue
+                   elif item.extra == 'mixed':
+                       if not 'all' in ch['search_types']: continue
+                   elif item.extra == 'documentaries':
+                       if not 'documentary' in ch['search_types']: continue
+                   elif item.extra == 'torrents':
+                       if not 'torrent' in ch['categories']: continue
+                   else:
+                       if 'Puede requerir el uso de proxies' in ch['notes']: pass
+                       elif not 'all' in ch['search_types']: continue
 
-           config.set_setting('proxysearch_process', True)
+               config.set_setting('proxysearch_process', True)
 
-           proxysearch_channel(item, ch['id'], ch['name'], iniciales_channels_proxies_memorized)
+               proxysearch_channel(item, ch['id'], ch['name'], iniciales_channels_proxies_memorized)
 
 
     config.set_setting('proxysearch_process', '')

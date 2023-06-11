@@ -2,24 +2,60 @@
 
 import re
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://seriesantiguas.com/'
+host = 'https://www.seriesantiguas.com/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www.seriesantiguas.net/', 'https://seriesantiguas.com/']
+
+
+domain = config.get_setting('dominio', 'seriesantiguas', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'seriesantiguas')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'seriesantiguas')
+    else: host = domain
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.seriesantiguas.net/', 'https://www.seriesantiguas.com/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'seriesantiguas', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_seriesantiguas', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='seriesantiguas', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_seriesantiguas', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
@@ -29,6 +65,8 @@ def mainlist(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -49,10 +87,10 @@ def list_all(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     if '<div class="progression-studios-elementor-video-post-container">' in data:
-         bloque = scrapertools.find_single_match(data, '<div class="progression-studios-elementor-video-post-container">(.*?)</div><!-- close .progression-studios-elementor-video-post-container -->')
+         bloque = scrapertools.find_single_match(data, '<div class="progression-studios-elementor-video-post-container">(.*?)</div></div></div></div></div></div></div>')
     else: bloque = data
 
-    matches = scrapertools.find_multiple_matches(bloque, '<div id="post-(.*?)</a><!-- Link -->')
+    matches = scrapertools.find_multiple_matches(bloque, '<div id="post-(.*?)</div></div></a>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
@@ -62,6 +100,8 @@ def list_all(item):
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        if thumb.startswith('/'): thumb = host[:-1] + thumb
 
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
 
@@ -153,7 +193,9 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="progression-studios-season-item">(.*?)<!-- close embedded video -->')
+    bloque = scrapertools.find_single_match(data, '<div id="progression-studios-season-video-list-' + str(item.contentSeason) + '(.*?)</div></div></div></div></div>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<div class="progression-studios-season-item">(.*?)</div><div class="clearfix-pro">')
 
     if not matches: matches = scrapertools.find_multiple_matches(data, "<div class='post hentry'>(.*?)</div></div>")
 
@@ -252,14 +294,18 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    if "<div class='post-body entry-content'>" in data:
-        bloque = scrapertools.find_single_match(data, "<div class='post-body entry-content'>(.*?)<div class='post-footer'>")
+    if "<div class='post-body entry-content'>" in data: bloque = scrapertools.find_single_match(data, "<div class='post-body entry-content'>(.*?)<div class='post-footer'>")
     else: bloque = data
 
-    matches = scrapertools.find_multiple_matches(bloque, '<iframe.*?src="(.*?)"')
+    matches1 = scrapertools.find_multiple_matches(bloque, '<iframe.*?allow="autoplay".*?data-src="(.*?)".*?</iframe>')
+
+    matches2 = scrapertools.find_multiple_matches(bloque, '<noscript><iframe.*? src="(.*?)".*?</iframe>')
+
+    matches = matches1 + matches2
 
     for url in matches:
         if url.startswith('//'): url = 'https:' + url
+
         url = url.replace('&amp;', '&')
 
         servidor = servertools.get_server_from_url(url)

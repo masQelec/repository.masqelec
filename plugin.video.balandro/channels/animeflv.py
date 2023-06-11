@@ -183,8 +183,8 @@ def list_all(item):
         else:
             SerieName = title
 
-            if 'Season' in title: SerieName = title.split("Season")[0]
-            if 'Movie' in title: SerieName = title.split("Movie")[0]
+            if 'Season' in SerieName: SerieName = SerieName.split("Season")[0]
+            if 'Movie' in SerieName: SerieName = SerieName.split("Movie")[0]
 
             SerieName = SerieName.strip()
 
@@ -229,18 +229,18 @@ def last_epis(item):
     for url, thumb, episode, title in matches:
         if not url or not title: continue
 
-        epis = episode.replace('Episodio', '').strip()
-
-        episode = episode.replace('Episodio', 'epis.')
-
-        title = episode + ' ' + title
-
         SerieName = title
 
-        if 'Season' in title: SerieName = title.split("Season")[0]
-        if 'Movie' in title: SerieName = title.split("Movie")[0]
+        if 'Season' in SerieName: SerieName = SerieName.split("Season")[0]
+        if 'Movie' in SerieName: SerieName = SerieName.split("Movie")[0]
 
         SerieName = SerieName.strip()
+
+        epis = episode.replace('Episodio', '').strip()
+
+        episode = episode.replace('Episodio', 'Epis.')
+
+        title = episode + ' ' + title
 
         if url:
             itemlist.append(item.clone( action='findvideos', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail=thumb,
@@ -309,7 +309,9 @@ def episodios(item):
     for url, thumb, title in matches[item.page * item.perpage:]:
         i += 1
 
-        itemlist.append(item.clone( action='findvideos', url = url if url.startswith('http') else host[:-1] + url, title = title,
+        titulo = title + ' ' + item.contentSerieName
+
+        itemlist.append(item.clone( action='findvideos', url = url if url.startswith('http') else host[:-1] + url, title = titulo,
                                     thumbnail=thumb, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = i ))
 
         if len(itemlist) >= item.perpage:
@@ -349,14 +351,18 @@ def findvideos(item):
 
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
-        elif '/moonplayer' in url: continue
-
         if not url.startswith('http'): url = 'https:' + url
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose' ))
+        url = servertools.normalize_url(servidor, url)
+
+        other = ''
+        if servidor == 'various':
+            if '/filemoon.' in url: other = 'Filemoon'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose', other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -389,6 +395,7 @@ def play(item):
         url = scrapertools.find_single_match(data, '<iframe id="embedvideo".*?</div>.*?src="(.*?)"')
 
         if 'www.googletagmanager.com' in url: url = ''
+        elif 'error.jpg' in url: url = ''
 
         if not url: url = scrapertools.find_single_match(data, '<li class="linkserver".*?data-video="(.*?)"')
 
