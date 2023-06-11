@@ -112,7 +112,7 @@ def list_all(item):
         type = type.strip().lower()
 
         titulo = title
-        titulo = titulo.replace('Español Latino', '').replace('Español latino', '').replace('español Latino', '').replace('español latino', '').strip()
+        titulo = titulo.replace('Español Latino', '').replace('Español latino', '').replace('español Latino', '').replace('español latino', '').replace('Español', '').replace('español', '').strip()
 
         if type == 'pelicula':
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
@@ -120,8 +120,11 @@ def list_all(item):
         else:
             SerieName = titulo
 
-            if 'Temporada' in titulo: SerieName = titulo.split("Temporada")[0]
-            if 'Audio' in titulo: SerieName = titulo.split("Audio")[0]
+            if 'Temporada' in SerieName: SerieName = SerieName.split("Temporada")[0]
+            if 'Audio' in SerieName: SerieName = SerieName.split("Audio")[0]
+
+            if 'Español Latino' in SerieName: SerieName = SerieName.split("Español Latino")[0]
+            elif 'Español' in SerieName: SerieName = SerieName.split("Español")[0]
 
             SerieName = SerieName.strip()
 
@@ -162,21 +165,27 @@ def last_epis(item):
 
         SerieName = title
 
-        if 'Temporada' in title: SerieName = title.split("Temporada")[0]
-        if 'episodio' in title: SerieName = title.split("episodio")[0]
-        if 'Audio' in title: SerieName = title.split("Audio")[0]
+        if 'Temporada' in SerieName: SerieName = SerieName.split("Temporada")[0]
+        elif 'episodio' in SerieName: SerieName = SerieName.split("episodio")[0]
+        elif 'Audio' in SerieName: SerieName = SerieName.split("Audio")[0]
+
+        if 'Español Latino' in SerieName: SerieName = SerieName.split("Español Latino")[0]
+        elif 'Español' in SerieName: SerieName = SerieName.split("Español")[0]
 
         SerieName = SerieName.strip()
+
+        season = scrapertools.find_single_match(title, 'Temporada (.*?) ')
+        if not season: season = 1
 
         if not epis.lower() in title: titulo = '%s - %s' % (title, epis)
         else: titulo = title
 
         epis = epis.replace('Episodio', '').strip()
 
-        season = 1
-
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -235,11 +244,13 @@ def episodios(item):
                 else: item.perpage = 50
 
     for epis, url, thumb in matches[item.page * item.perpage:]:
-        title = 'Episodio %s' % epis
-
         url = "%s/%s" % (item.url, url)
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
+        title = 'Episodio %s' % epis
+
+        titulo = title + ' ' + item.contentSerieName
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break

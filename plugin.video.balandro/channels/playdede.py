@@ -1286,7 +1286,10 @@ def findvideos(item):
 
         if not server or not sid: continue
 
-        if server == 'alternativo': continue
+        if server == 'waaw': continue
+        elif server == 'powvideo': continue
+        elif server == 'streamplay': continue
+        elif server == 'alternativo': continue
         elif server == 'userload': continue
 
         lang = scrapertools.find_single_match(match, 'data-lang="(.*?)"')
@@ -1297,9 +1300,13 @@ def findvideos(item):
 
         qlty = scrapertools.find_single_match(match, '">Calidad:.*?">(.*?)</span>')
 
+        if server == 'filemoon': other = 'Filemoon'
+        elif server == 'streamwish': other = 'Streamwish'
+        else: other = ''
+
         server = servertools.corregir_servidor(server)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', id = sid, language = lang, quality = qlty ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', id = sid, language = lang, quality = qlty, other = other ))
 
     # ~ Enlaces
     bloque = scrapertools.find_single_match(data, '<div class="linkSorter">(.*?)<div class="contEP contepID_3">')
@@ -1309,17 +1316,25 @@ def findvideos(item):
     for qlty, lang, url, server in matches:
         ses += 1
 
-        if server == 'alternativo': continue
-        elif server == 'userload': continue
-
         if not url or not server: continue
+
+        if server == 'waaw': continue
+        elif server == 'powvideo': continue
+        elif server == 'streamplay': continue
+        elif server == 'alternativo': continue
+        elif server == 'userload': continue
 
         if lang.lower() == 'espsub': lang = 'Vose'
 
         lang = lang.capitalize()
+
+        if server == 'filemoon': other = 'Filemoon'
+        elif server == 'streamwish': other = 'Streamwish'
+        else: other = 'E'
+
         server = servertools.corregir_servidor(server)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = lang, quality = qlty, other = 'E' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = lang, quality = qlty, other = other ))
 
     # ~ Descargas
     bloque = scrapertools.find_single_match(data, '<div class="contEP contepID_3">(.*?)$')

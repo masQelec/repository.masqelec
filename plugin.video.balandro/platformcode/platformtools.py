@@ -547,6 +547,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
     for it in itemlist:
         # Verificar servers desconocidos o no implementados
         apuntar = False
+
         if it.server == 'desconocido':
             # El canal no ha fijado server, y la url no se ha detectado de ningún server conocido
             apuntar = True
@@ -559,15 +560,22 @@ def developer_mode_check_findvideos(itemlist, parent_item):
                 if not os.path.isfile(path):
                     apuntar = True
 
-        if apuntar:
-            if not it.server in ['ddownload', 'dfiles', 'dropapk', 'desiupload', 'fileflares', 'fireload', 'katfile', 'krakenfiles', 'oload', 'pandafiles', 'rockfile', 'turbobit', 'uploadrive', 'uppit', 'userload']:
-                txt_log_servers += 'Canal: %s Server: %s Url: %s' % (it.channel, it.server, it.url)
+        # Server Various
+        if it.server in ['dropload', 'fastupload', 'filemoon', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex']:
+            apuntar = False
 
-                if parent_item.contentType == 'movie':
-                    txt_log_servers += ' Película: %s' % (parent_item.contentTitle)
-                else:
-                    txt_log_servers += ' Serie: %s Temporada %s Episodio %s' % (parent_item.contentSerieName, parent_item.contentSeason, parent_item.contentEpisodeNumber)
-                txt_log_servers += os.linesep
+        elif it.server in ['ddownload', 'dfiles', 'dropapk', 'desiupload', 'fileflares', 'filerice', 'fireload', 'katfile', 'megaupload', 'oload', 'pandafiles', 'rockfile', 'turbobit', 'uploadrive', 'uppit', 'userload']:
+            apuntar = False
+
+        if apuntar:
+            txt_log_servers += 'Canal: %s Server: %s Url: %s' % (it.channel, it.server, it.url)
+
+            if parent_item.contentType == 'movie':
+                txt_log_servers += ' Película: %s' % (parent_item.contentTitle)
+            else:
+                txt_log_servers += ' Serie: %s Temporada %s Episodio %s' % (parent_item.contentSerieName, parent_item.contentSeason, parent_item.contentEpisodeNumber)
+
+            txt_log_servers += os.linesep
 
         # Verificar calidades
         if it.quality == '' or it.quality_num == '': continue # Si no hay calidad o el canal no ha fijado el orden de calidades, nada a comprobar
@@ -858,7 +866,7 @@ def play_video(item, parent_item, autoplay=False):
             return play_torrent(mediaurl, parent_item)
 
         # ~ Para evitar ERROR: CCurlFile::Stat - Failed: Peer certificate cannot be authenticated with given CA certificates(60)
-        if item.server not in ['m3u8hls', 'zembed']:
+        if item.server not in ['m3u8hls', 'zembed', 'youtube']:
             if 'verifypeer=false' not in mediaurl and 'googleusercontent' not in mediaurl: 
                 mediaurl += '|' if '|' not in mediaurl else '&'
                 mediaurl += 'verifypeer=false'

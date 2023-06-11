@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Dropload,  Fastupload,  Filemoon,  Mvidoo,  Rutube,  Streamhub,  Tubeload,  Uploadever,  Videowood,  Yandex)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Dropload,  Fastupload,  Filemoon,  Hexupload,  Krakenfiles,  Moonplayer, Mvidoo,  Rutube,  Streamhub,  Streamwish,  Tubeload,  Uploadever,  Videowood,  Yandex)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -61,6 +61,10 @@
         "url": "\\1"
       },
       {
+        "pattern": "https://moonplayer.lat/e/([0-9a-zA-Z]+)",
+        "url": "https://filemoon.top/e/\\1"
+      },
+      {
         "pattern": "(https://disk.yandex.(?:ru|com)/(?:d/|i/)[A-z0-9]+)",
         "url": "\\1"
       },
@@ -86,7 +90,7 @@
       },
       {
         "pattern": "(https://streamhub.to/)(?:embed-|e/|d/)?([0-9a-zA-Z]+)",
-        "url": "\\1"
+        "url": "https://streamhub.to/e/\\2"
       },
       {
         "pattern": "(https://fastupload.io/)([0-9a-zA-Z]+/file)",
@@ -107,6 +111,22 @@
       {
         "pattern": "(https://dropload.io/)(?:embed-|e/|d/)?([0-9a-zA-Z]+)",
         "url": "https://dropload.io/\\2"
+      },
+      {
+        "pattern": "https://streamwish.com/(?:e/|f/)?([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://streamwish.to/(?:e/|f/)?([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://krakenfiles.com/(?:view|embed-video)?/([0-9a-zA-Z]+)",
+        "url": "https://krakenfiles.com/embed-video/\\1"
+      },
+      {
+        "pattern": "https://hexupload.net/(?:embed-)?([0-9a-zA-Z]+)",
+        "url": "https://hexupload.net/\\1"
       }
     ]
   }

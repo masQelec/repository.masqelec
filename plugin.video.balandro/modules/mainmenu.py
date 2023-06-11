@@ -32,28 +32,43 @@ current_month = int(datetime.today().month)
 
 context_desarrollo = []
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_infor
+tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
 context_desarrollo.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
-tit = '[COLOR %s]Ajustes categoría sistema[/COLOR]' % color_exec
+tit = '[COLOR %s]Ajustes categoría Team[/COLOR]' % color_exec
 context_desarrollo.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+
+context_menu = []
+
+tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
+context_menu.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
+
+tit = '[COLOR fuchsia][B]Parámetros Play[/B][/COLOR]'
+context_menu.append({'title': tit, 'channel': 'helper', 'action': 'show_play_parameters'})
+
+tit = '[COLOR %s]Ajustes categorías Menú y Play[/COLOR]' % color_exec
+context_menu.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
 
 context_buscar = []
 
-tit = '[COLOR %s][B]Información ajustes buscar[/B][/COLOR]' % color_infor
+tit = '[COLOR powderblue][B]Parámetros Buscar[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'search', 'action': 'show_help_parameters'})
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_avis
+tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
+
+tit = '[COLOR fuchsia][B]Parámetros Play[/B][/COLOR]'
+context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_play_parameters'})
 
 tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
-tit = '[COLOR cyan][B]Últimos Cambios dominios[/B][/COLOR]'
+tit = '[COLOR mediumaquamarine][B]Últimos Cambios dominios[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
-tit = '[COLOR %s][B]Quitar Dominios memorizados[/B][/COLOR]' % color_infor
+tit = '[COLOR %s][B]Quitar Dominios memorizados[/B][/COLOR]' % color_alert
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'manto_domains'})
 
 tit = '[COLOR greenyellow][B]Buscar Solo en los canales[/B][/COLOR]'
@@ -70,7 +85,7 @@ if config.get_setting('search_excludes_all', default=''):
     tit = '[COLOR violet][B]Quitar canales excluidos[/B][/COLOR]'
     context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_excluded_del'})
 
-tit = '[COLOR %s][B]Global configurar proxies[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR powderblue][B]Global configurar proxies[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'proxysearch', 'action': 'proxysearch_all'})
 
 if config.get_setting('proxysearch_excludes', default=''):
@@ -83,19 +98,19 @@ context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_help_p
 tit = '[COLOR %s][B]Quitar proxies actuales[/B][/COLOR]' % color_list_proxies
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
-tit = '[COLOR %s]Información búsquedas[/COLOR]' % color_infor
+tit = '[COLOR %s][B]Información búsquedas[/B][/COLOR]' % color_infor
 context_buscar.append({'title': tit, 'channel': 'search', 'action': 'show_help'})
 
-tit = '[COLOR %s]Ajustes categorías dominios, buscar y proxies[/COLOR]' % color_exec
+tit = '[COLOR %s]Ajustes categorías Dominios, Proxies y Buscar[/COLOR]' % color_exec
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
 
 context_generos = []
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_avis
+tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
 context_generos.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
-tit = '[COLOR %s][B]Global configurar proxies[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR powderblue][B]Global configurar proxies[/B][/COLOR]'
 context_generos.append({'title': tit, 'channel': 'proxysearch', 'action': 'proxysearch_all'})
 
 if config.get_setting('proxysearch_excludes', default=''):
@@ -108,28 +123,28 @@ context_generos.append({'title': tit, 'channel': 'helper', 'action': 'show_help_
 tit = '[COLOR %s][B]Quitar proxies actuales[/B][/COLOR]' % color_list_proxies
 context_generos.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
-tit = '[COLOR %s]Ajustes categorías menú y canales[/COLOR]' % color_exec
+tit = '[COLOR %s]Ajustes categorías Menú y Canales[/COLOR]' % color_exec
 context_generos.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
 
 context_proxy_channels = []
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_infor
+tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
 context_proxy_channels.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
 tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
 context_proxy_channels.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-tit = '[COLOR %s]Ajustes categoría menú y proxies[/COLOR]' % color_exec
+tit = '[COLOR %s]Ajustes categoría Menú y Proxies[/COLOR]' % color_exec
 context_proxy_channels.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
 
 context_cfg_search = []
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_infor
+tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
 context_cfg_search.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
-tit = '[COLOR %s]Ajustes categoría menú[/COLOR]' % color_exec
+tit = '[COLOR %s]Ajustes categoría Menú[/COLOR]' % color_exec
 context_cfg_search.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
 
@@ -142,13 +157,13 @@ if config.get_setting('cliente_torrent') == 'Seleccionar' or config.get_setting(
 tit = '[COLOR %s][B]Motores torrents instalados[/B][/COLOR]' % color_avis
 context_torrents.append({'title': tit, 'channel': 'helper', 'action': 'show_clients_torrent'})
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_infor
+tit = '[COLOR tan][B]Parámetros Canales[/B][/COLOR]'
 context_torrents.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
 
 tit = '[COLOR mediumaquamarine][B]Últimos Cambios dominios[/B][/COLOR]'
 context_torrents.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
-tit = '[COLOR %s]Ajustes categorías dominios, canales, torrents y buscar[/COLOR]' % color_exec
+tit = '[COLOR %s]Ajustes categorías Canales, Dominios, Torrents y Buscar[/COLOR]' % color_exec
 context_torrents.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
 
@@ -161,22 +176,22 @@ else:
     tit = '[COLOR %s][B]Información parental[/B][/COLOR]' % color_infor
     context_parental.append({'title': tit, 'channel': 'helper', 'action': 'show_help_adults'})
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_avis
+tit = '[COLOR tan][B]Parámetros Canales[/B][/COLOR]'
 context_parental.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
 
 tit = '[COLOR mediumaquamarine][B]Últimos Cambios dominios[/B][/COLOR]'
 context_parental.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
-tit = '[COLOR %s]Ajustes categorías dominios, canales y parental[/COLOR]' % color_exec
+tit = '[COLOR %s]Ajustes categorías Canales, Parental, y Dominios[/COLOR]' % color_exec
 context_parental.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
 
 context_desactivados = []
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_infor
+tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
 context_desactivados.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
-tit = '[COLOR %s]Ajustes categoría menú y canales[/COLOR]' % color_exec
+tit = '[COLOR %s]Ajustes categoría Menú y Canales[/COLOR]' % color_exec
 context_desactivados.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
 
@@ -185,16 +200,19 @@ context_preferidos = []
 tit = '[COLOR %s][B]Información preferidos[/B][/COLOR]' % color_infor
 context_preferidos.append({'title': tit, 'channel': 'helper', 'action': 'show_help_tracking'})
 
+tit = '[COLOR mediumaquamarine][B]Últimos Cambios dominios[/B][/COLOR]'
+context_preferidos.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
+
 tit = '[COLOR %s][B]Comprobar Nuevos Episodios[/B][/COLOR]' % color_adver
 context_preferidos.append({'title': tit, 'channel': 'actions', 'action': 'comprobar_nuevos_episodios'})
 
 tit = '[COLOR %s][B]Eliminar Todos los preferidos[/B][/COLOR]' % color_alert
 context_preferidos.append({'title': tit, 'channel': 'actions', 'action': 'manto_tracking_dbs'})
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_avis
+tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
 context_preferidos.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
-tit = '[COLOR %s]Ajustes categoría preferidos[/COLOR]' % color_exec
+tit = '[COLOR %s]Ajustes categoría Preferidos[/COLOR]' % color_exec
 context_preferidos.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
 
@@ -206,10 +224,10 @@ context_descargas.append({'title': tit, 'channel': 'downloads', 'action': 'show_
 tit = '[COLOR %s][B]Eliminar Todas las descargas[/B][/COLOR]' % color_alert
 context_descargas.append({'title': tit, 'channel': 'actions', 'action': 'manto_folder_downloads'})
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_avis
+tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
 context_descargas.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
-tit = '[COLOR %s]Ajustes categoría descargas[/COLOR]' % color_exec
+tit = '[COLOR %s]Ajustes categoría Descargas[/COLOR]' % color_exec
 context_descargas.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
 
@@ -218,7 +236,7 @@ context_config = []
 tit = '[COLOR %s][B]Quitar Proxies memorizados[/B][/COLOR]' % color_alert
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
-tit = '[COLOR %s]Información menús[/COLOR]' % color_avis
+tit = '[COLOR tan][B]Parámetros Canales[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
 
 tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
@@ -227,10 +245,10 @@ context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_help_d
 tit = '[COLOR %s][B]Últimos Cambios dominios[/B][/COLOR]' % color_exec
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
-tit = '[COLOR %s][B]Quitar Dominios memorizados[/B][/COLOR]' % color_infor
+tit = '[COLOR %s][B]Quitar Dominios memorizados[/B][/COLOR]' % color_alert
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_domains'})
 
-tit = '[COLOR %s]Sus Ajustes personalizados[/COLOR]' % color_avis
+tit = '[COLOR %s][B]Sus Ajustes personalizados[/B][/COLOR]' % color_avis
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_sets'})
 
 tit = '[COLOR %s]Cookies actuales[/COLOR]' % color_infor
@@ -247,6 +265,9 @@ context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_advs
 
 tit = '[COLOR darkorange][B]Borrar Carpeta Caché[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_folder_cache'})
+
+tit = '[COLOR olive][B]Limpiezas[/B][/COLOR]'
+context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_limpiezas'})
 
 tit = '[COLOR mediumaquamarine][B]Restablecer parámetros Internos[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_params'})
@@ -293,13 +314,13 @@ def mainlist(item):
 
     context_usual = []
 
-    tit = '[COLOR %s]Información menús[/COLOR]' % color_infor
+    tit = '[COLOR tan][B]Parámetros Canales[/B][/COLOR]'
     context_usual.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
 
     tit = '[COLOR mediumaquamarine][B]Últimos Cambios dominios[/B][/COLOR]'
     context_usual.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
-    tit = '[COLOR %s]Ajustes categorías dominios, canales y buscar[/COLOR]' % color_exec
+    tit = '[COLOR %s]Ajustes categorías Canales, Dominios, y Buscar[/COLOR]' % color_exec
     context_usual.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
     if not config.get_setting('mnu_simple', default=False):
@@ -311,7 +332,7 @@ def mainlist(item):
             if config.get_setting('ord_descargas', default=False):
                 itemlist.append(item.clone( channel='downloads', action='mainlist', title='[B]Descargas[/B]', context=context_descargas, thumbnail=config.get_thumb('downloads'), text_color='seagreen' ))
 
-    itemlist.append(item.clone( action='', title='[B]Menú:[/B]', thumbnail=config.get_thumb('addon'), text_color='tan' ))
+    itemlist.append(item.clone( action='', title='[B]Menú:[/B]', thumbnail=config.get_thumb('addon'), text_color='tan', context=context_menu ))
 
     if config.get_setting('mnu_sugeridos', default=True):
         itemlist.append(item.clone( action='channels', extra='suggested', title=' - Sugeridos', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='aquamarine' ))
@@ -320,7 +341,7 @@ def mainlist(item):
         itemlist.append(item.clone( action='channels', extra='all', title=' - Canales', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='gold' ))
 
     if config.get_setting('mnu_idiomas', default=True):
-        itemlist.append(item.clone( channel='groups', action='mainlist', mnu_lang='idiomas', title=' - Idiomas', context=context_cfg_search, thumbnail=config.get_thumb('idiomas'), text_color='limegreen' ))
+        itemlist.append(item.clone( channel='groups', action='mainlist', mnu_lang='idiomas', title=' - Idiomas', context=context_menu, thumbnail=config.get_thumb('idiomas'), text_color='limegreen' ))
 
     if config.get_setting('mnu_grupos', default=True):
         itemlist.append(item.clone( channel='groups', action='mainlist', extra='groups', title=' - Grupos', context=context_cfg_search, thumbnail=config.get_thumb('bookshelf'), text_color='magenta' ))
@@ -406,7 +427,7 @@ def mainlist(item):
     tit = '[COLOR goldenrod][B]Miscelánea[/B][/COLOR]'
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_help_miscelanea'})
 
-    tit = '[COLOR %s]Información menús[/COLOR]' % color_avis
+    tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
     tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
@@ -417,6 +438,9 @@ def mainlist(item):
 
     tit = '[COLOR %s][B]Log Media Center[/B][/COLOR]' % color_adver
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_log'})
+
+    tit = '[COLOR blue][B]Log Balandro Media Center[/B][/COLOR]'
+    context_ayuda.append({'title': tit, 'channel': 'submnuteam', 'action': 'balandro_log'})
 
     tit = '[COLOR %s][B]Test sistema[/B][/COLOR]' % color_avis
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_test'})
@@ -454,7 +478,7 @@ def channels(item):
 
     context_search = []
 
-    tit = '[COLOR %s][B]Global configurar proxies[/B][/COLOR]' % color_list_proxies
+    tit = '[COLOR powderblue][B]Global configurar proxies[/B][/COLOR]'
     context_search.append({'title': tit, 'channel': 'proxysearch', 'action': 'proxysearch_all'})
 
     if config.get_setting('proxysearch_excludes', default=''):
@@ -464,10 +488,10 @@ def channels(item):
     tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
     context_search.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-    tit = '[COLOR %s]Información búsquedas[/COLOR]' % color_infor
+    tit = '[COLOR %s][B]Información búsquedas[/B][/COLOR]' % color_infor
     context_search.append({'title': tit, 'channel': 'search', 'action': 'show_help'})
 
-    tit = '[COLOR %s]Ajustes categoría buscar[/COLOR]' % color_exec
+    tit = '[COLOR %s]Ajustes categoría Buscar[/COLOR]' % color_exec
     context_search.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
     if item.extra == 'movies':
@@ -926,10 +950,10 @@ def channels(item):
             tit = '[COLOR yellowgreen][B]Dominio vigente[/B][/COLOR]'
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominio_vigente'})
 
-            tit = '[COLOR darkorange][B]Modificar dominio Memorizado[/B][/COLOR]'
+            tit = '[COLOR orange][B]Modificar dominio Memorizado[/B][/COLOR]'
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominio_memorizado'})
 
-            tit = '[COLOR %s][B]Configurar dominio a usar[/B][/COLOR]' % color_adver
+            tit = '[COLOR powderblue][B]Configurar dominio a usar[/B][/COLOR]'
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominios'})
 
         if 'register' in ch['clusters']:
@@ -971,7 +995,7 @@ def channels(item):
         context.append({'title': tit, 'channel': item.channel, 'action': '_tests'})
 
         if cfg_domains:
-            tit = '[COLOR %s]Ajustes categoría dominios[/COLOR]' % color_exec
+            tit = '[COLOR %s]Ajustes categoría Dominios[/COLOR]' % color_exec
             context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
         color = color_list_prefe if ch['status'] == 1 else 'white' if ch['status'] == 0 else color_list_inactive

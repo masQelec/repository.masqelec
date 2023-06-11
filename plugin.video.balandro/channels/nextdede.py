@@ -659,7 +659,13 @@ def findvideos(item):
             if not config.get_setting('developer_mode', default=False): continue
 
         if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, quality = qlty ))
+            other = ''
+
+            if servidor == 'various':
+                if '/filemoon.' in url: other = 'Filemoon'
+                elif '/streamwish.' in url: other = 'Streamwish'
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, quality = qlty, other = other ))
 
     # ~ Descargar
     bloque = scrapertools.find_single_match(data, '<div class="links-modal-body"><table>(.*?)</table>')

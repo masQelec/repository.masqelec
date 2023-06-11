@@ -284,6 +284,8 @@ def episodios(item):
             tab_epis = sorted(tab_epis, key=lambda x: x[0])
 
             for orden, url, tit, ses, epi in tab_epis:
+                 tit = tit + ' ' + item.contentSerieName
+
                  itemlist.append(item.clone( action = 'findvideos', url = url, title = tit, contentType = 'episode',
                                              contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
 
@@ -329,6 +331,8 @@ def episodios(item):
         tab_epis = sorted(tab_epis, key=lambda x: x[0])
 
         for orden, url, tit, ses, epi in tab_epis:
+            tit = tit.replace('"', '').strip()
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = tit, contentType = 'episode', contentSeason = ses, contentEpisodeNumber = epi ))
 
     tmdb.set_infoLabels(itemlist)

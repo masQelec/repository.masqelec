@@ -515,7 +515,11 @@ def findvideos(item):
            if servidor and servidor != 'directo':
                url = servertools.normalize_url(servidor, url)
 
-               itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang ))
+               if '/filemoon.' in url: other = 'Filemoon'
+               elif '/streamwish.' in url: other = 'Streamwish'
+               else: other = ''
+
+               itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:

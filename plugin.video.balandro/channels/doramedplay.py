@@ -150,7 +150,13 @@ def list_all(item):
             else: SerieName = title
 
             if 'Sub spn' in SerieName: SerieName = SerieName.split("Sub spn")[0]
+            elif 'Sub spa' in SerieName: SerieName = SerieName.split("Sub spa")[0]
             elif 'Sub eng' in SerieName: SerieName = SerieName.split("Sub eng")[0]
+            elif 'sub spa' in SerieName: SerieName = SerieName.split("sub spa")[0]
+            elif 'all subs' in SerieName: SerieName = SerieName.split("all subs")[0]
+            elif 'all sub' in SerieName: SerieName = SerieName.split("all sub")[0]
+
+            SerieName = SerieName.strip()
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
@@ -159,6 +165,7 @@ def list_all(item):
     if itemlist:
         if '<div class="pagination">' in data:
             next_url = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "<a href='(.*?)'")
+            if not next_url: next_url = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
 
             if next_url:
                 if '/page/' in next_url:
@@ -415,7 +422,13 @@ def sub_search(item):
             else: SerieName = title
 
             if 'Sub spn' in SerieName: SerieName = SerieName.split("Sub spn")[0]
+            elif 'Sub spa' in SerieName: SerieName = SerieName.split("Sub spa")[0]
             elif 'Sub eng' in SerieName: SerieName = SerieName.split("Sub eng")[0]
+            elif 'sub spa' in SerieName: SerieName = SerieName.split("sub spa")[0]
+            elif 'all subs' in SerieName: SerieName = SerieName.split("all subs")[0]
+            elif 'all sub' in SerieName: SerieName = SerieName.split("all sub")[0]
+
+            SerieName = SerieName.strip()
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': year} ))

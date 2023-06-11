@@ -59,6 +59,9 @@ def get_video_url(page_url, url_referer=''):
 
         elif 'fastupload' in page_url: txt_server = 'Fastupload'
         elif 'dropload' in page_url: txt_server = 'Dropload'
+        elif 'streamwish' in page_url: txt_server = 'Streamwish'
+        elif 'krakenfiles' in page_url: txt_server = 'Krakenfiles'
+        elif 'hexupload' in page_url: txt_server = 'Hexupload'
 
         platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))

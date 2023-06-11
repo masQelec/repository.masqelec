@@ -41,17 +41,17 @@ def mainlist(item):
         if config.get_setting('search_extra_trailers', default=False):
             itemlist.append(item.clone( channel='trailers', action='search', title=' - Buscar en [COLOR darkgoldenrod]Tráilers[/COLOR] ...', thumbnail=config.get_thumb('search') ))
 
-        itemlist.append(item.clone( action='search', title=' - Buscar [COLOR deepskyblue]Titulo[/COLOR] ...', search_type='movie', thumbnail=config.get_thumb('search') ))
+        itemlist.append(item.clone( action='search', title=' - Buscar [COLOR deepskyblue]título[/COLOR] ...', search_type='movie', thumbnail=config.get_thumb('search') ))
 
-        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'now_playing', title='   - En cartelera' ))
-        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'popular', title='   - Más populares' ))
-        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'top_rated', title='   - Mejor valoradas' ))
+        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'now_playing', title='   - En cartelera', thumbnail=config.get_thumb('novedades') ))
+        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'popular', title='   - Más populares', thumbnail=config.get_thumb('besttvshows') ))
+        itemlist.append(item.clone( action='listado', search_type='movie', extra = 'top_rated', title='   - Mejor valoradas', thumbnail=config.get_thumb('besttvshows') ))
 
         # ~ itemlist.append(item.clone( action='listado', search_type='movie', url = 'movie/upcoming', title='   - Próximas' ))
 
-        itemlist.append(item.clone( action='networks', search_type='movie', title='   - Por productora' ))
-        itemlist.append(item.clone( action='generos', search_type='movie', title='   - Por género' ))
-        itemlist.append(item.clone( action='anios', search_type='movie', title='   - Por año' ))
+        itemlist.append(item.clone( action='networks', search_type='movie', title='   - Por productora', thumbnail=config.get_thumb('booklet') ))
+        itemlist.append(item.clone( action='generos', search_type='movie', title='   - Por género', thumbnail=config.get_thumb('listgenres') ))
+        itemlist.append(item.clone( action='anios', search_type='movie', title='   - Por año', thumbnail=config.get_thumb('listyears') ))
 
     presentar = True
     if item.search_type == 'movie': presentar = False
@@ -62,35 +62,37 @@ def mainlist(item):
     if presentar:
         itemlist.append(item.clone( title = '[B]Series:[/B]', thumbnail=config.get_thumb('tvshow'), action = '', text_color='hotpink' ))
 
-        itemlist.append(item.clone( action='search', title=' - Buscar [COLOR hotpink]Titulo[/COLOR] ...', search_type='tvshow', thumbnail=config.get_thumb('search') ))
+        itemlist.append(item.clone( action='search', title=' - Buscar [COLOR hotpink]título[/COLOR] ...', search_type='tvshow', thumbnail=config.get_thumb('search') ))
 
         itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'on_the_air', title='   - En emisión' ))
-        itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'popular', title='   - Más populares' ))
-        itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'top_rated', title='   - Mejor valoradas' ))
+        itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'popular', title='   - Más populares', thumbnail=config.get_thumb('besttvshows') ))
+        itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'top_rated', title='   - Mejor valoradas', thumbnail=config.get_thumb('besttvshows') ))
 
         # ~ itemlist.append(item.clone( action='listado', search_type='tvshow', url = 'tv/airing_today', title='   - Que se emiten Hoy' ))
 
-        itemlist.append(item.clone( action='networks', search_type='tvshow', title='   - Por productora' ))
-        itemlist.append(item.clone( action='generos', search_type='tvshow', title='   - Por género' ))
-        itemlist.append(item.clone( action='anios', search_type='tvshow', title='   - Por año' ))
+        itemlist.append(item.clone( action='networks', search_type='tvshow', title='   - Por productora', thumbnail=config.get_thumb('booklet') ))
+        itemlist.append(item.clone( action='generos', search_type='tvshow', title='   - Por género', thumbnail=config.get_thumb('listgenres') ))
+        itemlist.append(item.clone( action='anios', search_type='tvshow', title='   - Por año', thumbnail=config.get_thumb('listyears') ))
 
     return itemlist
 
 
 def show_help(item):
-    txt = 'En este apartado se pueden hacer consultas a la web [B]The Movie Database[/B] (TMDb), un proyecto comunitario que ofrece información de películas, series y personas.'
+    txt = 'En este apartado se pueden hacer consultas a la web [COLOR gold][B]The Movie Database[/B][/COLOR] (TMDb), un proyecto comunitario que ofrece información de películas, series y personas.'
 
     txt += '[CR]'
-    txt += '[CR]Se puede buscar la filmografía de una persona y ver las películas/series en dónde ha participado.'
-    txt += ' Y también se pueden ver distintas listas de películas, series y personas según varios conceptos (más populares, más valoradas, por géneros, etc).'
+    txt += '[CR]Se puede buscar la [COLOR moccasin][B]filmografía[/B][/COLOR] de una persona y ver las películas/series dónde ha participado.'
 
     txt += '[CR]'
-    txt += '[CR]Al seleccionar una película/serie se iniciará su búsqueda en los diferentes canales del addon y se mostrarán los resultados encontrados.'
+    txt += '[CR]También se pueden ver distintas [COLOR yellow][B]Listas[/B][/COLOR] de películas y/ó series según varios conceptos (más populares, más valoradas, por géneros, etc.)'
+
+    txt += '[CR]'
+    txt += '[CR]Al seleccionar una película/serie [COLOR chartreuse][B]se iniciará su búsqueda en los canales[/B][/COLOR] y se mostrarán los resultados encontrados.'
     txt += ' Hay que tener en cuenta que habrá películas/series que no tendrán enlaces en ninguno de los canales.'
 
     txt += '[CR]'
-    txt += '[CR]Si al buscar por persona se obtiene una sola coincidencia, se listan directamente sus películas y series (Ej: Stanley Kubrick).'
-    txt += ' Si puede haber varios resultados se muestra una lista de personas para seleccionar la que corresponda (Ej: Kubrick).'
+    txt += '[CR]Si al buscar por persona [COLOR violet][B]se obtiene una sola coincidencia[/B][/COLOR] de películas, se listan directamente sus películas y series (Ej: Stanley Kubrick).'
+    txt += ' Si hubierna varios resultados se muestra una [COLOR yellowgreen][B]Lista de Personas[/B][/COLOR] para seleccionar la que corresponda (Ej: Kubrick).'
 
     platformtools.dialog_textviewer('Información búsquedas y listas en TMDB', txt)
     return True

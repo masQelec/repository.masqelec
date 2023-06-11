@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w5.cinecalidad.bz/'
+host = 'https://w11.cinecalidad.bz/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -24,7 +24,9 @@ ant_hosts = ['https://cinecalidad.la/', 'https://cinecalidad.fo/', 'https://ww22
              'https://w9.cinecalidad.lc/', 'https://w10.cinecalidad.lc/', 'https://w8.cinecalidad.lc/',
              'https://w11.cinecalidad.lc/', 'https://w13.cinecalidad.lc/', 'https://c1.cinecalidad.lc/',
              'https://w14.cinecalidad.lc/', 'https://cinecalidad.bz/', 'https://w1.cinecalidad.bz/', 
-             'https://w2.cinecalidad.bz/', 'https://w3.cinecalidad.bz/', 'https://w4.cinecalidad.bz/']
+             'https://w2.cinecalidad.bz/', 'https://w3.cinecalidad.bz/', 'https://w4.cinecalidad.bz/',
+             'https://w5.cinecalidad.bz/', 'https://w6.cinecalidad.bz/', 'https://w7.cinecalidad.bz/',
+             'https://w8.cinecalidad.bz/', 'https://w9.cinecalidad.bz/', 'https://w10.cinecalidad.bz/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadla', default='')
@@ -96,18 +98,17 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    # ~ 14/12/2022  Solo hay 3 pelis
-    # ~ itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='aquamarine' ))
-    # ~ itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'espana/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'espana/', search_type = 'movie' ))
 
-    # ~ itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='aquamarine' ))
+    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'calidad/4k-ultra-hd-hdr/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'calidad/4k-ultra-hd-hdr/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie' ))
 
 
     return itemlist
@@ -164,7 +165,7 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1999, -1):
+    for x in range(current_year, 1969, -1):
         url = host + 'fecha/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color='deepskyblue' ))
@@ -465,6 +466,7 @@ def findvideos(item):
 
             if 'subtítulo' in servidor: continue
             elif 'forzado' in servidor: continue
+            elif 'gdtot' in servidor: continue
 
             elif servidor == 'utorrent': servidor = 'torrent'
             elif 'torrent' in servidor: servidor = 'torrent'
@@ -498,7 +500,6 @@ def play(item):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-
     if item.data_url:
         url_play = base64.b64decode(item.data_url).decode("utf-8")
 
@@ -508,6 +509,9 @@ def play(item):
 
         url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
+
+        if url:
+            if not 'https' in url: url = ''
 
         if not url:
             if '/acortalink.' in data:

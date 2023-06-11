@@ -169,7 +169,7 @@ def list_all(item):
         year = '-'
         if item.any: year = item.any
 
-        title = title.replace('&#8211;', '')
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('#038;', '')
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 

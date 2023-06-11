@@ -12,7 +12,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.pelisplus.lat/'
+host = 'https://pelisplus.ninja/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www.pelisplus.lat/', 'https://www.pelisplus.llc/', 'https://www.pelisplus.ninja/']
+
+
+domain = config.get_setting('dominio', 'pelispluslat', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'pelispluslat')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'pelispluslat')
+    else: host = domain
 
 
 def item_configurar_proxies(item):
@@ -35,7 +47,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -48,6 +60,10 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     # ~ 10/2/2023
     timeout = None
 
@@ -79,11 +95,39 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'pelispluslat', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_pelispluslat', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='pelispluslat', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_pelispluslat', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -100,7 +144,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -126,7 +170,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'listado-series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'series-en-estreno/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'series-de-estreno/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series-populares/', search_type = 'tvshow' ))
 
@@ -451,7 +495,7 @@ def findvideos(item):
 
             if not 'http' in url: url = host[:-1] + url
 
-            if 'pelisplus.lat' in url:
+            if host in url:
                 prv = do_downloadpage(url, headers={'Referer': item.url})
 
                 url = scrapertools.find_single_match(prv, "(?is)window.location.href = '([^']+)")
@@ -472,6 +516,11 @@ def findvideos(item):
             url = servertools.normalize_url(servidor, url)
 
             link_other = normalize_other(url)
+
+            if not link_other:
+                if servidor == 'various':
+                    if '/filemoon.' in url: link_other = 'Filemoon'
+                    elif '/streamwish.' in url: link_other = 'Streamwish'
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = IDIOMAS.get(lang, lang), other = link_other ))
 
@@ -630,7 +679,7 @@ def list_search(item):
 def search(item, texto):
     logger.info()
     try:
-       item.url = host + 'search?s=' + texto.replace(" ", "+")
+       item.url = host + '?s=' + texto.replace(" ", "+")
        return list_search(item)
     except:
        import sys

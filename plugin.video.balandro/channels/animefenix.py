@@ -70,7 +70,11 @@ def do_downloadpage(url, post=None, headers=None):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
         data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
-        if not data: data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            if not 'animes?q=' in url:
+                platformtools.dialog_notification('AnimeFenix', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -80,7 +84,7 @@ def do_downloadpage(url, post=None, headers=None):
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+                    data = httptools.downloadpage(url, post=post, headers=headers).data
                 else:
                    data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
         except:
@@ -254,9 +258,10 @@ def list_all(item):
 
         SerieName = title
 
-        if 'Peliculas' in title: SerieName = title.split("Peliculas")[0]
-        if 'Latino' in title: SerieName = title.split("Latino")[0]
-        if 'Movie' in title: SerieName = title.split("Movie")[0]
+        if 'Peliculas' in SerieName: SerieName = SerieName.split("Peliculas")[0]
+        if 'Latino' in SerieName: SerieName = SerieName.split("Latino")[0]
+        if 'Movie' in SerieName: SerieName = SerieName.split("Movie")[0]
+        if 'Season' in SerieName: SerieName = SerieName.split("Season")[0]
 
         SerieName = SerieName.strip()
 
@@ -294,9 +299,10 @@ def list_last(item):
     for url, thumb, title in matches:
         SerieName = title
 
-        if 'Peliculas' in title: SerieName = title.split("Peliculas")[0]
-        if 'Latino' in title: SerieName = title.split("Latino")[0]
-        if 'Movie' in title: SerieName = title.split("Movie")[0]
+        if 'Peliculas' in SerieName: SerieName = SerieName.split("Peliculas")[0]
+        if 'Latino' in SerieName: SerieName = SerieName.split("Latino")[0]
+        if 'Movie' in SerieName: SerieName = SerieName.split("Movie")[0]
+        if 'Season' in SerieName: SerieName = SerieName.split("Season")[0]
 
         SerieName = SerieName.strip()
 
@@ -321,9 +327,12 @@ def last_epis(item):
     for url, thumb, title, episode in matches:
         SerieName = title
 
-        if 'Peliculas' in title: SerieName = title.split("Peliculas")[0]
-        if 'Latino' in title: SerieName = title.split("Latino")[0]
-        if 'Movie' in title: SerieName = title.split("Movie")[0]
+        if 'Peliculas' in SerieName: SerieName = SerieName.split("Peliculas")[0]
+        if 'Latino' in SerieName: SerieName = SerieName.split("Latino")[0]
+        if 'Movie' in SerieName: SerieName = SerieName.split("Movie")[0]
+        if 'Season' in SerieName: SerieName = SerieName.split("Season")[0]
+
+        SerieName = SerieName.strip()
 
         try:
             epis = scrapertools.find_single_match(episode, "Episodio.*?(\d+)")
@@ -401,7 +410,9 @@ def episodios(item):
         except:
             episode = 0
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode ))
+        titulo = title + ' ' + item.contentSerieName
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -438,6 +449,7 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         serv = ''
+
         for srv, vid in srvs:
             vid = vid.replace('#vid', '')
 
@@ -445,6 +457,10 @@ def findvideos(item):
 
             serv = srv.lower()
             break
+
+        if serv == 'stream2':
+            servidor = 'various'
+            serv = 'Streamwish'
 
         if not serv == 'fireload':
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose', other = serv ))

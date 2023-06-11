@@ -381,6 +381,8 @@ def findvideos(item):
 
         lang = lang.strip()
 
+        lang = lang.replace('</li></ul>', '?')
+
         url = scrapertools.find_single_match(data, 'id="' + str(opt) + '".*?<iframe.*?src="(.*?)"')
 
         if not url or url.startswith('//'):
@@ -403,8 +405,11 @@ def findvideos(item):
                         data = do_downloadpage(new_url)
 
                         urls = scrapertools.find_multiple_matches(data, "go_to_player.*?'(.*?)'")
+                        if not urls: urls = scrapertools.find_multiple_matches(data, '<a target="_blank" href="(.*?)"')
 
                         for url in urls:
+                            if '/1fichier.' in url: continue
+
                             servidor = servertools.get_server_from_url(url)
                             servidor = servertools.corregir_servidor(servidor)
 
@@ -427,6 +432,29 @@ def findvideos(item):
                 data2 = do_downloadpage(url)
 
                 url = scrapertools.find_single_match(data2, '<iframe.*?src="([^"]+)')
+
+                if '/gnula.club/embed.php?id=' in url:
+                    data = do_downloadpage(url)
+
+                    urls = scrapertools.find_multiple_matches(data, "go_to_player.*?'(.*?)'")
+                    if not urls: urls = scrapertools.find_multiple_matches(data, '<a target="_blank" href="(.*?)"')
+
+                    for url in urls:
+                        if '/1fichier.' in url: continue
+
+                        servidor = servertools.get_server_from_url(url)
+                        servidor = servertools.corregir_servidor(servidor)
+
+                        if servertools.is_server_available(servidor):
+                            if not servertools.is_server_enabled(servidor): continue
+                            else:
+                                if not config.get_setting('developer_mode', default=False): continue
+
+                        url = servertools.normalize_url(servidor, url)
+
+                        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
+
+                    return itemlist
 
                 if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 

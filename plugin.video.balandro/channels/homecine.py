@@ -441,7 +441,7 @@ def list_all(item):
         if thumb.startswith('//'): thumb = 'https:' + thumb
         elif thumb.startswith('/'): thumb = host + thumb
 
-        title = title.replace('&amp;', '&')
+        title = title.replace('&amp;', '&').replace('&#8211;', '')
 
         year = scrapertools.find_single_match(info, 'rel="tag">(\d{4})<')
         if not year: year = '-'

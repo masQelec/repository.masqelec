@@ -201,6 +201,8 @@ def episodios(item):
 
         titulo = '1x%s - Episodio %s' % (epi_num, epi_num)
 
+        titulo = titulo + ' ' + item.contentSerieName
+
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epi_num ))
 
         if len(itemlist) >= item.perpage:
@@ -247,7 +249,26 @@ def findvideos(item):
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose' ))
+            url = servertools.normalize_url(servidor, url)
+
+            link_other = ''
+
+            if config.get_setting('developer_mode', default=False):
+                try:
+                   link_other = url.split('//')[1]
+                   link_other = link_other.split('/')[0]
+                except:
+                   link_other = url
+            else: link_other = url
+
+            link_other = link_other.replace('www.', '').replace('.com', '').replace('.net', '').replace('.org', '').replace('.top', '')
+            link_other = link_other.replace('.co', '').replace('.cc', '').replace('.sh', '').replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '')
+            link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.sx', '')
+
+            if servidor == 'directo': other = link_other
+            else: link_other = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = link_other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

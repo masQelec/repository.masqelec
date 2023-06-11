@@ -5,7 +5,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.poseidonhd2.com/'
+host = 'https://poseidonhd2.co/'
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.poseidonhd2.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
 
 
 def mainlist(item):
@@ -64,7 +76,7 @@ def generos(item):
 
     url = host[:-1]
 
-    data = httptools.downloadpage(url).data
+    data = do_downloadpage(url)
 
     bloque = scrapertools.find_single_match(data, '>Generos<(.*?)</ul>')
 
@@ -86,7 +98,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     if '<h2' in data:
         bloque = scrapertools.find_single_match(data, '<h2(.*?)Destacadas</h3>')
@@ -103,6 +115,8 @@ def list_all(item):
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
+
+        title = title.replace('&#x27;', "'")
 
         if url.startswith("/"): url = host[:-1] + url
 
@@ -150,7 +164,7 @@ def last_epis(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, '<h1(.*?)Destacadas</h3>')
 
@@ -201,7 +215,7 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, '<option value="(.*?)"')
 
@@ -230,7 +244,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(str(data), '{"number":' + str(item.contentSeason) + '.*?"episodes"(.*?)]}')
 
@@ -299,7 +313,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, '<li class="open_submenu active actives">(.*?)</div></li>')
 
@@ -340,6 +354,8 @@ def findvideos(item):
                    elif srv == 'ok-ru': srv ='okru'
                    elif srv == 'voex': srv ='voe'
                    elif srv == 'videovard': other = srv
+                   elif srv == 'filemoon': other = srv
+                   elif srv == 'streamwish': other = srv
                    elif srv == 'player' or srv == 'embed':
                       other = srv
                       srv = ''
@@ -405,7 +421,7 @@ def play(item):
     host_player = host.replace('https://', 'https://fs.')
 
     if url.startswith('https://player.'):
-        data = httptools.downloadpage(url).data
+        data = do_downloadpage(url)
 
         url_final = scrapertools.find_single_match(data, "var url = '(.*?)'")
         if not url_final: url_final = scrapertools.find_single_match(data, 'let url = "(.*?)"')
@@ -420,7 +436,7 @@ def play(item):
                url_final = ''
 
     if url_final == '':
-        data = httptools.downloadpage(url).data
+        data = do_downloadpage(url)
 
         value_php = scrapertools.find_single_match(data, '<input type="hidden" name="data" value="([^"]+)"')
 
@@ -429,7 +445,7 @@ def play(item):
 
             post = {'h': index_php}
 
-            url_final = httptools.downloadpage(host_player + 'r.php', post = post).url
+            url_final = httptools.downloadpage(host_player + 'r.php', post = post)
 
             if not url_final:
                 data_post = httptools.downloadpage(host_player + 'api.php', post = post).data
@@ -445,7 +461,7 @@ def play(item):
             url_final = httptools.downloadpage(host + 'r.php', post = post).url
 
             if '/index.php?' in url_final:
-                index_php = url_final.replace( host_player + 'index.php?h=', '')
+                index_php = url_final.replace(host_player + 'index.php?h=', '')
 
                 post = {'h': index_php}
 

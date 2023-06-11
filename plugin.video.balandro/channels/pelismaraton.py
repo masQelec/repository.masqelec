@@ -70,6 +70,25 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     else:
         data = httptools.downloadpage_proxy('pelismaraton', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                   data = httptools.downloadpage_proxy('pelismaraton', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        except:
+            pass
+
+    if '<title>Just a moment...</title>' in data:
+        if not '?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -95,6 +114,8 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='manto_domain_pelismaraton', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_pelismaraton', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     platformtools.itemlist_refresh()
 
@@ -352,7 +373,8 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, 'onclick="go_to_player.*?'+ "'(.*?)'" + '.*?>opción.*?<p.*?">(.*?)</p>')
+    matches = scrapertools.find_multiple_matches(data, 'onclick="go_to_player.*?' + "'(.*?)'" + '.*?>opción.*?<p.*?">(.*?)</p>')
+    if not matches: matches = scrapertools.find_multiple_matches(data, 'onclick="go_to_player.*?' + "'(.*?)'" + '.*?<span>(.*?)</span>')
 
     ses = 0
 
@@ -360,34 +382,36 @@ def findvideos(item):
         ses += 1
 
         servidor = srv_lang.split('-')[0]
+        if len(servidor) <= 2: servidor = srv_lang.split('-')[1]
+
         servidor = servidor.strip().lower()
 
         if servidor == 'hqq' or servidor == 'waaw' or servidor == 'netu': continue
 
         if servidor:
             lang = srv_lang.split('-')[1]
-            lang = lang.replace('Español', '').strip().lower()
+            if len(lang) >= 3:
+                lang = srv_lang.split('-')[0]
+                if len(lang) <= 2: lang = '?'
+
+            lang = lang.strip().lower()
 
             itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang,lang) ))
 
     # ~ Descargas
-    bloque = scrapertools.find_single_match(data, '<div id="tabs-download"(.*?)</div></div></div>')
+    matches = scrapertools.find_multiple_matches(data, '<span class="Num">.*?</span>(.*?)</td><td>(.*?)</td><td><span>(.*?)</span>.*?href="(.*?)".*?Descargar</a>')
 
-    matches = scrapertools.find_multiple_matches(bloque, ' href="(.*?)".*?>opción.*?<p.*?">(.*?)</p>')
-
-    for url, srv_lang in matches:
+    for srv, lang, qlty, url in matches:
         ses += 1
 
-        servidor = srv_lang.split('-')[0]
-        servidor = servidor.strip().lower()
+        servidor = srv.strip().lower()
 
         if servidor == '1fichier': continue
 
         if servidor:
-            lang = srv_lang.split('-')[1]
-            lang = lang.replace('Español', '').strip().lower()
+            lang = lang.strip().lower()
 
-            itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang,lang), other = 'D' ))
+            itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang,lang), quality = qlty, other = 'D' ))
 
     if not itemlist:
         if not ses == 0:

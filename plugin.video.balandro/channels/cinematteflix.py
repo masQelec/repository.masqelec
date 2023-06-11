@@ -87,7 +87,7 @@ def list_all(item):
         if item.group == 'magazine':
             if '/sin-categoria/' in match: continue
 
-        url = scrapertools.find_single_match(match, 'class="entry-title"><a href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
         if not url: continue
 
         if '/passionatte.com/' in url: continue
@@ -115,11 +115,14 @@ def list_all(item):
         elif 'Versión ' in info: langs = 'Vo'
         else: langs = 'Esp'
 
-        title = scrapertools.find_single_match(match, 'rel="bookmark">(.*?)</a>').lower()
+        title = scrapertools.find_single_match(match, 'rel="bookmark">(.*?)</a>')
+        if not title: title = scrapertools.find_single_match(match, 'href=".*?">(.*?)</a>')
 
         if not title: continue
 
-        title = title.lower().replace('ver ', '').replace('videoclub gratuito ', '').replace('videoclub gratis ', '').replace('videoclub online ', '').replace('videoclub ', '').replace('y descargar ', '').strip()
+        title = title.lower()
+
+        title = title.replace('Ver Serie completa ', '').replace('ver ', '').replace('videoclub gratuito online ', '').replace('videoclub gratuito ', '').replace('videoclub gratis: ', '').replace('videoclub gratis ', '').replace('videoclub online gratis: ', '').replace('videoclub online gratis ', '').replace('videoclub online: ', '').replace('videoclub online ', '').replace('videoclub: ', '').replace('videoclub ', '').replace('y descargar ', '').strip()
 
         if title.startswith('|'):
             title = title.split("|")[1]

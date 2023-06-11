@@ -25,15 +25,23 @@
       },
       {
         "pattern": "(https://playhide.online/(?:e|d|w)/[A-z0-9]+)",
-        "url": "https://streamhide.to/e/\\1"
+        "url": "\\1"
       },
       {
         "pattern": "(https://guccihide.com/(?:e|d|w)/[A-z0-9]+)",
-        "url": "https://streamhide.to/e/\\1"
+        "url": "\\1"
       },
       {
         "pattern": "(https://moviesm4u.com/(?:e|d|w)/[A-z0-9]+)",
-        "url": "https://streamhide.to/e/\\1"
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://louishide.com/(?:e|d|w)/[A-z0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://ahvsh.com/(?:e|d|w)/[A-z0-9]+)",
+        "url": "\\1"
       }
     ]
   }

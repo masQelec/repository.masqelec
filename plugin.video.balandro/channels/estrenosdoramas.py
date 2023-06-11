@@ -355,9 +355,7 @@ def episodios(item):
 
     bloque = scrapertools.find_single_match(data, '>Lista de capítulos!<(.*?)</ul></div>')
 
-    patron = '<a href="(.*?)">(.*?)</a>'
-
-    matches = re.compile(patron, re.DOTALL).findall(bloque)
+    matches = re.compile('<a href="(.*?)">(.*?)</a>', re.DOTALL).findall(bloque)
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -401,7 +399,7 @@ def episodios(item):
                 else: item.perpage = 50
 
     for url, title in matches[item.page * item.perpage:]:
-        if not 'Capitulo' in title: continue
+        if not 'Capitulo' in title and not 'Capítulo' in title: continue
 
         epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
         if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
@@ -628,14 +626,22 @@ def play(item):
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-        if not 'https:' in str(url): url = 'https:' + str(url)
+        if '.estrenosdoramas.' in url: url = ''
+        elif '/rumble.' in url: url = ''
 
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
+        if url:
+            if not 'https:' in str(url): url = 'https:' + str(url)
 
-        url = servertools.normalize_url(servidor, url)
+            url = url.replace('&amp;', '')
 
-        itemlist.append(item.clone(server = servidor, url = url))
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            if '/vk.com/' in url: servidor = 'vk'
+
+            url = servertools.normalize_url(servidor, url)
+
+            itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
 

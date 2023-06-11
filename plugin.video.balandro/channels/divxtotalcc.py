@@ -44,7 +44,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados ó bloqueos)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -364,33 +364,34 @@ def play(item):
     itemlist = []
 
     if item.other == 'Directo':
-        item.url = host_play + 'download_tt.php?u=' + item.url
+        if not item.url.endswith('.torrent'):
+            item.url = host_play + 'download_tt.php?u=' + item.url
 
-        if PY3:
-            from core import requeststools
-            data = requeststools.read(item.url, 'divxtotalcc')
-        else:
-            data = do_downloadpage(item.url)
+            if PY3:
+                from core import requeststools
+                data = requeststools.read(item.url, 'divxtotalcc')
+            else:
+                data = do_downloadpage(item.url)
 
-        if data:
-            try:
-               if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data):
-                   platformtools.dialog_ok('DivxTotalCc', '[COLOR cyan]Archivo no encontrado[/COLOR]')
-                   return itemlist
-               elif '<p>Por causas ajenas a ' in str(data):
-                   if not config.get_setting('proxies', item.channel, default=''):
-                       return 'Archivo [COLOR cyan]bloqueado[/COLOR] [COLOR red]Configure proxies a usar ...[/COLOR]'
+            if data:
+                try:
+                   if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data):
+                       platformtools.dialog_ok('DivxTotalCc', '[COLOR cyan]Archivo no encontrado[/COLOR]')
+                       return itemlist
+                   elif '<p>Por causas ajenas a ' in str(data):
+                       if not config.get_setting('proxies', item.channel, default=''):
+                           return 'Archivo [COLOR cyan]bloqueado[/COLOR] [COLOR red]Configure los proxies[/COLOR]'
 
-                   return 'Archivo [COLOR red]bloqueado[/COLOR]'
-            except:
-               pass
+                       return 'Archivo [COLOR red]bloqueado[/COLOR]'
+                except:
+                   pass
 
-            file_local = os.path.join(config.get_data_path(), "temp.torrent")
-            with open(file_local, 'wb') as f: f.write(data); f.close()
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
 
-            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
 
-        return itemlist
+            return itemlist
 
     if not item.url.endswith('.torrent'):
         host_torrent = host_play[:-1]
@@ -412,7 +413,7 @@ def play(item):
                    return itemlist
                elif '<p>Por causas ajenas a ' in str(data):
                    if not config.get_setting('proxies', item.channel, default=''):
-                       return 'Archivo [COLOR cyan]bloqueado[/COLOR] [COLOR red]Configure proxies a usar ...[/COLOR]'
+                       return 'Archivo [COLOR cyan]bloqueado[/COLOR] [COLOR red]Configure los proxies[/COLOR]'
 
                    return 'Archivo [COLOR cyan]bloqueado[/COLOR]'
             except:

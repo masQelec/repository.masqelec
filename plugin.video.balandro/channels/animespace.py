@@ -83,7 +83,7 @@ def list_all(item):
 
         thumb = thumb.replace("200/", "800/").replace("280/", "1120/")
 
-        title = title.replace('&#039;', "'")
+        title = title.replace('&#039;', "'").replace('&quot;', "")
 
         SerieName = title
 
@@ -121,7 +121,7 @@ def last_epis(item):
     matches = re.compile(patron, re.DOTALL).findall(bloque)
 
     for url, thumb, epis, title in matches:
-        title = title.replace('&#039;', "'")
+        title = title.replace('&#039;', "'").replace('&quot;', "")
 
         SerieName = title
 
