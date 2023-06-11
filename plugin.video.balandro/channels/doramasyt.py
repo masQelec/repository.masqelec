@@ -44,7 +44,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'doramas?categoria=dorama', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Episodios recientes', action = 'last_episodes', url = host, search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Episodios recientes', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'olive' ))
 
     itemlist.append(item.clone( title = 'Live action', action = 'list_all', url = host + 'doramas?categoria=live-action', search_type = 'tvshow' ))
 
@@ -207,7 +207,7 @@ def list_all(item):
     return itemlist
 
 
-def last_episodes(item):
+def last_epis(item):
     logger.info()
     itemlist = []
 
@@ -225,6 +225,8 @@ def last_episodes(item):
 
         if "capitulo" in title: SerieName = title.split("capitulo")[0]
         else: titulo = SerieName
+
+        SerieName = SerieName.strip()
 
         season = 1
         if not epis: epis = 0
@@ -353,8 +355,10 @@ def findvideos(item):
         srv = srv.lower()
 
         if 'hqq' in srv or 'waaw' in srv or 'netu' in srv: continue
+        elif 'fireload' in srv: continue
 
         elif 'ok' in srv: srv = 'okru'
+        elif 'mixdropco' in srv: srv = 'mixdrop'
 
         srv = srv.replace('com/', '')
 
@@ -368,7 +372,7 @@ def findvideos(item):
 
             servidor = servertools.corregir_servidor(srv)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, other = servidor ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, other = servidor.capitalize() ))
 
     # Enlaces descarga
 
@@ -384,6 +388,8 @@ def findvideos(item):
 
             if not srv: continue
 
+            elif 'fireload' in srv: continue
+
             elif srv == 'ok': srv = 'mega'
 
             if servertools.is_server_available(srv):
@@ -391,11 +397,9 @@ def findvideos(item):
             else:
                 if not config.get_setting('developer_mode', default=False): continue
 
-                if srv == 'mediafire': continue
-
             servidor = servertools.corregir_servidor(srv)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, other = servidor + ' (D)' ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, other = servidor.capitalize() + ' (D)' ))
 
     if not itemlist:
         if not ses == 0:

@@ -168,7 +168,9 @@ def episodios(item):
                 else: item.perpage = 50
 
     for url, epis, title in matches[item.page * item.perpage:]:
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
+        titulo = title + ' ' + item.contentSerieName
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break

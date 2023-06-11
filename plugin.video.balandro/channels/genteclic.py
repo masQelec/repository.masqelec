@@ -126,7 +126,10 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = item.languages ))
+        lang = item.languages
+        if not lang: lang = 'Lat'
+
+        itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang ))
 
     if not itemlist:
         if not ses == 0:

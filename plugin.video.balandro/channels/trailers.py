@@ -13,7 +13,7 @@ else:
 
 import re
 
-from platformcode import config, logger
+from platformcode import logger
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
@@ -107,23 +107,26 @@ def list_search(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+    post = {'q': item.tex, 'tab': 'resumen'}
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="fl-item">(.*?)</a></p>')
+    data = httptools.downloadpage(host + 'ajax/_typesense/', post = post, headers = {'Referer': host + 'buscar/?q=' + item.tex}).data
+
+    matches = scrapertools.find_multiple_matches(str(data), '"adicionales":(.*?)"coincidencia":')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, ' href="(.*?)"')
+        if not '"PELI"' in match: continue
 
-        title = scrapertools.find_single_match(match, ' alt="(.*?)"')
+        url = scrapertools.find_single_match(str(match), '"url".*?"(.*?)"')
+
+        title = scrapertools.find_single_match(str(match), '"titulos":.*?"(.*?)"')
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
+        url = host + '/peliculas/' + url
 
-        if thumb.startswith('/'): thumb = host[:-1] + thumb
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie' ))
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -131,7 +134,7 @@ def list_search(item):
 def search(item, texto):
     logger.info()
     try:
-       item.url = host + 'buscar/?q=' + texto.replace(" ", "+")
+       item.tex = texto.replace(" ", "+")
        return list_search(item)
     except:
         import sys

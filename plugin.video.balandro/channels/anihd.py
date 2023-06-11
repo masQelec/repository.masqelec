@@ -151,6 +151,7 @@ def findvideos(item):
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
         elif 'jetload.' in url: continue
+        elif '/hydrax.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -158,7 +159,7 @@ def findvideos(item):
         url = servertools.normalize_url(servidor, url)
 
         other = ''
-        if servidor == 'directo': other = srv
+        if servidor == 'directo': other = srv.replace('server', '').strip()
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other = other ))
 

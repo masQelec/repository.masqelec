@@ -412,8 +412,10 @@ def findvideos(item):
 
             url = servertools.normalize_url(servidor, url)
 
+            link_other = ''
             if servidor == 'directo': link_other = normalize_other(url)
-            else: link_other = ''
+            elif servidor == 'various':
+                  if '/filemoon.' in url: link_other = 'filemoon'
 
             lang = idioma
 
@@ -428,7 +430,7 @@ def findvideos(item):
 
 
 def normalize_other(url):
-    if '/clonamesta' in url or '/moonplayer' in url: link_other = ''
+    if '/clonamesta' in url: link_other = ''
 
     elif 'pelisplus' in url: link_other = 'plus'
     elif 'pelisplay' in url: link_other = 'play'

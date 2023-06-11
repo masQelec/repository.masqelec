@@ -1005,8 +1005,9 @@ def findvideos(item):
              "24": {"t": "d", "d": "https://katfile.com/%s"},
              "27": {"t": "d", "d": "https://nitroflare.com/%s"},
              "31": {"t": "s", "d": "https://vidoza.net/embed-%s.html"},
-             "35": {"t": "d", "d": "https://uptobox.com/%s"},
-             "38": {"t": "d", "d": "https://clicknupload.cc/%s"}
+             "35": {"t": "s", "d": "https://uptobox.com/%s"},
+             "38": {"t": "s", "d": "https://clicknupload.cc/%s"},
+             "40": {"t": "s", "d": "https://vidmoly.me/embed-%s.html"},
              }
 
     # ~ try:

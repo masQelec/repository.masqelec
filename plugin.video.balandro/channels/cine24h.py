@@ -207,7 +207,7 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         if url:
-           itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = lang, quality = qlty ))
+           itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url ))
 
     if not itemlist:
         if not ses == 0:

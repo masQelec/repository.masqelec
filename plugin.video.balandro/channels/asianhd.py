@@ -82,11 +82,11 @@ def list_all(item):
         else:
             SerieName = title.replace('(Dub)' , '')
 
-            if "Season" in SerieName: SerieName = SerieName.split("Season")[0]
+            if "Episode" in SerieName: SerieName = SerieName.split("Episode")[0]
+            elif "Season" in SerieName: SerieName = SerieName.split("Season")[0]
             elif " S1 " in SerieName: SerieName = SerieName.split(" S1 ")[0]
             elif " S2 " in SerieName: SerieName = SerieName.split(" S2 ")[0]
             elif " S3 " in SerieName: SerieName = SerieName.split(" S3 ")[0]
-            elif "Episode" in SerieName: SerieName = SerieName.split("Episode")[0]
 
             SerieName = SerieName.strip()
 

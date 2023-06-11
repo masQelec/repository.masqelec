@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast"],
 
-  "clusters": ["suggested", "kids", "docs"],
+  "clusters": ["notice", "suggested", "kids", "docs"],
 
   "notes": "Películas en español, por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

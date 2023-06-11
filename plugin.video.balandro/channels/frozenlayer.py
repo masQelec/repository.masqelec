@@ -260,10 +260,9 @@ def findvideos(item):
             else: servidor = ''
 
             if servidor:
-                lang = 'Vose'
                 url = item.url_tor
 
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Vose' ))
 
                 return itemlist
 
@@ -274,11 +273,38 @@ def findvideos(item):
 
         if url.endswith('.torrent'): servidor = 'torrent'
         elif url.startswith('magnet:?'): servidor = 'torrent'
-        else: continue
+        else:
+           servidor = servertools.get_server_from_url(url)
+           servidor = servertools.corregir_servidor(servidor)
 
-        lang = 'Vose'
+           url = servertools.normalize_url(servidor, url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang ))
+           if servidor == 'directo': continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Vose' ))
+
+    if not itemlist:
+        matches = scrapertools.find_multiple_matches(data, 'FlashVars.*?text=https.*?https(.*?)">')
+        if not matches:
+            if 'FlashVars="text=' in data: ses += 1
+
+        if matches:
+           for match in matches:
+               ses += 1
+
+               url = 'https' + match
+
+               if url.endswith('.torrent'): servidor = 'torrent'
+               elif url.startswith('magnet:?'): servidor = 'torrent'
+               else:
+                  servidor = servertools.get_server_from_url(url)
+                  servidor = servertools.corregir_servidor(servidor)
+
+                  url = servertools.normalize_url(servidor, url)
+
+                  if servidor == 'directo': continue
+
+               itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Vose' ))
 
     if not itemlist:
         if not ses == 0:

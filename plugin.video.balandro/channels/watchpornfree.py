@@ -34,7 +34,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'scenes/' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'scenes/category/featured-scenes/' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'category/featured/' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host, text_color = 'deepskyblue' ))
 
@@ -147,6 +147,8 @@ def findvideos(item):
         if servidor == 'various':
             if '/tubeload.' in url: other = 'Tubeload'
             elif '/mvidoo.' in url: other = 'Mvidoo'
+            elif '/streamhub.' in url: other = 'Streamhub'
+            elif '/filemoon.' in url: other = 'Filemoon'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'VO', other = other ))
 

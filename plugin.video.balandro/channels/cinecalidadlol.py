@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://c2.cinecalidad.win/'
+host = 'https://w6.cinecalidad.vet/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -24,7 +24,10 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://c3.cinecalidad.cat/', 'https://c4.cinecalidad.cat/', 'https://cinecalidad.win/',
              'https://w1.cinecalidad.win/', 'https://w2.cinecalidad.win/', 'https://w5.cinecalidad.win/',
              'https://w6.cinecalidad.win/', 'https://w7.cinecalidad.win/', 'https://w8.cinecalidad.win/',
-             'https://w9.cinecalidad.win/', 'https://c1.cinecalidad.win/']
+             'https://w9.cinecalidad.win/', 'https://c1.cinecalidad.win/', 'https://c2.cinecalidad.win/',
+             'https://w10.cinecalidad.win/', 'https://w1.cinecalidad.ist/', 'https://cinecalidad.ist/',
+             'https://cinecalidad.vet/', 'https://w1.cinecalidad.vet/', 'https://w2.cinecalidad.vet/',
+             'https://w3.cinecalidad.vet/', 'https://w4.cinecalidad.vet/', 'https://w5.cinecalidad.vet/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -124,6 +127,8 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='manto_domain_cinecalidadlol', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_cinecalidadlol', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     platformtools.itemlist_refresh()
 
@@ -233,7 +238,7 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1999, -1):
+    for x in range(current_year, 1969, -1):
         url = host + 'fecha-de-lanzamiento/' + str(x) + '/'
 
         if item.group == '?ref=es': url = url + item.group
@@ -308,6 +313,7 @@ def list_all(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, "<span class='pages'>.*?class='current'>.*?" + 'href="(.*?)"')
+        if not next_page: next_page = scrapertools.find_single_match(data, '<span class="pages">.*?class="current">.*?' + 'href="(.*?)"')
 
         if next_page:
             if '/page/' in next_page:
@@ -478,6 +484,7 @@ def findvideos(item):
 
     if '>No hay opciones para ver en latino' in data:
         new_url = scrapertools.find_single_match(data, ">No hay opciones para ver en latino.*?<a href='(.*?)'>Ver en castellano<")
+        if not new_url: new_url = scrapertools.find_single_match(data, '>No hay opciones para ver en latino.*?<a href="(.*?)">Ver en castellano<')
 
         if new_url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR yellowgreen][B]Sin opciones Play en Latino[/B][/COLOR]')
@@ -555,6 +562,7 @@ def findvideos(item):
 
             if 'subtítulo' in servidor: continue
             elif 'forzado' in servidor: continue
+            elif 'cinecalidad' in servidor: continue
 
             elif servidor == 'utorrent': servidor = 'torrent'
             elif 'torrent' in servidor: servidor = 'torrent'
@@ -600,7 +608,10 @@ def play(item):
         if not url: url = scrapertools.find_single_match(data, '<iframe.*?data-src="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
 
-        if '/?id=' in url: url = ''
+        if '/?id=' in url:
+            data = do_downloadpage(url)
+
+            url: url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
 
         if url:
             url = url.replace('&amp;', '&')

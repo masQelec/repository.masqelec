@@ -2,12 +2,24 @@
 
 import re, os
 
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
 host = 'https://www2.mejortorrent.rip'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://www1.mejortorrent.rip']
+
+
+domain = config.get_setting('dominio', 'mejortorrentapp', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'mejortorrentapp')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'mejortorrentapp')
+    else: host = domain
 
 
 perpage = 30
@@ -33,7 +45,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -47,8 +59,6 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://www1.mejortorrent.rip']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -60,11 +70,39 @@ def do_downloadpage(url, post=None, headers=None):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'mejortorrentapp', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_mejortorrentapp', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='mejortorrentapp', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_mejortorrentapp', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -79,7 +117,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -102,7 +140,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -123,7 +161,7 @@ def mainlist_documentales(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'tvshow', text_color = 'cyan' ))
 

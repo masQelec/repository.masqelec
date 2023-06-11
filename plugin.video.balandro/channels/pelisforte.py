@@ -266,6 +266,8 @@ def play(item):
                     return 'Servidor [COLOR plum]No Soportado[/COLOR]'
                 elif '/playpf.link/' in url:
                     return 'Servidor [COLOR plum]No Soportado[/COLOR]'
+                elif '/vgfplay.' in url:
+                    return 'Servidor [COLOR plum]No Soportado[/COLOR]'
 
                 if '/wtfsb.link/' in url:
                     url = url.replace('/wtfsb.link/', '/streamsb.net/')

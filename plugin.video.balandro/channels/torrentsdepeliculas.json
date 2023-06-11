@@ -11,7 +11,7 @@
   "categories": ["movie", "torrent"],
   "language": ["cast"],
 
-  "clusters": ["temporary", "torrents", "years", "docs"],
+  "clusters": ["torrents", "years", "docs"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas por géneros y año."
+  "notes": "Web CERRADA. Canal con enlaces Torrent exclusivamente. Películas por géneros y año."
 }

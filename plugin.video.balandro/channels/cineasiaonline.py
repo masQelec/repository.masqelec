@@ -104,8 +104,7 @@ def list_all(item):
 
         if not year: year = '-'
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, 
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -150,9 +149,12 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
+        if '/streamhub.' in url: other = 'Streamhub'
+        else: other = ''
+
         if servidor == 'zplayer': url += "|referer=%s" % host
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = idioma ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = idioma, other = other ))
 
     if not itemlist:
         if not ses == 0:

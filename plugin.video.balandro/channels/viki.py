@@ -147,18 +147,25 @@ def last_epis(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         temp_epis = scrapertools.find_single_match(match, '<span>(.*?)</span>')
+        if ' / ' in temp_epis:
+            temp_epis = temp_epis.split(" / ")[0]
+            temp_epis = temp_epis.strip()
 
         if not temp_epis: continue
 
         season = scrapertools.find_single_match(temp_epis, 'T(.*?)E').strip()
-        episode = scrapertools.find_single_match(temp_epis, 'E(.*?)/').strip()
+        episode = scrapertools.find_single_match(temp_epis, 'E(.*?)$').strip()
+
+        title = title.replace('&#215;', ' ')
 
         titulo = temp_epis + '  ' + title
 
         if 'Capitulo' in title: SerieName = title.split("Capitulo")[0]
+        elif 'Capítulo' in title: SerieName = title.split("Capítulo")[0]
         else: SerieName = title
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=SerieName, contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
+                                    contentSerieName=SerieName, contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
 
     tmdb.set_infoLabels(itemlist)
 

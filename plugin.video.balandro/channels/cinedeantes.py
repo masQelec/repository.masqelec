@@ -22,7 +22,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Búsquedas:', action = '', folder=False, text_color='plum' ))
     itemlist.append(item.clone ( title = ' - Buscar película ...', action = 'search', grupo = 'alfab', search_type = 'movie', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone ( title = ' - Buscar por agrupación ...', action = 'search', grupo = 'agrupa', search_type = 'movie', text_color='salmon' ))
+    itemlist.append(item.clone ( title = ' - Buscar por agrupación ...', action = 'search', grupo = 'agrupa', search_type = 'all', text_color='salmon' ))
 
     itemlist.append(item.clone ( title = 'Novedades', action = 'news' ))
 
@@ -307,6 +307,7 @@ def list_all(item):
         if matches:
             if num_matches > hasta:
                 next_page = item.page + 1
+
                 itemlist.append(item.clone( title = 'Siguientes ...', page = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
@@ -697,12 +698,14 @@ def search(item, texto):
     logger.info()
     try:
        item.url = host
-       if item.grupo == 'agrupa':
-            item.filtro_search = texto
-            return pelis(item)
-       else:
+
+       if item.grupo == 'alfab':
             item.title_search = texto
             return list_search(item)
+
+       else:
+            item.filtro_search = texto
+            return pelis(item)
     except:
        import sys
        for line in sys.exc_info():
