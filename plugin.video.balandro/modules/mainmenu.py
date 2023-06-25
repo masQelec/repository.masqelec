@@ -341,7 +341,7 @@ def mainlist(item):
         itemlist.append(item.clone( action='channels', extra='all', title=' - Canales', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='gold' ))
 
     if config.get_setting('mnu_idiomas', default=True):
-        itemlist.append(item.clone( channel='groups', action='mainlist', mnu_lang='idiomas', title=' - Idiomas', context=context_menu, thumbnail=config.get_thumb('idiomas'), text_color='limegreen' ))
+        itemlist.append(item.clone( channel='groups', action='mainlist', mnu_lang='idiomas', title=' - Idiomas', context=context_menu, thumbnail=config.get_thumb('idiomas'), text_color='yellowgreen' ))
 
     if config.get_setting('mnu_grupos', default=True):
         itemlist.append(item.clone( channel='groups', action='mainlist', extra='groups', title=' - Grupos', context=context_cfg_search, thumbnail=config.get_thumb('bookshelf'), text_color='magenta' ))
@@ -950,11 +950,12 @@ def channels(item):
             tit = '[COLOR yellowgreen][B]Dominio vigente[/B][/COLOR]'
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominio_vigente'})
 
+            if 'Dispone de varios posibles dominios' in ch['notes']:
+                tit = '[COLOR powderblue][B]Configurar dominio a usar[/B][/COLOR]'
+                context.append({'title': tit, 'channel': item.channel, 'action': '_dominios'})
+
             tit = '[COLOR orange][B]Modificar dominio Memorizado[/B][/COLOR]'
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominio_memorizado'})
-
-            tit = '[COLOR powderblue][B]Configurar dominio a usar[/B][/COLOR]'
-            context.append({'title': tit, 'channel': item.channel, 'action': '_dominios'})
 
         if 'register' in ch['clusters']:
             cfg_user_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_username'

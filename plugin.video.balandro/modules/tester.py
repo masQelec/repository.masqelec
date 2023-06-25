@@ -81,9 +81,10 @@ def test_channel(channel_name):
     txt += '[COLOR moccasin][B]Balandro:[/B][/COLOR] ' + config.get_addon_version() + '[CR][CR]'
 
     txt += '[COLOR moccasin][B]Parámetros:[/B][/COLOR][CR]'
+
     txt += 'id: ' + str(params['id']) + '[CR]'
+    txt += 'name: ' + str(params['name']) + '[CR]'
     txt += 'active: ' + str(params['active']) + '[CR]'
-    txt += 'searchable: [COLOR yellowgreen][B]' + str(params['searchable']) + '[/B][/COLOR][CR]'
 
     search_types = str(params['search_types'])
     search_types = search_types.replace('[', '').replace(']', '').replace("'", '').strip()
@@ -93,9 +94,27 @@ def test_channel(channel_name):
     categories = categories.replace('[', '').replace(']', '').replace("'", '').strip()
     txt += 'categories: ' + str(categories) + '[CR]'
 
+    if config.get_setting('developer_mode', default=False):
+        txt += '[CR][COLOR moccasin][B]Desarrollo:[/B][/COLOR]'
+
+        sets_clusters = str(params['clusters'])
+        sets_clusters = sets_clusters.replace('[', '').replace(']', '').replace("'", '').strip()
+        txt += '[CR]clusters: ' + sets_clusters
+
+        sets_notes = str(params['notes'])
+        txt += '[CR]notes: ' + sets_notes
+
+        txt += '[CR]'
+
+    txt += '[CR][COLOR moccasin][B]Contenidos:[/B][/COLOR][CR]'
+
+    if 'temporary' in str(params['clusters']): txt += 'búsquedas: [COLOR red][B]False[/B][/COLOR][CR]'
+    else: txt += 'búsquedas: [COLOR chartreuse][B]' + str(params['searchable']) + '[/B][/COLOR][CR]'
+
     language = str(params['language'])
     language = language.replace('[', '').replace(']', '').replace("'", '').strip()
-    txt += 'language: ' + str(language) + '[CR]'
+    language = language.replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'Vo')
+    txt += 'idiomas: ' + str(language) + '[CR]'
 
     clusters = str(params['clusters'])
     clusters = clusters.replace('[', '').replace(']', '').replace("'", '').strip()
@@ -109,14 +128,81 @@ def test_channel(channel_name):
     if 'register' in clusters: clusters = clusters.replace('register,', '').strip()
     if 'current' in clusters: clusters = clusters.replace('current,', '').strip()
     if 'torrents' in clusters: clusters = clusters.replace('torrents,', '').strip()
+    if 'notice' in clusters: clusters = clusters.replace('notice,', '').strip()
+    if 'languages' in clusters: clusters = clusters.replace('languages,', '').strip()
+
+    if 'news' in clusters: clusters = clusters.replace('news,', '').strip()
+    if 'news' in clusters: clusters = clusters.replace('news', '').strip()
+
+    if 'lasts' in clusters: clusters = clusters.replace('lasts,', '').strip()
+    if 'lasts' in clusters: clusters = clusters.replace('lasts', '').strip()
+
+    if 'classic' in clusters: clusters = clusters.replace('classic,', '').strip()
+    if 'classic' in clusters: clusters = clusters.replace('classic', '').strip()
+
+    if 'rankings' in clusters: clusters = clusters.replace('rankings,', '').strip()
+    if 'rankings' in clusters: clusters = clusters.replace('rankings', '').strip()
+
+    if 'countries' in clusters: clusters = clusters.replace('countries,', '').strip()
+    if 'countries' in clusters: clusters = clusters.replace('countries', '').strip()
+
+    if 'qualityes' in clusters: clusters = clusters.replace('qualityes,', '').strip()
+    if 'qualityes' in clusters: clusters = clusters.replace('qualityes', '').strip()
+
+    if 'producers' in clusters: clusters = clusters.replace('producers,', '').strip()
+    if 'producers' in clusters: clusters = clusters.replace('producers', '').strip()
+
+    if 'years' in clusters: clusters = clusters.replace('years,', '').strip()
+    if 'years' in clusters: clusters = clusters.replace('years', '').strip()
+
+    if 'stars' in clusters: clusters = clusters.replace('stars,', '').strip()
+    if 'stars' in clusters: clusters = clusters.replace('stars', '').strip()
+
+    if 'directors' in clusters: clusters = clusters.replace('directors,', '').strip()
+    if 'directors' in clusters: clusters = clusters.replace('directors', '').strip()
+
+    if 'lists' in clusters: clusters = clusters.replace('lists,', '').strip()
+    if 'lists' in clusters: clusters = clusters.replace('lists', '').strip()
+
+    if 'categories' in clusters: clusters = clusters.replace('categories,', '').strip()
+    if 'categories' in clusters: clusters = clusters.replace('categories', '').strip()
 
     if str(params['clusters']) == "['dorama']": clusters = clusters.replace('dorama', '').strip()
     if str(params['clusters']) == "['anime']": clusters = clusters.replace('anime', '').strip()
 
-    if 'adults' in clusters: clusters = clusters.replace('adults,', '').strip()
+    if 'dorama' in clusters: clusters = clusters.replace('dorama,', '').strip()
+    if 'dorama' in clusters: clusters = clusters.replace('dorama', '').strip()
+
+    if 'anime' in clusters: clusters = clusters.replace('anime,', '').strip()
+    if 'anime' in clusters: clusters = clusters.replace('anime', '').strip()
+
+    if 'tales' in clusters: clusters = clusters.replace('tales,', '').strip()
+    if 'tales' in clusters: clusters = clusters.replace('tales', '').strip()
+
     if str(params['clusters']) == "['adults']": clusters = clusters.replace('adults', '').strip()
 
-    if clusters: txt += 'clusters: ' + str(clusters) + '[CR]'
+    if 'adults' in clusters: clusters = clusters.replace('adults,', '').strip()
+    if 'adults' in clusters: clusters = clusters.replace('adults', '').strip()
+
+    if 'docs' in clusters: clusters = clusters.replace('docs,', '').strip()
+    if 'docs' in clusters: clusters = clusters.replace('docs', '').strip()
+
+    if 'kids' in clusters: clusters = clusters.replace('kids,', '').strip()
+    if 'kids' in clusters: clusters = clusters.replace('kids', '').strip()
+
+    if 'infantil' in clusters: clusters = clusters.replace('infantil,', '').strip()
+    if 'infantil' in clusters: clusters = clusters.replace('infantil', '').strip()
+
+    if 'vos' in clusters: clusters = clusters.replace('vos,', '').strip()
+    if 'vos' in clusters: clusters = clusters.replace('vos', '').strip()
+
+    if '4k' in clusters: clusters = clusters.replace('4k,', '').strip()
+    if '4k' in clusters: clusters = clusters.replace('4k', '').strip()
+
+    if '3d' in clusters: clusters = clusters.replace('3d,', '').strip()
+    if '3d' in clusters: clusters = clusters.replace('3d', '').strip()
+
+    if clusters: txt += 'grupos: ' + str(clusters) + '[CR]'
 
     notes = str(params['notes'])
 
@@ -130,143 +216,275 @@ def test_channel(channel_name):
 
     if 'Puede requerir el uso de proxies' in notes: notes = scrapertools.find_single_match(str(notes), '(.*?)Puede requerir el uso de proxies').strip()
 
-    txt += 'notes: [COLOR yellowgreen][B]' + str(notes) + '[/B][/COLOR]'
+    txt += 'info: [COLOR yellow][B]' + str(notes) + '[/B][/COLOR]'
+
+    txt_temas = ''
+
+    if 'géneros' in str(params['notes']) or 'Géneros' in str(params['notes']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR thistle][B]Géneros[/B][/COLOR]'
+
+    if 'languages' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR yellowgreen][B]Idiomas[/B][/COLOR]'
+
+    if 'news' in str(params['clusters']) or 'lasts' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR darksalmon][B]Novedades[/B][/COLOR]'
+
+    if 'classic' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR turquoise][B]Clásicos[/B][/COLOR]'
+
+    if 'rankings' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR powderblue][B]Rankings[/B][/COLOR]'
+
+    if 'countries' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR dodgerblue][B]Paises[/B][/COLOR]'
+
+    if 'qualityes' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR moccasin][B]Calidades[/B][/COLOR]'
+
+    if 'producers' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR teal][B]Productoras[/B][/COLOR]'
+
+    if 'years'  in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR sienna][B]Años[/B][/COLOR]'
+
+    if 'stars' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR magenta][B]Intérpretes[/B][/COLOR]'
+
+    if 'directors' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR slateblue][B]Dirección[/B][/COLOR]'
+
+    if 'lists' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR steelblue][B]Listas[/B][/COLOR]'
+
+    if 'categories' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR violet][B]Categorías[/B][/COLOR]'
+
+    if 'docs' in str(params['clusters']):
+        if not str(params['categories']) == "['documentary']":
+            if txt_temas: txt_temas += ', '
+            txt_temas += '[COLOR cyan][B]Documentales[/B][/COLOR]'
+
+    if 'kids' in str(params['clusters']) or 'infantil' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR lightyellow][B]Infantil[/B][/COLOR]'
+
+    if 'tales' in str(params['clusters']):
+        if not 'Web dedicada exclusivamente en Novelas' in str(params['notes']):
+            if txt_temas: txt_temas += ', '
+            txt_temas += '[COLOR limegreen][B]Novelas[/B][/COLOR]'
+
+    if 'dorama' in str(params['clusters']):
+        if not 'Web dedicada exclusivamente al dorama' in str(params['notes']):
+            if txt_temas: txt_temas += ', '
+            txt_temas += '[COLOR firebrick][B]Doramas[/B][/COLOR]'
+
+    if 'anime' in str(params['clusters']):
+        if not 'Web dedicada exclusivamente al anime' in str(params['notes']):
+            if txt_temas: txt_temas += ', '
+            txt_temas += '[COLOR springgreen][B]Animes[/B][/COLOR]'
+
+    if 'vos' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR yellowgreen][B]VOS[/B][/COLOR]'
+
+    if '4k' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR lightblue][B]4K[/B][/COLOR]'
+
+    if '3d' in str(params['clusters']):
+        if txt_temas: txt_temas += ', '
+        txt_temas += '[COLOR powderblue][B]3D[/B][/COLOR]'
+
+    if txt_temas: txt += '[CR]temas: ' + txt_temas
 
     txt_diag = ''
 
-    if 'temporary' in str(params['clusters']): txt_diag  += 'estado: ' + '[COLOR plum][B]Temporalmente Inactivo[/B][/COLOR]'
+    sets_categories = str(params['categories'])
 
-    if 'inestable' in str(params['clusters']):
+    if sets_categories == "['movie']":
         if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'estado: ' + '[COLOR plum][B]Inestable[/B][/COLOR]'
+        txt_diag  += 'incluye: ' + '[COLOR deepskyblue][B]solo Películas[/B][/COLOR]'
 
-    if 'problematic' in str(params['clusters']):
+    elif sets_categories == "['movie', 'torrent']":
         if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'servidores: ' + '[COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR]'
+        txt_diag  += 'incluye: ' + '[COLOR deepskyblue][B]solo Películas[/B][/COLOR]'
 
-    if 'mismatched' in str(params['clusters']):
-        if not PY3:
+    elif sets_categories == "['tvshow']":
+        if txt_diag: txt_diag += '[CR]'
+        txt_diag  += 'incluye: ' + '[COLOR hotpink][B]solo Series[/B][/COLOR]'
+
+    elif sets_categories == "['documentary']":
+        if not 'Películas' in str(params['notes']):
             if txt_diag: txt_diag += '[CR]'
-            txt_diag  += 'result: ' + '[COLOR violet][B]Posible MediaCenter Incompatibile (Sin Resultados) si versión anterior a 19.x[/B][/COLOR]'
+            txt_diag  += 'incluye: ' + '[COLOR cyan][B]solo Documentales[/B][/COLOR]'
 
-    if 'clons' in str(params['clusters']):
+    elif sets_categories == "['movie', 'adults']":
         if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'clones: ' + '[COLOR lightyellow][B]Varios Clones[/B][/COLOR]'
-
-    if 'suggested' in str(params['clusters']):
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'canal: ' + '[COLOR aquamarine][B]Sugerido[/B][/COLOR]'
-
-    cfg_status_channel = 'channel_' + channel_id + '_status'
-
-    if str(config.get_setting(cfg_status_channel)) == '1':
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'marcado: ' + '[COLOR aqua][B]Preferido[/B][/COLOR]'
-
-    elif str(config.get_setting(cfg_status_channel)) == '-1':
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'marcado: ' + '[COLOR aqua][B]Desactivado[/B][/COLOR]'
-
-    if not params['searchable']:
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'buscar: ' + '[COLOR yellow][B]No Interviene[/B][/COLOR]'
-    else:
-        if str(params['search_types']) == "['documentary']":
-            if txt_diag: txt_diag += '[CR]'
-            txt_diag  += 'buscar: ' + '[COLOR yellow][B]Solo Documental[/B][/COLOR]'
-
-    if '+18' in str(params['notes']):
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'adultos: ' + '[COLOR orange][B]+18[/B][/COLOR]'
+        txt_diag  += 'incluye: ' + '[COLOR orange][B]solo Vídeos[/B][/COLOR]'
 
     if 'Web dedicada exclusivamente al anime' in str(params['notes']):
         if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'contenido: ' + '[COLOR springgreen][B]Solo Animes[/B][/COLOR]'
+        txt_diag  += 'contenido: ' + '[COLOR springgreen][B]solo Animes[/B][/COLOR]'
 
-    if 'Web dedicada exclusivamente al dorama' in str(params['notes']):
+    elif 'Web dedicada exclusivamente al dorama' in str(params['notes']):
         if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'contenido: ' + '[COLOR firebrick][B]Solo Doramas[/B][/COLOR]'
+        txt_diag  += 'contenido: ' + '[COLOR firebrick][B]solo Doramas[/B][/COLOR]'
 
-    if 'Web dedicada exclusivamente en Novelas' in str(params['notes']):
+    elif 'Web dedicada exclusivamente en Novelas' in str(params['notes']):
         if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'contenido: ' + '[COLOR limegreen][B]Solo Novelas[/B][/COLOR]'
+        txt_diag  += 'contenido: ' + '[COLOR limegreen][B]solo Novelas[/B][/COLOR]'
 
-    if 'Web dedicada exclusivamente a los tráilers' in str(params['notes']):
+    elif 'Web dedicada exclusivamente a los tráilers' in str(params['notes']):
         if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'contenido: ' + '[COLOR limegreen][B]Solo Tráilers[/B][/COLOR]'
+        txt_diag  += 'contenido: ' + '[COLOR darkgoldenrod][B]solo Tráilers[/B][/COLOR]'
 
-    if not str(params['clusters']) == "['adults']":
-        if 'adults' in str(params['clusters']):
+    if 'temporary' in str(params['clusters']):
+        if txt_diag: txt_diag += '[CR]'
+        txt_diag  += 'estado: ' + '[COLOR plum][B]Temporalmente Inactivo[/B][/COLOR]'
+
+    if not 'Temporalmente Inactivo' in txt_diag:
+        if 'inestable' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
-            txt_diag  += 'contenido: ' + '[COLOR orange][B]Puede tener enlaces para Adultos[/B][/COLOR]'
+            txt_diag  += 'estado: ' + '[COLOR plum][B]Inestable[/B][/COLOR]'
 
-    if str(params['search_types']) == "['documentary']":
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'contenido: ' + '[COLOR cyan][B]Solo Documentales[/B][/COLOR]'
-
-    if 'Canal con enlaces Torrent exclusivamente' in str(params['notes']):
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'contenido: ' + '[COLOR blue][B]Solo Torrents[/B][/COLOR]'
-
-    if 'Canal con enlaces Streaming y Torrent' in str(params['notes']):
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'enlaces: ' + '[COLOR thistle][B]Streaming y Torrent[/B][/COLOR]'
-
-    if 'register' in str(params['clusters']):
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'cuenta: ' + '[COLOR green][B]Requiere registrarse[/B][/COLOR]'
-
-    if 'dominios' in str(params['notes']):
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'dominios: ' + '[COLOR lightyellow][B]Varios disponibles[/B][/COLOR]'
-
-    if 'current' in str(params['clusters']):
-        cfg_dominio_channel = 'channel_' + channel_id + '_dominio'
-        if config.get_setting(cfg_dominio_channel, default=''):
+        if 'problematic' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
-            txt_diag  += 'memorizado: ' + '[COLOR darkorange][B]' + config.get_setting(cfg_dominio_channel) + '[/B][/COLOR]'
+            txt_diag  += 'servidores: ' + '[COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR]'
 
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag  += 'vigente: ' + '[COLOR darkorange][B]Puede comprobarse el último dominio[/B][/COLOR]'
+        if 'mismatched' in str(params['clusters']):
+            if not PY3:
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag  += 'result: ' + '[COLOR violet][B]Posible MediaCenter Incompatibile (Sin Resultados) si versión anterior a 19.x[/B][/COLOR]'
 
-    if 'Puede requerir el uso de proxies' in params['notes']:
-        if txt_diag: txt_diag += '[CR]'
-        txt_diag += 'bloqueo: ' + '[COLOR red][B]Puede requerir el uso de proxies en función del país/operadora desde el que se accede[/B][/COLOR]'
-
-    if config.get_setting('search_excludes_movies', default=''):
-        if "'" + channel_id + "'" in str(config.get_setting('search_excludes_movies')):
+        if 'clons' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
-            txt_diag += 'excluido: Buscar en [COLOR deepskyblue][B]Películas[/B][/COLOR]'
+            txt_diag  += 'clones: ' + '[COLOR lightyellow][B]Varios Clones[/B][/COLOR]'
 
-    if config.get_setting('search_excludes_tvshows', default=''):
-        if "'" + channel_id + "'" in str(config.get_setting('search_excludes_tvshows')):
+        if 'suggested' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
-            txt_diag += 'excluido: Buscar en [COLOR hotpink][B]Series[/B][/COLOR]'
+            txt_diag  += 'canal: ' + '[COLOR aquamarine][B]Sugerido[/B][/COLOR]'
 
-    if config.get_setting('search_excludes_documentaries', default=''):
-        if "'" + channel_id + "'" in str(config.get_setting('search_excludes_documentaries')):
+        cfg_status_channel = 'channel_' + channel_id + '_status'
+
+        if str(config.get_setting(cfg_status_channel)) == '1':
             if txt_diag: txt_diag += '[CR]'
-            txt_diag += 'excluido: Buscar en [COLOR cyan][B]Documentales[/B][/COLOR]'
+            txt_diag  += 'marcado: ' + '[COLOR gold][B]Preferido[/B][/COLOR]'
 
-    if config.get_setting('search_excludes_torrents', default=''):
-        if "'" + channel_id + "'" in str(config.get_setting('search_excludes_torrents')):
+        elif str(config.get_setting(cfg_status_channel)) == '-1':
             if txt_diag: txt_diag += '[CR]'
-            txt_diag += 'excluido: Buscar en [COLOR blue][B]Torrents[/B][/COLOR]'
+            txt_diag  += 'marcado: ' + '[COLOR gray][B]Desactivado[/B][/COLOR]'
 
-    if config.get_setting('search_excludes_mixed', default=''):
-        if "'" + channel_id + "'" in str(config.get_setting('search_excludes_mixed')):
+        if not params['searchable']:
             if txt_diag: txt_diag += '[CR]'
-            txt_diag += 'excluido: Buscar en [COLOR yellow][B]Películas y/ó Series[/B][/COLOR]'
+            txt_diag  += 'buscar: ' + '[COLOR chartreuse][B]No Interviene[/B][/COLOR]'
+        else:
+            if str(params['search_types']) == "['documentary']":
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag  += 'buscar: ' + '[COLOR cyan][B]solo Documental[/B][/COLOR]'
 
-    if config.get_setting('search_excludes_all', default=''):
-        if "'" + channel_id + "'" in str(config.get_setting('search_excludes_all')):
+        if '+18' in str(params['notes']):
             if txt_diag: txt_diag += '[CR]'
-            txt_diag += 'excluido: Buscar en [COLOR green][B]Todos[/B][/COLOR]'
+            txt_diag  += 'adultos: ' + '[COLOR orange][B]+18[/B][/COLOR]'
 
-    if params['searchable']:
-        cfg_searchable_channel = 'channel_' + channel_id + '_no_searchable'
+        if not str(params['clusters']) == "['adults']":
+            if 'adults' in str(params['clusters']):
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag  += '+18: ' + '[COLOR orange][B]Puede tener enlaces para Adultos[/B][/COLOR]'
 
-        if config.get_setting(cfg_searchable_channel, default=False): txt_diag += '[COLOR violet][B]Excluido en Búsquedas[/B][/COLOR]'
+        if str(params['search_types']) == "['documentary']":
+            if not 'Películas' in str(params['notes']):
+                if not 'docs' in str(params['clusters']):
+                    if txt_diag: txt_diag += '[CR]'
+                    txt_diag  += 'contenido: ' + '[COLOR cyan][B]solo Documentales[/B][/COLOR]'
+
+        if 'Canal con enlaces Torrent exclusivamente' in str(params['notes']):
+            if txt_diag: txt_diag += '[CR]'
+            txt_diag  += 'enlaces: ' + '[COLOR blue][B]solo Torrents[/B][/COLOR]'
+
+        if 'Canal con enlaces Streaming y Torrent' in str(params['notes']):
+            if txt_diag: txt_diag += '[CR]'
+            txt_diag  += 'enlaces: ' + '[COLOR thistle][B]Streaming y Torrent[/B][/COLOR]'
+
+        if 'register' in str(params['clusters']):
+            if txt_diag: txt_diag += '[CR]'
+
+            username = config.get_setting(channel_id + '_username', channel_id, default='')
+            if not username: txt_diag += 'cuenta: ' + '[COLOR green][B]Requiere registrarse[/B][/COLOR]'
+            else: txt_diag += 'cuenta: ' + '[COLOR green][B]Credenciales informadas[/B][/COLOR]'
+
+        if 'dominios' in str(params['notes']):
+            if txt_diag: txt_diag += '[CR]'
+            txt_diag  += 'dominios: ' + '[COLOR lightyellow][B]Varios disponibles[/B][/COLOR]'
+
+        if 'current' in str(params['clusters']):
+            cfg_dominio_channel = 'channel_' + channel_id + '_dominio'
+            if config.get_setting(cfg_dominio_channel, default=''):
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag  += 'memorizado: ' + '[COLOR pink][B]' + config.get_setting(cfg_dominio_channel) + '[/B][/COLOR]'
+
+            if txt_diag: txt_diag += '[CR]'
+            txt_diag  += 'vigente: ' + '[COLOR darkorange][B]Puede comprobarse el último dominio[/B][/COLOR]'
+
+        if 'Puede requerir el uso de proxies' in params['notes']:
+            if txt_diag: txt_diag += '[CR]'
+            txt_diag += 'bloqueo: ' + '[COLOR red][B]Puede requerir el uso de proxies en función del país/operadora desde el que se accede[/B][/COLOR]'
+
+        if 'notice' in str(params['clusters']):
+            if txt_diag: txt_diag += '[CR]'
+            txt_diag  += 'aviso: ' + '[COLOR indianred][B] CloudFlare [/COLOR][COLOR orangered] Protection[/B][/COLOR]'
+
+        if config.get_setting('search_included_all', default=''):
+            if "'" + channel_id + "'" in str(config.get_setting('search_excludes_movies')):
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag += 'incluido: Buscar está [COLOR yellow][B]Asignado[/B][/COLOR]'
+
+        if config.get_setting('search_excludes_movies', default=''):
+            if "'" + channel_id + "'" in str(config.get_setting('search_excludes_movies')):
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag += 'excluido: Buscar en [COLOR deepskyblue][B]Películas[/B][/COLOR]'
+
+        if config.get_setting('search_excludes_tvshows', default=''):
+            if "'" + channel_id + "'" in str(config.get_setting('search_excludes_tvshows')):
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag += 'excluido: Buscar en [COLOR hotpink][B]Series[/B][/COLOR]'
+
+        if config.get_setting('search_excludes_documentaries', default=''):
+            if "'" + channel_id + "'" in str(config.get_setting('search_excludes_documentaries')):
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag += 'excluido: Buscar en [COLOR cyan][B]Documentales[/B][/COLOR]'
+
+        if config.get_setting('search_excludes_torrents', default=''):
+            if "'" + channel_id + "'" in str(config.get_setting('search_excludes_torrents')):
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag += 'excluido: Buscar en [COLOR blue][B]Torrents[/B][/COLOR]'
+
+        if config.get_setting('search_excludes_mixed', default=''):
+            if "'" + channel_id + "'" in str(config.get_setting('search_excludes_mixed')):
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag += 'excluido: Buscar en [COLOR yellow][B]Películas y/ó Series[/B][/COLOR]'
+
+        if config.get_setting('search_excludes_all', default=''):
+            if "'" + channel_id + "'" in str(config.get_setting('search_excludes_all')):
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag += 'excluido: Buscar en [COLOR green][B]Todos[/B][/COLOR]'
+
+        if params['searchable']:
+            cfg_searchable_channel = 'channel_' + channel_id + '_no_searchable'
+
+            if config.get_setting(cfg_searchable_channel, default=False): txt_diag += '[COLOR violet][B]Excluido en Búsquedas[/B][/COLOR]'
 
     if txt_diag:
         txt += '[CR][CR][COLOR moccasin][B]Diagnosis:[/B][/COLOR][CR]'
@@ -422,7 +640,7 @@ def test_channel(channel_name):
                 platformtools.dialog_textviewer(channel_name.capitalize(), txt)
                 return txt
 
-    platformtools.dialog_textviewer(channel_name.capitalize(), txt)
+    platformtools.dialog_textviewer(channel_name.upper(), txt)
 
 
 def info_channel(channel_name, channel_poe, host, dominio, txt, ant_hosts):
@@ -1139,7 +1357,7 @@ def test_server(server_name):
            platformtools.dialog_textviewer(server_name.capitalize(), txt)
            return txt
 
-    platformtools.dialog_textviewer(server_name.capitalize(), txt)
+    platformtools.dialog_textviewer(server_name.upper(), txt)
 
 
 def info_server(server_name, server_poe, url, txt):

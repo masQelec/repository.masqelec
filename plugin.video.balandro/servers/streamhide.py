@@ -24,6 +24,7 @@ def get_video_url(page_url, url_referer=''):
     page_url = page_url.replace('//moviesm4u.com/e/', '//streamhide.to/e/').replace('//moviesm4u.com/', '//streamhide.to/e/').replace('//moviesm4u.com/w/', '//streamhide.to/e/')
     page_url = page_url.replace('//louishide.com/e/', '//streamhide.to/e/').replace('//louishide.com/', '//streamhide.to/e/').replace('//louishide.com/w/', '//streamhide.to/e/')
     page_url = page_url.replace('//ahvsh.com/e/', '//streamhide.to/e/').replace('//ahvsh.com/', '//streamhide.to/e/').replace('//ahvsh.com/w/', '//streamhide.to/e/')
+    page_url = page_url.replace('//movhide.pro/e/', '//streamhide.to/e/').replace('//movhide.pro/', '//streamhide.to/e/').replace('//movhide.pro/w/', '//streamhide.to/e/')
 
     response = httptools.downloadpage(page_url)
 

@@ -83,14 +83,25 @@ def do_downloadpage(url, post=None, headers=None, follow_redirects=True, onlydat
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    timeout = 40
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_cuevana3_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, timeout=timeout)
     else:
         resp = httptools.downloadpage_proxy('cuevana3', url, post=post, headers=headers, follow_redirects=follow_redirects, timeout=timeout)
 
-    if onlydata: return resp.data
+        if onlydata:
+            if not resp.data:
+                if not 'search/' in url:
+                    platformtools.dialog_notification('Cuevana3', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                    resp = httptools.downloadpage_proxy('cuevana3', url, post=post, headers=headers, follow_redirects=follow_redirects, timeout=timeout)
+
+    if onlydata:
+        if not resp.data: return ''
+
+        return resp.data
 
     return resp
 

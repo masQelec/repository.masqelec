@@ -459,10 +459,12 @@ def play(item):
 
     if 'http' not in url: return itemlist
 
+    timeout = config.get_setting('channels_repeat', default=30)
+
     if not url.startswith(host):
-        resp = httptools.downloadpage(url, follow_redirects=False, timeout = 30)
+        resp = httptools.downloadpage(url, follow_redirects=False, timeout=timeout)
     else:
-        resp = httptools.downloadpage_proxy('playview', url, follow_redirects=False, timeout = 30)
+        resp = httptools.downloadpage_proxy('playview', url, follow_redirects=False, timeout=timeout)
 
     url = ''
 

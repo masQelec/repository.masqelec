@@ -98,7 +98,7 @@ else: proxies_todos = False
 proxies_tipos = config.get_setting('proxies_tipos', default=False)
 proxies_paises = config.get_setting('proxies_paises', default=False)
 proxies_maximo = config.get_setting('proxies_maximo', default=True)
-proxies_list =  config.get_setting('proxies_list', default=False)
+proxies_list = config.get_setting('proxies_list', default=False)
 proxies_help = config.get_setting('proxies_help', default=True)
 
 if not proxies_list: opciones_provider.remove(private_list)
@@ -109,8 +109,25 @@ providers_preferred = config.get_setting('providers_preferred', default='')
 if providers_preferred:
     providers_preferred = str(providers_preferred).lower()
 
-    if not str(providers_preferred) in str(list(opciones_provider)):
-        platformtools.dialog_ok(config.__addon_name, 'Tiene informados en sus ajustes [COLOR cyan]Proveedores Preferidos[/COLOR] de proxies que son [COLOR coral]Desconocidos[/COLOR].', 'No se tendrán en cuenta [COLOR yellow]Ninguno[/COLOR] de ellos.', '[COLOR red]Preferidos: [COLOR cyan][B]' + str(providers_preferred + '[/B][/COLOR]'))
+    if not providers_preferred.endswith == ',': providers_preferred = providers_preferred + ','
+
+    providers_preferred = providers_preferred.replace(',,', '',)
+
+    provs_preferred = scrapertools.find_multiple_matches(providers_preferred, '(.*?),')
+
+    provs_ok = True
+
+    for prov_preferred in provs_preferred:
+        prov_preferred = prov_preferred.strip()
+
+        if not prov_preferred: continue
+
+        if not prov_preferred in str(list(opciones_provider)):
+            provs_ok = False
+            break
+
+    if not provs_ok:
+        platformtools.dialog_ok(config.__addon_name, 'Tiene informados en ajustes [COLOR wheat][B]Proveedores Preferidos[/B][/COLOR] de proxies [COLOR coral][B]Desconocidos[/B][/COLOR].', 'No se tendrán en cuenta [COLOR yellow][B]Ninguno de ellos y se anulan[/B][/COLOR].', '[COLOR red]Preferidos: [COLOR violet][B]' + str(providers_preferred + '[/B][/COLOR]'))
         providers_preferred = ''
 
 
@@ -931,7 +948,7 @@ def _buscar_proxies(canal, url, provider, procesar):
     if not all_providers_proxies:
         if not proxies:
             if providers_preferred:
-                platformtools.dialog_ok(config.__addon_name, 'Tiene informados en sus ajustes [COLOR cyan]Proveedores Preferidos[/COLOR] de proxies.', '[COLOR yellow]Sin proxies según sus parámetros actuales.[/COLOR]', '[COLOR red]Preferidos: [COLOR cyan][B]' + str(providers_preferred + '[/B][/COLOR]'))
+                platformtools.dialog_ok(config.__addon_name, 'Tiene informados en ajustes [COLOR wheat][B]Proveedores Preferidos[/B][/COLOR] de proxies.', '[COLOR yellow][B]Sin proxies según sus parámetros actuales.[/B][/COLOR]', '[COLOR red]Preferidos: [COLOR violet][B]' + str(providers_preferred + '[/B][/COLOR]'))
             else:
                platformtools.dialog_notification('Buscar proxies ' + provider.capitalize(), '[B][COLOR %s]Sin proxies según parámetros[/COLOR][/B]' % color_adver)
             return False
@@ -1523,7 +1540,7 @@ def _geonode(url, tipo_proxy, pais_proxy, max_proxies):
 
     for prox, puerto in enlaces:
         if puerto:
-            puerto = puerto.replace(',', '')
+            puerto = puerto.replace(',', '').strip()
 
             proxies.append(prox + ':' + puerto)
 

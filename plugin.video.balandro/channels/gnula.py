@@ -58,17 +58,19 @@ def do_downloadpage(url, post=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    # ~ timeout
-    timeout = 20
-
-    if '/lista-' in url: timeout = 30
-    elif '/ver-' in url: timeout = 40
-    elif '/generos/' in url: timeout = 50
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_gnula_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, timeout=timeout).data
     else:
         data = httptools.downloadpage_proxy('gnula', url, post=post, timeout=timeout).data
+
+        if not data:
+            if '/lista-' in url or '/ver-' in url or '/generos/' in url:
+                platformtools.dialog_notification('Gnula', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('gnula', url, post=post, timeout=timeout).data
 
     return data
 

@@ -12,11 +12,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://pelisplus.ninja/'
+host = 'https://pelisplus.mov/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.pelisplus.lat/', 'https://www.pelisplus.llc/', 'https://www.pelisplus.ninja/']
+ant_hosts = ['https://www.pelisplus.lat/', 'https://www.pelisplus.llc/', 'https://www.pelisplus.ninja/',
+             'https://pelisplus.ninja/']
 
 
 domain = config.get_setting('dominio', 'pelispluslat', default='')
@@ -64,19 +65,23 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    # ~ 10/2/2023
-    timeout = None
-
-    if '/player/auto.php?' in url: timeout = 20
-
     if not headers: headers = {'Referer': host}
 
     if '/release/' in url: raise_weberror = False
+
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_pelispluslat_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
         data = httptools.downloadpage_proxy('pelispluslat', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+        if not data:
+            if not '?s=' in url:
+                platformtools.dialog_notification('PelisPlusLat', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('pelispluslat', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:

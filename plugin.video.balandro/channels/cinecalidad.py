@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww1.cinecalidad.ms/'
+host = 'https://www.cinecalidad.tf/'
 
 
 # ~ por si viene de enlaces guardados
@@ -15,7 +15,7 @@ ant_hosts = ['https://www.cinecalidad.eu/', 'https://www.cinecalidad.im/', 'http
              'https://www.cinecalidad.li/', 'https://www.cine-calidad.com/', 'https://cinecalidad.website/',
              'https://www.cinecalidad.lat/', 'https://cinecalidad3.com/', 'https://www5.cine-calidad.com/',
              'https://v3.cine-calidad.com/', 'https://cinecalidad.dev/', 'https://cinecalidad.ms/',
-             'https://www3.cinecalidad.ms/']
+             'https://www3.cinecalidad.ms/', 'https://ww1.cinecalidad.ms/', 'https://www.cinecalidad.gs/']
 
 domain = config.get_setting('dominio', 'cinecalidad', default='')
 
@@ -236,7 +236,7 @@ def list_all(item):
 
         url = url.replace('\\/', '/')
 
-        if 'netflix-premium-12-meses' in url: continue
+        if '-premium-12-meses' in url: continue
 
         if not url or not title: continue
 

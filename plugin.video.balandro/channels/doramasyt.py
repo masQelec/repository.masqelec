@@ -231,6 +231,8 @@ def last_epis(item):
         season = 1
         if not epis: epis = 0
 
+        title = title.replace('capitulo', '[COLOR goldenrod]capitulo[/COLOR]')
+
         titulo = str(season) + 'x' + str(epis) + ' ' + title
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail = thumb, url = url,

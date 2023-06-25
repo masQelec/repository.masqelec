@@ -199,6 +199,8 @@ def last_epis(item):
 
         SerieName = SerieName.strip()
 
+        title = title.replace('capitulo', '[COLOR goldenrod]capitulo[/COLOR]')
+
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 

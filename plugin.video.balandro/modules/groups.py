@@ -866,11 +866,12 @@ def ch_groups(item):
             tit = '[COLOR yellowgreen][B]Dominio vigente[/B][/COLOR]'
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominio_vigente'})
 
+            if 'Dispone de varios posibles dominios' in ch['notes']:
+                tit = '[COLOR powderblue][B]Configurar dominio a usar[/B][/COLOR]'
+                context.append({'title': tit, 'channel': item.channel, 'action': '_dominios'})
+
             tit = '[COLOR orange][B]Modificar dominio Memorizado[/B][/COLOR]'
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominio_memorizado'})
-
-            tit = '[COLOR powderblue][B]Configurar dominio a usar[/B][/COLOR]'
-            context.append({'title': tit, 'channel': item.channel, 'action': '_dominios'})
 
         if 'register' in ch['clusters']:
             cfg_user_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_username'

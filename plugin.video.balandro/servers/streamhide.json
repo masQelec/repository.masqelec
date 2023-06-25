@@ -42,6 +42,10 @@
       {
         "pattern": "(https://ahvsh.com/(?:e|d|w)/[A-z0-9]+)",
         "url": "\\1"
+      },
+      {
+        "pattern": "(https://movhide.pro/(?:e|d|w)/[A-z0-9]+)",
+        "url": "\\1"
       }
     ]
   }

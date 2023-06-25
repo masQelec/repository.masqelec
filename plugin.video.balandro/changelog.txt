@@ -2,7 +2,20 @@
 
 [COLOR yellow][B]2023[/B][/COLOR]
 
-3.0.6  [COLOR darkorange] 1 de Jumio de 2023[/COLOR]
+3.0.7  [COLOR darkorange] 12 de Junio de 2023[/COLOR]
+    Correcciones: Bugs de la version anterior
+
+    Generos: Re-configurados
+
+    Canales:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+    Servidores:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+3.0.6  [COLOR darkorange] 1 de Junio de 2023[/COLOR]
     Correcciones: Bugs de la version anterior
 
     Generos: Re-configurados

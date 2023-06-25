@@ -157,6 +157,8 @@ def list_all(item):
             SerieName = re.sub(r'(\d{4})$', '', SerieName)
             SerieName = SerieName.strip()
 
+            title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]')
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentSerieName=SerieName,
                                         contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode, infoLabels={'year': '-'} ))
         else:

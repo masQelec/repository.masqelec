@@ -46,14 +46,22 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
-    timeout = 30
+    if url.startswith(host):
+        if not headers: headers = {'Referer': host}
+
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_mirapeliculas_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
         data = httptools.downloadpage_proxy('mirapeliculas', url, post=post, headers=headers, timeout=timeout).data
 
-    logger.info("check-02-mp-list: %s" % data)
+        if not data:
+            if not 'buscar/?q=' in url:
+                platformtools.dialog_notification('MiraPeliculas', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('mirapeliculas', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -63,7 +71,7 @@ def do_downloadpage(url, post=None, headers=None):
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
                     data = httptools.downloadpage_proxy('mirapeliculas', url, post=post, headers=headers, timeout=timeout).data
         except:

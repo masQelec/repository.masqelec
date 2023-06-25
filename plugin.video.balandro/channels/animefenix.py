@@ -64,7 +64,7 @@ def do_downloadpage(url, post=None, headers=None):
 
     timeout = None
     if host in url:
-        if config.get_setting('channel_animefenix_proxies', default=''): timeout = 40
+        if config.get_setting('channel_animefenix_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
@@ -84,7 +84,7 @@ def do_downloadpage(url, post=None, headers=None):
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
                    data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
         except:
@@ -342,6 +342,8 @@ def last_epis(item):
         SerieName = SerieName.replace(str(epis), '').strip()
 
         title = episode + ' ' + title.replace(str(epis), '').strip()
+
+        title = title.replace('Episodio', '[COLOR goldenrod]Episodio[/COLOR]')
 
         if url:
             itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb, infoLabels={'year': '-'},

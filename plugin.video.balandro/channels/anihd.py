@@ -107,6 +107,8 @@ def list_all(item):
             epis = scrapertools.find_single_match(url, '-episode-(.*?)$')
             if not epis: epis = 1
 
+            title = title.replace('Episode', '[COLOR goldenrod]Episode[/COLOR]')
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, 
                                         contentType = 'episode', contentSerieName = SerieName, contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': '-'} ))
 

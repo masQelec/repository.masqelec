@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Dropload,  Fastupload,  Filemoon,  Hexupload,  Krakenfiles,  Moonplayer, Mvidoo,  Rutube,  Streamhub,  Streamwish,  Tubeload,  Uploadever,  Videowood,  Yandex)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Desiupload,  Dropload,  Fastupload,  Filemoon,  Hexupload,  Krakenfiles,  Moonplayer, Mvidoo,  Rutube,  Streamhub,  Streamwish,  Tubeload,  Uploadever,  Videowood,  Yandex)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -93,6 +93,14 @@
         "url": "https://streamhub.to/e/\\2"
       },
       {
+        "pattern": "https://streamhub.gg/watch/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://streamhub.gg/)(?:embed-|e/|d/)?([0-9a-zA-Z]+)",
+        "url": "https://streamhub.to/e/\\2"
+      },
+      {
         "pattern": "(https://fastupload.io/)([0-9a-zA-Z]+/file)",
         "url": "https://fastupload.io/\\2"
       },
@@ -127,6 +135,14 @@
       {
         "pattern": "https://hexupload.net/(?:embed-)?([0-9a-zA-Z]+)",
         "url": "https://hexupload.net/\\1"
+      },
+      {
+        "pattern": "https://desiupload.co/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://desiupload.to/([0-9a-zA-Z]+)",
+        "url": "\\1"
       }
     ]
   }
