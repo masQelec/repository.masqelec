@@ -318,7 +318,7 @@ def do_downloadpage(url, post=None, headers=None, referer=None):
     if not referer: referer = host
 
     timeout = None
-    if '?genre=' in url: timeout = 30
+    if '?genre=' in url: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
@@ -357,6 +357,9 @@ def acciones(item):
     if username:
         itemlist.append(Item( channel='domains', action='operative_domains_playdede', title='[B]Dominio Operativo Vigente[/B]',
                               desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='mediumaquamarine' ))
+
+        itemlist.append(Item( channel='domains', action='last_domain_playdede', title='[B]Comprobar último dominio vigente[/B]',
+                              desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'

@@ -82,11 +82,9 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    # ~ timeout 13/7/2022
-    timeout = 15
-
-    if '/?query' in url: timeout = 30
-    elif '/categoria/' in url: timeout = 30
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_grantorrent_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
     headers = {'Referer': host}
 
@@ -94,6 +92,11 @@ def do_downloadpage(url, post=None, headers=None):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
         data = httptools.downloadpage_proxy('grantorrent', url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            if not '?s=' in url:
+                platformtools.dialog_notification('GranTorrent', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('grantorrent', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
@@ -236,6 +239,8 @@ def list_all(item):
         lang = 'Esp'
 
         qlty = scrapertools.find_single_match(match, ' text-center">.*?<span>(.*?)</span>')
+
+        title = title.replace('&#038;', '').strip()
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, qualities=qlty,
                                     contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))

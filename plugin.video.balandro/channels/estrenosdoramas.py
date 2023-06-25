@@ -61,11 +61,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/doramas-online/', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host + 'category/ultimos-capitulos-online/', search_type = 'tvshow', text_color = 'olive' ))
+
     itemlist.append(item.clone( title = 'Capítulos recientes', action = 'last_news', url = host, search_type = 'tvshow', text_color = 'olive' ))
 
     itemlist.append(item.clone( title = 'Últimas', action = 'last_series', url = host, search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host + 'category/ultimos-capitulos-online/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'tvshow' ))
 
@@ -129,12 +129,12 @@ def list_all(item):
         lang = ''
         if item.doblado: lang = 'Lat'
 
-        tipo = 'movie' if '/peliculas/' in match else 'tvshow'
+        tipo = 'movie' if '/pelicula-' in match else 'tvshow'
 
         if tipo == 'tvshow':
-           if 'Pelicula' in title:
+           if 'Pelicula' in title or 'Película' in title:
                tipo = 'movie'
-               title = title.replace('Pelicula', '').strip()
+               title = title.replace('Pelicula', '').replace("Película ", '').strip()
         else:
            if 'Capitulo' in title:
                tipo = 'tvshow'
@@ -147,6 +147,8 @@ def list_all(item):
         if tipo == 'movie':
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
+
+            title = title.replace("Pelicula ", '').replace("Película ", '').strip()
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
@@ -192,11 +194,116 @@ def last_pelis(item):
 
         title = title.replace("&#8217;", "'")
 
-        title = title.replace('Pelicula', '').strip()
+        title = title.replace("Pelicula ", '').replace("Película ", '').strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+
+def last_epis(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '>Resultados<(.*?)>AVISO LEGAL<')
+
+    matches = re.compile('<div class="" id="post-(.*?)</div>').findall(bloque)
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
+        if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
+
+        if not url or not title: continue
+
+        elif '/pelicula-' in url: continue
+        elif 'Pelicula' in title or 'Película' in title: continue
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        season = 1
+
+        epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
+        if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
+        if not epis: epis = 0
+
+        title_serie = scrapertools.find_single_match(title, '(.*?)Capitulo').strip()
+        if not title_serie: title_serie = scrapertools.find_single_match(title, '(.*?)Capítulo').strip()
+
+        if not title_serie: continue
+
+        title_serie = title_serie.replace("&#8217;", "'")
+
+        titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
+                                    contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if "<div class='wp-pagenavi'" in data:
+            next_url = scrapertools.find_single_match(data, "class='current'>" + '.*?href="(.*?)"')
+
+            if next_url:
+                if '/page/' in next_url:
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'last_epis', text_color = 'coral' ))
+
+    return itemlist
+
+
+def last_news(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '>Últimos Capítulos<(.*?) Capítulos')
+
+    matches = re.compile('id="post-(.*?)</div>').findall(bloque)
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
+        if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
+
+        if not url or not title: continue
+
+        elif '/pelicula-' in url: continue
+        elif 'Pelicula' in title or 'Película' in title: continue
+
+        title = title.replace("&#8217;", "'")
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        season = 1
+
+        epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
+        if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
+        if not epis: epis = 0
+
+        title_serie = scrapertools.find_single_match(title, '(.*?)Capitulo').strip()
+        if not title_serie: title_serie = scrapertools.find_single_match(title, '(.*?)Capítulo').strip()
+
+        title_serie = title_serie.replace("&#8217;", "'")
+
+        if not title_serie: continue
+
+        titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
+                                    contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -222,6 +329,9 @@ def last_series(item):
 
         if not url or not title: continue
 
+        elif '/pelicula-' in url: continue
+        elif 'Pelicula' in title or 'Película' in title: continue
+
         title = title.replace("&#8217;", "'")
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
@@ -229,102 +339,6 @@ def last_series(item):
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
-
-    return itemlist
-
-
-def last_news(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    bloque = scrapertools.find_single_match(data, '>Últimos Capítulos<(.*?) Capítulos')
-
-    matches = re.compile('id="post-(.*?)</div>').findall(bloque)
-
-    for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-
-        title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
-        if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
-
-        if not url or not title: continue
-
-        title = title.replace("&#8217;", "'")
-
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
-
-        season = 1
-
-        epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
-        if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
-        if not epis: epis = 0
-
-        title_serie = scrapertools.find_single_match(title, '(.*?)Capitulo').strip()
-        if not title_serie: title_serie = scrapertools.find_single_match(title, '(.*?)Capítulo').strip()
-
-        title_serie = title_serie.replace("&#8217;", "'")
-
-        titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
-
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
-                                    contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': '-'} ))
-
-    tmdb.set_infoLabels(itemlist)
-
-    return itemlist
-
-
-def last_epis(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    bloque = scrapertools.find_single_match(data, '>Resultados<(.*?)>AVISO LEGAL<')
-
-    matches = re.compile('<div class="" id="post-(.*?)</div>').findall(bloque)
-
-    for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-
-        title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
-        if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
-
-        if not url or not title: continue
-        elif 'Pelicula' in title: continue
-
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
-
-        season = 1
-
-        epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
-        if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
-        if not epis: epis = 0
-
-
-        title_serie = scrapertools.find_single_match(title, '(.*?)Capitulo').strip()
-        if not title_serie: title_serie = scrapertools.find_single_match(title, '(.*?)Capítulo').strip()
-
-        title_serie = title_serie.replace("&#8217;", "'")
-
-        titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
-
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
-                                    contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': '-'} ))
-
-    tmdb.set_infoLabels(itemlist)
-
-    if itemlist:
-        if "<div class='wp-pagenavi'" in data:
-            next_url = scrapertools.find_single_match(data, "class='current'>" + '.*?href="(.*?)"')
-
-            if next_url:
-                if '/page/' in next_url:
-                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'last_epis', text_color = 'coral' ))
 
     return itemlist
 

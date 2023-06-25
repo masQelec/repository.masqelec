@@ -61,7 +61,7 @@ def do_downloadpage(url, post=None, headers=None):
 
     timeout = None
     if host in url:
-        if config.get_setting('channel_henaojara_proxies', default=''): timeout = 40
+        if config.get_setting('channel_henaojara_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data

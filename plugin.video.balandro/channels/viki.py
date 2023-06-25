@@ -164,6 +164,8 @@ def last_epis(item):
         elif 'Capítulo' in title: SerieName = title.split("Capítulo")[0]
         else: SerieName = title
 
+        titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
+
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
                                     contentSerieName=SerieName, contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
 
