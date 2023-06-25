@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://c23.cinecalidad.com.mx/'
+host = 'https://wvw.cinecalidad.com.mx/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -20,7 +20,9 @@ ant_hosts = ['https://cinecalidad.com.mx/', 'https://cinecalidad.fit/', 'https:/
             'https://c3.cinecalidad.com.mx/', 'https://c4.cinecalidad.com.mx/', 'https://c5.cinecalidad.com.mx/',
             'https://c6.cinecalidad.com.mx/', 'https://c7.cinecalidad.com.mx/', 'https://c8.cinecalidad.com.mx/',
             'https://c9.cinecalidad.com.mx/', 'https://c20.cinecalidad.com.mx/', 'https://c21.cinecalidad.com.mx/',
-            'https://c22.cinecalidad.com.mx/']
+            'https://c22.cinecalidad.com.mx/', 'https://c23.cinecalidad.com.mx/', 'https://c24.cinecalidad.com.mx/',
+            'https://c25.cinecalidad.com.mx/', 'https://c26.cinecalidad.com.mx/', 'https://c27.cinecalidad.com.mx/',
+            'https://c28.cinecalidad.com.mx/', 'https://c29.cinecalidad.com.mx/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadmx', default='')
@@ -435,7 +437,6 @@ def findvideos(item):
             if srv == 'netu' or srv == 'waaw' or srv == 'hqq': continue
             elif 'cinecalidad' in srv: continue
             elif 'subtítulo' in srv: continue
-            elif 'cinestart' in srv: continue
 
             qlty = '1080'
 
@@ -541,6 +542,9 @@ def play(item):
                 elif not url.startswith('http'): url = 'https://mega.nz/file/' + url
 
     if url:
+        if '/acortalink.' in url:
+            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
+
         if url.endswith('.torrent'):
             itemlist.append(item.clone( url = url, server = 'torrent' ))
             return itemlist

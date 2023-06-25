@@ -140,6 +140,8 @@ def list_all(item):
 
         url_tor = scrapertools.find_single_match(match, "<div id='descargar_torrent'>.*?href='(.*?)'")
 
+        title = title.replace('Episodio', '[COLOR goldenrod]Episodio[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace(' Cap', '[COLOR goldenrod] Cap[/COLOR]')
+
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, url_tor = url_tor,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': '-'} ))
 
@@ -172,6 +174,7 @@ def list_lst(item):
 
         if url:
             if url == '/buscar/descargas/tv': continue
+            elif url == '/buscar/descargas/pelicula': continue
 
             url = url + '/descargas'
 
@@ -227,6 +230,8 @@ def episodios(item):
             episode = scrapertools.find_single_match(title, "Episodio.*?(\d+)")
         except:
             episode = 0
+
+        title = title.replace('Pelicula', '[COLOR deepskyblue]Pelicula[/COLOR]').replace('Película', '[COLOR deepskyblue]Película[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=episode ))
 

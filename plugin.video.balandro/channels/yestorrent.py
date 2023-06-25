@@ -12,6 +12,38 @@ from lib import decrypters
 host = 'https://yestorrent.org/'
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_yestorrent_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://yestorrent.cx/', 'http://yestorrent.org/']
@@ -21,7 +53,10 @@ def do_downloadpage(url, post=None, raise_weberror=True):
 
     if '/years/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, raise_weberror=raise_weberror).data
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, raise_weberror=raise_weberror).data
+    else:
+        data = httptools.downloadpage_proxy('yestorrent', url, post=post, raise_weberror=raise_weberror).data
 
     return data
 
@@ -29,6 +64,8 @@ def do_downloadpage(url, post=None, raise_weberror=True):
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -41,6 +78,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -58,6 +97,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -81,14 +122,18 @@ def calidades(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title='En Micro HD', url = host + 'quality/MicroHD-1080p/', action='list_all', text_color='moccasin' ))
-    itemlist.append(item.clone( title='En HD', url = host + 'quality/hd/', action='list_all', text_color='moccasin' ))
+    itemlist.append(item.clone( title='En 3D', url = host + 'quality/3d/', action='list_all', text_color='moccasin' ))
+    itemlist.append(item.clone( title='En 4K UHD', url = host + 'quality/4k-uhd/', action='list_all', text_color='moccasin' ))
+
     itemlist.append(item.clone( title='En BD Rip', url = host + 'quality/bdrip/', action='list_all', text_color='moccasin' ))
-    itemlist.append(item.clone( title='En Dual 1080', url = host + 'quality/dual-1080p/', action='list_all', text_color='moccasin' ))
     itemlist.append(item.clone( title='En BluRay 720', url = host + 'quality/bluRay-720p/', action='list_all', text_color='moccasin' ))
     itemlist.append(item.clone( title='En BluRay 1080', url = host + 'quality/bluRay-1080p/', action='list_all', text_color='moccasin' ))
-    itemlist.append(item.clone( title='En 4K UHD', url = host + 'quality/4k-uhd/', action='list_all', text_color='moccasin' ))
-    itemlist.append(item.clone( title='En 3D', url = host + 'quality/3d/', action='list_all', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title='En Dual 1080', url = host + 'quality/dual-1080p/', action='list_all', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title='En HD', url = host + 'quality/hd/', action='list_all', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title='En Micro HD', url = host + 'quality/MicroHD-1080p/', action='list_all', text_color='moccasin' ))
 
     return itemlist
 
@@ -178,10 +223,10 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page_link = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
+        next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)')
 
-        if next_page_link:
-            itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page_link, text_color='coral' ))
+        if next_page:
+            itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page, text_color='coral' ))
 
     return itemlist
 

@@ -48,7 +48,7 @@ def configurar_proxies(item):
 def do_downloadpage(url, post=None, headers=None):
     timeout = None
     if host in url:
-        if config.get_setting('channel_jkanime_proxies', default=''): timeout = 40
+        if config.get_setting('channel_jkanime_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
@@ -261,6 +261,8 @@ def last_epis(item):
         SerieName = SerieName.strip()
 
         title = 'Cap.{} - {}'.format(episode, title)
+
+        title = title.replace('Cap.', '[COLOR goldenrod]Cap.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
                                     contentSerieName=SerieName, contentType='episode', contentSeason=1, contentEpisodeNumber=episode ))

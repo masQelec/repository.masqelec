@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww2.cuevana2.biz/'
+host = 'https://www.cuevana2.icu/'
 
 
 def item_configurar_proxies(item):
@@ -43,6 +43,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://ww2.cuevana2.biz/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not url.startswith(host):
         resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
     else:

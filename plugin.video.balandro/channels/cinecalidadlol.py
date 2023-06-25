@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w6.cinecalidad.vet/'
+host = 'https://wy.cinecalidad.vet/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -27,7 +27,10 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://w9.cinecalidad.win/', 'https://c1.cinecalidad.win/', 'https://c2.cinecalidad.win/',
              'https://w10.cinecalidad.win/', 'https://w1.cinecalidad.ist/', 'https://cinecalidad.ist/',
              'https://cinecalidad.vet/', 'https://w1.cinecalidad.vet/', 'https://w2.cinecalidad.vet/',
-             'https://w3.cinecalidad.vet/', 'https://w4.cinecalidad.vet/', 'https://w5.cinecalidad.vet/']
+             'https://w3.cinecalidad.vet/', 'https://w4.cinecalidad.vet/', 'https://w5.cinecalidad.vet/',
+             'https://w6.cinecalidad.vet/', 'https://w7.cinecalidad.vet/', 'https://w8.cinecalidad.vet/',
+             'https://w11.cinecalidad.vet/', 'https://w12.cinecalidad.vet/', 'https://ww.cinecalidad.vet/',
+             'https://wc.cinecalidad.vet/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -266,6 +269,8 @@ def list_all(item):
         if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
+
+        if '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url: continue
 
         if not url or not title: continue
 
@@ -567,6 +572,8 @@ def findvideos(item):
             elif servidor == 'utorrent': servidor = 'torrent'
             elif 'torrent' in servidor: servidor = 'torrent'
 
+            elif servidor == 'drive': servidor = 'gvideo'
+
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
             else:
@@ -606,6 +613,7 @@ def play(item):
         url = scrapertools.find_single_match(data, 'target="_blank" href="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, 'target="_blank" value="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, '<iframe.*?data-src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
 
         if '/?id=' in url:
@@ -619,8 +627,6 @@ def play(item):
             if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
                 return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-            elif '/cinestart' in url: url = ''
-
             if url:
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
@@ -632,6 +638,9 @@ def play(item):
                     elif not url.startswith('http'): url = 'https://mega.nz/file/' + url
 
     if url:
+        if '/acortalink.' in url:
+            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
+
         if url.endswith('.torrent'):
             itemlist.append(item.clone( url = url, server = 'torrent' ))
             return itemlist

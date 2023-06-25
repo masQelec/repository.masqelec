@@ -48,15 +48,22 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False, raise_weberror=True):
+def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False, raise_weberror=False):
     headers = {'Referer': host}
 
-    timeout = 30
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_dilo_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror, timeout=timeout)
     else:
         resp = httptools.downloadpage_proxy('dilo', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror, timeout=timeout)
+
+        if not resp.data:
+            if not 'search?s=' in url:
+                platformtools.dialog_notification('Dilo', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                resp = httptools.downloadpage_proxy('dilo', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror, timeout=timeout)
 
     if '<title>You are being redirected...</title>' in resp.data or '<title>Just a moment...</title>' in resp.data:
         try:
@@ -358,6 +365,16 @@ def last_epis(item):
         elif '/pan-paso-a-paso-' in url: continue
         elif '/larousse-gastronomique-' in url: continue
         elif '/motociclismo-' in url: continue
+        elif '/barely-legal-' in url: continue
+        elif '/computadoras-que-aprenden-' in url: continue
+        elif '/accion-cine-video-' in url: continue
+        elif '/la-mitologia-templaria-' in url: continue
+        elif '/viajar-espana-' in url: continue
+        elif 'rico-rico-y-con-fundamento-' in url: continue
+        elif '/cocinar-sin-carbohidratos-' in url: continue
+        elif '/chocolate-' in url: continue
+        elif '/postres-' in url: continue
+        elif '/freidora-de-aire-' in url: continue
 
         elif '-pc-' in url: continue
         elif '-magazine-' in url: continue
@@ -374,6 +391,7 @@ def last_epis(item):
         elif '-hits-' in url: continue
         elif '-photo-' in url: continue
         elif '-volume-' in url: continue
+        elif 'audiolibrovoz-' in url: continue
 
         epis.append(match)
 
@@ -620,7 +638,7 @@ def play(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(item.url, raise_weberror=False)
+    data = do_downloadpage(item.url)
 
     url = scrapertools.find_single_match(data, 'iframe class="" src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, 'a href="([^"]+)" target="_blank" class="player"')

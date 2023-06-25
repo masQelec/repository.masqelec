@@ -71,12 +71,17 @@ def do_downloadpage(url, post=None, headers=None):
 
     timeout = None
     if host in url:
-        if config.get_setting('channel_pelishouse_proxies', default=''): timeout = 30
+        if config.get_setting('channel_pelishouse_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
         data = httptools.downloadpage_proxy('pelishouse', url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            if not '?s=' in url:
+                platformtools.dialog_notification('PelisHouse', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('pelishouse', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:

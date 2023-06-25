@@ -942,8 +942,8 @@ def show_help_mirapeliculas(item):
     item.notice = 'mirapeliculas'
     show_help_canales(item)
 
-def show_help_pelisencastellano(item):
-    item.notice = 'pelisencastellano'
+def show_help_peliculaspro(item):
+    item.notice = 'peliculaspro'
     show_help_canales(item)
 
 def show_help_pelisforte(item):
@@ -968,10 +968,6 @@ def show_help_pepecinetop(item):
 
 def show_help_playdede(item):
     item.notice = 'playdede'
-    show_help_canales(item)
-
-def show_help_ppeliculas(item):
-    item.notice = 'ppeliculas'
     show_help_canales(item)
 
 def show_help_rojotorrent(item):
@@ -1902,9 +1898,9 @@ def show_help_providers(item):
 
     providers_preferred = config.get_setting('providers_preferred', default='')
     if providers_preferred:
-        txt = '[COLOR violet]Proveedores preferidos:[/COLOR][CR]'
+        txt = '[COLOR wheat][B]Proveedores preferidos:[/B][/COLOR][CR]'
 
-        txt += '    [COLOR pink]' + str(providers_preferred) + '[/COLOR][CR][CR]'
+        txt += '    [COLOR violet][B]' + str(providers_preferred) + '[/B][/COLOR][CR][CR]'
 
     txt += '[COLOR goldenrod][B]Proveedores habituales:[/B][/COLOR][CR]'
 
@@ -2432,7 +2428,7 @@ def show_test(item):
                    if 'addon_version' not in data or 'fix_version' not in data: access_fixes = None
             except: tex_access_fixes = '[COLOR lightblue][B]No se pudo comprobar[/B][/COLOR]'
 
-    txt = '[CR][CR][COLOR fuchsia]BALANDRO[/COLOR][CR]'
+    txt = '[CR][COLOR fuchsia]BALANDRO[/COLOR][CR]'
 
     if not your_ip: your_ip = '[COLOR red][B] Sin Conexión [/B][/COLOR]'
 
@@ -2490,6 +2486,13 @@ def show_test(item):
         if animeflv_dominio:
            if tex_dom: tex_dom = tex_dom + '  ' + animeflv_dominio
            else: tex_dom = animeflv_dominio
+
+    datos = channeltools.get_channel_parameters('animeonline')
+    if datos['active']:
+        animeonline_dominio = config.get_setting('channel_animeonline_dominio', default='')
+        if animeonline_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + animeonline_dominio
+           else: tex_dom = animeonline_dominio
 
     datos = channeltools.get_channel_parameters('cinecalidad')
     if datos['active']:
@@ -2561,6 +2564,13 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '  ' + elitetorrent_dominio
            else: tex_dom = elitetorrent_dominio
 
+    datos = channeltools.get_channel_parameters('ennovelas')
+    if datos['active']:
+        ennovelas_dominio = config.get_setting('channel_ennovelas_dominio', default='')
+        if ennovelas_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + ennovelas_dominio
+           else: tex_dom = ennovelas_dominio
+
     datos = channeltools.get_channel_parameters('entrepeliculasyseries')
     if datos['active']:
         entrepeliculasyseries_dominio = config.get_setting('channel_entrepeliculasyseries_dominio', default='')
@@ -2616,13 +2626,6 @@ def show_test(item):
         if mejortorrentapp_dominio:
            if tex_dom: tex_dom = tex_dom + '  ' + mejortorrentapp_dominio
            else: tex_dom = mejortorrentapp_dominio
-
-    datos = channeltools.get_channel_parameters('pelis28')
-    if datos['active']:
-        pelis28_dominio = config.get_setting('channel_pelis28_dominio', default='')
-        if pelis28_dominio:
-           if tex_dom: tex_dom = tex_dom + '  '  + pelis28_dominio
-           else: tex_dom = pelis28_dominio
 
     datos = channeltools.get_channel_parameters('pelishouse')
     if datos['active']:
@@ -2745,6 +2748,27 @@ def show_test(item):
 
     if tex_dom:
         txt += ' - [COLOR gold]Dominios:[/COLOR]  [COLOR springgreen]%s[/COLOR][CR][CR]' % str(tex_dom).replace('https://', '').replace('/', '')
+
+
+    filtros = {'clusters': 'register'}
+    opciones = []
+
+    ch_list = channeltools.get_channels_list(filtros=filtros)
+
+    if ch_list:
+        txt_ch = ''
+
+        for ch in ch_list:
+            username = config.get_setting(ch['id'] + '_username', ch['id'], default='')
+
+            if not txt_ch: txt_ch = '[CR]'
+
+            if not username: txt_ch  += '   ' + ch['name'] + ' [COLOR green][B]falta registrarse[/B][/COLOR][CR]'
+            else: txt_ch  += '   ' + ch['name'] +  '[COLOR green][B] informadas[/B][/COLOR][CR]'
+
+        if not txt_ch: txt_ch = 'No hay canales que requieran registrarse' 
+        txt += ' - [COLOR gold]Credenciales:[/COLOR]  %s' % str(txt_ch)
+        txt += '[CR]'
 
     filtros = {'searchable': True}
     opciones = []

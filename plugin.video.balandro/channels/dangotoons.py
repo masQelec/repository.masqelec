@@ -253,6 +253,8 @@ def findvideos(item):
 
         elif '/goo.' in url: continue
 
+        if url.startswith('//'): url = 'https:' + url
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

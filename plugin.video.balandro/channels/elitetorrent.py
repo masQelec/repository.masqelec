@@ -179,6 +179,7 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         qlty = scrapertools.find_single_match(match, 'style=.*?<i>(.*?)</i>')
+        if qlty == '---': qlty = ''
 
         lngs = []
         langs = scrapertools.find_multiple_matches(match, "data-src='.*?/images/(.*?).png'")
@@ -199,6 +200,8 @@ def list_all(item):
         tipo = 'movie' if '/peliculas/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
+        title = title.replace('&#8211;', '').replace('&amp;', '').replace('&#8215;', ' ')
+
         if tipo == 'movie':
             if not item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
@@ -210,8 +213,6 @@ def list_all(item):
         if tipo == 'tvshow':
             if not item.search_type == 'all':
                 if item.search_type == 'movie': continue
-
-            title = title.replace('&#8211;', '').replace('&#215;', ' ')
 
             SerieName = url
 
@@ -278,11 +279,13 @@ def findvideos(item):
     links = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
 
     for link in links:
-           other = ''
-           if 'magnet' in link: other = 'Magnet'
+        if '/tienda/' in link: continue
 
-           itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent',
-                                 language = item.languages, quality = item.qualities, other = other))
+        other = ''
+        if 'magnet' in link: other = 'Magnet'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent',
+                              language = item.languages, quality = item.qualities, other = other))
 
     return itemlist
 
@@ -317,6 +320,11 @@ def play(item):
             itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
         elif url_base64.endswith(".torrent"):
+            data = do_downloadpage(url_base64)
+
+            if not data or data == 'Fallo de consulta':
+               return 'Archivo [COLOR red]Corrupto[/COLOR]'
+
             itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
     return itemlist

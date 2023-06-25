@@ -107,6 +107,17 @@ def get_video_url(page_url, url_referer=''):
     elif '//lvturbo.com/' in page_url:
         page_url = page_url.replace('//lvturbo.com/e/', '//streamsb.net/play/').replace('//lvturbo.com/d/', '//streamsb.net/play/')
 
+    elif '//cinestart.net/' in page_url:
+        page_url = page_url.replace('//cinestart.net/e/', '//streamsb.net/play/').replace('//cinestart.net/d/', '//streamsb.net/play/')
+
+    elif '//vidmoviesb.xyz/' in page_url:
+        page_url = page_url.replace('//vidmoviesb.xyz/e/', '//streamsb.net/play/').replace('//vidmoviesb.xyz/d/', '//streamsb.net/play/')
+
+    elif '//sbsonic.com/' in page_url:
+        page_url = page_url.replace('//sbsonic.com/e/', '//streamsb.net/play/').replace('//sbsonic.com/d/', '//streamsb.net/play/')
+    elif '//sblona.com/' in page_url:
+        page_url = page_url.replace('//sblona.com/e/', '//streamsb.net/play/').replace('//sblona.com/d/', '//streamsb.net/play/')
+
     data = httptools.downloadpage(page_url).data
 
     if 'File Not Found' in data or 'File is no longer available' in data:
