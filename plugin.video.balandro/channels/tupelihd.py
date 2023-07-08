@@ -52,10 +52,13 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    raise_weberror = True
+    if '/peliculas/estrenos-' in url: raise_weberror = False
+
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers).data
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     else:
-        data = httptools.downloadpage_proxy('tupelihd', url, post=post, headers=headers).data
+        data = httptools.downloadpage_proxy('tupelihd', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -90,10 +93,11 @@ def estrenos(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Estrenos 2021', action = 'list_all', url = host + 'peliculas/estrenos-2021/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Estrenos 2020', action = 'list_all', url = host + 'peliculas/estrenos-2020/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Estrenos 2019', action = 'list_all', url = host + 'peliculas/estrenos-2019/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Estrenos 2018', action = 'list_all', url = host + 'peliculas/estrenos-2018/', text_color='moccasin' ))
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 2017, -1):
+        itemlist.append(item.clone( title = 'Estrenos ' + str(x), action = 'list_all', url = host + 'peliculas/estrenos-' + str(x) +'/', text_color='moccasin' ))
 
     return itemlist
 
@@ -103,9 +107,12 @@ def calidades(item):
     itemlist = []
 
     itemlist.append(item.clone( title = 'En 4K UHD Micro', action = 'list_all', url = host + 'peliculas/4k-uhdmicro/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En 4K UHD Remux', action = 'list_all', url = host + 'peliculas/4k-uhdremux/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'En 4K UHD Rip', action = 'list_all', url = host + 'peliculas/4k-uhdrip/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'En Bluray MicroHD', action = 'list_all', url = host + 'peliculas/bluray-microhd/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En 4K WEB Rip', action = 'list_all', url = host + 'peliculas/4kwebrip/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'En BDremux', action = 'list_all', url = host + 'peliculas/bdremux/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En Bluray 1080p', action = 'list_all', url = host + 'peliculas/bluray-1080p/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En Bluray MicroHD', action = 'list_all', url = host + 'peliculas/bluray-microhd/', text_color='moccasin' ))
 
     return itemlist
 
@@ -175,6 +182,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        if '/series/' in url: continue
+
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         year = scrapertools.find_single_match(article, '<span class="year">(\d+)</span>')
         if not year: year = '-'
@@ -207,6 +216,7 @@ def puntuar_calidad(txt):
 
     orden = [
           'cam',
+          'camrip',
           'hdcam',
           'webscreener',
           'tsscreener',
@@ -304,9 +314,8 @@ def findvideos(item):
             qlty = scrapertools.find_single_match(match, '<td><span>(.*?)</span>').strip()
 
             other = ''
-            if servidor.lower() != 'torrent':
-                other = 't'
-                servidor = ''
+
+            if servidor.lower() != 'torrent': other = 't'
 
             if servidor:
                 servidor = normalize_server(servidor)
@@ -336,8 +345,7 @@ def play(item):
     url = ''
 
     if item.other:
-        if not item.url.startswith == host:
-            return itemlist
+        if not item.url.startswith == host: return itemlist
 
     if item.server == 'torrent':
         itemlist.append(item.clone( url = item.url, server = 'torrent' ))

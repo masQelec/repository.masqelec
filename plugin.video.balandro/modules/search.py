@@ -461,8 +461,8 @@ def do_search(item, tecleado):
                  continue
 
         if 'register' in ch['clusters']:
-            check_login = config.get_setting('channel_%s_%s_login' % (ch['id'], ch['id']), default=False)
-            if check_login == False:
+            sesion_login = config.get_setting('channel_%s_%s_login' % (ch['id'], ch['id']), default=False)
+            if sesion_login == False:
                 num_canales = num_canales - 1
                 continue
                 
@@ -766,6 +766,9 @@ def do_search(item, tecleado):
                        elif 'register' in ch['clusters']:
                            username = config.get_setting(ch['id'] + '_username', ch['id'], default='')
                            if not username: titulo = titulo + ' [COLOR teal]faltan [I]Credenciales Cuenta[/I]'
+                           else:
+                               sesion_login = config.get_setting('channel_%s_%s_login' % (ch['id'], ch['id']), default=False)
+                               if sesion_login == False: titulo = titulo + ' [COLOR teal]falta [I]Iniciar Sesion[/I]'
 
                        elif only_includes:
                            if no_channels: titulo = titulo + ' [COLOR yellow]Ignorado no está en Incluidos'
@@ -774,7 +777,6 @@ def do_search(item, tecleado):
                            if no_channels: titulo = titulo + ' [COLOR yellow]Ignorado por CloudFlare Protection'
 
                        elif 'proxies' in ch['notes'].lower(): titulo = titulo + ' [COLOR red]comprobar si [I]Necesita Proxies[/I]'
-                       elif 'register' in ch['clusters']: titulo = titulo + ' [COLOR teal]comprobar [I]Credenciales Cuenta[/I]'
                        else:
                            if channels_search_excluded:
                                channels_preselct = str(channels_search_excluded).replace('[', '').replace(']', ',')
@@ -838,6 +840,8 @@ def do_search(item, tecleado):
             if ch['status'] != -1:
                 tit = '[COLOR %s][B]Marcar canal como Desactivado[/B][/COLOR]' % color_list_inactive
                 context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': -1})
+
+            color = 'chartreuse'
 
             titulo = '[B][COLOR %s]%s[/COLOR][/B]' % (color, titulo)
 

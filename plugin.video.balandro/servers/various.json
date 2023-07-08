@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Desiupload,  Dropload,  Fastupload,  Filemoon,  Hexupload,  Krakenfiles,  Moonplayer, Mvidoo,  Rutube,  Streamhub,  Streamwish,  Tubeload,  Uploadever,  Videowood,  Yandex)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Desiupload,  Dropload,  Fastupload,  Filelions,  Filemoon,  Hexupload,  Krakenfiles,  Moonplayer,  Mvidoo,  Rutube,  Streamhub,  Streamwish,  Tubeload,  Uploadever,  Videowood,  Yandex,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -138,11 +138,47 @@
       },
       {
         "pattern": "https://desiupload.co/([0-9a-zA-Z]+)",
-        "url": "\\1"
+        "url": "https://desiupload.co/\\1"
       },
       {
         "pattern": "https://desiupload.to/([0-9a-zA-Z]+)",
-        "url": "\\1"
+        "url": "https://desiupload.co/\\1"
+      },
+      {
+        "pattern": "https://desiupload.in/([0-9a-zA-Z]+)",
+        "url": "https://desiupload.co/\\1"
+      },
+      {
+        "pattern": "https://filelions.com/(?:v|f|d)/([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://filelions.to/(?:v|f|d)/([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://youdbox.com/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://youdbox.site/\\1"
+      },
+      {
+        "pattern": "https://youdbox.net/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://youdbox.site/\\1"
+      },
+      {
+        "pattern": "https://youdbox.org/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://youdbox.site/\\1"
+      },
+      {
+        "pattern": "https://youdbox.site/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://youdbox.site/\\1"
+      },
+      {
+        "pattern": "https://yodbox.com/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://youdbox.site/\\1"
+      },
+      {
+        "pattern": "https://youdboox.com/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://youdbox.site/\\1"
       }
     ]
   }

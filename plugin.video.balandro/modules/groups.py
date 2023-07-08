@@ -49,6 +49,9 @@ context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_p
 tit = '[COLOR fuchsia][B]Parámetros Play[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_play_parameters'})
 
+tit = '[COLOR red][B]Parámetros Proxies[/B][/COLOR]'
+context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_prx_parameters'})
+
 tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 

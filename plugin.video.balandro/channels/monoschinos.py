@@ -311,6 +311,7 @@ def findvideos(item):
         elif servidor == 'anonfile': servidor = 'anonfiles'
         elif servidor == 'zippy': servidor = 'zippyshare'
         elif servidor == 'drive': servidor = 'gvideo'
+        elif servidor == 'pixel': servidor = 'pixeldrain'
         elif servidor == 'senvid2': servidor = 'sendvid'
 
         elif servidor == 'sbanh' or servidor == 'sblanh' or servidor == 'sbspeed' or servidor == 'sbchill' or servidor == 'sblongvu' or servidor == 'sbrity' or servidor == 'sbhight': servidor = 'streamsb'
@@ -342,6 +343,7 @@ def findvideos(item):
 
         if srv == 'anonfile': srv = 'anonfiles'
         elif srv == 'zippy': srv = 'zippyshare'
+        elif srv == 'pixel': srv = 'pixeldrain'
 
         elif srv == 'ok':
           if '/www.fireload.com/' in url: continue

@@ -64,6 +64,8 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por país', action='paises', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
+
     return itemlist
 
 
@@ -79,11 +81,15 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Capítulos', action = 'list_all', url = host + 'capitulos-comoletos/', group = 'capis', search_type = 'tvshow', text_color = 'olive' ))
 
+    itemlist.append(item.clone( title = 'Mejores capítulos', action='list_all', url = host + 'las-mejores-series-turcas-en-espanol/', group = 'capis', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Turcas', action='list_all', url = host + 'series-turcas-gratishd/', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por país', action='paises', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'tvshow' ))
 
     return itemlist
 
@@ -101,6 +107,8 @@ def mainlist_animes(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'anime', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por país', action='paises', group = 'anime', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action='anios', group = 'anime', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', group = 'anime',  search_type = 'tvshow' ))
 
     return itemlist
 
@@ -137,7 +145,7 @@ def paises(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'country/brazil//', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'country/brazil/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'country/chile/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'country/colombia/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Japón', action = 'list_all', url = host + 'country/japan/', text_color='moccasin' ))
@@ -164,6 +172,17 @@ def anios(item):
         url = host + 'years/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = text_color ))
+
+    return itemlist
+
+
+def calidades(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'En 720', action = 'list_all', url = host + 'quality/720p/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En 1080', action = 'list_all', url = host + 'quality/1080p/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En Full HD', action = 'list_all', url = host + 'quality/full-hd/', text_color='moccasin' ))
 
     return itemlist
 

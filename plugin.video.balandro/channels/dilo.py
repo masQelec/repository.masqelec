@@ -369,12 +369,18 @@ def last_epis(item):
         elif '/computadoras-que-aprenden-' in url: continue
         elif '/accion-cine-video-' in url: continue
         elif '/la-mitologia-templaria-' in url: continue
-        elif '/viajar-espana-' in url: continue
         elif 'rico-rico-y-con-fundamento-' in url: continue
         elif '/cocinar-sin-carbohidratos-' in url: continue
         elif '/chocolate-' in url: continue
         elif '/postres-' in url: continue
         elif '/freidora-de-aire-' in url: continue
+        elif '/best-of-club-international-' in url: continue
+        elif '/escort-readers-wives-' in url: continue
+        elif '/anocero-' in url: continue
+        elif '/hoy-me-comere-la-vida-' in url: continue
+        elif '/razzle-extreme-' in url: continue
+        elif '/naughty-neighbors-' in url: continue
+        elif '/hobby-consolas-' in url: continue
 
         elif '-pc-' in url: continue
         elif '-magazine-' in url: continue
@@ -392,6 +398,9 @@ def last_epis(item):
         elif '-photo-' in url: continue
         elif '-volume-' in url: continue
         elif 'audiolibrovoz-' in url: continue
+        elif '-fotos-' in url: continue
+        elif '-espana-' in url: continue
+        elif '-national-geographic-' in url: continue
 
         epis.append(match)
 
@@ -448,7 +457,7 @@ def last_epis(item):
                      new_item.contentTitle = new_item.title = new_item.contentSerieName
                      new_item.infoLabels['year'] = '-'
 
-                     new_item.title = new_item.title + ' [COLOR deepskyblue] Película[/COLOR]'
+                     new_item.title = new_item.title + '[COLOR deepskyblue] Película[/COLOR]'
 
                      del new_item.contentSerieName
                      del new_item.contentSeason

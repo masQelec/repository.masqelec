@@ -175,7 +175,7 @@ def list_all(item):
     if 'Añadido recientemente' in data:
         bloque = scrapertools.find_single_match(data, 'Añadido recientemente(.*?)<div class="sidebar')
     else:
-        bloque = scrapertools.find_single_match(data, 'Tendencias(.*?)<div class="sidebar')
+        bloque = scrapertools.find_single_match(data, 'Peliculas Torrent(.*?)<div class="sidebar')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article')
 
@@ -201,7 +201,7 @@ def list_all(item):
 
     if itemlist:
         if '<div class="pagination">' in data:
-           next_url = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "<a href='(.*?)'")
+           next_url = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
 
            if next_url:
                if '/page/' in next_url:

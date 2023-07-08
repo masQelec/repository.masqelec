@@ -14,7 +14,7 @@ host = 'https://w4.cuevana3.ai/'
 # ~ por si viene de enlaces guardados
 ant_hosts = ['http://www.cuevana3.co/', 'https://cuevana3.co/', 'https://cuevana3.io/',
              'https://cuevana3.me/', 'https://ww1.cuevana3.me/', 'https://ww2.cuevana3.me/',
-             'https://ww3.cuevana3.me/', 'https://ww4.cuevana3.me/,' 'https://ww5.cuevana3.me/',
+             'https://ww3.cuevana3.me/', 'https://ww4.cuevana3.me/', 'https://ww5.cuevana3.me/',
              'https://c3.cuevana3.me/', 'https://s3.cuevana3.me/', 'https://es.cuevana3.me/',
              'https://a2.cuevana3.me/', 'https://b2.cuevana3.me/', 'https://d2.cuevana3.me/',
              'https://e2.cuevana3.me/', 'https://g2.cuevana3.me/', 'https://z2.cuevana3.me/',
@@ -534,7 +534,7 @@ def play(item):
 
             elif '/apialfa.tomatomatela.club/ir/goto_ddh.php' in item.url: api_url = 'https://apialfa.tomatomatela.club/ir/redirect_ddh.php'
             elif '/apialfa.tomatomatela.club/ir/rd.php' in item.url: api_url = 'https://apialfa.tomatomatela.club/ir/rd.php'
-            elif '/api.cuevana3.me/ir/player.php?h=' in item.url: api_url = 'https://api.cuevana3.me//ir/rd.php'
+            elif '/api.cuevana3.me/ir/player.php?h=' in item.url: api_url = 'https://api.cuevana3.me/ir/rd.php'
 
             elif '/api.cuevana3.me/sc/index.php?h=' in item.url:
                 api_url = 'https://api.cuevana3.me/sc/r.php'
@@ -558,7 +558,7 @@ def play(item):
 
                     api_post = 'url=' + fid
 
-                    if '/api.cuevana3.me/ir/player.php?h=' in item.url: api_url = 'https://api.cuevana3.me//ir/rd.php'
+                    if '/api.cuevana3.me/ir/player.php?h=' in item.url: api_url = 'https://api.cuevana3.me/ir/rd.php'
 
                     elif '/api.cuevana3.me/sc/index.php?h=' in url:
                         api_url = 'https://api.cuevana3.me/sc/r.php'

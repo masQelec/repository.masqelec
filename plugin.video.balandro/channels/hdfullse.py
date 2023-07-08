@@ -13,6 +13,8 @@ from core import httptools, scrapertools, jsontools, servertools, tmdb
 
 host = 'https://www.hdfull.it'
 
+refer = 'https://hdfull.pm/'
+
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://hdfull.se', 'https://hdfull.so', 'https://hdfull.fm',
@@ -67,7 +69,7 @@ def do_downloadpage(url, post = None, referer = None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    if not referer: referer = host
+    if not referer: referer = refer
     headers = {'Referer': referer}
 
     if not url.startswith(host):
@@ -225,7 +227,7 @@ def list_all(item):
     patron = '<div class="item"[^>]*">'
     patron += '\s*<a href="([^"]+)"[^>]*>\s*<img class="[^"]*"\s+src="([^"]+)"[^>]*>'
     patron += '\s*</a>\s*</div>\s*<div class="rating-pod">\s*<div class="left">(.*?)</div>'
-    patron += '.*? title="([^"]+)"'
+    patron += '.*?title="([^"]+)"'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
     if item.search_post != '' and item.search_type != 'all':
@@ -238,6 +240,7 @@ def list_all(item):
         languages = detectar_idiomas(langs)
 
         thumb = host + thumb
+
         url = host + url
 
         tipo = 'movie' if '/movie/' in url else 'tvshow'
@@ -293,6 +296,7 @@ def temporadas(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     # ~ Reintentar a veces tarda en responder
     if not data: data = do_downloadpage(item.url)
@@ -324,6 +328,11 @@ def temporadas(item):
         thumb = host + thumb
 
         if len(matches) == 1:
+            blk_temp = scrapertools.find_single_match(data, '>Todas las temporadas<(.*?)</div>')
+            num_temp = scrapertools.find_single_match(blk_temp, "'.*?/season-(.*?)'")
+
+            if num_temp: numtempo = num_temp
+
             title = title.replace('Season', 'Temporada').replace('Temporadas', 'Temporada')
 
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')

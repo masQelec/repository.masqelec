@@ -51,8 +51,8 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5672.93 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5672.127 Safari/537.36"
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.110 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.199 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -452,7 +452,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
         if lanzar_error:
             is_channel = inspect.getmodule(inspect.currentframe().f_back)
             if is_channel == None: is_channel = inspect.getmodule(inspect.currentframe().f_back.f_back)
-            is_channel = str(is_channel).replace("/servers/","\\servers\\")
+            is_channel = str(is_channel).replace("/servers/", "\\servers\\")
 
             if "\\servers\\" in is_channel or 'servertools' in is_channel: lanzar_error = False
 
@@ -468,18 +468,19 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
             else:
                is_channel = inspect.getmodule(inspect.currentframe().f_back)
                if is_channel == None: is_channel = inspect.getmodule(inspect.currentframe().f_back.f_back)
-               is_channel = str(is_channel).replace("/servers/","\\servers\\")
-               if "\\servers\\" in is_channel or 'servertools' in is_channel: error_py3 = False
+               is_channel = str(is_channel).replace("/servers/", "\\servers\\")
+               if "\\servers\\" in is_channel or 'servertools' in is_channel:
+                   if not location_url_headers: error_py3 = False
 
                if error_py3:
                    if not follow_redirects:
                        if 'location:' in str(location_url_headers):
                            try: location_url = location_url_headers['location']
-                           except: location_qurl = ''
+                           except: location_url = ''
 
                        elif 'Location:' in str(location_url_headers):
                            try: location_url = location_url_headers['Location']
-                           except: location_qurl = ''
+                           except: location_url = ''
 
                        if location_url:
                            response["sucess"] = True

@@ -18,6 +18,10 @@ def get_video_url(page_url, url_referer=''):
     page_url = page_url.replace('https://streamhide.to/d/https://playhide.online/d/', 'https://streamhide.to/d/')
     page_url = page_url.replace('https://streamhide.to/w/https://playhide.online/w/', 'https://streamhide.to/w/')
 
+    page_url = page_url.replace('https://streamhide.to/e/https://streamhide.com/e/', 'https://streamhide.to/e/')
+    page_url = page_url.replace('https://streamhide.to/d/https://streamhide.com/d/', 'https://streamhide.to/d/')
+    page_url = page_url.replace('https://streamhide.to/w/https://streamhide.com/w/', 'https://streamhide.to/w/')
+
     page_url = page_url.replace('//playhide.online/e/', '//streamhide.to/e/').replace('//playhide.online/d/', '//streamhide.to/e/').replace('//playhide.online/w/', '//streamhide.to/e/')
 
     page_url = page_url.replace('//guccihide.com/e/', '//streamhide.to/e/').replace('//guccihide.com/', '//streamhide.to/e/').replace('//guccihide.com/w/', '//streamhide.to/e/')

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb, jsontools
 
 
-host = 'https://playdede.to/'
+host = 'https://playdede.us/'
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
@@ -15,7 +15,8 @@ host = 'https://playdede.to/'
 
 
 # ~ por si viene de enlaces guardados posteriores
-ant_hosts = ['https://playdede.com/', 'https://playdede.org/', 'https://playdede.nu/']
+ant_hosts = ['https://playdede.com/', 'https://playdede.org/', 'https://playdede.nu/',
+             'https://playdede.to/']
 
 
 domain = config.get_setting('dominio', 'playdede', default='')
@@ -364,7 +365,7 @@ def acciones(item):
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
-    itemlist.append(item.clone( channel='domains', action='manto_domain_playdede', title=title, desde_el_canal = True, folder=False, thumbnail=config.get_thumb('keyboard'), text_color='darkorange' ))
+    itemlist.append(item.clone( channel='domains', action='manto_domain_playdede', title=title, desde_el_canal = True, host_canal = url, folder=False, thumbnail=config.get_thumb('keyboard'), text_color='darkorange' ))
 
     if not config.get_setting('playdede_login', 'playdede', default=False):
         if username:

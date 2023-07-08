@@ -10,7 +10,7 @@ from core import httptools, scrapertools, servertools, tmdb
 # ~ 23/12/2022 las series en la web NO acceden bien a los episodios
 
 
-host = 'https://peliculaspro.net/'
+host = 'https://peliculaspro.org/'
 
 
 def item_configurar_proxies(item):
@@ -46,6 +46,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://peliculaspro.net/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     timeout = None
     if host in url:
         if config.get_setting('channel_peliculaspro_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)

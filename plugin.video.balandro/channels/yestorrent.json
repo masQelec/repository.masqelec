@@ -9,7 +9,7 @@
   "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["torrent", "movie", "tvshow"],
-  "language": ["cast", "last", "vose"],
+  "language": ["cast", "lat", "vose"],
 
   "clusters": ["torrents", "qualityes", "languages", "years", "kids", "docs", "vos", "3d", "4k"],
 

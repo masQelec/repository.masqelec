@@ -355,16 +355,36 @@ def findvideos(item):
 
         if not url.startswith('http'): url = 'https:' + url
 
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
+        if "/streaming.php?" in url:
+            data = do_downloadpage(url)
 
-        url = servertools.normalize_url(servidor, url)
+            links = scrapertools.find_multiple_matches(data, '<li class="linkserver".*?data-video="(.*?)"')
 
-        other = ''
-        if servidor == 'various':
-            if '/filemoon.' in url: other = 'Filemoon'
+            for link in links:
+                if '/hqq.' in link or '/waaw.' in link or '/netu.' in link: continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose', other = other ))
+                servidor = servertools.get_server_from_url(link)
+                servidor = servertools.corregir_servidor(servidor)
+
+                link = servertools.normalize_url(servidor, link)
+
+                other = ''
+                if servidor == 'various':
+                    if '/filemoon.' in link: other = 'Filemoon'
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Vose', other = other ))
+
+        else:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            url = servertools.normalize_url(servidor, url)
+
+            other = ''
+            if servidor == 'various':
+                if '/filemoon.' in url: other = 'Filemoon'
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -401,10 +421,10 @@ def play(item):
 
         if not url: url = scrapertools.find_single_match(data, '<li class="linkserver".*?data-video="(.*?)"')
 
-    if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
     if url:
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
         if not url.startswith("http"): url = "https:" + url
 
         url = url.replace("\\/", "/")
