@@ -30,7 +30,7 @@ color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 
-_foro = "[COLOR plum][B][I] mimediacenter.info/foro/ [/I][/B][/COLOR]"
+_foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/ [/I][/B][/COLOR]"
 _source = "[COLOR coral][B][I] https://balandro-tk.github.io/balandro/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 
@@ -611,8 +611,6 @@ def test_providers(item):
 
     config.set_setting('channel_test_providers_dominio', '')
     config.set_setting('proxies', '', 'test_providers')
-
-    default_provider = 'proxyscrape.com'
 
     default_provider = 'proxyscrape.com'
     all_providers = 'All-providers'

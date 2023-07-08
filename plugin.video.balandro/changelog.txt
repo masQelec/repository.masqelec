@@ -2,6 +2,19 @@
 
 [COLOR yellow][B]2023[/B][/COLOR]
 
+3.0.8  [COLOR darkorange] 7 de Julio de 2023[/COLOR]
+    Correcciones: Bugs de la version anterior
+
+    Generos: Re-configurados
+
+    Canales:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
+    Servidores:
+       Modificados: Revision generalizada
+       Anulados: Las webs cerradas
+
 3.0.7  [COLOR darkorange] 12 de Junio de 2023[/COLOR]
     Correcciones: Bugs de la version anterior
 

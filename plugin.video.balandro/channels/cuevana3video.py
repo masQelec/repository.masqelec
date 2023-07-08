@@ -481,9 +481,9 @@ def findvideos(item):
 
                             url = servertools.normalize_url(servidor, link2)
 
-                            if '/clonamesta' in url or '/moonplayer' in url: continue
+                            if '/clonamesta' in url: continue
 
-                            if servidor == 'directo':
+                            if servidor == 'directo' or servidor == 'various':
                                 link_other = normalize_other(url)
                                 if link_other == '': continue
                             else: link_other = 'play'
@@ -501,9 +501,9 @@ def findvideos(item):
 
                 url = servertools.normalize_url(servidor, url)
 
-                if '/clonamesta' in url or '/moonplayer' in url: continue
+                if '/clonamesta' in url: continue
 
-                if servidor == 'directo':
+                if servidor == 'directo' or servidor == 'various':
                     link_other = normalize_other(url)
                     if link_other == '': continue
                 else: link_other = ''
@@ -537,7 +537,7 @@ def findvideos(item):
 
                            url = servertools.normalize_url(servidor, link2)
 
-                           if servidor == 'directo': link_other = normalize_other(url)
+                           if servidor == 'directo' or servidor == 'various': link_other = normalize_other(url)
                            else: link_other = 'play'
 
                            if not config.get_setting('developer_mode', default=False):
@@ -553,7 +553,7 @@ def findvideos(item):
 
             url = servertools.normalize_url(servidor, url)
 
-            if servidor == 'directo': link_other = normalize_other(url)
+            if servidor == 'directo' or servidor == 'various': link_other = normalize_other(url)
             else: link_other = ''
 
             if not config.get_setting('developer_mode', default=False):
@@ -583,6 +583,9 @@ def normalize_other(url):
     elif 'apialfa' in url: link_other = 'apialfa'
     elif 'tomatomatela' in url: link_other = 'dame'
     elif 'hydrax' in url: link_other = 'hydrax'
+    elif 'streamwish' in url: link_other = 'streamwish'
+    elif 'filemoon' in url: link_other = 'filemoon'
+
     else:
        if config.get_setting('developer_mode', default=False):
            try:
@@ -781,9 +784,6 @@ def play(item):
 
                     itemlist.append(item.clone(url=url, server=servidor))
                     return itemlist
-
-    if url:
-        if '/moonplayer' in url: url = ''
 
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url:

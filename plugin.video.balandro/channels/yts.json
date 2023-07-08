@@ -9,7 +9,7 @@
   "search_types": ["movie"],
 
   "categories": ["torrent", "movie"],
-  "language": ["vo"],
+  "language": ["cast", "vose", "vo"],
 
   "clusters": ["torrents", "qualityes", "languages", "years", "rankings", "kids", "docs", "vos", "4k", "3d"],
 

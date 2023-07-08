@@ -7,11 +7,11 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww2.animeonline.ninja/'
+host = 'https://ww3.animeonline.ninja/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://animeonline1.ninja/', 'https://www1.animeonline.ninja/']
+ant_hosts = ['https://animeonline1.ninja/', 'https://www1.animeonline.ninja/', 'https://ww2.animeonline.ninja/']
 
 
 domain = config.get_setting('dominio', 'animeonline', default='')
@@ -118,6 +118,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(Item( channel='helper', action='show_help_animeonline', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -140,8 +142,6 @@ def mainlist_animes(item):
         if actions.adults_password(item) == False: return itemlist
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
-
-    itemlist.append(Item( channel='helper', action='show_help_animeonline', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 

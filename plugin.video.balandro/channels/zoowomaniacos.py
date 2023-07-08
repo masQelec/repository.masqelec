@@ -142,7 +142,7 @@ def generos(item):
     bloque = scrapertools.find_single_match(str(jdata), "'options':.*?'a5':(.*?)'a4':")
     if not bloque: bloque = scrapertools.find_single_match(str(jdata), "'options':.*?'a5':(.*?)'a3':") # PY3
 
-    matches = scrapertools.find_multiple_matches(str(bloque), "'value': '(.*?)'.*?'label': '(.*?)'")
+    matches = scrapertools.find_multiple_matches(str(bloque), "'label': '(.*?)'.*?'value': '(.*?)'")
 
     _epochs = str(list(epochs))
     _writers = str(list(writers))
@@ -177,6 +177,8 @@ def generos(item):
         if title == 'Animación para Adultos': title = title + ' (+18)'
         elif title == 'Erótico': title = title + ' (+18)'
         elif title == 'Pornografía': title = title + ' (+18)'
+
+        title = title.replace('&amp;', '&')
 
         post = {'start': 0, 'length': perpage, 'metodo': 'ObtenerListaTotal', 'searchPanes[a5][0]': genre, 'search[value]': '', 'searchPanes[a3][0]': '', 'searchPanes[a4][0]': '', 'searchPanes[a6][0]': ''}
 
@@ -222,7 +224,7 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1899, -1):
+    for x in range(current_year, 1894, -1):
         any = str(x)
 
         post = {'start': 0, 'length': perpage, 'metodo': 'ObtenerListaTotal', 'searchPanes[a5][0]': '', 'search[value]': '', 'searchPanes[a3][0]': '', 'searchPanes[a4][0]': any, 'searchPanes[a6][0]': ''}
@@ -248,7 +250,7 @@ def paises(item):
     bloque = scrapertools.find_single_match(str(jdata), "'options':.*?'a6':(.*?)'data'")
     if not bloque: bloque = scrapertools.find_single_match(str(jdata), "'options':.*?'a6':(.*?)'a5':") # PY3
 
-    matches = scrapertools.find_multiple_matches(str(bloque), "'value': '(.*?)'.*?'label': '(.*?)'")
+    matches = scrapertools.find_multiple_matches(str(bloque), "'label': '(.*?)'.*?'value': '(.*?)'")
 
     for value, label in matches:
         if '\\' in label:
@@ -302,7 +304,7 @@ def directores(item):
     bloque = scrapertools.find_single_match(str(jdata), "'options':.*?'a3':(.*?)'a5':")
     if not bloque: bloque = scrapertools.find_single_match(str(jdata), "'options':.*?'a3':(.*?)}}}") # PY3
 
-    matches = scrapertools.find_multiple_matches(str(bloque), "'value': '(.*?)'.*?'label': '(.*?)'")
+    matches = scrapertools.find_multiple_matches(str(bloque), "'label': '(.*?)'.*?'value': '(.*?)'")
 
     for value, label in matches:
         if '\\' in label:
