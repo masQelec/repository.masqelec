@@ -38,7 +38,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = url_browser + '/0/all/all/0/latest/0/es', lang='Esp', search_type = 'movie', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'En inglés', action = 'list_all', url = url_browser + '/0/all/all/0/latest/0/en', lang='Ing', search_type = 'movie', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Versión original (subtitulda)', action = 'list_all', url = url_browser + '/0/all/all/0/latest/0/foreign', lang='Vos', search_type = 'movie', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Versión original (subtitulada)', action = 'list_all', url = url_browser + '/0/all/all/0/latest/0/foreign', lang='Vos', search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))

@@ -13,10 +13,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-# ~ web alternativa
-# ~ 31/5/2023  'https://7d2e-don.mirror.pm/'
-
-host = 'https://4463-don.mirror.pm/'
+host = 'https://51fc-don.mirror.pm/'
 
 
 try:
@@ -63,10 +60,15 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.pictures/', 'https://dontorrent.ms/', 'https://dontorrent.care/',
              'https://dontorrent.cash/', 'https://dontorrent.observer/', 'https://dontorrent.company/',
              'https://dontorrent.discount/', 'https://dontorrent.dad/', 'https://dontorrent.zip/',
+             'https://dontorrent.mov/', 'https://dontorrent.day/', 'https://dontorrent.boo/',
+             'https://dontorrent.foo/',
 
              'https://8ca7-don.mirror.pm/', 'https://1b1b-don.mirror.pm', 'https://6b6b-don.mirror.pm',
              'https://edf1-don.mirror.pm/', 'https://a36b-don.mirror.pm/', 'https://b2b8-don.mirror.pm/',
-             'https://238e-don.mirror.pm', 'https://7d2e-don.mirror.pm/']
+             'https://238e-don.mirror.pm', 'https://7d2e-don.mirror.pm/', 'https://a704-don.mirror.pm/',
+             'https://ffee-don.mirror.pm/'
+
+             'https://4463-don.mirror.pm/', 'https://4144-don.mirror.pm/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')

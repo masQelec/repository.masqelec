@@ -419,7 +419,7 @@ def _dominio_vigente(item):
     elif item.from_channel == 'playdede': domains.last_domain_playdede(item)
 
     else:
-        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Efectue Test Web, la comprobación No está permitida[/B][/COLOR]' % color_alert)
+        domains.manto_domain_common(item, item.from_channel, item.from_channel.capitalize())
 
 
 def _dominio_memorizado(item):
@@ -488,6 +488,8 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'pelispluslat': domains.manto_domain_pelispluslat(item)
 
     elif item.from_channel == 'playdede': domains.manto_domain_playdede(item)
+
+    elif item.from_channel == 'poseidonhd2': domains.manto_domain_poseidonhd2(item)
 
     elif item.from_channel == 'series24': domains.manto_domain_series24(item)
 
@@ -990,13 +992,6 @@ def _proxies(item):
         series24.configurar_proxies(item)
 
         if config.get_setting('channel_series24_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'seriesflixvideo':
-        from channels import seriesflixvideo
-        item.channel = 'seriesflixvideo'
-        seriesflixvideo.configurar_proxies(item)
-
-        if config.get_setting('channel_seriesflixvideo_proxies') is None: refrescar = False
 
     elif item.from_channel == 'seriesmovil':
         from channels import seriesmovil

@@ -34,6 +34,9 @@ def get_video_url(page_url, url_referer=''):
     headers = {'Referer': page_url.replace('mixdrop.co/e/', 'mixdrop.co/f/')}
     data = httptools.downloadpage(page_url, headers=headers).data
 
+    if '>WE ARE SORRY</h2>' in data or '<title>404 Not Found</title>' in data:
+        return 'El archivo no existe o ha sido borrado'
+
     url = scrapertools.find_single_match(data, 'window\.location\s*=\s*"([^"]+)')
     if url:
         if url.startswith('/e/'): url = 'https://mixdrop.co' + url
@@ -55,7 +58,6 @@ def get_video_url(page_url, url_referer=''):
 
         if url.startswith('//'):
             video_urls.append(["mp4", 'https:' + url])
-            # ~ video_urls.append(["mp4", 'https:' + url+'|Referer=https://mixdrop.co/'])
             break
 
     return video_urls

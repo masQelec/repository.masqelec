@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://cine24h.net/'
+host = 'https://cine24h.online/'
 
 
 perpage = 30
@@ -16,6 +16,12 @@ perpage = 30
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://cine24h.net/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '&years%5B%5D=' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -124,10 +130,17 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(article, '<img src="(.*?)"')
 
+        if not thumb.startswith("http"): thumb = "https:" + thumb
+
         year = scrapertools.find_single_match(article, '<span class="Year">(.*?)</span>')
         if not year: year = '-'
 
-        itemlist.append(item.clone( action='findvideos', url=url, title = title, thumbnail = thumb, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        lang = 'Lat'
+        if '-sub/' in url: lang = 'Vose'
+        if '-es/' in url: lang = 'Esp'
+
+        itemlist.append(item.clone( action='findvideos', url=url, title = title, thumbnail = thumb, languages = lang,
+                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
         if len(itemlist) >= perpage: break
 
@@ -207,7 +220,7 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         if url:
-           itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url ))
+           itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = item.languages ))
 
     if not itemlist:
         if not ses == 0:

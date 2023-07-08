@@ -1,8 +1,8 @@
-[COLOR coral][B]Balandro[/COLOR][COLOR chartreuse]  12 de Junio de 2023[/B][/COLOR]
-   [COLOR yellow][B]Version 3.0.7[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR][COLOR chartreuse]  7 de Julio de 2023[/B][/COLOR]
+   [COLOR yellow][B]Version 3.0.8[/B][/COLOR]
 
    [COLOR yellow]CONTACTO:[/COLOR]
-      Foro  [COLOR dodgerblue][B][I]mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
+      Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
       Telegram  [COLOR aquamarine][B][I]t.me/balandro_asesor[/I][/B][/COLOR]  Asesoramiento, Dudas, Consultas, etc.
 
    [COLOR yellow]MEDIA CENTERS:[/COLOR]
@@ -55,8 +55,8 @@
    [COLOR yellow]CANALES TEMPORALMENTE DES-ACTIVADOS:[/COLOR]
       [B][COLOR slateblue]Que canales estan Temporalmente Inactivos:[/COLOR][/B]
          [COLOR coral]Son los pendientes de su situacion, para evaluar su Re-activacion o Anulacion.[/COLOR]
-         DoramasWow,  Cuevana3Mu,  DocumaniaTv,  PeliSeries,
-         SeriesFlixVideo
+         Cuevana3,  Cuevana3Mu,  DocumaniaTv,  DoramasWow,
+         Ievenn,  PeliSeries
 
    [COLOR yellow]SERVIDORES CON VIAS ALTERNATIVAS:[/COLOR]
       [B][COLOR tan]Servidores con Vias Alternativas:[/COLOR][/B]
@@ -68,17 +68,17 @@
          script.module.resolveurl
 
    [COLOR yellow]RESUMEN TOTALES DE CANALES:[/COLOR]
-       275 [COLOR darkorange]Canales[/COLOR]
+       278 [COLOR darkorange]Canales[/COLOR]
 
-       104 [COLOR coral]Inactivos[/COLOR]
-           5 [COLOR cyan]Temporalmente Inactivos[/COLOR]
+       105 [COLOR coral]Inactivos[/COLOR]
+           6 [COLOR cyan]Temporalmente Inactivos[/COLOR]
 
            1 [COLOR violet]Con probable Incompatibilidad[/COLOR]
            3 [COLOR plum]Inestables[/COLOR]
-           6 [COLOR darkgoldenrod]Problematicos[/COLOR]
+           7 [COLOR darkgoldenrod]Problematicos[/COLOR]
 
          27 [COLOR olivedrab]CloudFlare Protection[/COLOR]
-         61 [COLOR red]Pueden Usar Proxies[/COLOR]
+         62 [COLOR red]Pueden Usar Proxies[/COLOR]
 
            3 [COLOR teal]Requieren Cuenta[/COLOR]
            1 [COLOR green]Con varios Dominios[/COLOR]
@@ -89,17 +89,17 @@
        166 [COLOR gold]Disponibles[/COLOR]
 
    [COLOR yellow]DISTRIBUCION CANALES DISPONIBLES:[/COLOR]
-         28 de [COLOR moccasin]Sugeridos[/COLOR]
+         26 de [COLOR moccasin]Sugeridos[/COLOR]
 
-         97 de [COLOR deepskyblue]Peliculas[/COLOR]
-         80 de [COLOR hotpink]Series[/COLOR]
+         96 de [COLOR deepskyblue]Peliculas[/COLOR]
+         81 de [COLOR hotpink]Series[/COLOR]
          67 de [COLOR yellow]Peliculas y Series[/COLOR]
 
          26 de [COLOR thistle]Generos[/COLOR]
            8 de [COLOR cyan]Documentales[/COLOR]
            9 de [COLOR lightyellow]Infantiles[/COLOR]
-         10 de [COLOR limegreen]Novelas[/COLOR]
-         41 de [COLOR blue]Torrents[/COLOR]
+         11 de [COLOR limegreen]Novelas[/COLOR]
+         42 de [COLOR blue]Torrents[/COLOR]
            9 de [COLOR firebrick]Doramas[/COLOR]
          14 de [COLOR springgreen]Animes[/COLOR]
          20 de [COLOR orange]Adultos[/COLOR]
@@ -112,6 +112,6 @@
          54 [COLOR coral]Inactivos[/COLOR]
          19 [COLOR fuchsia]Sin Soporte[/COLOR]
            8 [COLOR green]Con Vias alternativas[/COLOR]
-         15 [COLOR powderblue]Con Vias adicionales[/COLOR]
+         17 [COLOR powderblue]Con Vias adicionales[/COLOR]
 
        105 [COLOR gold]Disponibles[/COLOR]

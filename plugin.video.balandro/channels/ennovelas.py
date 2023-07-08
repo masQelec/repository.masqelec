@@ -7,11 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://e.ennovelas.net/'
+host = 'https://b.ennovelas.net/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://ennovelas.online/', 'https://w.ennovelas.net/', 'https://ww.ennovelas.net/']
+ant_hosts = ['https://ennovelas.net/', 'https://w.ennovelas.net/', 'https://ww.ennovelas.net/',
+             'https://e.ennovelas.net/', 'https://a.ennovelas.net/']
 
 
 domain = config.get_setting('dominio', 'ennovelas', default='')
@@ -112,6 +113,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(Item( channel='helper', action='show_help_ennovelas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -123,8 +126,6 @@ def mainlist(item):
     itemlist = []
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
-
-    itemlist.append(Item( channel='helper', action='show_help_ennovelas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -140,14 +141,14 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
-    itemlist.append(Item( channel='helper', action='show_help_ennovelas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
-
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
     return itemlist
 
@@ -158,8 +159,6 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
-    itemlist.append(Item( channel='helper', action='show_help_ennovelas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
-
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'telenovelas/', search_type = 'tvshow' ))
@@ -169,6 +168,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por país', action='paises', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'tvshow' ))
 
     return itemlist
 
@@ -211,7 +212,7 @@ def paises(item):
     itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'genre/novelas-espanolas/', lang = 'Esp', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Filipinas', action = 'list_all', url = host + 'genre/novelas-filipinas-online-gratis/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'India', action = 'list_all', url = host + 'genre/novelas-indias-online-gratis/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'genre/novelas-mexicanas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'genre/novelas-mexicanaas/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'genre/novelas-peruanas-online-gratis/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Reino unido', action = 'list_all', url = host + 'genre/novelas-reino-unido-online-gratis/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'genre/series-turcas/', text_color='moccasin' ))
@@ -241,6 +242,17 @@ def anios(item):
     return itemlist
 
 
+def calidades(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'En 720', action = 'list_all', url = host + 'quality/720p/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En 1080', action = 'list_all', url = host + 'quality/1080p/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En Full HD', action = 'list_all', url = host + 'quality/full-hd-video/', text_color='moccasin' ))
+
+    return itemlist
+
+
 def list_all(item):
     logger.info()
     itemlist = []
@@ -260,6 +272,7 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'data-img="(.*?)"')
 
         title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "").strip()
+        title = title.replace('&#8216;', "").replace('&#8217;', "").strip()
 
         SerieName = title
 
@@ -544,13 +557,15 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(item.url)
+    data = do_downloadpage(item.url + '?do=watch')
 
     values = scrapertools.find_multiple_matches(data, '<form method="post".*?action="(.*?)".*?<input type="hidden".*?name="(.*?)".*?value="(.*?)"')
 
     ses = 0
 
     for link, type, value in values:
+        ses += 1
+
         if not link: continue
 
         if type == 'watch': post = {'watch': str(value), 'submit': ''}
@@ -559,13 +574,11 @@ def findvideos(item):
         data = do_downloadpage(link, post = post, headers = {'Referer': item.url} )
 
         matches = scrapertools.find_multiple_matches(data, "<iframe src='(.*?)'")
+        if not matches: matches = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
         if not matches: matches = scrapertools.find_multiple_matches(data, '<td>Server.*?href="(.*?)"')
 
         for url in matches:
-            ses += 1
-
             if '.ennovelas.' in url: continue
-            elif '/ennovelas.' in url: continue
             elif '/tomatomatela.' in url: continue
             elif '/watching.' in url: continue
             elif '/novelas360.' in url: continue
@@ -600,6 +613,40 @@ def findvideos(item):
 
             if not servidor == 'directo':
                 itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
+
+
+    t_link = scrapertools.find_single_match(data, 'var vo_theme_dir = "(.*?)"')
+    id_link = scrapertools.find_single_match(data, 'vo_postID = "(.*?)"')
+
+    if t_link and id_link:
+        i = 0
+
+        while i <= 5:
+           data = do_downloadpage(t_link + '/temp/ajax/iframe.php?id=' + id_link + '&video=' + str(i), headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'} )
+
+           u_link = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
+           if not u_link: u_link = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
+
+           if u_link.startswith('//'): u_link = 'https:' + u_link
+
+           if u_link:
+              ses += 1
+
+              if '/ennovelas.' in u_link: u_link = ''
+
+           if u_link:
+               servidor = servertools.get_server_from_url(u_link)
+               servidor = servertools.corregir_servidor(servidor)
+
+               u_link = servertools.normalize_url(servidor, u_link)
+
+               if item.lang == 'Esp': lang = 'Esp'
+               else: lang = 'Lat'
+
+               if not servidor == 'directo':
+                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = 'P' ))
+
+           i += 1
 
     if not itemlist:
         if not ses == 0:

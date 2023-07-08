@@ -948,7 +948,7 @@ def _buscar_proxies(canal, url, provider, procesar):
     if not all_providers_proxies:
         if not proxies:
             if providers_preferred:
-                platformtools.dialog_ok(config.__addon_name, 'Tiene informados en ajustes [COLOR wheat][B]Proveedores Preferidos[/B][/COLOR] de proxies.', '[COLOR yellow][B]Sin proxies según sus parámetros actuales.[/B][/COLOR]', '[COLOR red]Preferidos: [COLOR violet][B]' + str(providers_preferred + '[/B][/COLOR]'))
+                platformtools.dialog_ok('Buscar proxies ' + provider.capitalize(), 'Tiene informados en ajustes [COLOR wheat][B]Proveedores Preferidos[/B][/COLOR] de proxies.', '[COLOR yellow][B]Sin proxies según sus parámetros actuales.[/B][/COLOR]', '[COLOR red]Preferidos: [COLOR violet][B]' + str(providers_preferred + '[/B][/COLOR]'))
             else:
                platformtools.dialog_notification('Buscar proxies ' + provider.capitalize(), '[B][COLOR %s]Sin proxies según parámetros[/COLOR][/B]' % color_adver)
             return False
@@ -1698,7 +1698,17 @@ def testear_lista_proxies(canal, provider, url, proxies=[]):
      # ~ float para calcular porcentaje
     num_proxies = float(len(proxies))
 
-    progreso = platformtools.dialog_progress('Test proxies ' + '[COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR] con [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '%d proxies a comprobar. [COLOR yellowgreen][B]Cancelar si tarda demasiado[/B][/COLOR].' % num_proxies)
+    txt_provider = provider
+
+    if txt_provider == 'proxy-list.download': txt_provider = 'proxy-list.d'
+    elif txt_provider == 'z-free-proxy-list.anon': txt_provider = 'z-free-proxy-list.a'
+    elif txt_provider == 'z-free-proxy-list.com': txt_provider = 'z-free-proxy-list.c'
+    elif txt_provider == 'z-free-proxy-list.uk': txt_provider = 'z-free-proxy-list.u'
+    elif txt_provider == 'z-proxy-list.org': txt_provider = 'proxy-list.o'
+
+    txt_provider = txt_provider.replace('z-', '').replace('.com', '').replace('.net', '').replace('.name', '').replace('.ge', '').replace('.pro', '').replace('.org', '').replace('.xyz', '').strip().capitalize()
+
+    progreso = platformtools.dialog_progress('Test proxies ' + '[COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR] con [COLOR red][B]' + txt_provider + '[/B][/COLOR]', '%d proxies a comprobar. [COLOR yellowgreen][B]Cancelar si tarda demasiado[/B][/COLOR].' % num_proxies)
 
     repeated = 0
 

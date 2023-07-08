@@ -54,8 +54,8 @@ def get_video_url(page_url, url_referer=''):
 
         elif 'yandex' in page_url: txt_server = 'Yandex'
         elif 'yadi' in page_url:
-              page_url = page_url.replace('/yadi.sk/', '/disk.yandex.ru/')
               txt_server = 'Yandex'
+              page_url = page_url.replace('/yadi.sk/', '/disk.yandex.ru/')
 
         elif 'fastupload' in page_url: txt_server = 'Fastupload'
         elif 'dropload' in page_url: txt_server = 'Dropload'
@@ -63,6 +63,9 @@ def get_video_url(page_url, url_referer=''):
         elif 'krakenfiles' in page_url: txt_server = 'Krakenfiles'
         elif 'hexupload' in page_url: txt_server = 'Hexupload'
         elif 'desiupload' in page_url: txt_server = 'Desiupload'
+        elif 'filelions' in page_url: txt_server = 'Filelions'
+
+        elif 'youdbox' in page_url or 'yodbox' in page_url or 'youdboox' in page_url: txt_server = 'Youdbox'
 
         platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))

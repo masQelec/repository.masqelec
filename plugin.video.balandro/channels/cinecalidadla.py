@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w11.cinecalidad.bz/'
+host = 'https://cinecalidad.zip/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -26,7 +26,8 @@ ant_hosts = ['https://cinecalidad.la/', 'https://cinecalidad.fo/', 'https://ww22
              'https://w14.cinecalidad.lc/', 'https://cinecalidad.bz/', 'https://w1.cinecalidad.bz/', 
              'https://w2.cinecalidad.bz/', 'https://w3.cinecalidad.bz/', 'https://w4.cinecalidad.bz/',
              'https://w5.cinecalidad.bz/', 'https://w6.cinecalidad.bz/', 'https://w7.cinecalidad.bz/',
-             'https://w8.cinecalidad.bz/', 'https://w9.cinecalidad.bz/', 'https://w10.cinecalidad.bz/']
+             'https://w8.cinecalidad.bz/', 'https://w9.cinecalidad.bz/', 'https://w10.cinecalidad.bz/',
+             'https://w11.cinecalidad.bz/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadla', default='')

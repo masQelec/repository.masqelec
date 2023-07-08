@@ -37,7 +37,7 @@ color_exec = config.get_setting('notification_exec_color', default='cyan')
 descartar_xxx = config.get_setting('descartar_xxx', default=False)
 descartar_anime = config.get_setting('descartar_anime', default=False)
 
-_foro = "[COLOR plum][B][I] mimediacenter.info/foro/ [/I][/B][/COLOR]"
+_foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/ [/I][/B][/COLOR]"
 _source = "[COLOR coral][B][I] https://balandro-tk.github.io/balandro/ [/I][/B][/COLOR]"
 _scripts = "[COLOR mediumaquamarine][B][I] https://balandro-tk.github.io/balandro/scripts/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
@@ -60,7 +60,7 @@ tit = '[COLOR limegreen][B]Ejemplos de Uso[/B][/COLOR]'
 context_temas.append({'title': tit, 'channel': 'helper', 'action': 'show_help_use'})
 
 tit = '[COLOR green][B]Apuntes sobre Parámetros[/B][/COLOR]'
-context_temas.append({'title': tit, 'channel': 'helper', 'action': 'show_help_use'})
+context_temas.append({'title': tit, 'channel': 'helper', 'action': 'show_help_settings'})
 
 tit = '[COLOR %s]Ajustes Configuración[/COLOR]' % color_exec
 context_temas.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
@@ -176,7 +176,7 @@ def submnu_menus(item):
 
     itemlist.append(item.clone( action='', title= '[B]MENÚS:[/B]', text_color='chartreuse', folder=False, thumbnail=config.get_thumb('dev') ))
 
-    itemlist.append(item.clone( action='show_menu_parameters', title= ' - [COLOR green][B]Información[/B][/COLOR] sobre sus [COLOR chocolate][B]Parámetros[/B][/COLOR] Actuales para los Menús', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='show_menu_parameters', title= ' - [COLOR green][B]Información[/B][/COLOR] sobre sus [COLOR chocolate][B]Parámetros[/B][/COLOR] Actuales', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR chartreuse][B]Menú[/B][/COLOR])', thumbnail=config.get_thumb('settings') ))
 
@@ -256,7 +256,7 @@ def submnu_parental(item):
 
     itemlist.append(item.clone( action='', title= '[B]PARENTAL:[/B]', text_color='orange', folder=False, thumbnail=config.get_thumb('roadblock') ))
 
-    itemlist.append(item.clone( action='show_menu_parameters', title= '[COLOR green][B]Información[/B][/COLOR] sobre sus [COLOR chocolate][B]Parámetros[/B][/COLOR] Actuales para los Menús', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='show_menu_parameters', title= '[COLOR green][B]Información[/B][/COLOR] sobre sus [COLOR chocolate][B]Parámetros[/B][/COLOR] Actuales', thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='show_help_adults', title= '[COLOR green][B]Información[/B][/COLOR] Control parental (+18)', thumbnail=config.get_thumb('news') ))
 
     if presentar:
@@ -389,6 +389,8 @@ def submnu_proxies(item):
 
     itemlist.append(item.clone( action='', title= '[B]PROXIES:[/B]', folder=False, text_color='red', thumbnail=config.get_thumb('flame') ))
 
+    itemlist.append(item.clone( action='show_prx_parameters', title= ' - [COLOR green][B]Información[/B][/COLOR] sobre sus [COLOR chocolate][B]Parámetros[/B][/COLOR] Actuales', thumbnail=config.get_thumb('news') ))
+
     itemlist.append(item.clone( action='show_help_proxies', title= ' - [COLOR green][B]Información[/B][/COLOR] Uso de proxies', thumbnail=config.get_thumb('settings') ))
     itemlist.append(item.clone( action='show_help_providers', title= ' - [COLOR green][B]Información[/B][/COLOR] Proveedores de proxies', thumbnail=config.get_thumb('settings') ))
 
@@ -509,6 +511,7 @@ def submnu_descargas(item):
     itemlist.append(item.clone( action='show_help_descargas', title= ' - [COLOR green][B]Información[/B][/COLOR] ¿ Cómo funcionan ?', thumbnail=config.get_thumb('tools') ))
     itemlist.append(item.clone( channel='actions', action='show_ubicacion', title= ' - ¿ Donde se ubican las [COLOR seagreen][B]Descargas[/B][/COLOR] ?', thumbnail=config.get_thumb('tools') ))
     itemlist.append(item.clone( action='show_help_usb', title= ' - ¿ Se puede Descargar directamente en una [COLOR goldenrod][B]Unidad USB[/B][/COLOR] ?', thumbnail=config.get_thumb('usb') ))
+    itemlist.append(item.clone( action='show_not_download', title= ' - ¿ Qué [COLOR goldenrod][B]NO[/B][/COLOR] está contemplado en las [COLOR seagreen][B]Descargas[/B][/COLOR] ?', thumbnail=config.get_thumb('roadblock') ))
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR seagreen][B]Descargas[/B][/COLOR])', thumbnail=config.get_thumb('settings') ))
 
     return itemlist
@@ -838,7 +841,7 @@ def show_help_miscelanea(item):
     txt += '  Fuente [COLOR yellow]Balandro[/COLOR]:  [COLOR plum][B]https://balandro-tk.github.io/balandro/[/B][/COLOR][CR]'
     txt += '  para obtener [COLOR yellowgreen]Repositorio, Add-On, Scripts, etc.[/COLOR][CR][CR]'
 
-    txt += '  Foro:  [COLOR coral][B]mimediacenter.info/foro/[/B][/COLOR][CR]'
+    txt += '  Foro:  [COLOR coral][B]www.mimediacenter.info/foro/[/B][/COLOR][CR]'
     txt += '  para [COLOR yellowgreen]Instalaciones, Novedades, Sugerencias, etc.[/COLOR][CR][CR]'
 
     txt += '  [COLOR chartreuse]Telegram[/COLOR]:  [COLOR lightblue][B]t.me/balandro_asesor[/B][/COLOR][CR]'
@@ -972,10 +975,6 @@ def show_help_playdede(item):
 
 def show_help_rojotorrent(item):
     item.notice = 'rojotorrent'
-    show_help_canales(item)
-
-def show_help_seriesflixvideo(item):
-    item.notice = 'seriesflixvideo'
     show_help_canales(item)
 
 def show_help_seriespapayato(item):
@@ -1353,6 +1352,17 @@ def show_not_contemplated(item):
     platformtools.dialog_textviewer('¿ Qué NO está contemplado en Balandro ?', txt)
 
 
+def show_not_download(item):
+    logger.info()
+
+    txt ='[COLOR red][B]¿ Qué temas no están Implementados en las Descargas ?[/B][/COLOR][CR][CR]'
+
+    txt += ' - Descargar [COLOR gold]Todos[/COLOR] los Capítulos de una Temporada alunísono[CR]'
+    txt += ' - Descargas formatos de ficheros NO admitidos [COLOR gold]m3u8, mpd, rtmp, rar, torrent[/COLOR][CR][CR]'
+
+    platformtools.dialog_textviewer('¿ Qué NO está contemplado en las Descargas ?', txt)
+
+
 def show_help_tracking(item):
     logger.info()
 
@@ -1668,6 +1678,108 @@ def show_play_parameters(item):
             txt +='[CR]    -  Servidores [COLOR cyan][B]Descartados [COLOR gray][B]' + str(config.get_setting('servers_discarded')) + '[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Parámetros Actuales en Play', txt)
+
+
+def show_prx_parameters(item):
+    default_provider = 'proxyscrape.com'
+    all_providers = 'All-providers'
+    private_list = 'Lista-proxies.txt'
+
+    opciones_provider = [
+            'spys.one',
+            'hidemy.name',
+            'httptunnel.ge',
+            'proxynova.com',
+            'free-proxy-list',
+            'spys.me',
+            default_provider,
+            'proxyservers.pro',
+            'us-proxy.org',
+            'proxy-list.download',
+            all_providers,
+            'proxysource.org',
+            'silverproxy.xyz',
+            'dailyproxylists.com',
+            'sslproxies.org',
+            'clarketm',
+            'google-proxy.net',
+            'ip-adress.com',
+            'proxydb.net',
+            'hidester.com',
+            'geonode.com',
+            private_list
+            ]
+
+    txt = ''
+
+    txt += '[COLOR yellow][B]PROVEEDORES:[/B][/COLOR]'
+
+    provider = config.get_setting('proxies_provider')
+    provider = opciones_provider[provider]
+
+    txt += '[CR][COLOR red][B] - Proveedor Habitual:[/B][/COLOR]' + ' [COLOR yellowgreen][B]' + provider + '[/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR red][B] - Ampliar Lista de Proveedores:[/B][/COLOR]'
+
+    if config.get_setting('proxies_extended', default=False): txt += ' [COLOR yellowgreen][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR yellowgreen][B] Des-Activado[/B][/COLOR]'
+
+    txt += '[CR][COLOR red][B] - Solo tener en cuenta al procesar los Proveedores Recomendados:[/B][/COLOR]'
+
+    if config.get_setting('proxies_recommended', default=False): txt += '[COLOR yellowgreen][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR yellowgreen][B] Des-Activado[/B][/COLOR]'
+
+    txt += '[CR][COLOR red][B] - Tratar Primero en las búsquedas los Proveedores de la Lista Ampliada:[/B][/COLOR]'
+
+    if config.get_setting('proxies_search_extended', default=False): txt += ' [COLOR yellowgreen][B] Activado[/B][/COLOR][CR]'
+    else: txt += ' [COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
+
+    if config.get_setting('providers_preferred', default=''):
+        txt += '[CR][COLOR red][B] - Tratar Solo los Proveedores Preferidos:[/B][/COLOR]'
+        txt +='[CR]    - [COLOR yellowgreen][B]' + str(config.get_setting('providers_preferred')) + '[/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR yellow][B]PROCESOS:[/B][/COLOR]'
+
+    txt += '[CR][COLOR red][B] - Buscar Automáticamente (solo si Proveedor Habitual Todos/All-Providers):[/B][/COLOR]'
+
+    if config.get_setting('proxies_auto', default=True): txt +='[CR]    - [COLOR yellowgreen][B] Activado[/B][/COLOR][CR]'
+    else: txt +='[CR]    - [COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR red][B] - Límite Máximo Total de proxies para Analizar:[/B][/COLOR]' + ' [COLOR yellowgreen][B]' + str(config.get_setting('proxies_totales_limit')) + '[/B][/COLOR]'
+
+    txt += '[CR][COLOR red][B] - Si se encontraron Suficientes proxies válidos dejar de buscar más:[/B][/COLOR]'
+
+    if config.get_setting('proxies_limit', default=False): txt += ' [COLOR yellowgreen][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR yellowgreen][B] Des-Activado[/B][/COLOR]'
+
+    txt += '[CR][COLOR red][B] - Limitar la Cantidad de proxies válidos:[/B][/COLOR]'
+
+    if config.get_setting('proxies_validos', default=True): txt += ' [COLOR yellowgreen][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR yellowgreen][B] Des-Activado[/B][/COLOR]'
+
+    txt += '[CR][COLOR red][B] - Cantidad Máxima de proxies válidos:[/B][/COLOR]' + ' [COLOR yellowgreen][B]' + str(config.get_setting('proxies_memory')) + '[/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR yellow][B]SOLICITUDES:[/B][/COLOR]'
+
+    txt += '[CR][COLOR red][B] - Solicitar el tipo de Anonimidad:[/B][/COLOR]'
+
+    if config.get_setting('proxies_tipos', default=False): txt += ' [COLOR yellowgreen][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR yellowgreen][B] Des-Activado[/B][/COLOR]'
+
+    txt += '[CR][COLOR red][B] - Solicitar el País:[/B][/COLOR]'
+
+    if config.get_setting('proxies_paises', default=False): txt += ' [COLOR yellowgreen][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR yellowgreen][B] Des-Activado[/B][/COLOR]'
+
+    txt += '[CR][COLOR red][B] - No solicitar y forzar el Valor máximo de los proxies a analizar:[/B][/COLOR]'
+
+    if config.get_setting('proxies_maximo', default=True): txt += ' [COLOR yellowgreen][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR yellowgreen][B] Des-Activado[/B][/COLOR]'
+
+    if config.get_setting('proxies_list', default=False):
+        txt += '[CR][COLOR red][B] - Habilitar la selección de su Lista Personalizada:[/B][/COLOR]' + ' [COLOR yellowgreen][B] Activado[/B][/COLOR][CR]'
+
+    platformtools.dialog_textviewer('Información Parámetros Actuales en Proxies', txt)
 
 
 def _menu_parameters():
@@ -2237,7 +2349,7 @@ def show_help_domains(item):
     txt += '[CR]    ver los datos [B][COLOR yellow]Host/Nuevo[/COLOR][/B] en la información del Test.'
 
     txt += '[CR][CR]    Así mismo, bajo ciertas circunstancias ese [B][COLOR gold]Test Web del Canal[/COLOR][/B].'
-    txt += '[CR]    podría obtener automáticamente el [B][COLOR yellow]Nuevo Dominio Permanente[/COLOR][/B] como propuesta.'
+    txt += '[CR]    podría obtener automáticamente el [B][COLOR yellow]Nuevo Dominio Permanente ó Temporal[/COLOR][/B] como propuesta.'
 
     txt += '[CR][CR]*) Imprescindible en caso de ser necesario, tomar buena nota de ese [B][COLOR gold]Nuevo Dominio[/COLOR][/B] para esa web.'
 
@@ -2696,6 +2808,13 @@ def show_test(item):
         if playdede_dominio:
            if tex_dom: tex_dom = tex_dom + '  '  + playdede_dominio
            else: tex_dom = playdede_dominio
+
+    datos = channeltools.get_channel_parameters('poseidonhd2')
+    if datos['active']:
+        poseidonhd2_dominio = config.get_setting('channel_poseidonhd2_dominio', default='')
+        if poseidonhd2_dominio:
+           if tex_dom: tex_dom = tex_dom + '  '  + poseidonhd2_dominio
+           else: tex_dom = poseidonhd2_dominio
 
     datos = channeltools.get_channel_parameters('series24')
     if datos['active']:

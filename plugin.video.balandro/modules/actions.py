@@ -369,10 +369,13 @@ def manto_params(item):
         config.set_setting('channel_pelisplushdlat_dominio', '')
         config.set_setting('channel_pelisplushdnz_dominio', '')
         config.set_setting('channel_pelispluslat_dominio', '')
+
         config.set_setting('channel_playdede_dominio', '')
         config.set_setting('channel_playdede_playdede_login', False)
         config.set_setting('channel_playdede_playdede_password', '')
         config.set_setting('channel_playdede_playdede_username', '')
+
+        config.set_setting('channel_poseidonhd2_dominio', '')
 
         config.set_setting('channel_series24_dominio', '')
         config.set_setting('channel_seriesantiguas_dominio', '')
@@ -407,7 +410,7 @@ def manto_params(item):
         download_path = filetools.join(config.get_data_path(), 'downloads')
         config.set_setting('downloadpath', download_path)
 
-        config.set_setting('chrome_last_version', '113.0.5672.127')
+        config.set_setting('chrome_last_version', '114.0.5735.199')
 
         config.set_setting('debug', '0')
 
@@ -1225,6 +1228,10 @@ def opciones_playdede(item):
     item.from_channel = 'playdede'
     opciones_domains_common(item)
 
+def opciones_poseidonhd2(item):
+    item.from_channel = 'poseidonhd2'
+    opciones_domains_common(item)
+
 def opciones_series24(item):
     item.from_channel = 'series24'
     opciones_domains_common(item)
@@ -1369,6 +1376,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'playdede': domains.manto_domain_playdede(item)
 
+            elif item.from_channel == 'poseidonhd2': domains.manto_domain_poseidonhd2(item)
+
             elif item.from_channel == 'series24': domains.manto_domain_series24(item)
 
             elif item.from_channel == 'seriesantiguas': domains.manto_domain_seriesantiguas(item)
@@ -1450,6 +1459,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'pelispluslat': domains.test_domain_pelispluslat(item)
 
             elif item.from_channel == 'playdede': domains.test_domain_playdede(item)
+
+            elif item.from_channel == 'poseidonhd2': domains.test_domain_poseidonhd2(item)
 
             elif item.from_channel == 'series24': domains.test_domain_series24(item)
 
