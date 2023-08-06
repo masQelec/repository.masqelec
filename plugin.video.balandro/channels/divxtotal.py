@@ -404,9 +404,8 @@ def play(item):
 
         if data:
             try:
-               if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data):
-                   platformtools.dialog_ok('DivxTotal', '[COLOR yellow]Archivo no encontrado[/COLOR]')
-                   return itemlist
+               if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                   return 'Archivo [COLOR red]No encontrado[/COLOR]'
                elif '<p>Por causas ajenas a ' in str(data):
                    if not config.get_setting('proxies', item.channel, default=''):
                        return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
@@ -437,9 +436,8 @@ def play(item):
 
         if data:
             try:
-               if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data):
-                   platformtools.dialog_ok('DivxTotal', '[COLOR yellow]Archivo no encontrado[/COLOR]')
-                   return itemlist
+               if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                   return 'Archivo [COLOR red]No encontrado[/COLOR]'
                elif '<p>Por causas ajenas a ' in str(data):
                    if not config.get_setting('proxies', item.channel, default=''):
                        return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'

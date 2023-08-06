@@ -3,14 +3,14 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Desiupload,  Dropload,  Fastupload,  Filelions,  Filemoon,  Hexupload,  Krakenfiles,  Moonplayer,  Mvidoo,  Rutube,  Streamhub,  Streamwish,  Tubeload,  Uploadever,  Videowood,  Yandex,  Youdbox)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Desiupload,  Dropload,  Embedgram,  Fastupload,  Filelions,  Filemoon,  Hexupload,  Krakenfiles,  Moonplayer,  Mvidoo,  Rutube,  Streamhub,  Streamwish,  Tubeload,  Uploadever,  Videowood,  Vudeo,  Yandex,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(https://tubeload.co/)(?:e/|f/)([0-9a-zA-Z]+)",
-        "url": "\\1"
+        "pattern": "https://tubeload.co/(?:e|f)/([0-9a-zA-Z]+)",
+        "url": "https://tubeload.co/f/\\2"
       },
       {
         "pattern": "https://mvidoo.com/(.*?)/([0-9a-zA-Z]+).mp4.html",
@@ -179,6 +179,22 @@
       {
         "pattern": "https://youdboox.com/(?:embed-)([0-9a-zA-Z]+)",
         "url": "https://youdbox.site/\\1"
+      },
+      {
+        "pattern": "https://vudeo.net/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://vudeo.co/\\1"
+      },
+      {
+        "pattern": "https://vudeo.io/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://vudeo.io/\\1"
+      },
+      {
+        "pattern": "https://vudeo.co/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://vudeo.co/\\1"
+      },
+      {
+        "pattern": "https://embedgram.com/(?:v|f)/([0-9a-zA-Z]+)",
+        "url": "https://embedgram.com.to/f/\\1"
       }
     ]
   }

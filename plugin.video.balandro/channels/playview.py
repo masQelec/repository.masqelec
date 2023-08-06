@@ -33,7 +33,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -46,19 +46,42 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_playview_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers).data
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('playview', url, post=post, headers=headers).data
+        data = httptools.downloadpage_proxy('playview', url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            if not 'search/' in url:
+                platformtools.dialog_notification('PlayView', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('playview', url, post=post, headers=headers, timeout=timeout).data
 
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='playview', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -72,7 +95,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -90,7 +113,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -414,11 +437,19 @@ def findvideos(item):
             if servidor == 'embedo': continue
             elif servidor == 'protonvideo': continue
             elif servidor == 'fastclick': continue
-            elif servidor == 'embedgram': continue
 
             elif servidor == 'anonfile': servidor = 'anonfiles'
 
             calidad = calidad.replace('(', '').replace(')', '').strip()
+
+            other = ''
+            if servidor == 'streamhub': other = servidor
+            elif servidor == 'desiupload': other = servidor
+            elif servidor == 'fastupload': other = servidor
+            elif servidor == 'embedgram': other = servidor
+            elif servidor == 'filelions': other = servidor
+            elif servidor == 'filemoon': other = servidor
+            elif servidor == 'tubeload': other = servidor
 
             servidor = servertools.corregir_servidor(servidor)
 
@@ -429,7 +460,7 @@ def findvideos(item):
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '',
                                   linkid = linkid, linktype = tipo, linkepi = item.contentEpisodeNumber if item.dataid else -1,
-                                  language = IDIOMAS.get(lang, lang), quality = calidad, quality_num = puntuar_calidad(calidad) ))
+                                  language = IDIOMAS.get(lang, lang), quality = calidad, quality_num = puntuar_calidad(calidad), other = other ))
 
     if not itemlist:
         if not ses == 0:

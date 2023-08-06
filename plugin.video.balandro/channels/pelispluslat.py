@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://home.pelisplus.lat/'
+host = 'https://pelisplus.lat/'
 
 
 player = 'player.pelisplus.lat'
@@ -15,7 +15,7 @@ player = 'player.pelisplus.lat'
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.pelisplus.lat/', 'https://www.pelisplus.llc/', 'https://www.pelisplus.ninja/',
-             'https://pelisplus.ninja/', 'https://pelisplus.mov/']
+             'https://pelisplus.ninja/', 'https://pelisplus.mov/', 'https://home.pelisplus.lat/']
 
 
 domain = config.get_setting('dominio', 'pelispluslat', default='')
@@ -46,7 +46,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -66,6 +66,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if not headers: headers = {'Referer': host}
 
     if '/release/' in url: raise_weberror = False
+    elif '/tendencias/' in url: raise_weberror = False
 
     timeout = None
     if host in url:

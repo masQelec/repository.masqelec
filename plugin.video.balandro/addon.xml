@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.balandro" name="Balandro" version="3.0.8" provider-name="Balandro Team">
+<addon id="plugin.video.balandro" name="Balandro" version="3.0.9" provider-name="Balandro Team">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -15,7 +15,7 @@
       <fanart>fanart.png</fanart>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]3.0.8[/COLOR][COLOR chartreuse]  Julio de 2023[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]3.0.9[/COLOR][COLOR chartreuse]  Agosto de 2023[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers Soportados[/COLOR][COLOR plum]  20.x,  19.x,  18.x  y  17.x[/B][/COLOR]
 

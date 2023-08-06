@@ -155,6 +155,7 @@ def list_all(item):
             elif 'sub spa' in SerieName: SerieName = SerieName.split("sub spa")[0]
             elif 'all subs' in SerieName: SerieName = SerieName.split("all subs")[0]
             elif 'all sub' in SerieName: SerieName = SerieName.split("all sub")[0]
+            elif 'sub all' in SerieName: SerieName = SerieName.split("sub all")[0]
 
             SerieName = SerieName.strip()
 
@@ -427,6 +428,7 @@ def sub_search(item):
             elif 'sub spa' in SerieName: SerieName = SerieName.split("sub spa")[0]
             elif 'all subs' in SerieName: SerieName = SerieName.split("all subs")[0]
             elif 'all sub' in SerieName: SerieName = SerieName.split("all sub")[0]
+            elif 'sub all' in SerieName: SerieName = SerieName.split("sub all")[0]
 
             SerieName = SerieName.strip()
 

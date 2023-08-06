@@ -9,7 +9,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(?:streamsb.com|streamsb.net|sbplay.org|sbplay.one|sbplay1.com|sbplay2.com|sbplay2.xyz|pelistop.co|sbfast.com|sbfast.live|sbfull.com|ssbstream.net|sbthe.com|sbspeed.com|streamsss.net|sblanh.com|sbanh.com|sblongvu.com|streamsb.top|sbchill.com|sbrity.com|sbhight.com|sbbrisk.com|sbface.com|view345.com|sbone.pro|sbasian.pro|streaamss.com|lvturbo.com|sbnet.one|sbani.pro|sbrapid.com|vidmoviesb.xyz|sbsonic.com|sblona.com)/(?:embed-|d/|e/)([A-z0-9]+)",
+        "pattern": "(?:streamsb.com|streamsb.net|sbplay.org|sbplay.one|sbplay1.com|sbplay2.com|sbplay2.xyz|pelistop.co|sbfast.com|sbfast.live|sbfull.com|ssbstream.net|sbthe.com|sbspeed.com|streamsss.net|sblanh.com|sbanh.com|sblongvu.com|streamsb.top|sbchill.com|sbrity.com|sbhight.com|sbbrisk.com|sbface.com|view345.com|sbone.pro|sbasian.pro|streaamss.com|lvturbo.com|sbnet.one|sbani.pro|sbrapid.com|vidmoviesb.xyz|sbsonic.com|sblona.com|likessb.com|sbnmp.bar)/(?:embed-|d/|e/)([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -94,6 +94,10 @@
       },
       {
         "pattern": "(?:playersb.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:playersb.com)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       },
       {
@@ -381,6 +385,10 @@
         "url": "https://streamsb.net/play/\\1"
       },
       {
+        "pattern": "(?:cinestart.net)/(?:embed-|d/|e/)([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
         "pattern": "(?:cinestart.net)/([A-z0-9]+).html",
         "url": "https://streamsb.net/play/\\1"
       },
@@ -434,6 +442,38 @@
       },
       {
         "pattern": "(?:sblona.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:likessb.com)/(?:embed-|d/|e/)([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:likessb.com)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:likessb.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:likessb.com)/([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbnmp.bar)/(?:embed-|d/|e/)([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbnmp.bar)/(?:embed-|d/|e/)([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbnmp.bar)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbnmp.bar)/([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
       }
     ]

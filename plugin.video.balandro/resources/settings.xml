@@ -148,7 +148,7 @@
         <setting id="opc_cinecalidadla" type="action" label="[COLOR gold]CineCalidadLa[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cinecalidadla)"/>
         <setting id="opc_cinecalidadlol" type="action" label="[COLOR gold]CineCalidadLol[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cinecalidadlol)"/>
         <setting id="opc_cinecalidadmx" type="action" label="[COLOR gold]CineCalidadMx[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cinecalidadmx)"/>
-        <setting id="opc_cuevana3" type="action" label="[COLOR gold]Cuevana3[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana3)"/>
+        <setting id="opc_cliversite" type="action" label="[COLOR gold]CliverSite[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cliversite)"/>
         <setting id="opc_cuevana3video" type="action" label="[COLOR gold]Cuevana3Video[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana3video)"/>
 
         <setting label="Canales D:" type="lsep"/>
@@ -167,6 +167,7 @@
         <setting id="opc_elitetorrent" type="action" label="[COLOR gold]EliteTorrent[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_elitetorrent)"/>
         <setting id="opc_ennovelas" type="action" label="[COLOR gold]EnNovelas[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_ennovelas)"/>
         <setting id="opc_entrepeliculasyseries" type="action" label="[COLOR gold]EntrePeliculasySeries[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_entrepeliculasyseries)"/>
+        <setting id="opc_estrenosdoramas" type="action" label="[COLOR gold]EstrenosDoramas[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_estrenosdoramas)"/>
 
         <setting label="Canales G:" type="lsep"/>
 
@@ -285,6 +286,7 @@
 
         <setting type="sep"/>
         <setting id="show_help_recaptcha" type="action" label="¿ Qué significa Requiere verificación [COLOR red][B]reCAPTCHA[/B][/COLOR] ?" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_recaptcha)"/>
+        <setting id="show_help_acortador" type="action" label="¿ Qué significa Tiene [COLOR plum][B]Acortador[/B][/COLOR] del enlace ?" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_acortador)"/>
         <setting id="show_server_report2" type="action" label="Como Reportar posible Fallo en la [COLOR fuchsia][B]Reproducción[/B][/COLOR] de Servidores" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_server_report)"/>
 
         <setting label="Información Servidores:" type="lsep"/>
@@ -349,15 +351,17 @@
         <setting id="prvx_opc" type="bool" label="Opciones" default="false"/>
         <setting id="show_help_providers" type="action" label="Información [COLOR aqua][B]Proveedores[/B][/COLOR] de proxies" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_providers)"/>
         <setting id="proxies_auto" type="bool" label="Proceso buscar [COLOR gold][B]Automáticamente[/B][/COLOR] (solo si Proveedor Habitual 'Todos')" default="true" visible="eq(-2,true)"/>
-        <setting id="proxies_provider" type="enum" label="Proveedor [COLOR goldenrod][B]Habitual[/B][/COLOR] de proxies" values="spys.one|hidemy.name|httptunnel.ge|proxynova.com|free-proxy-list|spys.me|proxyscrape.com|proxyservers.pro|us-proxy.org|proxy-list.download|Todos|proxysource.org|silverproxy.xyz|dailyproxylists.com|sslproxies.org|clarketm|google-proxy.net|ip-adress.com|proxydb.net|hidester.com|geonode.com" default="10" visible="eq(-3,true)"/>
-        <setting id="proxies_extended" type="bool" label="[COLOR aqua][B]Ampliar[/B][/COLOR] la lista de Proveedores a seleccionar" default="false" visible="eq(-4,true)"/>
+        <setting id="proxies_provider" type="enum" label="Proveedor [COLOR goldenrod][B]Habitual[/B][/COLOR] de proxies" values="spys.one|hidemy.name|httptunnel.ge|proxynova.com|free-proxy-list|spys.me|proxyscrape.com|proxyservers.pro|us-proxy.org|proxy-list.download|Todos|proxysource.org|silverproxy.xyz|dailyproxylists.com|sslproxies.org|clarketm|google-proxy.net|ip-adress.com|proxydb.net|hidester.com|geonode.com|mmpx12|roosterkid|almroot|shiftytr|mertguvencli" default="10" visible="eq(-3,true)"/>
+        <setting id="show_help_providers2" type="action" label="Información Lista [COLOR aqua][B]Ampliada[/COLOR] de [COLOR aqua][B]Proveedores[/B][/COLOR] de proxies" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_providers2)"/>
+        <setting id="proxies_extended" type="bool" label="[COLOR aqua][B]Ampliar[/B][/COLOR] la lista de Proveedores a seleccionar" default="false" visible="eq(-5,true)"/>
 
         <setting label="Filtrar Proveedores:" type="lsep"/>
 
         <setting id="chcp_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="proxies_recommended" type="bool" label="Solo tener en cuenta al procesar los Proveedores [COLOR chartreuse][B]Recomendados[/B][/COLOR]" default="false" visible="eq(-1,true)"/>
-        <setting id="proxies_search_extended" type="bool" label="Tratar Primero en las búsquedas los Proveedores de la [COLOR aqua][B]Lista Ampliada[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
-        <setting id="providers_preferred" label="Tratar [COLOR springgreen][B]Solo[/B][/COLOR] los Proveedores [COLOR wheat][B]Preferidos[/B][/COLOR] (separados por comas)" type="text" default="" visible="eq(-3,true)"/>
+        <setting id="show_help_recommended" type="action" label="Qué Proveedores de proxies están [COLOR lime][B]Recomendados[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_recommended)"/>
+        <setting id="proxies_recommended" type="bool" label="Solo tener en cuenta al procesar los Proveedores [COLOR lime][B]Recomendados[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
+        <setting id="proxies_search_extended" type="bool" label="Tratar Primero en las búsquedas los Proveedores de la [COLOR aqua][B]Lista Ampliada[/B][/COLOR]" default="false" visible="eq(-3,true)"/>
+        <setting id="providers_preferred" label="Tratar [COLOR springgreen][B]Solo[/B][/COLOR] los Proveedores [COLOR wheat][B]Preferidos[/B][/COLOR] (separados por comas)" type="text" default="" visible="eq(-4,true)"/>
 
         <setting label="Canales:" type="lsep"/>
 

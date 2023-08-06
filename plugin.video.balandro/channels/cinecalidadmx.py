@@ -33,6 +33,38 @@ if domain:
     else: host = domain
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_cinecalidadmx_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
@@ -66,6 +98,10 @@ def acciones(item):
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_cinecalidadmx', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_cinecalidadmx', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     platformtools.itemlist_refresh()
 
@@ -503,7 +539,6 @@ def play(item):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-
     if not url:
         servidor = servertools.get_server_from_url(item.dopt)
 
@@ -553,8 +588,7 @@ def play(item):
             itemlist.append(item.clone( url = url, server = 'torrent' ))
             return itemlist
 
-        elif servidor == 'zplayer':
-            url = url + '|' + host
+        elif servidor == 'zplayer': url = url + '|' + host
 
         itemlist.append(item.clone(url = url, server = servidor))
 

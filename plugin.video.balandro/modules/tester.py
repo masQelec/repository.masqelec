@@ -30,6 +30,7 @@ txt_blocs = '[COLOR darkorange][B]Parece estar Bloqueado por su Operadora de Int
 txt_checs = '[COLOR tomato][B]Compruebe su Internet y/ó el Canal, a través de un Navegador Web[/B][/COLOR][CR]'
 txt_coffs = '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
 
+txt_erase = '[COLOR orangered][B]Podrían Eliminarse los Proxies del Canal, pueden No necesitarse, salvo bloqueo en Play.[/B][/COLOR]'
 
 timeout = config.get_setting('httptools_timeout', default=15)
 
@@ -40,7 +41,7 @@ channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
-channels_despised = ['beeg', 'cuevana3mu', 'doramasqueen', 'hdfullse', 'pelispluscc', 'pelisplushdlat' ]
+channels_despised = ['beeg', 'cuevana3in', 'doramasqueen', 'hdfullse', 'pelispluscc', 'pelisplushdlat' ]
 
 servers_poe = [ 'directo', 'm3u8hls', 'torrent' ]
 
@@ -609,6 +610,8 @@ def test_channel(channel_name):
         elif config.get_setting('user_test_channel') == 'localize': config.set_setting('user_test_channel', 'localized')
         return ''
 
+    avis_causas = ''
+
     avisado = False
 
     if channel_id in str(channels_poe): pass
@@ -623,10 +626,9 @@ def test_channel(channel_name):
             break
 
         if invalid:
-            if not 'code: [COLOR springgreen][B]200' in txt:
-                avis_causas = ''
-                if '<p>Por causas ajenas a' in txt or '>Por causas ajenas a' in txt: avis_causas = txt_blocs.replace('[CR]', '')
+            if '<p>Por causas ajenas a' in txt or '>Por causas ajenas a' in txt: avis_causas = txt_blocs.replace('[CR]', '')
 
+            if not 'code: [COLOR springgreen][B]200' in txt:
                 if not channels_unsatisfactory == 'unsatisfactory':
                     platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                     avisado = True
@@ -643,11 +645,15 @@ def test_channel(channel_name):
                         platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                         avisado = True
 
-    else:
-       if not 'code: [COLOR springgreen][B]200' in txt:
-           avis_causas = ''
-           if '<p>Por causas ajenas a' in txt or '>Por causas ajenas a' in txt: avis_causas = txt_blocs.replace('[CR]', '')
+                    elif 'Se pueden Eliminar los Proxies' in txt:
+                        avis_causas = txt_erase
+                        platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                        avisado = True
 
+    else:
+       if '<p>Por causas ajenas a' in txt or '>Por causas ajenas a' in txt: avis_causas = txt_blocs.replace('[CR]', '')
+
+       if not 'code: [COLOR springgreen][B]200' in txt:
            if not channels_unsatisfactory == 'unsatisfactory':
                platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                avisado = True
@@ -664,13 +670,20 @@ def test_channel(channel_name):
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
+               elif 'Se pueden Eliminar los Proxies' in txt:
+                   avis_causas = txt_erase
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                   avisado = True
+
     if channels_unsatisfactory == 'unsatisfactory':
         if not avisado:
-            if 'Falso Positivo.' in txt: return txt
+            if 'Se pueden Eliminar los Proxies' in txt: return txt
+            elif 'Falso Positivo.' in txt: return txt
             elif 'invalid:' in txt: return txt
             return ''
         else:
-            if 'invalid:' in txt: return txt
+            if 'Se pueden Eliminar los Proxies' in txt: return txt
+            elif 'invalid:' in txt: return txt
             elif 'Podría estar Correcto' in txt: return ''
             else:
                 platformtools.dialog_textviewer(channel_name.upper(), txt)

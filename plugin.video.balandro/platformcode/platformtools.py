@@ -561,7 +561,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
                     apuntar = True
 
         # Server Various
-        if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox']:
+        if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram']:
             apuntar = False
 
         elif it.server in ['ddownload', 'dfiles', 'dropapk', 'fileflares', 'filerice', 'fireload', 'katfile', 'megaupload', 'oload', 'pandafiles', 'rockfile', 'turbobit', 'uploadrive', 'uppit', 'userload']:
@@ -866,7 +866,7 @@ def play_video(item, parent_item, autoplay=False):
             return play_torrent(mediaurl, parent_item)
 
         # ~ Para evitar ERROR: CCurlFile::Stat - Failed: Peer certificate cannot be authenticated with given CA certificates(60)
-        if item.server not in ['m3u8hls', 'zembed', 'youtube']:
+        if item.server not in ['blenditall', 'm3u8hls', 'zembed', 'youtube']:
             if 'verifypeer=false' not in mediaurl and 'googleusercontent' not in mediaurl: 
                 mediaurl += '|' if '|' not in mediaurl else '&'
                 mediaurl += 'verifypeer=false'

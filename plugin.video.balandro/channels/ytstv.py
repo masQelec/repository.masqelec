@@ -365,6 +365,9 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
+        if url.startswith('magne:'): url = url.replace('.magne', '.magnet')
+        elif url.endswith(".torren"): url = url.replace('.torren', '.torrent')
+
         if url.startswith('magnet:'): pass
         elif url.endswith(".torrent"): pass
         else: url = ''
@@ -391,6 +394,25 @@ def findvideos(item):
 
     return itemlist
 
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    data = do_downloadpage(item.url)
+
+    if '<title>Bot Verification</title>' in data:
+        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+    if url.startswith('magnet:'):
+        itemlist.append(item.clone( url = url, server = 'torrent' ))
+
+    elif url.endswith(".torrent"):
+        itemlist.append(item.clone( url = url, server = 'torrent' ))
+
+    return itemlist
 
 def search(item, texto):
     logger.info()

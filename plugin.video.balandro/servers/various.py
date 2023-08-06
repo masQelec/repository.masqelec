@@ -38,7 +38,7 @@ def get_video_url(page_url, url_referer=''):
     video_urls = []
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        txt_server = ''
+        txt_server = '???'
 
         if 'tubeload' in page_url: txt_server = 'Tubeload'
         elif 'mvidoo' in page_url: txt_server = 'Mvidoo'
@@ -51,6 +51,7 @@ def get_video_url(page_url, url_referer=''):
         elif 'streamhub' in page_url: txt_server = 'Streamhub'
         elif 'uploadever' in page_url: txt_server = 'Uploadever'
         elif 'videowood' in page_url: txt_server = 'Videowood'
+        elif 'moonplayer' in page_url: txt_server = 'Moonplayer'
 
         elif 'yandex' in page_url: txt_server = 'Yandex'
         elif 'yadi' in page_url:
@@ -66,6 +67,9 @@ def get_video_url(page_url, url_referer=''):
         elif 'filelions' in page_url: txt_server = 'Filelions'
 
         elif 'youdbox' in page_url or 'yodbox' in page_url or 'youdboox' in page_url: txt_server = 'Youdbox'
+
+        elif 'vudeo' in page_url: txt_server = 'Vudeo'
+        elif 'embedgram' in page_url: txt_server = 'Embedgram'
 
         platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))

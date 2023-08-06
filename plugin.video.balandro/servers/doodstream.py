@@ -82,7 +82,7 @@ def get_video_url(page_url, url_referer=''):
     if url:
         data2 = httptools.downloadpage(host + url, headers={'Referer': page_url}).data
         if not data2:
-            platformtools.dialog_notification('Cargando Doodstream', 'Espera requerida de %s segundos' % espera)
+            platformtools.dialog_notification('Cargando [COLOR cyan][B]Doodstream[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
             time.sleep(int(espera))
 
             data2 = httptools.downloadpage(host + url, headers={'Referer': page_url}).data

@@ -101,6 +101,8 @@ def mainlist(item):
 
         itemlist.append(item.clone( channel='helper', action='show_help_proxies', title= ' - [COLOR green][B]Información uso de proxies[/B][/COLOR]' ))
         itemlist.append(item.clone( channel='helper', action='show_help_providers', title= ' - [COLOR green][B]Información Proveedores de proxies[/B][/COLOR]' ))
+        itemlist.append(item.clone( channel='helper', action='show_help_providers2', title= ' - [COLOR green][B]Información Lista[/B][/COLOR] [COLOR aqua][B]Ampliada[/B][/COLOR][COLOR green][B] Proveedores de proxies[/B][/COLOR]' ))
+        itemlist.append(item.clone( channel='helper', action='show_help_recommended', title= ' - Qué [COLOR green][B]Proveedores de proxies[/B][/COLOR] están [COLOR lime][B]Recomendados[/B][/COLOR]' ))
 
         itemlist.append(item.clone( channel='filters', title=  ' - Qué canales pueden usar proxies', action='with_proxies',
                                     thumbnail=config.get_thumb('stack'), new_proxies=True ))

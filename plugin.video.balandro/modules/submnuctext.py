@@ -230,6 +230,8 @@ def submnu_search(item):
 
         itemlist.append(item.clone( channel='helper', action='show_help_proxies', title= ' - [COLOR green][B]Información Uso de proxies[/B][/COLOR]' ))
         itemlist.append(item.clone( channel='helper', action='show_help_providers', title= ' - [COLOR green][B]Información Proveedores de proxies[/B][/COLOR]' ))
+        itemlist.append(item.clone( channel='helper', action='show_help_providers2', title= ' - [COLOR green][B]Información Lista[/B][/COLOR] [COLOR aqua][B]Ampliada[/B][/COLOR][COLOR green][B] Proveedores de proxies[/B][/COLOR]' ))
+        itemlist.append(item.clone( channel='helper', action='show_help_recommended', title= ' - Qué [COLOR green][B]Proveedores de proxies[/B][/COLOR] están [COLOR lime][B]Recomendados[/B][/COLOR]' ))
 
         itemlist.append(item.clone( channel='filters', title=' - Qué canales pueden usar proxies', action='with_proxies', thumbnail=config.get_thumb('stack'), new_proxies=True ))
 
@@ -439,7 +441,7 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'cinecalidadmx': domains.manto_domain_cinecalidadmx(item)
 
-    elif item.from_channel == 'cuevana3': domains.manto_domain_cuevana3(item)
+    elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
 
     elif item.from_channel == 'cuevana3video': domains.manto_domain_cuevana3video(item)
 
@@ -454,6 +456,8 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'ennovelas': domains.manto_domain_ennovelas(item)
 
     elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
+
+    elif item.from_channel == 'estrenosdoramas': domains.manto_domain_estrenosdoramas(item)
 
     elif item.from_channel == 'gnula24': domains.manto_domain_gnula24(item)
 
@@ -664,6 +668,13 @@ def _proxies(item):
 
         if config.get_setting('channel_cinecalidadlol_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'cinecalidadmx':
+        from channels import cinecalidadmx
+        item.channel = 'cinecalidadmx'
+        cinecalidadmx.configurar_proxies(item)
+
+        if config.get_setting('channel_cinecalidadmx_proxies') is None: refrescar = False
+
     elif item.from_channel == 'cliversite':
         from channels import cliversite
         item.channel = 'cliversite'
@@ -684,20 +695,6 @@ def _proxies(item):
         cuevana2esp.configurar_proxies(item)
 
         if config.get_setting('channel_cuevana2esp_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'cuevana3':
-        from channels import cuevana3
-        item.channel = 'cuevana3'
-        cuevana3.configurar_proxies(item)
-
-        if config.get_setting('channel_cuevana3_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'cuevana3mu':
-        from channels import cuevana3mu
-        item.channel = 'cuevana3mu'
-        cuevana3mu.configurar_proxies(item)
-
-        if config.get_setting('channel_cuevana3mu_proxies') is None: refrescar = False
 
     elif item.from_channel == 'cuevana3video':
         from channels import cuevana3video
@@ -929,6 +926,20 @@ def _proxies(item):
         pelisplus.configurar_proxies(item)
 
         if config.get_setting('channel_pelisplus_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'pelisplushd':
+        from channels import pelisplushd
+        item.channel = 'pelisplushd'
+        pelisplushd.configurar_proxies(item)
+
+        if config.get_setting('channel_pelisplushd_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'pelisplushdnz':
+        from channels import pelisplushdnz
+        item.channel = 'pelisplushdnz'
+        pelisplushdnz.configurar_proxies(item)
+
+        if config.get_setting('channel_pelisplushdnz_proxies') is None: refrescar = False
 
     elif item.from_channel == 'pelispluslat':
         from channels import pelispluslat

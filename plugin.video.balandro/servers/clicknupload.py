@@ -66,6 +66,9 @@ def get_video_url(page_url, url_referer=''):
 
     if url:
         video_urls.append(["mp4", url])
+    else:
+        platformtools.dialog_notification('Cargando [COLOR cyan][B]Clicknupload[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
+        time.sleep(int(espera))
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):

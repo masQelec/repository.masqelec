@@ -13,7 +13,7 @@ host = 'https://elitedivx.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post).data
+    data = httptools.downloadpage(url, post=post, headers=headers).data
     return data
 
 
@@ -433,7 +433,8 @@ def list_search(item):
             if not item.search_type == 'all':
                 if item.search_type == "movie": continue
 
-            if " - " in title: SerieName = title.split(" - ")[0]
+            if "[" in title: SerieName = title.split("[")[0]
+            elif " - " in title: SerieName = title.split(" - ")[0]
             else: SerieName = title
 
             itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, fmt_sufijo=sufijo, 
@@ -447,7 +448,8 @@ def list_search(item):
                 itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title, fmt_sufijo=sufijo,
                                             contentType = 'movie', contentTitle = title, contentExtra = 'documentary', infoLabels={'year': "-"} ))
             else:
-                if "(" in title: titulo = title.split("(")[0]
+                if "[" in title: titulo = title.split("[")[0]
+                elif "(" in title: titulo = title.split("(")[0]
                 else: titulo = title
 
                 itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, fmt_sufijo=sufijo,

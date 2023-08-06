@@ -330,23 +330,23 @@ def submnu_play(item):
     itemlist.append(item.clone( action='show_play_parameters', title=' - Qué [COLOR chocolate][B]Ajustes[/B][/COLOR] tiene configurados en [COLOR fuchsia][B]Play[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( action='show_help_recaptcha', title= ' - ¿ Qué significa Requiere verificación [COLOR red][B]reCAPTCHA[/B][/COLOR] ?', thumbnail=config.get_thumb('roadblock') ))
+    itemlist.append(item.clone( action='show_help_acortador', title= ' - ¿ Qué significa Tiene [COLOR plum][B]Acortador[/B][/COLOR] del enlace ?', thumbnail=config.get_thumb('roadblock') ))
 
     itemlist.append(item.clone( action='show_servers_list', title= ' - Qué servidores están [COLOR darkorange][B]Disponibles[/B][/COLOR] (Activos)', tipo = 'activos', thumbnail=config.get_thumb('bolt') ))
 
     itemlist.append(item.clone( action='', title= '[B]PLAY [COLOR powderblue]Servidores Vías Alternativas[/COLOR]:[/B]', folder=False, text_color='orchid', thumbnail=config.get_thumb('settings') ))
 
-
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
         tex_yt = '  ' + cod_version
-    else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
+    else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
     itemlist.append(item.clone( action = '', title= ' [COLOR goldenrod][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_yt + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
         cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
         tex_yt = '  ' + cod_version
-    else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
+    else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
     itemlist.append(item.clone( action = '', title= ' [COLOR goldenrod][B]Youtube[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_yt + '[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
 
@@ -393,6 +393,8 @@ def submnu_proxies(item):
 
     itemlist.append(item.clone( action='show_help_proxies', title= ' - [COLOR green][B]Información[/B][/COLOR] Uso de proxies', thumbnail=config.get_thumb('settings') ))
     itemlist.append(item.clone( action='show_help_providers', title= ' - [COLOR green][B]Información[/B][/COLOR] Proveedores de proxies', thumbnail=config.get_thumb('settings') ))
+    itemlist.append(item.clone( action='show_help_providers2', title= ' - [COLOR green][B]Información[/B][/COLOR] Lista [COLOR aqua][B]Ampliada[/B][/COLOR] de Proveedores de proxies', thumbnail=config.get_thumb('settings') ))
+    itemlist.append(item.clone( action='show_help_recommended', title= ' - Qué Proveedores de proxies están [COLOR lime][B]Recomendados[/B][/COLOR]', thumbnail=config.get_thumb('flame') ))
 
     path = os.path.join(config.get_data_path(), 'Lista-proxies.txt')
 
@@ -901,6 +903,10 @@ def show_help_cinecalidadlol(item):
     item.notice = 'cinecalidadlol'
     show_help_canales(item)
 
+def show_help_cinecalidadmx(item):
+    item.notice = 'cinecalidadmx'
+    show_help_canales(item)
+
 def show_help_dilo(item):
     item.notice = 'dilo'
     show_help_canales(item)
@@ -1339,7 +1345,8 @@ def show_not_contemplated(item):
 
     txt += '[COLOR seagreen][B] - Descargas:[/B][/COLOR][CR]'
     txt += '   - Descargar [COLOR gold]Todos[/COLOR] los Capítulos de una Temporada alunísono[CR]'
-    txt += '   - Descargas formatos de ficheros NO admitidos [COLOR gold]m3u8, mpd, rtmp, rar, torrent[/COLOR][CR][CR]'
+    txt += '   - NO se admiten las descargas de ficheros en formatos [COLOR gold]m3u8,  mpd,  rtmp,  torrent[/COLOR][CR]'
+    txt += '   - NO están permitidas las descargas de ficheros en formato Comprimido [COLOR gold]zip,  rar,  etc.[/COLOR][CR][CR]'
 
     txt += '[COLOR gold][B] - Servidores:[/B][/COLOR][CR]'
     txt += '    - Cuentas Premium en el servidor [COLOR darkorange][B]Uptobox[/B][/COLOR][CR]'
@@ -1358,7 +1365,8 @@ def show_not_download(item):
     txt ='[COLOR red][B]¿ Qué temas no están Implementados en las Descargas ?[/B][/COLOR][CR][CR]'
 
     txt += ' - Descargar [COLOR gold]Todos[/COLOR] los Capítulos de una Temporada alunísono[CR]'
-    txt += ' - Descargas formatos de ficheros NO admitidos [COLOR gold]m3u8, mpd, rtmp, rar, torrent[/COLOR][CR][CR]'
+    txt += ' - NO se admiten las descargas de ficheros en formatos [COLOR gold]m3u8,  mpd,  rtmp,  torrent[/COLOR][CR]'
+    txt += ' - NO están permitidas las descargas de ficheros en formato Comprimido [COLOR gold]zip,  rar,  etc.[/COLOR][CR]'
 
     platformtools.dialog_textviewer('¿ Qué NO está contemplado en las Descargas ?', txt)
 
@@ -1456,7 +1464,8 @@ def show_help_descargas(item):
 
     txt += '[CR][CR][COLOR cyan][B]Restricciones[/B][/COLOR] en las [COLOR seagreen][B]Descargas:[/B][/COLOR][CR][CR]'
     txt += ' - Descargar [COLOR gold]Todos[/COLOR] los Capítulos de una Temporada alunísono[CR]'
-    txt += ' - Descargas formatos de ficheros NO admitidos [COLOR gold]m3u8, mpd, rtmp, rar, torrent[/COLOR][CR][CR]'
+    txt += ' - NO se admiten las descargas de ficheros en formatos [COLOR gold]m3u8,  mpd,  rtmp,  torrent[/COLOR][CR]'
+    txt += ' - NO están permitidas las descargas de ficheros en formato Comprimido [COLOR gold]zip,  rar,  etc.[/COLOR][CR]'
 
     platformtools.dialog_textviewer('Descargas y su Funcionamiento', txt)
 
@@ -1464,12 +1473,16 @@ def show_help_usb(item):
     logger.info()
 
     txt = '[COLOR cyan][B]SI[/B][/COLOR] se puede descargar directamente a una [COLOR goldenrod][B]Unidad USB[/B][/COLOR][CR]'
-    txt += 'Para ello deberá indicarlo en la Configuración, categoría [COLOR seagreen][B]Descargas[/B][/COLOR]'
+    txt += 'Para ello deberá indicarlo en la Configuración, categoría [COLOR seagreen][B]Descargas[/B][/COLOR] apartado Ubicación'
 
     txt += '[CR][CR][B][COLOR chartreuse]Si observase lentitud, parones, ó cualquier otra anomalía durante la [COLOR seagreen][B]Descarga[/B][/COLOR][COLOR chartreuse][B]:[/COLOR][/B][/COLOR][CR]'
     txt += '  Le [COLOR yellow]sugerimos[/COLOR] que efectue la [COLOR seagreen][B]descarga[/B][/COLOR] en la [COLOR gold][B]carpeta por defecto de la configuración[B][/COLOR][CR]'
     txt += '  y una vez finalizada, [COLOR cyan][B]Obtenga una Copia[/B][/COLOR] de esa [COLOR seagreen][B]descarga[/B][/COLOR] hacia la [COLOR goldenrod][B]Unidad USB[/B][/COLOR][CR]'
-    txt += '  desde la opción del menú [COLOR seagreen][B]Descargas[/B][/COLOR]'
+    txt += '  desde la opción del menú [COLOR seagreen][B]Descargas[/B][/COLOR] al seleccionar cualquier fichero existente en [COLOR seagreen][B]Descargas[/B][/COLOR].[CR]'
+
+    txt += '[CR]También puede [COLOR cyan][B]Obtener una Copia[/B][/COLOR] de su [COLOR seagreen][B]descarga[/B][/COLOR] hacia una [COLOR goldenrod][B]Unidad USB[/B][/COLOR][CR]'
+    txt += 'seleccionando cualquier fichero existente en sus [COLOR seagreen][B]Descargas[/B][/COLOR].[CR]'
+
 
     platformtools.dialog_textviewer('¿ Se puede Descargar directamente en una Unidad USB ?', txt)
 
@@ -1611,14 +1624,14 @@ def show_play_parameters(item):
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
         tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
-    else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
+    else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
     txt +='[CR]    - [COLOR orchid][B]ResolveUrl[/B][/COLOR] ' + '[COLOR yellowgreen][B] ' + tex_yt + '[/B][/COLOR]'
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
         cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
         tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
-    else: tex_yt = '  [COLOR red][B]No instalado[/B][/COLOR]'
+    else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
     txt +='[CR]    - [COLOR orchid][B]Youtube[/B][/COLOR] ' + '[COLOR yellowgreen][B] ' + tex_yt + '[/B][/COLOR]'
 
@@ -1707,6 +1720,11 @@ def show_prx_parameters(item):
             'proxydb.net',
             'hidester.com',
             'geonode.com',
+            'mmpx12',
+            'roosterkid',
+            'almroot',
+            'shiftytr',
+            'mertguvencli',
             private_list
             ]
 
@@ -2008,52 +2026,86 @@ def show_help_providers(item):
 
     txt = ''
 
-    providers_preferred = config.get_setting('providers_preferred', default='')
-    if providers_preferred:
-        txt = '[COLOR wheat][B]Proveedores preferidos:[/B][/COLOR][CR]'
+    if not item.ampliada:
+        providers_preferred = config.get_setting('providers_preferred', default='')
+        if providers_preferred:
+            txt = '[COLOR wheat][B]Proveedores preferidos:[/B][/COLOR][CR]'
 
-        txt += '    [COLOR violet][B]' + str(providers_preferred) + '[/B][/COLOR][CR][CR]'
+            txt += '    [COLOR violet][B]' + str(providers_preferred) + '[/B][/COLOR][CR][CR]'
+
+        txt += '[COLOR goldenrod][B]Proveedores habituales:[/B][/COLOR][CR]'
+
+        txt += '  [COLOR yellow]all-providers[/COLOR][CR]'
+        txt += '  [COLOR yellow]almroot[/COLOR][CR]'
+        txt += '  [COLOR yellow]clarketm[/COLOR][CR]'
+        txt += '  [COLOR yellow]dailyproxylists.com[/COLOR][CR]'
+        txt += '  [COLOR yellow]free-proxy-list[/COLOR][CR]'
+        txt += '  [COLOR yellow]geonode.com[/COLOR][CR]'
+        txt += '  [COLOR yellow]google-proxy.net[/COLOR][CR]'
+        txt += '  [COLOR yellow]hidemy.name[/COLOR][CR]'
+        txt += '  [COLOR yellow]httptunnel.ge[/COLOR][CR]'
+        txt += '  [COLOR yellow]hidester.com[/COLOR][CR]'
+        txt += '  [COLOR yellow]ip-adress.com[/COLOR][CR]'
+        txt += '  [COLOR yellow]mertguvencli[/COLOR][CR]'
+        txt += '  [COLOR red][B]mmpx12[COLOR lime]  recomendado[/B][/COLOR][CR]'
+        txt += '  [COLOR yellow]proxy-list.download[/COLOR][CR]'
+        txt += '  [COLOR yellow]proxydb.net[/COLOR][CR]'
+        txt += '  [COLOR yellow]proxynova.com[/COLOR][CR]'
+        txt += '  [COLOR red][B]proxyscrape.com[COLOR lime]  recomendado[/B][/COLOR][CR]'
+        txt += '  [COLOR yellow]proxyservers.pro[/COLOR][CR]'
+        txt += '  [COLOR yellow]proxysource.org[/COLOR][CR]'
+        txt += '  [COLOR yellow]roosterkid[/COLOR][CR]'
+        txt += '  [COLOR yellow]shiftytR[/COLOR][CR]'
+        txt += '  [COLOR yellow]silverproxy.xyz[/COLOR][CR]'
+        txt += '  [COLOR yellow]spys.me[/COLOR][CR]'
+        txt += '  [COLOR yellow]spys.one[/COLOR][CR]'
+        txt += '  [COLOR yellow]sslproxies.org[/COLOR][CR]'
+        txt += '  [COLOR red][B]us-proxy.org[COLOR lime]  recomendado[/B][/COLOR][CR]'
+
+    if config.get_setting('proxies_extended', default=False):
+        txt += '[CR][COLOR aqua][B]Lista ampliada de proveedores:[/B][/COLOR][CR]'
+
+        txt += '  [COLOR gold]coderduck[/COLOR][CR]'
+        txt += '  [COLOR gold]echolink[/COLOR][CR]'
+        txt += '  [COLOR red][B]free-proxy-list.anon[COLOR lime]  recomendado[/B][/COLOR][CR]'
+        txt += '  [COLOR gold]free-proxy-list.com[/COLOR][CR]'
+        txt += '  [COLOR gold]free-proxy-list.uk[/COLOR][CR]'
+        txt += '  [COLOR gold]free-proxy-list.uk[/COLOR][CR]'
+        txt += '  [COLOR gold]github[/COLOR][CR]'
+        txt += '  [COLOR gold]proxy-daily[/COLOR][CR]'
+        txt += '  [COLOR gold]proxy-list.org[/COLOR][CR]'
+        txt += '  [COLOR gold]proxyhub[/COLOR][CR]'
+        txt += '  [COLOR gold]proxyranker[/COLOR][CR]'
+        txt += '  [COLOR gold]xroxy[/COLOR][CR]'
+        txt += '  [COLOR gold]socks[/COLOR][CR]'
+        txt += '  [COLOR gold]squidproxyserver[/COLOR][CR]'
+
+    platformtools.dialog_textviewer('Proveedores de proxies', txt)
+
+
+def show_help_recommended(item):
+    logger.info()
+
+    txt = ''
 
     txt += '[COLOR goldenrod][B]Proveedores habituales:[/B][/COLOR][CR]'
 
-    txt += ' - [COLOR yellow][B]clarketm  [COLOR chartreuse]Recomendado[/B][/COLOR][CR]'
-    txt += ' - [COLOR yellow]dailyproxylists.com[/COLOR][CR]'
-    txt += ' - [COLOR yellow]free-proxy-list[/COLOR][CR]'
-    txt += ' - [COLOR yellow]geonode.com[/COLOR][CR]'
-    txt += ' - [COLOR yellow]google-proxy.net[/COLOR][CR]'
-    txt += ' - [COLOR yellow]hidemy.name[/COLOR][CR]'
-    txt += ' - [COLOR yellow]httptunnel.ge[/COLOR][CR]'
-    txt += ' - [COLOR yellow]hidester.com[/COLOR][CR]'
-    txt += ' - [COLOR yellow]ip-adress.com[/COLOR][CR]'
-    txt += ' - [COLOR yellow]proxy-list.download[/COLOR][CR]'
-    txt += ' - [COLOR yellow]proxydb.net[/COLOR][CR]'
-    txt += ' - [COLOR yellow]proxynova.com[/COLOR][CR]'
-    txt += ' - [COLOR yellow][B]proxyscrape.com  [COLOR chartreuse]Recomendado[/B][/COLOR][CR]'
-    txt += ' - [COLOR yellow]proxyservers.pro[/COLOR][CR]'
-    txt += ' - [COLOR yellow]proxysource.org[/COLOR][CR]'
-    txt += ' - [COLOR yellow]silverproxy.xyz[/COLOR][CR]'
-    txt += ' - [COLOR yellow]spys.me[/COLOR][CR]'
-    txt += ' - [COLOR yellow]spys.one[/COLOR][CR]'
-    txt += ' - [COLOR yellow]sslproxies.org[/COLOR][CR]'
-    txt += ' - [COLOR yellow][B]us-proxy.org  [COLOR chartreuse]Recomendado[/B][/COLOR][CR]'
+    txt += '  [COLOR yellow][B]mmpx12[/B][/COLOR][CR]'
+    txt += '  [COLOR yellow][B]proxyscrape.com[/B][/COLOR][CR]'
+    txt += '  [COLOR yellow][B]us-proxy.org[/B][/COLOR][CR]'
 
-    txt += '[CR][COLOR aqua][B]Lista ampliada de proveedores:[/B][/COLOR][CR]'
+    if config.get_setting('proxies_extended', default=False):
+        txt += '[CR][COLOR aqua][B]Lista ampliada de proveedores:[/B][/COLOR][CR]'
 
-    txt += ' - [COLOR gold]coderduck[/COLOR][CR]'
-    txt += ' - [COLOR gold]echolink[/COLOR][CR]'
-    txt += ' - [COLOR gold][B]free-proxy-list.anon  [COLOR chartreuse]Recomendado[/B][/COLOR][CR]'
-    txt += ' - [COLOR gold]free-proxy-list.com[/COLOR][CR]'
-    txt += ' - [COLOR gold]free-proxy-list.uk[/COLOR][CR]'
-    txt += ' - [COLOR gold]opsxcq[/COLOR][CR]'
-    txt += ' - [COLOR gold]proxy-daily[/COLOR][CR]'
-    txt += ' - [COLOR gold]proxy-list.org[/COLOR][CR]'
-    txt += ' - [COLOR gold]proxyhub[/COLOR][CR]'
-    txt += ' - [COLOR gold]proxyranker[/COLOR][CR]'
-    txt += ' - [COLOR gold]xroxy[/COLOR][CR]'
-    txt += ' - [COLOR gold]socks[/COLOR][CR]'
-    txt += ' - [COLOR gold]squidproxyserver[/COLOR][CR]'
+        txt += '  [COLOR gold][B]free-proxy-list.anon[/B][/COLOR][CR]'
 
-    platformtools.dialog_textviewer('Proveedores de proxies', txt)
+    platformtools.dialog_textviewer('Proveedores Recomendados de proxies', txt)
+
+def show_help_providers2(item):
+    logger.info()
+
+    item.ampliada = True
+    show_help_providers(item)
 
 
 def show_help_fixes(item):
@@ -2084,6 +2136,22 @@ def show_help_recaptcha(item):
     txt += '[CR][CR]Dada su dificultad [COLOR gold]NO[/COLOR] está contemplado en el Addon esta situación.'
 
     platformtools.dialog_textviewer('Información ¿ Qué significa Requiere verificación [COLOR red]reCAPTCHA[/COLOR] ?', txt)
+
+
+def show_help_acortador(item):
+    logger.info()
+
+    txt = 'Son avisos de porqué no se puede reproducir ese enlace en cuestion.[CR]'
+
+    txt += '[CR] Son redireccionamientos, que hacen que un Link concreto, efectue accesos a otros enlaces diferentes.'
+
+    txt += '[CR] Para reproducir ese enlace el servidor exige resolver y esperar Todos esas [COLOR gold]Redirecciones[/COLOR], para ello'
+
+    txt += '[CR] presenta un proceso para [COLOR yellow]seleccionar diferentes Webs[/COLOR] (publicidad, esperas, etc.)'
+
+    txt += '[CR][CR]Dada su dificultad [COLOR gold]NO[/COLOR] está contemplado en el Addon esta situación.'
+
+    platformtools.dialog_textviewer('Información ¿ Qué significa Tiene [COLOR plum]Acortador[/COLOR] del enlace ?', txt)
 
 
 def show_version(item):
@@ -2634,12 +2702,12 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '  ' + cinecalidadmx_dominio
            else: tex_dom = cinecalidadmx_dominio
 
-    datos = channeltools.get_channel_parameters('cuevana3')
+    datos = channeltools.get_channel_parameters('cliversite')
     if datos['active']:
-        cuevana3_dominio = config.get_setting('channel_cuevana3_dominio', default='')
-        if cuevana3_dominio:
-           if tex_dom: tex_dom = tex_dom + '  ' + cuevana3_dominio
-           else: tex_dom = cuevana3_dominio
+        cliversite_dominio = config.get_setting('channel_cliversite_dominio', default='')
+        if cliversite_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + cliversite_dominio
+           else: tex_dom = cliversite_dominio
 
     datos = channeltools.get_channel_parameters('cuevana3video')
     if datos['active']:
@@ -2689,6 +2757,13 @@ def show_test(item):
         if entrepeliculasyseries_dominio:
            if tex_dom: tex_dom = tex_dom + '  ' + entrepeliculasyseries_dominio
            else: tex_dom = entrepeliculasyseries_dominio
+
+    datos = channeltools.get_channel_parameters('estrenosdoramas')
+    if datos['active']:
+        estrenosdoramas_dominio = config.get_setting('channel_estrenosdoramas_dominio', default='')
+        if estrenosdoramas_dominio:
+           if tex_dom: tex_dom = tex_dom + '  ' + estrenosdoramas_dominio
+           else: tex_dom = estrenosdoramas_dominio
 
     datos = channeltools.get_channel_parameters('gnula24')
     if datos['active']:
@@ -3082,6 +3157,22 @@ def show_last_fix(item):
 
     if txt:
        txt = txt.replace('{', '').replace('}', '').replace('[', '').replace(']', '').replace(',', '').replace('"', '').replace("'", '').strip()
+
+       txt = txt.replace('addon_version:', '[COLOR cyan][B]Version:[/B][/COLOR]')
+       txt = txt.replace('files:', '[COLOR yellowgreen][B]Ficheros:[/B][/COLOR]')
+
+       txt = txt.replace('channels:', '[COLOR yellow][B]Canales:[/B][/COLOR]')
+       txt = txt.replace('core:', '[COLOR yellow][B]Core:[/B][/COLOR]')
+       txt = txt.replace('lib:', '[COLOR yellow][B]Lib:[/B][/COLOR]')
+       txt = txt.replace('modules:', '[COLOR yellow][B]Modules:[/B][/COLOR]')
+       txt = txt.replace('platformcode:', '[COLOR yellow][B]Platformcode:[/B][/COLOR]')
+       txt = txt.replace('resources:', '[COLOR yellow][B]Resources:[/B][/COLOR]')
+       txt = txt.replace('root dir:', '[COLOR yellow][B]Root:[/B][/COLOR]')
+       txt = txt.replace('servers:', '[COLOR yellow][B]Servidores:[/B][/COLOR]')
+
+       txt = txt.replace('fix_version:', '[COLOR cyan][B]Numero de Fix:[/B][/COLOR]')
+       txt = txt.replace('hash:', '[COLOR slateblue][B]Control Hash:[/B][/COLOR]')
+
        platformtools.dialog_textviewer('Información del último Fix instalado', txt)
 
 

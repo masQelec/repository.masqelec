@@ -7,11 +7,11 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.gnula4.cc/'
+host = 'https://www.pelistv.top/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.pelispedia.ws/', 'https://ww7.pelispedia.ws/']
+ant_hosts = ['https://www.pelispedia.ws/', 'https://ww7.pelispedia.ws/', 'https://www.gnula4.cc/']
 
 
 domain = config.get_setting('dominio', 'pelispediaws', default='')
@@ -88,7 +88,7 @@ def generos(item):
 
     bloque = scrapertools.find_single_match(data, '>Géneros<(.*?)</ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?>(.*?)</a>')
 
     for url, title in matches:
         title = title.replace('&amp;', '&')

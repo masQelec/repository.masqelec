@@ -15,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www11.cuevana3.ch'
+host = 'https://www12.cuevana3.ch'
 
 
 # ~ por si viene de enlaces guardados
@@ -27,7 +27,7 @@ ant_hosts = ['https://www1.cuevana3.video', 'https://www2.cuevana3.video', 'http
              'https://cuevana3.ch/', 'https://www1.cuevana3.ch', 'https://www2.cuevana3.ch',
              'https://www3.cuevana3.ch', 'https://www4.cuevana3.ch', 'https://www5.cuevana3.ch',
              'https://www6.cuevana3.ch', 'https://www7.cuevana3.ch', 'https://www8.cuevana3.ch',
-             'https://www9.cuevana3.ch', 'https://www10.cuevana3.ch']
+             'https://www9.cuevana3.ch', 'https://www10.cuevana3.ch', 'https://www11.cuevana3.ch']
 
 
 domain = config.get_setting('dominio', 'cuevana3video', default='')

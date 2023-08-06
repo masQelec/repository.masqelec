@@ -30,6 +30,7 @@ except:
 
 
 dominios = [
+         'https://hdfull.quest/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.store/',

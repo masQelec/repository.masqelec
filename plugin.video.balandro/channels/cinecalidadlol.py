@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wy.cinecalidad.vet/'
+host = 'https://www.cinecalidad.men/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -30,7 +30,7 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://w3.cinecalidad.vet/', 'https://w4.cinecalidad.vet/', 'https://w5.cinecalidad.vet/',
              'https://w6.cinecalidad.vet/', 'https://w7.cinecalidad.vet/', 'https://w8.cinecalidad.vet/',
              'https://w11.cinecalidad.vet/', 'https://w12.cinecalidad.vet/', 'https://ww.cinecalidad.vet/',
-             'https://wc.cinecalidad.vet/']
+             'https://wc.cinecalidad.vet/', 'https://wy.cinecalidad.vet/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -61,7 +61,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext

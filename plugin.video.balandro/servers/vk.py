@@ -56,6 +56,7 @@ def get_video_url(page_url, url_referer=''):
     page_url = normalizar_url(page_url)
 
     data = httptools.downloadpage(page_url).data
+
     if 'This video has been removed from public access' in data or 'Video not found' in data or '<div class="message_page_title">Error</div>' in data:
         return 'El archivo ya no esta disponible o ha sido borrado'
 
@@ -90,7 +91,7 @@ def get_video_url(page_url, url_referer=''):
         video_urls.append([lbl, url])
 
     if not video_urls:
-        platformtools.dialog_notification('Cargando Vk', 'Espera requerida de %s segundos' % espera)
+        platformtools.dialog_notification('Cargando [COLOR cyan][B]Vk[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
 
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
