@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import xbmc
+import xbmc, time
 
 from platformcode import config, logger, platformtools
 from core import httptools, scrapertools, jsontools
@@ -62,7 +62,7 @@ def get_video_url(page_url, url_referer=''):
         media_url = scrapertools.find_single_match(str(jdata), ".*?'file':.*?'(.*?)'")
 
     if not media_url:
-        platformtools.dialog_notification('Cargando Streamlare', 'Espera requerida de %s segundos' % espera)
+        platformtools.dialog_notification('Cargando [COLOR cyan][B]Streamlare[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
 
         data = httptools.downloadpage("https://streamlare.com/api/video/stream/get", post=post).data

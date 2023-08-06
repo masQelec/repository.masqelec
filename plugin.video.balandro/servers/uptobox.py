@@ -71,7 +71,7 @@ def get_video_url(page_url, url_referer=''):
     if waiting:
         platformtools.dialog_notification(config.__addon_name, "Tiempo de espera indeterminado")
     else:
-        platformtools.dialog_notification('Cargando Uptobox', 'Espera requerida de %s segundos' % espera)
+        platformtools.dialog_notification('Cargando U[COLOR cyan][B]ptobox[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):

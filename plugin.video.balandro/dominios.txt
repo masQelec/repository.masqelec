@@ -1,5 +1,5 @@
-[COLOR coral][B]Balandro[/COLOR][COLOR cyan]  7 de Julio de 2023 [/COLOR][COLOR limegreen]  Hora  8:00[/B][/COLOR]
-   [COLOR yellow][B]Version 3.0.8[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR][COLOR cyan]  4 de Agosto de 2023 [/COLOR][COLOR limegreen]  Hora  9:00[/B][/COLOR]
+   [COLOR yellow][B]Version 3.0.9[/B][/COLOR]
 
    [COLOR yellow][B][I]CONTACTO:[/I][/B][/COLOR]
      Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
@@ -19,11 +19,7 @@
 
    [COLOR yellowgreen][B]SITUACION CANALES:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
-   [COLOR slateblue][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR]
-     [B][COLOR moccasin] Cuevana3 [COLOR springgreen] w4.cuevana3.ai [COLOR red] Host Error [COLOR gray][I] Dominio No Localizado[/I][/B][/COLOR]
-     [B][COLOR moccasin] Ievenn [COLOR springgreen] ievenn.com [COLOR red] Host Error [COLOR gray][I] Index Off[/I][/B][/COLOR]
+   [COLOR slateblue][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
    [COLOR darkcyan][B]CANALES PROBABLEMENTE NO ACCESIBLES:[/B][/COLOR]
-     [B][COLOR moccasin] MegaSerie [COLOR springgreen] megaxserie.me [COLOR red] CloudFlare [COLOR orangered] Protection [COLOR plum][I] reCAPTCHA[/I][/B][/COLOR]
-     [B][COLOR moccasin] MiraPeliculas [COLOR springgreen] mirapeliculasde.com [COLOR red] CloudFlare [COLOR orangered] Protection[/B][/COLOR]
-     [B][COLOR moccasin] PepeCineTop [COLOR springgreen] pepecine.top [COLOR red] CloudFlare [COLOR orangered] Protection[/B][/COLOR]
+     [B][COLOR moccasin] PelisySeries [COLOR springgreen] pelisyseries.net [COLOR red] CloudFlare [COLOR orangered] Protection [COLOR plum][I] Hide reCAPTCHA[/I][/B][/COLOR]

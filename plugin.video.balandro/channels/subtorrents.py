@@ -393,8 +393,6 @@ def play(item):
         if url_base64.endswith('.torrent'): item.url = url_base64
 
     if item.url.endswith('.torrent'):
-        from platformcode import config
-
         if config.get_setting('proxies', item.channel, default=''):
             if PY3:
                 from core import requeststools

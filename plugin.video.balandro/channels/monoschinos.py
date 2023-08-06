@@ -322,6 +322,10 @@ def findvideos(item):
              other = servidor
              servidor = 'various'
 
+        elif 'streamwish' in servidor:
+             other = servidor
+             servidor = 'various'
+
         servidor = servertools.corregir_servidor(servidor)
 
         if servertools.is_server_available(servidor):

@@ -13,7 +13,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://51fc-don.mirror.pm/'
+host = 'https://4144-don.mirror.pm/'
 
 
 try:
@@ -29,7 +29,6 @@ if data_tor_proxy:
         if not host == tor_proxy: host = tor_proxy
 
 
-# ~ Dominios hasta 25/4/2023
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://dontorrent.one/',
              'https://dontorrent.app/', 'https://dontorrent.lol/', 'https://dontorrent.nz/',
@@ -61,14 +60,8 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.cash/', 'https://dontorrent.observer/', 'https://dontorrent.company/',
              'https://dontorrent.discount/', 'https://dontorrent.dad/', 'https://dontorrent.zip/',
              'https://dontorrent.mov/', 'https://dontorrent.day/', 'https://dontorrent.boo/',
-             'https://dontorrent.foo/',
-
-             'https://8ca7-don.mirror.pm/', 'https://1b1b-don.mirror.pm', 'https://6b6b-don.mirror.pm',
-             'https://edf1-don.mirror.pm/', 'https://a36b-don.mirror.pm/', 'https://b2b8-don.mirror.pm/',
-             'https://238e-don.mirror.pm', 'https://7d2e-don.mirror.pm/', 'https://a704-don.mirror.pm/',
-             'https://ffee-don.mirror.pm/'
-
-             'https://4463-don.mirror.pm/', 'https://4144-don.mirror.pm/']
+             'https://dontorrent.foo/', 'https://dontorrent.hair/', 'https://dontorrent.rsvp/',
+             'https://dontorrent.quest/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -576,7 +569,8 @@ def list_search(item):
             if not item.search_type == 'all':
                 if item.search_type == "movie": continue
 
-            if " - " in title: SerieName = title.split(" - ")[0]
+            if "[" in title: SerieName = title.split("[")[0]
+            elif " - " in title: SerieName = title.split(" - ")[0]
             else: SerieName = title
 
             itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, fmt_sufijo=sufijo, 
@@ -590,7 +584,8 @@ def list_search(item):
                 itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title, fmt_sufijo=sufijo,
                                             contentType = 'movie', contentTitle = title, contentExtra = 'documentary', infoLabels={'year': "-"} ))
             else:
-                if "(" in title: titulo = title.split("(")[0]
+                if "[" in title: titulo = title.split("[")[0]
+                elif "(" in title: titulo = title.split("(")[0]
                 else: titulo = title
 
                 itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, fmt_sufijo=sufijo,

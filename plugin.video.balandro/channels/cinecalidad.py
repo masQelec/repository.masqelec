@@ -70,6 +70,20 @@ def do_downloadpage(url, post=None, headers=None):
     else:
         data = httptools.downloadpage_proxy('cinecalidad', url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage_proxy('cinecalidad', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        except:
+            pass
+
     return data
 
 
@@ -236,7 +250,8 @@ def list_all(item):
 
         url = url.replace('\\/', '/')
 
-        if '-premium-12-meses' in url: continue
+        if '-1-ano' in url: continue
+        elif '-premium-12-meses' in url: continue
 
         if not url or not title: continue
 
@@ -503,6 +518,7 @@ def findvideos(item):
             elif servidor == 'ccplay': servidor = 'streamsb'
             elif 'watchsb' in servidor: servidor = 'streamsb'
             elif 'lvturbo' in servidor: servidor = 'streamsb'
+            elif 'likessb' in servidor: servidor = 'streamsb'
 
             elif servidor == 'streamwish':
                   other = servidor.capitalize()

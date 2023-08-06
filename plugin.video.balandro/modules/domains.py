@@ -21,9 +21,9 @@ from modules import tester
 
 channels_currents = [
         'animefenix', 'animeflv', 'animeonline',
-        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cinecalidadmx', 'cuevana3', 'cuevana3video',
+        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cinecalidadmx', 'cliversite', 'cuevana3video',
         'divxtotal', 'dontorrents',
-        'elifilms', 'elitetorrent', 'ennovelas', 'entrepeliculasyseries',
+        'elifilms', 'elitetorrent', 'ennovelas', 'entrepeliculasyseries', 'estrenosdoramas',
         'gnula24', 'grantorrent', 'grantorrents',
         'hdfull', 'hdfullse', ' henaojara',
         'mejortorrentapp',
@@ -31,6 +31,15 @@ channels_currents = [
         'series24', 'seriesantiguas', 'serieskao', 'seriesyonkis', 'srnovelas', 'subtorrents',
         'torrentpelis'
         ]
+
+dominioshdfull = [
+         'https://hdfull.quest/',
+         'https://hdfull.today/',
+         'https://hdfull.sbs/',
+         'https://hdfull.store/',
+         'https://hdfull.one/',
+         'https://hdfull.org/'
+         ]
 
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
@@ -361,12 +370,12 @@ def test_domain_cinecalidadmx(item):
         platformtools.dialog_notification(config.__addon_name + ' - CineCalidadMx', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def manto_domain_cuevana3(item):
+def manto_domain_cliversite(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana3[/B][/COLOR]' % color_exec)
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando CliverSite[/B][/COLOR]' % color_exec)
 
-    channel_json = 'cuevana3.json'
+    channel_json = 'cliversite.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
     data = filetools.read(filename_json)
@@ -391,10 +400,10 @@ def manto_domain_cuevana3(item):
     manto_domain_common(item, id, name)
 
 
-def test_domain_cuevana3(item):
+def test_domain_cliversite(item):
     logger.info()
 
-    datos = channeltools.get_channel_parameters('cuevana3')
+    datos = channeltools.get_channel_parameters('cliversite')
     if not datos['active']:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
         return
@@ -402,9 +411,9 @@ def test_domain_cuevana3(item):
     config.set_setting('developer_test_channels', '')
 
     try:
-        tester.test_channel('Cuevana3')
+        tester.test_channel('CliverSite')
     except:
-        platformtools.dialog_notification(config.__addon_name + ' - Cuevana3', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + ' - CliverSite', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_cuevana3video(item):
@@ -824,6 +833,53 @@ def test_domain_entrepeliculasyseries(item):
         platformtools.dialog_notification(config.__addon_name + ' - EntrePeliculasySeries', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
+def manto_domain_estrenosdoramas(item):
+    logger.info()
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EstrenosDoramas[/B][/COLOR]' % color_exec)
+
+    channel_json = 'estrenosdoramas.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_estrenosdoramas(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('estrenosdoramas')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('EstrenosDoramas')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - EstrenosDoramas', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
+
 def manto_domain_gnula24(item):
     logger.info()
 
@@ -1002,6 +1058,8 @@ def latest_domains_hdfull(item):
 
        latest_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
 
+       if not latest_domain: latest_domain = dominioshdfull[0]
+
        if latest_domain:
            latest_domain = latest_domain.replace('login', '')
            if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
@@ -1085,7 +1143,9 @@ def last_domain_hdfull(item):
 
                        operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
 
-                   latest_domain = operative_domains[0]
+                   if operative_domains: latest_domain = operative_domains[0]
+
+           if not latest_domain: latest_domain = dominioshdfull[0]
 
            if latest_domain:
                latest_domain = latest_domain.replace('login', '')
@@ -1093,8 +1153,8 @@ def last_domain_hdfull(item):
         except:
            latest_domain = ''
 
-        if latest_domain:
-            if latest_domain == domain: last_domain = latest_domain
+    if latest_domain:
+        if latest_domain == domain: last_domain = latest_domain
 
 
     if not last_domain:
@@ -1117,6 +1177,8 @@ def last_domain_hdfull(item):
                        operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
 
                    last_domain = operative_domains[0]
+
+           if not last_domain: last_domain = dominioshdfull[0]
 
            if last_domain:
                last_domain = last_domain.replace('login', '')
@@ -1143,6 +1205,8 @@ def last_domain_hdfull(item):
                    last_domain = scrapertools.find_single_match(data, 'location.replace.*?"(.*?)"')
                    if not last_domain: last_domain = scrapertools.find_single_match(data, '<link rel="canonical".*?href="(.*?)"')
 
+           if not last_domain: last_domain = dominioshdfull[0]
+
            if last_domain:
                last_domain = last_domain.replace('login', '')
                if not last_domain.endswith('/'): last_domain = last_domain + '/'
@@ -1151,11 +1215,12 @@ def last_domain_hdfull(item):
 
 
     if not last_domain:
-        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
+        if not domain in str(dominioshdfull):
+            platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
-        xbmc.sleep(1000)
-        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el último dominio vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://twitter.com/hdfulloficial[/B][/COLOR]')
-        return
+            xbmc.sleep(1000)
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el último dominio vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://twitter.com/hdfulloficial[/B][/COLOR]')
+            return
 
 
     host_channel = ''
@@ -1193,6 +1258,8 @@ def last_domain_hdfull(item):
     if not domain:
         nom_dom = 'Sin información'
         txt_dom = 'Aún No hay ningún Dominio memorizado.'
+
+    if not last_domain: last_domain = dominioshdfull[0]
 
     if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Vigente:           [COLOR cyan][B]' + last_domain + '[/B][/COLOR]'): 
         config.set_setting('dominio', last_domain, 'hdfull')
@@ -1251,6 +1318,9 @@ def operative_domains_hdfull(item):
                operative_domains_unescape = unquote(str(operative_domains_unescape))
 
                operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
+
+       if not operative_domains: operative_domains = dominioshdfull
+
     except:
        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Acceso Dominios Operativos[/B][/COLOR]' % color_alert)
        return
@@ -1297,6 +1367,8 @@ def operative_domains_hdfull(item):
     if domain == sel_domain:
         platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Dominio correcto[/B][/COLOR]' % color_infor)
         return
+
+    if not last_domain: last_domain = dominioshdfull[0]
 
     if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Seleccionado:   [COLOR cyan][B]' + sel_domain + '[/B][/COLOR]'): 
         config.set_setting('dominio', sel_domain, 'hdfull')
@@ -2972,12 +3044,12 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://': return
 
-    elif id == 'cuevana3':
+    elif id == 'cliversite':
         config.set_setting('user_test_channel', '')
 
         if not domain: domain = 'https://'
 
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Cuevana3  -->  [COLOR %s]https://??.cuevana3.??/[/COLOR]' % color_avis)
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio CliverSite  -->  [COLOR %s]https://???.cliver..??/[/COLOR]' % color_avis)
 
         if new_domain is None: return
         elif new_domain == 'https://': return
@@ -3051,6 +3123,16 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://entrepeliculasyseries.': return
+
+    elif id == 'estrenosdoramas':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio EstrenosDoramas  -->  [COLOR %s]https://???.estrenosdoramas.???/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://': return
 
     elif id == 'gnula24':
         config.set_setting('user_test_channel', '')

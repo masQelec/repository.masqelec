@@ -332,8 +332,11 @@ def play(item):
                 data = do_downloadpage(item.url)
 
             if data:
-                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data) or '<!doctype' in str(data):
+                if '<h1>404 Not Found</h1>' in str(data) or '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data) or '<!doctype' in str(data):
                     return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                elif 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                    return 'Archivo [COLOR red]No encontrado[/COLOR]'
 
                 import os
 

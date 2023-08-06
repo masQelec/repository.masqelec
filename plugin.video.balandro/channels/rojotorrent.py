@@ -35,7 +35,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -75,13 +75,27 @@ def do_downloadpage(url, post=None, headers=None):
     return data
 
 
-def mainlist(item):
+def acciones(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='rojotorrent', folder=False, text_color='chartreuse' ))
 
     itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(Item( channel='helper', action='show_help_rojotorrent', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
+def mainlist(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -96,9 +110,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
-
-    itemlist.append(Item( channel='helper', action='show_help_rojotorrent', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -121,9 +133,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
-
-    itemlist.append(Item( channel='helper', action='show_help_rojotorrent', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -142,9 +152,7 @@ def mainlist_documentary(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
-
-    itemlist.append(Item( channel='helper', action='show_help_rojotorrent', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
 
@@ -449,8 +457,6 @@ def play(item):
     itemlist = []
 
     if item.url.endswith('.torrent'):
-        from platformcode import config
-
         if config.get_setting('proxies', item.channel, default=''):
             if PY3:
                 from core import requeststools
@@ -506,7 +512,8 @@ def list_search(item):
             if not item.search_type == 'all':
                 if item.search_type == "movie": continue
 
-            if " - " in title: SerieName = title.split(" - ")[0]
+            if "[" in title: SerieName = title.split("[")[0]
+            elif " - " in title: SerieName = title.split(" - ")[0]
             else: SerieName = title
 
             itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, fmt_sufijo=sufijo, 
@@ -520,7 +527,8 @@ def list_search(item):
                 itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title, fmt_sufijo=sufijo,
                                             contentType = 'movie', contentTitle = title, contentExtra = 'documentary', infoLabels={'year': "-"} ))
             else:
-                if "(" in title: titulo = title.split("(")[0]
+                if "[" in title: titulo = title.split("[")[0]
+                elif "(" in title: titulo = title.split("(")[0]
                 else: titulo = title
 
                 itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, fmt_sufijo=sufijo,

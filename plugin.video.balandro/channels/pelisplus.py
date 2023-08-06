@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www3.pelisplus.ws/'
+host = 'https://pelisplushd.video/'
 
 
 # ~ por si viene de enlaces guardados
@@ -16,7 +16,8 @@ ant_hosts = ['https://pelisplus.so/', 'https://www1.pelisplus.so/', 'https://www
              'https://www1.pelisplus.pe/', 'https://pelisplus.cx/', 'https://www1.pelisplus.cx/',
              'https://www2.pelisplus.cx/', 'https://www3.pelisplus.cx/', 'https://pelisplus.ph/',
              'https://www1.pelisplus.ph/', 'https://www2.pelisplus.ph/', 'https://www3.pelisplus.ph/',
-             'https://www4.pelisplus.ph/', 'https://pelisplus.ws/']
+             'https://www4.pelisplus.ph/', 'https://pelisplus.ws/', 'https://www3.pelisplus.ws/',
+             'https://www4.pelisplus.ws/']
 
 
 domain = config.get_setting('dominio', 'pelisplus', default='')
@@ -47,7 +48,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext

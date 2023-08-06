@@ -204,20 +204,26 @@ def temporadas(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, 'class="select-ss"[^>]*>([^<]*)')
+    matches = scrapertools.find_multiple_matches(data, 'class="select-ss".*?>Temporada(.*?)</a></li>')
 
-    for n, title in enumerate(matches):
-        if not title: title = 'Temporada ' + str( n + 1)
+    for tempo in matches:
+        num_tempo = str(tempo)
+        num_tempo = num_tempo.strip()
+
+        title = 'Temporada ' + num_tempo
 
         if len(matches) == 1:
             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
             item.page = 0
             item.contentType = 'season'
-            item.contentSeason = n + 1
+            item.contentSeason = 0
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action='episodios', title = title, page = 0, contentType = 'season', contentSeason = n + 1, text_color = 'tan' ))
+        num_tempo = int(num_tempo)
+        num_tempo = num_tempo - 1
+
+        itemlist.append(item.clone( action='episodios', title = title, page = 0, contentType = 'season', contentSeason = num_tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -233,8 +239,10 @@ def episodios(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, "<div id='ss-(\d+)'>(.*?)</div>")
-    if not matches: matches = [(0, data)] # Temporada única
+    matches = scrapertools.find_multiple_matches(data, "dt='ss-" + str(item.contentSeason) + "'>(.*?)</div>")
+
+    # ~ Temporada única
+    if not matches: matches = [(0, data)]
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -277,31 +285,28 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
-    last_epi = 0
+    for match in matches[item.page * item.perpage:]:
+        season = int(item.contentSeason)
+        season += 1
 
-    for num_s, episodios in matches[item.page * item.perpage:]:
-        season = int(num_s) + 1
+        episodios = scrapertools.find_multiple_matches(match, '<a(.*?)</a>')
 
-        patron_epi = '<a href="([^"]+)"><li><span><strong>[^<]*</strong>(\d+)[^<]*</span>([^<]+)</li>'
-        matches_epi = scrapertools.find_multiple_matches(episodios, patron_epi)
+        for episodio in episodios:
+            url = scrapertools.find_single_match(episodio, 'href="(.*?)"')
 
-        for url, epi, title in matches_epi:
-            # convertir numeración episodios consecutivos
-            num_epi = int(epi)
+            epi = scrapertools.find_single_match(episodio, '</strong>(.*?)</span>')
+            if '-' in epi: epi = scrapertools.find_single_match(epi, '(.*?)-').strip()
 
-            if item.contentSeason:
-                if not str(item.contentSeason) == str(season): continue
+            title = scrapertools.find_single_match(episodio, '</span>(.*?)</li>')
 
-            episode = num_epi - last_epi if num_epi > last_epi else num_epi
-            titulo = '%sx%s %s' % (season, episode, title)
-            if season > 1 and num_epi > last_epi: titulo += ' (%s)' % epi
+            titulo = '%sx%s %s' % (str(season), epi, title)
 
-            itemlist.append(item.clone( action='findvideos', url= host + url, title = titulo, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
+            url = host + url
 
-            if num_epi: last_epi = num_epi
+            itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epi ))
 
-            if len(itemlist) >= item.perpage:
-                break
+        if len(itemlist) >= item.perpage:
+            break
 
     tmdb.set_infoLabels(itemlist)
 

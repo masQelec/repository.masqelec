@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast", "vose", "vo"],
 
-  "clusters": ["temporary", "suggested", "classic", "categories", "languages", "docs", "vos"],
+  "clusters": ["suggested", "classic", "categories", "languages", "docs", "vos"],
 
-  "notes": "Películas por idiomas, géneros."
+  "notes": "Web CERRADA. Películas por idiomas, géneros."
 }

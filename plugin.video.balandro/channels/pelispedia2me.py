@@ -44,7 +44,7 @@ def generos(item):
 
     bloque = scrapertools.find_single_match(data, '>GÉNEROS<(.*?)</ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?>(.*?)</a>')
 
     for url, title in matches:
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))

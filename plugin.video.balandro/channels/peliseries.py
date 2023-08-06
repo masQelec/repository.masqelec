@@ -74,9 +74,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Novelas', action = 'list_all', url = host + '/Novelas.html?page=1', search_type = 'tvshow', text_color='limegreen' ))
 
-    itemlist.append(item.clone( title = 'Anime', action = 'list_all', url = host + '/Anime.html?page=1', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + '/Anime.html?page=1', search_type = 'tvshow', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Anime más vistas', action = 'list_all', url = host + '/AnimeTop.html?page=1', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Animes más vistos', action = 'list_all', url = host + '/AnimeTop.html?page=1', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -100,7 +100,9 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&ntilde;', 'ñ')
+        title = title.replace('&ntilde;', 'ñ').replace('&iquest;', '¿').replace('&ccedil;', 'ç')
+
+        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'i').replace('&oacute;', 'o').replace('&uacute;', 'u')
 
         url = host + url
 

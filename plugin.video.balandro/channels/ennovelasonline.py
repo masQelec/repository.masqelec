@@ -72,7 +72,7 @@ def paises(item):
     itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'category/novelas-espanolas-online/', lang = 'Esp', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'category/novelas-mexicanas-online/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'category/novelas-peruanas-online/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'category/series-turcas-en-espanol-subtitulado', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'category/series-turcas-en-espanol-subtitulado', lang = 'Vose', text_color='moccasin' ))
 
     return itemlist
 
@@ -128,6 +128,8 @@ def list_all(item):
 
         SerieName = title
 
+        if " en (" in SerieName: SerieName = SerieName.split(" en ")[0]
+
         if " (" in SerieName: SerieName = SerieName.split(" (")[0]
         elif "(En Espanol)" in SerieName: SerieName = SerieName.split("(En Espanol)")[0]
         elif "En Español" in SerieName: SerieName = SerieName.split("En Español")[0]
@@ -146,7 +148,11 @@ def list_all(item):
 
         SerieName = SerieName.strip()
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+        lang = ''
+        if 'subtitulado' in title.lower(): lang = 'Vose'
+
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, lang=lang,
+                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -187,6 +193,8 @@ def last_epis(item):
 
         SerieName = title
 
+        if " en (" in SerieName: SerieName = SerieName.split(" en ")[0]
+
         if " (" in SerieName: SerieName = SerieName.split(" (")[0]
         elif "(En Espanol)" in SerieName: SerieName = SerieName.split("(En Espanol)")[0]
         elif "En Español" in SerieName: SerieName = SerieName.split("En Español")[0]
@@ -207,7 +215,10 @@ def last_epis(item):
 
         title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, infoLabels={'year': '-'},
+        lang = ''
+        if 'Subtitulado' in title: lang = 'Vose'
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, lang = lang, infoLabels={'year': '-'},
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
     tmdb.set_infoLabels(itemlist)
@@ -387,11 +398,11 @@ def findvideos(item):
         if type == 'watch': post = {'watch': str(value)}
         else: post = {'download': str(value)}
 
-        data = do_downloadpage(link, post = post, headers = {'Referer': item.url} )
+        data1 = do_downloadpage(link, post = post, headers = {'Referer': item.url} )
 
-        matches = scrapertools.find_multiple_matches(data, "<iframe src='(.*?)'")
-        if not matches: matches = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
-        if not matches: matches = scrapertools.find_multiple_matches(data, '<td>Server.*?href="(.*?)"')
+        matches = scrapertools.find_multiple_matches(data1, "<iframe src='(.*?)'")
+        if not matches: matches = scrapertools.find_multiple_matches(data1, '<iframe src="(.*?)"')
+        if not matches: matches = scrapertools.find_multiple_matches(data1, '<td>Server.*?href="(.*?)"')
 
         for url in matches:
             if '.ennovelas.' in url: continue
@@ -413,8 +424,7 @@ def findvideos(item):
 
             elif 'api.mycdn.moe/dl/?uptobox=' in url: url = url.replace('api.mycdn.moe/dl/?uptobox=', 'uptobox.com/')
 
-            elif url.startswith('http://vidmoly'):
-                  url = url.replace('http://vidmoly', 'https://vidmoly').replace('/w/', '/embed-')
+            elif url.startswith('http://vidmoly'): url = url.replace('http://vidmoly', 'https://vidmoly').replace('/w/', '/embed-')
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -422,6 +432,7 @@ def findvideos(item):
             url = servertools.normalize_url(servidor, url)
 
             if item.lang == 'Esp': lang = 'Esp'
+            elif item.lang == 'Vose': lang = 'Vose'
             else: lang = 'Lat'
 
             other = ''
@@ -430,7 +441,6 @@ def findvideos(item):
             if not servidor == 'directo':
                 itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
-
     t_link = scrapertools.find_single_match(data, 'var vo_theme_dir = "(.*?)"')
     id_link = scrapertools.find_single_match(data, 'vo_postID = "(.*?)"')
 
@@ -438,31 +448,55 @@ def findvideos(item):
         i = 0
 
         while i <= 5:
-           data = do_downloadpage(t_link + '/temp/ajax/iframe.php?id=' + id_link + '&video=' + str(i), headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'} )
+           data2 = do_downloadpage(t_link + '/temp/ajax/iframe.php?id=' + id_link + '&video=' + str(i), headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'} )
 
-           u_link = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
-           if not u_link: u_link = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
+           data2 = data2.strip()
+
+           if not data2: break
+
+           u_link = scrapertools.find_single_match(data2, '<iframe.*?src="(.*?)"')
+           if not u_link: u_link = scrapertools.find_single_match(data2, '<IFRAME.*?SRC="(.*?)"')
 
            if u_link.startswith('//'): u_link = 'https:' + u_link
 
            if u_link:
-              ses += 1
+               ses += 1
 
-              if '/ennovelas.' in u_link: u_link = ''
+               if '/ennovelas.' in u_link: u_link = ''
 
            if u_link:
+               if u_link.startswith('https://vk.com/'): u_link = u_link.replace('&amp;', '&')
+
                servidor = servertools.get_server_from_url(u_link)
                servidor = servertools.corregir_servidor(servidor)
 
                u_link = servertools.normalize_url(servidor, u_link)
 
                if item.lang == 'Esp': lang = 'Esp'
+               elif item.lang == 'Vose': lang = 'Vose'
                else: lang = 'Lat'
 
                if not servidor == 'directo':
                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = 'P' ))
 
            i += 1
+
+    # ~ Downloads
+    if not itemlist:
+        matches = scrapertools.find_multiple_matches(data, '<td>Server.*?href="(.*?)"')
+
+        for url in matches:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            url = servertools.normalize_url(servidor, url)
+
+            if item.lang == 'Esp': lang = 'Esp'
+            elif item.lang == 'Vose': lang = 'Vose'
+            else: lang = 'Lat'
+
+            if not servidor == 'directo':
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = 'D' ))
 
     if not itemlist:
         if not ses == 0:
