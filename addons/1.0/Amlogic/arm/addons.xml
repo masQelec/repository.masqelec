@@ -1038,7 +1038,7 @@ v5.2.14 (2017-01-23)
     </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="3.0.9" provider-name="Balandro Team">
+<addon id="plugin.video.balandro" name="Balandro" version="3.0.9.1" provider-name="Balandro Team">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
