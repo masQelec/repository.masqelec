@@ -167,7 +167,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -189,7 +189,7 @@ def mainlist_animes(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
@@ -509,10 +509,6 @@ def findvideos(item):
 
                 if not url.startswith('http'): url = host[:-1] + url
 
-            if url.startswith('/fembed.php?url='): url = url.replace('/fembed.php?url=', 'https://feurl.com/v/')
-            elif (host + 'fembed.php') in url: url = url.replace(host + 'fembed.php?url=', 'https://feurl.com/v/')
-            elif 'plusto.link' in url: url = url.replace('plusto.link', 'feurl.com')
-
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
@@ -522,8 +518,9 @@ def findvideos(item):
 
             if not link_other:
                 if servidor == 'various':
-                    if '/filemoon.' in url: link_other = 'Filemoon'
-                    elif '/streamwish.' in url: link_other = 'Streamwish'
+                    if 'filemoon' in url: link_other = 'filemoon'
+                    elif 'filelions' in url or 'azipcdn' in url or 'alions' in url or 'dlions' in url or 'mlions' in url: link_other = 'filelions'
+                    elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: link_other = 'streamwish'
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = IDIOMAS.get(lang, lang), quality = qlty, other = link_other ))
 
@@ -540,6 +537,7 @@ def findvideos(item):
         if not url: continue
         elif '/player.moovies.in/' in url: continue
         elif 'mystream.to' in url: continue
+        elif '/watchsb.' in url: continue
 
         qlty = scrapertools.find_single_match(str(match), '"quality":"(.*?)"')
 
@@ -552,13 +550,11 @@ def findvideos(item):
             if not url: url = scrapertools.find_single_match(prv, 'let url = "(.*?)"')
 
             if not url: continue
-            elif '/1fichier' in url: continue
+
+            if '/1fichier' in url: continue
+            elif '/watchsb.' in url: continue
 
             if not url.startswith('http'): url = host[:-1] + url
-
-        if url.startswith('/fembed.php?url='): url = url.replace('/fembed.php?url=', 'https://feurl.com/v/')
-        elif (host + 'fembed.php') in url: url = url.replace(host + 'fembed.php?url=', 'https://feurl.com/v/')
-        elif 'plusto.link' in url: url = url.replace('plusto.link', 'feurl.com')
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -569,8 +565,9 @@ def findvideos(item):
 
         if not link_other:
             if servidor == 'various':
-                if '/filemoon.' in url: link_other = 'Filemoon'
-                elif '/streamwish.' in url: link_other = 'Streamwish'
+                if 'filemoon' in url: link_other = 'filemoon'
+                elif 'filelions' in url or 'azipcdn' in url or 'alions' in url or 'dlions' in url or 'mlions' in url: link_other = 'filelions'
+                elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: link_other = 'streamwish'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = IDIOMAS.get(lang, lang), quality = qlty, other = link_other + ' D' ))
 

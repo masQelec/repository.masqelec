@@ -665,6 +665,7 @@ def findvideos(item):
             if servidor == 'various':
                 if '/filemoon.' in url: other = 'Filemoon'
                 elif '/streamwish.' in url: other = 'Streamwish'
+                elif '/vgembed.' in url: other = 'Vidguard'
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, quality = qlty, other = other ))
 

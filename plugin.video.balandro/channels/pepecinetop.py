@@ -393,7 +393,7 @@ def findvideos(item):
 
         data3 = do_downloadpage(new_url)
 
-        links = scrapertools.find_multiple_matches(data3, '<li onclick="go_to_player.*?' + "'(.*?)'.*?<p>(.*?)-")
+        links = scrapertools.find_multiple_matches(data3, 'go_to_player.*?' + "'(.*?)'.*?<p>(.*?)-")
 
         for link, lang2 in links:
             servidor = servertools.get_server_from_url(link)

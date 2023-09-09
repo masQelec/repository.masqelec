@@ -29,8 +29,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo general', action = 'list_all', url = host + '/descargas/detallada/bittorrent', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Doramas:', folder=False, text_color='firebrick' ))
+    itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/dorama', search_type = 'tvshow' ))
+
     if not descartar_anime:
-        itemlist.append(item.clone( title = 'Animes:', folder=False, text_color='moccasin' ))
+        itemlist.append(item.clone( title = 'Animes:', folder=False, text_color='springgreen' ))
 
         itemlist.append(item.clone( title = ' - Catálogo', action = 'list_lst', url = host + '/buscar/anime/tv?&categoria=tv&detallada=true', search_type = 'tvshow' ))
 
@@ -50,11 +53,7 @@ def mainlist_series(item):
         itemlist.append(item.clone( title = ' - Catálogo', action = 'list_lst', url = host + '/buscar/anime/ova?&categoria=ova&detallada=true', search_type = 'tvshow' ))
         itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/anime-OVA', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Doramas:', folder=False, text_color='moccasin' ))
-    itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/dorama', search_type = 'tvshow' ))
-
-    if not descartar_anime:
-        itemlist.append(item.clone( title = 'Mangas:', folder=False, text_color='moccasin' ))
+        itemlist.append(item.clone( title = 'Mangas:', folder=False, text_color='orange' ))
         itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/manga', search_type = 'tvshow' ))
 
     return itemlist

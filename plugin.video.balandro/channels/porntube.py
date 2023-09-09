@@ -201,7 +201,7 @@ def findvideos(item):
     videos = scrapertools.find_multiple_matches(str(data), ".*?'(.*?)'.*?'token'.*?:.*?'(.*?)'")
 
     for qlty, url in videos:
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, quality = qlty, server = 'directo', language = 'VO' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, quality = qlty, server = 'directo', language = 'Vo' ))
 
     return sorted(itemlist, key=lambda it: it.quality)
 

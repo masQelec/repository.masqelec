@@ -413,11 +413,6 @@ def findvideos(item):
 
             if url.startswith('//'): url = 'https:' + url
 
-            if 'api.mycdn.moe/sblink.php?id=' in url: url = url.replace('api.mycdn.moe/sblink.php?id=', 'sbanh.com/e/')
-
-            elif 'api.mycdn.moe/fembed.php?id=' in url: url = url.replace('api.mycdn.moe/fembed.php?id=', 'feurl.com/v/')
-            elif 'api.mycdn.moe/furl.php?id=' in url: url = url.replace('api.mycdn.moe/furl.php?id=', 'feurl.com/v/')
-
             elif 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 
             elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
@@ -436,7 +431,12 @@ def findvideos(item):
             else: lang = 'Lat'
 
             other = ''
-            if type == 'download': other = 'D'
+            if servidor == 'various':
+                if 'vudeo' in url: other = 'Vudeo'
+                elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+
+            else:
+                if type == 'download': other = 'D'
 
             if not servidor == 'directo':
                 itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
@@ -476,8 +476,14 @@ def findvideos(item):
                elif item.lang == 'Vose': lang = 'Vose'
                else: lang = 'Lat'
 
+               other = 'P'
+
+               if servidor == 'various':
+                   if 'vudeo' in u_link: other = 'Vudeo'
+                   elif 'streamwish' in u_link or 'strwish' in u_link or 'embedwish' in u_link or 'wishembed' in u_link or 'awish' in u_link or 'dwish' in u_link or 'mwish' in u_link: other = 'Streamwish'
+
                if not servidor == 'directo':
-                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = 'P' ))
+                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
 
            i += 1
 
@@ -495,8 +501,13 @@ def findvideos(item):
             elif item.lang == 'Vose': lang = 'Vose'
             else: lang = 'Lat'
 
+        other = 'D'
+
+        if servidor == 'various':
+            if 'vudeo' in url: other = 'Vudeo'
+
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = 'D' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:

@@ -355,6 +355,7 @@ def manto_params(item):
         config.set_setting('channel_henaojara_dominio', '')
 
         config.set_setting('channel_mejortorrentapp_dominio', '')
+        config.set_setting('channel_mitorrent_dominio', '')
 
         config.set_setting('channel_nextdede_nextdede_login', False)
         config.set_setting('channel_nextdede_nextdede_email', '')
@@ -363,7 +364,8 @@ def manto_params(item):
 
         config.set_setting('channel_pelishouse_dominio', '')
         config.set_setting('channel_pelismaraton_dominio', '')
-        config.set_setting('channel_pelispedia_dominio', '')
+        config.set_setting('channel_pelismart_dominio', '')
+        config.set_setting('channel_pelispanda_dominio', '')
         config.set_setting('channel_pelispediaws_dominio', '')
         config.set_setting('channel_pelisplus_dominio', '')
         config.set_setting('channel_pelisplushd_dominio', '')
@@ -386,6 +388,7 @@ def manto_params(item):
         config.set_setting('channel_subtorrents_dominio', '')
 
         config.set_setting('channel_torrentpelis_dominio', '')
+        config.set_setting('channel_tupelihd_dominio', '')
 
         config.set_setting('channels_proxies_memorized', '')
 
@@ -411,7 +414,7 @@ def manto_params(item):
         download_path = filetools.join(config.get_data_path(), 'downloads')
         config.set_setting('downloadpath', download_path)
 
-        config.set_setting('chrome_last_version', '115.0.5790.171')
+        config.set_setting('chrome_last_version', '116.0.5845.141')
 
         config.set_setting('debug', '0')
 
@@ -420,6 +423,8 @@ def manto_params(item):
         config.set_setting('developer_test_servers', '')
 
         config.set_setting('user_test_channel', '')
+
+        config.set_setting('sin_resp', '')
 
         manto_proxies(item)
 
@@ -477,12 +482,52 @@ def manto_advs(item):
     existe = filetools.exists(file)
 
     if existe == False:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero Advancedsettings[/COLOR][/B]' % color_infor)
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero Advanced Settings[/COLOR][/B]' % color_infor)
         return
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Advancedsettings ?[/B][/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Advanced Settings ?[/B][/COLOR]'):
         filetools.remove(file)
-        platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Fichero Advancedsettings eliminado[/B][/COLOR]', '[B][COLOR yellow]Debe Abandonar obligatoriamente su Media Center e Ingresar de nuevo en el.[/B][/COLOR]')
+        platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Fichero Advance dSettings eliminado[/B][/COLOR]', '[B][COLOR yellow]Debe Abandonar obligatoriamente su Media Center e Ingresar de nuevo en el.[/B][/COLOR]')
+
+
+def manto_favs(item):
+    logger.info()
+
+    path = translatePath(os.path.join('special://home/userdata', ''))
+
+    file_favs = 'favourites.xml'
+
+    file = path + file_favs
+
+    existe = filetools.exists(file)
+
+    if existe == False:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero Favourites Settings[/COLOR][/B]' % color_infor)
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Favourites Settings ?[/B][/COLOR]'):
+        filetools.remove(file)
+        platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Fichero Favourites Settings eliminado[/B][/COLOR]')
+
+
+def manto_pcfs(item):
+    logger.info()
+
+    path = translatePath(os.path.join('special://home/userdata', ''))
+
+    file_pcfs = 'playercorefactory.xml'
+
+    file = path + file_pcfs
+
+    existe = filetools.exists(file)
+
+    if existe == False:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero PlayerCoreFactory Settings[/COLOR][/B]' % color_infor)
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero PlayerCoreFactory Settings ?[/B][/COLOR]'):
+        filetools.remove(file)
+        platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Fichero PlayerCoreFactory Settings eliminado[/B][/COLOR]', '[B][COLOR yellow]Debe Abandonar obligatoriamente su Media Center e Ingresar de nuevo en el.[/B][/COLOR]')
 
 
 def manto_folder_cache(item):
@@ -525,6 +570,24 @@ def manto_limpiezas(item):
 
             if existe:
                 manto_advs(item)
+                procesado = True
+
+            path_favs = translatePath(os.path.join('special://home/userdata', ''))
+            file_favs = 'favourites.xml'
+            file = path_favs + file_favs
+            existe = filetools.exists(file)
+
+            if existe:
+                manto_favs(item)
+                procesado = True
+
+            path_pcfs = translatePath(os.path.join('special://home/userdata', ''))
+            file_pcfs = 'playercorefactory.xml'
+            file = path_pcfs + file_pcfs
+            existe = filetools.exists(file)
+
+            if existe:
+                manto_pcfs(item)
                 procesado = True
 
             path_cache = translatePath(os.path.join('special://temp/archive_cache', ''))
@@ -1204,6 +1267,10 @@ def opciones_mejortorrentapp(item):
     item.from_channel = 'mejortorrentapp'
     opciones_domains_common(item)
 
+def opciones_mitorrent(item):
+    item.from_channel = 'mitorrent'
+    opciones_domains_common(item)
+
 def opciones_pelishouse(item):
     item.from_channel = 'pelishouse'
     opciones_domains_common(item)
@@ -1212,8 +1279,12 @@ def opciones_pelismaraton(item):
     item.from_channel = 'pelismaraton'
     opciones_domains_common(item)
 
-def opciones_pelispedia(item):
-    item.from_channel = 'pelispedia'
+def opciones_pelismart(item):
+    item.from_channel = 'pelismart'
+    opciones_domains_common(item)
+
+def opciones_pelispanda(item):
+    item.from_channel = 'pelispanda'
     opciones_domains_common(item)
 
 def opciones_pelispediaws(item):
@@ -1274,6 +1345,10 @@ def opciones_subtorrents(item):
 
 def opciones_torrentpelis(item):
     item.from_channel = 'torrentpelis'
+    opciones_domains_common(item)
+
+def opciones_tupelihd(item):
+    item.from_channel = 'tupelihd'
     opciones_domains_common(item)
 
 
@@ -1374,11 +1449,15 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'mejortorrentapp': domains.manto_domain_mejortorrentapp(item)
 
+            elif item.from_channel == 'mitorrent': domains.manto_domain_mitorrent(item)
+
             elif item.from_channel == 'pelishouse': domains.manto_domain_pelishouse(item)
 
             elif item.from_channel == 'pelismaraton': domains.manto_domain_pelismaraton(item)
 
-            elif item.from_channel == 'pelispedia': domains.manto_domain_pelispedia(item)
+            elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
+
+            elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
 
             elif item.from_channel == 'pelispediaws': domains.manto_domain_pelispediaws(item)
 
@@ -1409,6 +1488,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'subtorrents': domains.manto_domain_subtorrents(item)
 
             elif item.from_channel == 'torrentpelis': domains.manto_domain_torrentpelis(item)
+
+            elif item.from_channel == 'tupelihd': domains.manto_domain_tupelihd(item)
 
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)
@@ -1460,11 +1541,15 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'mejortorrentapp': domains.test_domain_mejortorrentapp(item)
 
+            elif item.from_channel == 'mitorrent': domains.test_domain_mitorrent(item)
+
             elif item.from_channel == 'pelishouse': domains.test_domain_pelishouse(item)
 
             elif item.from_channel == 'pelismaraton': domains.test_domain_pelismaraton(item)
 
-            elif item.from_channel == 'pelispedia': domains.test_domain_pelispedia(item)
+            elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
+
+            elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
 
             elif item.from_channel == 'pelispediaws': domains.test_domain_pelispediaws(item)
 
@@ -1495,6 +1580,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'subtorrents': domains.test_domain_subtorrents(item)
 
             elif item.from_channel == 'torrentpelis': domains.test_domain_torrentpelis(item)
+
+            elif item.from_channel == 'tupelihd': domains.test_domain_tupelihd(item)
 
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)
@@ -1543,8 +1630,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'pelishouse': helper.show_help_pelishouse(item)
 
             elif item.from_channel == 'pelismaraton': helper.show_help_pelismaraton(item)
-
-            elif item.from_channel == 'pelispedia': helper.show_help_pelispedia(item)
 
             elif item.from_channel == 'pelispediaws': helper.show_help_pelispediaws(item)
 

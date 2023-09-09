@@ -460,9 +460,20 @@ def findvideos(item):
             serv = srv.lower()
             break
 
+        if serv == 'gamo': servidor = 'gamovideo'
+        elif serv == 'ru': servidor = 'okru'
+        elif serv == 'burst': servidor = 'burstcloud'
+        elif serv == 'yourupload': servidor = 'yourupload'
+        elif serv == 'mp4upload': servidor = 'mp4upload'
+
         if serv == 'stream2':
             servidor = 'various'
-            serv = 'Streamwish'
+            serv = 'streamwish'
+        elif serv == 'lion':
+            servidor = 'various'
+            serv = 'filelions'
+
+        if serv == servidor: serv = ''
 
         if not serv == 'fireload':
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose', other = serv ))

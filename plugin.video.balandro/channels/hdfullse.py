@@ -69,13 +69,22 @@ def do_downloadpage(url, post = None, referer = None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_hdfullse_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+
     if not referer: referer = refer
     headers = {'Referer': referer}
 
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers).data
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('hdfullse', url, post=post, headers=headers).data
+        data = httptools.downloadpage_proxy('hdfullse', url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            if not '/search' in url:
+                platformtools.dialog_notification('HdFullSe', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('hdfullse', url, post=post, headers=headers, timeout=timeout).data
 
     return data
 
@@ -169,9 +178,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( action = 'list_all', title = 'Más valoradas', url= host + '/tv-shows/imdb_rating', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( action = 'list_all', title = 'Animes', url = host + '/tv-tags/anime', search_type = 'tvshow', text_color='springgreen' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Doramas', url = host + '/tv-tags/dorama', search_type = 'tvshow', text_color='firebrick' ))
     itemlist.append(item.clone( action = 'list_all', title = 'Novelas', url = host + '/tv-tags/soap', search_type = 'tvshow', text_color='limegreen' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Doramas', url = host + '/tv-tags/dorama', search_type = 'tvshow', text_color='firebrick' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Animes', url = host + '/tv-tags/anime', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( action = 'list_all', title = 'Por alfabético', url = host + '/tv-shows/abc', search_type = 'tvshow' ))
 
@@ -481,14 +490,17 @@ def findvideos(item):
 
     data_obf = scrapertools.find_single_match(data, "var ad\s*=\s*'(.*?)'")
 
+    data_decrypt = ''
+
     for key in keys:
         try:
            data_decrypt = jsontools.load(balandroresolver.obfs(base64.b64decode(data_obf), 126 - int(key)))
            if data_decrypt: break
         except:
-           break
+           return itemlist
 
     matches = []
+
     for match in data_decrypt:
         if match['provider'] in provs:
             try:
@@ -510,10 +522,8 @@ def findvideos(item):
         try:
             calidad = unicode(calidad, 'utf8').upper().encode('utf8')
         except: 
-            try:
-                calidad = str(calidad, 'utf8').upper()
-            except:
-                calidad  = calidad.upper()
+            try: calidad = str(calidad, 'utf8').upper()
+            except: calidad  = calidad.upper()
 
         idioma = idioma.capitalize() if idioma != 'ESPSUB' else 'Vose'
 

@@ -78,10 +78,19 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_cuevana3video_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers).data
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers).data
+        data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            if not '/search.html?keyword=' in url:
+                platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -91,9 +100,9 @@ def do_downloadpage(url, post=None, headers=None):
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers).data
+                    data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -482,6 +491,7 @@ def findvideos(item):
                             url = servertools.normalize_url(servidor, link2)
 
                             if '/clonamesta' in url: continue
+                            elif '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url: continue
 
                             if servidor == 'directo' or servidor == 'various':
                                 link_other = normalize_other(url)
@@ -502,6 +512,7 @@ def findvideos(item):
                 url = servertools.normalize_url(servidor, url)
 
                 if '/clonamesta' in url: continue
+                elif '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url: continue
 
                 if servidor == 'directo' or servidor == 'various':
                     link_other = normalize_other(url)
@@ -536,6 +547,8 @@ def findvideos(item):
                            servidor = servertools.corregir_servidor(servidor)
 
                            url = servertools.normalize_url(servidor, link2)
+
+                           if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url: continue
 
                            if servidor == 'directo' or servidor == 'various': link_other = normalize_other(url)
                            else: link_other = 'play'
@@ -585,6 +598,7 @@ def normalize_other(url):
     elif 'hydrax' in url: link_other = 'hydrax'
     elif 'streamwish' in url: link_other = 'streamwish'
     elif 'filemoon' in url: link_other = 'filemoon'
+    elif 'filelions' in url: link_other = 'filelions'
 
     else:
        if config.get_setting('developer_mode', default=False):

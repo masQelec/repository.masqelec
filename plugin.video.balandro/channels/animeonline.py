@@ -525,7 +525,7 @@ def findvideos(item):
                        link_other = url
                 else: link_other = url
 
-                link_other = link_other.replace('www.', '').replace('.com', '').replace('.net', '').replace('.org', '').replace('.top', '')
+                link_other = link_other.replace('www.', '').replace('.com', '').replace('.net', '').replace('.org', '').replace('.top', '').replace('.do', '')
                 link_other = link_other.replace('.co', '').replace('.cc', '').replace('.sh', '').replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '')
                 link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.sx', '')
 

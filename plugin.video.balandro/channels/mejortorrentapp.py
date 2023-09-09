@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www4.mejortorrent.rip'
+host = 'https://www5.mejortorrent.rip'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://www1.mejortorrent.rip',
-             'https://www2.mejortorrent.rip', 'https://www3.mejortorrent.rip']
+             'https://www2.mejortorrent.rip', 'https://www3.mejortorrent.rip', 'https://www4.mejortorrent.rip']
 
 
 domain = config.get_setting('dominio', 'mejortorrentapp', default='')
@@ -291,7 +291,7 @@ def list_all(item):
 
         url = host + url
 
-        title = title.replace('-', ' ')
+        title = title.replace('-', ' ').strip()
 
         if item.search_type == 'movie':
             titulo = title
@@ -538,7 +538,7 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(data, '>Torrent:<.*?<a href="(.*?)"')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, quality = item.qualities ))
 
         return itemlist
 

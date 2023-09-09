@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -61,12 +61,21 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_pelisplushdnz_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+
     if '/year/' in url: raise_weberror = False
 
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('pelisplushdnz', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        data = httptools.downloadpage_proxy('pelisplushdnz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+        if not data:
+            if not 'search?s=' in url:
+                platformtools.dialog_notification('PelisPlusHdNz', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('pelisplushdnz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -126,10 +135,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas?page=', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas/estrenos?page=', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'peliculas/populares?page=', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
@@ -145,10 +150,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series?page=', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'series/estrenos?page=', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series/populares?page=', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
@@ -169,10 +170,6 @@ def mainlist_animes(item):
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes?page=', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'animes/estrenos?page=', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'animes/populares?page=', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'animes', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'animes', search_type = 'tvshow' ))
@@ -466,28 +463,39 @@ def findvideos(item):
         if srv == 'moe':
             data2 = do_downloadpage(url)
 
-            matches2 = scrapertools.find_multiple_matches(data2, "go_to_player.*?'(.*?)'.*?<span>(.*?)</span>")
+            matches2 = scrapertools.find_multiple_matches(data2, '<li onclick="' + "go_to_player.*?'(.*?)'.*?<span>(.*?)</span>")
 
             for link, srv2 in matches2:
                 srv2 = srv2.lower()
 
                 if srv2 == 'netu' or srv2 == 'waaw' or srv2 == 'hqq': continue
                 elif srv2 == '1fichier': continue
+                elif srv2 == 'plusvip': continue
 
                 if not link: continue
 
-                link = 'https://api.mycdn.moe/player/?id=' + link
+                link = base64.b64decode(link).decode("utf-8")
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = link, language = IDIOMAS.get(lang, lang), other = srv2 ))
+                if '/?uptobox=' in link:
+                    link = scrapertools.find_single_match(link, '/?uptobox=(.*?)$')
+                    link = 'https://uptobox.com/' + link
+
+                servidor = servertools.get_server_from_url(link)
+
+                other = ''
+
+                if servidor == 'various':
+                    if 'filemoon' in link: other = 'filemoon'
+                    elif 'streamwish' in link: other = 'streamwish'
+                    elif 'filelions' in link: other = 'filelions'
+
+                    #elif other == 'stp': other = 'streamtape'
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = link, language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
 
             continue
 
-        if 'api.mycdn.moe/sblink.php?id=' in url: url = url.replace('api.mycdn.moe/sblink.php?id=', 'sbanh.com/e/')
-
-        elif 'api.mycdn.moe/fembed.php?id=' in url: url = url.replace('api.mycdn.moe/fembed.php?id=', 'feurl.com/v/')
-        elif 'api.mycdn.moe/furl.php?id=' in url: url = url.replace('api.mycdn.moe/furl.php?id=', 'feurl.com/v/')
-
-        elif 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
+        if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 
         elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
 
@@ -503,9 +511,11 @@ def findvideos(item):
         if servidor == 'directo':
             link_other = scrapertools.find_single_match(data, '<a href="#option' + opt + '">(.*?)</a>')
 
-            if link_other.lower() == 'netu': continue
-            elif link_other.lower() == 'waaw': continue
-            elif link_other.lower() == 'hqq': continue
+            link_other = link_other.lower().strip()
+
+            if link_other == 'netu': continue
+            elif link_other == 'waaw': continue
+            elif link_other == 'hqq': continue
 
             elif link_other == '1fichier': continue
 
@@ -523,47 +533,16 @@ def play(item):
     logger.info()
     itemlist = []
 
-    if item.other == 'plusvip':
-        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-    elif item.url.startswith('https://plusvip.net/'):
-        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
     url = item.url
 
-    if item.server == 'directo':
-        data = do_downloadpage(url)
+    servidor = servertools.get_server_from_url(url)
+    servidor = servertools.corregir_servidor(servidor)
 
-        url = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
+    url = servertools.normalize_url(servidor, url)
 
-        if 'api.mycdn.moe/sblink.php?id=' in url: url = url.replace('api.mycdn.moe/sblink.php?id=', 'sbanh.com/e/')
+    if servidor == 'zplayer': url = url + '|Referer=' + host
 
-        elif 'api.mycdn.moe/fembed.php?id=' in url: url = url.replace('api.mycdn.moe/fembed.php?id=', 'feurl.com/v/')
-        elif 'api.mycdn.moe/furl.php?id=' in url: url = url.replace('api.mycdn.moe/furl.php?id=', 'feurl.com/v/')
-
-        elif 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
-
-        elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
-
-        elif 'api.mycdn.moe/dl/?uptobox=' in url: url = url.replace('api.mycdn.moe/dl/?uptobox=', 'uptobox.com/')
-
-        elif '/dl/?uptobox=' in url:
-              url = scrapertools.find_single_match(url, 'uptobox=(.*?)$')
-              if url: url = 'https://uptobox.com/' + url
-
-        if url:
-            servidor = servertools.get_server_from_url(url)
-
-            if servidor == 'directo': url = ''
-
-    if url:
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
-
-        if servidor == 'zplayer': url = url + '|Referer=' + host
-
-        itemlist.append(item.clone( url = url, server = servidor ))
+    itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
 

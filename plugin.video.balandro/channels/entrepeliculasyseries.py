@@ -433,10 +433,15 @@ def findvideos(item):
         links = scrapertools.find_multiple_matches(option, '<li class="option".*?data-link="(.*?)".*?</span>(.*?)</li>')
 
         for url, servidor in links:
+            servidor = servidor.strip()
+
+            other = ''
+            if servidor == 'Filemoon': other = servidor
+
             servidor = servertools.corregir_servidor(servidor)
 
             if servidor:
-               itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = language ))
+               itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = language, other = other ))
 
     # Descargas
     if '>Enlaces de descarga<' in data:

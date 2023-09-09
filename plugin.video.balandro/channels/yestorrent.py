@@ -381,7 +381,7 @@ def findvideos(item):
             elif url.startswith('magnet:'): srv = 'magnet'
             else:
                 servidor = 'directo'
-                if '/acortalink.me/' in url: srv = 'acortalink'
+                if '/acortalink.me/' in url: srv = 'torrent'
                 elif '/mega.' in url: srv = 'mega'
                 else:
                     srv = servertools.get_server_from_url(url)
@@ -405,7 +405,7 @@ def findvideos(item):
            servidor = 'directo'
            if '/acortalink.me/' in item.url:
               url = item.url
-              other = 'acortalink'
+              other = 'torrent'
            elif '/mega.' in item.url:
               url = item.url
               other = 'mega'

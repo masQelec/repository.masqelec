@@ -163,6 +163,9 @@ def findvideos(item):
         other = ''
         if servidor == 'directo': other = srv.replace('server', '').strip()
 
+        if servidor == 'various':
+            if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other = other ))
 
     if not itemlist:

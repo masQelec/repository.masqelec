@@ -398,6 +398,7 @@ def findvideos(item):
                    elif srv == 'videovard': other = srv
                    elif srv == 'filemoon': other = srv
                    elif srv == 'streamwish': other = srv
+                   elif srv == 'filelions': other = srv
                    elif srv == 'player' or srv == 'embed':
                       other = srv
                       srv = ''

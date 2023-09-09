@@ -132,7 +132,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&quot;', '')
+        title = title.replace('&quot;', '').replace('&#039;', "'")
 
         SerieName = title
 
@@ -186,7 +186,7 @@ def last_epis(item):
 
         if not epis: epis = 1
 
-        title = title.replace('&quot;', '')
+        title = title.replace('&quot;', '').replace('&#039;', "'")
 
         SerieName = title
 
@@ -314,15 +314,15 @@ def findvideos(item):
         elif servidor == 'pixel': servidor = 'pixeldrain'
         elif servidor == 'senvid2': servidor = 'sendvid'
 
-        elif servidor == 'sbanh' or servidor == 'sblanh' or servidor == 'sbspeed' or servidor == 'sbchill' or servidor == 'sblongvu' or servidor == 'sbrity' or servidor == 'sbhight': servidor = 'streamsb'
-
-        elif 'fembed' in servidor: servidor = 'fembed'
-
         elif 'filemoon' in servidor:
              other = servidor
              servidor = 'various'
 
-        elif 'streamwish' in servidor:
+        elif 'streamwish' in servidor or 'strwish' in servidor or 'embedwish' in servidor or 'wishembed' in servidor or 'awish' in servidor or 'dwish' in servidor or 'mwish' in servidor:
+             other = servidor
+             servidor = 'various'
+
+        elif 'vidguard' in servidor or 'vgfplay' in servidor or 'vgembed' in servidor:
              other = servidor
              servidor = 'various'
 
@@ -345,7 +345,10 @@ def findvideos(item):
 
         srv = srv.lower().strip()
 
+        if srv == '1fichier' or srv == '1ficher': continue
+
         if srv == 'anonfile': srv = 'anonfiles'
+        elif srv == 'bay': srv = 'bayfiles'
         elif srv == 'zippy': srv = 'zippyshare'
         elif srv == 'pixel': srv = 'pixeldrain'
 

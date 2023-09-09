@@ -222,6 +222,8 @@ def findvideos(item):
         elif srv == 'trailer': continue
 
         if '+ veloz' in srv: continue
+        elif 'sdav' in srv: continue
+        elif 'guayhd' in srv: continue
 
         idioma = idioma.strip()
 
@@ -234,10 +236,18 @@ def findvideos(item):
         if not url: url = scrapertools.find_single_match(data, '<div id=options-' + opt + '.*?<iframe data-src="(.*?)"')
 
         if url:
-            servidor = 'directo'
-            other = srv
+            servidor = servertools.corregir_servidor(srv)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other.capitalize(), language = lang ))
+            other = ''
+
+            if srv == 'ok': other = 'ok'
+
+            elif srv == 'swish': servidor = 'various'
+
+            if servidor == 'directo': other = srv
+            elif servidor == 'various': other = srv
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang , other = other.capitalize()))
 
     # ~ descargas recaptcha
 
@@ -280,11 +290,6 @@ def play(item):
                     return 'Servidor [COLOR plum]No Soportado[/COLOR]'
                 elif '/playpf.link/' in url:
                     return 'Servidor [COLOR plum]No Soportado[/COLOR]'
-                elif '/vgfplay.' in url:
-                    return 'Servidor [COLOR plum]No Soportado[/COLOR]'
-
-                if '/wtfsb.link/' in url:
-                    url = url.replace('/wtfsb.link/', '/streamsb.net/')
 
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)

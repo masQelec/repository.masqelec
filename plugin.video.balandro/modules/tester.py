@@ -6,7 +6,7 @@ if sys.version_info[0] >= 3: PY3 = True
 else: PY3 = False
 
 
-import os, re, time
+import os, re, time, xbmc, xbmcaddon
 
 from platformcode import config, logger, platformtools
 from core import httptools, scrapertools, filetools, jsontools
@@ -22,7 +22,7 @@ channels_unsatisfactory = config.get_setting('developer_test_channels', default=
 servers_unsatisfactory = config.get_setting('developer_test_servers', default='')
 
 
-txt_provs = '[COLOR plum][B]Obtenga Nuevos Proxies desde[/B][/COLOR] [COLOR yellow][B]All-providers[/B][/COLOR], [COLOR yellow][B]Proxyscrape.com[/B][/COLOR] ó [COLOR yellow][B]Us-proxy.com[/B][/COLOR][CR]'
+txt_provs = '[COLOR plum][B]Obtenga Nuevos Proxies desde[/B][/COLOR] [COLOR yellow][B]All-providers[/B][/COLOR], [COLOR yellow][B]Proxyscrape.com[/B][/COLOR], [COLOR yellow][B]Us-proxy.com[/B][/COLOR] ó los [COLOR magenta][B]Recomendados[/B][/COLOR][CR]'
 txt_proxs = '[COLOR red][B]Configure Proxies a Usar ...[/B][/COLOR][CR]'
 txt_pnews = '[COLOR red][B]Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
 txt_routs = '[COLOR yellow][B][I]Apague su Router durante 5 minutos aproximadamente, Re-Inicielo e inténtelo de nuevo[/I][/B][/COLOR][CR]'
@@ -31,6 +31,8 @@ txt_checs = '[COLOR tomato][B]Compruebe su Internet y/ó el Canal, a través de 
 txt_coffs = '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
 
 txt_erase = '[COLOR orangered][B]Podrían Eliminarse los Proxies del Canal, pueden No necesitarse, salvo bloqueo en Play.[/B][/COLOR]'
+txt_false = '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR]'
+txt_verif = '[COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]'
 
 timeout = config.get_setting('httptools_timeout', default=15)
 
@@ -41,7 +43,7 @@ channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
-channels_despised = ['beeg', 'cuevana3in', 'doramasqueen', 'hdfullse', 'pelispluscc', 'pelisplushdlat' ]
+channels_despised = ['beeg', 'cuevana3in', 'hdfullse', 'pelispluscc' ]
 
 servers_poe = [ 'directo', 'm3u8hls', 'torrent' ]
 
@@ -134,6 +136,7 @@ def test_channel(channel_name):
     clusters = str(params['clusters'])
     clusters = clusters.replace('[', '').replace(']', '').replace("'", '').strip()
 
+    if 'onlyone' in clusters: clusters = clusters.replace('onlyone,', '').strip()
     if 'suggested' in clusters: clusters = clusters.replace('suggested,', '').strip()
     if 'inestable' in clusters: clusters = clusters.replace('inestable,', '').strip()
     if 'problematic' in clusters: clusters = clusters.replace('problematic,', '').strip()
@@ -182,22 +185,23 @@ def test_channel(channel_name):
     if 'categories' in clusters: clusters = clusters.replace('categories,', '').strip()
     if 'categories' in clusters: clusters = clusters.replace('categories', '').strip()
 
-    if str(params['clusters']) == "['dorama']": clusters = clusters.replace('dorama', '').strip()
-    if str(params['clusters']) == "['anime']": clusters = clusters.replace('anime', '').strip()
+    if 'dorama' in clusters:
+        if 'Web dedicada exclusivamente al dorama' in str(params['notes']):
+           if 'dorama' in clusters: clusters = clusters.replace('dorama,', '').strip()
+           if 'dorama' in clusters: clusters = clusters.replace('dorama', '').strip()
 
-    if 'dorama' in clusters: clusters = clusters.replace('dorama,', '').strip()
-    if 'dorama' in clusters: clusters = clusters.replace('dorama', '').strip()
+    if 'anime' in clusters:
+        if not 'Web dedicada exclusivamente al anime' in str(params['notes']):
+           if 'anime' in clusters: clusters = clusters.replace('anime,', '').strip()
+           if 'anime' in clusters: clusters = clusters.replace('anime', '').strip()
 
-    if 'anime' in clusters: clusters = clusters.replace('anime,', '').strip()
-    if 'anime' in clusters: clusters = clusters.replace('anime', '').strip()
+    if 'adults' in clusters:
+        if '+18' in str(params['notes']):
+            if 'adults' in clusters: clusters = clusters.replace('adults,', '').strip()
+            if 'adults' in clusters: clusters = clusters.replace('adults', '').strip()
 
     if 'tales' in clusters: clusters = clusters.replace('tales,', '').strip()
     if 'tales' in clusters: clusters = clusters.replace('tales', '').strip()
-
-    if str(params['clusters']) == "['adults']": clusters = clusters.replace('adults', '').strip()
-
-    if 'adults' in clusters: clusters = clusters.replace('adults,', '').strip()
-    if 'adults' in clusters: clusters = clusters.replace('adults', '').strip()
 
     if 'docs' in clusters: clusters = clusters.replace('docs,', '').strip()
     if 'docs' in clusters: clusters = clusters.replace('docs', '').strip()
@@ -374,6 +378,33 @@ def test_channel(channel_name):
             if txt_diag: txt_diag += '[CR]'
             txt_diag  += 'clones: ' + '[COLOR lightyellow][B]Varios Clones[/B][/COLOR]'
 
+        if 'onlyone' in str(params['clusters']):
+            if txt_diag: txt_diag += '[CR]'
+            txt_diag  += 'play: ' + '[COLOR chocolate][B]un Único servidor[/B][/COLOR]'
+
+            if not '+18' in str(params['notes']):
+                if 'torrents' in str(params['clusters']):
+                    cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
+
+                    if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno': tex_tor = cliente_torrent
+                    else:
+                       tex_tor = cliente_torrent
+                       cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+                       if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
+                          cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+                          tex_tor += '  [COLOR fuchsia]' + cod_version + '[/COLOR]'
+
+                          if txt_diag: txt_diag += '[CR]'
+                          txt_diag  += 'motor: ' + '[COLOR gold][B]' + tex_tor + '[/B][/COLOR]'
+                else:
+                    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+                        cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+                        tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+                    else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
+
+                    if txt_diag: txt_diag += '[CR]'
+                    txt_diag  += 'youtube: ' + '[COLOR gold][B]' + tex_yt + '[/B][/COLOR]'
+
         if 'suggested' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
             txt_diag  += 'canal: ' + '[COLOR aquamarine][B]Sugerido[/B][/COLOR]'
@@ -394,14 +425,14 @@ def test_channel(channel_name):
         else:
             if str(params['search_types']) == "['documentary']":
                 if txt_diag: txt_diag += '[CR]'
-                txt_diag  += 'buscar: ' + '[COLOR cyan][B]solo Documental[/B][/COLOR]'
+                txt_diag  += 'buscar: ' + '[COLOR yellow][B]solo Documental[/B][/COLOR]'
 
         if '+18' in str(params['notes']):
             if txt_diag: txt_diag += '[CR]'
             txt_diag  += 'adultos: ' + '[COLOR orange][B]+18[/B][/COLOR]'
 
-        if not str(params['clusters']) == "['adults']":
-            if 'adults' in str(params['clusters']):
+        if 'adults' in str(params['clusters']):
+            if not '+18' in str(params['notes']):
                 if txt_diag: txt_diag += '[CR]'
                 txt_diag  += '+18: ' + '[COLOR orange][B]Puede tener enlaces para Adultos[/B][/COLOR]'
 
@@ -600,7 +631,7 @@ def test_channel(channel_name):
 
                 ant_hosts = tab_hosts
 
-                txt += '[CR][COLOR moccasin][B]Dominios Anteriores:[/B][/COLOR][CR]'
+                txt += '[CR][CR][COLOR moccasin][B]Dominios Anteriores:[/B][/COLOR][CR]'
 
                 for ant_host in ant_hosts:
                     txt += '[COLOR mediumaquamarine][B]' + ant_host[1] + '[/B][/COLOR][CR]'
@@ -655,8 +686,13 @@ def test_channel(channel_name):
 
        if not 'code: [COLOR springgreen][B]200' in txt:
            if not channels_unsatisfactory == 'unsatisfactory':
-               platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
-               avisado = True
+               if '[COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]' in txt:
+                   avis_causas = txt_verif
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                   avisado = True
+               else:
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                   avisado = True
 
            else:
                if 'Podría estar Correcto' in txt: pass
@@ -674,6 +710,13 @@ def test_channel(channel_name):
                    avis_causas = txt_erase
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
+
+               elif 'Falso Positivo.' in txt:
+                   avis_causas = txt_false
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                   avisado = True
+
+    txt = txt.replace('[CR][CR][CR]', '[CR][CR]')
 
     if channels_unsatisfactory == 'unsatisfactory':
         if not avisado:
@@ -837,7 +880,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
     txt += 'sucess: ' + color_sucess + str(response.sucess) + '[/B][/COLOR][CR]'
 
-    if response.code == 200: color_code = '[COLOR springgreen][B]'
+    if str(response.code) == '200': color_code = '[COLOR springgreen][B]'
     else: color_code = '[COLOR orangered][B]'
 
     txt += 'code: ' + color_code + str(response.code) + '[/B][/COLOR][CR]'
@@ -845,7 +888,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
     txt += 'error: ' + str(response.error) + '[CR]'
     txt += 'length: ' + str(len(response.data))
 
-    if quitar_proxies: txt += '[CR]quitar: [COLOR orangered][B]Se pueden Eliminar los Proxies del Canal, al parecer No se necesitan[/B][/COLOR]'
+    if quitar_proxies: txt += '[CR]quitar: [COLOR orange][B]Se pueden Eliminar los Proxies del Canal, al parecer No se necesitan, excepto bloqueo[/COLOR] [COLOR fuchsia][B]Play[/B][/COLOR]'
 
     new_web = scrapertools.find_single_match(str(response.headers), "'location':.*?'(.*?)'")
 
@@ -909,21 +952,21 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             if 'Estamos en mantenimiento, por favor inténtelo más tarde' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
 
             if new_web:
-                if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
-                    if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
-                    elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
+                    if str(response.code) == '301' or str(response.code) == '308': txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                    elif str(response.code) == '302' or str(response.code) == '307': txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
                     else: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio[/B][/COLOR]"
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home':
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio':
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
                     txt += '[CR]inicial: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
                     new_web = ''
 
-                    if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
+                    if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]"
 
                 if response.headers:
@@ -1010,19 +1053,19 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     txt += '[CR]login: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
                     new_web = ''
 
-                    if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
+                    if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
                         if 'dominios:' in txt: txt += "[CR]obtener: [COLOR yellow][B]Puede Obtener Otro Dominio desde Configurar Dominio a usar ...[/B][/COLOR]"
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home':
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio':
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
                     txt += '[CR]inicial: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
                     new_web = ''
 
-                    if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
+                    if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]"
 
                 if new_web:
@@ -1046,9 +1089,9 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                            if not 'nuevo:' in txt: txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
                        if not falso:
-                           if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
-                               if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
-                               elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                           if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
+                               if str(response.code) == '301' or str(response.code) == '308': txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                               elif str(response.code) == '302' or str(response.code) == '307': txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
                                else: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio[/B][/COLOR]"
 
                                txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
@@ -1084,14 +1127,33 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     txt += str(response.headers) + '[CR]'
 
             if len(response.data) > 0:
+                if len(response.data) < 1000:
+                    if not 'Sugerencias:' in txt:
+                        txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
+                        if 'actuales:' in txt:
+                            if 'Sin proxies' in txt: txt += txt_proxs
+                            else:
+                               if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                               txt += txt_provs
+
+                        txt += txt_routs
+
+                    txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
+
                 if not '/cgi-sys/suspendedpage.cgi' or not '/wp-admin/install.php' in new_web:
                     txt += '[CR][CR][COLOR moccasin][B]Datos:[/B][/COLOR][CR]'
                     txt += str(response.data).strip() + '[CR]'
 
+
     if 'active: True' in txt:
-        if not 'Sugerencias:' in txt:
-            if 'Invisible Captcha' in txt or 'Obtenga nuevos proxies' in txt or 'Host error' in txt or 'No se puede establecer una' in txt or 'Cloudflare' in txt or 'Unknow' in txt:
+        if 'Invisible Captcha' in txt or 'Obtenga nuevos proxies' in txt or 'Host error' in txt or 'No se puede establecer una' in txt or 'Cloudflare' in txt or 'Protection' in txt or 'Unknow' in txt or 'invalid:' in txt:
+            if not 'Sugerencias:' in txt:
                 if len(response.data) == 0: txt += '[CR]'
+                elif len(response.data) > 1000: txt += '[CR]'
+
+                elif 'code: [COLOR orangered][B]4' in txt: txt += '[CR]'
+                elif 'invalid:' in txt: txt += '[CR]'
 
                 txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
@@ -1136,14 +1198,15 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                     txt += txt_routs
 
-                elif 'Cloudflare' in txt:
-                    if 'actuales:' in txt:
-                        if 'Sin proxies' in txt: txt += txt_proxs
-                        else:
-                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
-                           txt += txt_provs
+                elif 'Cloudflare' in txt or 'Protection' in txt:
+                    if not 'code: [COLOR springgreen][B]200' in str(txt):
+                        if 'actuales:' in txt:
+                            if 'Sin proxies' in txt: txt += txt_proxs
+                            else:
+                               if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                               txt += txt_provs
 
-                    else: txt += txt_coffs
+                        else: txt += txt_coffs
 
                     txt += txt_routs
 
@@ -1412,6 +1475,8 @@ def test_server(server_name):
            platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + server_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Servidor NO ha resultado Satisfactorio.[/I][/B][/COLOR]', '[COLOR cyan][B]Por favor, compruebe la información del Test del Servidor.[/B][/COLOR]')
            avisado = True
 
+    txt = txt.replace('[CR][CR][CR]', '[CR][CR]')
+
     if servers_unsatisfactory == 'unsatisfactory':
         if not avisado: return ''
         else:
@@ -1482,7 +1547,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
 
     txt += 'sucess: ' + color_sucess + str(response.sucess) + '[/B][/COLOR][CR]'
 
-    if response.code == 200: color_code = '[COLOR springgreen][B]'
+    if str(response.code) == '200': color_code = '[COLOR springgreen][B]'
     else: color_code = '[COLOR orangered][B]'
 
     txt += 'code: ' + color_code  + str(response.code) + '[/B][/COLOR][CR]'
@@ -1538,13 +1603,13 @@ def acces_server(server_name, url, txt, follow_redirects=None):
                 txt += '[CR]login: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
                 new_web = ''
 
-                if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
+                if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
                     txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]"
 
             elif new_web:
-                if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
-                    if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
-                    elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
+                    if str(response.code) == '301' or str(response.code) == '308': txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                    elif str(response.code) == '302' or str(response.code) == '307': txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
                     else: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
@@ -1567,9 +1632,9 @@ def acces_server(server_name, url, txt, follow_redirects=None):
                     elif '/wp-admin/install.php' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'
 
                     else:
-                       if response.code == 300 or response.code == 301 or response.code == 302  or response.code == 303 or response.code == 304 or response.code == 307 or response.code == 308:
-                           if response.code == 301 or response.code == 308: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
-                           elif response.code == 302 or response.code == 307: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
+                       if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
+                           if str(response.code) == '301' or str(response.code) == '308': txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
+                           elif str(response.code) == '302' or str(response.code) == '307': txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Temporal[/B][/COLOR]"
                            else: txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio[/B][/COLOR]"
 
                            txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'

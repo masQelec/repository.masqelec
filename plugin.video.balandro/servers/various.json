@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Desiupload,  Dropload,  Embedgram,  Fastupload,  Filelions,  Filemoon,  Hexupload,  Krakenfiles,  Moonplayer,  Mvidoo,  Rutube,  Streamhub,  Streamwish,  Tubeload,  Uploadever,  Videowood,  Vudeo,  Yandex,  Youdbox)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Alions,  Awish,  Azipcdn,  Desiupload,  Dlions,  Dropload,  Dwish,  Embedgram,  Emturbovid  Embedwish,  Fastupload,  Filelions,  Filemoon,  Hexupload,  Krakenfiles,  Lulustream,  Luluvdo,  Mlions,  Moonplayer,  Mvidoo,  Mwish,  Rutube,  Streamhub,  Streamvid,  Streamwish,  Strwish,  Tubeload,  Turbovipplay,  Upload,  Uploadever,  Videowood,  Vidguard,  V6embed,  Vgembed,  Vudeo,  Wishembed,  Yandex,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -62,7 +62,7 @@
       },
       {
         "pattern": "https://moonplayer.lat/e/([0-9a-zA-Z]+)",
-        "url": "https://filemoon.top/e/\\1"
+        "url": "https://filemoon.sx/e/\\1"
       },
       {
         "pattern": "(https://disk.yandex.(?:ru|com)/(?:d/|i/)[A-z0-9]+)",
@@ -74,11 +74,11 @@
       },
       {
         "pattern": "(https://uploadever.com/)([0-9a-zA-Z]+)",
-        "url": "\\1"
+        "url": "https://uploadever.in/\\1"
       },
       {
         "pattern": "(https://uploadever.in/)([0-9a-zA-Z]+)",
-        "url": "\\1"
+        "url": "https://uploadever.in/\\1"
       },
       {
         "pattern": "(https://videowood.tv/)(?:embed/|video/)([0-9a-z]+)",
@@ -94,10 +94,18 @@
       },
       {
         "pattern": "https://streamhub.gg/watch/([0-9a-zA-Z]+)",
-        "url": "\\1"
+        "url": "https://streamhub.to/e/\\2"
       },
       {
         "pattern": "(https://streamhub.gg/)(?:embed-|e/|d/)?([0-9a-zA-Z]+)",
+        "url": "https://streamhub.to/e/\\2"
+      },
+      {
+        "pattern": "https://streamhub.ink/watch/([0-9a-zA-Z]+)",
+        "url": "https://streamhub.to/e/\\2"
+      },
+      {
+        "pattern": "(https://streamhub.ink/)(?:embed-|e/|d/)?([0-9a-zA-Z]+)",
         "url": "https://streamhub.to/e/\\2"
       },
       {
@@ -129,6 +137,38 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://streamwish.top/(?:e/|f/)?([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://streamwish.site/(?:e/|f/)?([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://strwish.xyz/(?:e/|f/)?([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://embedwish.com/(?:e/|f/)?([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://wishembed.pro/(?:e/|f/)?([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://awish.pro/(?:e/|f/)?([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://dwish.pro/(?:e/|f/)?([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://mwish.pro/(?:e/|f/)?([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://krakenfiles.com/(?:view|embed-video)?/([0-9a-zA-Z]+)",
         "url": "https://krakenfiles.com/embed-video/\\1"
       },
@@ -149,11 +189,35 @@
         "url": "https://desiupload.co/\\1"
       },
       {
+        "pattern": "https://azipcdn.com/(?:v|f|d)/([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://alions.pro/(?:v|f|d)/([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://dlions.pro/(?:v|f|d)/([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://mlions.pro/(?:v|f|d)/([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
         "pattern": "https://filelions.com/(?:v|f|d)/([0-9a-zA-Z]+)",
         "url": "https://filelions.to/f/\\1"
       },
       {
         "pattern": "https://filelions.to/(?:v|f|d)/([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://filelions.live/(?:v|f|d)/([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://filelions.xyz/(?:v|f|d)/([0-9a-zA-Z]+)",
         "url": "https://filelions.to/f/\\1"
       },
       {
@@ -186,7 +250,7 @@
       },
       {
         "pattern": "https://vudeo.io/(?:embed-)([0-9a-zA-Z]+)",
-        "url": "https://vudeo.io/\\1"
+        "url": "https://vudeo.co/\\1"
       },
       {
         "pattern": "https://vudeo.co/(?:embed-)([0-9a-zA-Z]+)",
@@ -195,6 +259,54 @@
       {
         "pattern": "https://embedgram.com/(?:v|f)/([0-9a-zA-Z]+)",
         "url": "https://embedgram.com.to/f/\\1"
+      },
+      {
+        "pattern": "https://vgfplay.com/(?:e|v|d)/([0-9a-zA-Z]+)",
+        "url": "https://vgembed.com/e/\\1"
+      },
+      {
+        "pattern": "https://vgfplay.xyz/(?:e|v|d)/([0-9a-zA-Z]+)",
+        "url": "https://vgembed.com/e/\\1"
+      },
+      {
+        "pattern": "https://vgembed.com/(?:e|v|d)/([0-9a-zA-Z]+)",
+        "url": "https://vgembed.com/e/\\1"
+      },
+      {
+        "pattern": "https://v6embed.xyz/(?:e|v|d)/([0-9a-zA-Z]+)",
+        "url": "https://vgembed.com/e/\\1"
+      },
+      {
+        "pattern": "https://vidguard.to/(?:e|v|d)/([0-9a-zA-Z]+)",
+        "url": "https://vgembed.com/e/\\1"
+      },
+      {
+        "pattern": "https://lulustream.com/(?:e|d)/([0-9a-zA-Z]+)",
+        "url": "https://lulustream.com/e/\\1"
+      },
+      {
+        "pattern": "https://luluvdo.com/(?:e|d)/([0-9a-zA-Z]+)",
+        "url": "https://lulustream.com/e/\\1"
+      },
+      {
+        "pattern": "https://turboviplay.com/t/([0-9a-zA-Z]+)",
+        "url": "https://emturbovid.com/t/\\1"
+      },
+      {
+        "pattern": "https://emturbovid.com/t/([0-9a-zA-Z]+)",
+        "url": "https://emturbovid.com/t/\\1"
+      },
+      {
+        "pattern": "https://streamvid.net/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://streamvid.net/\\1"
+      },
+      {
+        "pattern": "https://streamvid.cc/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://streamvid.cc/\\1"
+      },
+      {
+        "pattern": "https://upload.do/(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://upload.do/\\1"
       }
     ]
   }

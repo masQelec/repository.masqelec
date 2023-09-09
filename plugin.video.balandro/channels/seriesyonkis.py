@@ -487,8 +487,6 @@ def findvideos(item):
 
                         elif srv == 'nodispounnnerbler': continue
 
-                        elif srv == 'sbchill': srv = 'streamsb'
-
                         srv = servertools.corregir_servidor(srv)
 
                         if servertools.is_server_available(srv):

@@ -363,6 +363,10 @@ def findvideos(item):
             servidor = 'directo'
         else: link_other = ''
 
+        if servidor == 'various':
+            if 'filemoon' in url: link_other = 'Filemoon'
+            elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: link_other = 'Streamwish'
+
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = link_other ))
 
     # ~ Descargas
@@ -382,7 +386,9 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = 'd' ))
+        other = 'D'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -399,7 +405,7 @@ def play(item):
     url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
     if url.startswith(host):
-        if item.other == 'd':
+        if item.other == 'D' or 'D ' in item.other :
             url = httptools.downloadpage(url, follow_redirects=False, only_headers=True).headers.get('location', '')
         else:
             data = do_downloadpage(url)
@@ -417,6 +423,8 @@ def play(item):
         if url.startswith('//') == True: url = 'https:' + url
 
         if '/www.analu.xyz/' in url:
+            return 'Servidor [COLOR plum]NO soportado[/COLOR]'
+        elif '/gdriveplayer.io/' in url:
             return 'Servidor [COLOR plum]NO soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)

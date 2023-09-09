@@ -7,14 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wvw.cinecalidad.com.mx/'
+host = 'https://cinecalidad.com.mx/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://cinecalidad.com.mx/', 'https://cinecalidad.fit/', 'https://ww3.cinecalidad.com.mx/',
+ant_hosts = ['https://cinecalidad.fit/', 'https://ww3.cinecalidad.com.mx/',
             'https://ww10.cinecalidad.com.mx/', 'https://w5.cinecalidad.com.mx/', 'https://w15.cinecalidad.com.mx/',
             'https://ww1.cinecalidad.com.mx/', 'https://c1.cinecalidad.com.mx/', 'https://c2.cinecalidad.com.mx/',
             'https://c3.cinecalidad.com.mx/', 'https://c4.cinecalidad.com.mx/', 'https://c5.cinecalidad.com.mx/',
@@ -22,7 +22,8 @@ ant_hosts = ['https://cinecalidad.com.mx/', 'https://cinecalidad.fit/', 'https:/
             'https://c9.cinecalidad.com.mx/', 'https://c20.cinecalidad.com.mx/', 'https://c21.cinecalidad.com.mx/',
             'https://c22.cinecalidad.com.mx/', 'https://c23.cinecalidad.com.mx/', 'https://c24.cinecalidad.com.mx/',
             'https://c25.cinecalidad.com.mx/', 'https://c26.cinecalidad.com.mx/', 'https://c27.cinecalidad.com.mx/',
-            'https://c28.cinecalidad.com.mx/', 'https://c29.cinecalidad.com.mx/']
+            'https://c28.cinecalidad.com.mx/', 'https://c29.cinecalidad.com.mx/', 'https://wvw.cinecalidad.com.mx/',
+            'https://vww.cinecalidad.com.mx/', 'https://wvw.cinecalidad.com.mx/' 'https://wwv.cinecalidad.com.mx/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadmx', default='')
@@ -474,6 +475,8 @@ def findvideos(item):
             elif 'cinecalidad' in srv: continue
             elif 'subtítulo' in srv: continue
 
+            servidor = servertools.corregir_servidor(srv)
+
             qlty = '1080'
 
             language = lang
@@ -481,7 +484,22 @@ def findvideos(item):
             elif idio == 'es': language = 'Esp'
             elif idio == 'en': language = 'Vose'
 
-            itemlist.append(Item (channel = item.channel, action = 'play', server = 'directo', title = '', dopt = dopt, quality = qlty, language = language, other = srv ))
+            other = ''
+
+            if servidor == 'directo':
+                if srv == 'streamtape': servidor = 'streamtape'
+                elif srv == 'voe': servidor = 'voe'
+                elif srv == 'doods' or srv == 'doostream': servidor = 'doodstream'
+
+                elif srv == 'streamwish' or srv == 'strwish' or srv == 'embedwish' or srv == 'wishembed' or srv == 'awish' or srv == 'dwish' or srv == 'mwish': servidor = 'various'
+
+                elif srv == 'filemoon': servidor = 'various'
+
+            if servidor == 'various': other = srv.capitalize()
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', dopt = dopt, quality = qlty, language = language, other = other ))
 
     if '>DESCARGAR<' in data:
         bloque = scrapertools.find_single_match(data, '>DESCARGAR<(.*?)</ul>')
@@ -506,8 +524,10 @@ def findvideos(item):
             elif 'subtítulo' in srv: continue
             elif 'forzado' in srv: continue
             elif 'cinecalidad' in srv: continue
+            elif '1fichier' in srv: continue
 
             elif srv == 'utorrent': srv = 'torrent'
+            elif 'utorrent' in srv: servidor = 'torrent'
             elif 'torrent' in srv: srv = 'torrent'
 
             if servertools.is_server_available(srv):
@@ -517,7 +537,18 @@ def findvideos(item):
 
             if not url.startswith('http'): url = item.url + url
 
-            itemlist.append(Item (channel = item.channel, action = 'play', server = 'directo', title = '', url = url, quality = qlty, language = lang, other = srv ))
+            other = ''
+
+            servidor = servertools.corregir_servidor(srv)
+
+            if servidor == 'directo':
+                if srv == 'mega': servidor = 'mega'
+                elif srv == 'uptobox': servidor = 'uptobox'
+                elif srv == 'torrent': servidor = 'torrent'
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = qlty, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
