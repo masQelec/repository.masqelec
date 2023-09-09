@@ -179,6 +179,9 @@ def list_all(item):
     for url, qlty, year, thumb, title in matches[item.page * perpage:]:
         title = title.strip()
 
+        if year: title = title.replace(' ' + year, '')
+        else: year = '-'
+
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
         if len(itemlist) >= perpage: break

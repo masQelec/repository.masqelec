@@ -237,6 +237,7 @@ def findvideos(item):
         elif servidor == 'streamium': continue
         elif servidor == 'amus': continue
         elif servidor == 'mepu': continue
+        elif servidor == 'streamsb': continue
 
         if servidor == 'umi':
             url = url.replace("gocdn.html#", "gocdn.php?v=")
@@ -263,12 +264,15 @@ def findvideos(item):
 
             link_other = link_other.replace('www.', '').replace('.com', '').replace('.net', '').replace('.org', '').replace('.top', '')
             link_other = link_other.replace('.co', '').replace('.cc', '').replace('.sh', '').replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '')
-            link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.sx', '')
+            link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.sx', '').replace('.nz', '')
 
             if servidor == 'directo': other = link_other
             else: link_other = ''
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = link_other.capitalize() ))
+            if servidor == 'various':
+               if 'vidguard' in url or 'vgfplay' in url or 'vgembed' in url or 'v6embed' in url: link_other = 'Vidguard'
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = link_other ))
 
     if not itemlist:
         if not ses == 0:

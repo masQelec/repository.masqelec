@@ -128,7 +128,7 @@ def findvideos(item):
     for qlty, url in matches:
         url = 'https://video.beeg.com/' + url
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = qlty, url = url, language = 'VO' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = qlty, url = url, language = 'Vo' ))
 
     return sorted(itemlist, key=lambda it: it.quality)
 

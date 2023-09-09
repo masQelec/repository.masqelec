@@ -18,7 +18,7 @@ from lib import decrypters
 host = 'https://www.divxtotal.cc/'
 
 
-host_play = 'https://www.divxtotal.cat/'
+players = 'https://www.divxtotal.cat/'
 
 
 # ~ 11/2022 Para play en peliculas necesita proxies por bloqueo operadoras
@@ -57,7 +57,7 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
-    if not url.startswith(host) and not url.startswith(host_play):
+    if not url.startswith(host) and not url.startswith(players):
         data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
         data = httptools.downloadpage_proxy('divxtotalcc', url, post=post, headers=headers).data
@@ -379,7 +379,7 @@ def play(item):
 
     if item.other == 'Directo':
         if not item.url.endswith('.torrent'):
-            item.url = host_play + 'download_tt.php?u=' + item.url
+            item.url = players + 'download_tt.php?u=' + item.url
 
             if PY3:
                 from core import requeststools
@@ -407,7 +407,7 @@ def play(item):
             return itemlist
 
     if not item.url.endswith('.torrent'):
-        host_torrent = host_play[:-1]
+        host_torrent = players[:-1]
         url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
 
         if url_base64.endswith('.torrent'): item.url = url_base64

@@ -294,8 +294,13 @@ def findvideos(item):
 
             if servidor == 'zplayer': url = url + '|' + host
 
+            other = ''
+            if servidor == 'various':
+                if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+                elif 'azipcdn' in url or 'filelions' in url or 'alions' in url or 'dlions' in url or 'mlions' in url: other = 'Filelions'
+
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose', other = other ))
 
     # ~ descargas  no se tratan por anomizador
 

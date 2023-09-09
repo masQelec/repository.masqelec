@@ -1,5 +1,5 @@
-[COLOR coral][B]Balandro[/COLOR][COLOR chartreuse]  4 de Agosto de 2023[/B][/COLOR]
-   [COLOR yellow][B]Version 3.0.9[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR][COLOR chartreuse]  1 de Septiembre de 2023[/B][/COLOR]
+   [COLOR yellow][B]Version 3.1.00[/B][/COLOR]
 
    [COLOR yellow]CONTACTO:[/COLOR]
       Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
@@ -50,17 +50,17 @@
    [COLOR yellow]CANALES INESTABLES:[/COLOR]
       [B][COLOR plum]Que canales estan Inestables:[/COLOR][/B]
          [COLOR coral]Son los pendientes de su evolucion, para evaluar su Situacion Definitiva.[/COLOR]
-         HenaOjara,  MiraPeliculas,  PelisySeries,  PepeCineTop
+         MiraPeliculas,  PepeCineTop
 
    [COLOR yellow]CANALES TEMPORALMENTE DES-ACTIVADOS:[/COLOR]
       [B][COLOR slateblue]Que canales estan Temporalmente Inactivos:[/COLOR][/B]
          [COLOR coral]Son los pendientes de su situacion, para evaluar su Re-activacion o Anulacion.[/COLOR]
-         DocumaniaTv,  PeliSeries
+         DocumaniaTv,  PelisySeries
 
    [COLOR yellow]SERVIDORES CON VIAS ALTERNATIVAS:[/COLOR]
       [B][COLOR tan]Servidores con Vias Alternativas:[/COLOR][/B]
-         Clicknupload,  Doodstream,  MegaUp,  Sbembed,  Streamlare,
-         Streamsb,  Uptobox,  Various,  Vk,  Youtube
+         Clicknupload,  Doodstream,  MegaUp,  Streamlare,  Uptobox,
+         Various,  Vk,  Youtube
 
       [B][COLOR goldenrod]Que Vias Alternativas pueden necesitarse:[/COLOR][/B]
          plugin.video.youtube
@@ -69,48 +69,48 @@
    [COLOR yellow]RESUMEN TOTALES DE CANALES:[/COLOR]
        277 [COLOR darkorange]Canales[/COLOR]
 
-       109 [COLOR coral]Inactivos[/COLOR]
+       121 [COLOR coral]Inactivos[/COLOR]
            2 [COLOR cyan]Temporalmente Inactivos[/COLOR]
 
            1 [COLOR violet]Con probable Incompatibilidad[/COLOR]
-           4 [COLOR plum]Inestables[/COLOR]
-           7 [COLOR darkgoldenrod]Problematicos[/COLOR]
+           2 [COLOR plum]Inestables[/COLOR]
+           5 [COLOR darkgoldenrod]Problematicos[/COLOR]
 
          28 [COLOR olivedrab]CloudFlare Protection[/COLOR]
-         64 [COLOR red]Pueden Usar Proxies[/COLOR]
+         63 [COLOR red]Pueden Usar Proxies[/COLOR]
 
            3 [COLOR teal]Requieren Cuenta[/COLOR]
            1 [COLOR green]Con varios Dominios[/COLOR]
-         41 [COLOR goldenrod]Con gestion ultimo dominio Vigente[/COLOR]
+         44 [COLOR goldenrod]Con gestion ultimo dominio Vigente[/COLOR]
 
-         47 [COLOR fuchsia]No Intervendran en busquedas[/COLOR]
+         45 [COLOR fuchsia]No Intervendran en busquedas[/COLOR]
 
-       166 [COLOR gold]Disponibles[/COLOR]
+       154 [COLOR gold]Disponibles[/COLOR]
 
    [COLOR yellow]DISTRIBUCION CANALES DISPONIBLES:[/COLOR]
-         26 de [COLOR moccasin]Sugeridos[/COLOR]
+         24 de [COLOR moccasin]Sugeridos[/COLOR]
 
-         98 de [COLOR deepskyblue]Peliculas[/COLOR]
-         80 de [COLOR hotpink]Series[/COLOR]
-         66 de [COLOR yellow]Peliculas y Series[/COLOR]
+         92 de [COLOR deepskyblue]Peliculas[/COLOR]
+         76 de [COLOR hotpink]Series[/COLOR]
+         64 de [COLOR yellow]Peliculas y Series[/COLOR]
 
-         26 de [COLOR thistle]Generos[/COLOR]
-           8 de [COLOR cyan]Documentales[/COLOR]
-           9 de [COLOR lightyellow]Infantiles[/COLOR]
+         40 de [COLOR thistle]Generos[/COLOR]
+           6 de [COLOR cyan]Documentales[/COLOR]
+           8 de [COLOR lightyellow]Infantiles[/COLOR]
          10 de [COLOR limegreen]Novelas[/COLOR]
-         42 de [COLOR blue]Torrents[/COLOR]
-           8 de [COLOR firebrick]Doramas[/COLOR]
+         41 de [COLOR blue]Torrents[/COLOR]
+           7 de [COLOR firebrick]Doramas[/COLOR]
          14 de [COLOR springgreen]Animes[/COLOR]
-         20 de [COLOR orange]Adultos[/COLOR]
+         19 de [COLOR orange]Adultos[/COLOR]
 
            1 de [COLOR grey]Privados[/COLOR]
 
    [COLOR yellow]RESUMEN TOTALES SERVIDORES:[/COLOR]
        160 [COLOR darkorange]Servidores[/COLOR]
 
-         54 [COLOR coral]Inactivos[/COLOR]
+         57 [COLOR coral]Inactivos[/COLOR]
          19 [COLOR fuchsia]Sin Soporte[/COLOR]
-         10 [COLOR green]Con Vias alternativas[/COLOR]
-         19 [COLOR powderblue]Con Vias adicionales[/COLOR]
+           8 [COLOR green]Con Vias alternativas[/COLOR]
+         36 [COLOR powderblue]Con Vias adicionales[/COLOR]
 
-       106 [COLOR gold]Disponibles[/COLOR]
+       103 [COLOR gold]Disponibles[/COLOR]

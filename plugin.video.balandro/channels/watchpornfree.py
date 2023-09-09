@@ -140,17 +140,19 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         other = ''
-        if servidor == 'directo':
-            if '/yodbox.' in url: other = 'Yodbox'
-            else: continue
 
         if servidor == 'various':
-            if '/tubeload.' in url: other = 'Tubeload'
-            elif '/mvidoo.' in url: other = 'Mvidoo'
-            elif '/streamhub.' in url: other = 'Streamhub'
-            elif '/filemoon.' in url: other = 'Filemoon'
+            if 'tubeload' in url: other = 'Tubeload'
+            elif 'youdbox' in url or 'yodbox' in url or 'youdboox' in url: other = 'Yodbox'
+            elif 'mvidoo' in url: other = 'Mvidoo'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'VO', other = other ))
+            elif 'streamhub' in url: other = 'Streamhub'
+            elif 'filemoon' in url: other = 'Filemoon'
+            elif 'lulustream' in url or 'luluvdo' in url: other = 'Lulustream'
+            elif 'turboviplay' in url or 'emturbovid' in url: other = 'Turboviplay'
+            elif 'vidguard' in url or 'vgfplay' in url or 'vgembed' in url or 'v6embed' in url: other = 'Vidguard'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
 
     # ~  Download
     if '>Download<' in data:
@@ -166,20 +168,19 @@ def findvideos(item):
             elif '/nitro.' in url: continue
             elif '/ddownload.' in url: continue
             elif '/hexupload.' in url: continue
+            elif '/nitroflare.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
             other = 'D'
-            if servidor == 'directo':
-               if '/yodbox.' in url: other = 'Yodbox'
-               else: continue
 
             if servidor == 'various':
-                if '/tubeload.' in url: other = other + ' Tubeload'
-                elif '/mvidoo.' in url: other = other + ' Mvidoo'
+                if 'tubeload' in url: other = other + ' Tubeload'
+                elif 'youdbox' in url or 'yodbox' in url or 'youdboox' in url: other = other + ' Yodbox'
+                elif 'mvidoo' in url: other = other + ' Mvidoo'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'VO', other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
 
 
     if not itemlist:

@@ -7,9 +7,21 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://doramedplay.com/'
+host = 'https://doramedplay.cc/'
 
 sub_host = 'https://doramedplay.net/'
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://doramedplay.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
 
 
 def mainlist(item):
@@ -100,13 +112,19 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     if '-2/' in item.url or '/ratings/' in item.url:
         if '>Tendencias<' in data: bloque = scrapertools.find_single_match(data, '>Tendencias<(.*?)<div class="copy"')
         elif '>Ratings<' in data: bloque = scrapertools.find_single_match(data, '>Ratings<(.*?)<div class="copy"')
-        else: bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)<div class="copy"')
-    else: bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)<div class="copy"')
+        elif '>Añadido recientemente<' in data: bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)<div class="copy"')
+        elif '>Series de TV<' in data: bloque = scrapertools.find_single_match(data, '>Series de TV<(.*?)<div class="copy"')
+        else: bloque = scrapertools.find_single_match(data, '<h1>(.*?)<div class="copy"')
+
+    else:
+        if '>Añadido recientemente<' in data: bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)<div class="copy"')
+        elif '>Series de TV<' in data: bloque = scrapertools.find_single_match(data, '>Series de TV<(.*?)<div class="copy"')
+        else: bloque = scrapertools.find_single_match(data, '<h1>(.*?)<div class="copy"')
 
     matches = re.compile('<article id="(.*?)</article>').findall(bloque)
 
@@ -130,14 +148,21 @@ def list_all(item):
             if item.search_type == 'tvshow': continue
 
             if 'Sub spn' in title: contentTitle = title.split("Sub spn")[0]
+            elif 'Sub spa' in title: contentTitle = title.split("Sub spa")[0]
             elif 'Sub eng' in title: contentTitle = title.split("Sub eng")[0]
+            elif 'sub spa' in title: contentTitle = title.split("sub spa")[0]
+            elif 'sub eng' in title: contentTitle = title.split("sub eng")[0]
+            elif 'all subs' in title: contentTitle = title.split("all subs")[0]
+            elif 'all sub' in title: contentTitle = title.split("all sub")[0]
+            elif 'sub all' in title: contentTitle = title.split("sub all")[0]
             else: contentTitle = title
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=contentTitle, infoLabels={'year': year} ))
         else:
             if item.search_type == 'movie': continue
 
-            if '(En Emisión)' in title: SerieName = title.split("(En Emisión)")[0]
+            if '(Emisión)' in title: SerieName = title.split("(Emisión)")[0]
+            elif '(En Emisión)' in title: SerieName = title.split("(En Emisión)")[0]
             elif '(En emisión)' in title: SerieName = title.split("(En emisión)")[0]
             elif '(en emisión)' in title: SerieName = title.split("(en emisión)")[0]
             elif '(En Emision)' in title: SerieName = title.split("(En Emision)")[0]
@@ -153,6 +178,7 @@ def list_all(item):
             elif 'Sub spa' in SerieName: SerieName = SerieName.split("Sub spa")[0]
             elif 'Sub eng' in SerieName: SerieName = SerieName.split("Sub eng")[0]
             elif 'sub spa' in SerieName: SerieName = SerieName.split("sub spa")[0]
+            elif 'sub eng' in SerieName: SerieName = SerieName.split("sub eng")[0]
             elif 'all subs' in SerieName: SerieName = SerieName.split("all subs")[0]
             elif 'all sub' in SerieName: SerieName = SerieName.split("all sub")[0]
             elif 'sub all' in SerieName: SerieName = SerieName.split("sub all")[0]
@@ -179,7 +205,7 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     temporadas = re.compile("<span class='se-t.*?'>(.*?)</span>", re.DOTALL).findall(data)
 
@@ -210,7 +236,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, "<div class='se-c'.*?<span class='se-t.*?'>%s</span>(.*?)</div></div>" % (str(item.contentSeason)))
 
@@ -290,7 +316,7 @@ def findvideos(item):
 
     IDIOMAS = {'LAT': 'Lat', 'VOSE': 'Vose', 'Sub': 'Vose',}
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     patron = "<li id='player-option-.*?class='dooplay_player_option'.*?data-type='(.*?)' data-post='(.*?)' data-nume='(.*?)'"
 
@@ -312,7 +338,7 @@ def findvideos(item):
         else: domain = host
 
         post = {'action': 'doo_player_ajax', 'post': datapost, 'nume': datanume, 'type': datatype}
-        data = httptools.downloadpage("%swp-admin/admin-ajax.php" % domain, post = post, headers = {'Referer': item.url}).data
+        data = do_downloadpage('%swp-admin/admin-ajax.php' % domain, post = post, headers = {'Referer': item.url})
 
         url = scrapertools.find_single_match(data, '"embed_url":"(.*?)"')
         if not url: url = scrapertools.find_single_match(data, 'src="(.*?)"')
@@ -346,7 +372,7 @@ def play(item):
 
     if item.server == 'directo':
         if item.url.startswith == host or item.url.startswith == sub_host:
-            data = httptools.downloadpage(item.url).data
+            data = do_downloadpage(item.url)
 
             url = scrapertools.find_single_match(data, '<source src="(.*?)"')
 
@@ -360,6 +386,17 @@ def play(item):
                 url = servertools.normalize_url(servidor, url)
 
                 itemlist.append(item.clone(server = servidor, url = url))
+
+        elif item.url.startswith('https://player.doramed.top/'):
+            data = do_downloadpage(item.url)
+
+            url = scrapertools.find_single_match(str(data), "'file':'(.*?)'")
+
+            if url:
+                url = 'https://player.doramed.top/' + url
+
+                itemlist.append(item.clone(server = 'm3u8hls', url = url))
+
     else:
         itemlist.append(item.clone(server = item.server, url = item.url))
 
@@ -370,7 +407,7 @@ def sub_search(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, '>Resultados encontrados(.*?)<div class="copy"')
 
@@ -399,7 +436,13 @@ def sub_search(item):
                 if item.search_type == 'tvshow': continue
 
             if 'Sub spn' in title: contentTitle = title.split("Sub spn")[0]
+            elif 'Sub spa' in title: contentTitle = title.split("Sub spa")[0]
             elif 'Sub eng' in title: contentTitle = title.split("Sub eng")[0]
+            elif 'sub spa' in title: contentTitle = title.split("sub spa")[0]
+            elif 'sub eng' in title: contentTitle = title.split("sub eng")[0]
+            elif 'all subs' in title: contentTitle = title.split("all subs")[0]
+            elif 'all sub' in title: contentTitle = title.split("all sub")[0]
+            elif 'sub all' in title: contentTitle = title.split("sub all")[0]
             else: contentTitle = title
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, 
@@ -409,9 +452,9 @@ def sub_search(item):
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
-            if '(En Emisión)' in title: SerieName = title.split("(En Emisión)")[0]
-
-            if '(En emisión)' in title: SerieName = title.split("(En emisión)")[0]
+            if '(Emisión)' in title: SerieName = title.split("(Emisión)")[0]
+            elif '(En Emisión)' in title: SerieName = title.split("(En Emisión)")[0]
+            elif '(En emisión)' in title: SerieName = title.split("(En emisión)")[0]
             elif '(en emisión)' in title: SerieName = title.split("(en emisión)")[0]
             elif '(En Emision)' in title: SerieName = title.split("(En Emision)")[0]
             elif '(En emision)' in title: SerieName = title.split("(En emision)")[0]
@@ -426,6 +469,7 @@ def sub_search(item):
             elif 'Sub spa' in SerieName: SerieName = SerieName.split("Sub spa")[0]
             elif 'Sub eng' in SerieName: SerieName = SerieName.split("Sub eng")[0]
             elif 'sub spa' in SerieName: SerieName = SerieName.split("sub spa")[0]
+            elif 'sub eng' in SerieName: SerieName = SerieName.split("sub eng")[0]
             elif 'all subs' in SerieName: SerieName = SerieName.split("all subs")[0]
             elif 'all sub' in SerieName: SerieName = SerieName.split("all sub")[0]
             elif 'sub all' in SerieName: SerieName = SerieName.split("sub all")[0]

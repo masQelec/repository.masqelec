@@ -7,12 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://s.ennovelas.net/'
+host = 'https://d.ennovelas.net/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://ennovelas.net/', 'https://w.ennovelas.net/', 'https://ww.ennovelas.net/',
-             'https://e.ennovelas.net/', 'https://a.ennovelas.net/', 'https://b.ennovelas.net/']
+             'https://e.ennovelas.net/', 'https://a.ennovelas.net/', 'https://b.ennovelas.net/',
+             'https://s.ennovelas.net/', 'https://i.ennovelas.net/']
 
 
 domain = config.get_setting('dominio', 'ennovelas', default='')
@@ -233,7 +234,7 @@ def anios(item):
 
     if item.search_type == 'movie': limit_year = 2010
     else: limit_year = 1989
- 
+
     for x in range(current_year, limit_year, -1):
         url = host + 'years/' + str(x) + '/'
 
@@ -588,12 +589,7 @@ def findvideos(item):
 
             if url.startswith('//'): url = 'https:' + url
 
-            if 'api.mycdn.moe/sblink.php?id=' in url: url = url.replace('api.mycdn.moe/sblink.php?id=', 'sbanh.com/e/')
-
-            elif 'api.mycdn.moe/fembed.php?id=' in url: url = url.replace('api.mycdn.moe/fembed.php?id=', 'feurl.com/v/')
-            elif 'api.mycdn.moe/furl.php?id=' in url: url = url.replace('api.mycdn.moe/furl.php?id=', 'feurl.com/v/')
-
-            elif 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
+            if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 
             elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
 
@@ -610,7 +606,10 @@ def findvideos(item):
             else: lang = 'Lat'
 
             other = ''
-            if type == 'download': other = 'D'
+            if servidor == 'various':
+                if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+            else:
+                if type == 'download': other = 'D'
 
             if not servidor == 'directo':
                 itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
@@ -647,8 +646,13 @@ def findvideos(item):
                if item.lang == 'Esp': lang = 'Esp'
                else: lang = 'Lat'
 
+               other = 'P'
+
+               if servidor == 'various':
+                   if 'streamwish' in u_link or 'strwish' in u_link or 'embedwish' in u_link or 'wishembed' in u_link or 'awish' in u_link or 'dwish' in u_link or 'mwish' in u_link: other = 'Streamwish'
+
                if not servidor == 'directo':
-                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = 'P' ))
+                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
 
            i += 1
 
@@ -666,8 +670,13 @@ def findvideos(item):
         if item.lang == 'Esp': lang = 'Esp'
         else: lang = 'Lat'
 
+        other = 'D'
+
+        if servidor == 'various':
+            if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+
         if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = 'D' ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:

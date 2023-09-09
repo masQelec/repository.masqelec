@@ -38,38 +38,78 @@ def get_video_url(page_url, url_referer=''):
     video_urls = []
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        txt_server = '???'
+        txt_server = 'Unknow'
 
         if 'tubeload' in page_url: txt_server = 'Tubeload'
         elif 'mvidoo' in page_url: txt_server = 'Mvidoo'
         elif 'rutube' in page_url: txt_server = 'Rutube'
+        elif 'videowood' in page_url: txt_server = 'Videowood'
+        elif 'yandex' in page_url: txt_server = 'Yandex'
+        elif 'fastupload' in page_url: txt_server = 'Fastupload'
+        elif 'dropload' in page_url: txt_server = 'Dropload'
+        elif 'krakenfiles' in page_url: txt_server = 'Krakenfiles'
+        elif 'hexupload' in page_url: txt_server = 'Hexupload'
+        elif 'embedgram' in page_url: txt_server = 'Embedgram'
+        elif 'streamvid' in page_url: txt_server = 'Streamvid'
+        elif 'streamvid' in page_url: txt_server = 'Streamvid'
+
+        elif 'upload.do' in page_url: txt_server = 'Upload'
 
         elif 'filemoon' in page_url:
               txt_server = 'Filemoon'
-              page_url = page_url.replace('/filemoon.top/', '/filemoon.sx/')
+              page_url = page_url.replace('/filemoon.to/', '/filemoon.sx/').replace('/filemoon.in/', '/filemoon.sx/').replace('/filemoon.nl/', '/filemoon.sx/').replace('/filemoon.wf/', '/filemoon.sx/').replace('/filemoon.eu/', '/filemoon.sx/').replace('/filemoon.art/', '/filemoon.sx/').replace('/filemoon.link/', '/filemoon.sx/').replace('/filemoon.top/', '/filemoon.sx/')
 
-        elif 'streamhub' in page_url: txt_server = 'Streamhub'
-        elif 'uploadever' in page_url: txt_server = 'Uploadever'
-        elif 'videowood' in page_url: txt_server = 'Videowood'
-        elif 'moonplayer' in page_url: txt_server = 'Moonplayer'
+        elif 'streamhub' in page_url:
+              txt_server = 'Streamhub'
+              page_url = page_url.replace('/streamhub.gg/', '/streamhub.to/').replace('/streamhub.ink/', '/streamhub.to/')
 
-        elif 'yandex' in page_url: txt_server = 'Yandex'
+        elif 'uploadever' in page_url:
+              txt_server = 'Uploadever'
+              page_url = page_url.replace('/uploadever.com/', '/uploadever.in/')
+
+        elif 'moonplayer' in page_url:
+              txt_server = 'Moonplayer'
+              page_url = page_url.replace('/moonplayer.lat/', '/filemoon.sx/')
+
         elif 'yadi' in page_url:
               txt_server = 'Yandex'
               page_url = page_url.replace('/yadi.sk/', '/disk.yandex.ru/')
 
-        elif 'fastupload' in page_url: txt_server = 'Fastupload'
-        elif 'dropload' in page_url: txt_server = 'Dropload'
-        elif 'streamwish' in page_url: txt_server = 'Streamwish'
-        elif 'krakenfiles' in page_url: txt_server = 'Krakenfiles'
-        elif 'hexupload' in page_url: txt_server = 'Hexupload'
-        elif 'desiupload' in page_url: txt_server = 'Desiupload'
-        elif 'filelions' in page_url: txt_server = 'Filelions'
+        elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url:
+              txt_server = 'Streamwish'
+              page_url = page_url.replace('/streamwish.com/', '/streamwish.to/').replace('/streamwish.top/', '/streamwish.to/').replace('/streamwish.site/', '/streamwish.to/').replace('/strwish.xyz/', '/streamwish.to/').replace('/embedwish.com/', '/streamwish.to/').replace('/wishembed.pro/', '/streamwish.to/')
+              page_url = page_url.replace('/awish.pro/', '/streamwish.to/').replace('/dwish.pro/', '/streamwish.to/').replace('/mwish.pro/', '/streamwish.to/')
 
-        elif 'youdbox' in page_url or 'yodbox' in page_url or 'youdboox' in page_url: txt_server = 'Youdbox'
+        elif 'desiupload' in page_url:
+              txt_server = 'Desiupload'
+              page_url = page_url.replace('/desiupload.to/', '/desiupload.co/').replace('/desiupload.in/', '/desiupload.co/')
 
-        elif 'vudeo' in page_url: txt_server = 'Vudeo'
-        elif 'embedgram' in page_url: txt_server = 'Embedgram'
+        elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url:
+              txt_server = 'Filelions'
+              page_url = page_url.replace('/filelions.com/', '/filelions.to/').replace('/filelions.live/', '/filelions.to/').replace('/filelions.xyz/', '/filelions.to/')
+              page_url = page_url.replace('/azipcdn.com/', '/filelions.to/')
+              page_url = page_url.replace('/alions.pro/', '/filelions.to/').replace('/dlions.pro/', '/filelions.to/').replace('/mlions.pro/', '/filelions.to/')
+
+        elif 'youdbox' in page_url or 'yodbox' in page_url or 'youdboox' in page_url: 
+              txt_server = 'Youdbox'
+              page_url = page_url.replace('/youdbox.com/', '/youdbox.site/').replace('/youdbox.net/', '/youdbox.site/').replace('/youdbox.org/', '/youdbox.site/')
+              page_url = page_url.replace('/yodbox.com/', '/youdbox.site/').replace('/youdboox.com/', '/youdbox.site/')
+
+        elif 'vudeo' in page_url:
+              txt_server = 'Vudeo'
+              page_url = page_url.replace('/vudeo.net/', '/vudeo.co/').replace('/vudeo.io/', '/vudeo.co/')
+
+        elif 'vidguard' in page_url or 'vgfplay' in page_url or 'vgembed' in page_url or 'v6embed' in page_url:
+             txt_server = 'Vidguard'
+             page_url = page_url.replace('/vidguard.to/', '/vgembed.com/').replace('/vgfplay.com/', '/vgembed.com/').replace('/vgfplay.xyz/', '/vgembed.com/').replace('/v6embed.xyz/', '/vgembed.com/')
+
+        elif 'lulustream' in page_url or 'luluvdo' in page_url:
+              txt_server = 'Lulustream'
+              page_url = page_url.replace('/luluvdo.com/', '/lulustream.com/')
+
+        elif 'turboviplay' in page_url or 'emturbovid' in page_url:
+              txt_server = 'Turboviplay'
+              page_url = page_url.replace('/turboviplay.com.com/', '/emturbovid.com/')
 
         platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))

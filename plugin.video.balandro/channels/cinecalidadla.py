@@ -422,11 +422,6 @@ def findvideos(item):
 
             if servidor == 'ok': servidor = 'okru'
 
-            elif servidor.startswith('sb'): servidor = 'streamsb'
-            elif servidor == 'cloudemb': servidor = 'streamsb'
-            elif 'lvturbo' in servidor: servidor = 'streamsb'
-            elif 'likessb' in servidor: servidor = 'streamsb'
-
             elif servidor == 'google': servidor = 'gvideo'
 
             if servertools.is_server_available(servidor):

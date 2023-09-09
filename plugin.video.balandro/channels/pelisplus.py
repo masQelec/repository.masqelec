@@ -417,6 +417,8 @@ def findvideos(item):
             if servidor == 'directo': link_other = normalize_other(url)
             elif servidor == 'various':
                   if '/filemoon.' in url: link_other = 'filemoon'
+                  elif '/filelions.' in url: link_other = 'filelions'
+                  elif '/streamwish.' in url: link_other = 'streamwish'
 
             lang = idioma
 

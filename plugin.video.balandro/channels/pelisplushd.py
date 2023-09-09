@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www13.pelisplushd.lat/'
+host = 'https://www14.pelisplushd.lat/'
 
 
 # ~ por si viene de enlaces guardados
@@ -15,7 +15,7 @@ ant_hosts = ['https://pelisplushd.net/', 'https://pelisplushd.to/', 'https://www
              'https://www3.pelisplushd.to/', 'https://www4.pelisplushd.to/', 'https://www5.pelisplushd.to/',
              'https://www6.pelisplushd.to/', 'https://www7.pelisplushd.to/', 'https://www8.pelisplushd.to/',
              'https://www.pelisplushd.lat/', 'https://www4.pelisplushd.lat/', 'https://www8.pelisplushd.lat/',
-             'https://www11.pelisplushd.lat/', 'https://www12.pelisplushd.lat/']
+             'https://www11.pelisplushd.lat/', 'https://www12.pelisplushd.lat/', 'https://www13.pelisplushd.lat/']
 
 
 domain = config.get_setting('dominio', 'pelisplushd', default='')
@@ -56,7 +56,6 @@ def quitar_proxies(item):
 def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
-
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
@@ -347,10 +346,9 @@ def episodios(item):
     bloque = scrapertools.find_single_match(data, 'data-toggle="tab">Temporada.*?' + str(item.contentSeason) + '(.*?)<div class="clear"></div>')
     if not bloque: bloque = scrapertools.find_single_match(data, 'data-toggle="tab">TEMPORADA.*?' + str(item.contentSeason) + '(.*?)<div class="clear"></div>')
 
-    if bloque:
-        bloque = scrapertools.find_single_match(bloque, 'id="pills-vertical-' + str(item.contentSeason) + '(.*?)</div>')
+    if bloque: bloque = scrapertools.find_single_match(bloque, 'id="pills-vertical-' + str(item.contentSeason) + '(.*?)</div>')
 
-    matches = re.compile('<a href="(.*?)".*?">(.*?):(.*?)</a>', re.DOTALL).findall(bloque)
+    matches = re.compile('<a href="(.*?)".*?">(.*?)</a>', re.DOTALL).findall(bloque)
 
     num_matches = len(matches)
 
@@ -395,12 +393,10 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
-    for url, temp_epis, title in matches:
+    for url, title in matches:
         if url.startswith('/'): url = host[:-1] + url
 
-        episode = scrapertools.find_single_match(temp_epis, ".*?-(.*?)$").strip()
-
-        episode = episode.replace('E', '').strip()
+        episode = scrapertools.find_single_match(url, "-episodio-(.*?)$").strip()
 
         ord_epis = str(episode)
 
@@ -410,7 +406,7 @@ def episodios(item):
         else:
             if num_matches > 50: ord_epis = '0' + ord_epis
 
-        titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title
+        titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title.replace(str(item.contentSeason) + 'x' + str(episode), '')
 
         if num_matches > 50:
             tab_epis.append([ord_epis, url, titulo, episode])
@@ -461,12 +457,6 @@ def findvideos(item):
         if '/player.moovies.in/' in url: continue
         elif 'mystream.to' in url: continue
 
-        if url.startswith('/fembed.php?url='): url = url.replace('/fembed.php?url=', 'https://feurl.com/v/')
-        elif 'pelisplushd.to' in url: url = url.replace('pelisplushd.to', 'feurl.com')
-        elif 'pelisplushd.to/fembed.php' in url: url= url.replace('pelisplushd.to/fembed.php?url=', 'https://feurl.com/v/')
-        elif (host + 'fembed.php') in url: url = url.replace(host + 'fembed.php?url=', 'https://feurl.com/v/')
-        elif 'plusto.link' in url: url = url.replace('plusto.link', 'feurl.com')
-
         if url.startswith('/'): url = host[:-1] + url
 
         servidor = servertools.get_server_from_url(url)
@@ -479,9 +469,15 @@ def findvideos(item):
         if servidor == 'directo':
             link_other = scrapertools.find_single_match(data, '<a href="#option' + opt + '">(.*?)</a>')
 
-            if link_other == 'Netu' or link_other == 'NETU' or link_other == 'Waaw' or link_other == 'WAAW' or link_other == 'Hqq' or link_other == 'HQQ': continue
+            if link_other.lower() == 'netu' or link_other.lower() == 'waaw' or link_other.lower() == 'hqq': continue
+
+            elif link_other.lower() == 'sbfast': continue
 
             link_other = normalize_other(link_other)
+
+        if '/filemoon.' in url: link_other = 'filemoon'
+        elif '/filelions.' in url: link_other = 'filelions'
+        elif '/streamwish.' in url: link_other = 'streamwish'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = IDIOMAS.get(lang, lang), other = link_other ))
 

@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- 1280 x 720 -->
-	<include>Animation_DialogPopupOpenClose</include>
-	<depth>DepthOSD</depth>
 	<controls>
 		<control type="group">
-				<animation type="WindowOpen" reversible="false">
-                    <effect type="fade" start="0" end="100" time="250" tween="sine" delay="350" easing="in" />
-                    <effect type="slide" start="-500" end="0" time="250" center="auto" delay="350" tween="quadratic" easing="out" />
-                </animation>
-				<animation type="WindowClose" reversible="false">
-                    <effect type="fade" start="100" end="0" time="250" tween="sine" delay="350" easing="out" />
-                    <effect type="slide" start="0" end="500" time="250" center="auto" delay="350" tween="quadratic" easing="in" />
-                </animation>
+			<animation type="WindowOpen" reversible="false">
+				<effect type="zoom" start="80" end="100" center="640,360" easing="out" tween="back" time="200" delay="400"/>
+				<effect type="fade" start="0" end="100" time="200" delay="400"/>
+			</animation>
+			<animation type="WindowClose" reversible="false">
+				<effect type="zoom" start="100" end="80" center="640,360" easing="in" tween="back" time="200" delay="400"/>
+				<effect type="fade" start="100" end="0" time="200" delay="400"/>
+			</animation>
 			<!-- Background -->
+			<control type="image">
+				<width>1280</width>
+				<height>720</height>
+				<texture colordiffuse="cc151515">AddonWindow/white.png</texture>
+			</control>
 			<control type="image">
 				<left>30</left>
 				<top>30</top>
 				<width>1220</width>
 				<height>660</height>
-				<texture colordiffuse="f2000000">AddonWindow/white.png</texture>
+				<texture colordiffuse="fa000000">AddonWindow/white.png</texture>
 			</control>
 			<control type="button" id="32500">
 				<!-- Close button -->

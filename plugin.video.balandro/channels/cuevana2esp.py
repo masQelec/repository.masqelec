@@ -42,35 +42,42 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False, raise_weberror=True):
+def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://cuevana2espanol.com/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    if not url.startswith(host):
-        resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
-    else:
-        resp = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_cuevana2esp_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
-    if '<title>You are being redirected...</title>' in resp.data:
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+    else:
+        data = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            if not 'search?q=' in url:
+                platformtools.dialog_notification('Cuevana2Esp', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, timeout=timeout).data
+
+    if '<title>You are being redirected...</title>' in data:
         try:
             from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(resp.data)
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                    resp = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
+                    data = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
-    if only_headers: return resp.headers
-
-    return resp.data
+    return data
 
 
 def acciones(item):
@@ -420,8 +427,19 @@ def findvideos(item):
             srv = srv.lower().strip()
 
             if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
+            elif srv == 'fembed': continue
+            elif srv == 'streamsb': continue
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty, language = 'Lat', other = srv ))
+            elif srv == 'ok-ru': srv = 'okru'
+
+            servidor = servertools.corregir_servidor(srv)
+
+            other = srv
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                  quality = qlty, language = 'Lat', other = other.capitalize() ))
 
 
     if '"spanish":' in str(block):
@@ -435,8 +453,19 @@ def findvideos(item):
             srv = srv.lower().strip()
 
             if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
+            elif srv == 'fembed': continue
+            elif srv == 'streamsb': continue
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty, language = 'Esp', other = srv ))
+            elif srv == 'ok-ru': srv = 'okru'
+
+            servidor = servertools.corregir_servidor(srv)
+
+            other = srv
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                  quality = qlty, language = 'Esp', other = other.capitalize() ))
 
     if '"english":' in str(block):
         bloque = scrapertools.find_single_match(str(block), '"english":(.*?)]')
@@ -449,8 +478,19 @@ def findvideos(item):
             srv = srv.lower().strip()
 
             if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
+            elif srv == 'fembed': continue
+            elif srv == 'streamsb': continue
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty, language = 'Vose', other = srv ))
+            elif srv == 'ok-ru': srv = 'okru'
+
+            servidor = servertools.corregir_servidor(srv)
+
+            other = srv
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                  quality = qlty, language = 'Vose', other = other.capitalize() ))
 
     # ~ Descargas
     if '"downloads":' in str(block):
@@ -464,13 +504,24 @@ def findvideos(item):
             srv = srv.lower().strip()
 
             if srv == '1fichier': continue
+            elif srv == 'fembed': continue
+            elif srv == 'streamsb': continue
+
+            elif srv == 'ok-ru': srv = 'okru'
 
             if lang == 'Latino': lang = 'Lat'
             elif lang == 'Español': lang = 'Esp'
             elif lang == 'Subtitulado': lang = 'Vose'
             else: lang = '?'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty, language = lang, other = srv + ' D'))
+            servidor = servertools.corregir_servidor(srv)
+
+            other = srv
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                  quality = qlty, language = lang, other = other.capitalize() + ' D'))
 
     if not itemlist:
         if not ses == 0:

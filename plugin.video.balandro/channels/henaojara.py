@@ -85,7 +85,7 @@ def do_downloadpage(url, post=None, headers=None):
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
                     data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
         except:
@@ -505,10 +505,19 @@ def findvideos(item):
         other = scrapertools.find_single_match(data, 'data-tplayernv="Opt' + str(option) + '"><span>(.*?)</span>')
         other = other.replace('<strong>', '').replace('</strong>', '')
 
-        if other.lower() == 'hqq' or other.lower() == 'waaw'  or other.lower() == 'netu' or other.lower() == 'netuplayer': continue
+        other = other.strip().lower()
 
-        if other.lower() == 'streamwish': servidor = 'various'
-        else: servidor = 'directo'
+        if other == 'hqq' or other == 'waaw'  or other == 'netu' or other == 'netuplayer': continue
+
+        if other == 'streamwish': servidor = 'various'
+        elif other == 'filelions': servidor = 'various'
+        else:
+           if other == 'ok': servidor = 'okru'
+           elif other == 'mega': servidor = 'mega'
+           elif other == 'streamtape': servidor = 'streamtape'
+           else: servidor = 'directo'
+
+        if other == servidor: other = ''
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 

@@ -1306,6 +1306,7 @@ def findvideos(item):
 
         if server == 'filemoon': other = 'Filemoon'
         elif server == 'streamwish': other = 'Streamwish'
+        elif server == 'streamhub': other = 'Streamhub'
         else: other = ''
 
         server = servertools.corregir_servidor(server)
@@ -1334,6 +1335,7 @@ def findvideos(item):
 
         if server == 'filemoon': other = 'Filemoon'
         elif server == 'streamwish': other = 'Streamwish'
+        elif server == 'streamhub': other = 'Streamhub'
         else: other = 'E'
 
         server = servertools.corregir_servidor(server)

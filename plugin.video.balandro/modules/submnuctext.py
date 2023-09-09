@@ -102,8 +102,6 @@ def submnu_special(item):
                                     url = 'https://cinedeantes2.weebly.com/joyas-del-cine.html',
                                     thumbnail=config.get_thumb('bestmovies'),search_type = 'movie' ))
 
-        itemlist.append(item.clone( channel='adnstream', action='_ayer_y_siempre', title=' - Las mejores del cine de ayer y siempre', thumbnail = config.get_thumb('bestmovies'), search_type = 'movie' ))
-
         itemlist.append(item.clone( channel='zoowomaniacos', action='_culto', title=' - Las mejores del cine de culto', thumbnail = config.get_thumb('bestmovies'), search_type = 'movie' ))
 
         itemlist.append(item.clone( channel='zoowomaniacos', action='_las1001', title=' - Las 1001 que hay que ver', thumbnail = config.get_thumb('bestmovies'), search_type = 'movie' ))
@@ -473,11 +471,15 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'mejortorrentapp': domains.manto_domain_mejortorrentapp(item)
 
+    elif item.from_channel == 'mitorrent': domains.manto_domain_mitorrent(item)
+
     elif item.from_channel == 'pelishouse': domains.manto_domain_pelishouse(item)
 
     elif item.from_channel == 'pelismaraton': domains.manto_domain_pelismaraton(item)
 
-    elif item.from_channel == 'pelispedia': domains.manto_domain_pelispedia(item)
+    elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
+
+    elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
 
     elif item.from_channel == 'pelispediaws': domains.manto_domain_pelispediaws(item)
 
@@ -508,6 +510,8 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'subtorrents': domains.manto_domain_subtorrents(item)
 
     elif item.from_channel == 'torrentpelis': domains.manto_domain_torrentpelis(item)
+
+    elif item.from_channel == 'tupelihd': domains.manto_domain_tupelihd(item)
 
     else:
         platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Configuración No Permitida[/B][/COLOR]' % color_alert)
@@ -913,13 +917,6 @@ def _proxies(item):
 
         if config.get_setting('channel_pelispanda_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'pelispedia':
-        from channels import pelispedia
-        item.channel = 'pelispedia'
-        pelispedia.configurar_proxies(item)
-
-        if config.get_setting('channel_pelispedia_proxies') is None: refrescar = False
-
     elif item.from_channel == 'pelisplus':
         from channels import pelisplus
         item.channel = 'pelisplus'
@@ -933,6 +930,13 @@ def _proxies(item):
         pelisplushd.configurar_proxies(item)
 
         if config.get_setting('channel_pelisplushd_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'pelisplushdlat':
+        from channels import pelisplushdlat
+        item.channel = 'pelisplushdlat'
+        pelisplushdlat.configurar_proxies(item)
+
+        if config.get_setting('channel_pelisplushdlat_proxies') is None: refrescar = False
 
     elif item.from_channel == 'pelisplushdnz':
         from channels import pelisplushdnz
@@ -1031,6 +1035,13 @@ def _proxies(item):
         seriesyonkis.configurar_proxies(item)
 
         if config.get_setting('channel_seriesyonkis_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'sinpeli':
+        from channels import sinpeli
+        item.channel = 'sinpeli'
+        sinpeli.configurar_proxies(item)
+
+        if config.get_setting('channel_sinpeli_proxies') is None: refrescar = False
 
     elif item.from_channel == 'srnovelas':
         from channels import srnovelas

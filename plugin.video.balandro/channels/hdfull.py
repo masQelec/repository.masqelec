@@ -432,9 +432,9 @@ def mainlist(item):
         itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
         itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-        itemlist.append(item.clone( title='Animes', action = 'mainlist_series', text_color = 'springgreen' ))
-        itemlist.append(item.clone( title='Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
         itemlist.append(item.clone( title='Novelas', action = 'mainlist_series', text_color = 'limegreen' ))
+        itemlist.append(item.clone( title='Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
+        itemlist.append(item.clone( title='Animes', action = 'mainlist_series', text_color = 'springgreen' ))
 
         itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
@@ -510,9 +510,9 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url= dominio + 'series/imdb_rating', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow', text_color='springgreen' ))
-        itemlist.append(item.clone( action='list_all', title='Doramas', url= dominio + 'tags-tv/dorama', search_type = 'tvshow', text_color='firebrick' ))
         itemlist.append(item.clone( action='list_all', title='Novelas', url= dominio + 'tags-tv/soap', search_type = 'tvshow', text_color='limegreen' ))
+        itemlist.append(item.clone( action='list_all', title='Doramas', url= dominio + 'tags-tv/dorama', search_type = 'tvshow', text_color='firebrick' ))
+        itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow', text_color='springgreen' ))
 
         itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='tan' ))
 
@@ -988,14 +988,13 @@ def findvideos(item):
 
     data_js = do_downloadpage(dominio + 'js/providers.js')
 
-    # ~ 31/7/2022
-    # ~      "22": {"t": "d", "d": "https://mexa.sh/%s"},
+    # ~ 31/7/2022  "22": {"t": "d", "d": "https://mexa.sh/%s"},
+    # ~ 15/8/2022  "7": {"t": "s", "d": "https://watchsb.com/%s.html"},
 
     provs = {
              "4": {"t": "s", "d": "https://upstream.to/embed-%s.html"}, 
              "5": {"t": "s", "d": "https://cloudvideo.tv/embed-%s.html"},
              "6": {"t": "s", "d": "https://streamtape.com/e/%s"},
-             "7": {"t": "s", "d": "https://watchsb.com/%s.html"}, 
              "8": {"t": "d", "d": "https://www.filefactory.com/file/%s"},
              "9": {"t": "d", "d": "https://uploaded.net/f/%s"},
              "10": {"t": "d", "d": "https://rapidgator.net/file/%s.html"},

@@ -712,7 +712,7 @@ msgstr "%s removido de la Colección ¿Quiere limpiarla?[CR]Luego puede utilizar
 
 msgctxt "#30279"
 msgid "Video %s was previously removed from library.[CR]Force adding?"
-msgstr ""
+msgstr "Video %s se eliminó anteriormente de Colección.[CR]¿Forzar adición?"
 
 msgctxt "#30282"
 msgid "Nothing left to remove from Elementum"
@@ -1160,7 +1160,7 @@ msgstr "% de reproducción para marcar como ya visto"
 
 msgctxt "#30417"
 msgid "Use name of production company as Studio for shows"
-msgstr ""
+msgstr "Usar nombre de compañía productora como Studio en shows"
 
 msgctxt "#30418"
 msgid "Show number of unwatched episodes in Shows/Seasons"
@@ -2108,12 +2108,76 @@ msgstr "Marcar como no visto en Trakt"
 
 msgctxt "#30669"
 msgid "Delay addon startup, seconds"
-msgstr ""
+msgstr "Retraso de inicio del addon, en segundos"
 
 msgctxt "#30670"
 msgid "Downloading required binary file for '%s'"
-msgstr ""
+msgstr "Descargando archivo binario requerido para '%s'"
 
 msgctxt "#30671"
 msgid "List of Opennic DNS IPs"
+msgstr "Lista de IPs de DNS de Opennic"
+
+msgctxt "#30672"
+msgid "Compact database"
+msgstr "Compactar base de datos"
+
+msgctxt "#30673"
+msgid "Compact cache database"
+msgstr "Compactar base de datos de cache"
+
+msgctxt "#30674"
+msgid "Database was compacted"
+msgstr "La base de datos fue compactada"
+
+msgctxt "#30675"
+msgid "Remote host login"
+msgstr "Login de host remoto"
+
+msgctxt "#30676"
+msgid "Remote host password"
+msgstr "Contraseña de host remoto"
+
+msgctxt "#30677"
+msgid "Force start as a library"
+msgstr "Contraseña de host remoto"
+
+msgctxt "#30678"
+msgid "Remove from Kodi library, when movie is deleted from Trakt"
+msgstr ""
+
+msgctxt "#30679"
+msgid "Remove from Kodi library, when show is deleted from Trakt"
+msgstr ""
+
+msgctxt "#30680"
+msgid "Remove Elementum duplicates from library"
+msgstr ""
+
+msgctxt "#30681"
+msgid "[B]Found duplicates in Kodi library:[/B][CR]Movies: [COLOR gold][B]%s[/B][/COLOR], Shows: [COLOR gold][B]%s[/B][/COLOR], Episodes: [COLOR gold][B]%s[/B][/COLOR][CR]Proceed?"
+msgstr ""
+
+msgctxt "#30682"
+msgid "No duplicates were found in Kodi library"
+msgstr ""
+
+msgctxt "#30683"
+msgid "Starting library duplicates removal"
+msgstr ""
+
+msgctxt "#30684"
+msgid "Removed Movies: %s, Shows: %s, Episodes: %s"
+msgstr ""
+
+msgctxt "#30685"
+msgid "Remove movies from Elementum database"
+msgstr ""
+
+msgctxt "#30686"
+msgid "Remove shows from Elementum database"
+msgstr ""
+
+msgctxt "#30687"
+msgid "In Elementum library"
 msgstr ""

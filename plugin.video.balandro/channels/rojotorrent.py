@@ -279,14 +279,23 @@ def list_last(item):
     logger.info()
     itemlist = []
 
-    if item.search_type == "movie": search_type = "PELÍCULAS"
+    if item.search_type == "movie": search_type = "PELICULAS"
     elif item.search_type == "tvshow": search_type = "SERIES"
     elif item.search_type == "documentary": search_type = "DOCUMENTALES"
 
     data = do_downloadpage(item.url)
 
-    match = re.compile("""(?s)<div class="h5 text-dark">%s:<\/div>(.*?)<br><br>""" % (search_type)).findall(data)[0]
-    matches = re.compile(r"""<span class="text-muted">\d+-\d+-\d+<\/span> <a href='([^']+)' class="text-primary">([^<]+)""").findall(match)
+    if not data: return itemlist
+
+    if not '<div class="h5 text-dark">' in data:
+        data = data.replace("<div class='h5 text-dark'>", '<div class="h5 text-dark">')
+        data = data.replace("<span class='text-muted'>", '<span class="text-muted">')
+        data = data.replace("class='text-primary'>", 'class="text-primary">')
+
+    try:
+        bloque = re.compile('<div class="h5 text-dark">%s:<\/div>(.*?)<br><br>' % (search_type)).findall(data)[0]
+        matches = re.compile('<span class="text-muted">.*?' + "<a href='(.*?)'.*?" + 'class="text-primary">(.*?)</a>').findall(bloque)
+    except: return itemlist
 
     for url, title in matches:
         if item.search_type== 'movie':

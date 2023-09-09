@@ -2,16 +2,29 @@
 <window type="dialog">
 	<!-- 1280 x 720 -->
 	<defaultcontrol always="true">32501</defaultcontrol>
-	<depth>DepthOSD</depth>
   <controls>
 		<control type="group">
+			<animation type="WindowOpen" reversible="false">
+				<effect type="zoom" start="80" end="100" center="640,360" easing="out" tween="back" time="200" delay="400"/>
+				<effect type="fade" start="0" end="100" time="200" delay="400"/>
+			</animation>
+			<animation type="WindowClose" reversible="false">
+				<effect type="zoom" start="100" end="80" center="640,360" easing="in" tween="back" time="200" delay="400"/>
+				<effect type="fade" start="100" end="0" time="200" delay="400"/>
+			</animation>
+			<!-- Background -->
+			<control type="image">
+				<width>1280</width>
+				<height>720</height>
+				<texture colordiffuse="cc151515">AddonWindow/white.png</texture>
+			</control>
 			<control type="image">
 				<!-- Background -->
 				<posx>240</posx>
 				<posy>205</posy>
 				<width>800</width>
 				<height>350</height>
-				<texture colordiffuse="f2000000">AddonWindow/white.png</texture>
+				<texture colordiffuse="fa000000">AddonWindow/white.png</texture>
 			</control>
 			<control type="button" id="32500">
 				<!-- Close button -->

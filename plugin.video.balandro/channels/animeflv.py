@@ -371,6 +371,8 @@ def findvideos(item):
                 other = ''
                 if servidor == 'various':
                     if '/filemoon.' in link: other = 'Filemoon'
+                    elif '/streamwish.' in link: other = 'Streamwish'
+                    elif '/filelions.' in link: other = 'Filelions'
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Vose', other = other ))
 
@@ -383,6 +385,8 @@ def findvideos(item):
             other = ''
             if servidor == 'various':
                 if '/filemoon.' in url: other = 'Filemoon'
+                elif '/streamwish.' in url: other = 'Streamwish'
+                elif '/filelions.' in url: other = 'Filelions'
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other = other ))
 

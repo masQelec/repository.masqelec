@@ -537,6 +537,12 @@ def play(item):
 
         url = scrapertools.find_single_match(data, 'src="(.*?)"')
 
+        if '/player.' in url:
+            data = do_downloadpage(url)
+
+            if '/hqq' in data or '/waaw' in data or '/netu' in data:
+                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
         if url:
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)

@@ -233,7 +233,7 @@ def list_all(item):
         if "3D" in title: title = title.split("3D")[0]
 
         if lang.endswith("1.png"): lang = "Esp"
-        elif lang.endswith("2.png"): lang = "VO"
+        elif lang.endswith("2.png"): lang = "Vo"
         elif lang.endswith("4.png"): lang = "Fr"   
         elif lang.endswith("8.png"): lang = "It"
         elif lang.endswith("512.png"): lang = "Lat"
@@ -373,7 +373,7 @@ def findvideos(item):
         url_torrent = item.url
 
     if url_torrent:
-        itemlist.append(Item( channel = item.channel, action='play', title='', url=url_torrent, server='torrent', quality=item.qualityes, language=item.languages))
+        itemlist.append(Item( channel = item.channel, action='play', title='', url=url_torrent, server='torrent', quality=item.qualities, language=item.languages))
 
     return itemlist
 

@@ -15,6 +15,7 @@ from core import httptools, scrapertools, tmdb
 
 host = 'https://pasateatorrent.org/'
 
+
 # ~  03/2022 algunas series No hay enlaces
 # ~  04/2022 algunas pelis salta Recaptcha
 

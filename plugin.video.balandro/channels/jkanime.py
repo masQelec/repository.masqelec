@@ -370,12 +370,15 @@ def findvideos(item):
         other = ''
         if "/um.php" in url: other = 'um'
         elif "/jk.php" in url: other = 'jk'
-        elif "okru" in url: other = 'okru'
-        elif "fembed" in url: other = 'fembed'
-        elif "mixdrop" in url: other = 'mixdrop'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+           if not url.startswith(host): url = host[:-1] + url
+
+           if "okru" in url: servidor = 'okru'
+           if "mixdrop" in url: servidor = 'mixdrop'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other = other ))
 
@@ -385,11 +388,6 @@ def findvideos(item):
 def play(item):
     logger.info()
     itemlist = []
-
-    servidor = item.server
-
-    if servidor == 'directo':
-        if not item.url.startswith(host): item.url = host[:-1] + item.url
 
     url_play = item.url
 
@@ -414,7 +412,7 @@ def play(item):
 
             url_play = url
 
-    elif "okru" in item.url or "fembed" in item.url or "mixdrop" in item.url:
+    elif "okru" in item.url or "mixdrop" in item.url:
         data = do_downloadpage(item.url)
 
         url_play = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)"')

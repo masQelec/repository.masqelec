@@ -239,7 +239,8 @@ def episodios(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, "dt='ss-" + str(item.contentSeason) + "'>(.*?)</div>")
+    matches = scrapertools.find_multiple_matches(data, "dt='ss-" + str(item.contentSeason) + "'.*?>(.*?)</div>")
+    if not matches: matches = scrapertools.find_multiple_matches(data, 'dt="ss-' + str(item.contentSeason) + '".*?>(.*?)</div>')
 
     # ~ Temporada única
     if not matches: matches = [(0, data)]
@@ -293,6 +294,8 @@ def episodios(item):
 
         for episodio in episodios:
             url = scrapertools.find_single_match(episodio, 'href="(.*?)"')
+
+            if '#gs-' in url: continue
 
             epi = scrapertools.find_single_match(episodio, '</strong>(.*?)</span>')
             if '-' in epi: epi = scrapertools.find_single_match(epi, '(.*?)-').strip()

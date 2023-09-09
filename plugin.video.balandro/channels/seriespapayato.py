@@ -356,11 +356,11 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         other = servidor
-        if other == 'cinemaupload': other = ''
 
         url = host + '?trembed=' + data_key + '&trid=' + data_id + '&trtype=2'
 
-        itemlist.append(Item(channel = item.channel, action = 'play', server='directo', title = '', url = url, language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = other ))
+        itemlist.append(Item(channel = item.channel, action = 'play', server='directo', title = '', url = url,
+                             language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = other ))
 
     return itemlist
 

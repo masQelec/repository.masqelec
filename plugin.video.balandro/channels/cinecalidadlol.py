@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.cinecalidad.men/'
+host = 'https://ww.cinecalidad.men/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -30,7 +30,8 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://w3.cinecalidad.vet/', 'https://w4.cinecalidad.vet/', 'https://w5.cinecalidad.vet/',
              'https://w6.cinecalidad.vet/', 'https://w7.cinecalidad.vet/', 'https://w8.cinecalidad.vet/',
              'https://w11.cinecalidad.vet/', 'https://w12.cinecalidad.vet/', 'https://ww.cinecalidad.vet/',
-             'https://wc.cinecalidad.vet/', 'https://wy.cinecalidad.vet/']
+             'https://wc.cinecalidad.vet/', 'https://wy.cinecalidad.vet/', 'https://www.cinecalidad.men/',
+             'https://vww.cinecalidad.men/', 'https://wwv.cinecalidad.men/', 'https://wvw.cinecalidad.men/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -515,9 +516,10 @@ def findvideos(item):
             if '/play/' in url: continue
             elif 'youtube' in url: continue
 
-            srv = srv.strip()
+            srv = srv.lower().strip()
 
-            if srv.lower() == 'netu' or srv.lower() == 'waaw' or srv.lower() == 'hqq': continue
+            if srv == 'netu' or srv == 'waaw' or srv == 'hqq': continue
+            elif '1fichier' in srv: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -532,8 +534,18 @@ def findvideos(item):
                elif idio == 'es': language = 'Esp'
                elif idio == 'en': language = 'Vose'
 
-            if servidor == 'directo': other = srv
-            else: other = ''
+            other = ''
+
+            if servidor == 'directo':
+                if srv == 'streamtape': servidor = 'streamtape'
+                elif srv == 'voe': servidor = 'voe'
+                elif srv == 'doods' or srv == 'doostream': servidor = 'doodstream'
+
+                elif srv == 'streamwish' or srv == 'strwish' or srv == 'embedwish' or srv == 'wishembed' or srv == 'awish' or srv == 'dwish' or srv == 'mwish': servidor = 'various'
+
+                elif srv == 'filemoon': servidor = 'various'
+
+            if servidor == 'various': other = srv.capitalize()
 
             itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = qlty, language = language, other = other ))
 
@@ -570,6 +582,7 @@ def findvideos(item):
             elif 'cinecalidad' in servidor: continue
 
             elif servidor == 'utorrent': servidor = 'torrent'
+            elif 'utorrent' in servidor == : servidor = 'torrent'
             elif 'torrent' in servidor: servidor = 'torrent'
 
             elif servidor == 'drive': servidor = 'gvideo'

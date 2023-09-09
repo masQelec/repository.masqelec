@@ -33,7 +33,7 @@ proxies_search_extended = config.get_setting('proxies_search_extended', default=
 proxies_recommended = config.get_setting('proxies_recommended', default=False)
 
 
-tot_all_providers = 22
+tot_all_providers = 27
 
 opciones_provider = [
         'spys.one',
@@ -57,9 +57,13 @@ opciones_provider = [
         'proxydb.net',
         'hidester.com',
         'geonode.com',
+        'mmpx12',
+        'roosterkid',
+        'almroot',
+        'shiftytr',
+        'mertguvencli',
         private_list
         ]
-
 
 if proxies_extended:
     opciones_provider.append('z-coderduck')
@@ -67,6 +71,7 @@ if proxies_extended:
     opciones_provider.append('z-free-proxy-list.anon')
     opciones_provider.append('z-free-proxy-list.com')
     opciones_provider.append('z-free-proxy-list.uk')
+    opciones_provider.append('z-github')
     opciones_provider.append('z-opsxcq')
     opciones_provider.append('z-proxy-daily')
     opciones_provider.append('z-proxy-list.org')
@@ -78,9 +83,9 @@ if proxies_extended:
 
 
 opciones_recommended = [
+        'mmpx12',
         default_provider,
         'us-proxy.org',
-        'clarketm',
         'z-free-proxy-list.anon'
         ]
 
@@ -95,9 +100,11 @@ proxies_provider = config.get_setting('proxies_provider', default='10')
 if proxies_provider == 10: proxies_todos = True
 else: proxies_todos = False
 
+proxies_proces = config.get_setting('proxies_proces', default=True)
 proxies_tipos = config.get_setting('proxies_tipos', default=False)
 proxies_paises = config.get_setting('proxies_paises', default=False)
 proxies_maximo = config.get_setting('proxies_maximo', default=True)
+
 proxies_list = config.get_setting('proxies_list', default=False)
 proxies_help = config.get_setting('proxies_help', default=True)
 
@@ -172,8 +179,9 @@ def configurar_proxies_canal(canal, url):
             if proxysearch_process == True: pass
             else:
                if proxies_actuales:
-                   if not platformtools.dialog_yesno(config.__addon_name, 'Existen proxies memorizados en el canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea iniciar una nueva búsqueda de proxies en todos los proveedores ?[/B][/COLOR]'):
-                       procesar = False
+                   if proxies_proces:
+                       if not platformtools.dialog_yesno(config.__addon_name, 'Existen proxies memorizados en el canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea iniciar una nueva búsqueda de proxies en todos los proveedores ?[/B][/COLOR]'):
+                           procesar = False
 
             if procesar:
                 provider_auto = all_providers
@@ -192,16 +200,19 @@ def configurar_proxies_canal(canal, url):
 
         else:
             provider_fijo = opciones_provider[proxies_provider]
-            if not proxies_list:
-                if provider_fijo >= 0 and provider_fijo <= tot_all_providers: provider_fijo = opciones_provider[proxies_provider - 1]
 
+            if not PY3:
+                if not proxies_list:
+                    if provider_fijo >= 0 and provider_fijo <= tot_all_providers: provider_fijo = opciones_provider[proxies_provider - 1]
+	
             proxysearch_process = config.get_setting('proxysearch_process')
 
             if proxysearch_process == True: pass
             else:
                if proxies_actuales:
-                   if not platformtools.dialog_yesno(config.__addon_name, 'Existen proxies memorizados en el canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea iniciar una nueva búsqueda de proxies con el proveedor configurado en los Ajustes categoria proxies ?[/B][/COLOR] ' + '[COLOR red][B] ' + provider_fijo.capitalize() + '[/COLOR][/B]' ):
-                       procesar = False
+                   if proxies_proces:
+                       if not platformtools.dialog_yesno(config.__addon_name, 'Existen proxies memorizados en el canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea iniciar una nueva búsqueda de proxies con el proveedor configurado en los Ajustes categoria proxies ?[/B][/COLOR] ' + '[COLOR red][B] ' + provider_fijo.capitalize() + '[/COLOR][/B]' ):
+                           procesar = False
 
             if procesar:
                  if _buscar_proxies(canal, url, provider_fijo, procesar):
@@ -492,6 +503,20 @@ def _buscar_proxies(canal, url, provider, procesar):
                     proxies = proxytoolsz.z_free_proxy_list_anon(url, tipo_proxy, pais_proxy, max_proxies)
                     if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
+        if search_provider or provider == 'z-github':
+            searching = True
+
+            if proxies_recommended: searching = False
+            elif providers_preferred:
+                if not 'github' in providers_preferred: searching = False
+
+            if searching:
+                if len(all_providers_proxies) < proxies_totales_limit:
+                    if search_provider: platformtools.dialog_notification('Buscar en Github', msg_txt % color_infor)
+
+                    proxies = proxytoolsz.z_github(url, tipo_proxy, pais_proxy, max_proxies)
+                    if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
         if search_provider or provider == 'z-opsxcq':
             searching = True
 
@@ -634,19 +659,19 @@ def _buscar_proxies(canal, url, provider, procesar):
 
 
     # ~ Providers segun settings
-    if search_provider or provider == 'clarketm':
+    if search_provider or provider == 'mmpx12':
         searching = True
 
         if proxies_recommended:
-           if not 'clarketm' in opciones_recommended: searching = False
+           if not 'mmpx12' in opciones_recommended: searching = False
         elif providers_preferred:
-            if not 'clarketm' in providers_preferred: searching = False
+            if not 'mmpx12' in providers_preferred: searching = False
 
         if searching:
             if len(all_providers_proxies) < proxies_totales_limit:
-                if search_provider: platformtools.dialog_notification('Buscar en Clarketm', msg_txt % color_infor)
+                if search_provider: platformtools.dialog_notification('Buscar en Mmpx12', msg_txt % color_infor)
 
-                proxies = _clarketm(url, tipo_proxy, pais_proxy, max_proxies)
+                proxies = _mmpx12(url, tipo_proxy, pais_proxy, max_proxies)
                 if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     if search_provider or provider == default_provider:
@@ -775,6 +800,76 @@ def _buscar_proxies(canal, url, provider, procesar):
                 if search_provider: platformtools.dialog_notification('Buscar en Spys-one', msg_txt % color_infor)
 
                 proxies = _spys_one(url, tipo_proxy, pais_proxy, max_proxies)
+                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
+    if search_provider or provider == 'mertguvencli':
+        searching = True
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
+            if not 'mertguvencli' in providers_preferred: searching = False
+
+        if searching:
+            if len(all_providers_proxies) < proxies_totales_limit:
+                if search_provider: platformtools.dialog_notification('Buscar en Mertguvencli', msg_txt % color_infor)
+
+                proxies = _mertguvencli(url, tipo_proxy, pais_proxy, max_proxies)
+                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
+    if search_provider or provider == 'shiftytr':
+        searching = True
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
+            if not 'shiftytr' in providers_preferred: searching = False
+
+        if searching:
+            if len(all_providers_proxies) < proxies_totales_limit:
+                if search_provider: platformtools.dialog_notification('Buscar en Shiftytr', msg_txt % color_infor)
+
+                proxies = _shiftytr(url, tipo_proxy, pais_proxy, max_proxies)
+                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
+    if search_provider or provider == 'roosterkid':
+        searching = True
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
+            if not 'roosterkid' in providers_preferred: searching = False
+
+        if searching:
+            if len(all_providers_proxies) < proxies_totales_limit:
+                if search_provider: platformtools.dialog_notification('Buscar en Roosterkid', msg_txt % color_infor)
+
+                proxies = _roosterkid(url, tipo_proxy, pais_proxy, max_proxies)
+                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
+    if search_provider or provider == 'almroot':
+        searching = True
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
+            if not 'almroot' in providers_preferred: searching = False
+
+        if searching:
+            if len(all_providers_proxies) < proxies_totales_limit:
+                if search_provider: platformtools.dialog_notification('Buscar en Almroot', msg_txt % color_infor)
+
+                proxies = _almroot(url, tipo_proxy, pais_proxy, max_proxies)
+                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
+    if search_provider or provider == 'clarketm':
+        searching = True
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
+            if not 'clarketm' in providers_preferred: searching = False
+
+        if searching:
+            if len(all_providers_proxies) < proxies_totales_limit:
+                if search_provider: platformtools.dialog_notification('Buscar en Clarketm', msg_txt % color_infor)
+
+                proxies = _clarketm(url, tipo_proxy, pais_proxy, max_proxies)
                 if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
 
@@ -1153,6 +1248,96 @@ def _sslproxies_org(url, tipo_proxy, pais_proxy, max_proxies):
             elif not ':' in prox: continue
 
             proxies.append(prox)
+
+    if len(proxies) < 50: proxies = proxytoolsz.plus_proxies(proxies, max_proxies)
+
+    return proxies
+
+
+def _mmpx12(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    proxies = []
+
+    url_provider = 'https://raw.githubusercontent.com/mmpx12/proxy-list/master/https.txt'
+    resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
+
+    enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
+
+    for prox in enlaces:
+        proxies.append(prox)
+
+    if len(proxies) < 50: proxies = proxytoolsz.plus_proxies(proxies, max_proxies)
+
+    return proxies
+
+
+def _mertguvencli(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    proxies = []
+
+    url_provider = 'https://raw.githubusercontent.com/mertguvencli/http-proxy-list/main/proxy-list/data.txtt'
+    resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
+
+    enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
+
+    for prox in enlaces:
+        proxies.append(prox)
+
+    if len(proxies) < 50: proxies = proxytoolsz.plus_proxies(proxies, max_proxies)
+
+    return proxies
+
+
+def _shiftytr(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    proxies = []
+
+    url_provider = 'https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt'
+    resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
+
+    enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
+
+    for prox in enlaces:
+        proxies.append(prox)
+
+    if len(proxies) < 50: proxies = proxytoolsz.plus_proxies(proxies, max_proxies)
+
+    return proxies
+
+
+def _almroot(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    proxies = []
+
+    url_provider = 'https://raw.githubusercontent.com/almroot/proxylist/master/list.txt'
+    resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
+
+    enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
+
+    for prox in enlaces:
+        proxies.append(prox)
+
+    if len(proxies) < 50: proxies = proxytoolsz.plus_proxies(proxies, max_proxies)
+
+    return proxies
+
+
+def _roosterkid(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    proxies = []
+
+    url_provider = 'https://raw.githubusercontent.com/roosterkid/openproxylist/main/HTTPS_RAW.txt'
+    resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
+
+    enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
+
+    for prox in enlaces:
+        proxies.append(prox)
 
     if len(proxies) < 50: proxies = proxytoolsz.plus_proxies(proxies, max_proxies)
 
@@ -1819,7 +2004,7 @@ def testear_lista_proxies(canal, provider, url, proxies=[]):
             perc = int(hechos / num_proxies * 100)
             validos = sum([1 for proxy in proxies if proxies_info[proxy]['ok']])
 
-            progreso.update(perc, 'Comprobando el %d de %d proxies. [COLOR gold]Válidos[/COLOR] %d. [COLOR yellowgreen][B]Cancelar si tarda demasiado[/B][/COLOR] ó [COLOR cyan][B]si ya hay más de uno válido[/B][/COLOR].' % (hechos, num_proxies, validos))
+            progreso.update(perc, 'Comprobando el %d de %d proxies. [COLOR gold]Posibles Válidos[/COLOR] %d. [COLOR yellowgreen][B]Cancelar si tarda demasiado[/B][/COLOR] ó [COLOR cyan][B]si ya hay más de uno válido[/B][/COLOR].' % (hechos, num_proxies, validos))
 
             if proxies_limit:
                 if validos >= 10: break # ~ si todos los 10 más rápidos

@@ -74,6 +74,8 @@ def list_all(item):
     for url, thumb, title, in matches:
         title = title.replace('][', ' ').replace('[', ' ').replace(']', ' ')
 
+        title = title.replace('&#8211;', '').replace('&#8230;', '')
+
         if item.group == 'find':
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
         else:
@@ -162,8 +164,12 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
+        other = ''
+        if servidor == 'various':
+            if 'hexupload' in url: other = 'Hexupload'
+
         if url:
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'VO' ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vo', other = other ))
 
     if not itemlist:
         if not ses == 0:

@@ -13,7 +13,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-# ~ series solo hay 11
+# ~ 27/8/2023 Ahora hay series (antes solo habian 11)
 
 host = 'https://pelisyseries.net/'
 
@@ -53,10 +53,19 @@ def configurar_proxies(item):
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if '/lanzamiento/' in url: raise_weberror = False
 
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_pelisyseries_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+        if not data:
+            if not '?s=' in url:
+                platformtools.dialog_notification('PelisySeries', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -66,9 +75,9 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         except:
             pass
 
@@ -418,7 +427,6 @@ def findvideos(item):
         if 'youtube' in other: continue
 
         elif other == 'ok': other = 'okru'
-        elif other == 'feurl' or 'fembad' in other: other = 'fembed'
         elif other == 'dood': other = 'doodstream'
         elif other == 'uptostream': other = 'uptobox'
         elif other == 'archive': other = 'archiveorg'
@@ -445,7 +453,6 @@ def findvideos(item):
         size = ''
 
         if servidor == 'ok': servidor = 'okru'
-        elif servidor == 'feurl' or 'fembad' in servidor: servidor = 'fembed'
         elif servidor == 'dood': servidor = 'doodstream'
         elif servidor == 'uptostream': servidor = 'uptobox'
         elif servidor == 'archive': servidor = 'archiveorg'

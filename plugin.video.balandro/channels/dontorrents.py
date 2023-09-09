@@ -61,7 +61,7 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.discount/', 'https://dontorrent.dad/', 'https://dontorrent.zip/',
              'https://dontorrent.mov/', 'https://dontorrent.day/', 'https://dontorrent.boo/',
              'https://dontorrent.foo/', 'https://dontorrent.hair/', 'https://dontorrent.rsvp/',
-             'https://dontorrent.quest/']
+             'https://dontorrent.quest/', 'https://dontorrent.nexus/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -341,6 +341,8 @@ def list_last(item):
     elif item.search_type == "documentary": search_type = "DOCUMENTALES"
 
     data = do_downloadpage(item.url)
+
+    if not data: return itemlist
 
     match = re.compile("""(?s)<div class="h5 text-dark">%s:<\/div>(.*?)<br><br>""" % (search_type)).findall(data)[0]
     matches = re.compile(r"""<span class="text-muted">\d+-\d+-\d+<\/span> <a href='([^']+)' class="text-primary">([^<]+)""").findall(match)

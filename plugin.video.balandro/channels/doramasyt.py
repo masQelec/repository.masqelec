@@ -172,6 +172,8 @@ def list_all(item):
         title = re.sub(r'Audio|Latino|Castellano|\((.*?)\)', '', title)
         title = re.sub(r'\s:', ':', title)
 
+        title = title.replace('&#039;', '')
+
         if '<button class="btnone">Pelicula</button>' in match:
             tipo = 'movie' if '<button class="btnone">Pelicula</button>' in match else 'tvshow'
         else: tipo = item.search_type
@@ -220,6 +222,8 @@ def last_epis(item):
 
     for url, thumb, title, epis in matches:
         if not url or not title: continue
+
+        title = title.replace('&#039;', '')
 
         title = title.strip()
 
@@ -374,7 +378,14 @@ def findvideos(item):
 
             servidor = servertools.corregir_servidor(srv)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, other = servidor.capitalize() ))
+            if servidor == 'various':
+                if 'filemoon' in url: srv = 'filemoon'
+                elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: srv = 'streamwish'
+
+            if not servidor == 'directo':
+                if srv == servidor: srv = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = srv.capitalize() ))
 
     # Enlaces descarga
 
@@ -401,7 +412,10 @@ def findvideos(item):
 
             servidor = servertools.corregir_servidor(srv)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, other = servidor.capitalize() + ' (D)' ))
+            if not servidor == 'directo':
+                if srv == servidor: srv = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = srv.capitalize() + ' (D)' ))
 
     if not itemlist:
         if not ses == 0:

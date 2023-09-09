@@ -145,10 +145,44 @@ def submnu_center(item):
 
         if existe: presentar = True
         if presentar:
-            itemlist.append(item.clone( action='', title='[I]Archivo ADVANCEDSETTINGS:[/I]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
+            itemlist.append(item.clone( action='', title='[I]Archivo ADVANCED SETTINGS:[/I]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
 
             itemlist.append(item.clone( channel='helper', action='show_advs', title=' - Ver', thumbnail=config.get_thumb('quote'), text_color='yellow' ))
             itemlist.append(item.clone( channel='actions', action='manto_advs', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('quote'), text_color='red' ))
+
+        presentar = False
+
+        path_favs = translatePath(os.path.join('special://home/userdata', ''))
+
+        file_favs = 'favourites.xml'
+
+        file = path_favs + file_favs
+
+        existe = filetools.exists(file)
+
+        if existe: presentar = True
+        if presentar:
+            itemlist.append(item.clone( action='', title='[I]Archivo FAVOURITES SETTINGS:[/I]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
+
+            itemlist.append(item.clone( channel='helper', action='show_favs', title=' - Ver', thumbnail=config.get_thumb('quote'), text_color='yellow' ))
+            itemlist.append(item.clone( channel='actions', action='manto_favs', title=' - Eliminar', thumbnail=config.get_thumb('quote'), text_color='red' ))
+
+        presentar = False
+
+        path_pcfs = translatePath(os.path.join('special://home/userdata', ''))
+
+        file_pcfs = 'playercorefactory.xml'
+
+        file = path_pcfs + file_pcfs
+
+        existe = filetools.exists(file)
+
+        if existe: presentar = True
+        if presentar:
+            itemlist.append(item.clone( action='', title='[I]Archivo PLAYERCOREFACTORY SETTINGS:[/I]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
+
+            itemlist.append(item.clone( channel='helper', action='show_pcfs', title=' - Ver', thumbnail=config.get_thumb('quote'), text_color='yellow' ))
+            itemlist.append(item.clone( channel='actions', action='manto_pcfs', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('quote'), text_color='red' ))
 
     presentar = False
 
@@ -214,6 +248,13 @@ def submnu_addons(item):
         else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
         itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]Youtube[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_yt + '[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
+
+        if xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'):
+            cod_version = xbmcaddon.Addon("inputstream.adaptive").getAddonInfo("version").strip()
+            tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
+
+        itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]InputStream Adaptive[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_yt + '[/B][/COLOR]', thumbnail=config.get_thumb('Inputstreamadaptive') ))
 
 
     presentar = False
@@ -896,6 +937,8 @@ def test_all_webs(item):
 
                     if not proxies:
                         if config.get_setting('memorize_channels_proxies', default=True):
+                            channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
+
                             el_memorizado = "'" + ch['id'] + "'"
 
                             if el_memorizado in str(channels_proxies_memorized):

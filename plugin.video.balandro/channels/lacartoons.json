@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["lat"],
 
-  "clusters": ["suggested", "infantil", "classic", "rankings", "producers", "kids"],
+  "clusters": ["onlyone", "suggested", "infantil", "classic", "rankings", "producers", "kids"],
 
   "notes": "Series cartoons en idioma orignal de emisión."
 }

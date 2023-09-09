@@ -2,6 +2,11 @@
 
 [COLOR yellow][B]2023[/B][/COLOR]
 
+3.1.00  [COLOR darkorange] 1 de Septiembre de 2023[/COLOR]
+    Correcciones: Bugs de la version anterior
+    Generos: Re-configurados
+    Canales y Servidores: Sin variaciones
+
 3.0.9  [COLOR darkorange] 4 de Agosto de 2023[/COLOR]
     Correcciones: Bugs de la version anterior
     Generos: Re-configurados

@@ -26,6 +26,10 @@ color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 
+no_results_proxies = config.get_setting('search_no_results_proxies', default=True)
+no_results = config.get_setting('search_no_results', default=False)
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -185,42 +189,67 @@ def show_help_parameters(item):
     if config.get_setting('mnu_adultos', default=True):
         txt += '[CR]   - Los canales de [B][COLOR orange]Adultos[/COLOR][/B]'
 
+    txt += '[CR][CR] - [COLOR goldenrod][B]Procesos[/COLOR][/B]:'
+
+    txt += '[CR]   - Cuantos Resultados se previsualizarán por canal: [COLOR coral][B]' + str(config.get_setting('search_limit_by_channel', default=2)) + '[/COLOR][/B]'
+
     if config.get_setting('search_only_prefered', default=False):
-        txt += '[CR][CR] - Tiene activado efectuar búsquedas solo en los canales [B][COLOR gold]Preferidos[/COLOR][/B]'
+        txt += '[CR]   - Tiene Activado efectuar búsquedas solo en los canales [B][COLOR gold]Preferidos[/COLOR][/B]'
 
     if config.get_setting('search_only_suggesteds', default=False):
-        txt += '[CR][CR]'
-        txt += ' - Tiene activado efectuar búsquedas solo en los canales [B][COLOR moccasin]Sugeridos[/COLOR][/B]'
+        txt += '[CR]   - Tiene Activado efectuar búsquedas solo en los canales [B][COLOR moccasin]Sugeridos[/COLOR][/B]'
 
     if config.get_setting('search_no_proxies', default=False):
-        txt += '[CR][CR]'
-        txt += ' - Tiene activado descartar búsquedas en los canales con [B][COLOR red]Proxies informados[/COLOR][/B]'
+        txt += '[CR]   - Tiene Activado descartar búsquedas en los canales con [B][COLOR red]Proxies informados[/COLOR][/B]'
 
     if config.get_setting('search_con_torrents', default=False):
-        txt += '[CR][CR] - Tiene activado efectuar las búsquedas solo en los canales que pueden contener archivos [B][COLOR blue]Torrent[/COLOR][/B]'
+        txt += '[CR]   - Tiene Activado efectuar las búsquedas solo en los canales que pueden contener archivos [B][COLOR blue]Torrent[/COLOR][/B]'
 
     if config.get_setting('search_no_torrents', default=False):
-        txt += '[CR][CR] - Tiene activado descartar en las búsquedas los canales que pueden contener archivos [B][COLOR blue]Torrent[/COLOR][/B]'
+        txt += '[CR]   - Tiene Activado descartar en las búsquedas los canales que pueden contener archivos [B][COLOR blue]Torrent[/COLOR][/B]'
 
     if config.get_setting('search_no_exclusively_torrents', default=False):
-        txt += '[CR][CR] - Tiene activado descartar en las búsquedas los canales con enlaces exclusivamente [B][COLOR blue]Torrent[/COLOR][/B]'
+        txt += '[CR]   - Tiene Activado descartar en las búsquedas los canales con enlaces exclusivamente [B][COLOR blue]Torrent[/COLOR][/B]'
 
     if config.get_setting('search_no_notices', default=False):
-        txt += '[CR][CR] - Tiene activado descartar búsquedas en los canales con [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]'
+        txt += '[CR]   - Tiene Activado descartar búsquedas en los canales con [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]'
 
     if config.get_setting('search_no_inestables', default=False):
-        txt += '[CR][CR] - Tiene activado descartar búsquedas en los canales con [B][COLOR plum]Inestables[/COLOR][/B]'
+        txt += '[CR]   - Tiene Activado descartar búsquedas en los canales con [B][COLOR plum]Inestables[/COLOR][/B]'
 
     if config.get_setting('search_no_problematicos', default=False):
-        txt += '[CR][CR] - Tiene activado descartar búsquedas en los canales que sean [B][COLOR darkgoldenrod]Problemáticos[/COLOR][/B]'
+        txt += '[CR]   - Tiene Ativado descartar búsquedas en los canales que sean [B][COLOR darkgoldenrod]Problemáticos[/COLOR][/B]'
+
+    txt += '[CR]   - Añadir acceso al detalle de Personalizar Próximas Búsquedas:'
+
+    if config.get_setting('sub_mnu_cfg_prox_search', default=True): txt += ' [COLOR coral][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR coral][B] Des-Activado[/B][/COLOR]'
+
+    txt += '[CR]   - Notificar en qué canales No han funcionado los Proxies:'
+
+    if config.get_setting('search_no_work_proxies', default=False): txt += ' [COLOR coral][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR coral][B] Des-Activado[/B][/COLOR]'
+
+    txt += '[CR]   - Presentar en qué canales deberá configurar Nuevamente Proxies:'
+
+    if config.get_setting('search_no_results_proxies', default=True): txt += ' [COLOR coral][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR coral][B] Des-Activado[/B][/COLOR]'
+
+    txt += '[CR]   - Presentar los canales Sin Resultados:'
+
+    if config.get_setting('search_no_results', default=False): txt += ' [COLOR coral][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR coral][B] Des-Activado[/B][/COLOR]'
 
     if config.get_setting('search_no_channels', default=False):
-        txt += '[CR][CR] - Tiene activado notificar en las búsquedas los canales [B][COLOR yellowgreen]Ignorados[/COLOR][/B]'
+        txt += '[CR]    - Tiene Activado notificar en las búsquedas los canales [B][COLOR yellowgreen]Ignorados[/COLOR][/B]'
+
+    if not config.get_setting('search_multithread', default=True):
+        txt += '[CR]    - Tiene Des-Activada la opción [B][COLOR yellowgreen]Multithread[/COLOR][/B]'
 
     if config.get_setting('search_included_all', default=''):
-        txt += '[CR][CR] - [COLOR greenyellow][B]Solo Determinados canales[/B][/COLOR] incluidos en las búsquedas de [B][COLOR green]Todos[/COLOR][/B]:'
+        txt += '[CR]   - [COLOR greenyellow][B]Solo Determinados canales[/B][/COLOR] incluidos en las búsquedas de [B][COLOR green]Todos[/COLOR][/B]:'
 
-        txt += '[CR]    ' + str(config.get_setting('search_included_all'))
+        txt += '[CR]     ' + str(config.get_setting('search_included_all'))
 
     filtros = {'searchable': True}
     opciones = []
@@ -351,6 +380,14 @@ def do_search(item, tecleado):
 
     channels_new_proxies = []
 
+    if config.get_setting('search_no_work_proxies', default=False):
+        config.set_setting('sin_resp', '')
+        sin_results = False
+    else:
+        config.set_setting('sin_resp', 'no')
+        no_results_proxies = True
+        sin_results = True
+
     multithread = config.get_setting('search_multithread', default=True)
     threads = []
 
@@ -424,22 +461,16 @@ def do_search(item, tecleado):
 
         if item.search_special == 'anime':
             if 'anime' in ch['clusters']:
-                if not str(ch['clusters']) == "['anime']":
-                    if not str(ch['clusters']) == "['current', 'anime']":
-                        if not str(ch['clusters']) == "['current', 'notice', 'anime']":
-                            if not str(ch['clusters']) == "['notice', 'anime']":
-                                num_canales = num_canales - 1
-                                continue
+                if not 'Web dedicada exclusivamente al anime' in ch['notes']:
+                    num_canales = num_canales - 1
+                    continue
             else: continue
 
         if item.search_special == 'dorama':
             if 'dorama' in ch['clusters']:
-                if not str(ch['clusters']) == "['dorama']":
-                    if not str(ch['clusters']) == "['current', 'dorama']":
-                        if not str(ch['clusters']) == "['current', 'notice', 'dorama']":
-                            if not str(ch['clusters']) == "['notice', 'dorama']":
-                                num_canales = num_canales - 1
-                                continue
+                if not 'Web dedicada exclusivamente al dorama' in ch['notes']:
+                    num_canales = num_canales - 1
+                    continue
             else: continue
 
         if not PY3:
@@ -554,6 +585,7 @@ def do_search(item, tecleado):
 
         if progreso.iscanceled(): break
 
+
     if multithread:
         if PY3:
             pendent = [a for a in threads if a.is_alive()]
@@ -575,6 +607,8 @@ def do_search(item, tecleado):
                 pendent = [a for a in threads if a.is_alive()]
             else:
                 pendent = [a for a in threads if a.isAlive()]
+
+    config.set_setting('sin_resp', 'si')
 
     if item.from_channel != '': 
         # Búsqueda exacta en otros/todos canales de una peli/serie : mostrar sólo las coincidencias exactas
@@ -616,9 +650,6 @@ def do_search(item, tecleado):
 
     else:
         # Búsqueda parecida en todos los canales : link para acceder a todas las coincidencias y previsualización de n enlaces por canal
-        no_results = config.get_setting('search_no_results', default=False)
-        no_results_proxies = config.get_setting('search_no_results_proxies', default=True)
-
         nro = 0
 
         titulo = ''
@@ -637,7 +668,7 @@ def do_search(item, tecleado):
                 if len(ch['itemlist_search']) == 0:
                     action = 'mainlist'
 
-                    if no_results:
+                    if no_results or sin_results:
                         titulo = ch['name'] + '[COLOR coral] sin resultados'
 
                         if config.get_setting(cfg_proxies_channel, default=''):
@@ -647,6 +678,10 @@ def do_search(item, tecleado):
                             if 'proxies' in ch['notes'].lower():
                                 channels_new_proxies.append(ch['id'])
                                 titulo = titulo + ' [COLOR darkorange]quizás necesite [I]Configurar Proxies[/I]'
+
+                        if no_results == False:
+                            if sin_results:
+                                if not 'quizás' in titulo: continue
                     else:
                         if config.get_setting(cfg_proxies_channel, default=''):
                             if no_results_proxies:
@@ -689,20 +724,12 @@ def do_search(item, tecleado):
 
                     if item.search_special == 'anime':
                         if 'anime' in ch['clusters']:
-                            if not str(ch['clusters']) == "['anime']":
-                               if not str(ch['clusters']) == "['current', 'anime']":
-                                   if not str(ch['clusters']) == "['current', 'notice', 'anime']":
-                                       if not str(ch['clusters']) == "['notice', 'anime']":
-                                           continue
+                            if not 'Web dedicada exclusivamente al anime' in ch['notes']: continue
                         else: continue
 
                     if item.search_special == 'dorama':
                         if 'dorama' in ch['clusters']:
-                            if not str(ch['clusters']) == "['dorama']":
-                               if not str(ch['clusters']) == "['current', 'dorama']":
-                                   if not str(ch['clusters']) == "['current', 'notice', 'dorama']":
-                                       if not str(ch['clusters']) == "['notice', 'dorama']":
-                                           continue
+                            if not 'Web dedicada exclusivamente al dorama' in ch['notes']: continue
                         else: continue
 
                     if not PY3:
