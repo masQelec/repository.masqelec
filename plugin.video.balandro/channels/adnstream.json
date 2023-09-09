@@ -3,7 +3,7 @@
   "name": "AdnStream",
   "thumbnail": "adnstream.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["documentary"],
@@ -11,7 +11,7 @@
   "categories": ["documentary"],
   "language": ["cast"],
 
-  "clusters": ["rankings"],
+  "clusters": ["onlyone", "rankings"],
 
-  "notes": "Documentales y Películas en castellano."
+  "notes": "Web ANULADA. Documentales y Películas en castellano."
 }

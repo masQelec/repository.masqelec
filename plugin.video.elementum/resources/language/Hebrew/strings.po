@@ -2121,3 +2121,67 @@ msgstr ""
 msgctxt "#30671"
 msgid "List of Opennic DNS IPs"
 msgstr ""
+
+msgctxt "#30672"
+msgid "Compact database"
+msgstr ""
+
+msgctxt "#30673"
+msgid "Compact cache database"
+msgstr ""
+
+msgctxt "#30674"
+msgid "Database was compacted"
+msgstr ""
+
+msgctxt "#30675"
+msgid "Remote host login"
+msgstr ""
+
+msgctxt "#30676"
+msgid "Remote host password"
+msgstr ""
+
+msgctxt "#30677"
+msgid "Force start as a library"
+msgstr ""
+
+msgctxt "#30678"
+msgid "Remove from Kodi library, when movie is deleted from Trakt"
+msgstr ""
+
+msgctxt "#30679"
+msgid "Remove from Kodi library, when show is deleted from Trakt"
+msgstr ""
+
+msgctxt "#30680"
+msgid "Remove Elementum duplicates from library"
+msgstr ""
+
+msgctxt "#30681"
+msgid "[B]Found duplicates in Kodi library:[/B][CR]Movies: [COLOR gold][B]%s[/B][/COLOR], Shows: [COLOR gold][B]%s[/B][/COLOR], Episodes: [COLOR gold][B]%s[/B][/COLOR][CR]Proceed?"
+msgstr ""
+
+msgctxt "#30682"
+msgid "No duplicates were found in Kodi library"
+msgstr ""
+
+msgctxt "#30683"
+msgid "Starting library duplicates removal"
+msgstr ""
+
+msgctxt "#30684"
+msgid "Removed Movies: %s, Shows: %s, Episodes: %s"
+msgstr ""
+
+msgctxt "#30685"
+msgid "Remove movies from Elementum database"
+msgstr ""
+
+msgctxt "#30686"
+msgid "Remove shows from Elementum database"
+msgstr ""
+
+msgctxt "#30687"
+msgid "In Elementum library"
+msgstr ""

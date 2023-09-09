@@ -39,21 +39,20 @@ def sagas(item):
 
     data = httptools.downloadpage(item.url).data
 
-    bloque = scrapertools.find_single_match(data, '>Sagas<(.*?)</main>')
+    matches = scrapertools.find_multiple_matches(data, '<div class="col">.*?<a href="(.*?)".*?src="(.*?)".*?alt="(.*?)"')
 
-    matches = scrapertools.find_multiple_matches(bloque, 'data-src="(.*?)".*?alt="(.*?)".*?href="(.*?)"')
-
-    for thumb, title, url in matches:
+    for url, thumb, title in matches:
         if not title or not url: continue
 
         itemlist.append(item.clone( action = 'list_films', title = title, url = url, thumbnail = thumb, text_color = 'moccasin' ))
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
+        if len(itemlist) == 16:
+            next_page = scrapertools.find_single_match(data, '<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
 
-        if next_page:
-            if '-pag' in next_page:
-                itemlist.append(item.clone( title='Siguientes ...', url = next_page, action = 'sagas', text_color='coral' ))
+            if next_page:
+                if '-pag' in next_page:
+                    itemlist.append(item.clone( title='Siguientes ...', url = next_page, action = 'sagas', text_color='coral' ))
 
     return itemlist
 
@@ -122,9 +121,7 @@ def list_films(item):
 
     data = httptools.downloadpage(item.url).data
 
-    bloque = scrapertools.find_single_match(data, '<nav id="site-navigation"(.*?)<nav')
-
-    matches = scrapertools.find_multiple_matches(bloque, 'data-src="(.*?)".*?alt="(.*?)".*?<a href="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, '<tr class="row-.*?src="(.*?)".*?alt="(.*?)".*?<a href="(.*?)"')
 
     num_matches = len(matches)
     desde = item.page * perpage
@@ -159,6 +156,7 @@ def list_films(item):
     if itemlist:
         if num_matches > hasta:
             next_page = item.page + 1
+
             itemlist.append(item.clone( title='Siguientes ...', page = next_page, action = 'list_films', text_color='coral' ))
 
     return itemlist
@@ -178,6 +176,7 @@ def findvideos(item):
     if url.startswith('https://ipfs.infura.io/'):
         headers = {'referer': host}
         url = httptools.downloadpage(url, headers = headers, only_headers = True, follow_redirects = False).headers.get('location')
+
         if url:
             itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', language = 'Esp', url = url ))
             return itemlist

@@ -13,7 +13,7 @@ host = 'https://divxatope.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post).data
+    data = httptools.downloadpage(url, post=post, headers=headers).data
     return data
 
 
@@ -189,14 +189,23 @@ def list_last(item):
     logger.info()
     itemlist = []
 
-    if item.search_type == "movie": search_type = "PELÍCULAS"
+    if item.search_type == "movie": search_type = "PELICULAS"
     elif item.search_type == "tvshow": search_type = "SERIES"
     elif item.search_type == "documentary": search_type = "DOCUMENTALES"
 
     data = do_downloadpage(item.url)
 
-    match = re.compile("""(?s)<div class="h5 text-dark">%s:<\/div>(.*?)<br><br>""" % (search_type)).findall(data)[0]
-    matches = re.compile(r"""<span class="text-muted">\d+-\d+-\d+<\/span> <a href='([^']+)' class="text-primary">([^<]+)""").findall(match)
+    if not data: return itemlist
+
+    if not '<div class="h5 text-dark">' in data:
+        data = data.replace("<div class='h5 text-dark'>", '<div class="h5 text-dark">')
+        data = data.replace("<span class='text-muted'>", '<span class="text-muted">')
+        data = data.replace("class='text-primary'>", 'class="text-primary">')
+
+    try:
+        bloque = re.compile('<div class="h5 text-dark">%s:<\/div>(.*?)<br><br>' % (search_type)).findall(data)[0]
+        matches = re.compile('<span class="text-muted">.*?' + "<a href='(.*?)'.*?" + 'class="text-primary">(.*?)</a>').findall(bloque)
+    except: return itemlist
 
     for url, title in matches:
         if item.search_type== 'movie':
@@ -366,6 +375,7 @@ def findvideos(item):
            else:
               servidor = 'directo'
               if '/ttlinks.live/' in url: other = 'ttlinks'
+              else: other = 'Torrent'
 
            itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, quality = qlty, url = url, server = servidor, other = other ))
 
@@ -433,7 +443,8 @@ def list_search(item):
             if not item.search_type == 'all':
                 if item.search_type == "movie": continue
 
-            if " - " in title: SerieName = title.split(" - ")[0]
+            if "[" in title: SerieName = title.split("[")[0]
+            elif " - " in title: SerieName = title.split(" - ")[0]
             else: SerieName = title
 
             itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, fmt_sufijo=sufijo, 
@@ -447,7 +458,8 @@ def list_search(item):
                 itemlist.append(item.clone( action = 'findvideos', url = host[:-1] + url, title = title, fmt_sufijo=sufijo,
                                             contentType = 'movie', contentTitle = title, contentExtra = 'documentary', infoLabels={'year': "-"} ))
             else:
-                if "(" in title: titulo = title.split("(")[0]
+                if "[" in title: titulo = title.split("[")[0]
+                elif "(" in title: titulo = title.split("(")[0]
                 else: titulo = title
 
                 itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, fmt_sufijo=sufijo,

@@ -7,12 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://b.ennovelas.net/'
+host = 'https://d.ennovelas.net/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://ennovelas.net/', 'https://w.ennovelas.net/', 'https://ww.ennovelas.net/',
-             'https://e.ennovelas.net/', 'https://a.ennovelas.net/']
+             'https://e.ennovelas.net/', 'https://a.ennovelas.net/', 'https://b.ennovelas.net/',
+             'https://s.ennovelas.net/', 'https://i.ennovelas.net/']
 
 
 domain = config.get_setting('dominio', 'ennovelas', default='')
@@ -43,7 +44,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -161,9 +162,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'telenovelas/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'novelas/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_epis', url = host + 'capitulos-n2/', search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_epis', url = host + 'episodes/', search_type = 'tvshow', text_color = 'olive' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por país', action='paises', search_type = 'tvshow' ))
@@ -233,7 +234,7 @@ def anios(item):
 
     if item.search_type == 'movie': limit_year = 2010
     else: limit_year = 1989
- 
+
     for x in range(current_year, limit_year, -1):
         url = host + 'years/' + str(x) + '/'
 
@@ -278,6 +279,7 @@ def list_all(item):
 
         if " (" in SerieName: SerieName = SerieName.split(" (")[0]
         elif "(En Espanol)" in SerieName: SerieName = SerieName.split("(En Espanol)")[0]
+        elif "En Espanol" in SerieName: SerieName = SerieName.split("En Espanol")[0]
         elif "En Español" in SerieName: SerieName = SerieName.split("En Español")[0]
         elif "[Español Subtitulado]" in SerieName: SerieName = SerieName.split("[Español Subtitulado]")[0]
         elif "[SUB Espanol]" in SerieName: SerieName = SerieName.split("[SUB Espanol]")[0]
@@ -375,6 +377,7 @@ def last_epis(item):
 
         if " (" in SerieName: SerieName = SerieName.split(" (")[0]
         elif "(En Espanol)" in SerieName: SerieName = SerieName.split("(En Espanol)")[0]
+        elif "En Espanol" in SerieName: SerieName = SerieName.split("En Espanol")[0]
         elif "En Español" in SerieName: SerieName = SerieName.split("En Español")[0]
         elif "[Español Subtitulado]" in SerieName: SerieName = SerieName.split("[Español Subtitulado]")[0]
         elif "[SUB Espanol]" in SerieName: SerieName = SerieName.split("[SUB Espanol]")[0]
@@ -571,11 +574,11 @@ def findvideos(item):
         if type == 'watch': post = {'watch': str(value), 'submit': ''}
         else: post = {'download': str(value), 'submit': ''}
 
-        data = do_downloadpage(link, post = post, headers = {'Referer': item.url} )
+        data1 = do_downloadpage(link, post = post, headers = {'Referer': item.url} )
 
-        matches = scrapertools.find_multiple_matches(data, "<iframe src='(.*?)'")
-        if not matches: matches = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
-        if not matches: matches = scrapertools.find_multiple_matches(data, '<td>Server.*?href="(.*?)"')
+        matches = scrapertools.find_multiple_matches(data1, "<iframe src='(.*?)'")
+        if not matches: matches = scrapertools.find_multiple_matches(data1, '<iframe src="(.*?)"')
+        if not matches: matches = scrapertools.find_multiple_matches(data1, '<td>Server.*?href="(.*?)"')
 
         for url in matches:
             if '.ennovelas.' in url: continue
@@ -586,19 +589,13 @@ def findvideos(item):
 
             if url.startswith('//'): url = 'https:' + url
 
-            if 'api.mycdn.moe/sblink.php?id=' in url: url = url.replace('api.mycdn.moe/sblink.php?id=', 'sbanh.com/e/')
-
-            elif 'api.mycdn.moe/fembed.php?id=' in url: url = url.replace('api.mycdn.moe/fembed.php?id=', 'feurl.com/v/')
-            elif 'api.mycdn.moe/furl.php?id=' in url: url = url.replace('api.mycdn.moe/furl.php?id=', 'feurl.com/v/')
-
-            elif 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
+            if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 
             elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
 
             elif 'api.mycdn.moe/dl/?uptobox=' in url: url = url.replace('api.mycdn.moe/dl/?uptobox=', 'uptobox.com/')
 
-            elif url.startswith('http://vidmoly'):
-                  url = url.replace('http://vidmoly', 'https://vidmoly').replace('/w/', '/embed-')
+            elif url.startswith('http://vidmoly'): url = url.replace('http://vidmoly', 'https://vidmoly').replace('/w/', '/embed-')
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -609,11 +606,13 @@ def findvideos(item):
             else: lang = 'Lat'
 
             other = ''
-            if type == 'download': other = 'D'
+            if servidor == 'various':
+                if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+            else:
+                if type == 'download': other = 'D'
 
             if not servidor == 'directo':
                 itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
-
 
     t_link = scrapertools.find_single_match(data, 'var vo_theme_dir = "(.*?)"')
     id_link = scrapertools.find_single_match(data, 'vo_postID = "(.*?)"')
@@ -622,10 +621,14 @@ def findvideos(item):
         i = 0
 
         while i <= 5:
-           data = do_downloadpage(t_link + '/temp/ajax/iframe.php?id=' + id_link + '&video=' + str(i), headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'} )
+           data2 = do_downloadpage(t_link + '/temp/ajax/iframe.php?id=' + id_link + '&video=' + str(i), headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'} )
 
-           u_link = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
-           if not u_link: u_link = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
+           data2 = data2.strip()
+
+           if not data2: break
+
+           u_link = scrapertools.find_single_match(data2, '<iframe.*?src="(.*?)"')
+           if not u_link: u_link = scrapertools.find_single_match(data2, '<IFRAME.*?SRC="(.*?)"')
 
            if u_link.startswith('//'): u_link = 'https:' + u_link
 
@@ -643,10 +646,37 @@ def findvideos(item):
                if item.lang == 'Esp': lang = 'Esp'
                else: lang = 'Lat'
 
+               other = 'P'
+
+               if servidor == 'various':
+                   if 'streamwish' in u_link or 'strwish' in u_link or 'embedwish' in u_link or 'wishembed' in u_link or 'awish' in u_link or 'dwish' in u_link or 'mwish' in u_link: other = 'Streamwish'
+
                if not servidor == 'directo':
-                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = 'P' ))
+                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
 
            i += 1
+
+    # ~ Downloads
+    data = do_downloadpage(item.url + '?do=downloads', headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'})
+
+    matches = scrapertools.find_multiple_matches(data, '<td>Server.*?href="(.*?)"')
+
+    for url in matches:
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if item.lang == 'Esp': lang = 'Esp'
+        else: lang = 'Lat'
+
+        other = 'D'
+
+        if servidor == 'various':
+            if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+
+        if not servidor == 'directo':
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:

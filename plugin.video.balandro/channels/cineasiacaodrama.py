@@ -184,13 +184,9 @@ def findvideos(item):
     for match in matches:
         ses += 1
 
-        url = host + 'links/' + match
+        if match:
+            url = host + 'links/' + match
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: url = ''
-        elif '/gounlimited' in url: url = ''
-        elif '/oogly.' in url: url = ''
-
-        if url:
             idioma = IDIOMAS.get(lang, lang)
 
             if url.startswith('//'): url = 'https:' + url
@@ -224,6 +220,9 @@ def play(item):
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+        if '/gounlimited' in url: return itemlist
+        elif '/oogly.' in url: return itemlist
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

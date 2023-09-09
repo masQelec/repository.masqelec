@@ -55,7 +55,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -435,16 +435,30 @@ def findvideos(item):
     data = do_downloadpage(item.url)
 
     # ~ embeds
-    matches = scrapertools.find_multiple_matches(data, 'data-title="Opción.*?src="(.*?)"')
-    if not matches: matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, 'data-title="Opción.*?data-src="(.*?)"')
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<iframe.*?data-src="(.*?)"')
 
     for url in matches:
         url = url.strip()
         ref = item.url
 
+        if '/likessb.' in url: continue
+
         lang = 'Lat'
 
-        itemlist.append(Item( channel=item.channel, action = 'play', server = 'directo', url = url, ref = ref, ref_serie = item.ref_serie, language = lang ))
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        other = ''
+
+        if servidor == 'various':
+            if 'filemoon' in url: other = 'filemoon'
+            elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'streamwish'
+
+        elif not servidor == 'directo': other = ''
+
+        itemlist.append(Item( channel=item.channel, action = 'play', server = servidor, url = url, ref = ref, ref_serie = item.ref_serie,
+                              language = lang, other = other.capitalize() ))
 
     return itemlist
 
@@ -461,7 +475,7 @@ def play(item):
     servidor = servertools.get_server_from_url(url)
     servidor = servertools.corregir_servidor(servidor)
 
-    if not servidor == 'direct':
+    if not servidor == 'directo':
         url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone( url = url, server = servidor ))

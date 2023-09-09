@@ -191,6 +191,7 @@ def list_all(item):
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
         if '-1-ano' in url: continue
+        elif '-premium-12-meses' in url: continue
 
         if not url or not title: continue
 
@@ -420,10 +421,6 @@ def findvideos(item):
             elif servidor == 'vip': continue
 
             if servidor == 'ok': servidor = 'okru'
-
-            elif servidor.startswith('sb'): servidor = 'streamsb'
-            elif servidor == 'cloudemb': servidor = 'streamsb'
-            elif 'lvturbo' in servidor: servidor = 'streamsb'
 
             elif servidor == 'google': servidor = 'gvideo'
 

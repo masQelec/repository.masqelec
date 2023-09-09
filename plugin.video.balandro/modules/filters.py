@@ -1139,7 +1139,12 @@ def show_channels_list(item):
 
         if ch['active'] == False:
             if 'temporary' in ch['clusters']: info = info + '[COLOR pink][B] Temporalmente Inactivo [/B][/COLOR]'
-            else: info = info + '[COLOR red][B] Inactivo [/B][/COLOR]'
+            else:
+               info = info + '[COLOR red][B] Inactivo [/B][/COLOR]'
+               if 'web anulada.' in ch['notes'].lower(): info = info + '[COLOR pink][B] ANULADO[/B][/COLOR]'
+               elif 'web cerrada.' in ch['notes'].lower(): info = info + '[COLOR gold][B] CERRADO[/B][/COLOR]'
+               elif 'canal privado' in ch['notes'].lower(): info = info + '[COLOR grey][B] PRIVADO[/B][/COLOR]'
+
         elif ch['searchable'] == False: info = info + '[COLOR coral][B] No búsquedas [/B][/COLOR]'
         elif channels_search:
             if no_proxies:
@@ -1291,7 +1296,7 @@ def search_new_proxies(canal_0, canal_1, canal_2):
     return False
 
 def tests_channels(canal_0, canal_1, canal_2):
-    if platformtools.dialog_yesno(canal_0, '[COLOR darkorange][B]¿ Efectuar Test Web del Canal ?[/B][/COLOR]', canal_1, canal_2):
+    if platformtools.dialog_yesno(canal_0, '[COLOR goldenrod][B]¿ Efectuar Test Web del Canal ?[/B][/COLOR]', canal_1, canal_2):
         from modules import tester
 
         config.set_setting('developer_test_channels', '')
@@ -1302,7 +1307,7 @@ def tests_channels(canal_0, canal_1, canal_2):
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 def tests_servers(servidor_0, servidor_1):
-    if platformtools.dialog_yesno(servidor_0,'[COLOR darkorange][B]¿ Efectuar Test Web del Servidor ?[/B][/COLOR]', servidor_1):
+    if platformtools.dialog_yesno(servidor_0,'[COLOR goldenrod][B]¿ Efectuar Test Web del Servidor ?[/B][/COLOR]', servidor_1):
         from modules import tester
 
         config.set_setting('developer_test_servers', '')

@@ -28,7 +28,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Recientes', action = 'list_all', url = host + 'recently-added-raw', search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Capítulos recientes', action = 'list_all', url = host + 'recently-added-raw', search_type = 'tvshow', text_color = 'olive' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'ongoing-series', search_type = 'tvshow' ))
 
@@ -156,6 +156,9 @@ def findvideos(item):
 
         other = ''
         if servidor == 'directo': other = srv
+
+        if servidor == 'various':
+            if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other = other ))
 

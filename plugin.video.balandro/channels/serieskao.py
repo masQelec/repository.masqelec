@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -378,22 +378,11 @@ def findvideos(item):
     link = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
     if '+video[1]+' in str(link): link = scrapertools.find_single_match(data, "video\[1\] = '([^']+)")
 
-    if '.php?id=' in link:
-         link = scrapertools.find_single_match(data, "video\[3\] = '([^']+)")
-
-         if link:
-             if 'furl.php?id=' in link:
-                 url = link.replace('https://api.mycdn.moe/furl.php?id=', 'https://owodeuwu.xyz/v/')
-
-                 itemlist.append(Item( channel = item.channel, action = 'play', server = 'fembed', title = '', url = url ))
-
-         return itemlist
-
     if not link: return itemlist
 
     data = do_downloadpage(link)
 
-    matches = re.compile("go_to_player(.*?)</li>", re.DOTALL).findall(data)
+    matches = re.compile('<li onclick="go_to_player(.*?)</li>', re.DOTALL).findall(data)
 
     ses = 0
 
@@ -402,24 +391,39 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(match, "'(.*?)'")
 
+        if not url: continue
+
+        url = base64.b64decode(url).decode("utf-8")
+
+        if '/?uptobox=' in url:
+            url = scrapertools.find_single_match(url, '/?uptobox=(.*?)$')
+            url = 'https://uptobox.com/' + url
+
         lang = scrapertools.find_single_match(match, 'data-lang="(.*?)"')
 
         lng = IDIOMAS.get(lang, lang)
 
         other = scrapertools.find_single_match(match, '<span>(.*?)</span>').strip().lower()
 
-        if other == 'plusvip': continue
-        elif other == '1fichier': continue
+        if other == 'netu' or other == 'hqq' or other == 'waaw': continue
 
-        elif other == 'netu' or other == 'hqq' or other == 'waaw': continue
+        elif other == 'plusvip': continue
+        elif other == '1fichier': continue
 
         other = servertools.corregir_servidor(other)
 
-        if other == 'various':
-            if 'filemoon' in match: other = 'filemoon'
-            elif 'streamwish' in match: other = 'streamwish'
+        servidor = other
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = lng, other = other.capitalize() ))
+        if other == 'various':
+            if 'filemoon' in url: other = 'filemoon'
+            elif 'streamwish' in url: other = 'streamwish'
+            elif 'filelions' in url: other = 'filelions'
+
+        elif other == 'stp': other = 'streamtape'
+
+        if other == servidor: other = ''
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lng, other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -433,6 +437,8 @@ def play(item):
     logger.info()
     itemlist = []
 
+    url = item.url
+
     if not item.server == 'directo':
         servidor = servertools.get_server_from_url(item.url)
         servidor = servertools.corregir_servidor(servidor)
@@ -443,42 +449,17 @@ def play(item):
 
         return itemlist
 
-    url = 'https://api.mycdn.moe/player/?id=%s' % item.url
-
-    data = do_downloadpage(url)
-
-    url = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
-
-    if not url: return itemlist
-
-    if 'uptobox=' in url:
-        url = scrapertools.find_single_match(url, 'uptobox=([A-z0-9]+)')
-        url = 'https://uptobox.com/%s' % url
-
-    elif "/embedsito.net/" in url:
-        if url.endswith('.srt'):
-            url = scrapertools.find_single_match(url, '(.*?)poster=')
-        else:
-            data = httptools.downloadpage(url).data
-
-            url = scrapertools.find_single_match(data, 'var shareId = "([^"]+)"')
-
-            if not url: return itemlist
-
-            url = 'https://www.amazon.com/clouddrive/share/%s' % url
-
     if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-    if url:
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
+    servidor = servertools.get_server_from_url(url)
+    servidor = servertools.corregir_servidor(servidor)
 
-        url = servertools.normalize_url(servidor, url)
+    url = servertools.normalize_url(servidor, url)
 
-        if servidor == 'zplayer': url = url + '|' + host
+    if servidor == 'zplayer': url = url + '|' + host
 
-        itemlist.append(item.clone(url = url, server = servidor))
+    itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

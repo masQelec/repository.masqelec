@@ -11,7 +11,15 @@ host = 'https://yespornpleasexxx.com/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    timeout = None
+    if host in url: timeout = config.get_setting('channels_repeat', default=30)
+
+    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if not data:
+        if not '?s=' in url:
+            platformtools.dialog_notification('YesPornPlease', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -140,7 +148,7 @@ def findvideos(item):
             if url:
                 url += '|Referer=%s' % item.url
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'VO' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'Vo' ))
 
         servidor = servertools.get_server_from_url(link)
         servidor = servertools.corregir_servidor(servidor)
@@ -150,7 +158,7 @@ def findvideos(item):
         if not 'http' in link: link = 'https:' + link
 
         if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'VO' ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Vo' ))
 
     return itemlist
 

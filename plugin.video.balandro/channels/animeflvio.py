@@ -296,7 +296,12 @@ def findvideos(item):
 
         if servidor == 'directo': continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Vose' ))
+        other = ''
+        if servidor == 'various':
+            if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+            elif 'azipcdn' in url or 'filelions' in url or 'alions' in url or 'dlions' in url or 'mlions' in url: other = 'Filelions'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Vose', other = other ))
 
     if not itemlist:
         if not ses == 0:

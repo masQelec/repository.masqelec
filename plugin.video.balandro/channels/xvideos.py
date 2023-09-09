@@ -251,7 +251,7 @@ def findvideos(item):
 
         url = m3u8url.replace("hls.m3u8", url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = calidad, url = url, language = 'VO' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = calidad, url = url, language = 'Vo' ))
 
     return sorted(itemlist, key=lambda i: i.quality)
 

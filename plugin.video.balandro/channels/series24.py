@@ -43,7 +43,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -444,12 +444,20 @@ def findvideos(item):
 
         elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
 
+        servidor = servidor.replace('.tv', '').strip()
+
         lang = scrapertools.find_single_match(match, " src='.*?/flags/(.*?).png'")
 
         dpost = scrapertools.find_single_match(match, " data-post='(.*?)'")
         dnume = scrapertools.find_single_match(match, " data-nume='(.*?)'")
 
         if not dpost or not dnume: continue
+
+        other = servidor.lower().strip()
+
+        if servidor == 'streamwish' or servidor == 'strwish' or servidor == 'embedwish' or servidor == 'wishembed' or servidor == 'awish' or servidor == 'dwish' or servidor == 'mwish': other = 'streamwish'
+
+        elif servidor == 'filemoon': other = 'Filemoon'
 
         servidor = servertools.corregir_servidor(servidor)
 
@@ -458,7 +466,11 @@ def findvideos(item):
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', dpost = dpost, dnume = dnume, other = servidor.capitalize(), language = IDIOMAS.get(lang, lang) ))
+        if not servidor == 'directo':
+            if not servidor == 'various': other = ''
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, dpost = dpost, dnume = dnume,
+		                      language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
 
     # ~ enlaces
     matches = scrapertools.find_multiple_matches(data, "<tr id='link-'(.*?)</tr>")

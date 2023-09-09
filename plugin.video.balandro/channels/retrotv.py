@@ -9,6 +9,7 @@ from core import httptools, scrapertools, servertools, tmdb
 
 host = 'https://retrotv.org/'
 
+
 perpage = 20
 
 
@@ -46,6 +47,10 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista-series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/', search_type = 'tvshow', text_color = 'olive' ))
+
+    itemlist.append(item.clone( title = 'Animación', action ='list_all', url = host + 'category/animacion/', search_type = 'tvshow', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'Live action', action ='list_all', url = host + 'category/liveaction/', search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -119,11 +124,11 @@ def list_all(item):
     for match in matches[item.page * perpage:]:
         title = scrapertools.find_single_match(match, '<h3 class="Title">(.*?)</h3>')
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
-        if thumb.startswith('//'):
-            thumb = 'https:' + thumb
+        if thumb.startswith('//'): thumb = 'https:' + thumb
 
         year = scrapertools.find_single_match(match, '<span class="Year">(.*?)</span>')
         if not year: year = '-'
@@ -363,22 +368,20 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, 'data-tplayernv="Opt(.*?)"><span>(.*?)</span>')
+    matches = scrapertools.find_multiple_matches(data, 'data-tplayernv="Opt(.*?)"><span>(.*?)</span>.*?<span>(.*?)</span>')
 
     ses = 0
 
-    for opt, servidor in matches:
+    for opt, servidor, lang_qlty in matches:
         ses += 1
 
         servidor = servidor.replace('<strong>', '').replace('</strong>', '')
         servidor = servertools.corregir_servidor(servidor)
 
         url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src="(.*?)"')
-        if not url:
-            url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src=&quot;(.*?)&quot;')
+        if not url: url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src=&quot;(.*?)&quot;')
 
-        if url.startswith('//') == True:
-            url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src=&quot;(.*?)&quot;')
+        if url.startswith('//') == True: url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src=&quot;(.*?)&quot;')
 
         if not servidor or not url: continue
 
@@ -391,9 +394,19 @@ def findvideos(item):
         elif servidor == 'blenditall':
             link_other = servidor
             servidor = 'directo'
+
         else: link_other = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = link_other ))
+        lang = scrapertools.find_single_match(lang_qlty, '(.*?)-').strip()
+
+        if 'Latino' in lang: lang = 'Lat'
+        elif 'Castellano' in lang or 'Español' in lang: lang = 'Esp'
+        elif 'Subtitulado' in lang or 'VOSE' in lang: lang = 'Vose'
+        else: lang = '?'
+
+        qlty = scrapertools.find_single_match(lang_qlty, '-(.*?)$').strip()
+
+        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = lang, quality = qlty, other = link_other ))
 
     # ~ Descargas
     matches = scrapertools.find_multiple_matches(data, '<span class="Num">(.*?)</tr>')
@@ -436,12 +449,15 @@ def play(item):
                 url = scrapertools.find_single_match(data.lower(), '<iframe src="(.*?)"')
 
                 data = httptools.downloadpage(url).data
+
                 url = scrapertools.find_single_match(str(data), 'sources.*?"(.*?)"')
             else:
                 url = scrapertools.find_single_match(data, 'src="(.*?)"')
 
                 if 'blenditall' in url:
-                    data = httptools.downloadpage(url).data
+                    referer_url = url
+
+                    data = httptools.downloadpage(url, headers = {'Referer': 'https://blenditall.com/'}).data
 
                     urlb = scrapertools.find_single_match(data, '"file".*?"(.*?)"')
                     urlb = urlb.replace('\\/', '/')
@@ -450,17 +466,19 @@ def play(item):
                         if urlb.startswith('//') == True: urlb = 'https:' + urlb
 
                         if urlb.startswith('https://blenditall.com/playlist.m3u8?data='):
-                            itemlist.append(item.clone(server = 'm3u8hls', url = urlb))
+                            url = urlb + '|' + referer_url
+
+                            itemlist.append(item.clone(server = 'blenditall', url=url))
                             return itemlist
 
-                        data = httptools.downloadpage(urlb).data
+                        data = httptools.downloadpage(urlb, headers = {'Referer': 'https://blenditall.com/'}).data
 
                         new_url = scrapertools.find_single_match(data, '//blenditall.com/playlist.m3u8?data=(.*?)$')
 
                         if new_url:
-                            url = 'https://blenditall.com/playlist.m3u8?data=' + new_url
+                            url = 'https://blenditall.com/playlist.m3u8?data=' + new_url + '|' + referer_url
 
-                            itemlist.append(item.clone(server = 'm3u8hls', url = url))
+                            itemlist.append(item.clone(server = 'blenditall', url=url))
                             return itemlist
 
     if '/app.retrotvshows.com/' in url: url = ''

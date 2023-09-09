@@ -13,6 +13,9 @@ host = 'https://www1.movidy.mobi/'
 perpage = 22
 
 
+# ~ las series estructura diferente  '/browse?type=series'
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://movidy.mobi/', 'https://www.movidy.mobi/']
@@ -28,7 +31,6 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
 
 def mainlist(item):
-    # ~ las series estructura diferente  '/browse?type=series'
     return mainlist_pelis(item)
 
 
@@ -198,11 +200,25 @@ def findvideos(item):
 
                 link = servertools.normalize_url(servidor, link)
 
-                itemlist.append(Item (channel = item.channel, action = 'play', title = '', server = servidor, url = link, language = lang, quality = qlty ))
+                other = ''
+
+                if servidor == 'various':
+                    if 'streamhub' in link: other = 'Streamhub'
+                    elif 'streamwish' in link or 'strwish' in link or 'embedwish' in link or 'wishembed' in link or 'awish' in link or 'dwish' in link or 'mwish' in link: other = 'Streamwish'
+
+                if not servidor == 'directo':
+                    itemlist.append(Item (channel = item.channel, action = 'play', title = '', server = servidor, url = link, language = lang, quality = qlty, other = other ))
 
             continue
 
-        itemlist.append(Item (channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = lang, quality = qlty ))
+        other = ''
+
+        if servidor == 'various':
+            if 'streamhub' in url: other = 'Streamhub'
+            elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+
+        if not servidor == 'directo':
+          itemlist.append(Item (channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = lang, quality = qlty, other = other ))
 
     if not itemlist:
         if not ses == 0:

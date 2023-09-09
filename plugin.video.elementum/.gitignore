@@ -24,6 +24,7 @@ var/
 *.egg
 *.zip
 elementum-binaries-master/
+resources/site-packages/platform_detect
 # bin/
 
 # PyInstaller

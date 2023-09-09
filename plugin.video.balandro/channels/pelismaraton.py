@@ -388,6 +388,10 @@ def findvideos(item):
 
         if servidor == 'hqq' or servidor == 'waaw' or servidor == 'netu': continue
 
+        elif servidor == 'filemooon':
+              servidor = 'filemoon'
+              url = url.replace('filemooon', 'filemoon')
+
         if servidor:
             lang = srv_lang.split('-')[1]
             if len(lang) >= 3:

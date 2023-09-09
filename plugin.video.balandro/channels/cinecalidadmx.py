@@ -7,14 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wvw.cinecalidad.com.mx/'
+host = 'https://cinecalidad.com.mx/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://cinecalidad.com.mx/', 'https://cinecalidad.fit/', 'https://ww3.cinecalidad.com.mx/',
+ant_hosts = ['https://cinecalidad.fit/', 'https://ww3.cinecalidad.com.mx/',
             'https://ww10.cinecalidad.com.mx/', 'https://w5.cinecalidad.com.mx/', 'https://w15.cinecalidad.com.mx/',
             'https://ww1.cinecalidad.com.mx/', 'https://c1.cinecalidad.com.mx/', 'https://c2.cinecalidad.com.mx/',
             'https://c3.cinecalidad.com.mx/', 'https://c4.cinecalidad.com.mx/', 'https://c5.cinecalidad.com.mx/',
@@ -22,7 +22,8 @@ ant_hosts = ['https://cinecalidad.com.mx/', 'https://cinecalidad.fit/', 'https:/
             'https://c9.cinecalidad.com.mx/', 'https://c20.cinecalidad.com.mx/', 'https://c21.cinecalidad.com.mx/',
             'https://c22.cinecalidad.com.mx/', 'https://c23.cinecalidad.com.mx/', 'https://c24.cinecalidad.com.mx/',
             'https://c25.cinecalidad.com.mx/', 'https://c26.cinecalidad.com.mx/', 'https://c27.cinecalidad.com.mx/',
-            'https://c28.cinecalidad.com.mx/', 'https://c29.cinecalidad.com.mx/']
+            'https://c28.cinecalidad.com.mx/', 'https://c29.cinecalidad.com.mx/', 'https://wvw.cinecalidad.com.mx/',
+            'https://vww.cinecalidad.com.mx/', 'https://wvw.cinecalidad.com.mx/' 'https://wwv.cinecalidad.com.mx/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadmx', default='')
@@ -31,6 +32,38 @@ if domain:
     if domain == host: config.set_setting('dominio', '', 'cinecalidadmx')
     elif domain in str(ant_hosts): config.set_setting('dominio', '', 'cinecalidadmx')
     else: host = domain
+
+
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_cinecalidadmx_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
 
 
 def do_downloadpage(url, post=None, headers=None):
@@ -66,6 +99,10 @@ def acciones(item):
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_cinecalidadmx', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_cinecalidadmx', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     platformtools.itemlist_refresh()
 
@@ -438,6 +475,8 @@ def findvideos(item):
             elif 'cinecalidad' in srv: continue
             elif 'subtítulo' in srv: continue
 
+            servidor = servertools.corregir_servidor(srv)
+
             qlty = '1080'
 
             language = lang
@@ -445,7 +484,22 @@ def findvideos(item):
             elif idio == 'es': language = 'Esp'
             elif idio == 'en': language = 'Vose'
 
-            itemlist.append(Item (channel = item.channel, action = 'play', server = 'directo', title = '', dopt = dopt, quality = qlty, language = language, other = srv ))
+            other = ''
+
+            if servidor == 'directo':
+                if srv == 'streamtape': servidor = 'streamtape'
+                elif srv == 'voe': servidor = 'voe'
+                elif srv == 'doods' or srv == 'doostream': servidor = 'doodstream'
+
+                elif srv == 'streamwish' or srv == 'strwish' or srv == 'embedwish' or srv == 'wishembed' or srv == 'awish' or srv == 'dwish' or srv == 'mwish': servidor = 'various'
+
+                elif srv == 'filemoon': servidor = 'various'
+
+            if servidor == 'various': other = srv.capitalize()
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', dopt = dopt, quality = qlty, language = language, other = other ))
 
     if '>DESCARGAR<' in data:
         bloque = scrapertools.find_single_match(data, '>DESCARGAR<(.*?)</ul>')
@@ -470,8 +524,10 @@ def findvideos(item):
             elif 'subtítulo' in srv: continue
             elif 'forzado' in srv: continue
             elif 'cinecalidad' in srv: continue
+            elif '1fichier' in srv: continue
 
             elif srv == 'utorrent': srv = 'torrent'
+            elif 'utorrent' in srv: servidor = 'torrent'
             elif 'torrent' in srv: srv = 'torrent'
 
             if servertools.is_server_available(srv):
@@ -481,7 +537,18 @@ def findvideos(item):
 
             if not url.startswith('http'): url = item.url + url
 
-            itemlist.append(Item (channel = item.channel, action = 'play', server = 'directo', title = '', url = url, quality = qlty, language = lang, other = srv ))
+            other = ''
+
+            servidor = servertools.corregir_servidor(srv)
+
+            if servidor == 'directo':
+                if srv == 'mega': servidor = 'mega'
+                elif srv == 'uptobox': servidor = 'uptobox'
+                elif srv == 'torrent': servidor = 'torrent'
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = qlty, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -502,7 +569,6 @@ def play(item):
     # ~ por si esta en ant_hosts
     for ant in ant_hosts:
         url = url.replace(ant, host)
-
 
     if not url:
         servidor = servertools.get_server_from_url(item.dopt)
@@ -553,8 +619,7 @@ def play(item):
             itemlist.append(item.clone( url = url, server = 'torrent' ))
             return itemlist
 
-        elif servidor == 'zplayer':
-            url = url + '|' + host
+        elif servidor == 'zplayer': url = url + '|' + host
 
         itemlist.append(item.clone(url = url, server = servidor))
 

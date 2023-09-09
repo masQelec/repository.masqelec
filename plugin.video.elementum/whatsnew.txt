@@ -7,6 +7,41 @@
     - Source is open, so you can fork everything.
     - Some bug fixes or updates can come, to keep things working and have the latest versions.
 
+[B][COLOR red]0.1.97[/COLOR][/B]
+    - Reverted detection of memory on running device (new method was not correctly getting memory size on arm devices).
+    - Added a check for network locations when deciding where to write strm files (to skip network locations).
+    - Added linux-armv7-softfp platform, that is a Armv7 build, without hardfp enabled.
+
+[B][COLOR red]0.1.96[/COLOR][/B]
+    - Fixed issue with running on Android platforms.
+    - Added 'In Elementum library' lists, that show items, that are updated by Elementum.
+    - Added option to yclear movies/shows database from Elementum settings.
+    - Updated list sortings to make sure 'Next page' link is always on the bottom and adding more sorting options.
+
+[B][COLOR red]0.1.95[/COLOR][/B]
+    - Recommendation lists now return more entries.
+    - Trakt Lists now show all entries without pagination.
+    - Many changes to rendering to speed-up everything.
+    - /debug/bundle endpoint now can get kodi.log from Python part of addon, to publish logs when Kodi is running on remote host.
+
+[B][COLOR red]0.1.93-0.1.94[/COLOR][/B]
+    - Replaced internally managed "repository.elementum" with a standalone "repository.elementumorg" that can download addons even if Elementum is not working.
+    - Added Trakt removal sync (with settings in Trakt section), that will remove items from Kodi library, when it is removed from Trakt list.
+    - Added custom action to Kodi library settings section, that will search for library duplicates and remove all duplicate items.
+    - Small fixes to existing functionality.
+
+[B][COLOR red]0.1.88-0.1.92[/COLOR][/B]
+    - Initial support for connecting more than one plugin.video.elementum to a binary.
+    - Added support for exporting current configuration to a json/yaml file.
+    - Added support for reading configuration form json/yaml file (Kodi is not needed to startup).
+    - Added support for setting login/password to access Elementum binary.
+    - Added manual option to compact Elementum databases (instead of a periodic automatic run).
+    - Added support for allowing custom search queries, coming from context.elementum actions (needs latest context.elementum update).
+    - Changed the way plugin detects running OS and Architecture to use detection, based on shared library run.
+    - Added support for using custom profile location on Android (taken from Kodi environment).
+    - Fixed missing /debug handlers.
+    - Added option to force starting as a shared library.
+
 [B][COLOR red]0.1.87[/COLOR][/B]
     - Added basic support for running application as a shared library, that can be used on latest Android devices and Xbox devices (that do not allow to fork application).
     - Fixed repository.elementum xml declaration to run properly on Kodi 20.

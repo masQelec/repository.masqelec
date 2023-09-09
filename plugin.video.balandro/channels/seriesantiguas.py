@@ -88,9 +88,14 @@ def list_all(item):
 
     if '<div class="progression-studios-elementor-video-post-container">' in data:
          bloque = scrapertools.find_single_match(data, '<div class="progression-studios-elementor-video-post-container">(.*?)</div></div></div></div></div></div></div>')
+
+         if not bloque: bloque = scrapertools.find_single_match(data, '<div class="progression-studios-elementor-video-post-container">(.*?)<div class="aztec-progression-pagination-elementor">')
+         if not bloque: bloque = data
+
     else: bloque = data
 
-    matches = scrapertools.find_multiple_matches(bloque, '<div id="post-(.*?)</div></div></a>')
+    matches = scrapertools.find_multiple_matches(bloque, '<div id="post-(.*?)<div class="progression-studios-isotope-animation">')
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<div id="post-(.*?)<div class="clearfix-pro"></div>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
@@ -176,7 +181,7 @@ def temporadas(item):
                 itemlist = episodios(item)
                 return itemlist
 
-            itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
+            itemlist.append(item.clone( action = 'episodios', title = title, url = url, old = '', page = 0, contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -194,8 +199,9 @@ def episodios(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<div id="progression-studios-season-video-list-' + str(item.contentSeason) + '(.*?)</div></div></div></div></div>')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<div id="progression-studios-season-video-list-' + str(item.contentSeason) + '(.*?)<div class="clearfix-pro">')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<div class="progression-studios-season-item">(.*?)</div><div class="clearfix-pro">')
+    matches = scrapertools.find_multiple_matches(bloque, '<div class="progression-studios-season-item">(.*?)><div class="clearfix-pro">')
 
     if not matches: matches = scrapertools.find_multiple_matches(data, "<div class='post hentry'>(.*?)</div></div>")
 
@@ -251,12 +257,14 @@ def episodios(item):
         if not item.old:
             episode = scrapertools.find_single_match(epis, '<h2 class="progression-video-title">(.*?). ')
 
-            title = scrapertools.find_single_match(epis, '<h2 class="progression-video-title">.*?. (.*?)</h2>').strip()
+            title = scrapertools.find_single_match(epis, '<h2 class="progression-video-title">.*?. (.*?)</h2').strip()
         else:
             episode = scrapertools.find_single_match(epis, "Temporada.*?x(.*?)'").strip()
             episode = episode.replace(')', '')
 
             title = scrapertools.find_single_match(epis, "<img alt='(.*?)'")
+
+            if not title: title = scrapertools.find_single_match(epis, '<h2 class="progression-video-title">.*?. (.*?)</h2').strip()
 
         if not url or not episode: continue
 
@@ -297,11 +305,13 @@ def findvideos(item):
     if "<div class='post-body entry-content'>" in data: bloque = scrapertools.find_single_match(data, "<div class='post-body entry-content'>(.*?)<div class='post-footer'>")
     else: bloque = data
 
+    matches0 = scrapertools.find_multiple_matches(bloque, '<iframe.*?src="(.*?)".*?</iframe>')
+
     matches1 = scrapertools.find_multiple_matches(bloque, '<iframe.*?allow="autoplay".*?data-src="(.*?)".*?</iframe>')
 
     matches2 = scrapertools.find_multiple_matches(bloque, '<noscript><iframe.*? src="(.*?)".*?</iframe>')
 
-    matches = matches1 + matches2
+    matches = matches0 + matches1 + matches2
 
     for url in matches:
         if url.startswith('//'): url = 'https:' + url

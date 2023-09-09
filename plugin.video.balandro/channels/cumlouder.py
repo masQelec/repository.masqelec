@@ -240,7 +240,7 @@ def findvideos(item):
     for url, qlty in matches:
         url = url.replace("&amp;", "&")
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = qlty, url = url, language = 'VO' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = qlty, url = url, language = 'Vo' ))
 
     return itemlist
 

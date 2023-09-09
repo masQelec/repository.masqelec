@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import re, base64
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+import os, re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -12,8 +17,8 @@ from core import httptools, scrapertools, tmdb
 host = 'https://www.vivatorrents.org/'
 
 
-def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post).data
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    data = httptools.downloadpage(url, post=post, raise_weberror=raise_weberror).data
 
     return data
 
@@ -131,8 +136,17 @@ def list_all(item):
             if not item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
 
+            titulo = title
+
+            if "(" in titulo: titulo = titulo.split("(")[0]
+            elif "[" in titulo: titulo = titulo.split("[")[0]
+
+            if "Torrent" in titulo: titulo = titulo.split("Torrent")[0]
+
+            titulo = titulo.strip()
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, fmt_sufijo=sufijo,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+                                        contentType='movie', contentTitle=titulo, infoLabels={'year': year} ))
 
 
     tmdb.set_infoLabels(itemlist)
@@ -168,6 +182,46 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if '/?trdownload=' in url:
+        if PY3:
+            from core import requeststools
+            data = requeststools.read(url, 'vivatorrents')
+        else:
+             data = do_downloadpage(url, raise_weberror=False)
+
+        if data:
+            if 'Página no encontrada' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                 return 'Archivo [COLOR red]No encontrado[/COLOR]'
+
+            url = data
+
+            if 'b' in str(url): scrapertools.find_single_match(str(url), "b'(.*?)'")
+
+            file_local = os.path.join(config.get_data_path(), "temp.torrent")
+            with open(file_local, 'wb') as f: f.write(data); f.close()
+
+            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+
+            return itemlist
+
+        else: url = ''
+
+    if url:
+        if url.startswith('magnet:'):
+            itemlist.append(item.clone( url = url, server = 'torrent' ))
+
+        elif url.endswith(".torrent"):
+            itemlist.append(item.clone( url = url, server = 'torrent' ))
 
     return itemlist
 

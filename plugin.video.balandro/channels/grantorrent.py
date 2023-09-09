@@ -14,7 +14,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://grantorrent.zip/'
+host = 'https://www1.grantorrent.pm/'
 
 
 # ~ por si viene de enlaces guardados
@@ -23,8 +23,8 @@ ant_hosts = ['http://grantorrent.net/', 'https://grantorrent1.com/', 'https://gr
              'https://grantorrent.eu/', 'https://grantorrent.cc/', 'https://grantorrent.li/',
              'https://grantorrent.online/', 'https://grantorrentt.com/', 'https://grantorrent.nl/',
              'https://grantorrent.ch/', 'https://grantorrent.ac/', 'https://grantorrent.re/',
-             'https://grantorrent.se/,' 'https://grantorrent.si/', 'https://grantorrent.fi/',
-             'https://grantorrent.bz/']
+             'https://grantorrent.se/', 'https://grantorrent.si/', 'https://grantorrent.fi/',
+             'https://grantorrent.bz/', 'https://grantorrent.zip/']
 
 
 domain = config.get_setting('dominio', 'grantorrent', default='')
@@ -305,7 +305,7 @@ def findvideos(item):
         if not url.endswith('.torrent'):
             if not '/s.php' in url: continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'directo',
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
                               language = item.languages, quality = item.qualities, quality_num = puntuar_calidad(item.qualities) ))
 
     return itemlist
@@ -332,8 +332,11 @@ def play(item):
                 data = do_downloadpage(item.url)
 
             if data:
-                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data) or '<!doctype' in str(data):
+                if '<h1>404 Not Found</h1>' in str(data) or '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data) or '<!doctype' in str(data):
                     return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                elif 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                    return 'Archivo [COLOR red]No encontrado[/COLOR]'
 
                 import os
 

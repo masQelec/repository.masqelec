@@ -30,7 +30,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -78,6 +78,22 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='pelisforte', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_pelisforte', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     return mainlist_pelis(item)
 
@@ -85,9 +101,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
-
-    itemlist.append(Item( channel='helper', action='show_help_pelisforte', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -208,6 +222,8 @@ def findvideos(item):
         elif srv == 'trailer': continue
 
         if '+ veloz' in srv: continue
+        elif 'sdav' in srv: continue
+        elif 'guayhd' in srv: continue
 
         idioma = idioma.strip()
 
@@ -220,10 +236,18 @@ def findvideos(item):
         if not url: url = scrapertools.find_single_match(data, '<div id=options-' + opt + '.*?<iframe data-src="(.*?)"')
 
         if url:
-            servidor = 'directo'
-            other = srv
+            servidor = servertools.corregir_servidor(srv)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other.capitalize(), language = lang ))
+            other = ''
+
+            if srv == 'ok': other = 'ok'
+
+            elif srv == 'swish': servidor = 'various'
+
+            if servidor == 'directo': other = srv
+            elif servidor == 'various': other = srv
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang , other = other.capitalize()))
 
     # ~ descargas recaptcha
 
@@ -266,11 +290,6 @@ def play(item):
                     return 'Servidor [COLOR plum]No Soportado[/COLOR]'
                 elif '/playpf.link/' in url:
                     return 'Servidor [COLOR plum]No Soportado[/COLOR]'
-                elif '/vgfplay.' in url:
-                    return 'Servidor [COLOR plum]No Soportado[/COLOR]'
-
-                if '/wtfsb.link/' in url:
-                    url = url.replace('/wtfsb.link/', '/streamsb.net/')
 
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)

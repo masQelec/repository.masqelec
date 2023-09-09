@@ -7,13 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://animeflv.vc/'
+host = 'https://animeflv.sh/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www10.animeflv.cc/', 'https://www3.animeflv.net/', 'https://www3.animeflv.cc/',
              'https://ww3.animeflv.cc/', 'https://animeflv.bz/', 'https://www1.animeflv.bz/',
-             'https://www2.animeflv.bz/', 'https://animeflv.so/']
+             'https://www2.animeflv.bz/', 'https://animeflv.so/', 'https://animeflv.vc/']
 
 
 domain = config.get_setting('dominio', 'animeflv', default='')
@@ -371,6 +371,8 @@ def findvideos(item):
                 other = ''
                 if servidor == 'various':
                     if '/filemoon.' in link: other = 'Filemoon'
+                    elif '/streamwish.' in link: other = 'Streamwish'
+                    elif '/filelions.' in link: other = 'Filelions'
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Vose', other = other ))
 
@@ -383,6 +385,8 @@ def findvideos(item):
             other = ''
             if servidor == 'various':
                 if '/filemoon.' in url: other = 'Filemoon'
+                elif '/streamwish.' in url: other = 'Streamwish'
+                elif '/filelions.' in url: other = 'Filelions'
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other = other ))
 

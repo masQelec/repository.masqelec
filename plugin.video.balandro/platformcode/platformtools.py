@@ -557,15 +557,24 @@ def developer_mode_check_findvideos(itemlist, parent_item):
                 # para no repetir servers ya verificados
                 checkeds.append(it.server)
                 path = os.path.join(config.get_runtime_path(), 'servers', it.server + '.json')
-                if not os.path.isfile(path):
-                    apuntar = True
+                if not os.path.isfile(path): apuntar = True
 
-        # Server Various
-        if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox']:
-            apuntar = False
+        # Server Various y anulados/controlados
+        if apuntar:
+            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'lulustream', 'luluvdo', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'streamvid' 'upload.do']:
+                apuntar = False
 
-        elif it.server in ['ddownload', 'dfiles', 'dropapk', 'fileflares', 'filerice', 'fireload', 'katfile', 'megaupload', 'oload', 'pandafiles', 'rockfile', 'turbobit', 'uploadrive', 'uppit', 'userload']:
-            apuntar = False
+            elif it.server in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza', 'vanfem', 'youtvgratis', 'oceanplay', 'gotovideo.kiev.ua', 'owodeuwu', 'sypl', 'fembed9hd', 'watchse', 'vcdn', 'femoload', 'cubeembed']:
+                apuntar = False
+
+            elif it.server in ['sbembed', 'sbembed1', 'sbembed2', 'sbvideo', 'japopav']:
+                apuntar = False
+
+            elif it.server in ['sbplay', 'sbplay1', 'sbplay2', 'pelistop', 'sbfast', 'sbfull', 'ssbstream', 'sbthe', 'sbspeed', 'cloudemb', 'tubesb', 'embedsb', 'playersb', 'sbcloud1', 'watchsb', 'viewsb', 'watchmo', 'streamsss', 'sblanh', 'sbanh', 'sblongvu', 'sbchill', 'sbrity', 'sbhight', 'sbbrisk', 'sbface', 'view345', 'sbone', 'sbasian', 'streaamss', 'lvturbo', 'sbnet', 'sbani', 'sbrapid', 'cinestart', 'vidmoviesb', 'sbsonic', 'sblona', 'likessb']:
+                apuntar = False
+
+            elif it.server in ['ddownload', 'dfiles', 'dropapk', 'fileflares', 'filerice', 'fireload', 'katfile', 'megaupload', 'oload', 'pandafiles', 'rockfile', 'turbobit', 'uploadrive', 'uppit', 'userload']:
+                apuntar = False
 
         if apuntar:
             txt_log_servers += 'Canal: %s Server: %s Url: %s' % (it.channel, it.server, it.url)
@@ -866,7 +875,7 @@ def play_video(item, parent_item, autoplay=False):
             return play_torrent(mediaurl, parent_item)
 
         # ~ Para evitar ERROR: CCurlFile::Stat - Failed: Peer certificate cannot be authenticated with given CA certificates(60)
-        if item.server not in ['m3u8hls', 'zembed', 'youtube']:
+        if item.server not in ['blenditall', 'm3u8hls', 'zembed', 'youtube']:
             if 'verifypeer=false' not in mediaurl and 'googleusercontent' not in mediaurl: 
                 mediaurl += '|' if '|' not in mediaurl else '&'
                 mediaurl += 'verifypeer=false'

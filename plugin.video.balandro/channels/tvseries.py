@@ -256,7 +256,8 @@ def list_all(item):
                 temporada = scrapertools.find_single_match(titulo, '.*?".*?x(.*?)"')
                 capitulo = scrapertools.find_single_match(titulo, '.*?"(.*?)x')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, language = lang, thumbnail = thumb, contentType='episode', contentSeason = temporada, contentEpisodeNumber = capitulo ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, language = lang, thumbnail = thumb,
+                                    contentType='episode', contentSeason = temporada, contentEpisodeNumber = capitulo ))
 
     return itemlist
 

@@ -225,7 +225,7 @@ def mainlist(item):
         itemlist.append(item.clone( title = ' - Audio solo en Castellano', action = 'ch_groups', group = 'cast', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
         itemlist.append(item.clone( title = ' - Audio solo en Latino', action = 'ch_groups', group = 'lat', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
         itemlist.append(item.clone( title = ' - Audio solo en Vose', action = 'ch_groups', group = 'vose', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
-        itemlist.append(item.clone( title = ' - Audio solo en VO', action = 'ch_groups', group = 'vo', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
+        itemlist.append(item.clone( title = ' - Audio solo en Vo ó Vos', action = 'ch_groups', group = 'vo', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
 
         if item.mnu_lang:
             itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR fuchsia][B]Play[/B][/COLOR])', thumbnail=config.get_thumb('settings') ))
@@ -586,7 +586,7 @@ def submnu_audios(item):
     itemlist.append(item.clone( title = ' - Audio solo en Castellano', action = 'ch_groups', group = 'cast', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
     itemlist.append(item.clone( title = ' - Audio solo en Latino', action = 'ch_groups', group = 'lat', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
     itemlist.append(item.clone( title = ' - Audio solo en Vose', action = 'ch_groups', group = 'vose', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
-    itemlist.append(item.clone( title = ' - Audio solo en VO', action = 'ch_groups', group = 'vo', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
+    itemlist.append(item.clone( title = ' - Audio solo en Vo ó Vos', action = 'ch_groups', group = 'vo', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True ))
 
     return itemlist
 
@@ -787,33 +787,22 @@ def ch_groups(item):
         elif item.group == 'dorama':
             if item.only == 'doramas':
                 if 'dorama' in ch['clusters']:
-                    if not str(ch['clusters']) == "['dorama']":
-                        if not str(ch['clusters']) == "['current', 'dorama']":
-                            if not str(ch['clusters']) == "['current', 'notice', 'dorama']":
-                                if not str(ch['clusters']) == "['notice', 'dorama']": continue
+                    if not 'Web dedicada exclusivamente al dorama' in ch['notes']: continue
 
         elif item.group == 'anime':
             if item.only == 'animes':
                 if 'anime' in ch['clusters']:
-                    if not str(ch['clusters']) == "['anime']":
-                        if not str(ch['clusters']) == "['current', 'anime']":
-                            if not str(ch['clusters']) == "['current', 'notice', 'anime']":
-                                if not str(ch['clusters']) == "['notice', 'anime']": continue
+                    if not 'Web dedicada exclusivamente al anime' in ch['notes']: continue
 
             if 'anime' in ch['notes'].lower(): action = 'mainlist_anime'
             else:
                  if ch['name'].startswith('Series'): action = 'mainlist_series'
-                 else:
-                     if ch['name'] == 'Tekilaz': action = 'mainlist_series'
-                     else: action = 'mainlist_pelis'
+                 else: action = 'mainlist_pelis'
 
         elif item.group == 'adults':
             if item.only == 'adults':
                 if 'adults' in ch['clusters']:
-                    if not str(ch['clusters']) == "['adults']":
-                        if not str(ch['clusters']) == "['current', 'adults']":
-                            if not str(ch['clusters']) == "['current', 'notice', 'adults']":
-                               if not str(ch['clusters']) == "['notice', 'adults']": continue
+                    if not '+18' in ch['notes']: continue
 
         context = []
 
@@ -971,7 +960,7 @@ def ch_groups(item):
         if item.langs:
             langs = str(ch['language'])
             langs = langs.replace('[', '').replace(']', '').replace('cast', 'esp').replace("'", '').strip()
-            langs = langs.replace('esp', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'Vo')
+            langs = langs.replace('esp', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'Vo').replace('vos', 'Vos')
 
             titulo += ' [COLOR coral][I]' + str(langs) + '[/I][/COLOR]'
 
@@ -1017,7 +1006,7 @@ def ch_generos(item):
 
 
 def idioma_canal(lang):
-    idiomas = { 'cast': 'Castellano', 'lat': 'Latino', 'eng': 'Inglés', 'pt': 'Portugués', 'vo': 'VO', 'vose': 'Vose', 'vos': 'Vos', 'cat': 'Català' }
+    idiomas = { 'cast': 'Castellano', 'lat': 'Latino', 'eng': 'Inglés', 'pt': 'Portugués', 'vo': 'Vo', 'vose': 'Vose', 'vos': 'Vos', 'cat': 'Català' }
     return idiomas[lang] if lang in idiomas else lang
 
 

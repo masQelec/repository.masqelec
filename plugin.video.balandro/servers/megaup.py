@@ -55,7 +55,7 @@ def get_video_url(page_url, url_referer=''):
     url = scrapertools.find_single_match(data, "href='([^']+)'>download now</a>")
 
     if url:
-        platformtools.dialog_notification('Cargando MegaUp', 'Espera de %s segundos requerida' % espera)
+        platformtools.dialog_notification('Cargando [COLOR cyan][B]Megaup[/B][/COLOR]', 'Espera de %s segundos requerida' % espera)
         time.sleep(int(espera))
 
         headers = { 'Referer': page_url }

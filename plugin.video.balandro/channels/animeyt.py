@@ -222,6 +222,7 @@ def findvideos(item):
             elif 'player.animeyt' in url: continue
             elif 'jetload.' in url: continue
             elif '.tioanime.' in url: continue
+            elif '.fembed.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)

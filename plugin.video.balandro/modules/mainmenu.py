@@ -767,7 +767,7 @@ def channels(item):
 
         if not item.extra == 'all':
             if config.get_setting('search_extra_trailers', default=False):
-                if str(ch['clusters']) == "['trailers']": continue
+                if 'Web dedicada exclusivamente a los tráilers' in ch['notes']: continue
 
         if item.extra == 'problematics':
             if not 'problematic' in ch['clusters']: continue
@@ -1055,7 +1055,7 @@ def channels(item):
         if config.get_setting('mnu_simple', default=False):
             if 'movie' in ch['categories']:
                 if "tvshow" in ch['categories']:
-                    titulo += '[B][I][COLOR teal] películas, series[/COLOR][/I][/B]'
+                    titulo += '[B][I][COLOR teal] películas[/COLOR], [COLOR hotpink]series[/COLOR][/I][/B]'
                     if 'tales' in ch['clusters']: titulo += '[B][I][COLOR limegreen] novelas[/COLOR][/I][/B]'
                 else: titulo += '[B][I][COLOR deepskyblue] películas[/COLOR][/I][/B]'
             else:

@@ -7,7 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 
 
-host = 'https://www24.estrenosdoramas.net/'
+host = 'https://www25.estrenosdoramas.net/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www23.estrenosdoramas.net/', 'https://www24.estrenosdoramas.net/']
+
+
+domain = config.get_setting('dominio', 'estrenosdoramas', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'estrenosdoramas')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'estrenosdoramas')
+    else: host = domain
 
 
 GLBPLAYER = 'TEST'
@@ -15,8 +27,6 @@ GLBPLAYER = 'TEST'
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www23.estrenosdoramas.net/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -24,9 +34,35 @@ def do_downloadpage(url, post=None, headers=None):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'estrenosdoramas', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_estrenosdoramas', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='estrenosdoramas', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_estrenosdoramas', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar dorama ...', action = 'search', search_type = 'all', text_color = 'firebrick' ))
 
@@ -39,6 +75,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -56,6 +94,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -468,7 +508,10 @@ def findvideos(item):
             other = scrapertools.find_single_match(data, '<ul class="tabs">.*?<a href="#tab' + str(opt) + '">.*?<b>(.*?)</b>')
             other = other.replace('(', '').replace(')', '')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other, language = IDIOMAS.get(lang, lang) ))
+        elif servidor == 'various':
+            if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang), other = other ))
 
     if not itemlist:
         if not ses == 0:

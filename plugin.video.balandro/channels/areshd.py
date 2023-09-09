@@ -260,6 +260,9 @@ def findvideos(item):
          for link, srv in matches:
              ses += 1
 
+             if 'youtube' in srv: continue
+             elif 'waaw' in srv or 'hqq' in srv or 'netu' in srv: continue
+
              if i == 0: lang = idiomas[0]
              elif i == 1: lang = idiomas[1]
              elif i == 2: lang = idiomas[2]
@@ -270,10 +273,17 @@ def findvideos(item):
              elif 'Subtitulado' in lang or 'VOSE' in lang: lang = 'Vose'
              else: lang = '?'
 
-             if 'youtube' in srv: continue
-             elif 'waaw' in srv or 'hqq' in srv or 'netu' in srv: continue
+             srv = srv.lower().strip()
 
-             itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, language = lang, other = srv.capitalize() ))
+             servidor = servertools.corregir_servidor(srv)
+
+             other = srv
+
+             if servidor == srv: other = ''
+             elif not servidor == 'directo':
+                if not servidor == 'various': other = ''
+
+             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = lang, other = other.capitalize() ))
 
          i += 1
 

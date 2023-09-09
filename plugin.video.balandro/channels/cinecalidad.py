@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.cinecalidad.tf/'
+host = 'https://ww.cinecalidad.foo/'
 
 
 # ~ por si viene de enlaces guardados
@@ -15,7 +15,9 @@ ant_hosts = ['https://www.cinecalidad.eu/', 'https://www.cinecalidad.im/', 'http
              'https://www.cinecalidad.li/', 'https://www.cine-calidad.com/', 'https://cinecalidad.website/',
              'https://www.cinecalidad.lat/', 'https://cinecalidad3.com/', 'https://www5.cine-calidad.com/',
              'https://v3.cine-calidad.com/', 'https://cinecalidad.dev/', 'https://cinecalidad.ms/',
-             'https://www3.cinecalidad.ms/', 'https://ww1.cinecalidad.ms/', 'https://www.cinecalidad.gs/']
+             'https://www3.cinecalidad.ms/', 'https://ww1.cinecalidad.ms/', 'https://www.cinecalidad.gs/',
+             'https://www.cinecalidad.tf/', 'https://wvw.cinecalidad.tf/', 'https://vww.cinecalidad.tf/',
+             'https://wwv.cinecalidad.tf/', 'https://www.cinecalidad.foo/']
 
 domain = config.get_setting('dominio', 'cinecalidad', default='')
 
@@ -69,6 +71,20 @@ def do_downloadpage(url, post=None, headers=None):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     else:
         data = httptools.downloadpage_proxy('cinecalidad', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        try:
+            from lib import balandroresolver
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+            if ck_name and ck_value:
+                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+
+                if not url.startswith(host):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage_proxy('cinecalidad', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        except:
+            pass
 
     return data
 
@@ -236,7 +252,8 @@ def list_all(item):
 
         url = url.replace('\\/', '/')
 
-        if '-premium-12-meses' in url: continue
+        if '-1-ano' in url: continue
+        elif '-premium-12-meses' in url: continue
 
         if not url or not title: continue
 
@@ -485,10 +502,6 @@ def findvideos(item):
             elif servidor == 'player': continue
             elif servidor == 'vip': continue
 
-            elif servidor == 'latmax': servidor = 'fembed'
-            elif 'fembedhd' in servidor: servidor = 'fembed'
-            elif 'femlat' in servidor: servidor = 'fembed'
-
             elif 'voesx' in servidor: servidor = 'voe'
             elif servidor == 'maxplay': servidor = 'voe'
 
@@ -498,11 +511,6 @@ def findvideos(item):
             elif servidor == 'ok': servidor = 'okru'
 
             elif servidor == 'google drive': servidor = 'gvideo'
-
-            elif servidor.startswith('sb'): servidor = 'streamsb'
-            elif servidor == 'ccplay': servidor = 'streamsb'
-            elif 'watchsb' in servidor: servidor = 'streamsb'
-            elif 'lvturbo' in servidor: servidor = 'streamsb'
 
             elif servidor == 'streamwish':
                   other = servidor.capitalize()
@@ -549,7 +557,6 @@ def findvideos(item):
             elif servidor == 'bittorrent': servidor = 'torrent'
 
             elif 'bittorrent' in servidor: servidor = 'torrent'
-            elif 'fembed' in servidor: servidor = 'fembed'
 
             elif 'voesx' in servidor: servidor = 'voe'
             elif servidor == 'maxplay': servidor = 'voe'
@@ -584,7 +591,6 @@ def findvideos(item):
                 elif servidor == 'bittorrent': servidor = 'torrent'
 
                 elif 'bittorrent' in servidor: servidor = 'torrent'
-                elif 'fembed' in servidor: servidor = 'fembed'
 
                 elif 'voesx' in servidor: servidor = 'voe'
                 elif servidor == 'maxplay': servidor = 'voe'
@@ -684,9 +690,6 @@ def play(item):
     if url:
         if '/acortalink.' in url:
             return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
-
-        if url.startswith('https://pelisplushd.net/fembed.php?'):
-            url = url.replace('https://pelisplushd.net/fembed.php?url=', 'https://feurl.com/v/')
 
         if url.endswith('.torrent'):
             if config.get_setting('proxies', item.channel, default=''):

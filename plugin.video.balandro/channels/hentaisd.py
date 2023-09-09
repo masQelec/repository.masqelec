@@ -150,7 +150,7 @@ def findvideos(item):
             servidor = servertools.corregir_servidor(servidor)
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'VO' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vo' ))
 
     return itemlist
 

@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w.historiadeamor.org/'
+host = 'https://a.historiadeamor.org/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://w.historiadeamor.org/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     raise_weberror = True
     if '/years/' in url: raise_weberror = False
 
@@ -35,11 +41,25 @@ def do_downloadpage(url, post=None, headers=None):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='historiadeamortv', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(Item( channel='helper', action='show_help_historiadeamortv', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(Item( channel='helper', action='show_help_historiadeamortv', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -54,7 +74,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(Item( channel='helper', action='show_help_historiadeamortv', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -73,7 +93,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(Item( channel='helper', action='show_help_historiadeamortv', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -98,7 +118,7 @@ def mainlist_animes(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(Item( channel='helper', action='show_help_historiadeamortv', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
@@ -267,12 +287,17 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
+            lang = ''
+            if 'subtitulado' in title.lower() or 'subtitulo' in title.lower(): lang = 'Vose'
+
             if '/search/' in item.url or item.group == 'capis':
                 cap = False
 
                 if 'Capitulos' in title or 'Capítulos' in title or 'Episodes' in title: pass
 
                 elif 'Capitulo' in title or 'Capítulo' in title or 'Episode' in title: cap = True
+
+                if 'EN VIVO' in title: title = title.replace('EN VIVO', '').strip()
 
                 if cap:
                     season = scrapertools.find_single_match(title, 'Temporada(.*?)Capítulo').strip()
@@ -284,14 +309,14 @@ def list_all(item):
 
                     title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]').replace('Episode', '[COLOR goldenrod]Episode[/COLOR]')
 
-                    itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo, infoLabels={'year': '-'},
+                    itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, lang = lang, fmt_sufijo=sufijo, infoLabels={'year': '-'},
                                                 contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
                     continue
 
                 else:
                     title = title.replace('Temporada', '[COLOR tan]Temporada[/COLOR]')
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, lang = lang, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -423,6 +448,9 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if item.lang == 'Vose': lang = 'Vose'
+    else: lang = 'Lat'
+
     data = do_downloadpage(item.url)
 
     values = scrapertools.find_multiple_matches(data, '<input type="hidden".*?name="(.*?)".*?value="(.*?)"')
@@ -433,29 +461,23 @@ def findvideos(item):
         if type == 'watch': post = {'watch': str(value), 'submit': ''}
         else: post = {'download': str(value), 'submit': ''}
 
-        data = do_downloadpage( host + 'tokyvideo.php', post = post, headers = {'Referer': item.url + '?do=watch'} )
+        data1 = do_downloadpage( host + 'tokyvideo.php', post = post, headers = {'Referer': item.url + '?do=watch'} )
 
-        matches = scrapertools.find_multiple_matches(data, "<iframe src='(.*?)'")
-        if not matches: matches = scrapertools.find_multiple_matches(data, '<td>Server.*?href="(.*?)"')
+        matches = scrapertools.find_multiple_matches(data1, "<iframe src='(.*?)'")
+        if not matches: matches = scrapertools.find_multiple_matches(data1, '<td>Server.*?href="(.*?)"')
 
         for url in matches:
             ses += 1
 
             if url.startswith('//'): url = 'https:' + url
 
-            if 'api.mycdn.moe/sblink.php?id=' in url: url = url.replace('api.mycdn.moe/sblink.php?id=', 'sbanh.com/e/')
-
-            elif 'api.mycdn.moe/fembed.php?id=' in url: url = url.replace('api.mycdn.moe/fembed.php?id=', 'feurl.com/v/')
-            elif 'api.mycdn.moe/furl.php?id=' in url: url = url.replace('api.mycdn.moe/furl.php?id=', 'feurl.com/v/')
-
-            elif 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
+            if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 
             elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
 
             elif 'api.mycdn.moe/dl/?uptobox=' in url: url = url.replace('api.mycdn.moe/dl/?uptobox=', 'uptobox.com/')
 
-            elif url.startswith('http://vidmoly'):
-                  url = url.replace('http://vidmoly', 'https://vidmoly').replace('/w/', '/embed-')
+            elif url.startswith('http://vidmoly'): url = url.replace('http://vidmoly', 'https://vidmoly').replace('/w/', '/embed-')
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -463,20 +485,66 @@ def findvideos(item):
             url = servertools.normalize_url(servidor, url)
 
             other = ''
-            if type == 'download': other = 'D'
+            if servidor == 'various':
+                if 'youdbox' in url or 'yodbox' in url or 'youdboox' in url: other = 'Youdbox'
+            else:
+                if type == 'download': other = 'D'
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Lat', other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
     if not itemlist:
-        data = do_downloadpage(item.url + '?do=watch')
+        data2 = do_downloadpage(item.url + '?do=watch')
 
-        vo_postID = scrapertools.find_single_match(data, 'vo_postID = "(.*?)"')
+        t_link = scrapertools.find_single_match(data2, 'var vo_theme_dir = "(.*?)"')
+        id_link = scrapertools.find_single_match(data2, 'vo_postID = "(.*?)"')
+
+        if t_link and id_link:
+            i = 0
+
+            while i <= 5:
+               data3 = do_downloadpage(t_link + '/temp/ajax/iframe.php?id=' + id_link + '&video=' + str(i), headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'} )
+
+               data3 = data2.strip()
+
+               if not data3: break
+
+               u_link = scrapertools.find_single_match(data3, '<iframe.*?src="(.*?)"')
+               if not u_link: u_link = scrapertools.find_single_match(data3, '<IFRAME.*?SRC="(.*?)"')
+
+               if u_link.startswith('//'): u_link = 'https:' + u_link
+
+               if u_link:
+                   ses += 1
+
+                   if '/historiadeamortv.' in u_link: u_link = ''
+
+                   if u_link:
+                       servidor = servertools.get_server_from_url(u_link)
+                       servidor = servertools.corregir_servidor(servidor)
+
+                       u_link = servertools.normalize_url(servidor, u_link)
+
+                       if item.lang == 'Esp': lang = 'Esp'
+                       elif item.lang == 'Vose': lang = 'Vose'
+                       else: lang = 'Lat'
+
+                       other = 'P'
+
+                       if servidor == 'various':
+                           if 'youdbox' in u_link or 'yodbox' in u_link or 'youdboox' in u_link: other = 'Youdbox'
+
+                       if not servidor == 'directo':
+                          itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
+
+               i += 1
+
+        vo_postID = id_link
 
         if vo_postID:
-            data = do_downloadpage( host + 'emb/?vid=' + vo_postID )
+            data4 = do_downloadpage(host + 'emb/?vid=' + vo_postID )
 
-            url = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
+            url = scrapertools.find_single_match(data4, '<iframe src="(.*?)"')
 
             if url:
                 ses += 1
@@ -488,8 +556,15 @@ def findvideos(item):
 
                 url = servertools.normalize_url(servidor, url)
 
+                other = 'E'
+
+                if servidor == 'various':
+                    if 'youdbox' in url or 'yodbox' in url or 'youdboox' in url: other = 'Youdbox'
+
                 if not servidor == 'directo':
-                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Lat', other = 'E' ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
+
+    # ~ Downloads No hay enlaces nunca  ---> data5 = item.url + '?do=downloads'
 
     if not itemlist:
         if not ses == 0:

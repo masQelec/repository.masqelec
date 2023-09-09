@@ -30,7 +30,7 @@ def item_configurar_proxies(item):
 
     plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
     plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ... [COLOR plum](si no hay resultados)[/COLOR]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
 
 def quitar_proxies(item):
     from modules import submnuctext
@@ -42,42 +42,63 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False, raise_weberror=True):
+def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://cuevana2espanol.com/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    if not url.startswith(host):
-        resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
-    else:
-        resp = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
+    timeout = None
+    if host in url:
+        if config.get_setting('channel_cuevana2esp_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
-    if '<title>You are being redirected...</title>' in resp.data:
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+    else:
+        data = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            if not 'search?q=' in url:
+                platformtools.dialog_notification('Cuevana2Esp', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, timeout=timeout).data
+
+    if '<title>You are being redirected...</title>' in data:
         try:
             from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(resp.data)
+            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                    resp = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers, raise_weberror=raise_weberror)
+                    data = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
-    if only_headers: return resp.headers
+    return data
 
-    return resp.data
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='cuevana2esp', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -91,7 +112,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -111,7 +132,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item_configurar_proxies(item))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -125,6 +146,7 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'archives/series/top/week', search_type = 'tvshow' ))
 
     return itemlist
+
 
 def generos(item):
     logger.info()
@@ -405,8 +427,19 @@ def findvideos(item):
             srv = srv.lower().strip()
 
             if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
+            elif srv == 'fembed': continue
+            elif srv == 'streamsb': continue
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty, language = 'Lat', other = srv ))
+            elif srv == 'ok-ru': srv = 'okru'
+
+            servidor = servertools.corregir_servidor(srv)
+
+            other = srv
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                  quality = qlty, language = 'Lat', other = other.capitalize() ))
 
 
     if '"spanish":' in str(block):
@@ -420,8 +453,19 @@ def findvideos(item):
             srv = srv.lower().strip()
 
             if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
+            elif srv == 'fembed': continue
+            elif srv == 'streamsb': continue
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty, language = 'Esp', other = srv ))
+            elif srv == 'ok-ru': srv = 'okru'
+
+            servidor = servertools.corregir_servidor(srv)
+
+            other = srv
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                  quality = qlty, language = 'Esp', other = other.capitalize() ))
 
     if '"english":' in str(block):
         bloque = scrapertools.find_single_match(str(block), '"english":(.*?)]')
@@ -434,8 +478,19 @@ def findvideos(item):
             srv = srv.lower().strip()
 
             if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
+            elif srv == 'fembed': continue
+            elif srv == 'streamsb': continue
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty, language = 'Vose', other = srv ))
+            elif srv == 'ok-ru': srv = 'okru'
+
+            servidor = servertools.corregir_servidor(srv)
+
+            other = srv
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                  quality = qlty, language = 'Vose', other = other.capitalize() ))
 
     # ~ Descargas
     if '"downloads":' in str(block):
@@ -449,13 +504,24 @@ def findvideos(item):
             srv = srv.lower().strip()
 
             if srv == '1fichier': continue
+            elif srv == 'fembed': continue
+            elif srv == 'streamsb': continue
+
+            elif srv == 'ok-ru': srv = 'okru'
 
             if lang == 'Latino': lang = 'Lat'
             elif lang == 'Español': lang = 'Esp'
             elif lang == 'Subtitulado': lang = 'Vose'
             else: lang = '?'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, quality = qlty, language = lang, other = srv + ' D'))
+            servidor = servertools.corregir_servidor(srv)
+
+            other = srv
+
+            if servidor == srv: other = ''
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                  quality = qlty, language = lang, other = other.capitalize() + ' D'))
 
     if not itemlist:
         if not ses == 0:
@@ -479,6 +545,7 @@ def play(item):
     if new_url: url = new_url
 
     if '/cinestart.streams3.com/' in url: url = ''
+    elif '/player.php?' in url: url = ''
 
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:

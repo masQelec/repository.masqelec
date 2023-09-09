@@ -3,7 +3,7 @@
   "name": "SeriesPepitoTop",
   "thumbnail": "seriespepitotop.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["kids", "vos"],
 
-  "notes": "Series por Géneros."
+  "notes": "Web ANULADA. Series por Géneros."
 }

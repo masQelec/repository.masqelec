@@ -157,7 +157,7 @@ def findvideos(item):
     for match in matches:
         ses += 1
 
-        servidor = scrapertools.find_single_match(match, "<span class='title'>(.*?)</span>").lower()
+        servidor = scrapertools.find_single_match(match, "<span class='title'>(.*?)</span>").lower().strip()
 
         if not servidor: continue
 
@@ -165,7 +165,9 @@ def findvideos(item):
             ses = ses - 1
             continue
 
-        elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
+        if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
+
+        srv = servidor
 
         servidor = servertools.corregir_servidor(servidor)
 
@@ -181,7 +183,18 @@ def findvideos(item):
 
         if not dpost or not dnume: continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', dpost = dpost, dnume = dnume, other = servidor.capitalize(), language = IDIOMAS.get(lang, lang) ))
+        other = servidor
+
+        if servidor == 'various':
+            if 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv: other = 'streamwish'
+
+        if servidor == other: other = ''
+
+        elif not servidor == 'directo':
+           if not servidor == 'various': other = ''
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, dpost = dpost, dnume = dnume,
+                              language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
 
     # enlaces
     matches = scrapertools.find_multiple_matches(data, "<tr id='link-'(.*?)</tr>")

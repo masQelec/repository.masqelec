@@ -12,9 +12,10 @@ def get_video_url(page_url, url_referer=''):
 
     if 'okru.link' in page_url:
         v = scrapertools.find_single_match(page_url, "t=(\w+)")
+
         data = httptools.downloadpage("https://okru.link/details.php?v=" + v).data
 
-        video = scrapertools.find_single_match(data, '"file":"(.*?)"')
+        video = scrapertools.find_single_match(str(data), '"file":"(.*?)"')
         video = video.replace('\\/', '/')
 
         if video: video_urls.append(['mp4', video])

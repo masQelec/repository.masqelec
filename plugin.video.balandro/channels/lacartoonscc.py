@@ -262,7 +262,7 @@ def episodios(item):
     bloque = scrapertools.find_single_match(data, "<div class='se-q'>.*?<span class='title'>" + str(item.title) + "(.*?)</div></div>")
     if not bloque: bloque = scrapertools.find_single_match(data, "<div class='se-q'>.*?<span class='title'>Temporada(.*?)</div></div>")
 
-    patron = "<div class='imagen'.*?data-id='(.*?)'.*?src='(.*?)'.*?<div class='numerando'(.*?)</div>.*?<a href='(.*?)'>(.*?)</a>.*?</span>(.*?)</div></li>"
+    patron = "<div class='imagen'.*?data-id='(.*?)'.*?src='(.*?)'.*?<div class='numerando'(.*?)</div>.*?<a href='(.*?)'.*?>(.*?)</a>.*?</span>(.*?)</div></li>"
 
     episodes = scrapertools.find_multiple_matches(bloque, patron)
 
@@ -309,10 +309,10 @@ def episodios(item):
 
     for data_id, thumb, temp_epis, url, title, idiomas in episodes[item.page * item.perpage:]:
         langs = []
-        if '<img title="Español"' in idiomas: langs.append('Esp')
-        if '<img title="Latino"' in idiomas: langs.append('Lat')
-        if '<img title="Subtitulado"' in idiomas: langs.append('Vose')
-        if '<img title="Ingles"' in idiomas: langs.append('VO')
+        if 'title="Español"' in idiomas: langs.append('Esp')
+        if 'title="Latino"' in idiomas: langs.append('Lat')
+        if 'title="Subtitulado"' in idiomas: langs.append('Vose')
+        if 'title="Ingles"' in idiomas: langs.append('VO')
 
         epis = scrapertools.find_single_match(temp_epis, ".*?-(.*?)$").strip()
 
@@ -372,8 +372,19 @@ def findvideos(item):
 
         if not dpost or not dnume: continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', dpost = dpost, dnume = dnume, other = servidor.capitalize(),
-                              language = IDIOMAS.get(lang, lang) ))
+        other = ''
+
+        if servidor == 'streamwish' or servidor == 'strwish' or servidor == 'embedwish' or servidor == 'wishembed' or servidor == 'awish' or servidor == 'dwish' or servidor == 'mwish': other = 'streamwish'
+
+        elif servidor == 'filemoon': other = 'filemoon'
+
+        servidor = servertools.corregir_servidor(servidor)
+
+        if not servidor == 'directo':
+            if not servidor == 'various': other = ''
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, dpost = dpost, dnume = dnume,
+                              other = other.capitalize(), language = IDIOMAS.get(lang, lang) ))
 
     # enlaces
     matches = scrapertools.find_multiple_matches(data, "<tr id='link-'(.*?)</tr>")

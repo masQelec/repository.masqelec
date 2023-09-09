@@ -8,7 +8,7 @@ else:
     import urllib.parse as urlparse
 
 
-import os, re
+import os, re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -549,6 +549,8 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    IDIOMAS = {'0': 'Lat', '1': 'Esp', '2': 'Vose'}
+
     data = do_downloadpage(item.url)
 
     patron = "<li id='player-option-.*?class='dooplay_player_option'.*?data-type='(.*?)'.*?data-post='(.*?)'.*?data-nume='(.*?)'.*?<span class='title'>(.*?)</span>"
@@ -569,6 +571,41 @@ def findvideos(item):
 
         if not url: continue
 
+        if '.xyz/video/' in url:
+            data2 = do_downloadpage(url)
+
+            matches2 = scrapertools.find_multiple_matches(data2, '<li onclick="' + "go_to_player.*?'(.*?)'.*?<span>(.*?)</span>")
+
+            for link, srv2 in matches2:
+                srv2 = srv2.lower()
+
+                if srv2 == 'netu' or srv2 == 'waaw' or srv2 == 'hqq': continue
+                elif srv2 == 'plusvip': continue
+                elif srv2 == '1fichier': continue
+
+                if not link: continue
+
+                url2 = base64.b64decode(link).decode("utf-8")
+
+                if '/?uptobox=' in url2:
+                    url2 = scrapertools.find_single_match(url2, '/?uptobox=(.*?)$')
+                    url2 = 'https://uptobox.com/' + url2
+
+                lang = scrapertools.find_single_match(data2, 'data-lang="(.*?)"')
+
+                servidor = servertools.get_server_from_url(url2)
+                servidor = servertools.corregir_servidor(servidor)
+
+                url2 = servertools.normalize_url(servidor, url2)
+
+                other = ''
+                if servidor == 'various': other = srv2
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url2,
+                                      language = IDIOMAS.get(lang, lang), quality = item.qualities, other = other ))
+
+            continue
+
         try:
            lang, qlty = tag.strip().split(' ')
         except Exception:
@@ -587,6 +624,7 @@ def findvideos(item):
         elif '/demariquita.' in url: continue
         elif '/g-nula.top/' in url: continue
         elif '/media.esplay.' in url: continue
+        elif '/openload.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -786,10 +824,7 @@ def play(item):
     elif item.url.startswith('https://api.cuevana3.io'):
         fid = scrapertools.find_single_match(item.url, "h=([^&]+)")
 
-        if '/fembed/?h=' in item.url:
-            api_url = 'https://api.cuevana3.io/fembed/rd.php'
-            api_post = 'h=' + fid + '&ver=si'
-        elif '/sc/index.php?h=' in item.url:
+        if '/sc/index.php?h=' in item.url:
             api_url = 'https://api.cuevana3.io/sc/r.php'
             api_post = 'h=' + fid
         elif '/ir/goto_ddh.php?h=' in item.url:
@@ -813,10 +848,7 @@ def play(item):
             fid = scrapertools.find_single_match(url, "h=([^&]+)")
 
             if fid:
-                if '/fembed/?h=' in url:
-                    api_url = 'https://api.cuevana3.io/fembed/rd.php'
-                    api_post = 'h=' + fid + '&ver=si'
-                elif '/sc/index.php?h=' in url:
+                if '/sc/index.php?h=' in url:
                     api_url = 'https://api.cuevana3.io/sc/r.php'
                     api_post = 'h=' + fid
                 elif '/ir/goto_ddh.php?h=' in url:
