@@ -327,6 +327,7 @@ def PlayVideo(name, asin, adultstr, streamtype, forcefb=0):
             if not cookie:
                 g.dialog.notification(getString(30203), getString(30200), xbmcgui.NOTIFICATION_ERROR)
                 Log('Login error at playback')
+                return False
             '''
             if (g.platform & g.OS_ANDROID) and not isinstance(cookie, dict) and getConfig('uhdinfo') == '':
                 g.dialog.ok(g.__plugin__, getString(30272))
@@ -336,7 +337,7 @@ def PlayVideo(name, asin, adultstr, streamtype, forcefb=0):
             success, data = getURLData('catalog/GetPlaybackResources', asin, extra=True, vMT=vMT, dRes=dRes, useCookie=cookie, devicetypeid=dtid,
                                        proxyEndpoint=(None if bypassproxy else 'gpr'), opt=opt)
 
-            if success:
+            if success or not isinstance(cookie, dict):
                 break
 
         mpd, subs, timecodes = _ParseStreams(success, data, retmpd=True, bypassproxy=bypassproxy)
@@ -448,7 +449,7 @@ def PlayVideo(name, asin, adultstr, streamtype, forcefb=0):
         return False
 
     isAdult = adultstr == '1'
-    amazonUrl = g.BaseUrl + "/dp/" + (name if g.UsePrimeVideo else asin)
+    amazonUrl = g.BaseUrl + "/dp/" + (py2_decode(name) if g.UsePrimeVideo else asin)
     videoUrl = "%s/?autoplay=%s" % (amazonUrl, ('trailer' if streamtype == 1 else '1'))
     extern = not xbmc.getInfoLabel('Container.PluginName').startswith('plugin.video.amazon')
     suc = False

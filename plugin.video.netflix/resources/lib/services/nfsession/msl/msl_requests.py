@@ -13,10 +13,10 @@ import json
 import time
 import zlib
 
-import httpx
+import requests.exceptions as req_exceptions
 
 import resources.lib.common as common
-from resources.lib.common import get_system_platform
+from resources.lib.common import get_system_platform, is_device_l1_enabled
 from resources.lib.common.exceptions import MSLError
 from resources.lib.globals import G
 
@@ -163,7 +163,17 @@ class MSLRequests(MSLRequestBuilder):
             # On android, we have a different ESN from the login then use NETFLIXID auth may cause MSL errors,
             # (usually on L3 devices) because the identity do not match, so we need to use User id token auth
             # to switch MSL profile with current ESN when needed
-            auth_scheme = MSL_AUTH_USER_ID_TOKEN
+            if is_device_l1_enabled():
+                # 26/06/2023 replaced auth_scheme with MSL_AUTH_NETFLIXID,
+                # this is a workaround since there are new website changes in to the DRM session challenge used to request
+                # license that cause different problems, see discussion starting from comment in the following link:
+                # https://github.com/CastagnaIT/plugin.video.netflix/issues/1585#issuecomment-1585557883
+                auth_scheme = MSL_AUTH_NETFLIXID
+            else:
+                # 26/06/2023 despite the L1 workaround above, L3 devices can still use tokens to obtains low res videos,
+                # but just make sure that 1080p workaround (esn auto generation, regen_esn) is disabled or will cause
+                # invalid credentials errors
+                auth_scheme = MSL_AUTH_USER_ID_TOKEN
         else:
             auth_scheme = MSL_AUTH_NETFLIXID
 
@@ -200,7 +210,7 @@ class MSLRequests(MSLRequestBuilder):
                 LOG.debug('Request took {}s', time.perf_counter() - start)
                 LOG.debug('Request returned response with status {}', response.status_code)
                 break
-            except httpx.ConnectError as exc:
+            except req_exceptions.ConnectionError as exc:
                 LOG.error('HTTP request error: {}', exc)
                 if retry == 3:
                     raise

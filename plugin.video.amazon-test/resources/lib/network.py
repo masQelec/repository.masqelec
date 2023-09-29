@@ -189,7 +189,7 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
         getURL.lastResponseCode = r.status_code  # Set last response code
         response = 'OK' if 400 > r.status_code >= 200 else ''
         if not check:
-            response = r.content.decode('utf-8') if binary else r.text
+            response = r.content if binary else r.text
         else:
             rjson = False
         if useCookie and 'auth-cookie-warning-message' in response:
@@ -275,8 +275,8 @@ def getURLData(mode, asin, retformat='json', devicetypeid=g.dtid_web, version=2,
         url += '&videoMaterialType=' + vMT
         url += '&desiredResources=' + dRes
         url += '&supportedDRMKeyScheme=DUAL_KEY' if playback_req else ''
-        if devicetypeid == g.dtid_android:
-            url += '&deviceVideoCodecOverride=H264' + (',H265' if s.uhd else '')
+        if g.platform & g.OS_ANDROID:
+            url += '&deviceVideoCodecOverride=H264' + (',H265' if s.use_h265 else '')
             url += '&deviceHdrFormatsOverride=' + supported_hdr()
             url += '&deviceVideoQualityOverride=' + ('UHD' if s.uhd else 'HD')
 
@@ -376,7 +376,7 @@ def _sortedResult(result, query):
 
 
 def MechanizeLogin(preferToken=False):
-    if preferToken:  # and g.platform & g.OS_ANDROID
+    if preferToken:
         token = getToken()
         if token:
             return token
@@ -409,15 +409,18 @@ def LogIn(retToken=False):
             form = br.select_form()
 
         if 'auth-mfa-form' in uni_soup:
+            Log('OTP code', Log.DEBUG)
             msg = soup.find('form', attrs={'id': 'auth-mfa-form'})
             msgtxt = msg.p.get_text(strip=True)
-            kb = xbmc.Keyboard('', msgtxt)
-            kb.doModal()
-            if kb.isConfirmed() and kb.getText():
-                br['otpCode'] = kb.getText()
+            msgtxt += '\n\n' + soup.find('div', attrs={'class': 'a-alert-content'}).get_text(strip=True) if 'a-alert-content' in uni_soup else ''
+            wnd = _InputBox(msgtxt)
+            wnd.doModal()
+            if len(wnd.inp) > 0:
+                br['otpCode'] = wnd.inp
             else:
                 return None
         elif 'ap_dcq_form' in uni_soup:
+            Log('DCQ form', Log.DEBUG)
             msg = soup.find('div', attrs={'id': 'message_warning'})
             g.dialog.ok(g.__plugin__, msg.p.get_text(strip=True))
             dcq = soup.find('div', attrs={'id': 'ap_dcq1a_pagelet'})
@@ -442,6 +445,7 @@ def LogIn(retToken=False):
             else:
                 return None
         elif ('ap_captcha_img_label' in uni_soup) or ('auth-captcha-image-container' in uni_soup):
+            Log('Captcha', Log.DEBUG)
             wnd = _Captcha((getString(30008).split('…')[0]), soup, email)
             wnd.doModal()
             if wnd.email and wnd.cap and wnd.pwd:
@@ -450,6 +454,7 @@ def LogIn(retToken=False):
                 return None
             del wnd
         elif 'claimspicker' in uni_soup:
+            Log('Send otp request', Log.DEBUG)
             msg = soup.find('form', attrs={'name': 'claimspicker'})
             cs_title = msg.find('div', attrs={'class': 'a-row a-spacing-small'}).get_text(strip=True)
             cs_quest = msg.find('label', attrs={'class': 'a-form-label'})
@@ -468,6 +473,7 @@ def LogIn(retToken=False):
             else:
                 return None
         elif 'auth-select-device-form' in uni_soup:
+            Log('Select device form', Log.DEBUG)
             sd_form = soup.find('form', attrs={'id': 'auth-select-device-form'})
             sd_hint = sd_form.parent.p.get_text(strip=True)
             choices = []
@@ -479,12 +485,25 @@ def LogIn(retToken=False):
                 form.set_radio({choices[sel][1]: choices[sel][2]})
             else:
                 return None
+        elif 'verifyOtp' in uni_soup:
+            Log('verifyOtp', Log.DEBUG)
+            br.select_form('form[id="verification-code-form"]')
+            msg = [m.get_text() for m in soup.find_all('span', attrs={'class': 'transaction-approval-word-break'})]
+            [msg.append(m.get_text()) for m in soup.find_all('div', attrs={'id': 'invalid-otp-code-message'}) if 'invalid-otp-code-message' in uni_soup]
+            wnd = _InputBox('\n\n'.join(msg[1:]), task=msg[0])
+            wnd.doModal()
+            if len(wnd.inp) > 0:
+                br['otpCode'] = wnd.inp
+            else:
+                return None
         elif 'fwcim-form' in uni_soup:
+            Log('fcwim / otp email', Log.DEBUG)
             msg = soup.find('div', attrs={'class': 'a-row a-spacing-micro cvf-widget-input-code-label'})
             if msg:
-                ret = g.dialog.input(msg.get_text(strip=True))
-                if ret:
-                    br['code'] = ret
+                wnd = _InputBox(msg.get_text(strip=True))
+                wnd.doModal()
+                if len(wnd.inp) > 0:
+                    br['code'] = wnd.inp
                 else:
                     return None
             if soup.find('img', attrs={'alt': 'captcha'}):
@@ -498,6 +517,7 @@ def LogIn(retToken=False):
                     return None
                 del wnd
         elif 'validateCaptcha' in uni_soup:
+            Log('validateCaptcha', Log.DEBUG)
             wnd = _Challenge(soup)
             wnd.doModal()
             if wnd.cap:
@@ -507,7 +527,8 @@ def LogIn(retToken=False):
             else:
                 return None
             del wnd
-        elif 'pollingForm' in uni_soup:
+        elif 'pollingForm' in uni_soup and 'verifyOtp' not in uni_soup:
+            Log('polling', Log.DEBUG)
             msg = soup.find('span', attrs={'class': 'transaction-approval-word-break'}).get_text(strip=True)
             msg += '\n'
             rows = soup.find('div', attrs={'id': re.compile('.*channelDetails.*')})
@@ -558,6 +579,38 @@ def LogIn(retToken=False):
             password = keyboard.getText()
             return password
         return False
+    
+    def _findElem(br, form=None, link=None, log='si'):
+        response, soup = _parseHTML(br)
+        while 'validateCaptcha' in response:
+            br = _MFACheck(br, email, soup)
+            if br is None:
+                return False
+            if not br.get_current_form() is None:
+                br.submit_selected()
+            response, soup = _parseHTML(br)
+
+        caperr = -5
+        while caperr:
+            try:
+                if form:
+                    br.select_form('form[name="{}"]'.format(form))
+                elif link:
+                    br.follow_link(attrs=link)
+                break
+            except mechanicalsoup.LinkNotFoundError:
+                sleep(randint(750, 3000) / 1000)
+                caperr += 1
+                if s.register_device is False:
+                    getUA(True)
+                    br.session.headers.update({'User-Agent': getConfig('UserAgent')})
+                Log('Connect to SignIn Page %s attempts left' % -caperr)
+                br.refresh()
+                WriteLog(str(br.get_current_page()), 'login-{}'.format(log))
+        else:
+            g.dialog.ok(getString(30200), getString(30213).format(g.LOG_PATH))
+            return False
+        return True
 
     class LoginLocked(Exception):
         pass
@@ -605,7 +658,7 @@ def LogIn(retToken=False):
             br.session.verify = s.verifySsl
             br.set_verbose(2)
             Log('Connect to SignIn Page')
-            if s.data_source == 0:
+            if s.register_device is False:
                 br.session.headers.update({'User-Agent': getConfig('UserAgent')})
                 br.open(user['baseurl'] + ('/gp/flex/sign-out.html' if not user['pv'] else '/auth-redirect/?signin=1'))
                 Log(br.get_url(), Log.DEBUG)
@@ -625,8 +678,9 @@ def LogIn(retToken=False):
                 challenge = urlsafe_b64encode(sha256(verifier).digest()).rstrip(b"=")
                 br.session.headers.update(g.headers_android)
                 br.open('https://www.' + user['sidomain'])
-                WriteLog(str(br.get_current_page()), 'bu')
-                br.follow_link(attrs={'class': 'nav-show-sign-in'})
+                WriteLog(str(br.get_current_page()), 'login-bu')
+                if not _findElem(br, link={'class': 'nav-show-sign-in'}, log='bu'):
+                    return False
                 up = urlparse(br.get_url())
                 query = {k: v[0] for k, v in parse_qs(up.query).items()}
                 up_rt = urlparse(query['openid.return_to'])
@@ -660,9 +714,9 @@ def LogIn(retToken=False):
                 )
                 br.open(up.geturl())
                 Log(up.geturl(), Log.DEBUG)
-
-            form = br.select_form('form[name="signIn"]')
-            WriteLog(str(br.get_current_page()), 'login-si')
+            if not _findElem(br, form='signIn'):
+                return False
+            form = br.get_current_form()
             form.set_input({'email': email, 'password': password})
             if 'true' == g.addon.getSetting('rememberme'):
                 try:
@@ -674,7 +728,7 @@ def LogIn(retToken=False):
 
             while any(sp in response for sp in
                       ['auth-mfa-form', 'ap_dcq_form', 'ap_captcha_img_label', 'claimspicker', 'fwcim-form', 'auth-captcha-image-container', 'validateCaptcha',
-                       'pollingForm', 'auth-select-device-form']):
+                       'pollingForm', 'auth-select-device-form', 'verifyOtp']):
                 br = _MFACheck(br, email, soup)
                 if br is None:
                     return False
@@ -697,9 +751,11 @@ def LogIn(retToken=False):
                     user = registerDevice(url, user, verifier, clientid)
                 else:  # Raw HTML
                     try:
-                        name = re.search(r'action=sign-out[^"]*"[^>]*>[^?]+\s+([^?]+?)\s*\?', response).group(1)
+                        name = re.search(r'config\.customerName[\x27,]+([^\x27]+)', response).group(1)
                     except AttributeError:
-                        name = getString(30209)
+                        name = soup.find('span', attrs={'data-automation-id': 'nav-active-profile-name'})
+                        name = getString(30209) if name is None else name.get_text(strip=True)
+
                     from requests.utils import dict_from_cookiejar as dfcj
                     user = {
                         "name": name,
@@ -736,8 +792,7 @@ def LogIn(retToken=False):
                 Log('Login Error: {}'.format(msg_cont))
                 g.dialog.ok(msg_title, msg_cont)
             else:
-                g.dialog.ok(getString(30200), getString(30213))
-
+                g.dialog.ok(getString(30200), getString(30213).format(g.LOG_PATH))
     return False
 
 
@@ -781,7 +836,7 @@ def registerDevice(url, user, verifier, clientid):
     customer = data['extensions']['customer_info']
     user['name'] = customer.get('given_name', customer.get('name', getString(30209)))
     user['token'] = {'access': bearer['access_token'], 'refresh': bearer['refresh_token'], 'expires': int(time.time()) + int(bearer['expires_in'])}
-    user['cookie'] = {c['Name']: c['Value'] for c in data['tokens']['website_cookies']}
+    user['cookie'] = {c['Name'] + '-av' if c['Name'].endswith('-main') and user['pv'] else c['Name']: c['Value'] for c in data['tokens']['website_cookies']}
     return user
 
 
@@ -802,9 +857,12 @@ def getToken(user=None):
     if user is None:
         user = loadUser()
     token = user.get('token')
-    if token is not None:
+    if isinstance(token, dict):
         if int(time.time()) > token['expires']:
-            user['token'] = refreshToken(user)
+            newtoken = refreshToken(user)
+            if not newtoken:
+                return False
+            user['token'] = newtoken
             addUser(user)
         return {'Authorization': 'Bearer ' + user['token']['access']}
     return False
@@ -824,7 +882,7 @@ def refreshToken(user):
         Log('Token renewed')
         return token
     else:
-        Log('Token not renewed, registering device again', xbmc.LOGERROR)
+        Log('Token not renewed', xbmc.LOGERROR)
     return False
 
 
@@ -1044,6 +1102,10 @@ class _Captcha(pyxbmct.AddonDialogWindow):
         self.email = email
         self.pwd = ''
         self.cap = ''
+        if '.gif' in self.picurl:
+            cap = getURL(self.picurl, rjson=False, binary=True)
+            self.picurl = OSPJoin(g.DATA_PATH, 'cap-{}.gif'.format(int(time.time() * 1000)))
+            open(self.picurl, 'wb').write(cap)
         self.title = title.get_text(strip=True)
         self.image = pyxbmct.Image('', aspectRatio=2)
         self.tb_head = pyxbmct.TextBox()
@@ -1067,9 +1129,9 @@ class _Captcha(pyxbmct.AddonDialogWindow):
         self.placeControl(self.captcha, 7, 0, columnspan=2, pad_y=8)
         self.placeControl(self.btn_submit, 8, 0)
         self.placeControl(self.btn_cancel, 8, 1)
-        self.connect(self.btn_cancel, self.close)
+        self.connect(self.btn_cancel, self.cancel)
         self.connect(self.btn_submit, self.submit)
-        self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
+        self.connect(pyxbmct.ACTION_NAV_BACK, self.cancel)
         self.username.setText(self.email)
         self.username.setEnabled(False)
         self.password.setType(0 if self._s.show_pass else 6, '')
@@ -1094,7 +1156,16 @@ class _Captcha(pyxbmct.AddonDialogWindow):
         self.btn_cancel.controlLeft(self.btn_submit)
         self.setFocus(self.password)
 
+    def rmcap(self):
+        if xbmcvfs.exists(self.picurl):
+            xbmcvfs.delete(self.picurl)
+
+    def cancel(self):
+        self.rmcap()
+        self.close()
+
     def submit(self):
+        self.rmcap()
         self.pwd = self.password.getText()
         self.cap = self.captcha.getText()
         self.email = self.username.getText()
@@ -1156,6 +1227,55 @@ class _Challenge(pyxbmct.AddonDialogWindow):
 
     def submit(self):
         self.cap = self.ed_cap.getText()
+        self.close()
+
+
+class _InputBox(pyxbmct.AddonDialogWindow):
+    def __init__(self, msg, task='', head=None):
+        if head is None:
+            head = Globals().__plugin__
+        super(_InputBox, self).__init__(head)
+        self.tskv = 1 if len(task) > 0 else 0
+        self.setGeometry(450, 400, 6 + self.tskv, 2)
+        self.inp = ''
+        self.msg = msg
+        self.task = task
+        self.tb_msg = pyxbmct.TextBox()
+        self.fl_task = pyxbmct.FadeLabel(_alignment=pyxbmct.ALIGN_CENTER)
+        self.ed_cap = pyxbmct.Edit('', _alignment=pyxbmct.ALIGN_LEFT | pyxbmct.ALIGN_CENTER_Y)
+        self.btn_submit = pyxbmct.Button('OK')
+        self.btn_cancel = pyxbmct.Button(getString(30123))
+        self.set_controls()
+        self.set_navigation()
+
+    def set_controls(self):
+        self.placeControl(self.tb_msg, 0, 0, 3, 2)
+        if self.tskv:
+            self.placeControl(self.fl_task, 4, 0, 1, 2)
+        self.placeControl(self.ed_cap, 4 + self.tskv, 0, 1, 2)
+        self.placeControl(self.btn_submit, 5 + self.tskv, 0)
+        self.placeControl(self.btn_cancel, 5 + self.tskv, 1)
+        self.connect(self.btn_cancel, self.close)
+        self.connect(self.btn_submit, self.submit)
+        self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
+        self.tb_msg.setText(self.msg)
+        self.fl_task.addLabel(self.task)
+        self.setFocus(self.ed_cap)
+
+    def set_navigation(self):
+        self.ed_cap.controlUp(self.btn_submit)
+        self.ed_cap.controlDown(self.btn_submit)
+        self.btn_submit.controlUp(self.ed_cap)
+        self.btn_submit.controlDown(self.ed_cap)
+        self.btn_cancel.controlUp(self.ed_cap)
+        self.btn_cancel.controlDown(self.ed_cap)
+        self.btn_submit.controlRight(self.btn_cancel)
+        self.btn_submit.controlLeft(self.btn_cancel)
+        self.btn_cancel.controlRight(self.btn_submit)
+        self.btn_cancel.controlLeft(self.btn_submit)
+
+    def submit(self):
+        self.inp = self.ed_cap.getText()
         self.close()
 
 

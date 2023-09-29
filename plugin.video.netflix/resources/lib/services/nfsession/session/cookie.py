@@ -41,11 +41,11 @@ class SessionCookie(SessionBase):
         if not self.session.cookies:
             return False
         for cookie_name in LOGIN_COOKIES:
-            if cookie_name not in list(self.session.cookies.keys()):
+            if not any(cookie.name == cookie_name for cookie in list(self.session.cookies)):
                 LOG.error('The cookie "{}" do not exist, it is not possible to check the expiration',
                           cookie_name)
                 return False
-            for cookie in self.session.cookies.jar:
+            for cookie in list(self.session.cookies):
                 if cookie.name != cookie_name:
                     continue
                 if cookie.expires <= int(time.time()):

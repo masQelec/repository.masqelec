@@ -30,12 +30,13 @@
         <setting id="enable_uhd" type="bool" label="UltraHD (Android + Widevine L1)" visible="eq(-20,3)" enable="System.Platform.Android" default="false"/>
         <setting id="enable_hdr10" type="bool" label="HDR10+ (Android + Widevine L1)" visible="eq(-21,3)" enable="System.Platform.Android" default="false"/>
         <setting id="enable_dovi" type="bool" label="Dolby Vision (Android + Widevine L1)" visible="eq(-22,3)" enable="System.Platform.Android" default="false"/>
-        <setting id="proxy_mpdalter" type="bool" label="30248" default="true" visible="eq(-23,3)" />
-        <setting id="skip_scene" type="enum" label="30081" lvalues="30082|30083|30084|30085|30086" default="1" visible="eq(-24,3)"/>
-        <setting id="send_vp" type="slider" label="30066" range="0,2,90" default="4" option="percent" visible="eq(-25,3)"/>
+        <setting id="use_h265" type="bool" label="30020" visible="eq(-23,3)" enable="System.Platform.Android" default="false"/>
+        <setting id="proxy_mpdalter" type="bool" label="30248" default="true" visible="eq(-24,3)" />
+        <setting id="skip_scene" type="enum" label="30081" lvalues="30082|30083|30084|30085|30086" default="1" visible="eq(-25,3)"/>
+        <setting id="send_vp" type="slider" label="30066" range="0,2,90" default="4" option="percent" visible="eq(-26,3)"/>
         <!-- Browser/Script -->
-        <setting id="remotectrl" type="bool" label="30074" default="false" visible="lt(-26,2)"/>
-        <setting id="remote_vol" type="bool" label="30075" default="false" subsetting="true" enable="eq(-1,true)" visible="lt(-27,2)"/>
+        <setting id="remotectrl" type="bool" label="30074" default="false" visible="lt(-27,2)"/>
+        <setting id="remote_vol" type="bool" label="30075" default="false" subsetting="true" enable="eq(-1,true)" visible="lt(-28,2)"/>
     </category>
     <!-- Language -->
     <category label="30021">
@@ -61,14 +62,12 @@
         <setting id="show_pass" type="bool" label="30026" default="true"/>
         <setting id="multiuser" type="bool" label="30009" default="false"/>
         <setting id="rememberme" type="bool" label="30022" default="true"/>
+        <setting id="register_device" type="bool" label="30277" default="false" />
         <!-- Multiuser -->
-        <setting type="action" label="30130" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=LogIn)" visible="eq(-2,true)" option="close" />
-        <setting type="action" label="30131" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=removeUser)" visible="eq(-3,true)" option="close"/>
-        <setting type="action" label="30008" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=LogIn)" option="close" visible="eq(-4,false)"/>
-        <setting id="login_acc" type="text" label="30014" enable="false" default="" subsetting="true" visible="eq(-5,false)"/>
-        <!-- /Multiuser -->
-        <setting id="save_login" type="bool" label="30006" default="false" visible="false"/>
-        <!-- Multiuser -->
+        <setting type="action" label="30130" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=LogIn)" visible="eq(-3,true)" option="close" />
+        <setting type="action" label="30131" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=removeUser)" visible="eq(-4,true)" option="close"/>
+        <setting type="action" label="30008" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=LogIn)" option="close" visible="eq(-5,false)"/>
+        <setting id="login_acc" type="text" label="30014" enable="false" default="" subsetting="true" visible="eq(-6,false)"/>
         <setting label="30007" type="action" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=remLoginData)" option="close" visible="eq(-7,false)"/>
         <setting label="30010" type="action" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=remLoginData)" option="close" visible="eq(-8,true)"/>
     </category>
@@ -126,7 +125,7 @@
         <setting id="json_dump_raw" type="bool" label="30199" default="false" enable="eq(-1,true)" subsetting="true"/>
         <setting id="json_dump_collisions" type="bool" label="30197" default="false" enable="eq(-2,true)" subsetting="true"/>
         <setting id="log_http" type="bool" label="30274" default="false"/>
-        <setting id="create_zip" label="30275" type="action" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=createzip)"/>
-        <setting id="rm_logs" label="30276" type="action" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=rmlogs)"/>
+        <setting id="create_zip" label="30275" type="action" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=createZIP)"/>
+        <setting id="rm_logs" label="30276" type="action" action="RunPlugin(plugin://plugin.video.amazon-test/?mode=removeLogs)"/>
     </category>
 </settings>

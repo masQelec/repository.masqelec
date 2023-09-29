@@ -671,8 +671,8 @@ msgid "Captcha Request, please change IP or try again later"
 msgstr "Captcha kérés, módosítsa az IP-címet, vagy próbálja újra később"
 
 msgctxt "#30213"
-msgid "Unknown Error, please enable advanced debugging in settings and check avod-login.log/avod-login-si.log/avod-login-mfa.log"
-msgstr "Ismeretlen hiba, kérjük, engedélyezze a speciális hibakeresést a beállításokban, és ellenőrizze az avod-login.log/avod-login-si.log/avod-login-mfa.log fájlokat"
+msgid "Unknown Error, please enable advanced debugging in settings, sign in again and check the login-*.log files from the {} folder."
+msgstr ""
 
 msgctxt "#30214"
 msgid "Wrong Code"
@@ -837,4 +837,27 @@ msgstr ""
 
 msgctxt "#30276"
 msgid "Clear Logfiles"
+msgstr ""
+
+msgctxt "#30277"
+msgid "Register device for 4K playback"
+msgstr ""
+
+msgctxt "#30278"
+msgid "PrimeVideo error"
+msgstr ""
+
+msgctxt "#30279"
+msgid "Unable to find the navigation menu for {}.{}"
+msgstr ""
+
+msgctxt "#30280"
+msgid ""
+"\n"
+"This error often occurs with primevideo users when the register device for 4K setting is enabled.\n"
+"Please disable this setting and log in again."
+msgstr ""
+
+msgctxt "#30281"
+msgid "Archive created at {}"
 msgstr ""

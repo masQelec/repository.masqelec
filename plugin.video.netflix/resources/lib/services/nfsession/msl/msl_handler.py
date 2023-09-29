@@ -16,7 +16,7 @@ import xbmcaddon
 
 import resources.lib.common as common
 from resources.lib.common.cache_utils import CACHE_MANIFESTS
-from resources.lib.common.exceptions import MSLError
+from resources.lib.common.exceptions import MSLError, ErrorMsgNoReport
 from resources.lib.database.db_utils import TABLE_SESSION
 from resources.lib.globals import G
 from resources.lib.utils.esn import get_esn, set_esn, regen_esn
@@ -105,7 +105,7 @@ class MSLHandler:
                 # Then clear the credentials and also user tokens.
                 common.purge_credentials()
                 self.msl_requests.crypto.clear_user_id_tokens()
-            if 'User must login again' in str(exc):
+            elif 'User must login again' in str(exc):
                 # Know case when MSL error can happen:
                 # - User has done "Sign out of all devices" from account settings
                 # - User has login with an auth key generated before executing "Sign out of all devices"
@@ -115,8 +115,18 @@ class MSLHandler:
                 err_msg = ('\nIf you have done "Sign out of all devices" from Netflix account settings so '
                            'Logout from add-on settings and wait about 10 minutes before login again '
                            '(if used, a new Auth Key is required).')
-                raise MSLError(str(exc) + err_msg) from exc
+                raise ErrorMsgNoReport(str(exc) + err_msg) from exc
+            elif ('User authentication data does not match entity identity' in str(exc)
+                  and common.get_system_platform() == 'android'):
+                err_msg = ('Due to a MSL error you cannot playback videos with this device. '
+                           'This is a know problem due to a website changes.\n'
+                           'This problem could be solved in the future, but at the moment there is no solution.')
+                raise ErrorMsgNoReport(err_msg) from exc
             raise
+        if manifest.get('adverts', {}).get('adBreaks', []):
+            # Todo: manifest converter should handle ads streams with additional DASH periods
+            raise ErrorMsgNoReport('This add-on dont support playback videos with ads. '
+                                   'Please use an account plan without ads.')
         return self._tranform_to_dash(manifest)
 
     @measure_exec_time_decorator(is_immediate=True)
@@ -153,7 +163,7 @@ class MSLHandler:
                  common.censure(esn) if len(esn) > 50 else esn,
                  hdcp_version,
                  pformat(profiles, indent=2))
-        xid = int(time.time() * 10000)
+        xid = str(time.time_ns())[:18]
         # On non-Android systems, we pre-initialize the DRM with default PSSH/KID, this allows to obtain Challenge/SID
         # to achieve 1080p resolution.
         # On Android, pre-initialize DRM is possible but cannot keep the same DRM session, will result in an error
@@ -275,6 +285,7 @@ class MSLHandler:
             'requestSegmentVmaf': False,
             'supportsPartialHydration': False,
             'contentPlaygraph': ['start'],
+            'supportsAdBreakHydration': False,
             'liveMetadataFormat': 'INDEXED_SEGMENT_TEMPLATE',
             'useBetterTextUrls': True,
             'profileGroups': [{
@@ -302,7 +313,7 @@ class MSLHandler:
         else:
             params['xid'] = kwargs['xid']
 
-        endpoint_url = ENDPOINTS['manifest'] + create_req_params('licensedManifest')
+        endpoint_url = ENDPOINTS['manifest'] + create_req_params('prefetch/licensedManifest')
         request_data = self.msl_requests.build_request_data('licensedManifest', params)
         return endpoint_url, request_data
 
@@ -324,9 +335,13 @@ class MSLHandler:
                 'drmSessionId': sid,
                 'clientTime': int(time.time()),
                 'challengeBase64': challenge,
-                'xid': xid
+                'xid': xid,
+                'clientVersion': G.LOCAL_DB.get_value('client_version', '', table=TABLE_SESSION),
+                'platform': G.LOCAL_DB.get_value('browser_info_version', '', table=TABLE_SESSION),
+                'osVersion': G.LOCAL_DB.get_value('browser_info_os_version', '', table=TABLE_SESSION),
+                'osName': G.LOCAL_DB.get_value('browser_info_os_name', '', table=TABLE_SESSION)
             }]
-            endpoint_url = ENDPOINTS['license'] + create_req_params('prefetch/license')
+            endpoint_url = ENDPOINTS['license'] + create_req_params('license')
             try:
                 response = self.msl_requests.chunked_request(endpoint_url,
                                                              self.msl_requests.build_request_data(self.last_license_url,
@@ -339,6 +354,9 @@ class MSLHandler:
                            'To try to solve this problem you can force "Widevine L3" from the add-on Expert settings.\r\n'
                            'More info in the Wiki FAQ on add-on GitHub.')
                     raise MSLError(msg) from exc
+                if exc.err_number == '1044' and common.get_system_platform() != 'linux':
+                    raise ErrorMsgNoReport('MSL Error 1044: Currently video playback on Windows or MacOS does not work, '
+                                           'this is a known problem for which no solution has been found at this time.') from exc
                 raise
             # If this is a second license request from ISAdaptive then update the previous license data
             # so when we "release" the license we release the last one

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
+import json
 from collections import OrderedDict
 from copy import deepcopy
 from kodi_six import xbmcplugin
@@ -290,27 +292,26 @@ class PrimeVideo(Singleton):
 
     def Watchlist(self, path):
         path = path.split(self._separator)
+        result = ''
         remove = int(path[-1])
         action = ['Add', 'Remove'][remove]
+        u_path = '' if self._g.UsePrimeVideo else '/gp/video'
         gtis = unquote_plus(path[-2]).split(',')
-        params = '['
-        for gti in gtis if remove else [gtis[0]]:
-            params += '{"titleID":"%s","watchlist":true},' % gti
-        data = GrabJSON(self._g.BaseUrl + '/gp/video/api/enrichItemMetadata?itemsToEnrich=' + quote_plus(params[:-1]+']'))
-        for enrich in list(data['enrichments']):
+        query = 'metadataToEnrich={"placement":"HOVER","watchlist":"true"}&titleIDsToEnrich=%s&isCleanSlateActive=1&journeyIngressContext=' % json.dumps(gtis).replace(' ', '')
+        data = GrabJSON(self._g.BaseUrl + u_path + '/api/enrichItemMetadata?' + quote_plus(query, safe='=&'))
+        for enrich in data['enrichments']:
             endp = data['enrichments'][enrich]['watchlistAction']['endpoint']
-            if (endp['query']['tag'] == action and remove) or not remove:
-                endp['query']['tag'] = action
-                result = getURL(self._g.BaseUrl + endp['partialURL'], postdata=endp['query'], useCookie=True, check=True)
-                if result:
-                    Log('Watchlist: {} {}'.format(endp['query']['tag'].lower(), enrich))
+            endp['query']['tag'] = action
+            result = getURL(self._g.BaseUrl + endp['partialURL'], postdata=endp['query'], useCookie=True, check=True)
+            if result:
+                Log('Watchlist: {} {}'.format(endp['query']['tag'].lower(), enrich))
 
         if result:
             if remove == 1:
                 self.Refresh(self._separator.join(path[:-2]), False)
                 xbmc.executebuiltin('Container.Refresh')
             else:
-                self.Refresh('root/Watchlist', False)
+                self.Refresh('root/Watchlist/watchlist', False)
 
     def Profile(self, path):
         """ Profile actions """
@@ -485,12 +486,7 @@ class PrimeVideo(Singleton):
                 if mml:
                     self._catalog['root'][id]['lazyLoadData'] = home
         else:
-            self._g.dialog.notification(
-                'PrimeVideo error',
-                'You might be unable to access the service: check the website {} for more information'
-                ''.format(self._g.BaseUrl) if 'cerberus' in home else ''
-                'Unable to find the navigation menu', xbmcgui.NOTIFICATION_ERROR
-            )
+            self._g.dialog.ok(getString(30278), getString(30279).format(self._g.BaseUrl, getString(30280) if self._s.register_device else ''))
             Log('Unable to parse the navigation menu for {}'.format(self._g.BaseUrl), Log.ERROR)
             return False
 
@@ -686,7 +682,11 @@ class PrimeVideo(Singleton):
                     except:
                         folderType = 2  # Default to category
                     if folderType in [5, 3, 2, 0]:
-                        gtis = ','.join(entry['children']) if 'children' in entry else entry['metadata']['compactGTI']
+                        if 'children' in entry:
+                            gtis = ','.join(entry['children'])
+                        else:
+                            gt = entry['metadata']['compactGTI']
+                            gtis = self._videodata['urn2gti'].get(gt, gt)
                         in_wl = 1 if path.split('/')[:3] == ['root', 'Watchlist', 'watchlist'] else 0
                         ctxitems.append((getString(30180 + in_wl) % getString(self._g.langID[m['videometa']['mediatype']]),
                                          'RunPlugin({}pv/wltoogle/{}/{}/{})'.format(self._g.pluginid, path, quote_plus(gtis), in_wl)))
@@ -1382,7 +1382,7 @@ class PrimeVideo(Singleton):
                 cnt = ''
             # Categories
             elif 'collections' in cnt or 'containers' in cnt:
-                var = 'collection' if 'collections' in cnt else 'container'
+                var = 'collection' if len(cnt.get('collections', [])) > 0 else 'container'
                 filtered_col = [x for x in cnt[var + 's'] if x[var + 'Type'].lower() not in ['chartscarousel', 'standardhero', 'textcontainer', 'superhero', 'tentpolehero']]
                 if len(filtered_col) > 1:
                     for collection in filtered_col:
@@ -1435,7 +1435,7 @@ class PrimeVideo(Singleton):
                 if 'viewOutput' in cnt:
                     wl = return_item(cnt, 'viewOutput', 'features', wl_lib)
                 else:
-                    wl = {'filters': [x['values'] for x in return_item(cnt, 'content', 'baseOutput', 'filters', 'items') if 'OFFER_FILTER' in x['id']][0]}
+                    wl = {'filters': x['values'] for x in return_item(cnt, 'content', 'baseOutput', 'filters', 'items') if isinstance(x, dict) and 'OFFER_FILTER' in x['id']}
                 for f in wl.get('filters', []):
                     id = f['id'].lower()
                     url = f.get('apiUrl', f.get('href'))
