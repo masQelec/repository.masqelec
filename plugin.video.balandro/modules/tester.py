@@ -43,7 +43,7 @@ channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
-channels_despised = ['beeg', 'cuevana3in', 'hdfullse', 'pelispluscc' ]
+channels_despised = ['beeg', 'cuevana3in', 'hdfullse', 'pelisplushdlat' ]
 
 servers_poe = [ 'directo', 'm3u8hls', 'torrent' ]
 
@@ -75,7 +75,7 @@ def test_channel(channel_name):
             return
 
     if channel_id == 'hdfull' or channel_id == 'pelishouse' or channel_id == 'nextdede' or channel_id == 'playdede':
-        el_canal = ('Cargando Info [B][COLOR %s]' + channel_name) % color_infor
+        el_canal = ('[COLOR olivedrab][B]Cargando Info [/B][/COLOR][B][COLOR %s]' + channel_name) % color_infor
         platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
 
     if config.get_setting('developer_mode', default=False): txt = '[COLOR moccasin][B]Internet:[/COLOR]  [COLOR yellow]Status Developer Mode[/B][/COLOR][CR][CR]'
@@ -479,44 +479,55 @@ def test_channel(channel_name):
             txt_diag  += 'aviso: ' + '[COLOR indianred][B] CloudFlare [/COLOR][COLOR orangered] Protection[/B][/COLOR]'
 
         if config.get_setting('search_included_all', default=''):
-            if "'" + channel_id + "'" in str(config.get_setting('search_excludes_movies')):
+            if "'" + channel_id + "'" in str(config.get_setting('search_included_all')):
                 if txt_diag: txt_diag += '[CR]'
-                txt_diag += 'incluido: Buscar está [COLOR yellow][B]Asignado[/B][/COLOR]'
+                txt_diag += 'incluido: [COLOR yellow][B]Está asignado en búsquedas[/B][/COLOR]'
 
         if config.get_setting('search_excludes_movies', default=''):
             if "'" + channel_id + "'" in str(config.get_setting('search_excludes_movies')):
                 if txt_diag: txt_diag += '[CR]'
-                txt_diag += 'excluido: Buscar en [COLOR deepskyblue][B]Películas[/B][/COLOR]'
+                txt_diag += 'excluido: [COLOR deepskyblue][B]Búsquedas en Películas[/B][/COLOR]'
 
         if config.get_setting('search_excludes_tvshows', default=''):
             if "'" + channel_id + "'" in str(config.get_setting('search_excludes_tvshows')):
                 if txt_diag: txt_diag += '[CR]'
-                txt_diag += 'excluido: Buscar en [COLOR hotpink][B]Series[/B][/COLOR]'
+                txt_diag += 'excluido: [COLOR hotpink][B]Búsquedas en Series[/B][/COLOR]'
 
         if config.get_setting('search_excludes_documentaries', default=''):
             if "'" + channel_id + "'" in str(config.get_setting('search_excludes_documentaries')):
                 if txt_diag: txt_diag += '[CR]'
-                txt_diag += 'excluido: Buscar en [COLOR cyan][B]Documentales[/B][/COLOR]'
+                txt_diag += 'excluido: [COLOR cyan][B]Búsquedas en Documentales[/B][/COLOR]'
 
         if config.get_setting('search_excludes_torrents', default=''):
             if "'" + channel_id + "'" in str(config.get_setting('search_excludes_torrents')):
                 if txt_diag: txt_diag += '[CR]'
-                txt_diag += 'excluido: Buscar en [COLOR blue][B]Torrents[/B][/COLOR]'
+                txt_diag += 'excluido: [COLOR blue][B]Búsquedas en Torrents[/B][/COLOR]'
 
         if config.get_setting('search_excludes_mixed', default=''):
             if "'" + channel_id + "'" in str(config.get_setting('search_excludes_mixed')):
                 if txt_diag: txt_diag += '[CR]'
-                txt_diag += 'excluido: Buscar en [COLOR yellow][B]Películas y/ó Series[/B][/COLOR]'
+                txt_diag += 'excluido: [COLOR yellow][B]Búsquedas en Películas y/ó Series[/B][/COLOR]'
 
         if config.get_setting('search_excludes_all', default=''):
             if "'" + channel_id + "'" in str(config.get_setting('search_excludes_all')):
                 if txt_diag: txt_diag += '[CR]'
-                txt_diag += 'excluido: Buscar en [COLOR green][B]Todos[/B][/COLOR]'
+                txt_diag += 'excluido: [COLOR green][B]Búsquedas en Todos[/B][/COLOR]'
 
         if params['searchable']:
             cfg_searchable_channel = 'channel_' + channel_id + '_no_searchable'
 
-            if config.get_setting(cfg_searchable_channel, default=False): txt_diag += '[COLOR violet][B]Excluido en Búsquedas[/B][/COLOR]'
+            if config.get_setting(cfg_searchable_channel, default=False): txt_diag += '[CR]buscar: [COLOR violet][B]Excluido en Búsquedas[/B][/COLOR]'
+
+    if config.get_setting('autoplay_channels_discarded', default=''):
+        sin_autoplay = config.get_setting('autoplay_channels_discarded').split(',')
+
+        for no_autoplay in sin_autoplay:
+            no_autoplay = no_autoplay.lower().strip()
+
+            if no_autoplay == channel_id:
+                if txt_diag: txt_diag += '[CR]'
+                txt_diag += 'Auto Play: [COLOR fuchsia][B]Excluido[/B][/COLOR]'
+                break
 
     if txt_diag:
         if txt_temas: txt += '[CR]'
@@ -769,7 +780,7 @@ def info_channel(channel_name, channel_poe, host, dominio, txt, ant_hosts):
 
 
 def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, follow_redirects=None):
-    el_canal = ('Testeando [B][COLOR %s]' + channel_name) % color_infor
+    el_canal = ('[COLOR mediumaquamarine]Testeando [B][COLOR %s]' + channel_name) % color_infor
     platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
 
     channel_id = channel_name.lower()
@@ -959,7 +970,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio':
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/':
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1034,8 +1045,9 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                             break
 
                         if falso:
-                            txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
-                            txt += "[CR]comprobar: [COLOR yellow][B]Podría estar Correcto [/B][/COLOR][COLOR pink][B]el host:[/B][/COLOR] ó [COLOR limegreen][B]quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
+                            if new_web:
+                                txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
+                                txt += "[CR]comprobar: [COLOR yellow][B]Podría estar Correcto [/B][/COLOR][COLOR pink][B]el host:[/B][/COLOR] ó [COLOR limegreen][B]quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
         else:
             if len(response.data) < 1000:
@@ -1058,7 +1070,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio':
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/':
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1121,6 +1133,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                 if '/cgi-sys/suspendedpage.cgi' in new_web: txt += '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
                 else: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
 
+            if 'sorry:' in txt:
+                if not 'account:' in txt:
+                    if '/cgi-sys/defaultwebpage.cgi' in response.data: txt += '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
+                    else: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
+
             if not "'location': '/login'" in str(response.headers):
                 if not 'status:'in txt:
                     txt += '[CR][CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
@@ -1155,9 +1172,9 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                 elif 'code: [COLOR orangered][B]4' in txt: txt += '[CR]'
                 elif 'invalid:' in txt: txt += '[CR]'
 
-                txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
-
                 if 'Invisible Captcha' in txt:
+                    if not 'Sugerencias:' in txt: txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
                     if 'actuales:' in txt:
                         if 'Sin proxies' in txt: txt += txt_proxs
                         else:
@@ -1167,6 +1184,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     txt += txt_routs
  
                 elif 'Obtenga nuevos proxies' in txt:
+                    if not 'Sugerencias:' in txt: txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
                     if 'actuales:' in txt:
                         if 'Sin proxies' in txt: txt += txt_proxs
                         else:
@@ -1176,6 +1195,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     txt += txt_routs
 
                 elif 'Host error' in txt:
+                    if not 'Sugerencias:' in txt: txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
                     txt += txt_coffs
 
                     if 'actuales:' in txt:
@@ -1187,6 +1208,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     txt += txt_routs
 
                 elif 'No se puede establecer una' in txt:
+                    if not 'Sugerencias:' in txt: txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
                     txt += 'conexión:[COLOR yellow][B]No se pudo establecer la conectividad[/B][/COLOR][CR]'
 
                     if 'actuales:' in txt:
@@ -1200,6 +1223,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 elif 'Cloudflare' in txt or 'Protection' in txt:
                     if not 'code: [COLOR springgreen][B]200' in str(txt):
+                        if not 'Sugerencias:' in txt: txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
                         if 'actuales:' in txt:
                             if 'Sin proxies' in txt: txt += txt_proxs
                             else:
@@ -1208,9 +1233,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         else: txt += txt_coffs
 
-                    txt += txt_routs
+                        txt += txt_routs
 
                 elif 'Unknow' in txt:
+                    if not 'Sugerencias:' in txt: txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
                     if '<p>Por causas ajenas a' in txt or '>Por causas ajenas a' in txt: txt += txt_blocs
                     else: txt += '[COLOR goldenrod][B]Puede estar en Mantenimiento[/B][/COLOR][CR]'
 
@@ -1225,6 +1252,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     txt += txt_routs
 
                 elif '<p>Por causas ajenas a' in txt or '>Por causas ajenas a' in txt:
+                    if not 'Sugerencias:' in txt: txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
                     txt += txt_blocs
 
                     if 'actuales:' in txt:
@@ -1236,6 +1265,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     txt += txt_routs
 
                 else:
+                    if not 'Sugerencias:' in txt: txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+
                     txt += txt_coffs
                     txt += txt_checs
                     txt += txt_routs
@@ -1320,7 +1351,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                            txt += str(response.headers) + '[CR]'
 
         elif response.sucess == False:
-            txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+            if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
             txt += txt_coffs
             txt += txt_checs
@@ -1514,7 +1545,7 @@ def info_server(server_name, server_poe, url, txt):
 
 
 def acces_server(server_name, url, txt, follow_redirects=None):
-    el_server = ('Testeando [B][COLOR %s]' + server_name) % color_avis
+    el_server = ('[COLOR mediumaquamarine]Testeando [B][COLOR %s]' + server_name) % color_avis
     platformtools.dialog_notification(config.__addon_name, el_server + '[/COLOR][/B]')
 
     server_id = server_name.lower()
@@ -1673,7 +1704,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
         elif response.sucess == False:
             txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
-            txt += '[COLOR gold][B]Puede Descartar el Servidor en la Configuración [/COLOR](categoría [COLOR fuchsia]Play[/COLOR])[/B][CR]'
+            txt += '[COLOR gold][B]Puede Descartar el Servidor en los Ajustes preferencias [/COLOR](categoría [COLOR fuchsia]Play[/COLOR])[/B][CR]'
             txt += '[COLOR tomato][B]Compruebe su Internet y/ó el Servidor, a través de un Navegador Web[/B][/COLOR][CR]'
             txt += txt_routs
 

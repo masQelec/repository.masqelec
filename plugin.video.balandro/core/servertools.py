@@ -417,7 +417,7 @@ def corregir_servidor(servidor):
     elif servidor in ['highload', 'streamon']: return 'highload'
     elif servidor in ['vupload']: return 'vup'
     elif servidor in ['hdvid', 'vidhdthe']: return 'vidhd'
-    elif servidor in ['vtube', 'vidhdthe']: return 'playtube'
+    elif servidor in ['vtube', 'vidhdthe', 'vtplay', 'vtbe']: return 'playtube'
     elif servidor in ['voesx', 'voe-', 'voeun', '-voe', 'reputationsheriffkennethsand', 'fittingcentermondaysunday.com', 'tinycat-voe-fashion.com', 'scatch176duplicities.com', 'voex']: return 'voe'
 
     elif servidor in ['dai.ly']: return 'dailymotion'
@@ -432,7 +432,7 @@ def corregir_servidor(servidor):
     elif servidor in ['mailru', 'my.mail', 'my.mail.ru', 'my', 'mail', 'mail.ru']: return 'mailru'
 
     elif servidor in ['vidtodo', 'vidto', 'vidtodoo', 'vixtodo']: return 'vidtodo'
-    elif servidor in ['okru', 'ok', 'ok.ru', 'ok server', 'okru.link', 'odnoklassniki', 'okrufer']: return 'okru'
+    elif servidor in ['okru', 'ok', 'ok.ru', 'ok-ru', 'ok server', 'okru.link', 'odnoklassniki', 'okrufer']: return 'okru'
     elif servidor in ['streamz', 'streamzz']: return 'streamz'
     elif servidor in ['vevio', 'vev']: return 'vevio'
     elif servidor in ['vsmobi', 'v-s']: return 'vsmobi'
@@ -450,9 +450,53 @@ def corregir_servidor(servidor):
     elif servidor == 'uptostream': return 'uptobox'
     elif servidor == ['pixel']: return 'pixeldrain'
 
-    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'lulustream', 'luluvdo', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'streamvid' 'upload.do']: return 'various'
+    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast']: return 'various'
 
     else: return servidor
+
+
+def corregir_other(srv):
+    srv = srv.lower().strip()
+
+    if 'tubeload' in srv: srv = 'Tubeload'
+    elif 'mvidoo' in srv: srv = 'Mvidoo'
+    elif 'rutube' in srv: srv = 'Rutube'
+    elif 'videowood' in srv: srv = 'Videowood'
+    elif 'yandex' in srv: srv = 'Yandex'
+    elif 'fastupload' in srv: srv = 'Fastupload'
+    elif 'dropload' in srv: srv = 'Dropload'
+    elif 'krakenfiles' in srv: srv = 'Krakenfiles'
+    elif 'hexupload' in srv: srv = 'Hexupload'
+    elif 'embedgram' in srv: srv = 'Embedgram'
+    elif 'streamvid' in srv: srv = 'Streamvid'
+
+    elif 'upload.do' in srv or 'uploaddo' in srv: srv = 'Upload'
+
+    elif 'filemoon' in srv: srv = 'Filemoon'
+    elif 'streamhub' in srv: srv = 'Streamhub'
+    elif 'uploadever' in srv: srv = 'Uploadever'
+    elif 'moonplayer' in srv: srv = 'Moonplayer'
+    elif 'yadi' in srv: srv = 'Yandex'
+
+    elif 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv or 'wishfast' in srv: srv = 'Streamwish'
+
+    elif 'desiupload' in srv: srv = 'Desiupload'
+
+    elif 'filelions' in srv or 'azipcdn' in srv or 'alions' in srv or 'dlions' in srv or 'mlions' in srv or 'lion' in srv: srv = 'Filelions'
+
+    elif 'youdbox' in srv or 'yodbox' in srv or 'youdboox' in srv: srv = 'Youdbox'
+
+    elif 'vudeo' in srv: srv = 'Vudeo'
+
+    elif 'vidguard' in srv or 'vgfplay' in srv or 'vgembed' in srv or 'v6embed' in srv or 'vembed' in srv or 'vid-guard' in srv: srv = 'Vidguard'
+
+    elif 'lulustream' in srv or 'luluvdo' in srv: srv = 'Lulustream'
+
+    elif 'turboviplay' in srv or 'emturbovid' in srv: srv = 'Turboviplay'
+
+    elif 'file-upload' in srv: srv = 'Fileupload'
+
+    return srv
 
 
 # Reordenación/Filtrado de enlaces

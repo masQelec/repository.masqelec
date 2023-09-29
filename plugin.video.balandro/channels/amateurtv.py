@@ -23,14 +23,11 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
-    if descartar_xxx: return itemlist
+    if config.get_setting('descartar_xxx', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     # ~ itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
@@ -108,12 +105,37 @@ def findvideos(item):
         url = jdata['videoTechnologies']['fmp4']
 
         if url:
-            url += '|ignore_response_code=True'
-            itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server = 'directo', other = item.other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title='', url = url, server = 'directo', ref = item.url, other = item.other ))
     except:
         if not item.online:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]El vídeo está Off line[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.ref)
+    jdata = jsontools.load(data)
+
+    try:
+        qualities = jdata['qualities']
+
+        qltys = scrapertools.find_multiple_matches(str(qualities), "x(.*?)'")
+
+        for qlty in qltys:
+            url = item.url
+            url += '|ignore_response_code=True'
+
+            itemlist.append(["%s" % qlty, url])
+    except:
+        url = item.url
+        url += '|ignore_response_code=True'
+
+        itemlist.append(Item( channel = item.channel, server = 'directo', url = url ))
 
     return itemlist
 

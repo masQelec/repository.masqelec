@@ -140,8 +140,6 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     data = do_downloadpage(h_catalogue)
 
     patron = '<input type="checkbox" class="[^"]+" id="[^"]+" value="([^"]+)" name="genre\[\]">'
@@ -159,7 +157,7 @@ def generos(item):
 
         itemlist.append(item.clone( title = titulo.strip(), url = h_catalogue + '?genre[]=' + valor, action = 'list_all', text_color = 'hotpink' ))
 
-    if not descartar_xxx:
+    if not config.get_setting('descartar_xxx', default=False):
         if itemlist:
             itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'search?s=adultos', text_color = 'hotpink' ))
             itemlist.append(item.clone( action = 'temporadas', title = 'xxx / adultos internacional', url = host + 'internacional-adultos/', text_color = 'hotpink' ))
@@ -269,8 +267,6 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     data = do_downloadpage(item.url)
 
     matches = re.compile('<div class="col-lg-2 col-md-3 col-6 mb-3">\s*<a(.*?)</a>\s*</div>', re.DOTALL).findall(data)
@@ -282,7 +278,8 @@ def list_all(item):
 
         if not url or not title: continue
 
-        if descartar_xxx and ('/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url): continue
+        if config.get_setting('descartar_xxx', default=False):
+            if '/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url: continue
 
         year = scrapertools.find_single_match(article, '<div class="txt-gray-200 txt-size-\d+">(\d+)</div>')
         if year: title = title.replace('(' + year + ')', '').strip()
@@ -317,8 +314,6 @@ def last_epis(item):
 
     epis = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     if not item.page: item.page = 0
 
     perpage = 24
@@ -339,7 +334,8 @@ def last_epis(item):
 
         if not url: continue
 
-        if descartar_xxx and ('/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url): continue
+        if config.get_setting('descartar_xxx', default=False):
+            if '/coleccion-adulto-espanol/' in url or '/internacional-adultos/' in url: continue
 
         if '/va-' in url: continue
         elif '/cocina-' in url: continue

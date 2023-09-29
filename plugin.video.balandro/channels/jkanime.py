@@ -105,14 +105,11 @@ def mainlist_animes(item):
     logger.info()
     itemlist = []
 
-    descartar_anime = config.get_setting('descartar_anime', default=False)
-
-    if descartar_anime: return itemlist
+    if config.get_setting('descartar_anime', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -210,10 +207,10 @@ def list_all(item):
                 buscar_next = False
 
         if buscar_next:
-            next_url = scrapertools.find_single_match(data, '<a class="text nav-next".*?href="(.*?)".*?">Resultados')
+            next_page = scrapertools.find_single_match(data, '<a class="text nav-next".*?href="(.*?)".*?">Resultados')
 
-            if next_url:
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', page = 0, text_color = 'coral' ))
+            if next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', page = 0, text_color = 'coral' ))
 
     return itemlist
 

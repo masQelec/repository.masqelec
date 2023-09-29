@@ -180,7 +180,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( action = 'list_all', title = 'Novelas', url = host + '/tv-tags/soap', search_type = 'tvshow', text_color='limegreen' ))
     itemlist.append(item.clone( action = 'list_all', title = 'Doramas', url = host + '/tv-tags/dorama', search_type = 'tvshow', text_color='firebrick' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Animes', url = host + '/tv-tags/anime', search_type = 'tvshow', text_color='springgreen' ))
+
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( action = 'list_all', title = 'Animes', url = host + '/tv-tags/anime', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( action = 'list_all', title = 'Por alfabético', url = host + '/tv-shows/abc', search_type = 'tvshow' ))
 
@@ -205,6 +207,9 @@ def generos(item):
 
     for url, title in matches:
         if title == 'All': continue
+
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
 
         itemlist.append(item.clone( title = title, url = host + url, action = 'list_all', text_color = text_color ))
 

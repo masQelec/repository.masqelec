@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cinecalidad.zip/'
+host = 'https://wvw.cinecalidad.dad/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -27,7 +27,7 @@ ant_hosts = ['https://cinecalidad.la/', 'https://cinecalidad.fo/', 'https://ww22
              'https://w2.cinecalidad.bz/', 'https://w3.cinecalidad.bz/', 'https://w4.cinecalidad.bz/',
              'https://w5.cinecalidad.bz/', 'https://w6.cinecalidad.bz/', 'https://w7.cinecalidad.bz/',
              'https://w8.cinecalidad.bz/', 'https://w9.cinecalidad.bz/', 'https://w10.cinecalidad.bz/',
-             'https://w11.cinecalidad.bz/']
+             'https://w11.cinecalidad.bz/', 'https://cinecalidad.zip/', 'https://cinecalidad.dad/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadla', default='')
@@ -127,7 +127,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host + 'serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color='springgreen' ))
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'tvshow' ))
 
@@ -153,6 +154,9 @@ def generos(item):
 
         if title == '4K Ultra': continue
         elif title == 'Películas por año': continue
+
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = text_color ))
 

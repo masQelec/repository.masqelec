@@ -152,6 +152,9 @@ def generos(item):
     for url, title in matches:
         if title == 'Españolas': continue
 
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
+
         url = host[:-1] + url
 
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))

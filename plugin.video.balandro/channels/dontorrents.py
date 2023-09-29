@@ -61,7 +61,8 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.discount/', 'https://dontorrent.dad/', 'https://dontorrent.zip/',
              'https://dontorrent.mov/', 'https://dontorrent.day/', 'https://dontorrent.boo/',
              'https://dontorrent.foo/', 'https://dontorrent.hair/', 'https://dontorrent.rsvp/',
-             'https://dontorrent.quest/', 'https://dontorrent.nexus/']
+             'https://dontorrent.quest/', 'https://dontorrent.nexus/', 'https://dontorrent.bond/',
+             'https://dontorrent.tokyo/', 'https://dontorrent.boston/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -350,6 +351,7 @@ def list_last(item):
     for url, title in matches:
         if item.search_type== 'movie':
             if "(" in title: titulo = title.split("(")[0]
+            elif "[" in title: titulo = title.split("[")[0]
             else: titulo = title
 
             itemlist.append(item.clone( action='findvideos', url=host + url, title=title, contentType=item.search_type, contentTitle=titulo, infoLabels={'year': "-"} ))

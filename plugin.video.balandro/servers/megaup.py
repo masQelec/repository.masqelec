@@ -49,6 +49,8 @@ def get_video_url(page_url, url_referer=''):
 
     if "no longer available!" in msg_error:
         return "El fichero no existe o ha sido borrado"
+    elif '.rar' in data:
+            return "El archivo está en formato comprimido"
     elif msg_error:
         return msg_error
 

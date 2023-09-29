@@ -52,8 +52,6 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     itemlist.append(item.clone( title = 'Análisis y estudios', url = host + 'category/analisis-y-estudios/', action = 'list_all', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Artículos de cine', url = host + 'category/articulos-de-cine/', action = 'list_all', text_color = 'deepskyblue' ))
 
@@ -61,7 +59,7 @@ def generos(item):
     itemlist.append(item.clone( title = 'Críticas', url = host + 'category/critica/', action = 'list_all', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Contemporaneo', url = host + 'category/actualidad/', action = 'list_all', text_color = 'deepskyblue' ))
 
-    if not descartar_xxx:
+    if not config.get_setting('descartar_xxx', default=False):
         itemlist.append(item.clone( title = 'Erotismo', url = host + 'category/erotismo/', action = 'list_all', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Imprescindibles', url = host + 'category/imprescindibles/', action = 'list_all', text_color = 'deepskyblue' ))

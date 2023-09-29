@@ -23,14 +23,11 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
-    if descartar_xxx: return itemlist
+    if config.get_setting('descartar_xxx', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
@@ -76,7 +73,7 @@ def categorias(item):
             thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, contentType = 'movie',
-                                    contentTitle = title, contentExtra='adults', text_color = 'orange' ) )
+                                    contentTitle = title, contentExtra='adults', text_color = 'tan' ) )
 
     if item.group == 'cats' or item.group == 'stars':
         return sorted(itemlist,key=lambda x: x.title)
@@ -102,7 +99,7 @@ def pornstars(item):
     for letra in string.ascii_uppercase:
         url = item.url + letra + '/'
 
-        itemlist.append(item.clone (title = letra, action = 'categorias', url = url, text_color = 'orange' ))
+        itemlist.append(item.clone (title = letra, action = 'categorias', url = url, text_color = 'moccasin' ))
 
     return itemlist
 
@@ -139,7 +136,11 @@ def list_all(item):
         else:
             thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie',
+        time = scrapertools.find_single_match(match, 'title="Duration">(.*?)</span>')
+
+        titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
+
+        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, contentType = 'movie',
                                     contentTitle = title, contentExtra='adults') )
 
     if itemlist:

@@ -72,7 +72,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
+
     itemlist.append(item.clone( title = 'Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
 
     return itemlist
@@ -104,7 +106,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'generos/dorama/', search_type = 'tvshow', text_color = 'firebrick' ))
 
@@ -407,12 +410,34 @@ def findvideos(item):
 
         if other == 'netu' or other == 'hqq' or other == 'waaw': continue
 
-        elif other == 'plusvip': continue
         elif other == '1fichier': continue
 
         other = servertools.corregir_servidor(other)
 
         servidor = other
+
+        if other == 'plusvip':
+            vid_url = url
+
+            url_pattern = '(?:[\w\d]+://)?[\d\w]+\.[\d\w]+/moe\?data=(.+)$'
+            src_pattern = "this\[_0x5507eb\(0x1bd\)\]='(.+?)'"
+
+            data = do_downloadpage(vid_url)
+
+            url = scrapertools.find_single_match(vid_url, url_pattern)
+            src = scrapertools.find_single_match(data, src_pattern)
+
+            src_url = "https://plusvip.net{}".format(src)
+
+            url = do_downloadpage(src_url, post={'link': url}, headers = {'Referer': vid_url})
+
+            url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+
+            if not url: continue
+
+            url = url.replace('\\/', '/')
+
+            servidor = 'directo'
 
         if other == 'various':
             if 'filemoon' in url: other = 'filemoon'

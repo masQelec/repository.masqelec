@@ -13,6 +13,23 @@ host = 'https://watchpornfree.info/'
 perpage = 30
 
 
+def do_downloadpage(url, post=None, headers=None):
+    timeout = None
+    if host in url: timeout = config.get_setting('channels_repeat', default=30)
+
+    raise_weberror = True
+    if 'release-year/' in url: raise_weberror = False
+
+    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout, raise_weberror=raise_weberror).data
+
+    if not data:
+        if not '?s' in url:
+            platformtools.dialog_notification('WatchPornFree', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout, raise_weberror=raise_weberror).data
+
+    return data
+
+
 def mainlist(item):
     return mainlist_pelis(item)
 
@@ -21,14 +38,11 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
-    if descartar_xxx: return itemlist
+    if config.get_setting('descartar_xxx', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
@@ -43,7 +57,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por estudio', action = 'categorias', url = host, group = 'estudios' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host, group = 'categorias'))
 
-    itemlist.append(item.clone( title = 'Por año', action = 'categorias', url = host, group = 'years'))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', url = host))
 
     return itemlist
 
@@ -52,13 +66,11 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
     if item.group == 'estudios':
         data = scrapertools.find_single_match(data, 'Studios</a>(.*?)</ul>')
-    elif item.group == 'years':
-        data = scrapertools.find_single_match(data, 'Years</a>(.*?)</ul>')
     else:
         data = scrapertools.find_single_match(data, '>Categories</div>(.*?)</ul>')
 
@@ -73,8 +85,21 @@ def categorias(item):
 
     if item.group == 'estudios':
         return sorted(itemlist, key=lambda x: x.title)
-    elif item.group == 'years':
-        return sorted(itemlist, key=lambda x: x.title, reverse=True)
+
+    return itemlist
+
+
+def anios(item):
+    logger.info()
+    itemlist = []
+
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 1971, -1):
+        url = host + 'release-year/' + str(x)
+
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color='orange' ))
 
     return itemlist
 
@@ -85,7 +110,7 @@ def list_all(item):
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
     patron = '<article class="TPost B">.*?<a href="(.*?)">.*?data-lazy-src="(.*?)".*?<div class="Title">(.*?)</div>'
@@ -121,7 +146,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', '', data)
 
     bloque = scrapertools.find_single_match(data, '>Watch Online<(.*?)</div></div></div>')
@@ -200,7 +225,7 @@ def play(item):
     servidor = item.server
 
     if item.server == 'directo':
-        data = httptools.downloadpage(item.url).data
+        data = do_downloadpage(item.url)
 
         url = scrapertools.find_single_match(data, '<source src="(.*?)"')
 

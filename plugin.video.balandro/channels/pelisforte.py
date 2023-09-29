@@ -242,8 +242,6 @@ def findvideos(item):
 
             if srv == 'ok': other = 'ok'
 
-            elif srv == 'swish': servidor = 'various'
-
             if servidor == 'directo': other = srv
             elif servidor == 'various': other = srv
 

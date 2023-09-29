@@ -57,6 +57,9 @@ def generos(item):
     for url, title in matches:
         if title == 'Estrenos': continue
 
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
+
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key=lambda it: it.title)
@@ -185,16 +188,14 @@ def findvideos(item):
 
         other = servidor
 
-        if servidor == 'various':
-            if 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv: other = 'streamwish'
+        if servidor == 'various': other = servertools.corregir_other(srv)
 
         if servidor == other: other = ''
 
         elif not servidor == 'directo':
            if not servidor == 'various': other = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, dpost = dpost, dnume = dnume,
-                              language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, dpost = dpost, dnume = dnume, language = IDIOMAS.get(lang, lang), other = other ))
 
     # enlaces
     matches = scrapertools.find_multiple_matches(data, "<tr id='link-'(.*?)</tr>")

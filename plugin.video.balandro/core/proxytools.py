@@ -7,10 +7,15 @@ else: PY3 = True
 
 import os, time, re
 
+import xbmcgui
+
 from threading import Thread
 
 from core import httptools, proxytoolsz, scrapertools
 from platformcode import config, logger, platformtools
+
+
+item = []
 
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -18,6 +23,10 @@ color_infor = config.get_setting('notification_infor_color', default='pink')
 color_adver = config.get_setting('notification_adver_color', default='violet')
 color_avis  = config.get_setting('notification_avis_color', default='yellow')
 color_exec  = config.get_setting('notification_exec_color', default='cyan')
+
+
+HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = config.get_setting('httptools_timeout', default=15)
+if HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT == 0: HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = None
 
 
 default_provider = 'proxyscrape.com'
@@ -83,6 +92,7 @@ if proxies_extended:
 
 
 opciones_recommended = [
+        'almroot',
         'mmpx12',
         default_provider,
         'us-proxy.org',
@@ -278,6 +288,12 @@ def configurar_proxies_canal(canal, url):
 
         if proxies: acciones.append(platformtools.listitem_to_select('[COLOR red]Quitar proxies[/COLOR]', 'Suprimir proxies actuales para probar el canal sin ellos'))
 
+        hay_private = False
+        if provider == private_list:
+            hay_private = exist_yourlist()
+            if hay_private:
+                acciones.append(platformtools.listitem_to_select('[COLOR red]Eliminar lista actual [COLOR cyan] ' + private_list + '[/COLOR]', '[COLOR goldenrod][B]Solo si obtuvo una Nueva Lista[/B][/COLOR]'))
+
         acciones.append(platformtools.listitem_to_select('[COLOR yellowgreen]Ajustes categoría proxies[/COLOR]', '[COLOR mediumaquamarine]Si la modifica debe abandonar por cancelar[/COLOR]'))
 
         if proxies_help: acciones.append(platformtools.listitem_to_select('[COLOR green]Ayuda[/COLOR]', 'Informacion sobre la gestión de proxies'))
@@ -327,15 +343,30 @@ def configurar_proxies_canal(canal, url):
             _settings_proxies_canal(canal, sorted(opciones_provider, key=lambda x: x[0]))
 
         else:
-            if ret == 3:
-                if proxies: config.set_setting('proxies', '', canal)
-                else: configuracion_general()
+            if not hay_private:
+                if ret == 3:
+                    if proxies: config.set_setting('proxies', '', canal)
+                    else: configuracion_general()
 
-            elif ret == 4:
-                if proxies: configuracion_general()
-                else: show_help_proxies()
+                elif ret == 4:
+                     if proxies: configuracion_general()
+                     else: show_help_proxies()
 
-            elif ret == 5: show_help_proxies()
+                elif ret == 5: show_help_proxies()
+            else:
+                if ret == 3:
+                    if proxies: config.set_setting('proxies', '', canal)
+                    else: configuracion_general()
+
+                elif ret == 4:
+                    if proxies: manto_yourlist()
+                    else: show_help_proxies()
+
+                elif ret == 5:
+                     if proxies: configuracion_general()
+                     else: show_help_proxies()
+
+                elif ret == 6: show_help_proxies()
 
     return True
 
@@ -674,6 +705,21 @@ def _buscar_proxies(canal, url, provider, procesar):
                 proxies = _mmpx12(url, tipo_proxy, pais_proxy, max_proxies)
                 if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
+    if search_provider or provider == 'almroot':
+        searching = True
+
+        if proxies_recommended:
+           if not 'almroot' in opciones_recommended: searching = False
+        elif providers_preferred:
+            if not 'almroot' in providers_preferred: searching = False
+
+        if searching:
+            if len(all_providers_proxies) < proxies_totales_limit:
+                if search_provider: platformtools.dialog_notification('Buscar en Almroot', msg_txt % color_infor)
+
+                proxies = _almroot(url, tipo_proxy, pais_proxy, max_proxies)
+                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
     if search_provider or provider == default_provider:
         searching = True
 
@@ -693,7 +739,7 @@ def _buscar_proxies(canal, url, provider, procesar):
         searching = True
 
         if proxies_recommended:
-           if not 'us-proxy.org' in opciones_recommended: searching = False
+           if not 'us-proxy' in opciones_recommended: searching = False
         elif providers_preferred:
             if not 'us-proxy' in providers_preferred: searching = False
 
@@ -842,20 +888,6 @@ def _buscar_proxies(canal, url, provider, procesar):
                 if search_provider: platformtools.dialog_notification('Buscar en Roosterkid', msg_txt % color_infor)
 
                 proxies = _roosterkid(url, tipo_proxy, pais_proxy, max_proxies)
-                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
-
-    if search_provider or provider == 'almroot':
-        searching = True
-
-        if proxies_recommended: searching = False
-        elif providers_preferred:
-            if not 'almroot' in providers_preferred: searching = False
-
-        if searching:
-            if len(all_providers_proxies) < proxies_totales_limit:
-                if search_provider: platformtools.dialog_notification('Buscar en Almroot', msg_txt % color_infor)
-
-                proxies = _almroot(url, tipo_proxy, pais_proxy, max_proxies)
                 if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     if search_provider or provider == 'clarketm':
@@ -1129,7 +1161,7 @@ def _buscar_proxies(canal, url, provider, procesar):
                 txt_log += '%s ~ %s ~ %.2f segundos ~ %s ~ %d bytes' % (proxy, info['ok'], info['time'], info['code'], info['len']) + os.linesep
                 if info['ok']: num_ok += 1
 
-            txt_log += 'Búsqueda finalizada. Proxies válidos: %d' % (num_ok) + os.linesep
+            txt_log += 'Búsqueda finalizada. Posibles Proxies válidos: %d' % (num_ok) + os.linesep
 
             with open(proxies_log, 'wb') as f: f.write(txt_log if not PY3 else txt_log.encode('utf-8')); f.close()
 
@@ -1210,7 +1242,7 @@ def _dailyproxylists_com(url, tipo_proxy, pais_proxy, max_proxies):
 
             proxies.append(prox + ':' + port)
     else:
-        el_provider = '[B][COLOR %s] Proxypremium.top[/B][/COLOR]' % color_exec
+        el_provider = '[B][COLOR %s] Proxypremium[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Dailyproxylists.com', 'Vía' + el_provider)
 
         url_provider = 'https://proxypremium.top/full-proxy-list'
@@ -1423,7 +1455,7 @@ def _spys_one(url, tipo_proxy, pais_proxy, max_proxies):
     resp = httptools.downloadpage(url_provider, post=url_post, raise_weberror=False, follow_redirects=False)
 
     if '<title>Just a moment...</title>' in resp.data:
-        el_provider = '[B][COLOR %s] Freeproxy.world[/B][/COLOR]' % color_exec
+        el_provider = '[B][COLOR %s] Freeproxy[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Spys.one', 'Vía' + el_provider)
 
         url_provider = 'https://freeproxy.world/'
@@ -1493,7 +1525,7 @@ def _hidemy_name(url, tipo_proxy, pais_proxy, max_proxies):
         for prox, puerto in enlaces:
             proxies.append(prox + ':' + puerto)
     else:
-        el_provider = '[B][COLOR %s] TheSpeedX.proxy-list-s5[/B][/COLOR]' % color_exec
+        el_provider = '[B][COLOR %s] TheSpeedX-s5[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Hidemy.name', 'Vía' + el_provider)
 
         url_provider = 'https://github.com/TheSpeedX/PROXY-List/blob/master/socks5.txt'
@@ -1533,7 +1565,7 @@ def _httptunnel_ge(url, tipo_proxy, pais_proxy, max_proxies):
 
             proxies.append(prox + ':' + puerto)
     else:
-        el_provider = '[B][COLOR %s] Proxyscan.io[/B][/COLOR]' % color_exec
+        el_provider = '[B][COLOR %s] Proxyscan[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Httptunnel', 'Vía' + el_provider)
 
         url_provider = 'https://www.proxyscan.io/api/proxy?limit=100&type=socks4,socks5'
@@ -1855,7 +1887,7 @@ def _proxysource_org(url, tipo_proxy, pais_proxy, max_proxies):
            proxies.append(prox)
 
     if not proxies:
-        el_provider = '[B][COLOR %s] TheSpeedX.socks-list-http[/B][/COLOR]' % color_exec
+        el_provider = '[B][COLOR %s] TheSpeedX-http[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Spys.one', 'Vía' + el_provider)
 
         url_provider = 'https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/http.txt'
@@ -1919,16 +1951,34 @@ def acumulaciones(provider, proxies, all_providers_proxies, max_proxies):
 def do_test_proxy(url, proxy, info):
     logger.info()
 
-    try: resp = httptools.downloadpage(url, use_proxy = {'http': proxy, 'https': proxy}, timeout=15, raise_weberror=False)
+    try: resp = httptools.downloadpage(url, use_proxy = {'http': proxy, 'https': proxy}, timeout=HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT, raise_weberror=False)
     except: return
 
-    info['ok'] = (type(resp.code) == int and resp.code >= 200 and resp.code < 400)
-    if 'ERROR 404 - File not found' in str(resp.data) or 'HTTP/1.1 400 Bad Request' in str(resp.data) or '<title>Site Blocked</title>' in str(resp.data) or len(resp.data) < 100:
-        info['ok'] = False
+    bad_proxy = False
+
+    if '<urlopen error' in str(resp.code): bad_proxy = True
+
+    if not bad_proxy:
+        if resp.data:
+            if len(resp.data) > 1000:
+                proxy_ok = False
+
+                if str(resp.code) == '200': proxy_ok = True
+
+                if not proxy_ok:
+                    if (type(resp.code) == int and (resp.code < 200 or resp.code > 399)) or not resp.sucess: proxy_ok = False
+                    else: proxy_ok = True
+
+                if proxy_ok:
+                    if 'ERROR 404 - File not found' in str(resp.data) or 'HTTP Error 404: Not Found' in str(resp.data) or 'HTTP/1.1 400 Bad Request' in str(resp.data) or '<title>Site Blocked</title>' in str(resp.data):
+                        proxy_ok = False
+
+                if proxy_ok: info['ok'] = True
+                else: info['ok'] = False
 
     info['time'] = resp.time
     info['len'] = len(resp.data)
-    info['code'] = resp.code
+    info['code'] = str(resp.code)
 
 
 def testear_lista_proxies(canal, provider, url, proxies=[]):
@@ -2033,13 +2083,30 @@ def show_help_proxies():
 
     from modules import helper
 
-    item = []
-
     if providers_preferred:
         platformtools.dialog_ok(config.__addon_name, 'Tiene informados en sus ajustes [COLOR cyan]Proveedores Preferidos[/COLOR] de proxies.')
         helper.show_help_providers(item)
 
     helper.show_help_proxies(item)
+
+
+def exist_yourlist():
+    logger.info()
+
+    from core import filetools
+
+    path = os.path.join(config.get_data_path(), 'Lista-proxies.txt')
+
+    existe = filetools.exists(path)
+
+    return existe
+
+
+def manto_yourlist():
+    logger.info()
+
+    from modules import actions
+    actions.manto_yourlist(item)
 
 
 def configuracion_general():
@@ -2063,9 +2130,7 @@ def obtener_private_list():
     existe = filetools.exists(proxies_file)
 
     if not existe:
-        import xbmcgui
-
-        ubicacion_path = xbmcgui.Dialog().browseSingle(3, 'Seleccionar carpeta ubicación ' + private_list, 'files', '', False, False, '')
+        ubicacion_path = xbmcgui.Dialog().browseSingle(3, 'Seleccionar la [COLOR yellow]Carpeta[/COLOR] ubicación del fichero [COLOR yellowgreen]' + private_list + '[/COLOR]', 'files', '', False, False, '')
         if not ubicacion_path: return proxies
 
         proxies_file = filetools.join(ubicacion_path, private_list)
@@ -2075,6 +2140,14 @@ def obtener_private_list():
             platformtools.dialog_notification('Buscar proxies', '[B][COLOR %s]No se localiza fichero privado[/COLOR][/B]' % color_alert)
             time.sleep(1.0)
             return proxies
+
+        if platformtools.dialog_yesno(config.__addon_name, '[COLOR cyan][B]¿ Desea Guardar una copia del fichero [COLOR yellow]Lista-proxies.txt[COLOR cyan] en la carpeta por defecto [COLOR chocolate].../addon_data.../plugin.video.balandro[/B][/COLOR] ?'): 
+            proxies_file = os.path.join(config.get_data_path(), private_list)
+
+            origen = filetools.join(ubicacion_path, private_list)
+            destino = filetools.join(proxies_file)
+            if not filetools.copy(origen, destino, silent=False): platformtools.dialog_ok(config.__addon_name, 'Error, no se ha podido copiar el fichero', origen, destino)
+            else: platformtools.dialog_notification('Fichero copiado', proxies_file)
 
     data = filetools.read(proxies_file)
     data = re.sub(r'(?m)^#.*\n?', '', data)

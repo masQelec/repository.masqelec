@@ -508,8 +508,7 @@ def findvideos(item):
             other = scrapertools.find_single_match(data, '<ul class="tabs">.*?<a href="#tab' + str(opt) + '">.*?<b>(.*?)</b>')
             other = other.replace('(', '').replace(')', '')
 
-        elif servidor == 'various':
-            if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
+        elif servidor == 'various': other = servertools.corregir_other(url)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang), other = other ))
 

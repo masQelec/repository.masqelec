@@ -18,14 +18,11 @@ def mainlist_animes(item):
     logger.info()
     itemlist = []
 
-    descartar_anime = config.get_setting('descartar_anime', default=False)
-
-    if descartar_anime: return itemlist
+    if config.get_setting('descartar_anime', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
@@ -295,9 +292,7 @@ def findvideos(item):
             if servidor == 'zplayer': url = url + '|' + host
 
             other = ''
-            if servidor == 'various':
-                if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
-                elif 'azipcdn' in url or 'filelions' in url or 'alions' in url or 'dlions' in url or 'mlions' in url: other = 'Filelions'
+            if servidor == 'various': other = servertools.corregir_other(url)
 
             if not servidor == 'directo':
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose', other = other ))

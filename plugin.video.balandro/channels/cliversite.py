@@ -481,6 +481,8 @@ def findvideos(item):
 
             if '/netu.' in url or '/hqq.' in url or '/waaw.' in url: continue
 
+            if url.startswith('https://pelisplay.ioplay?'): url = url.replace('https://pelisplay.ioplay?', 'https://pelisplay.io/play?')
+
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
@@ -489,9 +491,7 @@ def findvideos(item):
             if servidor == 'directo':
                 link_other = normalize_other(srv)
                 if not link_other: continue
-            elif servidor == 'various':
-                if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url: link_other = 'Streamwish'
-                elif 'azipcdn' in url or 'filelions' in url: link_other = 'Filelions'
+            elif servidor == 'various': link_other = servertools.corregir_other(url)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang), other = link_other ))
 

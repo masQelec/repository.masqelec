@@ -15,13 +15,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb, jsontools
 
 
-host = 'https://play.pelishouse.me/'
+host = 'https://pelishouse.pro/'
 
 
 # ~ Series predominan  Enlaces No Soportados  (30/8/2022)
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://pelishouse.com/', 'https://pelishouse.me/', 'https://ww1.pelishouse.me/']
+ant_hosts = ['https://pelishouse.com/', 'https://pelishouse.me/', 'https://ww1.pelishouse.me/',
+             'https://play.pelishouse.me/']
 
 
 domain = config.get_setting('dominio', 'pelishouse', default='')
@@ -243,8 +244,6 @@ def generos(item):
        ('western', 'Western')
        ]
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     for opc, tit in opciones:
         if item.search_type == 'tvshow':
            if opc == 'accion': continue
@@ -265,7 +264,7 @@ def generos(item):
 
     if itemlist:
         if item.search_type == 'movie':
-            if not descartar_xxx:
+            if not config.get_setting('descartar_xxx', default=False):
                 itemlist.append(item.clone( action = 'list_all', title = 'xxx / adultos', url = host + 'genre/peliculas-18/', text_color = text_color ))
 
     return itemlist
@@ -599,10 +598,35 @@ def findvideos(item):
                 url2 = servertools.normalize_url(servidor, url2)
 
                 other = ''
+
+                if srv2 == 'plusvip':
+                    vid_url = link
+
+                    url_pattern = '(?:[\w\d]+://)?[\d\w]+\.[\d\w]+/moe\?data=(.+)$'
+                    src_pattern = "this\[_0x5507eb\(0x1bd\)\]='(.+?)'"
+
+                    data3 = do_downloadpage(vid_url)
+
+                    url = scrapertools.find_single_match(vid_url, url_pattern)
+                    src = scrapertools.find_single_match(data3, src_pattern)
+
+                    src_url = "https://plusvip.net{}".format(src)
+
+                    url = do_downloadpage(src_url, post={'link': url}, headers = {'Referer': vid_url})
+
+                    url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+
+                    if not url: continue
+
+                    url2 = url.replace('\\/', '/')
+
+                    servidor = 'directo'
+                    other = 'plusvip'
+
                 if servidor == 'various': other = srv2
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url2,
-                                      language = IDIOMAS.get(lang, lang), quality = item.qualities, other = other ))
+                                      language = IDIOMAS.get(lang, lang), quality = item.qualities, other = other.capitalize() ))
 
             continue
 
@@ -669,7 +693,7 @@ def findvideos(item):
             else:
                 if not config.get_setting('developer_mode', default=False): continue
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, other = 'd', language = language, quality = qlty ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = language, quality = qlty, other = 'd' ))
 
     if not itemlist:
         if not ses == 0:
@@ -910,8 +934,6 @@ def list_search(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     data = do_downloadpage(item.url)
 
     if item.search_type == 'movie' or item.search_type == 'all':
@@ -920,7 +942,7 @@ def list_search(item):
         matches = scrapertools.find_multiple_matches(data, patron)
 
         for url, thumb, title, year in scrapertools.find_multiple_matches(data, patron):
-            if descartar_xxx:
+            if config.get_setting('descartar_xxx', default=False):
                 if '/genre/18/' in url: continue
 
             if not year: year = '-'

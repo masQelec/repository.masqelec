@@ -11,7 +11,7 @@
   "categories": ["tvshow", "torrent"],
   "language": ["vose"],
 
-  "clusters": ["anime", "dorama", "torrents"],
+  "clusters": ["anime", "dorama", "adults", "torrents"],
 
   "notes": "Canal con enlaces Torrent exclusivamente. Animes, Ovas, Doramas y Mangas"
 }

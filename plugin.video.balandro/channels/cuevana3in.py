@@ -151,11 +151,7 @@ def findvideos(item):
 
                other = ''
 
-               if servidor == 'various':
-                   if 'filemoon' in match: other = 'Filemoon'
-                   elif 'filelions' in match or 'azipcdn' in match or 'alions' in match or 'dlions' in match or 'mlions' in match: other = 'Filelions'
-                   elif 'streamwish' in match or 'strwish' in match or 'embedwish' in match or 'wishembed' in match or 'awish' in match or 'dwish' in match or 'mwish' in match: other = 'Streamwish'
-                   elif 'moonplayer' in match: other = 'Moonplayer'
+               if servidor == 'various': other = servertools.corregir_other(match)
 
                if not servidor == 'directo':
                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = match, server = servidor, language = IDIOMAS.get(lang, lang), other = other ))
@@ -167,11 +163,7 @@ def findvideos(item):
 
         other = ''
 
-        if servidor == 'various':
-            if 'filemoon' in url: other = 'Filemoon'
-            elif 'filelions' in url or 'azipcdn' in url or 'alions' in url or 'dlions' in url or 'mlions' in url: other = 'Filelions'
-            elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
-            elif 'moonplayer' in url: other = 'Moonplayer'
+        if servidor == 'various': other = servertools.corregir_other(url)
 
         if not servidor == 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = IDIOMAS.get(lang, lang), other = other ))

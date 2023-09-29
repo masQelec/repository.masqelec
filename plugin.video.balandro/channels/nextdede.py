@@ -662,10 +662,7 @@ def findvideos(item):
         if not servidor == 'directo':
             other = ''
 
-            if servidor == 'various':
-                if '/filemoon.' in url: other = 'Filemoon'
-                elif '/streamwish.' in url: other = 'Streamwish'
-                elif '/vgembed.' in url: other = 'Vidguard'
+            if servidor == 'various': other = servertools.corregir_other(url)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, quality = qlty, other = other ))
 

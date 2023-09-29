@@ -404,7 +404,9 @@ def mainlist(item):
 
         itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
         itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
-        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
+
+        if not config.get_setting('descartar_anime', default=False):
+            itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
     return itemlist
 
@@ -481,7 +483,8 @@ def mainlist_series(item):
         itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series?orderBy=score', slug = 'series',
                                     nro_pagina = 1, order = '?orderBy=score', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
+        if not config.get_setting('descartar_anime', default=False):
+            itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
         itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', slug = 'series', nro_pagina = 1, search_type='tvshow'))
 
@@ -623,6 +626,9 @@ def generos(item):
     for genre, title in matches:
         if item.group == 'anime':
             if title == 'Documental': continue
+
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
 
         genre = '?genre=' + genre
 
@@ -1307,6 +1313,7 @@ def findvideos(item):
         if server == 'filemoon': other = 'Filemoon'
         elif server == 'streamwish': other = 'Streamwish'
         elif server == 'streamhub': other = 'Streamhub'
+        elif server == 'uploaddo': other = 'Uploaddo'
         else: other = ''
 
         server = servertools.corregir_servidor(server)
@@ -1336,6 +1343,7 @@ def findvideos(item):
         if server == 'filemoon': other = 'Filemoon'
         elif server == 'streamwish': other = 'Streamwish'
         elif server == 'streamhub': other = 'Streamhub'
+        elif server == 'uploaddo': other = 'Uploaddo'
         else: other = 'E'
 
         server = servertools.corregir_servidor(server)

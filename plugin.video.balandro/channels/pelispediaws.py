@@ -93,6 +93,9 @@ def generos(item):
     for url, title in matches:
         title = title.replace('&amp;', '&')
 
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
+
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
 
     return itemlist

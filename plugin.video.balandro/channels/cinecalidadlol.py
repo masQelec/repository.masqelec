@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww.cinecalidad.men/'
+host = 'https://v5.cinecalidad.men/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -31,7 +31,10 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://w6.cinecalidad.vet/', 'https://w7.cinecalidad.vet/', 'https://w8.cinecalidad.vet/',
              'https://w11.cinecalidad.vet/', 'https://w12.cinecalidad.vet/', 'https://ww.cinecalidad.vet/',
              'https://wc.cinecalidad.vet/', 'https://wy.cinecalidad.vet/', 'https://www.cinecalidad.men/',
-             'https://vww.cinecalidad.men/', 'https://wwv.cinecalidad.men/', 'https://wvw.cinecalidad.men/']
+             'https://vww.cinecalidad.men/', 'https://wwv.cinecalidad.men/', 'https://wvw.cinecalidad.men/',
+             'https://ww.cinecalidad.men/', 'https://vw.cinecalidad.men/', 'https://wv.cinecalidad.men/',
+             'https://vv.cinecalidad.men/', 'https://v.cinecalidad.men/', 'https://v1.cinecalidad.men/',
+             'https://v2.cinecalidad.men/', 'https://v3.cinecalidad.men/', 'https://v4.cinecalidad.men/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -166,14 +169,19 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host + 'espana/?ref=es', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/?ref=es', search_type = 'movie' ))
 
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = ' - [COLOR springgreen]Animes[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/anime/?ref=es', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie', group = '?ref=es' ))
     itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie', group = '?ref=es' ))
-
 
     itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
+
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = ' - [COLOR springgreen]Animes[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/anime/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie' ))
@@ -223,6 +231,9 @@ def generos(item):
         elif title == 'Destacadas': continue
         elif title == 'Series': continue
 
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
+
         url = host[:-1] + url
 
         if item.group == '?ref=es': url = url + item.group
@@ -271,7 +282,7 @@ def list_all(item):
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        if '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url: continue
+        if '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url: continue
 
         if not url or not title: continue
 
@@ -487,7 +498,6 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-
     if '>No hay opciones para ver en latino' in data:
         new_url = scrapertools.find_single_match(data, ">No hay opciones para ver en latino.*?<a href='(.*?)'>Ver en castellano<")
         if not new_url: new_url = scrapertools.find_single_match(data, '>No hay opciones para ver en latino.*?<a href="(.*?)">Ver en castellano<')
@@ -501,7 +511,6 @@ def findvideos(item):
             data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
             if '?ref=es' in item.url: lang = 'Esp'
-
 
     ses = 0
 
@@ -541,9 +550,7 @@ def findvideos(item):
                 elif srv == 'voe': servidor = 'voe'
                 elif srv == 'doods' or srv == 'doostream': servidor = 'doodstream'
 
-                elif srv == 'streamwish' or srv == 'strwish' or srv == 'embedwish' or srv == 'wishembed' or srv == 'awish' or srv == 'dwish' or srv == 'mwish': servidor = 'various'
-
-                elif srv == 'filemoon': servidor = 'various'
+                else: servidor = servertools.corregir_servidor(srv)
 
             if servidor == 'various': other = srv.capitalize()
 
@@ -582,7 +589,7 @@ def findvideos(item):
             elif 'cinecalidad' in servidor: continue
 
             elif servidor == 'utorrent': servidor = 'torrent'
-            elif 'utorrent' in servidor == : servidor = 'torrent'
+            elif 'utorrent' in servidor: servidor = 'torrent'
             elif 'torrent' in servidor: servidor = 'torrent'
 
             elif servidor == 'drive': servidor = 'gvideo'

@@ -247,19 +247,17 @@ def submnu_search(item):
             itemlist.append(item.clone( channel='proxysearch', title=' - Anular los canales excluidos de Configurar proxies a usar',
                                         action='channels_proxysearch_del', thumbnail=config.get_thumb('flame'), text_color='coral' ))
 
-
     if item.only_options_proxies:
-        itemlist.append(item.clone( action='', title= '[B]Configuración:[/B]', folder=False, text_color='goldenrod' ))
+        itemlist.append(item.clone( action='', title= '[B]Ajustes:[/B]', folder=False, text_color='goldenrod' ))
 
         itemlist.append(item.clone( channel='actions', title=' - [COLOR chocolate]Ajustes[/COLOR] categorías ([COLOR tan][B]Menú[/B][/COLOR], [COLOR red][B]Proxies[/B][/COLOR] y [COLOR yellow][B]Buscar[/B][/COLOR])', action = 'open_settings', thumbnail=config.get_thumb('settings') ))
 
         return itemlist
 
-
     if config.get_setting('sub_mnu_cfg_search', default=True):
         itemlist.append(item.clone( action='', title= '[B]Personalización búsquedas:[/B]', folder=False, text_color='moccasin' ))
 
-        itemlist.append(item.clone( channel='search', action='show_help_parameters', title='[COLOR chocolate][B] - Qué ajustes tiene configurados para las búsquedas[/B][/COLOR]', thumbnail=config.get_thumb('help') ))
+        itemlist.append(item.clone( channel='search', action='show_help_parameters', title='[COLOR chocolate][B] - Qué Ajustes tiene en preferncias para las búsquedas[/B][/COLOR]', thumbnail=config.get_thumb('help') ))
 
         itemlist.append(item.clone( channel='filters', action='no_actives', title=' - Qué canales no intervienen en las búsquedas (están desactivados)', thumbnail=config.get_thumb('stack') ))
 
@@ -319,7 +317,7 @@ def submnu_search(item):
             itemlist.append(item.clone( channel='filters', action='channels_excluded_del', title=' - [COLOR coral][B]Anular los canales excluidos en las búsquedas de [COLOR green]Todos[/B][/COLOR]',
                                         extra='all', thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='', title= '[B]Configuración:[/B]', folder=False, text_color='goldenrod' ))
+    itemlist.append(item.clone( action='', title= '[B]Ajustes:[/B]', folder=False, text_color='goldenrod' ))
 
     itemlist.append(item.clone( channel='actions', title=' - [COLOR chocolate]Ajustes[/COLOR] categorías ([COLOR tan][B]Menú[/B][/COLOR], [COLOR red][B]Proxies[/B][/COLOR] y [COLOR yellow][B]Buscar[/B][/COLOR])', action = 'open_settings', thumbnail=config.get_thumb('settings') ))
 
@@ -343,7 +341,6 @@ def _poner_no_searchable(item):
     config.set_setting('no_searchable', True, item.from_channel)
 
     if not item.module_search: _refresh_menu(item)
-
 
 def _quitar_no_searchable(item):
     platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR violet]Incluyendo en búsquedas[/COLOR][/B]')
@@ -441,15 +438,25 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
 
+    elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
+
+    elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
+
     elif item.from_channel == 'cuevana3video': domains.manto_domain_cuevana3video(item)
 
     elif item.from_channel == 'divxtotal': domains.manto_domain_divxtotal(item)
 
     elif item.from_channel == 'dontorrents': domains.manto_domain_dontorrents(item)
 
+    elif item.from_channel == 'dontorrentsin': domains.manto_domain_dontorrentsin(item)
+
+    elif item.from_channel == 'doramedplay': domains.manto_domain_doramedplay(item)
+
     elif item.from_channel == 'elifilms': domains.manto_domain_elifilms(item)
 
     elif item.from_channel == 'elitetorrent': domains.manto_domain_elitetorrent(item)
+
+    elif item.from_channel == 'elitetorrentnz': domains.manto_domain_elitetorrentnz(item)
 
     elif item.from_channel == 'ennovelas': domains.manto_domain_ennovelas(item)
 
@@ -471,7 +478,13 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'mejortorrentapp': domains.manto_domain_mejortorrentapp(item)
 
+    elif item.from_channel == 'mejortorrentnz': domains.manto_domain_mejortorrentnz(item)
+
     elif item.from_channel == 'mitorrent': domains.manto_domain_mitorrent(item)
+
+    elif item.from_channel == 'movidymobi': domains.manto_domain_movidymobi(item)
+
+    elif item.from_channel == 'peliculaspro': domains.manto_domain_peliculaspro(item)
 
     elif item.from_channel == 'pelishouse': domains.manto_domain_pelishouse(item)
 
@@ -503,18 +516,22 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'serieskao': domains.manto_domain_serieskao(item)
 
+    elif item.from_channel == 'seriesmetro': domains.manto_domain_seriesmetro(item)
+
     elif item.from_channel == 'seriesyonkis': domains.manto_domain_seriesyonkis(item)
 
     elif item.from_channel == 'srnovelas': domains.manto_domain_srnovelas(item)
 
     elif item.from_channel == 'subtorrents': domains.manto_domain_subtorrents(item)
 
+    elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
+
     elif item.from_channel == 'torrentpelis': domains.manto_domain_torrentpelis(item)
 
     elif item.from_channel == 'tupelihd': domains.manto_domain_tupelihd(item)
 
     else:
-        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Configuración No Permitida[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Ajuste No Permitido[/B][/COLOR]' % color_alert)
 
 
 def _credenciales(item):
@@ -714,6 +731,13 @@ def _proxies(item):
 
         if config.get_setting('channel_dilo_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'divxatope':
+        from channels import divxatope
+        item.channel = 'divxatope'
+        divxatope.configurar_proxies(item)
+
+        if config.get_setting('channel_divxatope_proxies') is None: refrescar = False
+
     elif item.from_channel == 'divxtotal':
         from channels import divxtotal
         item.channel = 'divxtotal'
@@ -748,6 +772,13 @@ def _proxies(item):
         elifilms.configurar_proxies(item)
 
         if config.get_setting('channel_elifilms_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'elitedivx':
+        from channels import elitedivx
+        item.channel = 'elitedivx'
+        elitedivx.configurar_proxies(item)
+
+        if config.get_setting('channel_elitedivx_proxies') is None: refrescar = False
 
     elif item.from_channel == 'ennovelas':
         from channels import ennovelas
@@ -979,13 +1010,6 @@ def _proxies(item):
         playdede.configurar_proxies(item)
 
         if config.get_setting('channel_playdede_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'playview':
-        from channels import playview
-        item.channel = 'playview'
-        playview.configurar_proxies(item)
-
-        if config.get_setting('channel_playview_proxies') is None: refrescar = False
 
     elif item.from_channel == 'reinventorrent':
         from channels import reinventorrent
