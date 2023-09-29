@@ -8,15 +8,17 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import urllib
-
 import re
+from urllib.parse import urlparse
+from urllib.parse import parse_qsl
+
 from ...kodion.items import VideoItem, DirectoryItem
 from . import utils
 
 
 class UrlToItemConverter(object):
     RE_CHANNEL_ID = re.compile(r'^/channel/(?P<channel_id>.+)$')
+    RE_SHORTS_VID = re.compile(r'^/shorts/(?P<video_id>.+)$')
 
     def __init__(self, flatten=True):
         self._flatten = flatten
@@ -33,9 +35,9 @@ class UrlToItemConverter(object):
         self._channel_ids = []
 
     def add_url(self, url, provider, context):
-        url_components = urllib.parse.urlparse(url)
-        if url_components.hostname.lower() == 'youtube.com' or url_components.hostname.lower() == 'www.youtube.com':
-            params = dict(urllib.parse.parse_qsl(url_components.query))
+        url_components = urlparse(url)
+        if url_components.hostname.lower() in ('youtube.com', 'www.youtube.com', 'm.youtube.com'):
+            params = dict(parse_qsl(url_components.query))
             if url_components.path.lower() == '/watch':
                 video_id = params.get('v', '')
                 if video_id:
@@ -60,6 +62,12 @@ class UrlToItemConverter(object):
                         playlist_item = DirectoryItem('', context.create_uri(['playlist', playlist_id]))
                         playlist_item.set_fanart(provider.get_fanart(context))
                         self._playlist_id_dict[playlist_id] = playlist_item
+            elif self.RE_SHORTS_VID.match(url_components.path):
+                re_match = self.RE_SHORTS_VID.match(url_components.path)
+                video_id = re_match.group('video_id')
+                plugin_uri = context.create_uri(['play'], {'video_id': video_id})
+                video_item = VideoItem('', plugin_uri)
+                self._video_id_dict[video_id] = video_item
             elif self.RE_CHANNEL_ID.match(url_components.path):
                 re_match = self.RE_CHANNEL_ID.match(url_components.path)
                 channel_id = re_match.group('channel_id')

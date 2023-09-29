@@ -7,15 +7,14 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import BaseHTTPServer
-from six.moves.urllib.parse import parse_qs, urlparse
-from six.moves import range
-
 import json
 import os
 import re
 import requests
 import socket
+from http import server as BaseHTTPServer
+from urllib.parse import parse_qs
+from urllib.parse import urlparse
 
 import xbmc
 import xbmcaddon
@@ -64,10 +63,13 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     # noinspection PyPep8Naming
     def do_GET(self):
         addon = xbmcaddon.Addon('plugin.video.youtube')
-        dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
+        mpd_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
         api_config_enabled = addon.getSetting('youtube.api.config.page') == 'true'
 
-        if self.path == '/client_ip':
+        # Strip trailing slash if present
+        stripped_path = self.path.rstrip('/')
+
+        if stripped_path == '/client_ip':
             client_json = json.dumps({"ip": "{ip}".format(ip=self.client_address[0])})
             self.send_response(200)
             self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -75,13 +77,13 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(client_json.encode('utf-8'))
 
-        if self.path != '/ping':
-            logger.log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
+        if stripped_path != '/ping':
+            logger.log_debug('HTTPServer: GET Request uri path |{proxy_path}|'.format(proxy_path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
         else:
-            if dash_proxy_enabled and self.path.endswith('.mpd'):
+            if mpd_proxy_enabled and self.path.endswith('.mpd'):
                 file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
                 file_chunk = True
                 logger.log_debug('HTTPServer: Request file path |{file_path}|'.format(file_path=file_path.encode('utf-8')))
@@ -98,7 +100,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 except IOError:
                     response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path.encode('utf-8'))
                     self.send_error(404, response)
-            elif api_config_enabled and self.path == '/api':
+            elif api_config_enabled and stripped_path.lower() == '/api':
                 html = self.api_config_page()
                 html = html.encode('utf-8')
                 self.send_response(200)
@@ -107,7 +109,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 self.end_headers()
                 for chunk in self.get_chunks(html):
                     self.wfile.write(chunk)
-            elif api_config_enabled and self.path.startswith('/api_submit'):
+            elif api_config_enabled and stripped_path.startswith('/api_submit'):
                 addon = xbmcaddon.Addon('plugin.video.youtube')
                 i18n = addon.getLocalizedString
                 xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
@@ -156,21 +158,21 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 self.end_headers()
                 for chunk in self.get_chunks(html):
                     self.wfile.write(chunk)
-            elif self.path == '/ping':
+            elif stripped_path == '/ping':
                 self.send_error(204)
             else:
                 self.send_error(501)
 
     # noinspection PyPep8Naming
     def do_HEAD(self):
-        logger.log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
+        logger.log_debug('HTTPServer: HEAD Request uri path |{proxy_path}|'.format(proxy_path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
         else:
             addon = xbmcaddon.Addon('plugin.video.youtube')
-            dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
-            if dash_proxy_enabled and self.path.endswith('.mpd'):
+            mpd_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
+            if mpd_proxy_enabled and self.path.endswith('.mpd'):
                 file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
                 if not os.path.isfile(file_path):
                     response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path.encode('utf-8'))
@@ -468,7 +470,7 @@ def get_http_server(address=None, port=None):
     except socket.error as e:
         logger.log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'.format(address=address, port=port, response=str(e)))
         xbmcgui.Dialog().notification(addon.getAddonInfo('name'), str(e),
-                                      xbmc.translatePath('special://home/addons/{0!s}/icon.png'.format(addon.getAddonInfo('id'))),
+                                      addon.getAddonInfo('icon'),
                                       5000, False)
         return None
 
