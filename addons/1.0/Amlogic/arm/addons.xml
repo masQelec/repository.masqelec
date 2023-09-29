@@ -1,5 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
+<addon id="script.module.inputstreamhelper" name="InputStream Helper" version="0.6.1+matrix.1" provider-name="emilsvennesson, dagwieers, mediaminister, horstle">
+  <requires>
+    <!--py3 compliant-->
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.pysocks" version="1.6.8" optional="true"/>
+  </requires>
+  <!-- This is needed to get an add-on icon -->
+  <extension point="xbmc.python.script" library="default.py">
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.python.module" library="lib"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="de_DE">Kodi InputStream und DRM Wiedergabe einfach gemacht</summary>
+    <summary lang="el_GR">Βοηθός Inputstream για το Kodi και εύκολη αναπαραγωγή DRM</summary>
+    <summary lang="en_GB">Kodi InputStream and DRM playback made easy</summary>
+    <summary lang="es_ES">Kodi InputStream y reproducción DRM echa fácil</summary>
+    <summary lang="fr_FR">La lecture Kodi InputStream et DRM en toute simplicité</summary>
+    <summary lang="hr_HR">Kodi InputStream olakšava reprodukciju DRM zaštićenog sadržaja</summary>
+    <description lang="de_DE">Dieses einfache Kodi-Modul macht das Leben für Addon Entwickler einfacher, die auf InputStream basierte Addons und DRM Wiedergabe angewiesen sind.</description>
+    <description lang="el_GR">Μία απλή μονάδα για το Kodi η οποία διευκολύνει την ζωή των προγραμματιστών οι οποίοι εξαρτώνται από τα πρόσθετσ InputStream και αναπαραγωγή τύπου DRM.</description>
+    <description lang="en_GB">A simple Kodi module that makes life easier for add-on developers relying on InputStream based add-ons and DRM playback.</description>
+    <description lang="es_ES">Un módulo Kodi simple que hace la vida más fácil para los desarrolladores de complementos que dependen de complementos basados en InputStream y reproducción de DRM.</description>
+    <description lang="fr_FR">Un simple module Kodi qui simplifie la vie des développeurs de modules complémentaires en s’appuyant sur des modules complémentaires basés sur InputStream et sur la lecture de DRM.</description>
+    <description lang="hr_HR">Jednostavan Kodi modul koji olakšava razvijanje dodataka koji se temelje na InputStream dodatku i reprodukciji DRM zaštićenog sadržaja.</description>
+    <description lang="ru_RU">Простой модуль для Kodi, который облегчает жизнь разработчикам дополнений, с использованием InputStream дополнений и воспроизведения DRM контента.</description>
+    <news>
+v0.6.1 (2023-05-30)
+- Performance improvements on Linux ARM
+- This will be the last release for Python 2 i.e. Kodi 18 (Leia) and below. The next release will require Python 3 and Kodi 19 (Matrix) or higher.
+
+v0.6.0 (2023-05-03)
+- Initial support for AARCH64 Linux
+- Initial support for AARCH64 Macs
+- New option to install a specific version on most platforms
+
+v0.5.10 (2022-04-18)
+- Fix automatic submission of release
+- Update German translation
+- Fix update_frequency setting
+- Fix install_from
+- Improve/Fix Widevine extraction from Chrome OS images
+
+v0.5.9 (2022-03-22)
+- Update Croatian translation
+- Replace deprecated LooseVersion
+- Fix http_get decode error
+- Option to install Widevine from specified source
+    </news>
+    <platform>all</platform>
+    <license>MIT</license>
+    <website>https://github.com/emilsvennesson/script.module.inputstreamhelper/wiki</website>
+    <source>https://github.com/emilsvennesson/script.module.inputstreamhelper</source>
+    <assets>
+      <icon>resources/icon.png</icon>
+    </assets>
+  </extension>
+</addon>
+
+<addon id="script.module.pyautogui"
+	name="PyAutoGUI"
+	version="0.9.51+matrix.1"
+	provider-name="Al Sweigart">
+	<requires>
+		<import addon="xbmc.python" version="3.0.0"/>
+	</requires>
+	<extension point="xbmc.python.module" library="lib" />
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en_GB">PyAutoGUI is a cross-platform GUI automation Python module for human beings. Used to programmatically control the mouse and keyboard.</summary>
+		<forum></forum>
+		<website>https://pyautogui.readthedocs.io/</website>
+		<license>see LICENSE.txt</license>
+		<platform>all</platform>
+		<source>https://github.com/asweigart/pyautogui</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+	</extension>
+</addon>
+
 <addon id="plugin.video.elementum" name="Elementum" version="0.1.97" provider-name="elgatito">
     <requires>
         <import addon="xbmc.addon" version="16.0.0" />
@@ -42,6 +121,146 @@
             <screenshot>resources/screenshots/webui.png</screenshot>
         </assets>
     </extension>
+</addon>
+
+<addon id="plugin.video.netflix" name="Netflix" version="1.22.3+matrix.1" provider-name="libdev, jojo, asciidisco, caphm, castagnait">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.addon.signals" version="0.0.6+matrix.1"/>
+    <import addon="script.module.inputstreamhelper" version="0.5.0+matrix.1"/>
+    <import addon="script.module.pycryptodome" version="3.4.3"/>
+    <import addon="script.module.requests"/>
+    <import addon="script.module.myconnpy" version="8.0.18+matrix.1"/> <!--MySQL Connector/Python-->
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py"/>
+  <extension point="xbmc.addon.metadata">
+    <reuselanguageinvoker>true</reuselanguageinvoker>
+    <summary lang="cs_CZ">Netflix</summary>
+    <description lang="cs_CZ">Plugin pro sledování filmů, seriálů online z Netflixu</description>
+    <disclaimer lang="cs_CZ">Použití tohoto doplňku nemusí být ve vaší zemi pobytu legální - před instalací dbejte na vaše zákony.</disclaimer>
+    <summary lang="de_DE">Netflix</summary>
+    <description lang="de_DE">Addon für Netflix VOD-Dienste</description>
+    <disclaimer lang="de_DE">Möglicherweise ist die Verwendung dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen.</disclaimer>
+    <summary lang="en_GB">Netflix</summary>
+    <description lang="en_GB">Netflix VOD Services Add-on</description>
+    <disclaimer lang="en_GB">The use of this add-on may not be legal in your country of residence - please check with your local laws before installing.</disclaimer>
+    <summary lang="el_GR">Νέτφλιξ</summary>
+    <description lang="el_GR">Πρόσθετο υπηρεσιών κατά παραγγελία του Νέτφλιξ</description>
+    <disclaimer lang="el_GR">Η χρήση αυτού του προσθέτου μπορεί να μην είναι νόμιμη στην χώρα που κατοικείτε - παρακαλώ ελέγξτε τους τοπικούς νόμους πριν την εγκατάσταση.</disclaimer>
+    <summary lang="nl_NL">Netflix</summary>
+    <description lang="nl_NL">Bekijk Netflix films en tvprogramma's in Kodi.</description>
+    <disclaimer lang="nl_NL">Sommige delen van deze add-on zijn mogelijk onwettig in jouw land - raadpleeg de lokale wetgeving alvorens deze add-on te installeren.</disclaimer>
+    <summary lang="ja_JP">Netflix</summary>
+    <description lang="ja_JP">Netflix VOD サービスアドオン</description>
+    <disclaimer lang="ja_JP">一部の国では、このアドオンを使用するのが不法でありますので、設置する前に必ず関連法律を確認してください</disclaimer>
+    <summary lang="ko_KR">Netflix</summary>
+    <description lang="ko_KR">Netflix VOD 서비스애드온</description>
+    <disclaimer lang="ko_KR">일부 국가에서는 이 애드온을 사용하는 것이 불법일 수도 있으니, 설치하기전 관련 법을 확인하기 바랍니다.</disclaimer>
+    <description lang="it_IT">Netflix Add-on servizi VOD</description>
+    <disclaimer lang="it_IT">L'utilizzo di questo add-on potrebbe non essere legale nel vostro paese di residenza - si prega di verificare le leggi in vigore prima dell'installazione.</disclaimer>
+    <summary lang="es_ES">Netflix</summary>
+    <description lang="es_ES">Complemento para los Servicios VOD de Netflix</description>
+    <disclaimer lang="es_ES">El uso de este complemento puede no ser legal en su país de residencia - Por favor, consulte las leyes locales antes de instalarlo.</disclaimer>
+    <summary lang="hu_HU">Netflix</summary>
+    <description lang="hu_HU">Netflix VOD kiegészítő a Kodihoz</description>
+    <disclaimer lang="hu_HU">Előfordulhat, hogy a kiegészítő használata nem törvényes az Ön országában - telepítés előtt tájékozódjon a helyi törvényekről</disclaimer>
+    <summary lang="pt_BR">Netflix</summary>
+    <description lang="pt_BR">Add-on para os serviços VOD do Netflix</description>
+    <disclaimer lang="pt_BR">O uso deste addon pode não ser legal no seu país de residência - por favor, verifique as suas leis locais antes de instalar.</disclaimer>
+    <summary lang="tr_TR">Netflix</summary>
+    <description lang="tr_TR">Netflix VOD Hizmetleri Eklentisi</description>
+    <disclaimer lang="tr_TR">Bu eklentinin bazı bölümleri ikamet ettiğiniz ülkede yasal olmayabilir - lütfen yüklemeden önce yerel yasalarınıza bakın.</disclaimer>
+    <summary lang="ro_RO">Netflix</summary>
+    <description lang="ro_RO">Add-on pentru servicii video la cerere Netflix</description>
+    <disclaimer lang="ro_RO">Utilizarea acestui add-on ar putea fi ilegală în țara în care locuiți - vă rugăm să verificați legile locale înainte de instalare.</disclaimer>
+    <summary lang="sv_SE">Netflix</summary>
+    <description lang="sv_SE">Netflix VOD Service-tillägg</description>
+    <disclaimer lang="sv_SE">Användandet av detta tillägg kanske inte är lagligt i ditt hemland - kontrollera med dina lokala lagar innan du installerar.</disclaimer>
+    <summary lang="zh_CN">Netflix</summary>
+    <description lang="zh_CN">Netflix VOD服务附加组件</description>
+    <disclaimer lang="zh_CN">此附加组件在您的居住国可能不合法-请在安装前与您当地的法律核对。</disclaimer>
+    <summary lang="fr_FR">Netflix</summary>
+    <description lang="fr_FR">Extension Netflix SVoD</description>
+    <disclaimer lang="fr_FR">L'utilisation de cette extension n'est peut-être pas légale dans votre pays de résidence - renseignez-vous avant de l'installer</disclaimer>
+    <summary lang="pl_PL">Netflix</summary>
+    <description lang="pl_PL">Wtyczka dla usług VOD serwisu Netflix</description>
+    <disclaimer lang="pl_PL">Korzystanie z tego dodatku może być niezgodne z prawem w twoim kraju zamieszkania - przed zainstalowaniem zapoznaj się z lokalnymi przepisami.</disclaimer>
+    <summary lang="he_IL">Netflix</summary>
+    <description lang="he_IL">תוסף VOD לשירות של Netflix</description>
+    <disclaimer lang="he_IL">השימוש בתוסף זה עלול להיות לא חוקי במדינת מגוריך - אנא בדוק את החוק ברשות המקומית לפני ההתקנה</disclaimer>
+    <summary lang="zh_TW">Netflix</summary>
+    <description lang="zh_TW">Netflix VOD服務套件</description>
+    <disclaimer lang="zh_TW">在您居住的國家使用此套件可能並不合法 - 請在安裝前與您當地的法律核對</disclaimer>
+	  <assets>
+      <icon>resources/media/icon.png</icon>
+      <fanart>resources/media/fanart.jpg</fanart>
+      <screenshot>resources/media/screenshot-01.jpg</screenshot>
+      <screenshot>resources/media/screenshot-02.jpg</screenshot>
+      <screenshot>resources/media/screenshot-03.jpg</screenshot>
+      <screenshot>resources/media/screenshot-04.jpg</screenshot>
+      <screenshot>resources/media/screenshot-05.jpg</screenshot>
+    </assets>
+    <language>en cs de es fr he hr hu it ja ko nl pl pt ro sv tr zh</language>
+    <platform>all</platform>
+    <license>MIT</license>
+    <website>https://www.netflix.com</website>
+    <email></email>
+    <forum>https://forum.kodi.tv/showthread.php?tid=329767</forum>
+    <source>https://github.com/CastagnaIT/plugin.video.netflix</source>
+    <news>v1.22.3 (2023-09-20)
+- Removed HTTPX module (http2) to fix compatibility with python >= 3.11
+- Restored Requests module (details https://github.com/CastagnaIT/plugin.video.netflix/pull/1622)
+- Fix cookies errors of 1.22.2
+    </news>
+  </extension>
+</addon>
+
+<addon id="script.module.kodi-six"
+       name="Kodi Six"
+       version="0.1.3.1"
+       provider-name="Roman V.M.">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.module" library="libs" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Wrappers around Kodi Python API for seamless Python 2/3 compatibility</summary>
+    <description lang="en_GB">Wrappers around Kodi Python API that normalize handling of textual and byte strings in Python 2 and 3.</description>
+    <platform>all</platform>
+    <license>GPL v.3</license>
+    <forum>https://forum.kodi.tv/showthread.php?tid=327883</forum>
+    <source>https://github.com/romanvm/kodi.six</source>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
+    <news>0.1.3:
+- Fix non-UTF-8 byte string decoding in Python 2.</news>
+  </extension>
+</addon>
+
+<addon id="script.module.requests" name="requests" version="2.31.0" provider-name="Python Software Foundation">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.certifi" version="2023.5.7"/>
+    <import addon="script.module.chardet" version="5.1.0"/>
+    <import addon="script.module.idna" version="3.4.0"/>
+    <import addon="script.module.urllib3" version="1.26.16+matrix.1"/>
+  </requires>
+  <extension point="xbmc.python.module" library="lib" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Requests is an elegant and simple HTTP library for Python, built for human beings.</summary>
+    <description lang="en_GB">Requests is an elegant and simple HTTP library for Python, built for human beings.</description>
+    <license>Apache-2.0</license>
+    <platform>all</platform>
+    <website>https://requests.readthedocs.io/</website>
+    <source>https://github.com/psf/requests</source>
+    <assets>
+      <icon>resources/icon.png</icon>
+    </assets>
+  </extension>
 </addon>
 
 <addon id="plugin.video.balandro" name="Balandro" version="3.1.01" provider-name="Balandro Team">
@@ -122,7 +341,7 @@
 
 <addon id="plugin.video.amazon-test"
        name="Amazon VOD"
-       version="0.9.5+matrix.1"
+       version="0.9.8+matrix.1"
        provider-name="Sandmann79, Varstahl">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
@@ -144,10 +363,16 @@
     <reuselanguageinvoker>true</reuselanguageinvoker>
     <summary lang="en_GB">Amazon Prime Video Streaming</summary>
     <summary lang="de_DE">Amazon Prime Instant Video</summary>
+    <summary lang="es_ES">Vídeo a demanda de Amazon Prime</summary>
+    <summary lang="ua_UA">Потокове відео Amazon Prime</summary>
     <description lang="en_GB">Movies and Television Shows for Prime Members</description>
     <description lang="de_DE">Filme und Serien für Amazon Prime Mitglieder</description>
+    <description lang="es_ES">Películas y Series para Miembros de Amazon Prime</description>
+    <description lang="ua_UA">Фільми та серіали для підписників Prime</description>
     <disclaimer lang="en_GB">Some parts of this addon may not be legal in your country of residence - please check with your local laws before installing.</disclaimer>
     <disclaimer lang="de_DE">Möglicherweise sind einge Teile dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen.</disclaimer>
+    <disclaimer lang="es_ES">Algunas partes de este addon pueden que sean illegales en tu país de residencia - por favor, compruébalo antes de la instalación.</disclaimer>
+    <disclaimer lang="ua_UA">Деякі частини цього плагіну можуть бути незаконні в країні вашого проживання - будь ласка, перевірте це перед встановленням.</disclaimer>
     <forum>http://www.kodinerds.net/index.php/Thread/44211-Release-Amazon-Prime-Instant-Video</forum>
     <source>https://github.com/Sandmann79/xbmc</source>
     <license>GPL-3.0-or-later</license>
@@ -332,5 +557,73 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
         <disclaimer lang="zh_CN">此插件未被谷歌认可</disclaimer>
         <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
     </extension>
+</addon>
+
+<addon id="script.module.pyxbmct"
+   name="PyXBMCt"
+   version="1.3.2+matrix.1"
+   provider-name="Roman V.M.">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.module" library="lib" />
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <summary lang="en_GB">PyXBMCt UI framework</summary>
+    <description lang="en_GB">PyXBMCt is a mini-framework for simple XBMC addon UI buliding. It is similar to PyQt and provides parent windows, a number of UI controls (widgets) and a grid layout manager to place controls.</description>
+    <license>GPL-3.0-only</license>
+    <forum>https://forum.kodi.tv/showthread.php?tid=174859</forum>
+    <website>http://romanvm.github.io/script.module.pyxbmct/</website>
+    <email>roman1972@gmail.com</email>
+    <source>https://github.com/romanvm/script.module.pyxbmct</source>
+    <news>1.3.2:
+- Drop Python 2 compatibility</news>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
+  </extension>
+</addon>
+
+<addon id="script.module.beautifulsoup4" name="beautifulsoup4" version="4.12.2" provider-name="Leonard Richardson">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.soupsieve" version="2.4.1"/>
+  </requires>
+  <extension point="xbmc.python.module" library="lib" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Screen-scraping library</summary>
+    <description lang="en_GB">Beautiful Soup is a library that makes it easy to scrape information from web pages. It sits atop an HTML or XML parser, providing Pythonic idioms for iterating, searching, and modifying the parse tree.</description>
+    <license>MIT</license>
+    <platform>all</platform>
+    <website>https://www.crummy.com/software/BeautifulSoup/</website>
+	<source>https://code.launchpad.net/beautifulsoup</source>
+    <assets>
+      <icon>resources/icon.png</icon>
+    </assets>
+  </extension>
+</addon>
+
+<addon id="script.module.mechanicalsoup"
+	name="MechanicalSoup"
+	version="1.0.0+matrix.1"
+	provider-name="Matthew Hickford, Dan Hemberger, Matthieu Moy">
+	<requires>
+		<import addon="xbmc.python" version="3.0.0"/>
+		<import addon="script.module.requests" version="2.22.0+matrix.1"/>
+		<import addon="script.module.beautifulsoup4" version="4.6.3+matrix.1"/>
+		<import addon="script.module.six" version="1.14.0+matrix.1"/>
+	</requires>
+	<extension point="xbmc.python.module" library="lib" />
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en_GB">A Python library for automating interaction with websites.</summary>
+		<forum></forum>
+		<website>https://mechanicalsoup.readthedocs.io/</website>
+		<license>MIT</license>
+		<platform>all</platform>
+		<source>https://github.com/MechanicalSoup/MechanicalSoup</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+	</extension>
 </addon>
 </addons>
