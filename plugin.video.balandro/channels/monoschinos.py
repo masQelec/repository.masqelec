@@ -18,13 +18,11 @@ def mainlist_animes(item):
     logger.info()
     itemlist = []
 
-    descartar_anime = config.get_setting('descartar_anime', default=False)
-
-    if descartar_anime: return itemlist
+    if config.get_setting('descartar_anime', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False: return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
@@ -314,17 +312,8 @@ def findvideos(item):
         elif servidor == 'pixel': servidor = 'pixeldrain'
         elif servidor == 'senvid2': servidor = 'sendvid'
 
-        elif 'filemoon' in servidor:
-             other = servidor
-             servidor = 'various'
-
-        elif 'streamwish' in servidor or 'strwish' in servidor or 'embedwish' in servidor or 'wishembed' in servidor or 'awish' in servidor or 'dwish' in servidor or 'mwish' in servidor:
-             other = servidor
-             servidor = 'various'
-
-        elif 'vidguard' in servidor or 'vgfplay' in servidor or 'vgembed' in servidor:
-             other = servidor
-             servidor = 'various'
+        else:
+             other = servertools.corregir_other(servidor)
 
         servidor = servertools.corregir_servidor(servidor)
 
@@ -333,7 +322,10 @@ def findvideos(item):
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose', other = other.capitalize() ))
+        if not servidor == 'directo':
+            if not servidor == 'various': other = ''
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose', other = other ))
 
     # download
     bloque = scrapertools.find_single_match(data, '<div class="downbtns">(.*?)</div>')

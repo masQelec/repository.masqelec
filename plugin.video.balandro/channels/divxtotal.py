@@ -15,13 +15,14 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www1.divxtotal.zip/'
+host = 'https://www2.divxtotal.zip/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://www.divxtotal.dev/',
              'https://www.divxtotal.ms/', 'https://www.divxtotal.fi/', 'https://www.divxtotal.cat/',
-             'https://www.divxtotal.pl/', 'https://www.divxtotal.wf/', 'https://www.divxtotal.win/']
+             'https://www.divxtotal.pl/', 'https://www.divxtotal.wf/', 'https://www.divxtotal.win/',
+             'https://www1.divxtotal.zip/']
 
 
 domain = config.get_setting('dominio', 'divxtotal', default='')
@@ -177,6 +178,9 @@ def generos(item):
 
     for url, title in matches:
         if title == 'Españolas': continue
+
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
 
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
 

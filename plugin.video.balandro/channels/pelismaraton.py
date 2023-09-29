@@ -162,7 +162,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color='springgreen' ))
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color='springgreen' ))
 
     return itemlist
 
@@ -171,8 +172,6 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     data = do_downloadpage(host)
 
     bloque = scrapertools.find_single_match(data, '>Peliculas por Genero(.*?)>Peliculas por Año')
@@ -180,8 +179,11 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)<span>')
 
     for url, title in matches:
-        if descartar_xxx:
+        if config.get_setting('descartar_xxx', default=False):
             if title == 'Erotico': continue
+
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
 
         title = title.capitalize()
 

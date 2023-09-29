@@ -7,13 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://animeflv.sh/'
+host = 'https://animeflv.ws/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www10.animeflv.cc/', 'https://www3.animeflv.net/', 'https://www3.animeflv.cc/',
              'https://ww3.animeflv.cc/', 'https://animeflv.bz/', 'https://www1.animeflv.bz/',
-             'https://www2.animeflv.bz/', 'https://animeflv.so/', 'https://animeflv.vc/']
+             'https://www2.animeflv.bz/', 'https://animeflv.so/', 'https://animeflv.vc/',
+             'https://animeflv.sh/']
 
 
 domain = config.get_setting('dominio', 'animeflv', default='')
@@ -71,14 +72,11 @@ def mainlist_animes(item):
     logger.info()
     itemlist = []
 
-    descartar_anime = config.get_setting('descartar_anime', default=False)
-
-    if descartar_anime: return itemlist
+    if config.get_setting('descartar_anime', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -205,9 +203,10 @@ def list_all(item):
                 buscar_next = False
 
         if buscar_next:
-            next_url = scrapertools.find_single_match(data, "li\s*class=selected><a href='[^']+.*?<\/li><li.*?<a href='([^']+)")
-            if next_url:
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if url.startswith('http') else item.url + next_url if not '?' in item.url else item.url.split('?')[0] + next_url,
+            next_page = scrapertools.find_single_match(data, "li\s*class=selected><a href='[^']+.*?<\/li><li.*?<a href='([^']+)")
+
+            if next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page if url.startswith('http') else item.url + next_page if not '?' in item.url else item.url.split('?')[0] + next_page,
                                             action = 'list_all', page = 0, text_color = 'coral' ))
 
     return itemlist

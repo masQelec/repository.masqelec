@@ -158,7 +158,7 @@ if tipo_channel != '':
                                     '[COLOR moccasin][B]Quizás puede deberse a un fallo de conexión[/B][/COLOR], [COLOR cyan][B]ó que la web asociada a este canal ha variado su estructura[/B][/COLOR], ó bien ser un error interno del Add-On. [COLOR yellowgreen][B]Para saber más detalles, consulta el fichero Log de su Media Center.[/B][/COLOR]')
         else:
             platformtools.dialog_ok('[COLOR red][B]Error inesperado en [COLOR gold]' + item.channel.capitalize() + '[/B][/COLOR]',
-                                    '[COLOR moccasin][B]Podría estar corrupto su fichero de Configuración de Balandro[/B][/COLOR], de ser así, [COLOR cyan][B]pruebe a Re-Instalar el Add-On[/B][/COLOR], ó bien ser un error interno del Add-On/Modulo. [COLOR yellowgreen][B]Para saber más detalles, consulta el fichero Log de su Media Center.[/B][/COLOR]')
+                                    '[COLOR moccasin][B]Podría estar corrupto su fichero de Ajustes de Balandro[/B][/COLOR], de ser así, [COLOR cyan][B]pruebe a Re-Instalar el Add-On[/B][/COLOR], ó bien ser un error interno del Add-On/Modulo. [COLOR yellowgreen][B]Para saber más detalles, consulta el fichero Log de su Media Center.[/B][/COLOR]')
 
 
 logger.info('[COLOR blue]Ending with %s[/COLOR]' % sys.argv[1])

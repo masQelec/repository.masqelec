@@ -1,0 +1,17 @@
+{
+  "id": "seriesturcas",
+  "name": "SeriesTurcas",
+  "thumbnail": "seriesturcas.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["suggested", "vos", "tales"],
+
+  "notes": "Web dedicada principalmente en Novelas. Películas y Series"
+}

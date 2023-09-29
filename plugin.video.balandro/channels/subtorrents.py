@@ -239,6 +239,8 @@ def list_all(item):
         elif lang.endswith("512.png"): lang = "Lat"
         else: lang = "Vose"
 
+        title = title.replace('&#038;', '&')
+
         itemlist.append(item.clone( action='findvideos', url=url, title=title, qualities=qlty, languages=lang, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -268,6 +270,8 @@ def list_series(item):
         if not url or not title: continue
 
         title = title.split("(")[0]
+
+        title = title.replace('&#038;', '&')
 
         if not host in url: url = host + url
 
@@ -443,20 +447,31 @@ def list_search(item):
 
         title_clean = re.sub('\([^\)]+\)', '', title).strip()
 
+        title = title.replace('&#038;', '&')
+
         tipo = 'tvshow' if '/series/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
+
+        if '1.png' in match: lang = "Esp"
+        elif '2.png' in match: lang = "Vo"
+        elif '4.png' in match: lang = "Fr"   
+        elif '8.png' in match: lang = "It"
+        elif '512.png' in match: lang = "Lat"
+        else: lang = "Vose"
 
         if tipo == 'movie':
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, fmt_sufijo=sufijo, contentType='movie', contentTitle=title_clean, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, fmt_sufijo=sufijo,
+                                        languages=lang, contentType='movie', contentTitle=title_clean, infoLabels={'year': year} ))
 									
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, fmt_sufijo=sufijo, contentType='tvshow', contentSerieName=title_clean, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, fmt_sufijo=sufijo,
+                                        languages=lang, contentType='tvshow', contentSerieName=title_clean, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

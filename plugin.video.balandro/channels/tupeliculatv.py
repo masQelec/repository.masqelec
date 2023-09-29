@@ -47,8 +47,6 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     data = httptools.downloadpage(host).data
 
     bloque = scrapertools.find_single_match(data, '>Películas por género</div>(.*?)</ul>')
@@ -60,7 +58,7 @@ def generos(item):
 
         if title == 'PROXIMOS ESTRENOS': continue
 
-        if descartar_xxx:
+        if config.get_setting('descartar_xxx', default=False):
             if title == 'Adultos': continue
             elif title == 'Erotico': continue
 
@@ -103,8 +101,6 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     data = httptools.downloadpage(item.url).data
 
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
@@ -117,7 +113,7 @@ def list_all(item):
     matches = re.compile(patron, re.DOTALL).findall(list_movies)
 
     for url, thumb, title, list_idiomas, year, genre in matches:
-        if descartar_xxx:
+        if config.get_setting('descartar_xxx', default=False):
             if genre == 'Adultos': continue
             elif genre == 'Erotico': continue
 
@@ -145,11 +141,9 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     data = httptools.downloadpage(item.url).data
 
-    if descartar_xxx:
+    if config.get_setting('descartar_xxx', default=False):
        genres = scrapertools.find_single_match(data, '&bull;(.*?)</span>')
 
        if 'Adultos' in genres or 'Erotico' in genres:

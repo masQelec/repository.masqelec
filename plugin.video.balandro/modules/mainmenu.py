@@ -74,6 +74,12 @@ context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'show_lates
 tit = '[COLOR %s][B]Quitar Dominios memorizados[/B][/COLOR]' % color_alert
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'manto_domains'})
 
+tit = '[COLOR gold][B]Qué canales nunca intervienen[/B][/COLOR]'
+context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'channels_no_searchables'})
+
+tit = '[COLOR gray][B]Qué canales están desactivados[/B][/COLOR]'
+context_buscar.append({'title': tit, 'channel': 'filters', 'action': 'no_actives'})
+
 tit = '[COLOR greenyellow][B]Buscar Solo en los canales[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_included'})
 
@@ -454,7 +460,7 @@ def mainlist(item):
     tit = '[COLOR green][B]Preguntas frecuentes[/B][/COLOR]'
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_help_faq'})
 
-    tit = '[COLOR %s]Ajustes configuración[/COLOR]' % color_exec
+    tit = '[COLOR %s]Ajustes preferencias[/COLOR]' % color_exec
     context_ayuda.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
 
     title = '[B]Ayuda[/B] (%s)  %s' % (config.get_addon_version(), last_ver)
@@ -466,7 +472,7 @@ def mainlist(item):
             tit = '[COLOR %s][B]Eliminar Fichero control Fix[/B][/COLOR]' % color_alert
             context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_last_fix'})
 
-    itemlist.append(item.clone( channel='actions', action='open_settings', title='[B]Configuración[/B]', context=context_config,
+    itemlist.append(item.clone( channel='actions', action='open_settings', title='[B]Ajustes[/B]', context=context_config,
                                 folder=False, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
     return itemlist
@@ -510,7 +516,7 @@ def channels(item):
                               extra = 'movies', thumbnail=config.get_thumb('search'), text_color='deepskyblue' ))
 
         if config.get_setting('search_extra_trailers', default=False):
-            itemlist.append(item.clone( channel='trailers', action='search', title='[B]Tráilers[/B]', text_color='darkgoldenrod' ))
+            itemlist.append(item.clone( channel='trailers', action='search', title='[B]Tráilers[/B]', thumbnail=config.get_thumb('trailers'), text_color='darkgoldenrod' ))
 
         if config.get_setting('search_extra_main', default=False):
             itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', thumbnail=config.get_thumb('novedades'), text_color='darksalmon' ))
@@ -583,7 +589,7 @@ def channels(item):
         itemlist.append(Item( channel='search', action='search', search_type='all', title='[B]Buscar Película y/o Serie ...[/B]', context=context_search, extra = 'mixed', thumbnail=config.get_thumb('search'), text_color='yellow' ))
 
         if config.get_setting('search_extra_trailers', default=False):
-             itemlist.append(item.clone( channel='trailers', action='search', title='[B]Tráilers[/B]', text_color='darkgoldenrod' ))
+             itemlist.append(item.clone( channel='trailers', action='search', title='[B]Tráilers[/B]', thumbnail=config.get_thumb('trailers'), text_color='darkgoldenrod' ))
 
         if config.get_setting('search_extra_main', default=False):
             itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', thumbnail=config.get_thumb('novedades'), text_color='darksalmon' ))
@@ -603,7 +609,7 @@ def channels(item):
         cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
 
         if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno':
-            itemlist.append(item.clone( channel='actions', action='open_settings', title='[COLOR chocolate][B]Ajustes[/B][/COLOR] configuración (categoría [COLOR blue][B]Torrents)[/B][/COLOR]' + ' [COLOR fuchsia][B]Motor:[/B][/COLOR][COLOR goldenrod][B] ' + cliente_torrent.capitalize() + '[/B][/COLOR]',
+            itemlist.append(item.clone( channel='actions', action='open_settings', title='[COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR blue][B]Torrents)[/B][/COLOR]' + ' [COLOR fuchsia][B]Motor:[/B][/COLOR][COLOR goldenrod][B] ' + cliente_torrent.capitalize() + '[/B][/COLOR]',
                                         folder=False, thumbnail=config.get_thumb('settings') ))
 
         if config.get_setting('mnu_search_proxy_channels', default=False):
@@ -616,7 +622,7 @@ def channels(item):
         itemlist.append(Item( channel='search', action='search', search_type='all', title='[B][COLOR blue]Buscar Torrent[/COLOR] película y/o Serie ...[/B]', context=context_search, extra = 'only_torrents', thumbnail=config.get_thumb('search'), text_color='yellow' ))
 
         if config.get_setting('search_extra_trailers', default=False):
-            itemlist.append(item.clone( channel='trailers', action='search', title='[B]Tráilers[/B]', text_color='darkgoldenrod' ))
+            itemlist.append(item.clone( channel='trailers', action='search', title='[B]Tráilers[/B]', thumbnail=config.get_thumb('trailers'), text_color='darkgoldenrod' ))
 
         if config.get_setting('sub_mnu_special', default=True):
             itemlist.append(item.clone( channel='submnuctext', action='submnu_special', title='[B]Especiales[/B]', context=context_cfg_search, extra='torrents', thumbnail=config.get_thumb('heart'), text_color='pink' ))
@@ -660,7 +666,7 @@ def channels(item):
                    itemlist.append(Item( channel='search', action='search', search_type='documentary', title='[B]Buscar Documental ...[/B]', context=context_search, thumbnail=config.get_thumb('search'), text_color='cyan' ))
 
                if config.get_setting('search_extra_trailers', default=False):
-                   itemlist.append(item.clone( channel='trailers', action='search', title='[B]Tráilers[/B]', text_color='darkgoldenrod' ))
+                   itemlist.append(item.clone( channel='trailers', action='search', title='[B]Tráilers[/B]', thumbnail=config.get_thumb('trailers'), text_color='darkgoldenrod' ))
 
                if config.get_setting('search_extra_main', default=False):
                    itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', thumbnail=config.get_thumb('novedades'), text_color='darksalmon' ))
@@ -695,7 +701,7 @@ def channels(item):
             itemlist.append(Item( channel='search', action='search', search_type='all', title='[B]Buscar Película y/o Serie ...[/B]', context=context_search, extra = 'mixed', thumbnail=config.get_thumb('search'), text_color='yellow' ))
 
             if config.get_setting('search_extra_trailers', default=False):
-                itemlist.append(item.clone( channel='trailers', action='search', title='[B]Tráilers[/B]', text_color='darkgoldenrod' ))
+                itemlist.append(item.clone( channel='trailers', action='search', title='[B]Tráilers[/B]', thumbnail=config.get_thumb('trailers'), text_color='darkgoldenrod' ))
 
             if config.get_setting('search_extra_main', default=False):
                 itemlist.append(item.clone( channel='tmdblists', action='mainlist', search_type='all', title='[B]Búsquedas y listas en TMDB[/B]', thumbnail=thumb_tmdb, text_color=color_adver ))
@@ -748,8 +754,8 @@ def channels(item):
                 itemlist.append(Item( channel='search', action='search', search_type='all', title='Buscar Anime ...', thumbnail=config.get_thumb('anime'), search_special = 'anime', text_color='springgreen' ))
 
         if item.extra == 'proxies' or item.extra == 'problematics':
-            itemlist.append(item.clone( channel='actions', action='open_settings', title='[B]Configuración[/B]', context=context_config,
-                                        folder=False, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
+            itemlist.append(item.clone( channel='actions', action='open_settings', title='[COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR tan][B]Menú)[/B][/COLOR]',
+                                        context=context_config, folder=False, thumbnail=config.get_thumb('settings') ))
 
         accion = 'mainlist'
         filtros = {}

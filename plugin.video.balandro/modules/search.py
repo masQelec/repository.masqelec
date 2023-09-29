@@ -12,7 +12,7 @@ from threading import Thread
 
 from platformcode import config, logger, platformtools
 from core.item import Item
-from core import channeltools
+from core import channeltools, scrapertools
 
 
 color_list_prefe = config.get_setting('channels_list_prefe_color', default='gold')
@@ -61,7 +61,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='', title= titulo, folder=False, text_color='chartreuse', thumbnail=config.get_thumb('stack') ))
 
     if config.get_setting('search_extra_trailers', default=False):
-         itemlist.append(item.clone( channel='trailers', action='search', title= ' - Buscar [COLOR darkgoldenrod]Tráiler[/COLOR]',
+         itemlist.append(item.clone( channel='trailers', action='search', title= ' - Buscar [COLOR darkgoldenrod]Tráiler[/COLOR]', thumbnail=config.get_thumb('trailers'),
                                     plot = 'Escribir el nombre de una película para buscar su tráiler' ))
 
     if config.get_setting('channels_link_main', default=True):
@@ -128,8 +128,11 @@ def mainlist(item):
     if config.get_setting('sub_mnu_cfg_search', default=True):
         itemlist.append(item.clone( action='', title= '[B]Personalización búsquedas:[/B]', folder=False, text_color='moccasin' ))
 
-        itemlist.append(item.clone( action='show_help_parameters', title=' - Qué [COLOR chocolate]Ajustes[/COLOR] tiene configurados para las búsquedas',
+        itemlist.append(item.clone( action='show_help_parameters', title=' - Qué [COLOR chocolate]Ajustes[/COLOR] tiene en preferencias para las búsquedas',
                                     thumbnail=config.get_thumb('help') ))
+
+        itemlist.append(item.clone( channel='filters', action='no_actives', title= ' - Qué canales [COLOR goldenrod][B]Nunca[/B][/COLOR] intervendrán en las búsquedas',
+                                    no_searchables = True, thumbnail=config.get_thumb('stack') ))
 
         itemlist.append(item.clone( channel='filters', action='no_actives', title= ' - Qué canales no intervienen en las búsquedas están [COLOR gray][B]Desactivados[/B][/COLOR]',
                                     thumbnail=config.get_thumb('stack') ))
@@ -155,7 +158,7 @@ def mainlist(item):
     itemlist.append(item.clone( channel='filters', title = ' - [COLOR cyan][B]Excluir canales en las búsquedas[/B][/COLOR]', action = 'mainlist',
                                 thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='', title= '[B]Configuración:[/B]', folder=False, text_color='goldenrod' ))
+    itemlist.append(item.clone( action='', title= '[B]Ajustes:[/B]', folder=False, text_color='goldenrod' ))
 
     itemlist.append(item.clone( channel='actions', title= ' - [COLOR chocolate]Ajustes[/COLOR] categorías ([COLOR red][B]Proxies[/B][/COLOR] y [COLOR yellow][B]Buscar[/B][/COLOR])', action = 'open_settings',
                                 thumbnail=config.get_thumb('settings') ))
@@ -172,13 +175,13 @@ def show_help_parameters(item):
     else: txt = 'Los canales que tenga marcados como [B][COLOR cyan]Desactivados[/COLOR][/B] nunca intervendrán en las búsquedas[CR][CR]'
 
     txt += ' - [B][COLOR gold]Canales[/COLOR][/B] que nunca intervienen en las busquedas:'
-    txt += '[CR][COLOR darkorange][B]    CineDeAntes,  CineLibreOnline,  Frozenlayer,'
+    txt += '[CR][COLOR darkorange][B]    CineDeAntes,  CineLibreOnline,  CineMatteFlix,  Frozenlayer,'
     txt += '[CR]    SeoDiv,  SigloXX,  Trailers,  TvSeries[/B][/COLOR]'
 
     if not config.get_setting('mnu_documentales', default=True):
         txt += '[CR][CR] - Los canales de [B][COLOR cyan]Documentales[/COLOR][/B] jamás intervendrán en las busquedas'
 
-    txt += '[CR][CR] - Qué canales Nunca intervendrán en las busquedas de [COLOR gold][B]Peliculas, Series y Documentales[/B][/COLOR]:'
+    txt += '[CR][CR] - Qué canales Nunca intervendrán en las busquedas de [COLOR gold][B]Peliculas, Series y/ó Documentales[/B][/COLOR]:'
 
     if config.get_setting('mnu_doramas', default=True):
         txt += '[CR]   - Los canales de [B][COLOR firebrick]Doramas[/COLOR][/B]'
@@ -225,6 +228,11 @@ def show_help_parameters(item):
     if config.get_setting('sub_mnu_cfg_prox_search', default=True): txt += ' [COLOR coral][B] Activado[/B][/COLOR]'
     else: txt += ' [COLOR coral][B] Des-Activado[/B][/COLOR]'
 
+    txt += '[CR]   - Menú contextual para Buscar Exacto ó Parecido en los resultados de las Búsquedas:'
+
+    if config.get_setting('search_dialog', default=True): txt += ' [COLOR coral][B] Activado[/B][/COLOR]'
+    else: txt += ' [COLOR coral][B] Des-Activado[/B][/COLOR]'
+
     txt += '[CR]   - Notificar en qué canales No han funcionado los Proxies:'
 
     if config.get_setting('search_no_work_proxies', default=False): txt += ' [COLOR coral][B] Activado[/B][/COLOR]'
@@ -247,9 +255,28 @@ def show_help_parameters(item):
         txt += '[CR]    - Tiene Des-Activada la opción [B][COLOR yellowgreen]Multithread[/COLOR][/B]'
 
     if config.get_setting('search_included_all', default=''):
-        txt += '[CR]   - [COLOR greenyellow][B]Solo Determinados canales[/B][/COLOR] incluidos en las búsquedas de [B][COLOR green]Todos[/COLOR][/B]:'
+        incluidos = config.get_setting('search_included_all', default='')
+        if incluidos:
+            txt += '[CR]   - [COLOR yellow][B]Búsquedas [COLOR greenyellow][B]Solo Determinados canales[/B][/COLOR] incluidos en [B][COLOR green]Todos[/COLOR][/B]:'
+            incluidos = scrapertools.find_multiple_matches(incluidos, "'(.*?)'")
 
-        txt += '[CR]     ' + str(config.get_setting('search_included_all'))
+            for incluido in incluidos:
+                incluido = incluido.capitalize().strip()
+                txt += '[CR]     [COLOR violet][B] ' + incluido + '[/B][/COLOR]'
+
+    filtros = {'searchable': True}
+
+    ch_list = channeltools.get_channels_list(filtros=filtros)
+
+    if ch_list:
+        txt_ch = ''
+
+        for ch in ch_list:
+            if not ch['status'] == -1: continue
+
+            txt_ch += '[CR]   [COLOR gray]%s[/COLOR]' % ch['name']
+
+        if txt_ch: txt += '[CR][CR] - [COLOR gold]Desactivados:[/COLOR]  %s' % str(txt_ch) 
 
     filtros = {'searchable': True}
     opciones = []
@@ -264,39 +291,69 @@ def show_help_parameters(item):
 
            if not config.get_setting(cfg_searchable_channel, default=False): continue
 
-           txt_ch += '[COLOR yellow]%s[/COLOR]  ' % ch['name']
+           txt_ch += '[CR]   [COLOR gold]%s[/COLOR]' % ch['name']
 
-       if txt_ch: txt += '[CR][CR] - [COLOR gold][B]Excluidos:[B][/COLOR]  %s' % str(txt_ch)
+       if txt_ch: txt += '[CR][CR] - [COLOR goldenrod][B]Canales excluidos[B][/COLOR]:  %s' % str(txt_ch)
 
     if config.get_setting('search_excludes_movies', default=''):
-        txt += '[CR][CR] - Canales excluidos en las búsquedas de [B][COLOR deepskyblue]Películas[/COLOR][/B]:'
+        excluidos = config.get_setting('search_excludes_movies', default='')
+        if excluidos:
+            txt += '[CR][CR] - [COLOR goldenrod][B]Canales excluidos en las búsquedas de [COLOR deepskyblue]Películas[/COLOR][/B]:'
+            excluidos = scrapertools.find_multiple_matches(excluidos, "'(.*?)'")
 
-        txt += '[CR]    ' + str(config.get_setting('search_excludes_movies'))
+            for excluido in excluidos:
+                excluido = excluido.capitalize().strip()
+                txt += '[CR]   [COLOR gold][B] ' + excluido + '[/B][/COLOR]'
 
     if config.get_setting('search_excludes_tvshows', default=''):
-        txt += '[CR][CR] - Canales excluidos en las búsquedas de [B][COLOR hotpink]Series[/COLOR][/B]:'
+        excluidos = config.get_setting('search_excludes_tvshows', default='')
+        if excluidos:
+            txt += '[CR][CR] - [COLOR goldenrod][B]Canales excluidos en las búsquedas de [COLOR hotpink]Series[/COLOR][/B]:'
+            excluidos = scrapertools.find_multiple_matches(excluidos, "'(.*?)'")
 
-        txt += '[CR]    ' + str(config.get_setting('search_excludes_tvshows'))
+            for excluido in excluidos:
+                excluido = excluido.capitalize().strip()
+                txt += '[CR]   [COLOR gold][B] ' + excluido + '[/B][/COLOR]'
 
     if config.get_setting('search_excludes_documentaries', default=''):
-        txt += '[CR][CR] - Canales excluidos en las búsquedas de [B][COLOR cyan]Documentales[/COLOR][/B]:'
+        excluidos = config.get_setting('search_excludes_documentaries', default='')
+        if excluidos:
+            txt += '[CR][CR] - [COLOR goldenrod][B]Canales excluidos en las búsquedas de [COLOR cyan]Documentales[/COLOR][/B]:'
+            excluidos = scrapertools.find_multiple_matches(excluidos, "'(.*?)'")
 
-        txt += '[CR]    ' + str(config.get_setting('search_excludes_documentaries'))
+            for excluido in excluidos:
+                excluido = excluido.capitalize().strip()
+                txt += '[CR]   [COLOR gold][B] ' + excluido + '[/B][/COLOR]'
 
     if config.get_setting('search_excludes_torrents', default=''):
-        txt += '[CR][CR] - Canales excluidos en las búsquedas de [B][COLOR blue]Torrents[/COLOR][/B]:'
+        excluidos = config.get_setting('search_excludes_torrents', default='')
+        if excluidos:
+            txt += '[CR][CR] - [COLOR goldenrod][B]Canales excluidos en las búsquedas de [COLOR blue]Torrents[/COLOR][/B]:'
+            excluidos = scrapertools.find_multiple_matches(excluidos, "'(.*?)'")
 
-        txt += '[CR]    ' + str(config.get_setting('search_excludes_torrents'))
+            for excluido in excluidos:
+                excluido = excluido.capitalize().strip()
+                txt += '[CR]   [COLOR gold][B] ' + excluido + '[/B][/COLOR]'
 
     if config.get_setting('search_excludes_mixed', default=''):
-        txt += '[CR][CR] - Canales excluidos en las búsquedas de [B][COLOR yellow]Películas y/ó Series[/COLOR][/B]:'
+        excluidos = config.get_setting('search_excludes_mixed', default='')
+        if excluidos:
+            txt += '[CR][CR] - [COLOR goldenrod][B]Canales excluidos en las búsquedas de [COLOR yellow]Películas y/ó Series[/COLOR][/B]:'
+            excluidos = scrapertools.find_multiple_matches(excluidos, "'(.*?)'")
 
-        txt += '[CR]    ' + str(config.get_setting('search_excludes_mixed'))
+            for excluido in excluidos:
+                excluido = excluido.capitalize().strip()
+                txt += '[CR]   [COLOR gold][B] ' + excluido + '[/B][/COLOR]'
 
     if config.get_setting('search_excludes_all', default=''):
-        txt += '[CR][CR] - Canales excluidos en las búsquedas de [B][COLOR green]Todos[/COLOR][/B]:'
+        excluidos = config.get_setting('search_excludes_all', default='')
+        if excluidos:
+            txt += '[CR][CR] - [COLOR goldenrod][B]Canales excluidos en las búsquedas de [COLOR green]Todos[/COLOR][/B]:'
+            excluidos = scrapertools.find_multiple_matches(excluidos, "'(.*?)'")
 
-        txt += '[CR]    ' + str(config.get_setting('search_excludes_all'))
+            for excluido in excluidos:
+                excluido = excluido.capitalize().strip()
+                txt += '[CR]   [COLOR gold][B] ' + excluido + '[/B][/COLOR]'
 
     if config.get_setting('search_show_last', default=True):
         txt += '[CR][CR] - Textos para búsquedas [B][COLOR goldenrod]Memorizados[/COLOR][/B]:'
@@ -336,20 +393,25 @@ def show_help_parameters(item):
 
 
 def show_help(item):
-    txt = 'Desde la configuración [COLOR yellow][B]categoría Buscar[/B][/COLOR] se puede definir [COLOR chartreuse][B] los Resultados que se Previsualizan para cada canal[/B][/COLOR].'
+    txt = ''
+
+    if not config.get_setting('search_extra_main', default=False):
+        txt += '[COLOR gold][B]Por Defecto[/B][/COLOR]:[CR]'
+        txt += ' Está [COLOR coral][B]Des-Habilitada[/B][/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR violet]Búsquedas Especiales (Listas TMDB, etc.)[/COLOR][/B][CR][CR]'
+
+        txt += '[COLOR gold][B]Explicaciones[/B][/COLOR]:[CR]'
+
+    txt += 'Desde los Ajustes [COLOR yellow][B]categoría Buscar[/B][/COLOR] se puede definir [COLOR chartreuse][B] los Resultados que se Previsualizan para cada canal[/B][/COLOR].'
     txt += ' Si por ejemplo el canal devuelve 15 resultados y se previsualizan 2, entrar en el enlace del [COLOR gold][B]Nombre del canal[/B][/COLOR] de la búsqueda para verlos todos.'
 
-    txt += '[CR]'
-    txt += '[CR]Según cada web/canal su buscador puede permitir diferenciar por [COLOR teal][B]Películas y/ó Series ó No[/B][/COLOR].'
+    txt += '[CR][CR]Según cada web/canal su buscador puede permitir diferenciar por [COLOR teal][B]Películas y/ó Series ó No[/B][/COLOR].'
 
-    txt += '[CR]'
-    txt += '[CR][COLOR yellowgreen][B]También es variable la sensibilidad de la búsqueda (si busca sólo en el Título ó también en la Sinopsis, el tratamiento si hay varias palabras, si devuelve muchos ó pocos resultados, etc.)[/B][/COLOR]'
+    txt += '[CR][CR][COLOR yellowgreen][B]También es variable la sensibilidad de la búsqueda (si busca sólo en el Título ó también en la Sinopsis, el tratamiento si hay varias palabras, si devuelve muchos ó pocos resultados, etc.)[/B][/COLOR]'
 
-    txt += '[CR]'
-    txt += '[CR]Desde cualquier [COLOR teal][B]Película ó Serie[/B][/COLOR], se puede acceder al [COLOR yellow][B]Menú contextual[/B][/COLOR] para buscar esa misma referencia en los demás canales.'
-    txt += '[CR]'
+    txt += '[CR][CR]Desde cualquier [COLOR teal][B]Película ó Serie[/B][/COLOR], se puede acceder al [COLOR yellow][B]Menú contextual[/B][/COLOR] para buscar esa misma referencia en los demás canales.'
 
-    txt += '[CR]Desde cualquier [COLOR teal][B]Película ó Serie[/B][/COLOR] guardada en [COLOR tan][B]Preferidos[/B][/COLOR], si al acceder se produce un error en la web, se ofrece un diálogo para volver a buscar esa referencia ([COLOR gold][B]Misma/Parecida/Similar[/B][/COLOR]) en los demás canales ó en el mismo canal (por si los enlaces ya no funcionan).'
+    txt += '[CR][CR]Desde cualquier [COLOR teal][B]Película ó Serie[/B][/COLOR] guardada en [COLOR tan][B]Preferidos[/B][/COLOR], si al acceder se produce un error en la web, se ofrece un diálogo para volver a buscar esa referencia ([COLOR gold][B]Misma/Parecida/Similar[/B][/COLOR]) en los demás canales ó en el mismo canal (por si los enlaces ya no funcionan).'
+
 
     platformtools.dialog_textviewer('Información sobre búsquedas', txt)
     return True

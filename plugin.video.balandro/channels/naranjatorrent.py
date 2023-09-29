@@ -268,6 +268,7 @@ def list_last(item):
     for url, title in matches:
         if item.search_type== 'movie':
             if "(" in title: titulo = title.split("(")[0]
+            elif "[" in title: titulo = title.split("[")[0]
             else: titulo = title
 
             itemlist.append(item.clone( action='findvideos', url=host + url, title=title, contentType=item.search_type, contentTitle=titulo, infoLabels={'year': "-"} ))

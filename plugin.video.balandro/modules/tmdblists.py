@@ -78,7 +78,7 @@ def mainlist(item):
 
 
 def show_help(item):
-    txt = 'En este apartado se pueden hacer consultas a la web [COLOR gold][B]The Movie Database[/B][/COLOR] (TMDb), un proyecto comunitario que ofrece información de películas, series y personas.'
+    txt = 'En este apartado se pueden hacer consultas a la web [COLOR gold][B]The Movie Database[/B][/COLOR] (TMDB), un proyecto comunitario que ofrece información de películas, series y personas.'
 
     txt += '[CR]'
     txt += '[CR]Se puede buscar la [COLOR moccasin][B]filmografía[/B][/COLOR] de una persona y ver las películas/series dónde ha participado.'

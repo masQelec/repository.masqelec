@@ -133,13 +133,11 @@ def mainlist_animes(item):
     logger.info()
     itemlist = []
 
-    descartar_anime = config.get_setting('descartar_anime', default=False)
-
-    if descartar_anime: return itemlist
+    if config.get_setting('descartar_anime', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False: return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -527,9 +525,9 @@ def findvideos(item):
 
                 link_other = link_other.replace('www.', '').replace('.com', '').replace('.net', '').replace('.org', '').replace('.top', '').replace('.do', '')
                 link_other = link_other.replace('.co', '').replace('.cc', '').replace('.sh', '').replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '')
-                link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.sx', '')
+                link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.sx', '').replace('.online', '')
 
-                if servidor == 'various': other = link_other
+                if servidor == 'various': other = servertools.corregir_other(link_other)
                 else:
                     link_other = servertools.corregir_servidor(link_other)
 

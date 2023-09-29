@@ -128,8 +128,6 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
     genres = []
 
     post = {'start': '', 'length': 20, 'metodo': 'ObtenerListaTotal'}
@@ -165,7 +163,7 @@ def generos(item):
         # ~ genre = x[0] PY3
         genre = title
 
-        if descartar_xxx:
+        if config.get_setting('descartar_xxx', default=False):
             if title == 'Animación para Adultos': continue
             elif title == 'Erótico': continue
             elif title == 'Pornografía': continue
