@@ -101,6 +101,21 @@ def check_addon_updates_force(item):
     platformtools.itemlist_refresh()
 
 
+def manto_yourlist(item):
+    logger.info()
+
+    path = os.path.join(config.get_data_path(), 'Lista-proxies.txt')
+
+    existe = filetools.exists(path)
+    if existe == False:
+        platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B].../addon_data.../plugin.video.balandro[/B][/COLOR]', 'Aún No hay fichero Lista de Proxies', '[B][COLOR %s]Lista-proxies.txt[/COLOR][/B]' % color_alert)
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Lista-proxies.txt ?[/B][/COLOR]'):
+        filetools.remove(path)
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Lista-proxies.txt eliminado[/B][/COLOR]' % color_infor)
+
+
 def manto_last_fix(item):
     logger.info()
 
@@ -331,13 +346,18 @@ def manto_params(item):
         config.set_setting('channel_cinecalidadlol_dominio', '')
         config.set_setting('channel_cinecalidadmx_dominio', '')
         config.set_setting('channel_cliversite_dominio', '')
+        config.set_setting('channel_cuevana2_dominio', '')
+        config.set_setting('channel_cuevana2esp_dominio', '')
         config.set_setting('channel_cuevana3video_dominio', '')
 
         config.set_setting('channel_divxtotal_dominio', '')
         config.set_setting('channel_dontorrents_dominio', '')
+        config.set_setting('channel_dontorrentsin_dominio', '')
+        config.set_setting('channel_doramedplay_dominio', '')
 
         config.set_setting('channel_elifilms_dominio', '')
         config.set_setting('channel_elitetorrent_dominio', '')
+        config.set_setting('channel_elitetorrentnz_dominio', '')
         config.set_setting('channel_ennovelas_dominio', '')
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
         config.set_setting('channel_estrenosdoramas_dominio', '')
@@ -355,13 +375,16 @@ def manto_params(item):
         config.set_setting('channel_henaojara_dominio', '')
 
         config.set_setting('channel_mejortorrentapp_dominio', '')
+        config.set_setting('channel_mejortorrentnz_dominio', '')
         config.set_setting('channel_mitorrent_dominio', '')
+        config.set_setting('channel_movidymobi_dominio', '')
 
         config.set_setting('channel_nextdede_nextdede_login', False)
         config.set_setting('channel_nextdede_nextdede_email', '')
         config.set_setting('channel_nextdede_nextdede_password', '')
         config.set_setting('channel_nextdede_nextdede_username', '')
 
+        config.set_setting('channel_peliculaspro_dominio', '')
         config.set_setting('channel_pelishouse_dominio', '')
         config.set_setting('channel_pelismaraton_dominio', '')
         config.set_setting('channel_pelismart_dominio', '')
@@ -383,20 +406,37 @@ def manto_params(item):
         config.set_setting('channel_series24_dominio', '')
         config.set_setting('channel_seriesantiguas_dominio', '')
         config.set_setting('channel_serieskao_dominio', '')
+        config.set_setting('channel_seriesmetro_dominio', '')
         config.set_setting('channel_seriesyonkis_dominio', '')
         config.set_setting('channel_srnovelas_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
 
+        config.set_setting('channel_todotorrents_dominio', '')
         config.set_setting('channel_torrentpelis_dominio', '')
         config.set_setting('channel_tupelihd_dominio', '')
 
+        config.set_setting('autoplay_max_links', '10')
+
+        config.set_setting('proxies_totales_limit', '500')
+        config.set_setting('proxies_memory', '5')
+
         config.set_setting('channels_proxies_memorized', '')
+
+        config.set_setting('search_limit_by_channel', '2')
+
+        config.set_setting('addon_tracking_interval', '12')
+        config.set_setting('tracking_perpage_movies', '10')
+        config.set_setting('tracking_perpage_tvshows', '10')
+        config.set_setting('tracking_perpage_episodes', '10')
+
+        config.set_setting('tmdb_threads', '20')
 
         config.set_setting('search_included_all', '')
 
         config.set_setting('search_excludes_movies', '')
         config.set_setting('search_excludes_tvshows', '')
         config.set_setting('search_excludes_documentaries', '')
+        config.set_setting('search_excludes_torrents', '')
         config.set_setting('search_excludes_mixed', '')
         config.set_setting('search_excludes_all', '')
 
@@ -411,10 +451,35 @@ def manto_params(item):
         config.set_setting('search_last_documentary', '')
         config.set_setting('search_last_person', '')
 
+        config.set_setting('search_no_work_proxies', False)
+        config.set_setting('search_no_results_proxies', True)
+        config.set_setting('search_no_results', False)
+        config.set_setting('search_no_channels', False)
+        config.set_setting('search_multithread', True)
+
+        config.set_setting('proxies_erase', True)
+        config.set_setting('proxies_help', True)
+
+        config.set_setting('proxies_vias', False)
+        config.set_setting('proxies_tplus', '32')
+
+        config.set_setting('proxies_list', False)
+
+        config.set_setting('proxies_proces', True)
+
         download_path = filetools.join(config.get_data_path(), 'downloads')
         config.set_setting('downloadpath', download_path)
 
-        config.set_setting('chrome_last_version', '116.0.5845.141')
+        config.set_setting('check_repo', True)
+        config.set_setting('erase_cookies', False)
+        config.set_setting('ver_stable_chrome', True)
+        config.set_setting('httptools_timeout', '15')
+        config.set_setting('notification_d_ok', False)
+        config.set_setting('notification_beep', False)
+        config.set_setting('channels_repeat', '30')
+        config.set_setting('servers_waiting', '6')
+
+        config.set_setting('chrome_last_version', '117.0.5938.92')
 
         config.set_setting('debug', '0')
 
@@ -637,6 +702,13 @@ def manto_limpiezas(item):
             if temps: manto_addons_temp(item)
 
         elif ret == 2:
+            path = os.path.join(config.get_runtime_path(), 'Lista-proxies.txt')
+            existe = filetools.exists(path)
+
+            if existe:
+                manto_yourlist(item)
+                procesado = True
+
             path = os.path.join(config.get_runtime_path(), 'last_fix.json')
             existe = filetools.exists(path)
 
@@ -1021,7 +1093,7 @@ def manto_folder_addon(item):
 
                 existe = filetools.exists(path)
                 if existe:
-                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]settings.xml[/B][/COLOR]', '[COLOR red][B][I]Imposible Eliminar su fichero de Configuración/Ajustes. Está Bloqueado por su Sistema Media Center[/I][/B][/COLOR]', '[COLOR cyan][B]Por favor, Eliminelo manualmente en la ruta [/B][/COLOR][COLOR yellow][B].../.kodi/userdata/plugin.video.balandro[/B][/COLOR]')
+                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]settings.xml[/B][/COLOR]', '[COLOR red][B][I]Imposible Eliminar su fichero de Ajustes/Preferencias. Está Bloqueado por su Sistema Media Center[/I][/B][/COLOR]', '[COLOR cyan][B]Por favor, Eliminelo manualmente en la ruta [/B][/COLOR][COLOR yellow][B].../.kodi/userdata/plugin.video.balandro[/B][/COLOR]')
             except:
                 pass
 
@@ -1072,7 +1144,7 @@ def adults_password_del(item):
 
     try:
        if int(password) == int(config.get_setting('adults_password')):
-           txt = 'Si es afirmativa su repuesta a la pregunta formulada, deberá salir y volver a acceder a esta configuración y si lo desea establecer un nuevo Pin parental.'
+           txt = 'Si es afirmativa su repuesta a la pregunta formulada, deberá salir y volver a acceder a los Ajustes y si lo desea establecer un nuevo Pin parental.'
            if platformtools.dialog_yesno(config.__addon_name, txt, '[B][COLOR %s]¿ Desea eliminar el Pin parental memorizado ?[/COLOR][/B]' % color_adver):
                config.set_setting('adults_password', '')
                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Pin anulado[/COLOR][/B]' % color_exec)
@@ -1207,6 +1279,14 @@ def opciones_cliversite(item):
     item.from_channel = 'cliversite'
     opciones_domains_common(item)
 
+def opciones_cuevana2(item):
+    item.from_channel = 'cuevana2'
+    opciones_domains_common(item)
+
+def opciones_cuevana2esp(item):
+    item.from_channel = 'cuevana2esp'
+    opciones_domains_common(item)
+
 def opciones_cuevana3video(item):
     item.from_channel = 'cuevana3video'
     opciones_domains_common(item)
@@ -1219,12 +1299,24 @@ def opciones_dontorrents(item):
     item.from_channel = 'dontorrents'
     opciones_domains_common(item)
 
+def opciones_dontorrentsin(item):
+    item.from_channel = 'dontorrentsin'
+    opciones_domains_common(item)
+
+def opciones_doramedplay(item):
+    item.from_channel = 'doramedplay'
+    opciones_domains_common(item)
+
 def opciones_elifilms(item):
     item.from_channel = 'elifilms'
     opciones_domains_common(item)
 
 def opciones_elitetorrent(item):
     item.from_channel = 'elitetorrent'
+    opciones_domains_common(item)
+
+def opciones_elitetorrentnz(item):
+    item.from_channel = 'elitetorrentnz'
     opciones_domains_common(item)
 
 def opciones_ennovelas(item):
@@ -1267,8 +1359,20 @@ def opciones_mejortorrentapp(item):
     item.from_channel = 'mejortorrentapp'
     opciones_domains_common(item)
 
+def opciones_mejortorrentnz(item):
+    item.from_channel = 'mejortorrentnz'
+    opciones_domains_common(item)
+
 def opciones_mitorrent(item):
     item.from_channel = 'mitorrent'
+    opciones_domains_common(item)
+
+def opciones_movidymobi(item):
+    item.from_channel = 'movidymobi'
+    opciones_domains_common(item)
+
+def opciones_peliculaspro(item):
+    item.from_channel = 'peliculaspro'
     opciones_domains_common(item)
 
 def opciones_pelishouse(item):
@@ -1331,6 +1435,10 @@ def opciones_serieskao(item):
     item.from_channel = 'serieskao'
     opciones_domains_common(item)
 
+def opciones_seriesmetro(item):
+    item.from_channel = 'seriesmetro'
+    opciones_domains_common(item)
+
 def opciones_seriesyonkis(item):
     item.from_channel = 'seriesyonkis'
     opciones_domains_common(item)
@@ -1341,6 +1449,10 @@ def opciones_srnovelas(item):
 
 def opciones_subtorrents(item):
     item.from_channel = 'subtorrents'
+    opciones_domains_common(item)
+
+def opciones_todotorrents(item):
+    item.from_channel = 'todotorrents'
     opciones_domains_common(item)
 
 def opciones_torrentpelis(item):
@@ -1419,15 +1531,25 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
 
+            elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
+
+            elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
+
             elif item.from_channel == 'cuevana3video': domains.manto_domain_cuevana3video(item)
 
             elif item.from_channel == 'divxtotal': domains.manto_domain_divxtotal(item)
 
             elif item.from_channel == 'dontorrents': domains.manto_domain_dontorrents(item)
 
+            elif item.from_channel == 'dontorrentsin': domains.manto_domain_dontorrentsin(item)
+
+            elif item.from_channel == 'doramedplay': domains.manto_domain_doramedplay(item)
+
             elif item.from_channel == 'elifilms': domains.manto_domain_elifilms(item)
 
             elif item.from_channel == 'elitetorrent': domains.manto_domain_elitetorrent(item)
+
+            elif item.from_channel == 'elitetorrentnz': domains.manto_domain_elitetorrentnz(item)
 
             elif item.from_channel == 'ennovelas': domains.manto_domain_ennovelas(item)
 
@@ -1449,7 +1571,13 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'mejortorrentapp': domains.manto_domain_mejortorrentapp(item)
 
+            elif item.from_channel == 'mejortorrentnz': domains.manto_domain_mejortorrentnz(item)
+
             elif item.from_channel == 'mitorrent': domains.manto_domain_mitorrent(item)
+
+            elif item.from_channel == 'movidymobi': domains.manto_domain_movidymobi(item)
+
+            elif item.from_channel == 'peliculaspro': domains.manto_domain_peliculaspro(item)
 
             elif item.from_channel == 'pelishouse': domains.manto_domain_pelishouse(item)
 
@@ -1481,11 +1609,15 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'serieskao': domains.manto_domain_serieskao(item)
 
+            elif item.from_channel == 'seriesmetro': domains.manto_domain_seriesmetro(item)
+
             elif item.from_channel == 'seriesyonkis': domains.manto_domain_seriesyonkis(item)
 
             elif item.from_channel == 'srnovelas': domains.manto_domain_srnovelas(item)
 
             elif item.from_channel == 'subtorrents': domains.manto_domain_subtorrents(item)
+
+            elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
 
             elif item.from_channel == 'torrentpelis': domains.manto_domain_torrentpelis(item)
 
@@ -1511,15 +1643,25 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cliversite': domains.test_domain_cliversite(item)
 
+            elif item.from_channel == 'cuevana2': domains.test_domain_cuevana2(item)
+
+            elif item.from_channel == 'cuevana2esp': domains.test_domain_cuevana2esp(item)
+
             elif item.from_channel == 'cuevana3video': domains.test_domain_cuevana3video(item)
 
             elif item.from_channel == 'divxtotal': domains.test_domain_divxtotal(item)
 
             elif item.from_channel == 'dontorrents': domains.test_domain_dontorrents(item)
 
+            elif item.from_channel == 'dontorrentsin': domains.test_domain_dontorrentsin(item)
+
+            elif item.from_channel == 'doramedplay': domains.test_domain_doramedplay(item)
+
             elif item.from_channel == 'elifilms': domains.test_domain_elifilms(item)
 
             elif item.from_channel == 'elitetorrent': domains.test_domain_elitetorrent(item)
+
+            elif item.from_channel == 'elitetorrentnz': domains.test_domain_elitetorrentnz(item)
 
             elif item.from_channel == 'ennovelas': domains.test_domain_ennovelas(item)
 
@@ -1541,7 +1683,13 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'mejortorrentapp': domains.test_domain_mejortorrentapp(item)
 
+            elif item.from_channel == 'mejortorrentnz': domains.test_domain_mejortorrentnz(item)
+
             elif item.from_channel == 'mitorrent': domains.test_domain_mitorrent(item)
+
+            elif item.from_channel == 'movidymobi': domains.test_domain_movidymobi(item)
+
+            elif item.from_channel == 'peliculaspro': domains.test_domain_peliculaspro(item)
 
             elif item.from_channel == 'pelishouse': domains.test_domain_pelishouse(item)
 
@@ -1573,11 +1721,15 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'serieskao': domains.test_domain_serieskao(item)
 
+            elif item.from_channel == 'seriesmetro': domains.test_domain_seriesmetro(item)
+
             elif item.from_channel == 'seriesyonkis': domains.test_domain_seriesyonkis(item)
 
             elif item.from_channel == 'srnovelas': domains.test_domain_srnovelas(item)
 
             elif item.from_channel == 'subtorrents': domains.test_domain_subtorrents(item)
+
+            elif item.from_channel == 'todotorrents': domains.test_domain_todotorrents(item)
 
             elif item.from_channel == 'torrentpelis': domains.test_domain_torrentpelis(item)
 
@@ -1591,8 +1743,6 @@ def opciones_domains_common(item):
 
             if item.from_channel == 'animefenix': helper.show_help_animefenix(item)
 
-            elif item.from_channel == 'animeflv': helper.show_help_animeflv(item)
-
             elif item.from_channel == 'animeonline': helper.show_help_animeonline(item)
 
             elif item.from_channel == 'cinecalidadlol': helper.show_help_cinecalidadlol(item)
@@ -1601,57 +1751,17 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cuevana3video': helper.show_help_cuevana3video(item)
 
-            elif item.from_channel == 'divxtotal': helper.show_help_divxtotal(item)
-
-            elif item.from_channel == 'dontorrents': helper.show_help_dontorrents(item)
-
-            elif item.from_channel == 'elifilms': helper.show_help_elifilms(item)
-
-            elif item.from_channel == 'elitetorrent': helper.show_help_elitetorrent(item)
-
             elif item.from_channel == 'ennovelas': helper.show_help_ennovelas(item)
 
             elif item.from_channel == 'entrepeliculasyseries': helper.show_help_entrepeliculasyseries(item)
 
-            elif item.from_channel == 'gnula24': helper.show_help_gnula24(item)
-
-            elif item.from_channel == 'grantorrent': helper.show_help_grantorrent(item)
-
-            elif item.from_channel == 'grantorrents': helper.show_help_grantorrents(item)
-
             elif item.from_channel == 'hdfull': helper.show_help_hdfull(item)
-
-            elif item.from_channel == 'hdfullse': helper.show_help_hdfullse(item)
 
             elif item.from_channel == 'henaojara': helper.show_help_henaojara(item)
 
-            elif item.from_channel == 'mejortorrentapp': helper.show_help_mejortorrentapp(item)
-
-            elif item.from_channel == 'pelishouse': helper.show_help_pelishouse(item)
-
             elif item.from_channel == 'pelismaraton': helper.show_help_pelismaraton(item)
 
-            elif item.from_channel == 'pelispediaws': helper.show_help_pelispediaws(item)
-
-            elif item.from_channel == 'pelisplus': helper.show_help_pelisplus(item)
-
-            elif item.from_channel == 'pelisplushd': helper.show_help_pelisplushd(item)
-
-            elif item.from_channel == 'pelisplushdlat':  helper.show_help_pelisplushdlat(item)
-
-            elif item.from_channel == 'pelisplushdnz': helper.show_help_pelisplushdnz(item)
-
-            elif item.from_channel == 'pelispluslat': helper.show_help_pelispluslat(item)
-
             elif item.from_channel == 'playdede': helper.show_help_playdede(item)
-
-            elif item.from_channel == 'series24': helper.show_help_series24(item)
-
-            elif item.from_channel == 'seriesantiguas': helper.show_help_seriesantiguas(item)
-
-            elif item.from_channel == 'serieskao': helper.show_help_serieskao(item)
-
-            elif item.from_channel == 'seriesyonkis': helper.show_help_seriesyonkis(item)
 
             elif item.from_channel == 'srnovelas': helper.show_help_srnovelas(item)
 

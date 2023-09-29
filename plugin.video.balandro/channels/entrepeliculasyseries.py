@@ -201,6 +201,9 @@ def generos(item):
 
            if title == 'Series Documentales': title = 'Documentales'
 
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
+
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = text_color ))
 
     if itemlist:

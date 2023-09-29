@@ -188,6 +188,9 @@ def generos(item):
         elif tit == 'Netflix': continue
         elif tit == 'News': continue
 
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
+
         if item.search_type == 'movie':
             if tit == 'Anime': continue
             elif tit == 'Marvel': continue

@@ -30,6 +30,7 @@ except:
 
 
 dominios = [
+         'https://hdfull.icu/',
          'https://hdfull.quest/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
@@ -434,7 +435,9 @@ def mainlist(item):
 
         itemlist.append(item.clone( title='Novelas', action = 'mainlist_series', text_color = 'limegreen' ))
         itemlist.append(item.clone( title='Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
-        itemlist.append(item.clone( title='Animes', action = 'mainlist_series', text_color = 'springgreen' ))
+
+        if not config.get_setting('descartar_anime', default=False):
+            itemlist.append(item.clone( title='Animes', action = 'mainlist_series', text_color = 'springgreen' ))
 
         itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
@@ -512,12 +515,17 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( action='list_all', title='Novelas', url= dominio + 'tags-tv/soap', search_type = 'tvshow', text_color='limegreen' ))
         itemlist.append(item.clone( action='list_all', title='Doramas', url= dominio + 'tags-tv/dorama', search_type = 'tvshow', text_color='firebrick' ))
-        itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow', text_color='springgreen' ))
+
+        if not config.get_setting('descartar_anime', default=False):
+            itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow', text_color='springgreen' ))
 
         itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='tan' ))
 
         itemlist.append(item.clone( action='list_episodes', title=' - Estreno', opcion = 'premiere', search_type = 'tvshow' ))
-        itemlist.append(item.clone( action='list_episodes', title=' - [COLOR springgreen]Anime[/COLOR]', opcion = 'anime', search_type = 'tvshow' ))
+
+        if not config.get_setting('descartar_anime', default=False):
+            itemlist.append(item.clone( action='list_episodes', title=' - [COLOR springgreen]Anime[/COLOR]', opcion = 'anime', search_type = 'tvshow' ))
+
         itemlist.append(item.clone( action='list_episodes', title=' - Últimos', opcion = 'latest', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_episodes', title=' - Actualizados', opcion = 'updated', search_type = 'tvshow' ))
 
@@ -584,6 +592,9 @@ def generos(item):
     for url, title in matches:
         if item.search_type == 'movie':
             if title == 'Novela': continue
+
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
 
         if url.startswith('/'): url = dominio + url[1:]
 

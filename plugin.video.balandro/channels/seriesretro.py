@@ -69,8 +69,6 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    current_year = current_year - 10
-
     for x in range(current_year, 1935, -1):
         itemlist.append(item.clone( title = str(x), url = host + '?s=trfilter&trfilter=1&years%5B%5D=' + str(x), action = 'list_all', text_color = 'hotpink' ))
 
@@ -114,14 +112,15 @@ def list_all(item):
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
         year = scrapertools.find_single_match(match, '<span class="Year">(.*?)</span>')
-        if not year:
-            year = scrapertools.find_single_match(match, '<span class=Year>(.*?)</span>')
+        if not year: year = scrapertools.find_single_match(match, '<span class=Year>(.*?)</span>')
 
-        if not year: year = '-'
+        if year: title = title.replace('(' + year + ')', '').strip()
+        else: year = '-'
 
-        name = title.replace('&#038;', '&')
+        title = title.replace('&#038;', '&')
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = name, infoLabels = {'year': year} ))
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
         if len(itemlist) >= perpage: break
 
@@ -166,7 +165,9 @@ def list_alfa(item):
         thumb = scrapertools.find_single_match(match, ' data-src="([^"]+)')
 
         year = scrapertools.find_single_match(match, '<strong>.*?</td><td>Serie</td><td>(\d{4})</span>')
-        if not year: year = '-'
+
+        if year: title = title.replace('(' + year + ')', '').strip()
+        else: year = '-'
 
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
@@ -341,14 +342,15 @@ def findvideos(item):
         ses += 1
 
         servidor = servidor.replace('<strong>', '').replace('</strong>', '')
+
+        srv = servidor.lower().strip()
+
         servidor = servertools.corregir_servidor(servidor)
 
         url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '.*?src="(.*?)"')
-        if not url:
-            url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '.*?src=&quot;(.*?)&quot;')
+        if not url: url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '.*?src=&quot;(.*?)&quot;')
 
-        if url.startswith('//') == True:
-            url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '.*?src=&quot;(.*?)&quot;')
+        if url.startswith('//') == True: url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '.*?src=&quot;(.*?)&quot;')
 
         if not servidor or not url: continue
 
@@ -364,8 +366,8 @@ def findvideos(item):
         else: link_other = ''
 
         if servidor == 'various':
-            if 'filemoon' in url: link_other = 'Filemoon'
-            elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: link_other = 'Streamwish'
+            if srv == 'filemoon': link_other = 'Filemoon'
+            elif srv == 'streamwish' or srv == 'strwish' or srv == 'embedwish' or srv ==  'wishembed' or srv == 'awish' or srv == 'dwish' or srv == 'mwish': link_other = 'Streamwish'
 
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = link_other ))
 
@@ -379,8 +381,6 @@ def findvideos(item):
         servidor = servidor.replace('.', '').lower().strip()
 
         if not servidor: continue
-
-        if servidor == 'mediafire': continue
 
         servidor = servertools.corregir_servidor(servidor)
 

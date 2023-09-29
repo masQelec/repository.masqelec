@@ -9,14 +9,15 @@ from core import httptools, scrapertools, servertools, tmdb
 from lib import decrypters
 
 
-host = 'https://allcalidad.ms/'
+host = 'https://allcalidad.re/'
 
 
-players = 'https://allcalidad.ms'
+players = 'https://allcalidad.re'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://elifilms.net/', 'https://elifilms.org/', 'https://allcalidad.si/']
+ant_hosts = ['https://elifilms.net/', 'https://elifilms.org/', 'https://allcalidad.si/',
+             'https://allcalidad.ms/']
 
 
 domain = config.get_setting('dominio', 'elifilms', default='')

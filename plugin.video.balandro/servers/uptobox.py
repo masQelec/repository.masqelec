@@ -63,9 +63,11 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
-    if "Unfortunately, the file you want is not available." in data or "Unfortunately, the video you want to see is not available" in data or "This stream doesn" in data or "Page not found" in data or "Archivo no encontrado" in data:
-        return "El archivo no existe o ha sido borrado"
- 
+    if '404 Not Found' in data or 'Unfortunately, the file you want is not available' in data or 'Unfortunately, the video you want to see is not available' in data or 'This stream doesn' in data or 'Page not found' in data or 'Archivo no encontrado' in data:
+        return 'El archivo no existe o ha sido borrado'
+    elif '.rar' in data:
+        return 'El archivo está en formato comprimido'
+
     waiting = scrapertools.find_single_match(data, "data-remaining-time='(.*?)'")
 
     if waiting:
@@ -135,13 +137,16 @@ def get_video_url(page_url, url_referer=''):
                     return video_urls
 
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+                return "Acceso limitado restringido (2do.)"
 
             except:
                import traceback
                logger.error(traceback.format_exc())
                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+               return video_urls
+
         else:
-           return 'Acceso limitado restringido (2do.)'
+           return 'ResolveUrl NO instalado'
 
     # ~ 31/1/2023  Pendiente porque algo no ha funcionado bien
     if BR2 is None:

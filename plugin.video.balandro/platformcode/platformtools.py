@@ -411,18 +411,24 @@ def set_context_commands(item, parent_item, colores):
                     item.clone(channel="tracking", action="addFavourite", from_channel=item.channel, from_action=item.action))) )
 
     # Buscar misma peli/serie en otros canales
-    if item.contentType in ['movie', 'tvshow'] and parent_item.channel not in ['tmdblists', 'filmaffinitylists', 'search']:
-        buscando = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
-        if not item.contentExtra in ['documentary', 'adults']:
-            infolabels = {'tmdb_id': item.infoLabels['tmdb_id']} if item.infoLabels['tmdb_id'] else {}
-            item_search = Item(channel='search', action='search', buscando=buscando, search_type=item.contentType, from_channel=item.channel, infoLabels=infolabels)
-            tipo_busqueda = 'en los canales' if item.channel == 'tracking' else 'en otros canales'
-            context_commands.append( ('[B][COLOR %s]Buscar Exacto %s[/COLOR][/B]' % (colores['search_exact'], tipo_busqueda), config.build_ContainerUpdate(item_search)) )
+    if item.contentType in ['movie', 'tvshow'] and parent_item.channel not in ['tmdblists', 'filmaffinitylists']:
+        presentar = True
+        if not config.get_setting('search_dialog', default=True):
+            if parent_item.channel in ['search']: presentar = False
 
-        if not item.contentExtra in ['adults']:
-            search_type = item.contentType if item.contentExtra != 'documentary' else 'documentary'
-            item_search = Item(channel='search', action='search', buscando=buscando, search_type=search_type, from_channel='')
-            context_commands.append( ('[B][COLOR %s]Buscar Parecido en los canales[/COLOR][/B]' % colores['search_similar'], config.build_ContainerUpdate(item_search)) )
+        if presentar:
+            buscando = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
+
+            if not item.contentExtra in ['documentary', 'adults']:
+                infolabels = {'tmdb_id': item.infoLabels['tmdb_id']} if item.infoLabels['tmdb_id'] else {}
+                item_search = Item(channel='search', action='search', buscando=buscando, search_type=item.contentType, from_channel=item.channel, infoLabels=infolabels)
+                tipo_busqueda = 'en los canales' if item.channel == 'tracking' else 'en otros canales'
+                context_commands.append( ('[B][COLOR %s]Buscar Exacto %s[/COLOR][/B]' % (colores['search_exact'], tipo_busqueda), config.build_ContainerUpdate(item_search)) )
+
+            if not item.contentExtra in ['adults']:
+                search_type = item.contentType if item.contentExtra != 'documentary' else 'documentary'
+                item_search = Item(channel='search', action='search', buscando=buscando, search_type=search_type, from_channel='')
+                context_commands.append( ('[B][COLOR %s]Buscar Parecido en los canales[/COLOR][/B]' % colores['search_similar'], config.build_ContainerUpdate(item_search)) )
 
     # Descargar vídeo
     if not config.get_setting('mnu_simple', default=False):
@@ -561,7 +567,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         # Server Various y anulados/controlados
         if apuntar:
-            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'lulustream', 'luluvdo', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'streamvid' 'upload.do']:
+            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast']:
                 apuntar = False
 
             elif it.server in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza', 'vanfem', 'youtvgratis', 'oceanplay', 'gotovideo.kiev.ua', 'owodeuwu', 'sypl', 'fembed9hd', 'watchse', 'vcdn', 'femoload', 'cubeembed']:

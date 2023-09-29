@@ -62,13 +62,13 @@ def proxysearch_all(item):
     if proxies_todos:
         if proxies_auto:
             if item.extra:
-               if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum][B]Este proceso Podría necesitar un considerable espacio de tiempo según su configuración actual de proxies.[/B][/COLOR]', "[COLOR yellow][B]¿ Desea iniciar la búsqueda de proxies para TODOS los canales que los necesiten ?[/B][/COLOR]"):
+               if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum][B]Este proceso Podría necesitar un considerable espacio de tiempo según sus Ajustes actuales de proxies.[/B][/COLOR]', "[COLOR yellow][B]¿ Desea iniciar la búsqueda de proxies para TODOS los canales que los necesiten ?[/B][/COLOR]"):
                    return
             else:
-               if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum][B]Este proceso Requerirá un considerable consumo de tiempo según su configuración actual de proxies.[/B][/COLOR]', "[COLOR yellow][B]¿ Desea iniciar la búsqueda de proxies para TODOS los canales que los necesiten ?[/B][/COLOR]"):
+               if not platformtools.dialog_yesno(config.__addon_name, '[COLOR plum][B]Este proceso Requerirá un considerable consumo de tiempo según su Ajustes actuales de proxies.[/B][/COLOR]', "[COLOR yellow][B]¿ Desea iniciar la búsqueda de proxies para TODOS los canales que los necesiten ?[/B][/COLOR]"):
                    return
         else:
-           platformtools.dialog_ok(config.__addon_name, '[COLOR red][B]En los Ajustes categoría proxies de la configuración, No tiene el Modo buscar automaticamente.[/B][/COLOR]')
+           platformtools.dialog_ok(config.__addon_name, '[COLOR red][B]En sus Ajustes/Preferenncias (categoría proxies), No tiene el Modo buscar automaticamente.[/B][/COLOR]')
            return
 
 

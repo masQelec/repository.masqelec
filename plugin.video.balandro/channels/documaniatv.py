@@ -322,7 +322,7 @@ def findvideos(item):
                 return
 
     if url_final:
-        url_final += "|Referer=" + host
+        # ~ Failed: HTTP returned error 401
 
         itemlist.append(Item ( channel = item.channel, action = 'play', server = 'directo', title = '', url = url_final, language = 'Esp' ))
 

@@ -119,7 +119,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
+    if not config.get_setting('descartar_anime', default=False):
+       itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
+
     itemlist.append(item.clone( title = 'Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
 
     return itemlist
@@ -151,7 +153,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series?page=', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'generos/dorama/series?page=', search_type = 'tvshow', text_color = 'firebrick' ))
 
@@ -191,7 +194,7 @@ def generos(item):
 
     bloque = scrapertools.find_single_match(data, '>Generos(.*?)</ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)">(.*?)</a>')
 
     for url, tit in matches:
         if item.group == 'animes':
@@ -200,6 +203,9 @@ def generos(item):
 
         if item.search_type == 'tvshow':
 	        if 'Televisión' in tit: continue
+
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
 
         url = host[:-1] + url + '?page='
 
@@ -470,7 +476,6 @@ def findvideos(item):
 
                 if srv2 == 'netu' or srv2 == 'waaw' or srv2 == 'hqq': continue
                 elif srv2 == '1fichier': continue
-                elif srv2 == 'plusvip': continue
 
                 if not link: continue
 
@@ -484,12 +489,34 @@ def findvideos(item):
 
                 other = ''
 
+                if srv2 == 'plusvip':
+                    vid_url = link
+
+                    url_pattern = '(?:[\w\d]+://)?[\d\w]+\.[\d\w]+/moe\?data=(.+)$'
+                    src_pattern = "this\[_0x5507eb\(0x1bd\)\]='(.+?)'"
+
+                    data3 = do_downloadpage(vid_url)
+
+                    url = scrapertools.find_single_match(vid_url, url_pattern)
+                    src = scrapertools.find_single_match(data3, src_pattern)
+
+                    src_url = "https://plusvip.net{}".format(src)
+
+                    url = do_downloadpage(src_url, post={'link': url}, headers = {'Referer': vid_url})
+
+                    url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+
+                    if not url: continue
+
+                    link = url.replace('\\/', '/')
+
+                    servidor = 'directo'
+                    other = 'plusvip'
+
                 if servidor == 'various':
                     if 'filemoon' in link: other = 'filemoon'
                     elif 'streamwish' in link: other = 'streamwish'
                     elif 'filelions' in link: other = 'filelions'
-
-                    #elif other == 'stp': other = 'streamtape'
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = link, language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
 

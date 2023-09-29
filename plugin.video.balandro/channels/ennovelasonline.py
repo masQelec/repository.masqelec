@@ -431,10 +431,7 @@ def findvideos(item):
             else: lang = 'Lat'
 
             other = ''
-            if servidor == 'various':
-                if 'vudeo' in url: other = 'Vudeo'
-                elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'Streamwish'
-
+            if servidor == 'various': other = servertools.corregir_other(url)
             else:
                 if type == 'download': other = 'D'
 
@@ -478,9 +475,7 @@ def findvideos(item):
 
                other = 'P'
 
-               if servidor == 'various':
-                   if 'vudeo' in u_link: other = 'Vudeo'
-                   elif 'streamwish' in u_link or 'strwish' in u_link or 'embedwish' in u_link or 'wishembed' in u_link or 'awish' in u_link or 'dwish' in u_link or 'mwish' in u_link: other = 'Streamwish'
+               if servidor == 'various': other = servertools.corregir_other(u_link)
 
                if not servidor == 'directo':
                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))

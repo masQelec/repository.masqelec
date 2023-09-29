@@ -1,5 +1,4 @@
 #!/usr/bin/python
-import time
 import subprocess
 import urllib
 
@@ -27,12 +26,6 @@ def reload_rclone():
         subprocess.call(["systemctl", "restart", "rclone_videos_2"])
 
     except:
-        time.sleep(5)
         reload_rclone()
 
 reload_rclone()
-
-# Execute every 12 hours
-while True:
-    time.sleep(23600)
-    reload_rclone()

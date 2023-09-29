@@ -23,14 +23,11 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
-    if descartar_xxx: return itemlist
+    if config.get_setting('descartar_xxx', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
@@ -100,7 +97,7 @@ def pornstars(item):
 
     patron = '<div class="box-chica">.*?'
     patron += '<a href="([^"]+)".*?'
-    patron += 'src=\'([^\']+.jpg)\'.*?'
+    patron += 'data-src="(.*?).*?'
     patron += '<h4><a href="[^"]+">([^<]+)</a></h4>.*?'
     patron += '<a class="total-videos".*?>([^<]+)</a>'
 

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cinecalidad.com.mx/'
+host = 'https://v2.cinecalidad.com.mx/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -23,7 +23,8 @@ ant_hosts = ['https://cinecalidad.fit/', 'https://ww3.cinecalidad.com.mx/',
             'https://c22.cinecalidad.com.mx/', 'https://c23.cinecalidad.com.mx/', 'https://c24.cinecalidad.com.mx/',
             'https://c25.cinecalidad.com.mx/', 'https://c26.cinecalidad.com.mx/', 'https://c27.cinecalidad.com.mx/',
             'https://c28.cinecalidad.com.mx/', 'https://c29.cinecalidad.com.mx/', 'https://wvw.cinecalidad.com.mx/',
-            'https://vww.cinecalidad.com.mx/', 'https://wvw.cinecalidad.com.mx/' 'https://wwv.cinecalidad.com.mx/']
+            'https://vww.cinecalidad.com.mx/', 'https://wvw.cinecalidad.com.mx/' 'https://wwv.cinecalidad.com.mx/',
+            'https://cinecalidad.com.mx/', 'https://v1.cinecalidad.com.mx/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadmx', default='')
@@ -139,6 +140,9 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
 
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = ' - [COLOR springgreen]Animes[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/anime/', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie' ))
 
@@ -183,6 +187,9 @@ def generos(item):
         elif title == 'Películas por año': continue
 
         if url.startswith('#menu'): continue
+
+        if config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
 
         if url.startswith('/'): url = host[:-1] + url
 
@@ -491,9 +498,7 @@ def findvideos(item):
                 elif srv == 'voe': servidor = 'voe'
                 elif srv == 'doods' or srv == 'doostream': servidor = 'doodstream'
 
-                elif srv == 'streamwish' or srv == 'strwish' or srv == 'embedwish' or srv == 'wishembed' or srv == 'awish' or srv == 'dwish' or srv == 'mwish': servidor = 'various'
-
-                elif srv == 'filemoon': servidor = 'various'
+                else: servidor = servertools.corregir_servidor(srv)
 
             if servidor == 'various': other = srv.capitalize()
 

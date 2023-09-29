@@ -378,9 +378,7 @@ def findvideos(item):
 
             servidor = servertools.corregir_servidor(srv)
 
-            if servidor == 'various':
-                if 'filemoon' in url: srv = 'filemoon'
-                elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: srv = 'streamwish'
+            if servidor == 'various': srv = servertools.corregir_other(url)
 
             if not servidor == 'directo':
                 if srv == servidor: srv = ''

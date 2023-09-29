@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww.cinecalidad.foo/'
+host = 'https://wwv.cinecalidad.foo/'
 
 
 # ~ por si viene de enlaces guardados
@@ -17,7 +17,8 @@ ant_hosts = ['https://www.cinecalidad.eu/', 'https://www.cinecalidad.im/', 'http
              'https://v3.cine-calidad.com/', 'https://cinecalidad.dev/', 'https://cinecalidad.ms/',
              'https://www3.cinecalidad.ms/', 'https://ww1.cinecalidad.ms/', 'https://www.cinecalidad.gs/',
              'https://www.cinecalidad.tf/', 'https://wvw.cinecalidad.tf/', 'https://vww.cinecalidad.tf/',
-             'https://wwv.cinecalidad.tf/', 'https://www.cinecalidad.foo/']
+             'https://wwv.cinecalidad.tf/', 'https://www.cinecalidad.foo/', 'https://vw.cinecalidad.foo/',
+             'https://ww.cinecalidad.foo/', 'https://w.cinecalidad.foo/']
 
 domain = config.get_setting('dominio', 'cinecalidad', default='')
 
@@ -169,8 +170,6 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series-populares/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes/', search_type = 'tvshow', text_color='springgreen' ))
-
     itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'tvshow' ))
 
     return itemlist
@@ -252,8 +251,7 @@ def list_all(item):
 
         url = url.replace('\\/', '/')
 
-        if '-1-ano' in url: continue
-        elif '-premium-12-meses' in url: continue
+        if '-1-ano' in url or '-premium-12-meses' in url or '/netflix/a-day-without-a-mexican/' in url: continue
 
         if not url or not title: continue
 
