@@ -30,6 +30,7 @@ except:
 
 
 dominios = [
+         'https://hd-full.one/',
          'https://hdfull.icu/',
          'https://hdfull.quest/',
          'https://hdfull.today/',
@@ -139,10 +140,16 @@ class login_dialog(xbmcgui.WindowDialog):
 
 
 def do_make_login_logout(url, post=None):
+    hay_proxies = False
+    if config.get_setting('channel_hdfull_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, raise_weberror=False).data
     else:
-        data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
+        else:
+            data = httptools.downloadpage(url, post=post, raise_weberror=False).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -154,7 +161,10 @@ def do_make_login_logout(url, post=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, raise_weberror=False).data
                 else:
-                    data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, raise_weberror=False).data
         except:
             pass
 
@@ -347,10 +357,16 @@ def do_downloadpage(url, post=None, referer=None):
     if referer: headers = {'Referer': referer}
     else: headers = {'Referer': domain}
 
+    hay_proxies = False
+    if config.get_setting('channel_hdfull_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
     else:
-        data = httptools.downloadpage_proxy('hdfull', url, post=post, headers=headers, raise_weberror=False).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('hdfull', url, post=post, headers=headers, raise_weberror=False).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
 
     if '<div id="popup_login_result"></div>' in data:
         if not config.get_setting('hdfull_login', 'hdfull', default=False):
@@ -475,7 +491,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( action='list_all', title='Catálogo', url = dominio + 'peliculas', search_type = 'movie' ))
 
-        itemlist.append(item.clone( action='list_all', title='Últimos estrenos', url = dominio + 'peliculas-estreno', search_type = 'movie' ))
+        itemlist.append(item.clone( action='list_all', title='Últimos estrenos', url = dominio + 'peliculas-estreno', search_type = 'movie', text_color='slateblue' ))
         itemlist.append(item.clone( action='list_all', title='Últimas actualizadas', url = dominio + 'peliculas-actualizadas', search_type = 'movie' ))
 
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url = dominio + 'peliculas/imdb_rating', search_type = 'movie' ))
@@ -521,7 +537,7 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='tan' ))
 
-        itemlist.append(item.clone( action='list_episodes', title=' - Estreno', opcion = 'premiere', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_episodes', title=' - [COLOR slateblue]Estreno[/COLOR]', opcion = 'premiere', search_type = 'tvshow' ))
 
         if not config.get_setting('descartar_anime', default=False):
             itemlist.append(item.clone( action='list_episodes', title=' - [COLOR springgreen]Anime[/COLOR]', opcion = 'anime', search_type = 'tvshow' ))
@@ -832,7 +848,9 @@ def temporadas(item):
         if retitle != title: titulo += ' - ' + retitle
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.referer = item.url
             item.url = url
@@ -916,7 +934,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts

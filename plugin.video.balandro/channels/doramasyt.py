@@ -14,7 +14,7 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Buscar dorama ...', action = 'search', search_type = 'all', text_color = 'firebrick' ))
+    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
@@ -40,7 +40,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+    itemlist.append(item.clone( title = 'Buscar dorama ...', action = 'search', search_type = 'tvshow', text_color = 'firebrick' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'doramas?categoria=dorama', search_type = 'tvshow' ))
 
@@ -61,7 +61,7 @@ def generos(item):
     itemlist = []
 
     if item.search_type == 'movie': text_color = 'deepskyblue'
-    else: text_color = 'hotpink'
+    else: text_color = 'firebrick'
 
     genres = [
        ['policial', 'Policial'],
@@ -251,9 +251,11 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    title = 'Sin temporadas'
+    if config.get_setting('channels_seasons', default=True):
+        title = 'Sin temporadas'
 
-    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#039;', "'").replace('&#8217;', "'"), '[COLOR tan]' + title + '[/COLOR]')
+        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#039;', "'").replace('&#8217;', "'"), '[COLOR tan]' + title + '[/COLOR]')
+
     item.page = 0
     item.contentType = 'season'
     item.contentSeason = 1
@@ -271,9 +273,8 @@ def episodios(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<div class="col-item">.*?<a href="(.*?)".*?<img src="(.*?)".*?<p>(.*?)</p>'
-
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('<div class="col-item">.*?<a href="(.*?)".*?<img src="(.*?)".*?<p>(.*?)</p>', re.DOTALL).findall(data)
+    if not matches: matches = re.compile('<div class="col-item.*?<a href="(.*?)".*?<img src="(.*?)".*?<p>(.*?)</p>', re.DOTALL).findall(data)
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -283,7 +284,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts

@@ -61,19 +61,29 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_torrentpelis_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_torrentpelis_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('torrentpelis', url, post=post, headers=headers, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('torrentpelis', url, post=post, headers=headers, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
             if not '?s=' in url:
                 platformtools.dialog_notification('TorrentPelis', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('torrentpelis', url, post=post, headers=headers, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('torrentpelis', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -85,7 +95,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('torrentpelis', url, post=post, headers=headers, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('torrentpelis', url, post=post, headers=headers, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -258,7 +271,10 @@ def play(item):
             if not urlb64.startswith(host):
                 resp = httptools.downloadpage(urlb64, follow_redirects=False, only_headers=True)
             else:
-                resp = httptools.downloadpage_proxy('torrentpelis', urlb64, follow_redirects=False, only_headers=True)
+                if config.get_setting('channel_torrentpelis_proxies', default=''):
+                    resp = httptools.downloadpage_proxy('torrentpelis', urlb64, follow_redirects=False, only_headers=True)
+                else:
+                    resp = httptools.downloadpage(urlb64, follow_redirects=False, only_headers=True)
 
             if 'location' in resp.headers: url = resp.headers['location']
         else:
@@ -269,7 +285,10 @@ def play(item):
         if not url.startswith(host):
             resp = httptools.downloadpage(url, follow_redirects=False, only_headers=True)
         else:
-            resp = httptools.downloadpage_proxy('torrentpelis', url, follow_redirects=False, only_headers=True)
+            if config.get_setting('channel_torrentpelis_proxies', default=''):
+                resp = httptools.downloadpage_proxy('torrentpelis', url, follow_redirects=False, only_headers=True)
+            else:
+                resp = httptools.downloadpage(url, follow_redirects=False, only_headers=True)
 
         if 'location' in resp.headers: url = resp.headers['location']
 

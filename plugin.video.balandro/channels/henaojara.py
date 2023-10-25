@@ -63,19 +63,29 @@ def do_downloadpage(url, post=None, headers=None):
         if url == host: headers = {'Referer': 'https://duckduckgo.com/'}
         else: headers = {'Referer': host}
 
+    hay_proxies = False
+    if config.get_setting('channel_henaojara_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_henaojara_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
             if not '?s=' in url:
                 platformtools.dialog_notification('HenaOjara', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -87,7 +97,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('henaojara', url, post=post, headers=headers, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -409,7 +422,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('HenaOjara', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -516,6 +530,8 @@ def findvideos(item):
 
         if other == servidor: other = ''
 
+        if servidor == 'various': other = servertools.corregir_other(other)
+
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 
     # Descargas
@@ -553,24 +569,31 @@ def play(item):
            if not url.startswith(host):
                url = httptools.downloadpage(url, follow_redirects=False, timeout=timeout).headers['location']
            else:
-               url = httptools.downloadpage_proxy('henaojara', url, follow_redirects=False, timeout=timeout).headers['location']
+               if config.get_setting('channel_henaojara_proxies', default=''):
+                   url = httptools.downloadpage_proxy('henaojara', url, follow_redirects=False, timeout=timeout).headers['location']
+               else:
+                   url = httptools.downloadpage(url, follow_redirects=False, timeout=timeout).headers['location']
         except:
            url = ''
 
     else:
         data = do_downloadpage(url)
 
-        new_url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"')
+        new_url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"').strip()
 
         if new_url:
             if new_url.startswith('//'): new_url = 'https:' + new_url
 
             url = new_url
 
-            if '/nyuu.hjstream.xyz' in new_url:
+            if '/nyuu.' in new_url:
+                new_url = new_url.replace('&amp;', '&').strip()
+
                 data = do_downloadpage(new_url)
 
                 url = scrapertools.find_single_match(data, 'url: "(.*?)"')
+
+                url = url.replace('&amp;', '&').strip()
 
                 if url:
                     itemlist.append(item.clone( url=url, server='directo'))
@@ -582,18 +605,19 @@ def play(item):
                 data = do_downloadpage(new_url)
 
                 url = scrapertools.find_single_match(data, 'src="(.*?)"')
+
                 if url.startswith('//'): url = 'https:' + url
 
-    if '/hqq.' in url or '/waaw.' in url or '/netu' in url:
-        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
-    elif '.mystream.' in url:
-        return 'Servidor [COLOR tan]Cerrado[/COLOR]'
-
-    elif '/streamium.xyz/' in url: url = ''
+    if '/streamium.xyz/' in url: url = ''
     elif '/descargas/' in url: url = ''
 
     if url:
+        if '/hqq.' in url or '/waaw.' in url or '/netu' in url:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+        elif '.mystream.' in url:
+            return 'Servidor [COLOR tan]Cerrado[/COLOR]'
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

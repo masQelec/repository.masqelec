@@ -41,9 +41,9 @@ def get_video_url(page_url, url_referer=''):
     data = httptools.downloadpage(page_url).data
 
     if "copyrightsRestricted" in data or "COPYRIGHTS_RESTRICTED" in data or "LIMITED_ACCESS" in data:
-        return 'El archivo ha sido eliminado por violación del copyright'
+        return 'Archivo eliminado por violación copyright'
     elif "notFound" in data:
-        return 'El archivo no existe o ha sido eliminado'
+        return 'Archivo inexistente ó eliminado'
 
     data = scrapertools.decodeHtmlentities(data).replace('\\', '')
 

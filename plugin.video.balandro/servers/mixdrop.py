@@ -35,7 +35,7 @@ def get_video_url(page_url, url_referer=''):
     data = httptools.downloadpage(page_url, headers=headers).data
 
     if '>WE ARE SORRY</h2>' in data or '<title>404 Not Found</title>' in data:
-        return 'El archivo no existe o ha sido borrado'
+        return 'Archivo inexistente ó eliminado'
 
     url = scrapertools.find_single_match(data, 'window\.location\s*=\s*"([^"]+)')
     if url:

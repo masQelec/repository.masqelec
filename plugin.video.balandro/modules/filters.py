@@ -606,8 +606,8 @@ def only_torrents(item):
 def channels_status(item):
     logger.info()
 
-    if item.des_rea: cabecera = 'Desactivar o Re-activar'
-    else: cabecera = 'Marcar o Des-marcar Preferidos'
+    if item.des_rea: cabecera = 'Desactivar ó Re-activar'
+    else: cabecera = 'Marcar ó Des-marcar Preferidos'
 
     filtros = {}
 
@@ -618,6 +618,9 @@ def channels_status(item):
     ch_list = channeltools.get_channels_list(filtros=filtros)
 
     for ch in ch_list:
+        if not config.get_setting('mnu_adultos', default=True):
+            if '+18' in ch['notes']: continue
+
         info = ''
 
         if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
@@ -632,24 +635,26 @@ def channels_status(item):
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
         if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
-        if '+18' in ch['notes']: info = info + '[COLOR pink][B] Adultos [/B][/COLOR]'
-        elif 'anime' in ch['clusters']: info = info + '[COLOR fuchsia][B] Anime [/B][/COLOR]'
-        elif 'torrents' in ch['clusters']: info = info + '[COLOR violet][B] Torrents [/B][/COLOR]'
+        if '+18' in ch['notes']: info = info + '[COLOR orange][B] Adultos [/B][/COLOR]'
+        elif 'anime' in ch['clusters']: info = info + '[COLOR springgreen][B] Anime [/B][/COLOR]'
+        elif 'torrents' in ch['clusters']: info = info + '[COLOR blue][B] Torrents [/B][/COLOR]'
         elif 'dorama' in ch['clusters']: info = info + '[COLOR firebrick][B] Doramas [/B][/COLOR]'
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
-        tipos = str(tipos).replace('movie', 'Películas').replace('tvshow', 'Series').replace('documentary', 'Documentales').replace('all,', '').strip()
+        tipos = str(tipos).replace('movie', '[COLOR deepskyblue]Películas[/COLOR]').replace('tvshow', '[COLOR hotpink]Series[/COLOR]').replace('documentary', '[COLOR cyan]Documentales[/COLOR]').replace('all,', '').strip()
+
+        if '+18' in ch['notes']: tipos = str(tipos).replace('[COLOR deepskyblue]Películas[/COLOR]', '[COLOR teal]Vídeos[/COLOR]')
 
         if info: info = info + '  '
-        info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
+        info = info + '[B]' + tipos + '[/B]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
-        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
+        idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'Vo').replace('vos', 'Vos')
 
         if info: info = info + '  '
-        info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
+        info = info + '[COLOR coral]' + idiomas + '[/COLOR]'
 
         it = xbmcgui.ListItem(ch['name'], info)
         it.setArt({'thumb': ch['thumbnail']})
@@ -657,7 +662,7 @@ def channels_status(item):
 
         channels_ids.append(ch['id'])
 
-    ret = xbmcgui.Dialog().multiselect('Personalizar canales [COLOR yellow]' + cabecera + '[/COLOR]', opciones, preselect=preselect, useDetails=True)
+    ret = xbmcgui.Dialog().multiselect('Personalizar Canales [COLOR yellow]' + cabecera + '[/COLOR]', opciones, preselect=preselect, useDetails=True)
 
     if ret is None: return
 
@@ -1289,6 +1294,10 @@ def show_clients_torrent(item):
         else: exists_torrent = ' [COLOR red][B] No instalado [/B]'
 
         if client_name == 'Elementum': client_recommended = '[COLOR limegreen][B]  Recomendado[/B][/COLOR]'
+        elif client_name == 'Pulsar': client_recommended = '[COLOR goldenrod][B]  Obsoleto[/B][/COLOR]'
+        elif client_name == 'Quasar': client_recommended = '[COLOR goldenrod][B]  Obsoleto[/B][/COLOR]'
+        elif client_name == 'Stream': client_recommended = '[COLOR goldenrod][B]  Obsoleto[/B][/COLOR]'
+        elif client_name == 'Xbmctorrent': client_recommended = '[COLOR goldenrod][B]  Obsoleto[/B][/COLOR]'
         else: client_recommended = ''
 
         opciones_torrent.append(platformtools.listitem_to_select('[COLOR cyan]' + client_name + '[/COLOR]', '[COLOR moccasin]' + client_id + exists_torrent + '[/COLOR]' + client_recommended, thumb))

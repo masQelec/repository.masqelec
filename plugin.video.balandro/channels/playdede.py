@@ -123,10 +123,16 @@ class login_dialog(xbmcgui.WindowDialog):
 
 
 def do_make_login_logout(url, post=None, headers=None):
+    hay_proxies = False
+    if config.get_setting('channel_playdede_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
     else:
-        data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -138,7 +144,10 @@ def do_make_login_logout(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
                 else:
-                    data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
         except:
             pass
 
@@ -324,7 +333,10 @@ def do_downloadpage(url, post=None, headers=None, referer=None):
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
+        if config.get_setting('channel_playdede_proxies', default=''):
+            data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
 
     if "data-showform='login'" in data:
         if not config.get_setting('playdede_login', 'playdede', default=False):
@@ -427,7 +439,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, _type = 'movies', nro_pagina = 1, search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, _type = 'movies', nro_pagina = 1, search_type = 'movie', text_color='slateblue' ))
 
         itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'peliculas?orderBy=item_date', slug = 'peliculas',
                                     nro_pagina = 1, order = '?orderBy=item_date', search_type = 'movie' ))
@@ -1172,7 +1184,9 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = int(tempo)
@@ -1213,7 +1227,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('PlayDede', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -1455,7 +1470,7 @@ def list_search(item):
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
-        year = scrapertools.find_single_match(match, '<p>, (\d+)</p>')
+        year = scrapertools.find_single_match(match, '<p>.*?, (\d+)</p>')
         if not year: year = '-'
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'

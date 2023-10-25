@@ -38,6 +38,8 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host  + 'most-popular/' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host  + 'top-rated/' ))
 
+    itemlist.append(item.clone( title = 'Long Play', action = 'list_all', url = host  + 'search/?sort_by=duration&from_videos=1' ))
+
     itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host + 'channels/' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'categories/' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'models/' ))
@@ -132,7 +134,8 @@ def list_all(item):
         next_page = scrapertools.find_single_match(data, '<li class="page-current">.*?<li class="page">.*?data-parameters=".*?">(.*?)</a>')
 
         if next_page:
-            if 'search/' in item.url: next_page = host + 'search/' + item.tex + next_page + '/'
+            if 'search/?sort_by=duration' in item.url: next_page = host + 'search/?sort_by=duration&from_videos=1' + next_page + '/'
+            elif 'search/' in item.url: next_page = host + 'search/' + item.tex + next_page + '/'
             elif 'most-popular/' in item.url: next_page = host + 'most-popular/' + next_page + '/'
             elif 'top-rated/' in item.url: next_page = host + 'top-rated/' + next_page + '/'
             elif 'channels/' in item.url: next_page = host + 'channels/' + next_page + '/'

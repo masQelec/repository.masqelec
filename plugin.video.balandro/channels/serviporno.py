@@ -56,7 +56,7 @@ def canales(item):
     for thumb, url, title in matches:
          url = host[:-1] + url
 
-         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, text_color = 'orange' ))
+         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'orange' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)" class="btn-pagination">Siguiente')
@@ -83,7 +83,7 @@ def categorias(item):
     for thumb, url, title in matches:
          url = host[:-1] + url
 
-         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, text_color='tan' ))
+         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='tan' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -108,7 +108,7 @@ def pornstars(item):
 
          titulo = '[COLOR moccasin]%s[/COLOR] (%s)' % (title, videos)
 
-         itemlist.append(item.clone (action='list_all', title=titulo, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title ))
+         itemlist.append(item.clone (action='list_all', title=titulo, url=url, thumbnail=thumb, text_color = 'moccasin' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)" class="btn-pagination">Siguiente')
@@ -163,6 +163,15 @@ def findvideos(item):
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
     url = scrapertools.find_single_match(data, "sendCdnInfo.'([^']+)")
+
+    if not url:
+        url = scrapertools.find_single_match(data, '<meta itemprop="embedURL".*?content="(.*?)"')
+
+        if url:
+            data = do_downloadpage(url)
+
+            url = scrapertools.find_single_match(data, '<source src="(.*?)"')
+
     url = url.replace("&amp;", "&")
 
     if url:
