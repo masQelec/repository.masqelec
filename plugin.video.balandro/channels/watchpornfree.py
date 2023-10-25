@@ -166,16 +166,7 @@ def findvideos(item):
 
         other = ''
 
-        if servidor == 'various':
-            if 'tubeload' in url: other = 'Tubeload'
-            elif 'youdbox' in url or 'yodbox' in url or 'youdboox' in url: other = 'Yodbox'
-            elif 'mvidoo' in url: other = 'Mvidoo'
-
-            elif 'streamhub' in url: other = 'Streamhub'
-            elif 'filemoon' in url: other = 'Filemoon'
-            elif 'lulustream' in url or 'luluvdo' in url: other = 'Lulustream'
-            elif 'turboviplay' in url or 'emturbovid' in url: other = 'Turboviplay'
-            elif 'vidguard' in url or 'vgfplay' in url or 'vgembed' in url or 'v6embed' in url: other = 'Vidguard'
+        if servidor == 'various': other = servertools.corregir_other(url)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
 
@@ -194,18 +185,25 @@ def findvideos(item):
             elif '/ddownload.' in url: continue
             elif '/hexupload.' in url: continue
             elif '/nitroflare.' in url: continue
+            elif '/katfile.' in url: continue
+            elif '/fikper.' in url: continue
+            elif '/turbobit.' in url: continue
+            elif '/hitfile.' in url: continue
 
-            servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
+            if '/drivevideo.' in url:
+                if 'link=' in url: url = scrapertools.find_single_match(url, '.*?link=(.*?)$')
 
-            other = 'D'
+            if url:
+                url = url.replace('//filemoon.sx/download/', '//filemoon.sx/d/')
 
-            if servidor == 'various':
-                if 'tubeload' in url: other = other + ' Tubeload'
-                elif 'youdbox' in url or 'yodbox' in url or 'youdboox' in url: other = other + ' Yodbox'
-                elif 'mvidoo' in url: other = other + ' Mvidoo'
+                servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
+                other = 'D'
+
+                if servidor == 'various': other = servertools.corregir_other(url)
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
 
 
     if not itemlist:
@@ -229,17 +227,10 @@ def play(item):
 
         url = scrapertools.find_single_match(data, '<source src="(.*?)"')
 
-        if url:
-            servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
+        if not url: return itemlist
 
-    else:
-       if '/drivevideo.' in url:
-           if '?link=' in url:
-               url = scrapertools.find_single_match(url, '.*?link=(.*?)$')
-
-               servidor = servertools.get_server_from_url(url)
-               servidor = servertools.corregir_servidor(servidor)
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
 
     itemlist.append(item.clone(server = servidor, url = url))
 

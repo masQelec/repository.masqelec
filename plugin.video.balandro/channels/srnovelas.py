@@ -74,10 +74,16 @@ def do_downloadpage(url, post=None, headers=None):
 
     if not headers: headers = {'Referer': host}
 
+    hay_proxies = False
+    if config.get_setting('channel_srnovelas_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
-        data = httptools.downloadpage_proxy('srnovelas', url, post=post, headers=headers).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('srnovelas', url, post=post, headers=headers).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -89,7 +95,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers).data
                 else:
-                    data = httptools.downloadpage_proxy('srnovelas', url, post=post, headers=headers).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('srnovelas', url, post=post, headers=headers).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers).data
         except:
             pass
 
@@ -148,6 +157,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'olive' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host, group = 'onair', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Programas de TV', action = 'list_all', url = host + 'programas-tv/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'tvshow' ))
 
@@ -318,7 +329,9 @@ def temporadas(item):
     seasons = scrapertools.find_multiple_matches(data, '<span class="su-spoiler-icon">.*?Temporada(.*?)</div>')
 
     if not seasons:
-        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
+        if config.get_setting('channels_seasons', default=True):
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
+
         item.page = 0
         item.contentType = 'season'
         item.contentSeason = 1
@@ -331,7 +344,9 @@ def temporadas(item):
         title = 'Temporada ' + title.strip()
 
         if len(seasons) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
@@ -370,7 +385,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('SrNovelas', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -451,9 +467,7 @@ def findvideos(item):
 
         other = ''
 
-        if servidor == 'various':
-            if 'filemoon' in url: other = 'filemoon'
-            elif 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url: other = 'streamwish'
+        if servidor == 'various': other = servertools.corregir_other(url)
 
         elif not servidor == 'directo': other = ''
 
@@ -481,7 +495,6 @@ def play(item):
         itemlist.append(item.clone( url = url, server = servidor ))
 
         httptools.save_cookie('w3tc_referrer', host, 'srnovelas.com')
-
         return itemlist
 
     CUSTOM_HEADERS = {}
@@ -490,7 +503,7 @@ def play(item):
 
     httptools.save_cookie('w3tc_referrer', item.ref_serie, 'srnovelas.com')
 
-    data = httptools.downloadpage(item.url, headers=CUSTOM_HEADERS).data
+    data = do_downloadpage(item.url, headers=CUSTOM_HEADERS)
 
     olid = scrapertools.find_single_match(data, "var OLID = '(.*?)'")
 
@@ -502,6 +515,14 @@ def play(item):
            new_url = new_url + olid
 
            referer = item.url.replace('/?or=', '/?od=')
+
+           if not new_url.startswith(host):
+               resp = httptools.downloadpage(new_url, headers={'Referer': referer}, follow_redirects=False, only_headers=True)
+           else:
+               if config.get_setting('channel_srnovelas_proxies', default=''):
+                   resp = httptools.downloadpage_proxy('srnovelas', new_url, headers={'Referer': referer}, follow_redirects=False, only_headers=True)
+               else:
+                   resp = httptools.downloadpage(new_url, headers={'Referer': referer}, follow_redirects=False, only_headers=True)
 
            resp = httptools.downloadpage(new_url, headers={'Referer': referer}, follow_redirects=False, only_headers=True)
 
@@ -522,9 +543,10 @@ def play(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        url = servertools.normalize_url(servidor, url)
+        if not servidor == 'directo': 
+            url = servertools.normalize_url(servidor, url)
 
-        itemlist.append(item.clone( url = url, server = servidor ))
+            itemlist.append(item.clone( url = url, server = servidor ))
 
     httptools.save_cookie('w3tc_referrer', host, 'srnovelas.com')
 

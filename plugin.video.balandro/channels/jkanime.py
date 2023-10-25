@@ -46,18 +46,29 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    hay_proxies = False
+    if config.get_setting('channel_jkanime_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_jkanime_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
-            platformtools.dialog_notification('JKAnime', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-            data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers, timeout=timeout).data
+            if not '/buscar/' in url:
+                platformtools.dialog_notification('JKAnime', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -69,7 +80,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                   data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('jkanime', url, post=post, headers=headers, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -319,8 +333,9 @@ def episodios(item):
     try:
        paginas, capitulos = pages_episodes(data)
 
-       if paginas > 1:
-           platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR cyan]Cargando ' + str(paginas) + ' Páginas[/COLOR]')
+       if not config.get_setting('channels_charges', default=True):
+           if paginas > 1:
+               platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR cyan]Cargando ' + str(paginas) + ' Páginas[/COLOR]')
 
        for pag in range(1, paginas + 1):
            pag_nro = str(pag)
@@ -377,6 +392,8 @@ def findvideos(item):
            if "okru" in url: servidor = 'okru'
            if "mixdrop" in url: servidor = 'mixdrop'
 
+        if servidor == 'various': other = servertools.corregir_other(url)
+
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other = other ))
 
     return itemlist
@@ -391,7 +408,8 @@ def play(item):
     if "/um.php" in item.url or "/um2.php" in item.url:
         item.url = item.url.replace('/um2.php', '/um.php')
 
-        data = do_downloadpage(item.url)
+        headers = {"Referer": item.url}
+        data = do_downloadpage(item.url, headers = headers)
 
         url_play = scrapertools.find_single_match(data, "swarmId: \'([^\']+)\'")
 
@@ -405,7 +423,10 @@ def play(item):
             if not url_play.startswith(host):
                 url = httptools.downloadpage(url_play, follow_redirects=False, only_headers=True).headers.get("location", "")
             else:
-                url = httptools.downloadpage_proxy('jkanime', url_play, follow_redirects=False, only_headers=True).headers.get("location", "")
+                if config.get_setting('channel_jkanime_proxies', default=''):
+                    url = httptools.downloadpage_proxy('jkanime', url_play, follow_redirects=False, only_headers=True).headers.get("location", "")
+                else:
+                    url = httptools.downloadpage(url_play, follow_redirects=False, only_headers=True).headers.get("location", "")
 
             url_play = url
 

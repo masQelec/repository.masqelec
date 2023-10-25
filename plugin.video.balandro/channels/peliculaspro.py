@@ -59,19 +59,29 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_peliculaspro_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_peliculaspro_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
         if not data:
             if not '?s=' in url:
                 platformtools.dialog_notification('PeliculasPro', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -83,7 +93,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         except:
             pass
 
@@ -149,7 +162,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'peliculas', search_type = 'movie' ))
 
-    itemlist.append(item.clone ( title = 'Estrenos', action = 'list_all', url = host + 'category/estrenos', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = 'Estrenos', action = 'list_all', url = host + 'category/estrenos', search_type = 'movie', text_color='slateblue' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -259,7 +272,9 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(temporadas) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.dpost = dpost
             item.contentType = 'season'
@@ -295,7 +310,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('PeliculasPro', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts

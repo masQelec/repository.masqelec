@@ -68,7 +68,7 @@ def categorias(item):
         url = urlparse.urljoin(item.url, url)
         url = url + '?ajax=1&type=most-recent&page=1'
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, contentType = 'movie', text_color = 'orange' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'orange' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

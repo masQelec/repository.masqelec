@@ -3,14 +3,14 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Alions,  Awish,  Azipcdn,  Desiupload,  Dlions,  Dropload,  Dwish,  Embedgram,  Emturbovid,  Embedwish,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Hexupload,  Krakenfiles,  Lulustream,  Luluvdo,  Mlions,  Moonplayer,  Mvidoo,  Mwish,  Rutube,  Streamhub,  Streamvid,  Streamwish,  Strwish,  Tubeload,  Turboviplay,  Uploaddo,  Uploadever,  Vgfplay,  Vid-guard,  Videowood,  Vidguard,  V6embed,  Vgembed,  Vembed, Vudeo,  Wishembed,  Wishfast,  Yadi,  Yandex,  Yodbox,  Youdboox,  Youdbox)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Alions,  Awish,  Azipcdn,  Desiupload,  Dlions,  Doodporn,  Dropload,  Dwish,  Embedgram,  Emturbovid,  Embedwish,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Fviplions,  Hexupload,  Krakenfiles,  Lulustream,  Luluvdo,  Mlions,  Moonplayer,  Mvidoo,  Mwish,  Rutube,  Sfastwish,  Streamhub,  Streamvid,  Streamwish,  Strwish,  Tubeload,  Turboviplay,  Uploaddo,  Uploadever,  Vgfplay,  Vid-guard,  Vidello,  Videowood,  Vidguard,  Vidspeed,  V6embed,  Vgembed,  Vembed, Vudeo,  Wishembed,  Wishfast,  Yadi,  Yandex,  Yodbox,  Youdboox,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
     "patterns": [
       {
         "pattern": "https://tubeload.co/(?:e/|f/)([0-9a-zA-Z]+)",
-        "url": "https://tubeload.co/f/\\2"
+        "url": "https://tubeload.co/f/\\1"
       },
       {
         "pattern": "https://mvidoo.com/(.*?)/([0-9a-zA-Z]+).mp4.html",
@@ -94,7 +94,7 @@
       },
       {
         "pattern": "https://streamhub.gg/watch/([0-9a-zA-Z]+)",
-        "url": "https://streamhub.to/e/\\2"
+        "url": "https://streamhub.to/e/\\1"
       },
       {
         "pattern": "(https://streamhub.gg/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
@@ -102,7 +102,7 @@
       },
       {
         "pattern": "https://streamhub.ink/watch/([0-9a-zA-Z]+)",
-        "url": "https://streamhub.to/e/\\2"
+        "url": "https://streamhub.to/e/\\1"
       },
       {
         "pattern": "(https://streamhub.ink/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
@@ -134,6 +134,10 @@
       },
       {
         "pattern": "https://streamwish.to/(?:e/|f/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://streamwish.to/([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
@@ -173,11 +177,23 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://sfastwish.com/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://doodporn.xyz/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://krakenfiles.com/(?:view/|embed-video/)([0-9a-zA-Z]+)",
         "url": "https://krakenfiles.com/embed-video/\\1"
       },
       {
         "pattern": "https://hexupload.net/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://hexupload.net/\\1"
+      },
+      {
+        "pattern": "https://hexupload.net/([0-9a-zA-Z]+)",
         "url": "https://hexupload.net/\\1"
       },
       {
@@ -206,6 +222,10 @@
       },
       {
         "pattern": "https://mlions.pro/(?:v/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://fviplions.com/(?:v/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://filelions.to/f/\\1"
       },
       {
@@ -335,6 +355,18 @@
       {
         "pattern": "https://file-upload.in/(?:embed-)([0-9a-zA-Z]+)",
         "url": "https://file-upload.in/\\1"
+      },
+      {
+        "pattern": "https://vidello.net/(?:embed-|)([a-z0-9]+.html)",
+        "url": "https://vidello.net/\\1"
+      },
+      {
+        "pattern": "https://www.vidspeeds.com/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://www.vidspeeds.com/\\1"
+      },
+      {
+        "pattern": "https://vidspeed.cc/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://vidspeed.cc/\\1"
       }
     ]
   }

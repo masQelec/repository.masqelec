@@ -11,7 +11,7 @@ def get_video_url(page_url, url_referer=''):
     data = httptools.downloadpage(page_url).data
 
     if "Not Found" in data or "File was deleted" in data or "is no longer available" in data:
-        return 'El archivo no existe o ha sido borrado'
+        return 'Archivo inexistente ó eliminado'
 
     match = scrapertools.find_multiple_matches(data, 'download-url.*?href="([^"]+)"')
     for url in match:

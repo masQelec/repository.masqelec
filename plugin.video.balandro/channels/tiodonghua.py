@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import base64
+import re, base64
 
 
 from platformcode import config, logger, platformtools
@@ -29,11 +29,9 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
-
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
+
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'anime/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host, group = 'last_epis', search_type = 'tvshow', text_color = 'olive' ))
 
@@ -78,6 +76,7 @@ def list_all(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     if item.group == 'last_epis':
         if '>Hot Series Update<' in data: bloque = scrapertools.find_single_match(data, '>Hot Series Update<(.*?)>Recommendation<')
@@ -94,7 +93,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        title = title.replace('&#8211;', '').replace('&#8217;', '').strip()
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').strip()
 
         SerieName = title
 
@@ -131,7 +130,7 @@ def list_all(item):
 
             titulo = str(season) + 'x' + str(epis) + ' ' + title
 
-            SerieName = SerieName.replace(episode, '').strip() #.replace(' ' + str(epis), '').strip()
+            SerieName = SerieName.replace(episode, '').strip()
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, infoLabels={'year': '-'},
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis))
@@ -143,10 +142,15 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data,'class="page-numbers current".*?href="(.*?)"')
+        if 'Previous' in data:
+            next_page = scrapertools.find_single_match(data,'<div class="hpage">.*?</a>.*?href="(.*?)"')
+        else:
+            next_page = scrapertools.find_single_match(data,'<div class="hpage">.*?href="(.*?)"')
 
         if next_page:
-            if '/page/' in next_page:
+            if '?page=' in next_page:
+                next_page = host + 'anime/' + next_page
+
                 itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
     return itemlist
@@ -171,7 +175,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('TioDonghua', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -265,7 +270,10 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = 'D' ))
+        other = 'D'
+        if servidor == 'various': other = servertools.corregir_other(url) + ' D'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = other ))
 
     if not itemlist:
         if not ses == 0:

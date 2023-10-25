@@ -163,8 +163,7 @@ def findvideos(item):
         url = servertools.normalize_url(servidor, url)
 
         other = ''
-        if servidor == 'various':
-            if 'hexupload' in url: other = 'Hexupload'
+        if servidor == 'various': other = servertools.corregir_other(url)
 
         if url:
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vo', other = other ))

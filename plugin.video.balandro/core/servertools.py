@@ -403,7 +403,7 @@ def corregir_servidor(servidor):
     # ~ elif servidor in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza', 'vanfem', 'youtvgratis', 'oceanplay', 'gotovideo.kiev.ua', 'owodeuwu', 'sypl', 'fembed9hd', 'watchse', 'vcdn', 'femoload', 'cubeembed']: return 'fembed'
 
     elif servidor in ['evoplay']: return 'evoload'
-    elif servidor in ['streamta.pe', 'strtapeadblock', 'strtapeadblocker', 'streamtapeadblock', 'streamadblockplus', 'adblockstrtech', 'adblockstrtape', 'adblockstreamtape', 'adblockeronstape', 'playstp', 'strcloud', 'strtpe', 'stape', 'strtape', 'scloud', 'shavetape', 'stapewithadblock', 'streamtapeadblockuser', 'stapadblockuser', 'adblocktape', 'streamta.site', 'streamadblocker', 'stp']: return 'streamtape'
+    elif servidor in ['streamta.pe', 'strtapeadblock', 'strtapeadblocker', 'streamtapeadblock', 'streamadblockplus', 'adblockstrtech', 'adblockstrtape', 'adblockstreamtape', 'adblockeronstape', 'playstp', 'strcloud', 'strtpe', 'stape', 'strtape', 'scloud', 'shavetape', 'stapewithadblock', 'streamtapeadblockuser', 'stapadblockuser', 'adblocktape', 'streamta.site', 'streamadblocker', 'stp', 'tapewithadblock.org', 'adblocktape.wiki', 'antiadtape.com', 'tapeblocker.com', 'streamnoads.com']: return 'streamtape'
 
     # ~ elif servidor in ['sbembed', 'sbembed1', 'sbembed2', 'sbvideo', 'japopav']: return 'sbembed'
 
@@ -418,7 +418,7 @@ def corregir_servidor(servidor):
     elif servidor in ['vupload']: return 'vup'
     elif servidor in ['hdvid', 'vidhdthe']: return 'vidhd'
     elif servidor in ['vtube', 'vidhdthe', 'vtplay', 'vtbe']: return 'playtube'
-    elif servidor in ['voesx', 'voe-', 'voeun', '-voe', 'reputationsheriffkennethsand', 'fittingcentermondaysunday.com', 'tinycat-voe-fashion.com', 'scatch176duplicities.com', 'voex']: return 'voe'
+    elif servidor in ['voesx', 'voe-', 'voeun', '-voe', 'reputationsheriffkennethsand', 'fittingcentermondaysunday.com', 'tinycat-voe-fashion.com', 'scatch176duplicities.com', 'voex', 'yodelswartlike', 'nectareousoverelate', 'apinchcaseation', 'strawberriesporail', 'crownmakermacaronicism', 'cigarlessarefy', 'generatesnitrosate', 'figeterpiazine', 'timberwoodanotia', 'tubelessceliolymph', 'wolfdyslectic', 'metagnathtuggers', 'chromotypic', 'gamoneinterrupted', 'rationalityaloelike', 'valeronevijao']: return 'voe'
 
     elif servidor in ['dai.ly']: return 'dailymotion'
     elif servidor in ['ploud', 'midov']: return 'peertube'
@@ -450,7 +450,7 @@ def corregir_servidor(servidor):
     elif servidor == 'uptostream': return 'uptobox'
     elif servidor == ['pixel']: return 'pixeldrain'
 
-    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast']: return 'various'
+    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions']: return 'various'
 
     else: return servidor
 
@@ -478,11 +478,11 @@ def corregir_other(srv):
     elif 'moonplayer' in srv: srv = 'Moonplayer'
     elif 'yadi' in srv: srv = 'Yandex'
 
-    elif 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv or 'wishfast' in srv: srv = 'Streamwish'
+    elif 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv or 'wishfast' in srv or 'doodporn' in srv or 'sfastwish' in srv: srv = 'Streamwish'
 
     elif 'desiupload' in srv: srv = 'Desiupload'
 
-    elif 'filelions' in srv or 'azipcdn' in srv or 'alions' in srv or 'dlions' in srv or 'mlions' in srv or 'lion' in srv: srv = 'Filelions'
+    elif 'filelions' in srv or 'azipcdn' in srv or 'alions' in srv or 'dlions' in srv or 'mlions' in srv or 'lion' in srv or 'fviplions' in srv: srv = 'Filelions'
 
     elif 'youdbox' in srv or 'yodbox' in srv or 'youdboox' in srv: srv = 'Youdbox'
 
@@ -495,6 +495,10 @@ def corregir_other(srv):
     elif 'turboviplay' in srv or 'emturbovid' in srv: srv = 'Turboviplay'
 
     elif 'file-upload' in srv: srv = 'Fileupload'
+
+    elif 'vidello' in srv: srv = 'Vidello'
+
+    elif 'vidspeed' in srv or 'vidspeeds' in srv: srv = 'Vidspeed'
 
     return srv
 

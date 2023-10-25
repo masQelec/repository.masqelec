@@ -46,19 +46,29 @@ def do_downloadpage(url, post=None, headers=None):
     if url.startswith(host):
         if not headers: headers = {'Referer': host}
 
+    hay_proxies = False
+    if config.get_setting('channel_pepecinetop_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_pepecinetop_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('pepecinetop', url, post=post, headers=headers, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('pepecinetop', url, post=post, headers=headers, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
             if not '?s=' in url:
                 platformtools.dialog_notification('PepeCineTop', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('pepecinetop', url, post=post, headers=headers, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('pepecinetop', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -70,19 +80,21 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('pepecinetop', url, post=post, headers=headers, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('pepecinetop', url, post=post, headers=headers, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
-    if '<title>Just a moment...</title>' in data:
-        if not '?s=' in url:
+    if not '?s=' in url:
+        if '<title>Just a moment...</title>' in data:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
-        return ''
+            return ''
 
-    elif '<title>One moment, please...</title>' in data:
-        if not '?s=' in url:
+        elif '<title>One moment, please...</title>' in data:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection [COLOR plum]Level 2[/B][/COLOR]')
-        return ''
+            return ''
 
     return data
 
@@ -127,7 +139,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone ( title = 'Estrenos', action = 'list_all', url = host + 'ver/genero/estrenos/', search_type = 'movie' ))
+    itemlist.append(item.clone ( title = 'Estrenos', action = 'list_all', url = host + 'ver/genero/estrenos/', search_type = 'movie', text_color='slateblue' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -144,7 +156,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-pepecine/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'ver/genero/estrenos/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'ver/genero/estrenos/', search_type = 'tvshow', text_color='olive' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -258,7 +270,9 @@ def temporadas(item):
         title = 'Temporada ' + season
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = season
@@ -295,7 +309,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('PepeCineTop', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts

@@ -10,6 +10,17 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://pelisforte.nu/'
 
 
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://pelisforte.co/']
+
+domain = config.get_setting('dominio', 'pelisforte', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'pelisforte')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'pelisforte')
+    else: host = domain
+
+
 def item_configurar_proxies(item):
     color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
 
@@ -44,17 +55,21 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://pelisforte.co/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
+
+    hay_proxies = False
+    if config.get_setting('channel_pelisforte_proxies', default=''): hay_proxies = True
 
     if '/release/' in url: raise_weberror = False
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     else:
-        data = httptools.downloadpage_proxy('pelisforte', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('pelisforte', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -66,7 +81,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
                 else:
-                    data = httptools.downloadpage_proxy('pelisforte', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('pelisforte', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    else:
+                       data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -82,8 +100,22 @@ def acciones(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+    domain_memo = config.get_setting('dominio', 'pelisforte', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_pelisforte', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='pelisforte', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_pelisforte', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
 
@@ -103,7 +135,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
-    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ultimas-peliculas/', search_type = 'movie' ))
 
@@ -243,7 +275,8 @@ def findvideos(item):
             if srv == 'ok': other = 'ok'
 
             if servidor == 'directo': other = srv
-            elif servidor == 'various': other = srv
+
+            elif servidor == 'various': other = servertools.corregir_other(srv)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang , other = other.capitalize()))
 
@@ -272,7 +305,10 @@ def play(item):
             if not new_url.startswith(host):
                 resp = httptools.downloadpage(new_url, headers={'Referer': host}, follow_redirects=False, only_headers=True)
             else:
-                resp = httptools.downloadpage_proxy('pelisforte', new_url, headers={'Referer': host}, follow_redirects=False, only_headers=True)
+                if config.get_setting('channel_pelisforte_proxies', default=''):
+                    resp = httptools.downloadpage_proxy('pelisforte', new_url, headers={'Referer': host}, follow_redirects=False, only_headers=True)
+                else:
+                    resp = httptools.downloadpage(new_url, headers={'Referer': host}, follow_redirects=False, only_headers=True)
 
             if 'location' in resp.headers: url = resp.headers['location']
             else: url = ''

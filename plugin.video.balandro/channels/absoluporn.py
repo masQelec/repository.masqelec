@@ -61,7 +61,7 @@ def categorias(item):
 
         url = host + url
 
-        itemlist.append(item.clone (action='list_all', title=titulo, url=url, contentType = 'movie', text_color = 'tan' ))
+        itemlist.append(item.clone (action='list_all', title=titulo, url=url, text_color = 'tan' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

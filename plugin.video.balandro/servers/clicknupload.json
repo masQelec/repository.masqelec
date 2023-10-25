@@ -10,7 +10,7 @@
     "patterns": [
       {
         "pattern": "https://clicknupload.(?:org|com|me|co|cc|to|link|club|red|click|download)/([A-z0-9]+)",
-        "url": "https://clicknupload.cc/\\1"
+        "url": "https://clicknupload.org/\\1"
       }
     ]
   }

@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 3.1.01[/COLOR] [COLOR chartreuse] 26 de Septiembre de 2023[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 3.1.02[/COLOR] [COLOR chartreuse] 24 de Octubre de 2023[/B][/COLOR]
 
    [COLOR yellow]CONTACTO:[/COLOR]
       Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
@@ -19,34 +19,29 @@
    [COLOR yellow]ADD-ONS EXTERNOS:[/COLOR]
       [B][COLOR mediumaquamarine]Motores Torrents Soportados:[/COLOR][/B]
          plugin.video.elementum [COLOR greenyellow][I] Recomendado[/I][/COLOR]
-         plugin.video.pulsar
-         plugin.video.quasar
-         plugin.video.stream
          plugin.video.torrenter
          plugin.video.torrentin
          plugin.video.torrest
-         plugin.video.xbmctorrent
 
       [B][COLOR indianred]Otros Add-ons que pueden necesitarse:[/COLOR][/B]
          plugin.video.youtube
          script.module.resolveurl
 
-   [COLOR yellow]INCIDENCIAS CORREGIDAS:[/COLOR]
-      Bugs de la version anterior
-
    [COLOR yellow]MODIFICACIONES:[/COLOR]
-      Generos: Re-configurados
-      Canales: Revision generalizada y Anulados las webs cerradas
-      Servidores: Revision generalizada y Anulados las webs cerradas
+      [COLOR moccasin][B]Correcciones:[/B][/COLOR]
+         Bugs de la version anterior
+         Generos: Re-configurados
+         Canales: Revision generalizada y Anulados las webs cerradas
+         Servidores: Revision generalizada y Anulados las webs cerradas
 
-   [COLOR yellow]NOVEDADES:[/COLOR]
-      Canales: Sin novedades
-      Servidores: Sin novedades
+      [COLOR moccasin][B]Novedades:[/B][/COLOR]
+         Canales: Sin novedades
+         Servidores: Sin novedades
 
    [COLOR yellow]CANALES QUE REQUIEREN REGISTRARSE (Cuenta):[/COLOR]
       HdFull,  NextDede,  PlayDede
 
-   [COLOR yellow]CANALES CON POSIBLES INCOMPATIBLES:[/COLOR]
+   [COLOR yellow]CANALES QUE PUEDEN SER INCOMPATIBLES:[/COLOR]
       [COLOR slateblue][B]Con Media Centers anteriores a 19.x, podrian NO resultar operativos[/B][/COLOR]
       SeriesPapayaXyz
 
@@ -57,11 +52,11 @@
 
    [COLOR yellow]CANALES INESTABLES:[/COLOR]
       [COLOR slateblue][B]Son los pendientes de su evolucion, para evaluar su Situacion Definitiva[/B][/COLOR]
-      MiraPeliculas,  PepeCineTop
+      HenaOjara
 
    [COLOR yellow]CANALES TEMPORALMENTE DES-ACTIVADOS:[/COLOR]
       [COLOR slateblue][B]Son los pendientes de su situacion, para evaluar su Re-activacion o Anulacion[/B][/COLOR]
-      DocumaniaTv,  PelisySeries
+      DocumaniaTv,  PelisHouse,  PelisplusLat
 
    [COLOR yellow]SERVIDORES CON VIAS ALTERNATIVAS:[/COLOR]
       Clicknupload,  Doodstream,  MegaUp,  Playtube,
@@ -72,57 +67,10 @@
       Filelions,  Filemoon,  Fileupload,  Hexupload,
       Krakenfiles,  Lulustream,  Moonplayer,  Mvidoo,
       Rutube,  Streamhub,  Streamvid,  Streamwish,
-      Tubeload,  Uploadever,  Uploaddo,  Videowood,
-      Vidguard,  Vudeo,  Yandex,  Youdbox
+      Tubeload,  Uploadever,  Uploaddo,  Vidello,
+      Videowood,  Vidguard,  Vidspeed,  Vudeo,
+      Yandex,  Youdbox
 
    [COLOR yellow]VIAS ALTERNATIVAS/ADICIONALES QUE PUEDEN NECESITARSE:[/COLOR]
       plugin.video.youtube
       script.module.resolveurl
-
-   [COLOR yellow]RESUMEN TOTALES DE CANALES:[/COLOR]
-       280 [COLOR darkorange]Canales[/COLOR]
-
-       125 [COLOR coral]Inactivos[/COLOR]
-           2 [COLOR cyan]Temporalmente Inactivos[/COLOR]
-
-           1 [COLOR violet]Con probable Incompatibilidad[/COLOR]
-           2 [COLOR plum]Inestables[/COLOR]
-           5 [COLOR darkgoldenrod]Problematicos[/COLOR]
-
-         27 [COLOR olivedrab]CloudFlare Protection[/COLOR]
-         64 [COLOR red]Pueden Usar Proxies[/COLOR]
-
-           3 [COLOR teal]Requieren Cuenta[/COLOR]
-           1 [COLOR green]Con varios Dominios[/COLOR]
-         54 [COLOR goldenrod]Con gestion ultimo dominio Vigente[/COLOR]
-
-         46 [COLOR fuchsia]No Intervendran en busquedas[/COLOR]
-
-       153 [COLOR gold]Disponibles[/COLOR]
-
-   [COLOR yellow]DISTRIBUCION CANALES DISPONIBLES:[/COLOR]
-         25 de [COLOR moccasin]Sugeridos[/COLOR]
-
-         89 de [COLOR deepskyblue]Peliculas[/COLOR]
-         76 de [COLOR hotpink]Series[/COLOR]
-         64 de [COLOR yellow]Peliculas y Series[/COLOR]
-
-         40 de [COLOR thistle]Generos[/COLOR]
-           6 de [COLOR cyan]Documentales[/COLOR]
-           8 de [COLOR lightyellow]Infantiles[/COLOR]
-         10 de [COLOR limegreen]Novelas[/COLOR]
-         41 de [COLOR blue]Torrents[/COLOR]
-           6 de [COLOR firebrick]Doramas[/COLOR]
-         15 de [COLOR springgreen]Animes[/COLOR]
-         21 de [COLOR orange]Adultos[/COLOR]
-           1 de [COLOR grey]Privados[/COLOR]
-
-   [COLOR yellow]RESUMEN TOTALES SERVIDORES:[/COLOR]
-       160 [COLOR darkorange]Servidores[/COLOR]
-
-         57 [COLOR coral]Inactivos[/COLOR]
-         19 [COLOR fuchsia]Sin Soporte[/COLOR]
-           9 [COLOR green]Con Vias alternativas[/COLOR]
-         24 [COLOR powderblue]Con Vias adicionales[/COLOR]
-
-       103 [COLOR gold]Disponibles[/COLOR]

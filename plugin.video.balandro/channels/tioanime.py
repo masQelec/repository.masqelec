@@ -158,7 +158,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('TioAnime', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -265,8 +266,7 @@ def findvideos(item):
             if servidor == 'directo': other = link_other
             else: link_other = ''
 
-            if servidor == 'various':
-               if 'vidguard' in url or 'vgfplay' in url or 'vgembed' in url or 'v6embed' in url: link_other = 'Vidguard'
+            if servidor == 'various': link_other = servertools.corregir_other(url)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = link_other ))
 

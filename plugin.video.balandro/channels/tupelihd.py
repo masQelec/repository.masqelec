@@ -65,10 +65,16 @@ def do_downloadpage(url, post=None, headers=None):
     raise_weberror = True
     if '/peliculas/estrenos-' in url: raise_weberror = False
 
+    hay_proxies = False
+    if config.get_setting('channel_tupelihd_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     else:
-        data = httptools.downloadpage_proxy('tupelihd', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('tupelihd', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -125,7 +131,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'torrents-peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'estrenos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'estrenos', search_type = 'movie', text_color='slateblue' ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
@@ -147,7 +153,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'torrents-series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'estrenos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'estrenos', search_type = 'tvshow', text_color='olive' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -315,7 +321,9 @@ def temporadas(item):
         title = 'Temporada ' + numtempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = numtempo
@@ -355,7 +363,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('TuPeliHd', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -553,7 +562,10 @@ def play(item):
         if not item.url.startswith(host):
             url = httptools.downloadpage(item.url, only_headers = True, follow_redirects = False).headers.get('location')
         else:
-            url = httptools.downloadpage_proxy('tupelihd', item.url, only_headers = True, follow_redirects = False).headers.get('location')
+            if config.get_setting('channel_tupelihd_proxies', default=''):
+                url = httptools.downloadpage_proxy('tupelihd', item.url, only_headers = True, follow_redirects = False).headers.get('location')
+            else:
+                url = httptools.downloadpage(item.url, only_headers = True, follow_redirects = False).headers.get('location')
 
         if url:
             if url.endswith('.torrent'):

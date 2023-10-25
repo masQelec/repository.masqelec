@@ -54,7 +54,7 @@ def get_video_url(page_url, url_referer=''):
     data = httptools.downloadpage(page_url, headers={"Referer": host}).data
 
     if '<title>Video not found' in data:
-        return "El archivo no existe o ha sido borrado"
+        return "Archivo inexistente ó eliminado"
 
     if '<title>Access denied' in data or '<title>Attention Required! | Cloudflare</title>' in data:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
@@ -73,6 +73,17 @@ def get_video_url(page_url, url_referer=''):
             except:
                 import traceback
                 logger.error(traceback.format_exc())
+
+                if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
+                    if 'File Not Found or Removed' in traceback.format_exc():
+                        return 'Archivo inexistente ó eliminado'
+                    elif 'The requested video was not found' in traceback.format_exc():
+                        return 'Archivo inexistente ó eliminado'
+                    elif 'No se ha encontrado ningún link al vídeo' in traceback.format_exc():
+                        return 'Fichero sin link al vídeo'
+                    elif 'Unable to locate link':
+                        return 'Fichero sin link al vídeo'
+
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 
         else:
@@ -108,7 +119,19 @@ def get_video_url(page_url, url_referer=''):
                 except:
                    import traceback
                    logger.error(traceback.format_exc())
+
+                   if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
+                       if 'File Not Found or Removed' in traceback.format_exc():
+                           return 'Archivo inexistente ó eliminado'
+                       elif 'The requested video was not found' in traceback.format_exc():
+                           return 'Archivo inexistente ó eliminado'
+                       elif 'No se ha encontrado ningún link al vídeo' in traceback.format_exc():
+                           return 'Fichero sin link al vídeo'
+                       elif 'Unable to locate link':
+                           return 'Fichero sin link al vídeo'
+
                    platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
             else:
                return 'Acceso Denegado (2do.)' # ~ Cloudflare recaptcha
 
@@ -138,7 +161,19 @@ def get_video_url(page_url, url_referer=''):
             except:
                import traceback
                logger.error(traceback.format_exc())
+
+               if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
+                   if 'File Not Found or Removed' in traceback.format_exc():
+                       return 'Archivo inexistente ó eliminado'
+                   elif 'The requested video was not found' in traceback.format_exc():
+                       return 'Archivo inexistente ó eliminado'
+                   elif 'No se ha encontrado ningún link al vídeo' in traceback.format_exc():
+                       return 'Fichero sin link al vídeo'
+                   elif 'Unable to locate link':
+                       return 'Fichero sin link al vídeo'
+
                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
         else:
            return 'Acceso Denegado (3ro.)' # ~ Cloudflare recaptcha
 

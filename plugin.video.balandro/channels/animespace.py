@@ -43,7 +43,9 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'emision', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por categorías', action = 'categorias', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'categoria/pelicula', search_type = 'movie', text_color = 'deepskyblue' ))
+
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -52,14 +54,16 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'categoria/anime', search_type = 'tvshow', text_color='springgreen' ))
-    itemlist.append(item.clone( title = 'Caricaturas', action = 'list_all', url = host + 'categoria/caricaturas', search_type = 'tvshow', text_color='springgreen' ))
-    itemlist.append(item.clone( title = 'Cortos', action = 'list_all', url = host + 'categoria/corto', search_type = 'tvshow', text_color='springgreen' ))
-    itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'categoria/especial', search_type = 'tvshow', text_color='springgreen' ))
-    itemlist.append(item.clone( title = 'Live action', action = 'list_all', url = host + 'categoria/live-action', search_type = 'tvshow', text_color='springgreen' ))
-    itemlist.append(item.clone( title = 'Onas', action = 'list_all', url = host + 'categoria/ona', search_type = 'tvshow', text_color='springgreen' ))
-    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'categoria/ova', search_type = 'tvshow', text_color='springgreen' ))
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'categoria/pelicula', search_type = 'tvshow', text_color = 'deepskyblue' ))
+    text_color = 'springgreen'
+
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'categoria/anime', search_type = 'tvshow', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Caricaturas', action = 'list_all', url = host + 'categoria/caricaturas', search_type = 'tvshow', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Cortos', action = 'list_all', url = host + 'categoria/corto', search_type = 'tvshow', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'categoria/especial', search_type = 'tvshow', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Live action', action = 'list_all', url = host + 'categoria/live-action', search_type = 'tvshow', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Onas', action = 'list_all', url = host + 'categoria/ona', search_type = 'tvshow', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'categoria/ova', search_type = 'tvshow', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'categoria/pelicula', search_type = 'movie', text_color=text_color ))
 
     return itemlist
 
@@ -166,7 +170,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('AnimeSpace', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts

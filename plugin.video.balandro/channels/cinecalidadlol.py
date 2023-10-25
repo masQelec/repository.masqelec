@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://v5.cinecalidad.men/'
+host = 'https://www.cinecalidad.gg/'
 
 
 players = ['https://cinecalidad.', '.cinecalidad.']
@@ -34,7 +34,8 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://vww.cinecalidad.men/', 'https://wwv.cinecalidad.men/', 'https://wvw.cinecalidad.men/',
              'https://ww.cinecalidad.men/', 'https://vw.cinecalidad.men/', 'https://wv.cinecalidad.men/',
              'https://vv.cinecalidad.men/', 'https://v.cinecalidad.men/', 'https://v1.cinecalidad.men/',
-             'https://v2.cinecalidad.men/', 'https://v3.cinecalidad.men/', 'https://v4.cinecalidad.men/']
+             'https://v2.cinecalidad.men/', 'https://v3.cinecalidad.men/', 'https://v4.cinecalidad.men/',
+             'https://v5.cinecalidad.men/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -85,10 +86,16 @@ def do_downloadpage(url, post=None, headers=None):
     raise_weberror = True
     if '/fecha-de-lanzamiento/' in url: raise_weberror = False
 
+    hay_proxies = False
+    if config.get_setting('channel_cinecalidadlol_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     else:
-        data = httptools.downloadpage_proxy('cinecalidadlol', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('cinecalidadlol', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -100,7 +107,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
                 else:
-                    data = httptools.downloadpage_proxy('cinecalidadlol', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('cinecalidadlol', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -397,7 +407,9 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
@@ -433,7 +445,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts

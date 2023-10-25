@@ -15,7 +15,7 @@ def mainlist(item):
 
     item.category = 'TMDB'
 
-    itemlist.append(item.clone( action='show_help', title='[B]Información TMDB[/B]', folder=False, thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información[/B][/COLOR] TMDB', folder=False, thumbnail=config.get_thumb('help') ))
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen' ))
 

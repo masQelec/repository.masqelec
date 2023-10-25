@@ -106,8 +106,8 @@ def list_all(item):
 
             title = title.replace('Episode', '[COLOR goldenrod]Episode[/COLOR]')
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, 
-                                        contentType = 'episode', contentSerieName = SerieName, contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, infoLabels={'year': '-'}, 
+                                        contentType = 'episode', contentSerieName = SerieName, contentSeason = season, contentEpisodeNumber = epis ))
 
     tmdb.set_infoLabels(itemlist)
 

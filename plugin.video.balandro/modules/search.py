@@ -39,7 +39,7 @@ def mainlist(item):
 
     item.category = 'Buscar'
 
-    itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información búsquedas[/B][/COLOR]', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información[/B][/COLOR] Búsquedas', thumbnail=config.get_thumb('help') ))
 
     if config.get_setting('search_extra_main', default=False):
         itemlist.append(item.clone( action='', title= '[B]Búsquedas por Título en TMDB:[/B]', folder=False, text_color='violet', thumbnail=thumb_tmdb ))
@@ -103,10 +103,10 @@ def mainlist(item):
     if config.get_setting('search_extra_proxies', default=True):
         itemlist.append(item.clone( action='', title= '[B]Búsquedas en canales con Proxies:[/B]', folder=False, text_color='red' ))
 
-        itemlist.append(item.clone( channel='helper', action='show_help_proxies', title= ' - [COLOR green][B]Información uso de proxies[/B][/COLOR]' ))
-        itemlist.append(item.clone( channel='helper', action='show_help_providers', title= ' - [COLOR green][B]Información Proveedores de proxies[/B][/COLOR]' ))
-        itemlist.append(item.clone( channel='helper', action='show_help_providers2', title= ' - [COLOR green][B]Información Lista[/B][/COLOR] [COLOR aqua][B]Ampliada[/B][/COLOR][COLOR green][B] Proveedores de proxies[/B][/COLOR]' ))
-        itemlist.append(item.clone( channel='helper', action='show_help_recommended', title= ' - Qué [COLOR green][B]Proveedores de proxies[/B][/COLOR] están [COLOR lime][B]Recomendados[/B][/COLOR]' ))
+        itemlist.append(item.clone( channel='helper', action='show_help_proxies', title= ' - [COLOR green][B]Información[/B][/COLOR] Uso de proxies' ))
+        itemlist.append(item.clone( channel='helper', action='show_help_providers', title= ' - [COLOR green][B]Información[/B][/COLOR] Proveedores de proxies' ))
+        itemlist.append(item.clone( channel='helper', action='show_help_providers2', title= ' - [COLOR green][B]Información[/B][/COLOR] Lista [COLOR aqua][B]Ampliada[/B][/COLOR] Proveedores de proxies' ))
+        itemlist.append(item.clone( channel='helper', action='show_help_recommended', title= ' - Qué [COLOR green][B]Proveedores[/B][/COLOR] de proxies están [COLOR lime][B]Recomendados[/B][/COLOR]' ))
 
         itemlist.append(item.clone( channel='filters', title=  ' - Qué canales pueden usar proxies', action='with_proxies',
                                     thumbnail=config.get_thumb('stack'), new_proxies=True ))
@@ -137,7 +137,7 @@ def mainlist(item):
         itemlist.append(item.clone( channel='filters', action='no_actives', title= ' - Qué canales no intervienen en las búsquedas están [COLOR gray][B]Desactivados[/B][/COLOR]',
                                     thumbnail=config.get_thumb('stack') ))
 
-        itemlist.append(item.clone( channel='filters', action='channels_status', title= ' - Personalizar canales [COLOR gray][B](Desactivar ó Re-activar)[/B][/COLOR]',
+        itemlist.append(item.clone( channel='filters', action='channels_status', title= ' - Personalizar [COLOR gold]Canales[/COLOR] (Desactivar ó Re-activar)',
                                     des_rea = True, thumbnail=config.get_thumb('stack') ))
 
         itemlist.append(item.clone( channel='filters', action='only_prefered', title= ' - Qué canales tiene marcados como [COLOR gold]Preferidos[/COLOR]',
@@ -904,7 +904,7 @@ def do_search(item, tecleado):
                     cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
                     if not config.get_setting(cfg_proxies_channel, default=''):
-                        tit = '[COLOR %s]Información proxies[/COLOR]' % color_infor
+                        tit = '[COLOR %s]Información Proxies[/COLOR]' % color_infor
                         context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
                     tit = '[COLOR %s][B]Configurar proxies a usar[/B][/COLOR]' % color_list_proxies

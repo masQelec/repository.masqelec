@@ -41,10 +41,16 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url):
+    hay_proxies = False
+    if config.get_setting('channel_estrenoscinesaa_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url).data
     else:
-        data = httptools.downloadpage_proxy('estrenoscinesaa', url).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('estrenoscinesaa', url).data
+        else:
+            data = httptools.downloadpage(url).data
 
     return data
 

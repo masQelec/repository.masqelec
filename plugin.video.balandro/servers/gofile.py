@@ -16,7 +16,7 @@ def get_video_url(page_url, url_referer=''):
     api_data = httptools.downloadpage('https://api.gofile.io/createAccount').data
 
     if not '"ok"' in str(api_data):
-        return 'El archivo ha sido eliminado o no existe'
+        return 'Archivo inexistente ó eliminado'
 
     token = scrapertools.find_single_match(str(api_data), '"token":"(.*?)"')
     if not token: return video_urls

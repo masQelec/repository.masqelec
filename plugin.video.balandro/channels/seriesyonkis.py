@@ -60,10 +60,16 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_seriesyonkis_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     else:
-        data = httptools.downloadpage_proxy('seriesyonkis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('seriesyonkis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data:
         try:
@@ -75,7 +81,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
                 else:
-                    data = httptools.downloadpage_proxy('seriesyonkis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('seriesyonkis', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -274,7 +283,9 @@ def temporadas(item):
         title = 'Temporada ' + numtempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = numtempo
@@ -314,7 +325,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('SeriesYonkis', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -536,7 +548,10 @@ def play(item):
             if not link.startswith(host):
                  url = httptools.downloadpage(link, post = post, follow_redirects=False).headers.get('location', '')
             else:
-                 url = httptools.downloadpage_proxy('seriesyonkis', link, post = post, follow_redirects=False).headers.get('location', '')
+                 if config.get_setting('channel_seriesyonkis_proxies', default=''):
+                     url = httptools.downloadpage_proxy('seriesyonkis', link, post = post, follow_redirects=False).headers.get('location', '')
+                 else:
+                     url = httptools.downloadpage(link, post = post, follow_redirects=False).headers.get('location', '')
 
         else:
             if servidor == 'directo':
@@ -557,7 +572,10 @@ def play(item):
                 if not link.startswith(host):
                     url = httptools.downloadpage(link, post = post, follow_redirects=False).headers.get('location', '')
                 else:
-                    url = httptools.downloadpage_proxy('seriesyonkis', link, post = post, follow_redirects=False).headers.get('location', '')
+                    if config.get_setting('channel_seriesyonkis_proxies', default=''):
+                        url = httptools.downloadpage_proxy('seriesyonkis', link, post = post, follow_redirects=False).headers.get('location', '')
+                    else:
+                        url = httptools.downloadpage(link, post = post, follow_redirects=False).headers.get('location', '')
 
     if url:
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:

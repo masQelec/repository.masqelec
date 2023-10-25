@@ -20,22 +20,24 @@ from modules import tester
 
 
 channels_currents = [
-        'animefenix', 'animeflv', 'animeonline',
-        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cinecalidadmx', 'cliversite', 'cuevana2', 'cuevana2esp', 'cuevana3video',
+        'animefenix', 'animeflv', 'animeid', 'animeonline',
+        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cliversite', 'cuevana2', 'cuevana2esp', 'cuevana3lw', 'cuevana3video',
         'divxtotal', 'dontorrents', 'dontorrentsin', 'doramedplay',
         'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelas', 'entrepeliculasyseries', 'estrenosdoramas',
         'gnula24', 'grantorrent', 'grantorrents',
         'hdfull', 'hdfullse', ' henaojara',
         'mejortorrentapp', 'mejortorrentnz', 'mitorrent', 'movidymobi',
         'peliculaspro', 
-        'pelishouse', 'pelismaraton', 'pelismart', 'pelispanda', 'pelispediaws', 'pelisplus', 'pelisplushd', 'pelisplushdlat', 'pelisplushdnz', 'pelispluslat',
+        'pelisforte', 'pelismaraton', 'pelismart', 'pelispanda', 'pelispediaws', 'pelisplus', 'pelisplushd', 'pelisplushdlat', 'pelisplushdnz', 'pelispluslat',
         'playdede',
         'poseidonhd2',
         'series24', 'seriesantiguas', 'serieskao', 'seriesmetro', 'seriesyonkis', 'srnovelas', 'subtorrents',
-        'todotorrents', 'torrentpelis', 'tupelihd'
+        'todotorrents', 'torrentpelis', 'tupelihd',
+        'yestorrent'
         ]
 
 dominioshdfull = [
+         'https://hd-full.one/',
          'https://hdfull.icu/',
          'https://hdfull.quest/',
          'https://hdfull.today/',
@@ -142,6 +144,52 @@ def test_domain_animeflv(item):
         tester.test_channel('AnimeFlv')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - AnimeFlv', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
+def manto_domain_animeid(item):
+    logger.info()
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando AnimeId[/B][/COLOR]' % color_exec)
+
+    channel_json = 'animeid.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_animeid(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('animeid')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('AnimeId')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - AnimeId', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_animeonline(item):
@@ -328,52 +376,6 @@ def test_domain_cinecalidadlol(item):
         platformtools.dialog_notification(config.__addon_name + ' - CineCalidadLol', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def manto_domain_cinecalidadmx(item):
-    logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando CineCalidadMx[/B][/COLOR]' % color_exec)
-
-    channel_json = 'cinecalidadmx.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_cinecalidadmx(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('cinecalidadmx')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('CineCalidadMx')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - CineCalidadMx', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
 def manto_domain_cliversite(item):
     logger.info()
 
@@ -510,6 +512,52 @@ def test_domain_cuevana2esp(item):
         tester.test_channel('Cuevana2Esp')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - Cuevana2Esp', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
+def manto_domain_cuevana3lw(item):
+    logger.info()
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana3Lw[/B][/COLOR]' % color_exec)
+
+    channel_json = 'cuevana3lw.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_cuevana3lw(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('cuevana3lw')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('Cuevana3Lw')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - Cuevana3Lw', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_cuevana3video(item):
@@ -2226,12 +2274,12 @@ def test_domain_peliculaspro(item):
         platformtools.dialog_notification(config.__addon_name + ' - PeliculasPro', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def manto_domain_pelishouse(item):
+def manto_domain_pelisforte(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisHouse[/B][/COLOR]' % color_exec)
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisForte[/B][/COLOR]' % color_exec)
 
-    channel_json = 'pelishouse.json'
+    channel_json = 'pelisforte.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
     data = filetools.read(filename_json)
@@ -2256,10 +2304,10 @@ def manto_domain_pelishouse(item):
     manto_domain_common(item, id, name)
 
 
-def test_domain_pelishouse(item):
+def test_domain_pelisforte(item):
     logger.info()
 
-    datos = channeltools.get_channel_parameters('pelishouse')
+    datos = channeltools.get_channel_parameters('pelisforte')
     if not datos['active']:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
         return
@@ -2267,9 +2315,9 @@ def test_domain_pelishouse(item):
     config.set_setting('developer_test_channels', '')
 
     try:
-        tester.test_channel('PelisHouse')
+        tester.test_channel('PelisForte')
     except:
-        platformtools.dialog_notification(config.__addon_name + ' - PelisHouse', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + ' - PelisForte', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_pelismaraton(item):
@@ -3469,6 +3517,52 @@ def test_domain_torrentpelis(item):
         platformtools.dialog_notification(config.__addon_name + ' - TorrentPelis', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
+def manto_domain_yestorrent(item):
+    logger.info()
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando YesTorrent[/B][/COLOR]' % color_exec)
+
+    channel_json = 'yestorrent.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_yestorrent(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('yestorrent')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('YesTorrent')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - YesTorret', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
 def manto_domain_tupelihd(item):
     logger.info()
 
@@ -3513,6 +3607,22 @@ def test_domain_tupelihd(item):
         tester.test_channel('TuPeliHd')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - TuPeliHd', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
+def test_domain_yestorrent(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('yestorrent')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('YesTorrent')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - YesTorrent', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_common(item, id, name):
@@ -3597,6 +3707,16 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://animeflv.': return
 
+    elif id == 'animeid':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://animeid.'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio AnimeId  -->  [COLOR %s]https://animeid.???/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://animeid.': return
+
     elif id == 'animeonline':
         config.set_setting('user_test_channel', '')
 
@@ -3637,22 +3757,12 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://cinecalidad.': return
 
-    elif id == 'cinecalidadmx':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio CineCalidadMx  -->  [COLOR %s]https://???.cinecalidad.???/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://': return
-
     elif id == 'cliversite':
         config.set_setting('user_test_channel', '')
 
         if not domain: domain = 'https://'
 
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio CliverSite  -->  [COLOR %s]https://???.cliver..??/[/COLOR]' % color_avis)
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio CliverSite  -->  [COLOR %s]https://???.cliver..??[/COLOR]' % color_avis)
 
         if new_domain is None: return
         elif new_domain == 'https://': return
@@ -3662,7 +3772,7 @@ def manto_domain_common(item, id, name):
 
         if not domain: domain = 'https://'
 
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Cuevana2  -->  [COLOR %s]https://???.cuevana2.???[/COLOR]' % color_avis)
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Cuevana2  -->  [COLOR %s]https://???.cuevana2.???/[/COLOR]' % color_avis)
 
         if new_domain is None: return
         elif new_domain == 'https://': return
@@ -3672,7 +3782,17 @@ def manto_domain_common(item, id, name):
 
         if not domain: domain = 'https://'
 
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Cuevana2Esp  -->  [COLOR %s]https://???.cuevana2espanol.???[/COLOR]' % color_avis)
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Cuevana2Esp  -->  [COLOR %s]https://???.cuevana2espanol.???/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://': return
+
+    elif id == 'cuevana3lw':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Cuevana3Lw  -->  [COLOR %s]https://cuevana?.???[/COLOR]' % color_avis)
 
         if new_domain is None: return
         elif new_domain == 'https://': return
@@ -3897,15 +4017,15 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://peliculaspro.': return
 
-    elif id == 'pelishouse':
+    elif id == 'pelisforte':
         config.set_setting('user_test_channel', '')
 
-        if not domain: domain = 'https://'
+        if not domain: domain = 'https://pelisforte.'
 
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio PelisHouse  -->  [COLOR %s]https://???.pelishouse.??/[/COLOR]' % color_avis)
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio PelisForte  -->  [COLOR %s]https://pelisforte.??/[/COLOR]' % color_avis)
 
         if new_domain is None: return
-        elif new_domain == 'https://': return
+        elif new_domain == 'https://pelisforte.': return
 
     elif id == 'pelismaraton':
         config.set_setting('user_test_channel', '')
@@ -4072,7 +4192,7 @@ def manto_domain_common(item, id, name):
 
         if not domain: domain = 'https://'
 
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio SrNovelas  -->  [COLOR %s]https://??????.??/[/COLOR]' % color_avis)
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio SrNovelas  -->  [COLOR %s]https://???.???/[/COLOR]' % color_avis)
 
         if new_domain is None: return
         elif new_domain == 'https://': return
@@ -4117,6 +4237,16 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://': return
 
+    elif id == 'yestorrent':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://yestorrent.'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio YesTorrent  -->  [COLOR %s]https://yestorrent.???/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://yestorrent.': return
+
     else:
         return
 
@@ -4154,6 +4284,7 @@ def manto_domain_common(item, id, name):
 
         if not new_domain.endswith('/'):
             if id == 'cliversite': pass
+            elif id == 'cuevana3lw': pass
             elif id == 'cuevana3video': pass
             elif id == 'hdfullse': pass
             elif id == 'mejortorrentapp': pass
@@ -4162,6 +4293,7 @@ def manto_domain_common(item, id, name):
         else:
            avisar = False
            if id == 'cliversite': avisar = True
+           elif id == 'cuevana3lw': avisar = True
            elif id == 'cuevana3video': avisar = True
            elif id == 'hdfullse': avisar = True
            elif id == 'mejortorrentapp': avisar = True

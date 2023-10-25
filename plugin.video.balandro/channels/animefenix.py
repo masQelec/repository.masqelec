@@ -62,19 +62,29 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_animefenix_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_animefenix_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
             if not 'animes?q=' in url:
                 platformtools.dialog_notification('AnimeFenix', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -86,7 +96,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                   data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('animefenix', url, post=post, headers=headers, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -373,7 +386,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('AnimeFenix', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -533,16 +547,14 @@ def play(item):
 
             url = scrapertools.find_single_match(data, '"file":"([^"]+)"')
 
-        elif 'terabox.' in url:
-            url = ''
+        elif 'terabox.' in url: url = ''
 
-        elif '.fireload.com' in url:
-            url = scrapertools.find_single_match(url, 'v=(.*?)$')
-
-    if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+        elif '.fireload.' in url: url = scrapertools.find_single_match(url, 'v=(.*?)$')
 
     if url:
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
         if not url.startswith("http"): url = "https:" + url
 
         url = url.replace('&amp;', '&').replace("\\/", "/")

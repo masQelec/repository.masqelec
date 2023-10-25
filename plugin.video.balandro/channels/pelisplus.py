@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www1.pelisplushd.video/'
+host = 'https://pelisplushd.so/'
 
 
 # ~ por si viene de enlaces guardados
@@ -17,7 +17,7 @@ ant_hosts = ['https://pelisplus.so/', 'https://www1.pelisplus.so/', 'https://www
              'https://www2.pelisplus.cx/', 'https://www3.pelisplus.cx/', 'https://pelisplus.ph/',
              'https://www1.pelisplus.ph/', 'https://www2.pelisplus.ph/', 'https://www3.pelisplus.ph/',
              'https://www4.pelisplus.ph/', 'https://pelisplus.ws/', 'https://www3.pelisplus.ws/',
-             'https://www4.pelisplus.ws/', 'https://pelisplushd.video/']
+             'https://www4.pelisplus.ws/', 'https://pelisplushd.video/', 'https://www1.pelisplushd.video/']
 
 
 domain = config.get_setting('dominio', 'pelisplus', default='')
@@ -67,10 +67,16 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     if '/peliculas-' in url: raise_weberror = False
 
+    hay_proxies = False
+    if config.get_setting('channel_pelisplus_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     else:
-        data = httptools.downloadpage_proxy('pelisplus', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('pelisplus', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -82,7 +88,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
                 else:
-                    data = httptools.downloadpage_proxy('pelisplus', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('pelisplus', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -141,7 +150,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '?page=', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'estrenos?page=', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'estrenos?page=', search_type = 'movie', text_color='slateblue' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -265,7 +274,9 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(temporadas) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
@@ -305,7 +316,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('PelisPlus', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -415,10 +427,7 @@ def findvideos(item):
 
             link_other = ''
             if servidor == 'directo': link_other = normalize_other(url)
-            elif servidor == 'various':
-                  if '/filemoon.' in url: link_other = 'filemoon'
-                  elif '/filelions.' in url: link_other = 'filelions'
-                  elif '/streamwish.' in url: link_other = 'streamwish'
+            elif servidor == 'various': link_other = servertools.corregir_other(url)
 
             lang = idioma
 
@@ -486,9 +495,12 @@ def play(item):
                 vid = item.url.replace('https://apialfa.tomatomatela.club/sc/index.php', 'https://apialfa.tomatomatela.club/sc/r.php')
 
                 if not vid.startswith(host):
-                    data = httptools.downloadpage(vid, post=post).data
+                    data = do_downloadpage(vid, post=post)
                 else:
-                    data = httptools.downloadpage_proxy('pelisplus', vid, post=post).data
+                    if config.get_setting('channel_pelisplus_proxies', default=''):
+                        data = do_downloadpage_proxy('pelisplus', vid, post=post)
+                    else:
+                        data = do_downloadpage(vid, post=post)
 
                 url = scrapertools.find_single_match(data, '<meta name="og:url" content="(.*?)"')
 
@@ -510,7 +522,10 @@ def play(item):
                 if not vid.startswith(host):
                     new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                 else:
-                    new_url = httptools.downloadpage_proxy('pelisplus', vid, post=post, follow_redirects=False).headers['location']
+                    if config.get_setting('channel_pelisplus_proxies', default=''):
+                        new_url = httptools.downloadpage_proxy('pelisplus', vid, post=post, follow_redirects=False).headers['location']
+                    else:
+                        new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
             except:
                 new_url = ''
 
@@ -525,7 +540,10 @@ def play(item):
                         if not vid.startswith(host):
                             new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                         else:
-                            new_url = httptools.downloadpage_proxy('pelisplus', vid, post=post, follow_redirects=False).headers['location']
+                            if config.get_setting('channel_pelisplus_proxies', default=''):
+                                new_url = httptools.downloadpage_proxy('pelisplus', vid, post=post, follow_redirects=False).headers['location']
+                            else:
+                                new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                     except:
                         new_url = ''
 
@@ -547,7 +565,10 @@ def play(item):
                     if not vid.startswith(host):
                         url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                     else:
-                        url = httptools.downloadpage_proxy('pelisplus', vid, post=post, follow_redirects=False).headers['location']
+                        if config.get_setting('channel_pelisplus_proxies', default=''):
+                            url = httptools.downloadpage_proxy('pelisplus', vid, post=post, follow_redirects=False).headers['location']
+                        else:
+                            url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                 except:
                     url = ''
 
@@ -622,7 +643,10 @@ def list_search(item):
     if not item.url.startswith(host):
         data = httptools.downloadpage(url = item.url, headers=h, raise_weberror=False).data
     else:
-        data = httptools.downloadpage_proxy('pelisplus', url = item.url, headers=h, raise_weberror=False).data
+        if config.get_setting('channel_pelisplus_proxies', default=''):
+            data = httptools.downloadpage_proxy('pelisplus', url = item.url, headers=h, raise_weberror=False).data
+        else:
+            data = httptools.downloadpage(url = item.url, headers=h, raise_weberror=False).data
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 

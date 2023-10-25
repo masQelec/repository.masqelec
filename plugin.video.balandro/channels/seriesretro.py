@@ -229,7 +229,9 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
@@ -266,7 +268,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('SeriesRetro', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -365,9 +368,7 @@ def findvideos(item):
             servidor = 'directo'
         else: link_other = ''
 
-        if servidor == 'various':
-            if srv == 'filemoon': link_other = 'Filemoon'
-            elif srv == 'streamwish' or srv == 'strwish' or srv == 'embedwish' or srv ==  'wishembed' or srv == 'awish' or srv == 'dwish' or srv == 'mwish': link_other = 'Streamwish'
+        if servidor == 'various': link_other = servertools.corregir_other(srv)
 
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = link_other ))
 

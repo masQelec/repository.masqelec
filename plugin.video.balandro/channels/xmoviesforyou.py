@@ -11,7 +11,16 @@ host = 'https://xmoviesforyou.com'
 
 
 def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    timeout = None
+    if host in url: timeout = config.get_setting('channels_repeat', default=30)
+
+    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
+    if not data:
+        if not '?s=' in url:
+            platformtools.dialog_notification('XmoviesForYou', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+            httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
     return data
 
 

@@ -26,7 +26,7 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='show_help', title='[B]Información Filmaffinity[/B]', folder=False, thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información[/B][/COLOR] Filmaffinity', folder=False, thumbnail=config.get_thumb('help') ))
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
@@ -668,7 +668,6 @@ def emmy_ediciones(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, '<td><a href="(.*?)".*?title="">(.*?)</a>')
     matches = scrapertools.find_multiple_matches(data, '<td><a href="(.*?)" title="(.*?)">(.*?)</a>')
 
     for url, title, anyo in matches:
@@ -915,6 +914,8 @@ def _emmys(item):
 
     if item.origen == 'mnu_esp':
         return emmy_ediciones(item)
+
+    item.url = host + 'award-edition.php?edition-id=emmy_'
 
     item.url = item.url + str(current_year)
 

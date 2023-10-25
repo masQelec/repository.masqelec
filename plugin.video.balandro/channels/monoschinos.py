@@ -37,6 +37,8 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'En blu-ray', action = 'list_all', url = host + '/animes?categoria=false&genero=blu-ray', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + '/animes?categoria=pelicula', search_type = 'movie', text_color = 'deepskyblue' ))
+
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
@@ -226,7 +228,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('MonosChinos', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -311,8 +314,9 @@ def findvideos(item):
         elif servidor == 'drive': servidor = 'gvideo'
         elif servidor == 'pixel': servidor = 'pixeldrain'
         elif servidor == 'senvid2': servidor = 'sendvid'
-
         else:
+             if servidor == 'vgembedcom': servidor = 'vembed'
+
              other = servertools.corregir_other(servidor)
 
         servidor = servertools.corregir_servidor(servidor)
@@ -345,7 +349,7 @@ def findvideos(item):
         elif srv == 'pixel': srv = 'pixeldrain'
 
         elif srv == 'ok':
-          if '/www.fireload.com/' in url: continue
+          if '.fireload.com/' in url: continue
 
           elif '/mega.nz/' in url: srv = 'mega'
 

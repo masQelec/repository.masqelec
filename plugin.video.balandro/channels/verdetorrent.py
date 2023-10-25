@@ -51,10 +51,16 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    hay_proxies = False
+    if config.get_setting('channel_verdetorrent_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
-        data = httptools.downloadpage_proxy('verdetorrent', url, post=post, headers=headers).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('verdetorrent', url, post=post, headers=headers).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
 
@@ -98,7 +104,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/page/1', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'movie', text_color='slateblue' ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
@@ -121,7 +127,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'series/letra-.', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'tvshow', text_color='olive' ))
 
     itemlist.append(item.clone( title = 'En HD (alfabético)', action = 'list_all', url = host + 'series/hd/letra-.', search_type = 'tvshow' ))
 
@@ -140,7 +146,7 @@ def mainlist_documentary(item):
 
     itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'documentales/letra-.', search_type = 'documentary'))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary' ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary', text_color='darkcyan' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = host + 'documentales', search_type = 'documentary' ))
 
@@ -398,7 +404,7 @@ def episodios(item):
 
         if url.startswith("//"): url = "https:" + url
 
-        itemlist.append(item.clone( action='findvideos', url=url, title="%s %s" %(title, item.contentSerieName), 
+        itemlist.append(item.clone( action='findvideos', url=url, title="%s %s" %(title, item.contentSerieName),
                                     language = 'Esp', contentSeason = season, contentType = 'episode', contentEpisodeNumber = episode ))
 
     tmdb.set_infoLabels(itemlist)

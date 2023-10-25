@@ -339,15 +339,16 @@ def manto_params(item):
 
         config.set_setting('channel_animefenix_dominio', '')
         config.set_setting('channel_animeflv_dominio', '')
+        config.set_setting('channel_animeid_dominio', '')
         config.set_setting('channel_animeonline_dominio', '')
 
         config.set_setting('channel_cinecalidad_dominio', '')
         config.set_setting('channel_cinecalidadla_dominio', '')
         config.set_setting('channel_cinecalidadlol_dominio', '')
-        config.set_setting('channel_cinecalidadmx_dominio', '')
         config.set_setting('channel_cliversite_dominio', '')
         config.set_setting('channel_cuevana2_dominio', '')
         config.set_setting('channel_cuevana2esp_dominio', '')
+        config.set_setting('channel_cuevana3lw_dominio', '')
         config.set_setting('channel_cuevana3video_dominio', '')
 
         config.set_setting('channel_divxtotal_dominio', '')
@@ -385,7 +386,7 @@ def manto_params(item):
         config.set_setting('channel_nextdede_nextdede_username', '')
 
         config.set_setting('channel_peliculaspro_dominio', '')
-        config.set_setting('channel_pelishouse_dominio', '')
+        config.set_setting('channel_pelisforte_dominio', '')
         config.set_setting('channel_pelismaraton_dominio', '')
         config.set_setting('channel_pelismart_dominio', '')
         config.set_setting('channel_pelispanda_dominio', '')
@@ -414,6 +415,8 @@ def manto_params(item):
         config.set_setting('channel_todotorrents_dominio', '')
         config.set_setting('channel_torrentpelis_dominio', '')
         config.set_setting('channel_tupelihd_dominio', '')
+
+        config.set_setting('channel_yestorrent_dominio', '')
 
         config.set_setting('autoplay_max_links', '10')
 
@@ -479,7 +482,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '117.0.5938.92')
+        config.set_setting('chrome_last_version', '118.0.5993.89')
 
         config.set_setting('debug', '0')
 
@@ -914,6 +917,45 @@ def manto_temporales(item):
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Ficheros Temporales eliminados[/B][/COLOR]' % color_infor)
 
 
+def manto_logs(item):
+    logger.info()
+
+    hay_logs = False
+
+    path = os.path.join(config.get_data_path(), 'servers_todo.log')
+    existe = filetools.exists(path)
+    if existe: hay_logs = True
+
+    path = os.path.join(config.get_data_path(), 'qualities_todo.log')
+    existe = filetools.exists(path)
+    if existe: hay_logs = True
+
+    path = os.path.join(config.get_data_path(), 'proxies.log')
+    existe = filetools.exists(path)
+    if existe: hay_logs = True
+
+    if hay_logs == False:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros Logs[/COLOR][/B]' % color_alert)
+        return
+
+    texto = '[COLOR red][B]¿ Confirma Eliminar los ficheros Logs ?[/B][/COLOR]'
+
+    if platformtools.dialog_yesno(config.__addon_name, texto):
+        path = os.path.join(config.get_data_path(), 'servers_todo.log')
+        existe = filetools.exists(path)
+        if existe: filetools.remove(path)
+
+        path = os.path.join(config.get_data_path(), 'qualities_todo.log')
+        existe = filetools.exists(path)
+        if existe: filetools.remove(path)
+
+        path = os.path.join(config.get_data_path(), 'proxies.log')
+        existe = filetools.exists(path)
+        if existe: filetools.remove(path)
+
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Ficheros Logs eliminados[/B][/COLOR]' % color_infor)
+
+
 def manto_addons_packages(item):
     logger.info()
 
@@ -1255,6 +1297,10 @@ def opciones_animeflv(item):
     item.from_channel = 'animeflv'
     opciones_domains_common(item)
 
+def opciones_animeid(item):
+    item.from_channel = 'animeid'
+    opciones_domains_common(item)
+
 def opciones_animeonline(item):
     item.from_channel = 'animeonline'
     opciones_domains_common(item)
@@ -1271,10 +1317,6 @@ def opciones_cinecalidadlol(item):
     item.from_channel = 'cinecalidadlol'
     opciones_domains_common(item)
 
-def opciones_cinecalidadmx(item):
-    item.from_channel = 'cinecalidadmx'
-    opciones_domains_common(item)
-
 def opciones_cliversite(item):
     item.from_channel = 'cliversite'
     opciones_domains_common(item)
@@ -1285,6 +1327,10 @@ def opciones_cuevana2(item):
 
 def opciones_cuevana2esp(item):
     item.from_channel = 'cuevana2esp'
+    opciones_domains_common(item)
+
+def opciones_cuevana3lw(item):
+    item.from_channel = 'cuevana3lw'
     opciones_domains_common(item)
 
 def opciones_cuevana3video(item):
@@ -1375,8 +1421,8 @@ def opciones_peliculaspro(item):
     item.from_channel = 'peliculaspro'
     opciones_domains_common(item)
 
-def opciones_pelishouse(item):
-    item.from_channel = 'pelishouse'
+def opciones_pelisforte(item):
+    item.from_channel = 'pelisforte'
     opciones_domains_common(item)
 
 def opciones_pelismaraton(item):
@@ -1463,6 +1509,10 @@ def opciones_tupelihd(item):
     item.from_channel = 'tupelihd'
     opciones_domains_common(item)
 
+def opciones_yestorrent(item):
+    item.from_channel = 'yestorrent'
+    opciones_domains_common(item)
+
 
 def opciones_domains_common(item):
     logger.info()
@@ -1519,6 +1569,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'animeflv': domains.manto_domain_animeflv(item)
 
+            elif item.from_channel == 'animeid': domains.manto_domain_animeid(item)
+
             elif item.from_channel == 'animeonline': domains.manto_domain_animeonline(item)
 
             elif item.from_channel == 'cinecalidad': domains.manto_domain_cinecalidad(item)
@@ -1527,13 +1579,13 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cinecalidadlol': domains.manto_domain_cinecalidadlol(item)
 
-            elif item.from_channel == 'cinecalidadmx': domains.manto_domain_cinecalidadmx(item)
-
             elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
 
             elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
 
             elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
+
+            elif item.from_channel == 'cuevana3lw': domains.manto_domain_cuevana3lw(item)
 
             elif item.from_channel == 'cuevana3video': domains.manto_domain_cuevana3video(item)
 
@@ -1579,7 +1631,7 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'peliculaspro': domains.manto_domain_peliculaspro(item)
 
-            elif item.from_channel == 'pelishouse': domains.manto_domain_pelishouse(item)
+            elif item.from_channel == 'pelisforte': domains.manto_domain_pelisforte(item)
 
             elif item.from_channel == 'pelismaraton': domains.manto_domain_pelismaraton(item)
 
@@ -1623,6 +1675,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'tupelihd': domains.manto_domain_tupelihd(item)
 
+            elif item.from_channel == 'yestorrent': domains.manto_domain_yestorrent(item)
+
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)
 
@@ -1630,6 +1684,8 @@ def opciones_domains_common(item):
             if item.from_channel == 'animefenix': domains.test_domain_animefenix(item)
 
             elif item.from_channel == 'animeflv': domains.test_domain_animeflv(item)
+
+            elif item.from_channel == 'animeid': domains.test_domain_animeid(item)
 
             elif item.from_channel == 'animeonline': domains.test_domain_animeonline(item)
 
@@ -1639,13 +1695,13 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cinecalidadlol': domains.test_domain_cinecalidadlol(item)
 
-            elif item.from_channel == 'cinecalidadmx': domains.test_domain_cinecalidadmx(item)
-
             elif item.from_channel == 'cliversite': domains.test_domain_cliversite(item)
 
             elif item.from_channel == 'cuevana2': domains.test_domain_cuevana2(item)
 
             elif item.from_channel == 'cuevana2esp': domains.test_domain_cuevana2esp(item)
+
+            elif item.from_channel == 'cuevana3lw': domains.test_domain_cuevana3lw(item)
 
             elif item.from_channel == 'cuevana3video': domains.test_domain_cuevana3video(item)
 
@@ -1691,7 +1747,7 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'peliculaspro': domains.test_domain_peliculaspro(item)
 
-            elif item.from_channel == 'pelishouse': domains.test_domain_pelishouse(item)
+            elif item.from_channel == 'pelisforte': domains.test_domain_pelisforte(item)
 
             elif item.from_channel == 'pelismaraton': domains.test_domain_pelismaraton(item)
 
@@ -1735,6 +1791,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'tupelihd': domains.test_domain_tupelihd(item)
 
+            elif item.from_channel == 'yestorrent': domains.test_domain_yestorrent(item)
+
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)
 
@@ -1747,8 +1805,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cinecalidadlol': helper.show_help_cinecalidadlol(item)
 
-            elif item.from_channel == 'cinecalidadmx': helper.show_help_cinecalidadmx(item)
-
             elif item.from_channel == 'cuevana3video': helper.show_help_cuevana3video(item)
 
             elif item.from_channel == 'ennovelas': helper.show_help_ennovelas(item)
@@ -1758,6 +1814,10 @@ def opciones_domains_common(item):
             elif item.from_channel == 'hdfull': helper.show_help_hdfull(item)
 
             elif item.from_channel == 'henaojara': helper.show_help_henaojara(item)
+
+            elif item.from_channel == 'peliculaspro': helper.show_help_peliculaspro(item)
+
+            elif item.from_channel == 'pelisforte': helper.show_help_pelisforte(item)
 
             elif item.from_channel == 'pelismaraton': helper.show_help_pelismaraton(item)
 

@@ -52,6 +52,10 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_all', url = host + 'category/capitulos-completos/', group = 'capis', search_type = 'tvshow', text_color = 'olive' ))
 
+    itemlist.append(item.clone( title = 'Mexicanas (capítulos)', action = 'list_all', url = host + 'category/novelas-mexicanas/', group = 'capis', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Turcas (capítulos)', action = 'list_all', url = host + 'category/series-turcas/', group = 'capis', search_type = 'tvshow' ))
+
     return itemlist
 
 
@@ -61,7 +65,7 @@ def list_list(item):
 
     if not item.page: item.page = 0
 
-    data = do_downloadpage(host)
+    data = do_downloadpage(host + 'seriesturcastv-4/')
 
     bloque = scrapertools.find_single_match(data, ">Categories<(.*?)</div>	</aside>")
 
@@ -71,6 +75,11 @@ def list_list(item):
 
     for url, title in matches[item.page * perpage:]:
         title = title.capitalize()
+
+        if title == 'Capitulos completos': continue
+        elif title == 'Novelas mexicanas': continue
+        elif title == 'Películas turcas': continue
+        elif title == 'Series turcas': continue
 
         itemlist.append(item.clone( action = 'temporadas', title = title, url = url, text_color = 'hotpink',
                                     contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
@@ -157,12 +166,16 @@ def list_all(item):
 
         SerieName = SerieName.strip()
 
+        tipo = 'tvshow' if '/category/' in item.url else 'movie'
+
         if item.search_type == 'tvshow':
             if '?s=' in item.url: tipo = 'tvshow'
         elif item.search_type == 'movie':
             if '?s=' in item.url: tipo = 'movie'
         else:
-           tipo = 'tvshow' if '/category/' in url else 'movie'
+            if '?s=' in item.url:
+                if '>Películas Turcas<' in match: tipo = 'movie'
+                elif '>Capitulos Completos<' in match: tipo = 'tvshow'
 
         sufijo = '' if item.search_type != 'all' else tipo
 
@@ -170,12 +183,18 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
+                if '?s=' in item.url: 
+                    if '>Capitulos Completos<' in match: continue
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = SerieName, infoLabels={'year': '-'} ))
 
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
+
+                if '?s=' in item.url: 
+                    if '>Películas Turcas<' in match: continue
 
             lang = ''
             if 'subtitulado' in title.lower() or 'subtitulo' in title.lower(): lang = 'Vose'
@@ -206,17 +225,20 @@ def list_all(item):
                 else:
                     title = title.replace('Temporada', '[COLOR tan]Temporada[/COLOR]')
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, lang = lang, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+                    itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, lang = lang, fmt_sufijo=sufijo,
+                                                contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, "<div class='pagination'>.*?<span class='current'>.*?a href='(.*?)'")
+        if '?s=' in item.url: next_page = scrapertools.find_single_match(data, '<nav id="vce-pagination" class="vce-load-more">.*?a href="(.*?)"')
+        else:
+            next_page = scrapertools.find_single_match(data, "<div class='pagination'>.*?<span class='current'>.*?a href='(.*?)'")
+            if not next_page: next_page = scrapertools.find_single_match(data, '<nav id="vce-pagination" class="vce-load-more">.*?a href="(.*?)"')
 
-        if next_url:
-            if '/page/' in next_url:
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
+        if next_page:
+            if '/page/' in next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 
@@ -236,14 +258,18 @@ def temporadas(item):
         epis = re.compile('<a class="epNum"(.*?)</a>', re.DOTALL).findall(block)
 
         if epis:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = 1
             itemlist = episodios(item)
 
     else:
-        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
+        if config.get_setting('channels_seasons', default=True):
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
+
         item.page = 0
         item.contentType = 'season'
         item.contentSeason = 1
@@ -280,7 +306,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('SeriesTurcas', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -367,7 +394,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
     ses = 0
 
@@ -385,8 +412,7 @@ def findvideos(item):
 
         other = ''
 
-        if servidor == 'various':
-            if 'youdbox' in url or 'yodbox' in url or 'youdboox' in url: other = 'Youdbox'
+        if servidor == 'various': other = servertools.corregir_other(url)
 
         if not servidor == 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))

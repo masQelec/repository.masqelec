@@ -186,7 +186,9 @@ def list_all(item):
 
     order = 0
 
-    if matches: platformtools.dialog_notification('TvSeries', '[COLOR blue]Cargando episodios[/COLOR]')
+    if matches:
+        if not config.get_setting('channels_charges', default=True):
+            platformtools.dialog_notification('TvSeries', '[COLOR blue]Cargando episodios[/COLOR]')
 
     for match in matches:
         if match.startswith('//') == True: url = 'https:' + match

@@ -43,21 +43,31 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    hay_proxies = False
+    if config.get_setting('channel_homecine_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_homecine_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if '/release-year/' in url: raise_weberror = False
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('homecine', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('homecine', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
         if not data:
             if not '/?s=' in url:
                 platformtools.dialog_notification('HomeCine', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('homecine', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('homecine', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -69,7 +79,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('homecine', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('homecine', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         except:
             pass
 
@@ -756,7 +769,10 @@ def play(item):
     if not item.url.startswith(host):
         url = httptools.downloadpage(item.url, headers = headers, follow_redirects = False, only_headers = True).headers.get('location', '')
     else:
-        url = httptools.downloadpage_proxy('homecine', item.url, headers = headers, follow_redirects = False, only_headers = True).headers.get('location', '')
+        if config.get_setting('channel_homecine_proxies', default=''):
+            url = httptools.downloadpage_proxy('homecine', item.url, headers = headers, follow_redirects = False, only_headers = True).headers.get('location', '')
+        else:
+            url = httptools.downloadpage(item.url, headers = headers, follow_redirects = False, only_headers = True).headers.get('location', '')
 
     if url:
         data = do_downloadpage(url, headers = headers, raise_weberror = False)

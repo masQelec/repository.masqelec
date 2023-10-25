@@ -43,10 +43,16 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    hay_proxies = False
+    if config.get_setting('channel_sinpeli_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
-        data = httptools.downloadpage_proxy('sinpeli', url, post=post, headers=headers).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('sinpeli', url, post=post, headers=headers).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -58,7 +64,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers).data
                 else:
-                    data = httptools.downloadpage_proxy('sinpeli', url, post=post, headers=headers).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('sinpeli', url, post=post, headers=headers).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers).data
         except:
             pass
 

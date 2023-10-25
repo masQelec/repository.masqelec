@@ -64,12 +64,20 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_pelisplushd_proxies', default=''): hay_proxies = True
+
     if '/year/' in url: raise_weberror = False
+    # ~ en la web da error 404 Not found
+    elif 'peliculas?page=' in url: raise_weberror = False
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     else:
-        data = httptools.downloadpage_proxy('pelisplushd', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('pelisplushd', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -131,7 +139,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas?page=', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas/estrenos?page=', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas/estrenos?page=', search_type = 'movie', text_color='slateblue' ))
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'peliculas/populares?page=', search_type = 'movie' ))
 
@@ -151,7 +159,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series?page=', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'series/estrenos?page=', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'series/estrenos?page=', search_type = 'tvshow', text_color='olive' ))
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series/populares?page=', search_type = 'tvshow' ))
 
@@ -176,7 +184,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes?page=', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'animes/estrenos?page=', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'animes/estrenos?page=', search_type = 'tvshow', text_color='olive' ))
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'animes/populares?page=', search_type = 'tvshow' ))
 
@@ -324,7 +332,9 @@ def temporadas(item):
         title = 'Temporada ' + nro_tempo
 
         if len(temporadas) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
@@ -367,7 +377,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('PelisPlusHd', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -446,8 +457,6 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'latino': 'Lat', 'subtitulado': 'Vose'}
-
     lang = 'Lat'
 
     data = do_downloadpage(item.url)
@@ -461,7 +470,8 @@ def findvideos(item):
 
         ses += 1
 
-        if '/player.moovies.in/' in url: continue
+        if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
+        elif '/player.moovies.in/' in url: continue
         elif 'mystream.to' in url: continue
 
         if url.startswith('/'): url = host[:-1] + url
@@ -478,15 +488,38 @@ def findvideos(item):
 
             if link_other.lower() == 'netu' or link_other.lower() == 'waaw' or link_other.lower() == 'hqq': continue
 
-            elif link_other.lower() == 'sbfast': continue
+            elif link_other.lower() == 'sbfast' or link_other.lower() == 'streamsb': continue
 
             link_other = normalize_other(link_other)
 
-        if '/filemoon.' in url: link_other = 'filemoon'
-        elif '/filelions.' in url: link_other = 'filelions'
-        elif '/streamwish.' in url: link_other = 'streamwish'
+        if servidor == 'various': link_other = servertools.corregir_other(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = IDIOMAS.get(lang, lang), other = link_other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other ))
+
+    matches = scrapertools.find_multiple_matches(data, 'data-url="(.*?)"')
+
+    for url in matches:
+        if not url: continue
+
+        ses += 1
+
+        if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
+        elif '/player.moovies.in/' in url: continue
+        elif 'mystream.to' in url: continue
+        elif '/watchsb.' in url: continue
+
+        if url.startswith('/'): url = host[:-1] + url
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        link_other = ''
+
+        if servidor == 'various': link_other = servertools.corregir_other(url)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other ))
 
     if not itemlist:
         if not ses == 0:

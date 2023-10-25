@@ -59,19 +59,29 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_animeonline_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_animeonline_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('animeonline', url, post=post, headers=headers, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('animeonline', url, post=post, headers=headers, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
             if not '?s=' in url:
                 platformtools.dialog_notification('AnimeOnline', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('animeonline', url, post=post, headers=headers, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('animeonline', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -83,7 +93,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('animeonline', url, post=post, headers=headers, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('animeonline', url, post=post, headers=headers, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -338,7 +351,9 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(temporadas) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
@@ -376,7 +391,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('AnimeOnline', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -502,6 +518,8 @@ def findvideos(item):
             if url:
                 if url == 'undefined': continue
 
+                if url.startswith('https:/streamwish.'): url = url.replace('https:/streamwish.', 'https://streamwish.')
+
                 if 'Sub Español' in dat_server: lang = 'Vose'
                 elif 'Sub Latino' in dat_server: lang = 'Vose'
                 elif 'Latino' in dat_server: lang = 'Lat'
@@ -517,7 +535,9 @@ def findvideos(item):
 
                 if config.get_setting('developer_mode', default=False):
                     try:
-                       link_other = url.split('//')[1]
+                       if '//' in url: link_other = url.split('//')[1]
+                       else: link_other = url.split('/')[1]
+
                        link_other = link_other.split('/')[0]
                     except:
                        link_other = url

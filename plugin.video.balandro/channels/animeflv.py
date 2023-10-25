@@ -94,7 +94,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=3', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por categorías', action = 'categorias', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos',  search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -116,7 +116,7 @@ def categorias(item):
         url = '%s?order=%s' %(url_cat, categorie_id)
         title = title.strip()
 
-        itemlist.append(item.clone( action = "list_all", url = url, title = title, text_color='springgreen' ))
+        itemlist.append(item.clone( action = "list_all", url = url, title = title, text_color='moccasin' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -272,7 +272,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('AnimeFlv', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -368,10 +369,7 @@ def findvideos(item):
                 link = servertools.normalize_url(servidor, link)
 
                 other = ''
-                if servidor == 'various':
-                    if '/filemoon.' in link: other = 'Filemoon'
-                    elif '/streamwish.' in link: other = 'Streamwish'
-                    elif '/filelions.' in link: other = 'Filelions'
+                if servidor == 'various': other = servertools.corregir_other(link)
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Vose', other = other ))
 
@@ -382,10 +380,7 @@ def findvideos(item):
             url = servertools.normalize_url(servidor, url)
 
             other = ''
-            if servidor == 'various':
-                if '/filemoon.' in url: other = 'Filemoon'
-                elif '/streamwish.' in url: other = 'Streamwish'
-                elif '/filelions.' in url: other = 'Filelions'
+            if servidor == 'various': other = servertools.corregir_other(url)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other = other ))
 
