@@ -62,9 +62,12 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_seriespapayaxyz_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_seriespapayaxyz_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not headers: headers = {'Referer': host, 'Connection': 'keep-alive'}
 
@@ -73,12 +76,19 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
         if not data:
             if not '?s=' in url:
                 platformtools.dialog_notification('SeriesPapayaXyz', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -90,7 +100,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('seriespapayaxyz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    else:
+                       data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         except:
             pass
 
@@ -362,7 +375,9 @@ def temporadas(item):
         title = 'Temporada ' + season
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.sin_epis = sin_epis
             item.contentType = 'season'
@@ -418,7 +433,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('SeriesPapayaXyz', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -658,7 +674,10 @@ def play(item):
         if not item.url.startswith(host):
             resp = httptools.downloadpage(item.url, follow_redirects=False, headers=headers)
         else:
-            resp = httptools.downloadpage_proxy('seriespapayaxyz', item.url, follow_redirects=False, headers=headers)
+            if config.get_setting('channel_seriespapayaxyz_proxies', default=''):
+                resp = httptools.downloadpage_proxy('seriespapayaxyz', item.url, follow_redirects=False, headers=headers)
+            else:
+                resp = httptools.downloadpage(item.url, follow_redirects=False, headers=headers)
 
         if 'location' in resp.headers: url = resp.headers['location']
 
@@ -666,11 +685,14 @@ def play(item):
             headers = {}
 
             if not item.url.startswith(host):
-                data = httptools.downloadpage(item.url, headers=headers).data
+                data = do_downloadpage(item.url, headers=headers)
             else:
                 headers = {'Referer': host, 'Connection': 'keep-alive'}
 
-                data = httptools.downloadpage_proxy('seriespapayaxyz', item.url, headers=headers).data
+                if config.get_setting('channel_seriespapayaxyz_proxies', default=''):
+                    data = httptools.downloadpage_proxy('seriespapayaxyz', item.url, headers=headers).data
+                else:
+                    data = httptools.downloadpage(item.url, headers=headers).data
 
             url = scrapertools.find_single_match(data, 'src="(.*?)"')
             if not url: url = scrapertools.find_single_match(data, 'SRC="(.*?)"')
@@ -710,7 +732,10 @@ def play(item):
         if not item.url.startswith(host):
             url = httptools.downloadpage(item.url, post = post, headers = headers, follow_redirects=False, only_headers=True).headers.get('location', '')
         else:
-            url = httptools.downloadpage_proxy('seriespapayaxyz', item.url, post = post, headers = headers, follow_redirects=False, only_headers=True).headers.get('location', '')
+            if config.get_setting('channel_seriespapayaxyz_proxies', default=''):
+                url = httptools.downloadpage_proxy('seriespapayaxyz', item.url, post = post, headers = headers, follow_redirects=False, only_headers=True).headers.get('location', '')
+            else:
+                url = httptools.downloadpage(item.url, post = post, headers = headers, follow_redirects=False, only_headers=True).headers.get('location', '')
 
         if url:
             if url.startswith('//') == True: url = 'https:' + url
@@ -737,10 +762,12 @@ def play(item):
 
     else:
         if not item.url.startswith(host):
-            data = httptools.downloadpage(item.url).data
+            data = do_downloadpage(item.url)
         else:
-            data = httptools.downloadpage_proxy('seriespapayaxyz', item.url).data
-
+            if config.get_setting('channel_seriespapayaxyz_proxies', default=''):
+                data = httptools.downloadpage_proxy('seriespapayaxyz', item.url).data
+            else:
+                data = httptools.downloadpage(item.url).data
 
         new_url = scrapertools.find_single_match(data, "location.href='([^']+)")
 

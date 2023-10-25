@@ -7,13 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www6.mejortorrent.rip'
+host = 'https://www7.mejortorrent.rip'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://www1.mejortorrent.rip',
              'https://www2.mejortorrent.rip', 'https://www3.mejortorrent.rip', 'https://www4.mejortorrent.rip',
-             'https://www5.mejortorrent.rip']
+             'https://www5.mejortorrent.rip', 'https://www6.mejortorrent.rip']
 
 
 domain = config.get_setting('dominio', 'mejortorrentapp', default='')
@@ -64,10 +64,16 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_mejortorrentapp_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
-        data = httptools.downloadpage_proxy('mejortorrentapp', url, post=post, headers=headers).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('mejortorrentapp', url, post=post, headers=headers).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
 
@@ -125,7 +131,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/public/peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/public/torrents/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/public/torrents/', search_type = 'movie', text_color='slateblue' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_list', url = host + '/busqueda/', search_type = 'movie' ))
 
@@ -148,7 +154,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/public/torrents/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/public/torrents/', search_type = 'tvshow', text_color='olive' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_list', url = host + '/busqueda/', search_type = 'tvshow' ))
 
@@ -169,7 +175,7 @@ def mainlist_documentales(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/documentales/', search_type = 'documentary' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/public/torrents/', search_type = 'documentary' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/public/torrents/', search_type = 'documentary', text_color='darkcyan' ))
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_list', url = host + '/busqueda/', search_type = 'documentary' ))
 

@@ -71,7 +71,7 @@ def categorias(item):
         title = title.strip()
         url = urlparse.urljoin(item.url, url)
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, contentType = 'movie', text_color = 'tan' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'tan' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

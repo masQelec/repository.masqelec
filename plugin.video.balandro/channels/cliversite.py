@@ -62,10 +62,16 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_cliversite_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
-        data = httptools.downloadpage_proxy('cliversite', url, post=post, headers=headers).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('cliversite', url, post=post, headers=headers).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -77,7 +83,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers).data
                 else:
-                    data = httptools.downloadpage_proxy('cliversite', url, post=post, headers=headers).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('cliversite', url, post=post, headers=headers).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers).data
         except:
             pass
 
@@ -136,7 +145,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/peliculas', search_type = 'movie', tipo = 'index', pagina = 1 ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/peliculas/estrenos', search_type = 'movie', tipo = 'estrenos', pagina = 1 ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/peliculas/estrenos', search_type = 'movie', tipo = 'estrenos', pagina = 1, text_color='slateblue' ))
 
     itemlist.append(item.clone( title = 'Más Vistas', action = 'list_all', url = host + '/peliculas/mas-vistas', search_type = 'movie', page = 0, pagina = 1 ))  
 
@@ -316,7 +325,9 @@ def temporadas(item):
         title = 'Temporada ' + numtempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+				
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = numtempo
@@ -359,7 +370,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('CliverSite', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -574,10 +586,7 @@ def play(item):
 
                     vid = item.url.replace('https://apialfa.tomatomatela.club/sc/index.php', 'https://apialfa.tomatomatela.club/sc/r.php')
 
-                    if not vid.startswith(host):
-                        data = httptools.downloadpage(vid, post=post).data
-                    else:
-                        data = httptools.downloadpage_proxy('cliversite', vid, post=post).data
+                    data = do_downloadpage(vid, post=post)
 
                     url = scrapertools.find_single_match(data, '<meta name="og:url" content="(.*?)"')
 
@@ -599,7 +608,10 @@ def play(item):
                     if not vid.startswith(host):
                         new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                     else:
-                        new_url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                        if config.get_setting('channel_cliversite_proxies', default=''):
+                            new_url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                        else:
+                            new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                 except:
                     new_url = ''
 
@@ -614,7 +626,10 @@ def play(item):
                             if not vid.startswith(host):
                                 new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                             else:
-                                new_url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                                if config.get_setting('channel_cliversite_proxies', default=''):
+                                    new_url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                                else:
+                                    new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                         except:
                             new_url = ''
 
@@ -636,7 +651,10 @@ def play(item):
                         if not vid.startswith(host):
                             url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                         else:
-                            url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                            if config.get_setting('channel_cliversite_proxies', default=''):
+                                url = httptools.downloadpage_proxy('cliversite', vid, post=post, follow_redirects=False).headers['location']
+                            else:
+                                url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                     except:
                         url = ''
 
@@ -660,7 +678,10 @@ def play(item):
                 if not item.url.startswith(host):
                     resp = httptools.downloadpage(item.url)
                 else:
-                    resp = httptools.downloadpage_proxy('cliversite', item.url)
+                    if config.get_setting('channel_cliversite_proxies', default=''):
+                        resp = httptools.downloadpage_proxy('cliversite', item.url)
+                    else:
+                        resp = httptools.downloadpage(item.url)
 
                 if not resp.data: return itemlist
             else:

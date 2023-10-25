@@ -68,19 +68,29 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_mejortorrentnz_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_mejortorrentnz_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('mejortorrentnz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('mejortorrentnz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
         if not data:
             if not '/?s=' in url:
                 platformtools.dialog_notification('MejorTorrentNz', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('mejortorrentnz', url, post=post, headers=headers, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('mejortorrentnz', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -138,7 +148,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/peliculas-13/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/ultimos-torrents-3/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/ultimos-torrents-3/', search_type = 'movie', text_color='slateblue' ))
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/peliculas-hd-3/', search_type = 'movie' ))
 
@@ -157,7 +167,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/series-3/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/ultimos-torrents-3/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/ultimos-torrents-3/', search_type = 'tvshow', text_color='olive' ))
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/series-hd-2/', search_type = 'tvshow' ))
 
@@ -176,7 +186,7 @@ def mainlist_documentales(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/documentales-3/', search_type = 'documentary' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/ultimos-torrents-3/', search_type = 'documentary' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/ultimos-torrents-3/', search_type = 'documentary', text_color='darkcyan' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'documentary' ))
 
@@ -444,7 +454,10 @@ def findvideos(item):
            if not vid.startswith(host):
                resp = httptools.downloadpage(vid, post = post, headers = {'Referer': item.ref}, raise_weberror=False)
            else:
-               resp = httptools.downloadpage_proxy('mejortorrentnz', vid, post = post, headers = {'Referer': item.ref}, raise_weberror=False)
+               if config.get_setting('channel_mejortorrentnz_proxies', default=''):
+                   resp = httptools.downloadpage_proxy('mejortorrentnz', vid, post = post, headers = {'Referer': item.ref}, raise_weberror=False)
+               else:
+                   resp = httptools.downloadpage(vid, post = post, headers = {'Referer': item.ref}, raise_weberror=False)
 
            data = resp.data
         except:
@@ -478,7 +491,10 @@ def play(item):
         if not url.startswith(host):
             resp = httptools.downloadpage(url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False)
         else:
-            resp = httptools.downloadpage_proxy('mejortorrentnz', url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False)
+            if config.get_setting('channel_mejortorrentnz_proxies', default=''):
+                resp = httptools.downloadpage_proxy('mejortorrentnz', url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False)
+            else:
+                resp = httptools.downloadpage(url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False)
 
         link = ''
 

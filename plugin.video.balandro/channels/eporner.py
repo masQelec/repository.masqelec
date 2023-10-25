@@ -72,8 +72,7 @@ def categorias(item):
         else:
             thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, contentType = 'movie',
-                                    contentTitle = title, contentExtra='adults', text_color = 'tan' ) )
+        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'tan' ) )
 
     if item.group == 'cats' or item.group == 'stars':
         return sorted(itemlist,key=lambda x: x.title)
@@ -140,8 +139,7 @@ def list_all(item):
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
-        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, contentType = 'movie',
-                                    contentTitle = title, contentExtra='adults') )
+        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
         bloque = scrapertools.find_single_match(data, '<div class="numlist2(.*?)</div>')

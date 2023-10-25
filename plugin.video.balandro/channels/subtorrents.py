@@ -69,10 +69,16 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_subtorrents_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
-        data = httptools.downloadpage_proxy('subtorrents', url, post=post, headers=headers).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('subtorrents', url, post=post, headers=headers).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -84,7 +90,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers).data
                 else:
-                   data = httptools.downloadpage_proxy('subtorrents', url, post=post, headers=headers).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('subtorrents', url, post=post, headers=headers).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers).data
         except:
             pass
 
@@ -152,13 +161,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'peliculas-subtituladas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = ' - Estrenos', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - [COLOR slateblue]Estrenos[/COLOR]', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Otros idiomas:', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=audio-latino', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = ' - Estrenos', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino', search_type = 'movie', ))
+    itemlist.append(item.clone( title = ' - [COLOR slateblue]Estrenos[/COLOR]', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino', search_type = 'movie', ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
@@ -300,7 +309,9 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo

@@ -50,19 +50,29 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     if '/release/' in url: raise_weberror = False
 
+    hay_proxies = False
+    if config.get_setting('channel_megaserie_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_megaserie_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('megaserie', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('megaserie', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
         if not data:
             if not '?s=' in url:
                 platformtools.dialog_notification('MegaSerie', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('megaserie', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('megaserie', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -74,7 +84,10 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('megaserie', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('megaserie', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         except:
             pass
 
@@ -299,7 +312,9 @@ def temporadas(item):
         title = 'Temporada ' + numtempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = numtempo
@@ -342,7 +357,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('MegaSerie', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -436,7 +452,10 @@ def findvideos(item):
                 if not url_base64.startswith(host):
                     new_url = httptools.downloadpage(url_base64, follow_redirects=False).headers.get('location', '')
                 else:
-                    new_url = httptools.downloadpage_proxy('megaserie', url_base64, follow_redirects=False).headers.get('location', '')
+                    if config.get_setting('channel_megaserie_proxies', default=''):
+                        new_url = httptools.downloadpage_proxy('megaserie', url_base64, follow_redirects=False).headers.get('location', '')
+                    else:
+                        new_url = httptools.downloadpage(url_base64, follow_redirects=False).headers.get('location', '')
 
                 if new_url:
                     data1 = do_downloadpage(new_url)
@@ -485,7 +504,10 @@ def findvideos(item):
                 if not url_base64.startswith(host):
                     new_url = httptools.downloadpage(url_base64, follow_redirects=False).headers.get('location', '')
                 else:
-                    new_url = httptools.downloadpage_proxy('megaserie', url_base64, follow_redirects=False).headers.get('location', '')
+                    if config.get_setting('channel_megaserie_proxies', default=''):
+                        new_url = httptools.downloadpage_proxy('megaserie', url_base64, follow_redirects=False).headers.get('location', '')
+                    else:
+                        new_url = httptools.downloadpage(url_base64, follow_redirects=False).headers.get('location', '')
 
                 if new_url:
                     data2 = do_downloadpage(new_url)
@@ -561,7 +583,10 @@ def play(item):
         if not url_base64.startswith(host):
             url = httptools.downloadpage(url_base64, follow_redirects=False).headers.get('location', '')
         else:
-            url = httptools.downloadpage_proxy('megaserie', url_base64, follow_redirects=False).headers.get('location', '')
+            if config.get_setting('channel_megaserie_proxies', default=''):
+                url = httptools.downloadpage_proxy('megaserie', url_base64, follow_redirects=False).headers.get('location', '')
+            else:
+                url = httptools.downloadpage(url_base64, follow_redirects=False).headers.get('location', '')
 
         if url:
             servidor = servertools.get_server_from_url(url)

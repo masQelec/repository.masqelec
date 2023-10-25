@@ -58,7 +58,7 @@ def get_video_url(page_url, url_referer=''):
     data = httptools.downloadpage(page_url).data
 
     if 'This video has been removed from public access' in data or 'Video not found' in data or '<div class="message_page_title">Error</div>' in data:
-        return 'El archivo ya no esta disponible o ha sido borrado'
+        return 'Archivo inexistente ó eliminado'
 
     url_savevk = 'https://savevk.com/' + page_url.replace('https://vk.com/', '')
 
@@ -91,6 +91,16 @@ def get_video_url(page_url, url_referer=''):
         video_urls.append([lbl, url])
 
     if not video_urls:
+        data = httptools.downloadpage(page_url).data
+
+        matches = scrapertools.find_multiple_matches(data, '"url(\d+)":"([^"]+)"')
+
+        for calidad, url in matches:
+            url = url.replace("\/", "/")
+
+            video_urls.append([calidad, url])
+
+    if not video_urls:
         platformtools.dialog_notification('Cargando [COLOR cyan][B]Vk[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
 
@@ -111,6 +121,17 @@ def get_video_url(page_url, url_referer=''):
             except:
                 import traceback
                 logger.error(traceback.format_exc())
+
+                if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
+                    if 'File Not Found or Removed' in traceback.format_exc():
+                        return 'Archivo inexistente ó eliminado'
+                    elif 'The requested video was not found' in traceback.format_exc():
+                        return 'Archivo inexistente ó eliminado'
+                    elif 'No se ha encontrado ningún link al vídeo' in traceback.format_exc():
+                        return 'Fichero sin link al vídeo'
+                    elif 'Unable to locate link':
+                        return 'Fichero sin link al vídeo'
+
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 
         else:

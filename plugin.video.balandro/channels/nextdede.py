@@ -288,7 +288,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/discovery?filter={"type": "movie", "sorting": "newest"}', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/movies', search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/movies', search_type = 'movie', text_color='slateblue' ))
 
         itemlist.append(item.clone( title = 'Últimas agregadas', action = 'list_last', url = host + '/trends', search_type = 'movie' ))
 
@@ -527,7 +527,9 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
@@ -567,7 +569,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('NextDede', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts

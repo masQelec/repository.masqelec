@@ -15,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww1.cuevana3.ch'
+host = 'https://ww3.cuevana3.ch'
 
 
 # ~ por si viene de enlaces guardados
@@ -28,7 +28,7 @@ ant_hosts = ['https://www1.cuevana3.video', 'https://www2.cuevana3.video', 'http
              'https://www3.cuevana3.ch', 'https://www4.cuevana3.ch', 'https://www5.cuevana3.ch',
              'https://www6.cuevana3.ch', 'https://www7.cuevana3.ch', 'https://www8.cuevana3.ch',
              'https://www9.cuevana3.ch', 'https://www10.cuevana3.ch', 'https://www11.cuevana3.ch',
-             'https://www12.cuevana3.ch']
+             'https://www12.cuevana3.ch', 'https://ww1.cuevana3.ch', 'https://ww2.cuevana3.ch']
 
 
 domain = config.get_setting('dominio', 'cuevana3video', default='')
@@ -79,19 +79,29 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_cuevana3video_proxies_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
-        if config.get_setting('channel_cuevana3video_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
             if not '/search.html?keyword=' in url:
                 platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                   data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -103,7 +113,10 @@ def do_downloadpage(url, post=None, headers=None):
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
         except:
             pass
 
@@ -168,7 +181,9 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/peliculas', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/estrenos', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/estrenos', search_type = 'movie', text_color='slateblue' ))
+
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + '/peliculas-mas-vistas', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
@@ -186,7 +201,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catalogo', action = 'list_all', url = host + '/serie', filtro = 'tabserie-1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_episodes', url = host + '/serie', search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + '/serie', search_type = 'tvshow', text_color = 'olive' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + '/serie', filtro = 'tabserie-4', search_type = 'tvshow' ))
 
@@ -254,12 +269,13 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail='https:'+ thumb, qualities=qlty, fmt_sufijo=sufijo, 
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, fmt_sufijo=sufijo, 
                                         contentType='movie', contentTitle=title, infoLabels={'year': '-', 'plot': plot} ))
 
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
+
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, 
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': '-', 'plot': plot} ))
 
@@ -297,13 +313,14 @@ def list_all(item):
     return itemlist
 
 
-def last_episodes(item):
+def last_epis(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, 'Ultimos Episodios.*?</ul>')
+    bloque = scrapertools.find_single_match(data, 'Ultimos Episodios(.*?)</ul>')
+
     patron  = '(?is)<a href="([^"]+).*?src="([^"]+).*?"Title">([^<]+).*?<p>([^<]+)'
 
     matches = scrapertools.find_multiple_matches(bloque, patron)
@@ -339,7 +356,9 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
@@ -375,7 +394,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -421,7 +441,7 @@ def episodios(item):
         title = scrapertools.find_single_match(datos, '<h2[^>]*>(.*?)</h2>')
 
         thumb = scrapertools.find_single_match(datos, 'data-src=([^ >]+)"')
-        if  thumb.startswith('//'): thumb = 'https:' + thumb
+        if thumb.startswith('//'): thumb = 'https:' + thumb
 
         url = host + url
 
@@ -720,10 +740,7 @@ def play(item):
 
                 vid = item.url.replace('https://apialfa.tomatomatela.club/sc/index.php', 'https://apialfa.tomatomatela.club/sc/r.php')
 
-                if not vid.startswith(host):
-                    data = httptools.downloadpage(vid, post=post).data
-                else:
-                    data = httptools.downloadpage_proxy('cuevana3video', vid, post=post).data
+                data = do_downloadpage(vid, post=post)
 
                 url = scrapertools.find_single_match(data, '<meta name="og:url" content="(.*?)"')
 
@@ -745,7 +762,10 @@ def play(item):
                 if not vid.startswith(host):
                     new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                 else:
-                    new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
+                    if config.get_setting('channel_cuevana3video_proxies_proxies', default=''):
+                        new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
+                    else:
+                        new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
             except:
                 new_url = ''
 
@@ -760,7 +780,10 @@ def play(item):
                         if not vid.startswith(host):
                             new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                         else:
-                            new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
+                            if config.get_setting('channel_cuevana3video_proxies_proxies', default=''):
+                                new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
+                            else:
+                                new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                     except:
                         new_url = ''
 
@@ -781,7 +804,10 @@ def play(item):
                     if not vid.startswith(host):
                         url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                     else:
-                        url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
+                        if config.get_setting('channel_cuevana3video_proxies_proxies', default=''):
+                            url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
+                        else:
+                            url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                 except:
                     url = ''
 

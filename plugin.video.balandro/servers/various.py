@@ -3,7 +3,7 @@
 import xbmc, time
 
 from platformcode import config, logger, platformtools
-from core import scrapertools
+from core import httptools, scrapertools
 
 
 espera = config.get_setting('servers_waiting', default=6)
@@ -51,6 +51,7 @@ def get_video_url(page_url, url_referer=''):
         elif 'hexupload' in page_url: txt_server = 'Hexupload'
         elif 'embedgram' in page_url: txt_server = 'Embedgram'
         elif 'streamvid' in page_url: txt_server = 'Streamvid'
+        elif 'vidello' in page_url: txt_server = 'Vidello'
 
         elif 'upload.do' in page_url: txt_server = 'Uploaddo'
 
@@ -76,20 +77,20 @@ def get_video_url(page_url, url_referer=''):
               txt_server = 'Yandex'
               page_url = page_url.replace('/yadi.sk/', '/disk.yandex.ru/')
 
-        elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url:
+        elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url:
               txt_server = 'Streamwish'
               page_url = page_url.replace('/streamwish.com/', '/streamwish.to/').replace('/streamwish.top/', '/streamwish.to/').replace('/streamwish.site/', '/streamwish.to/').replace('/strwish.xyz/', '/streamwish.to/').replace('/embedwish.com/', '/streamwish.to/').replace('/wishembed.pro/', '/streamwish.to/')
-              page_url = page_url.replace('/awish.pro/', '/streamwish.to/').replace('/dwish.pro/', '/streamwish.to/').replace('/mwish.pro/', '/streamwish.to/').replace('/wishfast.top/', '/streamwish.to/')
+              page_url = page_url.replace('/awish.pro/', '/streamwish.to/').replace('/dwish.pro/', '/streamwish.to/').replace('/mwish.pro/', '/streamwish.to/').replace('/wishfast.top/', '/streamwish.to/').replace('sfastwish.com', '/streamwish.to/').replace('/doodporn.xyz/', '/streamwish.to/')
 
         elif 'desiupload' in page_url:
               txt_server = 'Desiupload'
               page_url = page_url.replace('/desiupload.to/', '/desiupload.co/').replace('/desiupload.in/', '/desiupload.co/')
 
-        elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url:
+        elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url:
               txt_server = 'Filelions'
               page_url = page_url.replace('/filelions.com/', '/filelions.to/').replace('/filelions.live/', '/filelions.to/').replace('/filelions.xyz/', '/filelions.to/').replace('/filelions.online/', '/filelions.to/')
               page_url = page_url.replace('/azipcdn.com/', '/filelions.to/')
-              page_url = page_url.replace('/alions.pro/', '/filelions.to/').replace('/dlions.pro/', '/filelions.to/').replace('/mlions.pro/', '/filelions.to/')
+              page_url = page_url.replace('/alions.pro/', '/filelions.to/').replace('/dlions.pro/', '/filelions.to/').replace('/mlions.pro/', '/filelions.to/').replace('/fviplions.com/', '/filelions.to/')
 
         elif 'youdbox' in page_url or 'yodbox' in page_url or 'youdboox' in page_url: 
               txt_server = 'Youdbox'
@@ -119,8 +120,15 @@ def get_video_url(page_url, url_referer=''):
               txt_server = 'Fileupload'
               page_url = page_url.replace('/www.file-upload.com/', '/www.file-upload.org/')
 
+        elif 'vidspeed' in page_url or 'vidspeeds' in page_url:
+              txt_server = 'Vidspeed'
+              page_url = page_url.replace('/www.vidspeeds.com/', '/vidspeed.cc/')
+              page_url = page_url.replace('/embed-', '/')
+
         platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
+
+        if txt_server == 'Unknow': return 'Servidor desconocido'
 
         try:
             import_libs('script.module.resolveurl')
@@ -142,6 +150,28 @@ def get_video_url(page_url, url_referer=''):
         except:
             import traceback
             logger.error(traceback.format_exc())
+
+            if txt_server == 'Vidspeed':
+                data = httptools.downloadpage(page_url).data
+                url = scrapertools.find_single_match(str(data), 'file:"(.*?)"')
+
+                if url:
+                    # ~ 13/10/2023  Directo pq falla ReslveUrl
+                    video_urls = [[url[-4:], url]]
+                    return video_urls
+
+            if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
+                if 'File Not Found or Removed' in traceback.format_exc():
+                    return 'Archivo inexistente ó eliminado'
+                elif 'The requested video was not found' in traceback.format_exc():
+                    return 'Archivo inexistente ó eliminado'
+                elif 'No se ha encontrado ningún link al vídeo' in traceback.format_exc():
+                    return 'Fichero sin link al vídeo'
+                elif 'Unable to locate link':
+                    return 'Fichero sin link al vídeo'
+                elif 'Wrong captcha. Please try again.' in traceback.format_exc():
+                    return 'Captcha erróneo. Intenetelo de nuevo'
+
             return 'Sin Respuesta ' + txt_server
     else:
        return 'Falta [COLOR red]ResolveUrl[/COLOR]'
