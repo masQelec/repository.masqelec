@@ -482,7 +482,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '118.0.5993.89')
+        config.set_setting('chrome_last_version', '119.0.6045.106')
 
         config.set_setting('debug', '0')
 

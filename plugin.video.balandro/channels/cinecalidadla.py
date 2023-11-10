@@ -10,7 +10,7 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://wvw.cinecalidad.dad/'
 
 
-players = ['https://cinecalidad.', '.cinecalidad.']
+_players = ['https://cinecalidad.', '.cinecalidad.']
 
 
 # ~ por si viene de enlaces guardados
@@ -47,6 +47,15 @@ def do_downloadpage(url, post=None, headers=None):
     if '/fecha/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if not data:
+        if url.startswith(host):
+            if not '?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CieCalidadLa', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -497,23 +506,80 @@ def play(item):
     logger.info()
     itemlist = []
 
+    domain_memo = config.get_setting('dominio', 'cinecalidadla', default='')
+
+    if domain_memo: host_player = domain_memo
+    else: host_player = host
+
     url = item.url
 
     servidor = item.server
 
     # ~ por si esta en ant_hosts
     for ant in ant_hosts:
-        url = url.replace(ant, host)
+        url = url.replace(ant, host_player)
+
+    if not host_player in url:
+        for _player in _players:
+            if _player in url:
+                url_avis = url
+                if '/?' in url_avis: url_avis = url.split('?')[0]
+
+                platformtools.dialog_ok(config.__addon_name + ' CineCalidadLa', '[COLOR cyan][B]Al parecer el Canal cambió de Dominio.[/B][/COLOR]', '[COLOR yellow][B]' + url_avis + '[/B][/COLOR]', 'Por favor, Reviselo en [COLOR goldenrod][B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]')
+                return itemlist
 
     if item.data_url:
         url_play = base64.b64decode(item.data_url).decode("utf-8")
 
         url = item.url + '?playnow=' + url_play
 
+        if not host_player in url:
+            for _player in _players:
+                if _player in url:
+                    url_avis = url
+                    if '/?' in url_avis: url_avis = url.split('?')[0]
+
+                    platformtools.dialog_ok(config.__addon_name + ' CineCalidadLa', '[COLOR cyan][B]Al parecer el Canal cambió de Dominio.[/B][/COLOR]', '[COLOR yellow][B]' + url_avis + '[/B][/COLOR]', 'Por favor, Reviselo en [COLOR goldenrod][B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]')
+                    return itemlist
+
         data = do_downloadpage(url)
 
         url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, "window.location.href = '(.*?)'")
+
+        if url == '${src}':
+             link = ''
+
+             matches = scrapertools.find_multiple_matches(data,'class="link onlinelink play a"(.*?)</a>')
+
+             for match in matches:
+                 srv = scrapertools.find_single_match(match,'data-domain="(.*?)"')
+
+                 if srv == 'ok': srv == 'okru'
+
+                 if not srv == item.server: continue
+
+                 link = scrapertools.find_single_match(match,'data-src="(.*?)"')
+                 break
+
+             if link:
+                 url_play = item.url.replace('?castellano=sp', '') + '?player=' + link
+
+                 headers = {'Referer': item.url}
+
+                 data = do_downloadpage(url_play, headers=headers)
+
+                 url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
+                 if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
+                 if not url: url = scrapertools.find_single_match(data, "window.location.href = '(.*?)'")
+
+                 if '/?playnow=' in url:
+                    data = do_downloadpage(url)
+
+                    url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
+                    if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
+                    if not url: url = scrapertools.find_single_match(data, "window.location.href = '(.*?)'")
 
         if url:
             if not 'https' in url: url = ''
@@ -557,7 +623,7 @@ def play(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        if servidor == 'zplayer':  url = url + '|' + host
+        if servidor == 'zplayer':  url = url + '|' + host_player
 
         itemlist.append(item.clone(url = url, server = servidor))
 

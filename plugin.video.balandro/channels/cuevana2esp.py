@@ -1,10 +1,47 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
 import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
+
+
+LINUX = False
+BR = False
+BR2 = False
+
+if PY3:
+    try:
+       import xbmc
+       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
+    except: pass
+ 
+try:
+   if LINUX:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+          BR2 = True
+       except: pass
+   else:
+       if PY3:
+           from lib import balandroresolver
+           BR = true
+       else:
+          try:
+             from lib import balandroresolver2 as balandroresolver
+             BR2 = True
+          except: pass
+except:
+   try:
+      from lib import balandroresolver2 as balandroresolver
+      BR2 = True
+   except: pass
 
 
 host = 'https://www.cuevana2espanol.net/'
@@ -60,7 +97,7 @@ def do_downloadpage(url, post=None, headers=None):
         url = url.replace(ant, host)
 
     hay_proxies = False
-    if config.get_setting('channel_cuevana2esp_proxies_proxies', default=''): hay_proxies = True
+    if config.get_setting('channel_cuevana2esp_proxies', default=''): hay_proxies = True
 
     timeout = None
     if host in url:
@@ -76,7 +113,9 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not 'search?q=' in url:
-                platformtools.dialog_notification('Cuevana2Esp', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Cuevana2Esp', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
                     data = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, timeout=timeout).data
@@ -84,11 +123,11 @@ def do_downloadpage(url, post=None, headers=None):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data:
-        try:
-            from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-            if ck_name and ck_value:
-                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+        if BR or BR2:
+            try:
+                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+                if ck_name and ck_value:
+                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
@@ -97,8 +136,8 @@ def do_downloadpage(url, post=None, headers=None):
                         data = httptools.downloadpage_proxy('cuevana2esp', url, post=post, headers=headers, timeout=timeout).data
                     else:
                         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-        except:
-            pass
+            except:
+                pass
 
     return data
 
@@ -244,6 +283,8 @@ def list_all(item):
         url = host[:-1] + url
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
+        thumb = thumb.replace('&amp;', '&')
+
         thumb = host[:-1] + thumb
 
         year = scrapertools.find_single_match(article, '<span>(\d{4})</span>')
@@ -304,7 +345,7 @@ def last_epis(item):
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
         thumb = host[:-1] + thumb
 
-        temp_epis = scrapertools.find_single_match(match, '</h2></a><span>(.*?)</span>')
+        temp_epis = scrapertools.find_single_match(match, '</h3></a><span>(.*?)</span>')
         temp_epis = temp_epis.replace('<!-- -->', '')
 
         season = scrapertools.find_single_match(temp_epis, '(.*?)x')

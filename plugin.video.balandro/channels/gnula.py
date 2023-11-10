@@ -75,7 +75,9 @@ def do_downloadpage(url, post=None):
 
         if not data:
             if '/lista-' in url or '/ver-' in url or '/generos/' in url:
-                platformtools.dialog_notification('Gnula', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Gnula', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
                     data = httptools.downloadpage_proxy('gnula', url, post=post, timeout=timeout).data

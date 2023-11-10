@@ -129,6 +129,8 @@ def lista(item, elementos):
 def listado(item):
     logger.info()
 
+    if not item.page: item.page = 1
+
     tipo = 'movie' if item.search_type == 'movie' else 'tv'
     elementos = tmdb.get_list(tipo, item.extra, item.page)
 
@@ -137,6 +139,8 @@ def listado(item):
 
 def descubre(item):
     logger.info()
+
+    if not item.page: item.page = 1
 
     tipo = 'movie' if item.search_type == 'movie' else 'tv'
     elementos = tmdb.get_discover(tipo, item.extra, item.page)
@@ -147,6 +151,8 @@ def descubre(item):
 def descubre_networks(item):
     logger.info()
 
+    if not item.page: item.page = 1
+
     tipo = 'movie' if item.search_type == 'movie' else 'tv'
     elementos = tmdb.get_discover_networks(tipo, item.extra, item.page)
 
@@ -156,6 +162,8 @@ def descubre_networks(item):
 def generos(item):
     logger.info()
     itemlist = []
+
+    if not item.page: item.page = 1
 
     if item.search_type == 'movie': text_color = 'deepskyblue'
     else: text_color = 'hotpink'
@@ -216,6 +224,8 @@ def networks(item):
 
 def descubre_anios(item):
     logger.info()
+
+    if not item.page: item.page = 1
 
     tipo = 'movie' if item.search_type == 'movie' else 'tv'
     elementos = tmdb.get_discover_anios(tipo, item.extra, item.page)

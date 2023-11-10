@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod]Dominios [/COLOR][COLOR cyan]  24 de Octubre de 2023 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 3.1.02[/B][/COLOR]
+[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod]Dominios [/COLOR][COLOR aqua]  7 de Noviembre de 2023 [/COLOR][COLOR limegreen]  Hora  20:00  [/COLOR][COLOR yellow]Version 3.1.03[/B][/COLOR]
 
   [COLOR yellow][B][I]CONTACTO:[/I][/B][/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
@@ -12,11 +12,16 @@
          o menos saturados, o mas duraderos, ademas pueden ser gratuitos o de pago.[/B][/COLOR]
 
   [COLOR deepskyblue][B]GESTION PROXIES LISTAS PERSONALIZADAS:[/B][/COLOR] 
-    [B][COLOR moccasin] Lista-proxies.zip [COLOR dodgerblue] Descarga desde el Foro [COLOR limegreen][I] Revision 11/10/2023 [/I][/B][/COLOR]
+    [B][COLOR moccasin] Lista-proxies.zip [COLOR dodgerblue] Descarga desde el Foro [COLOR limegreen][I] Revision 7/11/2023 [/I][/B][/COLOR]
 
   [COLOR cyan][B]ULTIMOS CAMBIOS DE DOMINIOS:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
-  [COLOR yellowgreen][B]SITUACION CANALES:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
+  [COLOR yellowgreen][B]SITUACION CANALES:[/B][/COLOR]
+    [B][COLOR moccasin] AnimeYt [COLOR springgreen] animeyt.moe [I][COLOR olivedrab] Dominio No Localizado [/I][/B][/COLOR]
+    [B][COLOR moccasin] Cuevana2Esp [COLOR springgreen] www.cuevana2.icu [I][COLOR olivedrab] Dominio Dominio No Localizado [/I][/B][/COLOR]
+    [B][COLOR moccasin] Cuevana3Lw [COLOR springgreen] cuevana8.online [I][COLOR olivedrab] Cuenta Suspendida [/I][/B][/COLOR]
+    [B][COLOR moccasin] FrozenLayer [COLOR springgreen] www.frozen-layer.com [I][COLOR olivedrab] Dominio No Localizado [/I][/B][/COLOR]
+    [B][COLOR moccasin] NewPelis [COLOR springgreen] newpelis.re [I][COLOR olivedrab] Dominio No Localizado [/I][/B][/COLOR]
 
   [COLOR slateblue][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR]
     [B][COLOR moccasin] DocumaniaTv [COLOR springgreen] www.documaniatv.com [I][COLOR olivedrab] Pdte. Re-Activar o Anular [/I][/B][/COLOR]

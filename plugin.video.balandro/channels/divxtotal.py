@@ -15,14 +15,14 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www2.divxtotal.zip/'
+host = 'https://www2.divxtotal.mov/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://www.divxtotal.dev/',
              'https://www.divxtotal.ms/', 'https://www.divxtotal.fi/', 'https://www.divxtotal.cat/',
              'https://www.divxtotal.pl/', 'https://www.divxtotal.wf/', 'https://www.divxtotal.win/',
-             'https://www1.divxtotal.zip/']
+             'https://www1.divxtotal.zip/', 'https://www2.divxtotal.zip/']
 
 
 domain = config.get_setting('dominio', 'divxtotal', default='')
@@ -80,6 +80,17 @@ def do_downloadpage(url, post=None, headers=None):
             data = httptools.downloadpage_proxy('divxtotal', url, post=post, headers=headers).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers).data
+
+        if not data:
+            if not '?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DivxTotal', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('divxtotal', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
 
@@ -204,10 +215,9 @@ def list_all(item):
     if not bloque:
         if item.search_type == 'tvshow': bloque = data
 
-    if not bloque:
-        if item.group == 'lasts':
-            if item.search_type == 'movie': bloque = scrapertools.find_single_match(data, '<div class="panel panel-default peliculas-bloque bloque-home">(.*?)>Series</h3>')
-            else: bloque = scrapertools.find_single_match(data, '>Series</h3>(.*?)>Programas</h3>')
+    if item.group == 'lasts':
+        if item.search_type == 'movie': bloque = scrapertools.find_single_match(data, '>Películas</h3>(.*?)>Series</h3>')
+        else: bloque = scrapertools.find_single_match(data, '>Series</h3>(.*?)>Programas</h3>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
     if not matches:
@@ -230,7 +240,7 @@ def list_all(item):
         sufijo = '' if item.search_type != 'all' else tipo
 
         title = title.replace('- pelicula torrent', '').strip()
-        title = title.replace("&#8217;", "'").replace("&#8230;", ':')
+        title = title.replace("&#8217;", "'").replace("&#8230;", ':').replace("&#8211;", ':')
 
         titulo = title
 

@@ -79,17 +79,17 @@ def mainlist(item):
                                     thumbnail=config.get_thumb('documentary'),
                                     plot = 'Escribir el nombre de un documental para buscarlo en los canales de documentales' ))
 
-    if config.get_setting('mnu_doramas', default=True):
-        if not config.get_setting('mnu_simple', default=False):
+    if not config.get_setting('mnu_simple', default=False):
+        if config.get_setting('mnu_doramas', default=True):
             itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR firebrick]Dorama[/COLOR] ...',
                                         thumbnail=config.get_thumb('computer'), search_special = 'dorama',
                                         plot = 'Escribir el nombre de un dorama para buscarlo Solo en los canales exlusivos de Doramas' ))
 
-    if config.get_setting('mnu_animes', default=True):
-        if not config.get_setting('mnu_simple', default=False):
-            itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR springgreen]Anime[/COLOR] ...',
-                                        thumbnail=config.get_thumb('anime'), search_special = 'anime',
-                                        plot = 'Escribir el nombre de un anime para buscarlo Solo en los canales exlusivos de Animes' ))
+        if config.get_setting('mnu_animes', default=True):
+            if not config.get_setting('descartar_anime', default=True):
+               itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR springgreen]Anime[/COLOR] ...',
+                                           thumbnail=config.get_thumb('anime'), search_special = 'anime',
+                                           plot = 'Escribir el nombre de un anime para buscarlo Solo en los canales exlusivos de Animes' ))
 
     if config.get_setting('search_extra_main', default=False):
         itemlist.append(item.clone( action='', title= '[B]Búsquedas Especiales:[/B]', folder=False, text_color='yellowgreen' ))

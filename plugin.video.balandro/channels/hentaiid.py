@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import re
 
 from platformcode import config, logger, platformtools
@@ -9,6 +8,12 @@ from core import httptools, scrapertools, servertools
 
 
 host = 'https://hentai-id.tv/'
+
+
+def do_downloadpage(url, post=None, headers=None):
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
 
 
 def mainlist(item):
@@ -44,7 +49,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(host).data
+    data = do_downloadpage(host)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
     bloque = scrapertools.find_single_match(data, 'id="hentai2"><div[^>]+>(.*?)</div></div>')
@@ -61,7 +66,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}", "", data)
 
     bloque = scrapertools.find_single_match(data, '<div class="col-xs-12 col-md-12 col-lg-9px-3"><ul>(.*?)</ul><div class="clearfix">')
@@ -95,7 +100,7 @@ def episodios(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}", "", data)
 
     bloque = scrapertools.find_single_match(data, '<div class="box-entry-title text-center">Lista de Capítulos</div>(.*?)</div></div>')
@@ -117,7 +122,7 @@ def findvideos(item):
     videos = []
     downloads = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}', "", data)
 
     matches = re.compile('<(?:iframe)?(?:IFRAME)?\s*(?:src)?(?:SRC)?="([^"]+)"', re.DOTALL).findall(data)
@@ -136,7 +141,7 @@ def findvideos(item):
 
     if paste:
         try:
-           data = httptools.downloadpage('https://gpaste.us/' + paste).data
+           data = do_downloadpage('https://gpaste.us/' + paste)
 
            block = scrapertools.find_single_match(data, 'id="input_text">(.*?)</div>')
 

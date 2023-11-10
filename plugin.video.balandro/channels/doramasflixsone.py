@@ -99,7 +99,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8211;', '').replace('&amp;', ' & ').replace('&#8217;', "'").strip()
+        title = title.replace('&#8211;', '').replace('&amp;', ' & ').replace('&#8217;', "'").replace('&#038;', '&').strip()
 
         SerieName = title
 
@@ -234,7 +234,7 @@ def episodios(item):
         title = scrapertools.find_single_match(match, '<h3 class="post-box-title">.*?rel="bookmark">(.*?)</a>').strip()
         if not title: title = scrapertools.find_single_match(match, '<h3><a href=".*?">(.*?)</a>').strip()
 
-        title = title.replace('&#8211;', '').replace('&amp;', ' & ').replace('&#8217;', "'").strip()
+        title = title.replace('&#8211;', '').replace('&amp;', ' & ').replace('&#8217;', "'").replace('&#038;', '&').strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 

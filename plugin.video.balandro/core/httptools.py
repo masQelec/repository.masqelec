@@ -49,8 +49,8 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.71 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.89 Safari/537.36"
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.89 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.6045.106 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -188,8 +188,8 @@ def downloadpage_proxy(canal,
                         proxy_ok = True
                         break
 
-                    if 'file not found' in resp.data.lower():
-                        logger.info('Proxy (error 404 y data = File not found) %s SI responde %s' % (proxy, resp.code))
+                    if ' not found' in str(resp.data).lower():
+                        logger.info('Proxy (error 404 y data = Not Found) %s SI responde %s' % (proxy, resp.code))
                         proxy_ok = True
                         break
 
@@ -207,13 +207,13 @@ def downloadpage_proxy(canal,
                         proxy_ok = True
                         break
 
-                    if 'file not found' in resp.data.lower():
-                        logger.info('Sin proxies (error 404 y File not found) %s' % resp.code)
+                    if ' not found' in str(resp.data).lower():
+                        logger.info('Sin proxies (error 404 y Not Found) %s' % resp.code)
                         proxy_ok = True
                         break
 
         else:
-            if 'ERROR 404 - File not found' in str(resp.data) or 'HTTP Error 404: Not Found' in str(resp.data) or '<title>Site Blocked</title>' in str(resp.data) or 'HTTP/1.1 400 Bad Request' in str(resp.data):
+            if ' not found' in str(resp.data).lower() or ' bad request' in str(resp.data).lower() or '<title>Site Blocked</title>' in str(resp.data):
                 logger.info('Proxy respuesta insuficiente %s' % proxy)
             else:
                 proxy_ok = True
@@ -648,10 +648,8 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
            logger.error(traceback.format_exc(1))
 
     # ~ Guardar en caché si la respuesta parece válida (no parece not found ni bloqueado, al menos un enlace o json, al menos 1000 bytes)
-    if use_cache and type(response['code']) == int and response['code'] >= 200 and response['code'] < 400 and response['data'] != '' \
-       and len(response['data']) > 1000 \
-       and 'ERROR 404 - File not found' not in str(response['data']) and 'HTTP Error 404: Not Found' not in str(response['data']) and '<title>Site Blocked</title>' not in str(response['data']) \
-       and 'HTTP/1.1 400 Bad Request' not in str(response['data']) \
+    if use_cache and type(response['code']) == int and response['code'] >= 200 and response['code'] < 400 and response['data'] != '' and len(response['data']) > 1000 \
+       and ' not found' not in str(response['data']).lower() and ' bad request' not in str(response['data']).lower() and '<title>Site Blocked</title>' not in str(response['data']) \
        and ('href=' in str(response['data']) or str(response['data']).startswith('{')):
             with open(cache_file, 'wb') as f: f.write(str(response['data'])); f.close()
             logger.info("Guardado caché %s url %s" % (cache_md5url, url))

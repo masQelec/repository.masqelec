@@ -1,10 +1,47 @@
 ﻿# -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
 import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
+
+
+LINUX = False
+BR = False
+BR2 = False
+
+if PY3:
+    try:
+       import xbmc
+       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
+    except: pass
+ 
+try:
+   if LINUX:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+          BR2 = True
+       except: pass
+   else:
+       if PY3:
+           from lib import balandroresolver
+           BR = true
+       else:
+          try:
+             from lib import balandroresolver2 as balandroresolver
+             BR2 = True
+          except: pass
+except:
+   try:
+      from lib import balandroresolver2 as balandroresolver
+      BR2 = True
+   except: pass
 
 
 host = 'https://pepecine.top/'
@@ -63,7 +100,9 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '?s=' in url:
-                platformtools.dialog_notification('PepeCineTop', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PepeCineTop', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
                     data = httptools.downloadpage_proxy('pepecinetop', url, post=post, headers=headers, timeout=timeout).data
@@ -71,11 +110,11 @@ def do_downloadpage(url, post=None, headers=None):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        try:
-            from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-            if ck_name and ck_value:
-                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+        if BR or BR2:
+            try:
+                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+                if ck_name and ck_value:
+                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
@@ -84,8 +123,8 @@ def do_downloadpage(url, post=None, headers=None):
                         data = httptools.downloadpage_proxy('pepecinetop', url, post=post, headers=headers, timeout=timeout).data
                     else:
                         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-        except:
-            pass
+            except:
+                pass
 
     if not '?s=' in url:
         if '<title>Just a moment...</title>' in data:

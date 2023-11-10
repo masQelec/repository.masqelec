@@ -6,7 +6,7 @@
   "notes": "Alternative vía: Script.Module.ResolveUrl",
 
   "find_videos": {
-    "ignore_urls": [],
+    "ignore_urls": ["https://vk.com/video"],
     "patterns": [
       {
         "pattern": "/video_ext.php\\?oid=(\\d+)&id=(\\d+)",

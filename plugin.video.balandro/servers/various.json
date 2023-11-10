@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Alions,  Awish,  Azipcdn,  Desiupload,  Dlions,  Doodporn,  Dropload,  Dwish,  Embedgram,  Emturbovid,  Embedwish,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Fviplions,  Hexupload,  Krakenfiles,  Lulustream,  Luluvdo,  Mlions,  Moonplayer,  Mvidoo,  Mwish,  Rutube,  Sfastwish,  Streamhub,  Streamvid,  Streamwish,  Strwish,  Tubeload,  Turboviplay,  Uploaddo,  Uploadever,  Vgfplay,  Vid-guard,  Vidello,  Videowood,  Vidguard,  Vidspeed,  V6embed,  Vgembed,  Vembed, Vudeo,  Wishembed,  Wishfast,  Yadi,  Yandex,  Yodbox,  Youdboox,  Youdbox)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Alions,  Awish,  Azipcdn,  Desiupload,  Dlions,  Doodporn,  Dropload,  Dwish,  Embedgram,  Emturbovid,  Embedwish,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Fviplions,  Hexupload,  Krakenfiles,  Lulustream,  Luluvdo,  Mlions,  Moonmov,  Moonplayer,  Mvidoo,  Mwish,  Rutube,  Sfastwish,  Streamhub,  Streamvid,  Streamwish,  Strwish,  Tubeload,  Turboviplay,  Tuborstb,  Uploaddo,  Uploadever,  Vgfplay,  Vid-guard,  Vidello,  Videowood,  Vidguard,  Vidspeed,  V6embed,  Vgembed,  Vembed,  Vudeo,  Wishembed,  Wishfast,  Yadi,  Yandex,  Yodbox,  Youdboox,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -59,6 +59,10 @@
       {
         "pattern": "(https://filemoon.top/(?:e/|d/)[0-9a-zA-Z]+)",
         "url": "\\1"
+      },
+      {
+        "pattern": "https://moonmov.pro/e/([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
       },
       {
         "pattern": "https://moonplayer.lat/e/([0-9a-zA-Z]+)",
@@ -330,6 +334,10 @@
       },
       {
         "pattern": "https://emturbovid.com/t/([0-9a-zA-Z]+)",
+        "url": "https://emturbovid.com/t/\\1"
+      },
+      {
+        "pattern": "https://tuborstb.co/t/([0-9a-zA-Z]+)",
         "url": "https://emturbovid.com/t/\\1"
       },
       {
