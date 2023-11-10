@@ -71,13 +71,11 @@ def proxysearch_all(item):
            platformtools.dialog_ok(config.__addon_name, '[COLOR red][B]En sus Ajustes/Preferenncias (categoría proxies), No tiene el Modo buscar automaticamente.[/B][/COLOR]')
            return
 
-
     cfg_excludes = 'proxysearch_excludes'
     channels_excludes = config.get_setting(cfg_excludes, default='')
 
     channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
     iniciales_channels_proxies_memorized = channels_proxies_memorized
-
 
     proceso_seleccionar = True
 
@@ -340,7 +338,6 @@ def proxysearch_all(item):
 
         proxysearch_channel(item, ch['id'], ch['name'], iniciales_channels_proxies_memorized)
 
-
     # ~ los que No intervienen en el buscar ganeral
     if not config.get_setting('mnu_simple', default=False):
         filtros = {'searchable': False}
@@ -381,10 +378,8 @@ def proxysearch_all(item):
 
                proxysearch_channel(item, ch['id'], ch['name'], iniciales_channels_proxies_memorized)
 
-
     config.set_setting('proxysearch_process', '')
     config.set_setting('proxysearch_process_proxies', '')
-
 
     if procesados == 0:
         if iniciales_channels_proxies_memorized:
@@ -443,7 +438,6 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
 
     global procesados
 
-
     channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
 
     if config.get_setting('memorize_channels_proxies', default=True):
@@ -452,6 +446,11 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
 
             if iniciales_channels_proxies_memorized:
                 if not el_memorizado in str(channels_proxies_memorized): return
+
+            channel_json = channel_id + '.json'
+            filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+            existe = filetools.exists(filename_json)
+            if not existe: return
 
             cfg_proxies_channel = 'channel_' + channel_id + '_proxies'
 
@@ -505,6 +504,10 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
     if not esta_en_poe:
        if dominio: host = dominio
        else:
+          if channel_id == 'playdede':
+              el_canal = ('[COLOR cyan][B]Cargando espere ... [/B][/COLOR][B][COLOR %s]' + channel_name) % color_avis
+              platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]', time=3000)
+
            try:
               data = filetools.read(filename_py)
            except:

@@ -1,10 +1,47 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
 import os, re, xbmcgui
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb, jsontools
+
+
+LINUX = False
+BR = False
+BR2 = False
+
+if PY3:
+    try:
+       import xbmc
+       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
+    except: pass
+ 
+try:
+   if LINUX:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+          BR2 = True
+       except: pass
+   else:
+       if PY3:
+           from lib import balandroresolver
+           BR = true
+       else:
+          try:
+             from lib import balandroresolver2 as balandroresolver
+             BR2 = True
+          except: pass
+except:
+   try:
+      from lib import balandroresolver2 as balandroresolver
+      BR2 = True
+   except: pass
 
 
 host = 'https://playdede.us/'
@@ -36,7 +73,6 @@ login_ko = '[COLOR red][B]PlayDede Login incorrecto[/B][/COLOR]'
 no_login = '[COLOR orangered][B]PlayDede Sin acceso Login[/B][/COLOR]'
 
 datos_ko = '>Registrarme<'
-close_open = '[COLOR cyan][B]Cierre la sesión e Iniciela de nuevo[/B][/COLOR]'
 
 notification_d_ok = config.get_setting('notification_d_ok', default=True)
 
@@ -135,11 +171,11 @@ def do_make_login_logout(url, post=None, headers=None):
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        try:
-            from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-            if ck_name and ck_value:
-                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+        if BR or BR2:
+            try:
+                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+                if ck_name and ck_value:
+                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
@@ -148,8 +184,8 @@ def do_make_login_logout(url, post=None, headers=None):
                         data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False).data
                     else:
                         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
-        except:
-            pass
+            except:
+                pass
 
     if '<title>Just a moment...</title>' in data:
         platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
@@ -990,7 +1026,7 @@ def list_last(item):
 
             title = title.replace('/', '').strip()
 
-            titulo = titulo.replace(str(season) + 'x' + epis, '').strip()
+            titulo = titulo.replace(str(season) + 'x' + str(epis), '').strip()
             titulo = titulo.replace(title, '').strip()
 
             if not 'Episodio' in title: titulo = titulo +  ' ' + title
@@ -1043,7 +1079,7 @@ def list_last(item):
 
             titulo = titulo.replace('  ', ' ')
 
-            if not 'x' in titulo: titulo = titulo + ' ' + str(season) + 'x' + str (epis)
+            if not 'x' in titulo: titulo = titulo + ' ' + str(season) + 'x' + str(epis)
 
             SerieName = SerieName.replace('  ', ' ')
 
@@ -1325,10 +1361,12 @@ def findvideos(item):
 
         qlty = scrapertools.find_single_match(match, '">Calidad:.*?">(.*?)</span>')
 
-        if server == 'filemoon': other = 'Filemoon'
+        if server == 'filelions': other = 'Filelions'
+        elif server == 'filemoon': other = 'Filemoon'
         elif server == 'streamwish': other = 'Streamwish'
         elif server == 'streamhub': other = 'Streamhub'
         elif server == 'uploaddo': other = 'Uploaddo'
+        elif server == 'vembed': other = 'Vidguard'
         else: other = ''
 
         server = servertools.corregir_servidor(server)
@@ -1355,10 +1393,12 @@ def findvideos(item):
 
         lang = lang.capitalize()
 
-        if server == 'filemoon': other = 'Filemoon'
+        if server == 'filelions': other = 'Filelions'
+        elif server == 'filemoon': other = 'Filemoon'
         elif server == 'streamwish': other = 'Streamwish'
         elif server == 'streamhub': other = 'Streamhub'
         elif server == 'uploaddo': other = 'Uploaddo'
+        elif server == 'vembed': other = 'Vidguard'
         else: other = 'E'
 
         server = servertools.corregir_servidor(server)

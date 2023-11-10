@@ -195,10 +195,13 @@ def episodios(item):
 
         epis = scrapertools.find_single_match(capitulo, 'Capitulo(.*?)-').strip()
 
+        title = title.replace('&#39;s', "'s")
+
         title = '%sx%s %s %s' % (str(item.contentSeason), epis, capitulo, title)
+
         title = title.replace('--', '').replace('-', '')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType='episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType='episode', contentSeason = item.contentSeason, contentEpisodeNumber = capitulo ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -241,7 +244,10 @@ def findvideos(item):
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Lat' ))
+        other = ''
+        if servidor == 'various': other = servertools.corregir_other(url)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Lat', other = other ))
 
     if not itemlist:
         if not ses == 0:

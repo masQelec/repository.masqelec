@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -653,7 +653,9 @@ def list_search(item):
 
     matches = scrapertools.find_multiple_matches(bloques, '<h2 class="wsite-content-title"(.*?)</h2>')
 
-    if matches: platformtools.dialog_notification('CineDeAntes', '[COLOR blue]Cargando películas[/COLOR]')
+    if matches:
+        if config.get_setting('channels_charges_movies', default=True):
+            platformtools.dialog_notification('CineDeAntes', '[COLOR blue]Cargando películas[/COLOR]')
 
     for match in matches:
         match = match.replace('<font size="4"><em><u>', '').replace('</u></em></font>', '').replace('L<u style=""><em style="">', 'L')

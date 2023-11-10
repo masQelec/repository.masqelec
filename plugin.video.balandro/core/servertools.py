@@ -74,12 +74,19 @@ def normalize_url(serverid, url):
             url = url.encode('utf-8', 'strict')
         elif PY3 and isinstance(url, bytes):
             url = url.decode('utf-8', 'strict')
+
         for match in re.compile(pattern["pattern"], re.DOTALL).finditer(url):
             new_url = pattern["url"]
+
             for x in range(len(match.groups())):
                 new_url = new_url.replace("\\%s" % (x + 1), match.groups()[x])
 
-            if new_url not in server_parameters["find_videos"].get("ignore_urls", []):
+            ignore_urls = server_parameters["find_videos"].get("ignore_urls", [])
+
+            if new_url not in ignore_urls:
+                if str(ignore_urls) == "['https://vk.com/video']":
+                    new_url = url
+
                 found = True
             else:
                 new_url = url
@@ -447,10 +454,11 @@ def corregir_servidor(servidor):
     elif servidor in ['thevideome', 'thevideo']: return 'thevideome'
     elif servidor in ['1fichier', 'onefichier']: return '1fichier'
     elif servidor in ['uploadedto', 'uploaded', 'ul', 'ul.to']: return 'uploadedto'
+
     elif servidor == 'uptostream': return 'uptobox'
     elif servidor == ['pixel']: return 'pixeldrain'
 
-    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions']: return 'various'
+    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov']: return 'various'
 
     else: return servidor
 
@@ -475,6 +483,7 @@ def corregir_other(srv):
     elif 'filemoon' in srv: srv = 'Filemoon'
     elif 'streamhub' in srv: srv = 'Streamhub'
     elif 'uploadever' in srv: srv = 'Uploadever'
+    elif 'moonmov' in srv: srv = 'Moonplayer'
     elif 'moonplayer' in srv: srv = 'Moonplayer'
     elif 'yadi' in srv: srv = 'Yandex'
 
@@ -492,7 +501,7 @@ def corregir_other(srv):
 
     elif 'lulustream' in srv or 'luluvdo' in srv: srv = 'Lulustream'
 
-    elif 'turboviplay' in srv or 'emturbovid' in srv: srv = 'Turboviplay'
+    elif 'turboviplay' in srv or 'emturbovid' in srv or 'tuborstb' in srv: srv = 'Turboviplay'
 
     elif 'file-upload' in srv: srv = 'Fileupload'
 

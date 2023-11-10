@@ -15,11 +15,11 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cuevana8.vip'
+host = 'https://cuevana8.online'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://cuevana3.law', 'https://pro.cuevana8.vip' ]
+ant_hosts = ['https://cuevana3.law', 'https://pro.cuevana8.vip', 'https://cuevana8.vip']
 
 domain = config.get_setting('dominio', 'cuevana3lw', default='')
 
@@ -216,7 +216,7 @@ def last_epis(item):
     data = do_downloadpage(host)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '</h3>(.*?)</section>')
+    bloque = scrapertools.find_single_match(data, '>episodios</h3>(.*?)</section>')
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
@@ -229,11 +229,15 @@ def last_epis(item):
 
         thumb = 'https:' + thumb
 
-        season, episode = scrapertools.get_season_and_episode(title).split("x")
+        season = scrapertools.find_single_match(article, '<span class="num-epi">(.*?)x').strip()
+        if not season: season = 1
+
+        episode = scrapertools.find_single_match(article, '<span class="num-epi">.*?x(.*?)</span>').strip()
+        if not episode: episode = 1
 
         contentSerieName = scrapertools.find_single_match(title, '(.*?) \d')
 
-        titulo = season + 'x' + episode + ' ' + title.replace(season + 'x' + episode, '').strip()
+        titulo = str(season) + 'x' + str(episode) + ' ' + title.replace(str(season) + 'x' + str(episode), '').strip()
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail=thumb, url = url,
                                     contentType = 'episode', contentSerieName=contentSerieName, contentSeason = season, contentEpisodeNumber = episode ))
@@ -409,7 +413,7 @@ def findvideos(item):
             if vid:
                 if vid.startswith('//'): vid = 'https:' + vid
 
-                if '/play?' in vid:
+                if '/play?' in vid or '/streamhd?' in vid:
                     vid = vid.replace('&amp;', '&')
 
                     data = do_downloadpage(vid)
@@ -433,12 +437,16 @@ def findvideos(item):
                             other = ''
                             if servidor == 'various': other = servertools.corregir_other(url)
 
+                            if url.startswith('//'): url = 'https:' + url
+
                             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
 
                     embed = scrapertools.find_single_match(str(data), "sources:.*?'(.*?)'")
 
                     if embed:
                         ses += 1
+
+                        if embed.startswith('//'): embed = 'https:' + embed
 
                         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = embed, language = lang ))
 
@@ -459,6 +467,8 @@ def findvideos(item):
                         other = ''
                         if servidor == 'various': other = servertools.corregir_other(url)
 
+                        if url.startswith('//'): url = 'https:' + url
+
                         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
 
             else:
@@ -467,6 +477,8 @@ def findvideos(item):
                 if servidor == srv: other = ''
                 elif not servidor == 'directo':
                    if not servidor == 'various': other = ''
+
+                if url.startswith('//'): url = 'https:' + url
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other.capitalize() ))
 
@@ -482,28 +494,29 @@ def play(item):
     logger.info()
     itemlist = []
 
-    url = item.url.replace('&#038;', '&')
+    url = item.url.replace('&#038;', '&').replace('&amp;', '&')
 
     if not item.server:
-        item.url = item.url.replace('&#038;', '&')
+        item.url = url
 
         data = do_downloadpage(item.url)
 
         url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
         if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
-        if url:
-            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+        if not url: return itemlist
 
-            servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
+        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
+            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-            url = servertools.normalize_url(servidor, url)
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
 
-            itemlist.append(item.clone(server = servidor, url = url))
+        url = servertools.normalize_url(servidor, url)
 
-            return itemlist
+        itemlist.append(item.clone(server = servidor, url = url))
+
+        return itemlist
 
     itemlist.append(item.clone(server = item.server, url = url))
 

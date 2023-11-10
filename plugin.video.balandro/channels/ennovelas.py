@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
 import re
 
 from platformcode import config, logger, platformtools
@@ -7,14 +12,46 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://v.ennovelas.net/'
+LINUX = False
+BR = False
+BR2 = False
+
+if PY3:
+    try:
+       import xbmc
+       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
+    except: pass
+ 
+try:
+   if LINUX:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+          BR2 = True
+       except: pass
+   else:
+       if PY3:
+           from lib import balandroresolver
+           BR = true
+       else:
+          try:
+             from lib import balandroresolver2 as balandroresolver
+             BR2 = True
+          except: pass
+except:
+   try:
+      from lib import balandroresolver2 as balandroresolver
+      BR2 = True
+   except: pass
+
+host = 'https://o.ennovelas.net/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://ennovelas.net/', 'https://w.ennovelas.net/', 'https://ww.ennovelas.net/',
              'https://e.ennovelas.net/', 'https://a.ennovelas.net/', 'https://b.ennovelas.net/',
              'https://s.ennovelas.net/', 'https://i.ennovelas.net/', 'https://d.ennovelas.net/',
-             'https://f.ennovelas.net/', 'https://t.ennovelas.net/', 'https://n.ennovelas.net/']
+             'https://f.ennovelas.net/', 'https://t.ennovelas.net/', 'https://n.ennovelas.net/',
+             'https://v.ennovelas.net/']
 
 
 domain = config.get_setting('dominio', 'ennovelas', default='')
@@ -78,11 +115,11 @@ def do_downloadpage(url, post=None, headers=None):
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        try:
-            from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-            if ck_name and ck_value:
-                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+        if BR or BR2:
+            try:
+                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+                if ck_name and ck_value:
+                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -91,8 +128,8 @@ def do_downloadpage(url, post=None, headers=None):
                         data = httptools.downloadpage_proxy('ennovelas', url, post=post, headers=headers, raise_weberror=raise_weberror).data
                     else:
                         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-        except:
-            pass
+            except:
+                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '/search/' in url:
@@ -579,7 +616,8 @@ def findvideos(item):
     if item.lang == 'Esp': lang = 'Esp'
     else: lang = 'Lat'
 
-    data = do_downloadpage(item.url)
+    data = do_downloadpage(item.url + '?do=watch')
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     values = scrapertools.find_multiple_matches(data, '<form method="post".*?action="(.*?)".*?<input type="hidden".*?name="(.*?)".*?value="(.*?)"')
 
@@ -600,7 +638,8 @@ def findvideos(item):
         if not matches: matches = scrapertools.find_multiple_matches(data1, '<td>Server.*?href="(.*?)"')
 
         for url in matches:
-            if '.ennovelas.' in url: continue
+            if '/ennovelas.' in url: continue
+            elif '.ennovelas.' in url: continue
             elif '/tomatomatela.' in url: continue
             elif '/watching.' in url: continue
             elif '/novelas360.' in url: continue
@@ -653,7 +692,7 @@ def findvideos(item):
            if u_link.startswith('//'): u_link = 'https:' + u_link
 
            if u_link:
-              if '/ennovelas.' in u_link: u_link = ''
+              if '/ennovelas.' in u_link or '.ennovelas.' in u_link: u_link = ''
 
            if u_link:
                servidor = servertools.get_server_from_url(u_link)
@@ -672,7 +711,7 @@ def findvideos(item):
            i += 1
 
     # ~ Downloads
-    data = do_downloadpage(item.url, headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'})
+    data = do_downloadpage(item.url + '?do=downloads', headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'})
 
     matches = scrapertools.find_multiple_matches(data, '<td>Server.*?href="(.*?)"')
 

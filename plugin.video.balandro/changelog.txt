@@ -2,6 +2,12 @@
 
 [COLOR yellow][B]2023[/B][/COLOR]
 
+3.1.03  [COLOR darkorange] 8 de Noviembre de 2023[/COLOR]
+    Patch: Bug Ubuntu con Python 3
+    Correcciones: Bugs de la version anterior
+    Generos: Re-configurados
+    Canales y Servidores: Sin variaciones
+
 3.1.02  [COLOR darkorange] 24 de Octubre de 2023[/COLOR]
     Correcciones: Bugs de la version anterior
     Generos: Re-configurados

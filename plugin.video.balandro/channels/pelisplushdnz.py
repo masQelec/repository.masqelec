@@ -80,7 +80,9 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not 'search?s=' in url:
-                platformtools.dialog_notification('PelisPlusHdNz', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PelisPlusHdNz', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
                     data = httptools.downloadpage_proxy('pelisplushdnz', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data

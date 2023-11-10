@@ -4,7 +4,7 @@ import os, xbmc, xbmcgui
 
 from platformcode import config, logger, platformtools
 from core.item import Item
-from core import channeltools, scrapertools
+from core import channeltools, scrapertools, filetools, jsontools
 
 
 color_list_prefe = config.get_setting('channels_list_prefe_color', default='gold')
@@ -327,12 +327,17 @@ def with_proxies(item):
 
         if item.memo_proxies:
             if channels_proxies_memorized:
+                channel_json = ch['id'] + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+                existe = filetools.exists(filename_json)
+                if not existe: continue
+
                 el_memorizado = "'" + ch['id'] + "'"
                 if not el_memorizado in str(channels_proxies_memorized):
                     if not config.get_setting(cfg_proxies_channel, default=''): continue
                 else:
                    if item.memo_proxies:
-                        if not config.get_setting(cfg_proxies_channel, default=''): continue
+                       if not config.get_setting(cfg_proxies_channel, default=''): continue
             else:
                 if not config.get_setting(cfg_proxies_channel, default=''): continue
 
@@ -398,7 +403,7 @@ def no_actives(item):
         filtros = {'searchable': False}
     else:
         cabecera = 'Canales Desactivados'
-        filtros = {'searchable': True}
+        filtros = {}
 
     opciones_channels = []
     canales_no_actives = []
@@ -989,8 +994,6 @@ def show_servers_list(item):
     servers_discarded = config.get_setting('servers_discarded', default='')
     if servers_discarded: servers_discarded_list = servers_discarded.lower().replace(' ', '').split(',')
 
-    from core import filetools, jsontools
-
     if item.tipo == 'activos':
         cabecera = 'Servidores Disponibles'
         filtro = True
@@ -1272,8 +1275,6 @@ def show_clients_torrent(item):
     logger.info()
 
     cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
-
-    from core import jsontools
 
     torrent_clients = jsontools.get_node_from_file('torrent.json', 'clients', os.path.join(config.get_runtime_path(), 'servers'))
 

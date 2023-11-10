@@ -17,9 +17,13 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if not data:
-        if not '?s=' in url:
-            platformtools.dialog_notification('YesPornPlease', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        if url.startswith(host):
+            if not '?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('YesPornPlease', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 

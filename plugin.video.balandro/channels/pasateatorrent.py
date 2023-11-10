@@ -332,7 +332,7 @@ def play(item):
 
     if PY3:
         from core import requeststools
-        data = requeststools.read(item.url, '')
+        data = requeststools.read(item.url, 'pasateatorrent')
     else:
         data = do_downloadpage(item.url)
 

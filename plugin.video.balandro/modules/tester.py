@@ -569,6 +569,10 @@ def test_channel(channel_name):
 
        if dominio: host = dominio
        else:
+          if channel_id == 'playdede':
+              el_canal = ('[COLOR cyan][B]Cargando espere ... [/B][/COLOR][B][COLOR %s]' + channel_name) % color_avis
+              platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]', time=3000)
+
           try:
              data = filetools.read(filename_py)
           except:
@@ -817,6 +821,13 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             except:
                 pass
 
+        if not response.data:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification(channel_name.capitalize(), '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, timeout=timeout, bypass_cloudflare=False)
+
     else:
         response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
         if response.sucess == True: quitar_proxies = True
@@ -858,6 +869,13 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
             except:
                 pass
+
+        if not response.data:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification(channel_name.capitalize(), '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, timeout=timeout, bypass_cloudflare=False)
 
         text_with_proxies = '[COLOR red] con proxies [/COLOR]'
 
@@ -971,7 +989,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'novelas') in new_web:
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'novelas') in new_web or (host + 'tv-novelas') in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1054,7 +1072,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             if len(response.data) < 1000:
                 if not 'Diagnosis:' in txt: txt += '[CR][CR][COLOR moccasin][B]Diagnosis:[/B][/COLOR]'
 
-                if 'The website is under maintenance' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+                if '<title>Account Suspended</title>' in response.data: txt += '[CR]status: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
+                elif 'The website is under maintenance' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
                 elif 'The server is temporarily busy' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
                 elif '/cgi-sys/defaultwebpage.cgi' in response.data: txt += '[CR]sorry: [COLOR springgreen][B]Contact your hosting Provider[/B][/COLOR]'
                 elif '/www.alliance4creativity.com/' in new_web: txt += '[CR]legal: [COLOR springgreen][B]Copyright infringement[/B][/COLOR]'
@@ -1071,7 +1090,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'novelas') in new_web:
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'novelas') in new_web or (host + 'tv-novelas') in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1131,13 +1150,17 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     elif '/wp-admin/install.php' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'
 
             if 'status:' in txt:
-                if '/cgi-sys/suspendedpage.cgi' in new_web: txt += '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
-                else: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
+                if '/cgi-sys/suspendedpage.cgi' in new_web: txt += '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR][CR]'
+                else:
+                   if not '<title>Account Suspended</title>' in response.data:
+                       if not '>Hello world!<' in response.data: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
 
             if 'sorry:' in txt:
                 if not 'account:' in txt:
-                    if '/cgi-sys/defaultwebpage.cgi' in response.data: txt += '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
-                    else: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
+                    if '/cgi-sys/defaultwebpage.cgi' in response.data: txt += '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR][CR]'
+                    else:
+                       if not '<title>Account Suspended</title>' in response.data:
+                           if not '>Hello world!<' in response.data: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
 
             if not "'location': '/login'" in str(response.headers):
                 if not 'status:'in txt:
@@ -1147,6 +1170,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             if len(response.data) > 0:
                 if len(response.data) < 1000:
                     if not 'Sugerencias:' in txt:
+                        if '<title>Account Suspended</title>' in response.data or '>Hello world!<' in response.data: txt += '[CR]'
+
                         txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
                         if 'actuales:' in txt:
@@ -1680,6 +1705,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
             if 'status:'in txt:
                 if '/cgi-sys/suspendedpage.cgi' in new_web: txt += '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
                 else: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
+
             else:
                if response.headers:
                    txt += '[CR][CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'

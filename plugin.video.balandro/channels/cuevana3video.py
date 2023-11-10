@@ -4,9 +4,10 @@ import sys
 
 if sys.version_info[0] < 3:
     import urlparse
+    PY3 = False
 else:
     import urllib.parse as urlparse
-
+    PY3 = True
 
 import re, time
 
@@ -15,7 +16,39 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww3.cuevana3.ch'
+LINUX = False
+BR = False
+BR2 = False
+
+if PY3:
+    try:
+       import xbmc
+       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
+    except: pass
+ 
+try:
+   if LINUX:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+          BR2 = True
+       except: pass
+   else:
+       if PY3:
+           from lib import balandroresolver
+           BR = true
+       else:
+          try:
+             from lib import balandroresolver2 as balandroresolver
+             BR2 = True
+          except: pass
+except:
+   try:
+      from lib import balandroresolver2 as balandroresolver
+      BR2 = True
+   except: pass
+
+
+host = 'https://cuevana3.ch'
 
 
 # ~ por si viene de enlaces guardados
@@ -24,11 +57,11 @@ ant_hosts = ['https://www1.cuevana3.video', 'https://www2.cuevana3.video', 'http
              'https://www1.cuevana3.cx', 'https://www2.cuevana3.cx', 'https://cuevana3.pe',
              'https://www1.cuevana3.pe', 'https://www2.cuevana3.pe', 'https://cuevana3.vc',
              'https://www1.cuevana3.vc', 'https://cuevana3.fm', 'https://www1.cuevana3.fm',
-             'https://cuevana3.ch/', 'https://www1.cuevana3.ch', 'https://www2.cuevana3.ch',
-             'https://www3.cuevana3.ch', 'https://www4.cuevana3.ch', 'https://www5.cuevana3.ch',
-             'https://www6.cuevana3.ch', 'https://www7.cuevana3.ch', 'https://www8.cuevana3.ch',
-             'https://www9.cuevana3.ch', 'https://www10.cuevana3.ch', 'https://www11.cuevana3.ch',
-             'https://www12.cuevana3.ch', 'https://ww1.cuevana3.ch', 'https://ww2.cuevana3.ch']
+             'https://www1.cuevana3.ch', 'https://www2.cuevana3.ch', 'https://www3.cuevana3.ch',
+             'https://www4.cuevana3.ch', 'https://www5.cuevana3.ch', 'https://www6.cuevana3.ch',
+             'https://www7.cuevana3.ch', 'https://www8.cuevana3.ch', 'https://www9.cuevana3.ch',
+             'https://www10.cuevana3.ch', 'https://www11.cuevana3.ch', 'https://www12.cuevana3.ch',
+             'https://ww1.cuevana3.ch', 'https://ww2.cuevana3.ch', 'https://ww3.cuevana3.ch']
 
 
 domain = config.get_setting('dominio', 'cuevana3video', default='')
@@ -80,7 +113,7 @@ def do_downloadpage(url, post=None, headers=None):
         url = url.replace(ant, host)
 
     hay_proxies = False
-    if config.get_setting('channel_cuevana3video_proxies_proxies', default=''): hay_proxies = True
+    if config.get_setting('channel_cuevana3video_proxies', default=''): hay_proxies = True
 
     timeout = None
     if host in url:
@@ -96,7 +129,9 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '/search.html?keyword=' in url:
-                platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
                     data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
@@ -104,11 +139,11 @@ def do_downloadpage(url, post=None, headers=None):
                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        try:
-            from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-            if ck_name and ck_value:
-                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+        if BR or BR2:
+            try:
+                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+                if ck_name and ck_value:
+                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
@@ -117,8 +152,8 @@ def do_downloadpage(url, post=None, headers=None):
                         data = httptools.downloadpage_proxy('cuevana3video', url, post=post, headers=headers, timeout=timeout).data
                     else:
                         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-        except:
-            pass
+            except:
+                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '/search.html?keyword=' in url:
@@ -617,9 +652,9 @@ def normalize_other(url):
     elif 'apialfa' in url: link_other = 'apialfa'
     elif 'tomatomatela' in url: link_other = 'dame'
     elif 'hydrax' in url: link_other = 'hydrax'
-    elif 'streamwish' in url: link_other = 'streamwish'
-    elif 'filemoon' in url: link_other = 'filemoon'
-    elif 'filelions' in url: link_other = 'filelions'
+    elif 'streamwish' in url: link_other = 'Streamwish'
+    elif 'filemoon' in url: link_other = 'Filemoon'
+    elif 'filelions' in url: link_other = 'Filelions'
 
     else:
        if config.get_setting('developer_mode', default=False):
@@ -762,7 +797,7 @@ def play(item):
                 if not vid.startswith(host):
                     new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                 else:
-                    if config.get_setting('channel_cuevana3video_proxies_proxies', default=''):
+                    if config.get_setting('channel_cuevana3video_proxies', default=''):
                         new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
                     else:
                         new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
@@ -780,7 +815,7 @@ def play(item):
                         if not vid.startswith(host):
                             new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                         else:
-                            if config.get_setting('channel_cuevana3video_proxies_proxies', default=''):
+                            if config.get_setting('channel_cuevana3video_proxies', default=''):
                                 new_url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
                             else:
                                 new_url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
@@ -804,7 +839,7 @@ def play(item):
                     if not vid.startswith(host):
                         url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']
                     else:
-                        if config.get_setting('channel_cuevana3video_proxies_proxies', default=''):
+                        if config.get_setting('channel_cuevana3video_proxies', default=''):
                             url = httptools.downloadpage_proxy('cuevana3video', vid, post=post, follow_redirects=False).headers['location']
                         else:
                             url = httptools.downloadpage(vid, post=post, follow_redirects=False).headers['location']

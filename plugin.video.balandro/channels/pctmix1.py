@@ -8,7 +8,7 @@ if sys.version_info[0] >= 3: PY3 = True
 
 import re
 
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
@@ -17,11 +17,22 @@ host = 'https://pctmix1.live/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if '/release-year/' in url: raise_weberror = False
-
     headers = {'Referer': host}
+
+    if '/release-year/' in url: raise_weberror = False
    
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if not data:
+        if url.startswith(host):
+            if not '?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PctMix1', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                # ~ 6/11/2023
+                # ~ timeout = config.get_setting('channels_repeat', default=30)
+                timeout = 40
+
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -172,7 +183,7 @@ def play(item):
 
     if PY3:
         from core import requeststools
-        data = requeststools.read(url, '')
+        data = requeststools.read(url, 'pctmix1')
     else:
         data = do_downloadpage(url)
 

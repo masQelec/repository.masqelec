@@ -17,7 +17,7 @@ else:
 import os, xbmc, xbmcgui, xbmcaddon
 
 from platformcode import logger, config, platformtools, updater
-from core import filetools
+from core import filetools, scrapertools
 from core.item import Item
 
 from modules import filters
@@ -55,10 +55,6 @@ def submnu_team(item):
 
     itemlist.append(item.clone( action='', title='[B]DESARROLLO:[/B]', context=context_desarrollo, thumbnail=config.get_thumb('team'), text_color='darkorange' ))
 
-    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR cyan][B]Últimos Cambios dominios[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
-
-    itemlist.append(item.clone( channel='helper', action='show_version', title= '[COLOR green][B]Información[/B][/COLOR] Versión', thumbnail=config.get_thumb('news') ))
-
     itemlist.append(item.clone( action='resumen_canales', title='[COLOR gold][B]Canales[/B][/COLOR] Resúmenes y Distribución', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='resumen_servidores', title='[COLOR fuchsia][B]Servidores[/B][/COLOR] Resúmenes y Distribución', thumbnail=config.get_thumb('bolt') ))
@@ -67,7 +63,7 @@ def submnu_team(item):
 
     itemlist.append(item.clone( action='submnu_center', title=' - [B]Media Center[/B]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
 
-    itemlist.append(item.clone( action='submnu_addons', title=' - [B]Addons[/B]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
+    itemlist.append(item.clone( action='submnu_addons', title=' - [B]Add-Ons[/B]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
 
     itemlist.append(item.clone( action='submnu_sistema', title=' - [B]Sistema[/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
@@ -209,27 +205,27 @@ def submnu_addons(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='', title='[B]ADDONS:[/B]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
+    itemlist.append(item.clone( action='', title='[B]ADD-ONS:[/B]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
 
     if not item.helper:
         itemlist.append(item.clone( channel='helper', action='show_help_vias', title= '[COLOR green][B]Información[/B][/COLOR] vía alternativa [COLOR goldenrod][B]ResolveUrl[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
         itemlist.append(item.clone( channel='helper', action='show_help_vias', title= '[COLOR green][B]Información[/B][/COLOR] vía alternativa [COLOR goldenrod][B]Youtube[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
 
-        itemlist.append(item.clone( channel='helper', action='show_help_torrents', title= '¿ Dónde obtener los [COLOR gold][B]Clientes/Motores[/B][/COLOR] para torrents (Add-Ons) ?', thumbnail=config.get_thumb('tools') ))
+        itemlist.append(item.clone( channel='helper', action='show_help_torrents', title= '¿ Dónde obtener los Add-Ons para [COLOR gold][B]Clientes/Motores[/B][/COLOR] torrents ?', thumbnail=config.get_thumb('tools') ))
         itemlist.append(item.clone( channel='helper', action='show_clients_torrent', title= 'Clientes/Motores externos torrent [COLOR gold][B]Soportados[/B][/COLOR]', thumbnail=config.get_thumb('cloud') ))
 
-        itemlist.append(item.clone( action='', title='[I]Addons EXTERNOS y VIAS ALTERNATIVAS:[/I]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
+        itemlist.append(item.clone( action='', title='[I]Add-ons EXTERNOS y VIAS ALTERNATIVAS:[/I]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
 
         if config.get_setting('mnu_torrents', default=True):
             cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
 
             if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno': tex_tor = cliente_torrent
             else:
-              tex_tor = cliente_torrent
-              cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
-              if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-                  cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
-                  tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+               tex_tor = cliente_torrent
+               cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+               if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
+                   cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+                   tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
 
             itemlist.append(item.clone( action = '', title= ' - Cliente/Motor Torrent Habitual asignado ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR]', thumbnail=config.get_thumb('torrents') ))
 
@@ -261,7 +257,7 @@ def submnu_addons(item):
 
         itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_mr + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
 
-        itemlist.append(item.clone( action='', title='[I]Addons EXTERNOS REPOSITORIOS:[/I]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
+        itemlist.append(item.clone( action='', title='[I]Add-ons EXTERNOS REPOSITORIOS:[/I]', thumbnail=config.get_thumb('tools'), text_color='yellowgreen' ))
 
         if xbmc.getCondVisibility('System.HasAddon("repository.resolveurl")'):
             cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
@@ -332,6 +328,8 @@ def submnu_sistema(item):
     itemlist.append(item.clone( action='', title='[B]SISTEMA:[/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
     if not item.helper:
+        itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR green][B]Información[/B][/COLOR] [COLOR aqua][B]Últimos Cambios dominios[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+        itemlist.append(item.clone( channel='helper', action='show_version', title= '[COLOR green][B]Información[/B][/COLOR] Versión', thumbnail=config.get_thumb('news') ))
         itemlist.append(item.clone( channel='actions', action = 'test_internet', title= 'Comprobar el estado de su [COLOR gold][B]Internet[/B][/COLOR]', thumbnail=config.get_thumb('crossroads') ))
         itemlist.append(item.clone( channel='helper', action='show_test', title= 'Test [COLOR gold][B]Status[/B][/COLOR] del sistema', thumbnail=config.get_thumb('addon') ))
 
@@ -1239,10 +1237,79 @@ def show_addons(item):
     for addons in item.addons:
         txt += '  ' + str(addons) + '[CR][CR]'
 
-    titulo = 'Información Addons '
+    titulo = 'Información Add-ons '
     if item.tipo == 'Caché': titulo = 'Información Archivos '
 
     platformtools.dialog_textviewer(titulo + item.tipo , txt)
+
+
+def show_help_addons(item):
+    logger.info()
+
+    txt = ''
+
+    cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
+
+    if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno': tex_tor = cliente_torrent
+    else:
+       tex_tor = cliente_torrent
+       cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+       if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
+           cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+           tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+    txt += ' - Cliente/Motor Torrent ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("script.elementum.burst")'):
+        cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()
+        tex_tor = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+    else: tex_tor = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_tor + '[/B][/COLOR][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'):
+        cod_version = xbmcaddon.Addon("inputstream.adaptive").getAddonInfo("version").strip()
+        tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+    else: tex_ia = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR fuchsia][B]InputStream Adaptive[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_ia + '[/B][/COLOR][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+        cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+        tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+    else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR fuchsia][B]Youtube[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_yt + '[/B][/COLOR][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+        cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+        tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+    else: tex_mr = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_mr + '[/B][/COLOR][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("repository.resolveurl")'):
+        cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
+        tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+    else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR gold][B]Repository ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
+        cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
+        tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+    else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR gold][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
+        cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
+        tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+    else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR gold][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
+ 
+    platformtools.dialog_textviewer('Información Add-Ons', txt)
 
 
 def balandro_log(item):
@@ -1295,6 +1362,7 @@ def resumen_canales(item):
     from core import channeltools
 
     total = 0
+
     inactives = 0
     temporarys = 0
     mismatcheds = 0
@@ -1305,7 +1373,10 @@ def resumen_canales(item):
     registers = 0
     dominios = 0
     currents = 0
+    onlyones = 0
     searchables = 0
+    status = 0
+
     disponibles = 0
     suggesteds = 0
     peliculas = 0
@@ -1348,6 +1419,7 @@ def resumen_canales(item):
         if 'register' in ch['clusters']: registers += 1
         if 'dominios' in ch['notes'].lower(): dominios += 1
         if 'current' in ch['clusters']: currents += 1
+        if 'onlyone' in ch['clusters']: onlyones += 1
         if ch['searchable'] == False: searchables += 1
         if 'suggested' in ch['clusters']: suggesteds += 1
 
@@ -1396,7 +1468,31 @@ def resumen_canales(item):
     txt += '       ' + str(registers) + ' [COLOR teal]Requieren Cuenta[/COLOR][CR]'
     txt += '       ' + str(dominios) + ' [COLOR green]Varios Dominios[/COLOR][CR]'
     txt += '     ' + str(currents) + ' [COLOR goldenrod]Gestión Dominio Vigente[/COLOR][CR]'
-    txt += '     ' + str(searchables) + ' [COLOR fuchsia]No Actuan en Búsquedas[/COLOR][CR]'
+    txt += '     ' + str(onlyones) + ' [COLOR fuchsia]Con un Único Servidor[/COLOR][CR]'
+    txt += '     ' + str(searchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
+
+    path = os.path.join(config.get_runtime_path(), 'dominios.txt')
+
+    existe = filetools.exists(path)
+
+    if existe:
+        txt_status = ''
+
+        try:
+           with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+        except:
+           try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+           except: pass
+
+        if txt_status:
+            bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES:(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS:')
+
+            matches = bloque.count('[COLOR springgreen]')
+
+            if matches:
+                status = matches
+
+                txt += '       ' + str(status) + ' [COLOR tan]Problemas Acceso Dominio[/COLOR][CR]'
 
     txt += '[CR]  ' + str(disponibles) + ' [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
 
@@ -1432,7 +1528,7 @@ def resumen_servidores(item):
     inactives = 0
     notsuported = 0
     alternatives = 0
-    aditionals = 26
+    aditionals = 27
     disponibles = 0
 
     path = os.path.join(config.get_runtime_path(), 'servers')

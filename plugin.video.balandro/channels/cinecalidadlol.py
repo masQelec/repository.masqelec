@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
 import re
 
 from platformcode import config, logger, platformtools
@@ -7,10 +12,42 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
+LINUX = False
+BR = False
+BR2 = False
+
+if PY3:
+    try:
+       import xbmc
+       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
+    except: pass
+ 
+try:
+   if LINUX:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+          BR2 = True
+       except: pass
+   else:
+       if PY3:
+           from lib import balandroresolver
+           BR = true
+       else:
+          try:
+             from lib import balandroresolver2 as balandroresolver
+             BR2 = True
+          except: pass
+except:
+   try:
+      from lib import balandroresolver2 as balandroresolver
+      BR2 = True
+   except: pass
+
+
 host = 'https://www.cinecalidad.gg/'
 
 
-players = ['https://cinecalidad.', '.cinecalidad.']
+_players = ['https://cinecalidad.', '.cinecalidad.']
 
 
 # ~ por si viene de enlaces guardados
@@ -97,12 +134,23 @@ def do_downloadpage(url, post=None, headers=None):
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
+        if not data:
+            if '?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('cinecalidadla', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        try:
-            from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-            if ck_name and ck_value:
-                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+        if BR or BR2:
+            try:
+                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+                if ck_name and ck_value:
+                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -111,8 +159,8 @@ def do_downloadpage(url, post=None, headers=None):
                         data = httptools.downloadpage_proxy('cinecalidadlol', url, post=post, headers=headers, raise_weberror=raise_weberror).data
                     else:
                         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-        except:
-            pass
+            except:
+                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '?s=' in url:
@@ -555,6 +603,8 @@ def findvideos(item):
                if idio == 'mx': language = 'Lat'
                elif idio == 'es': language = 'Esp'
                elif idio == 'en': language = 'Vose'
+            else:
+               if idio == 'en': language = 'Vose'
 
             other = ''
 
@@ -601,6 +651,8 @@ def findvideos(item):
             elif 'forzado' in servidor: continue
             elif 'cinecalidad' in servidor: continue
 
+            elif servidor == 'uptostream': continue
+
             elif servidor == 'utorrent': servidor = 'torrent'
             elif 'utorrent' in servidor: servidor = 'torrent'
             elif 'torrent' in servidor: servidor = 'torrent'
@@ -631,16 +683,29 @@ def play(item):
     logger.info()
     itemlist = []
 
+    domain_memo = config.get_setting('dominio', 'cinecalidadlol', default='')
+
+    if domain_memo: host_player = domain_memo
+    else: host_player = host
+
     url = item.url
 
     servidor = item.server
 
     # ~ por si esta en ant_hosts
     for ant in ant_hosts:
-        url = url.replace(ant, host)
+        url = url.replace(ant, host_player)
 
+    if not host_player in url:
+        for _player in _players:
+            if _player in url:
+                url_avis = url
+                if '/?' in url_avis: url_avis = url.split('?')[0]
 
-    if url.startswith(host) or str(players) in url:
+                platformtools.dialog_ok(config.__addon_name + ' CineCalidadLol', '[COLOR cyan][B]Al parecer el Canal cambió de Dominio.[/B][/COLOR]', '[COLOR yellow][B]' + url_avis + '[/B][/COLOR]', 'Por favor, Reviselo en [COLOR goldenrod][B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]')
+                return itemlist
+
+    if host_player in url or str(_players) in url:
         data = do_downloadpage(url)
 
         url = scrapertools.find_single_match(data, 'target="_blank" href="(.*?)"')
@@ -648,6 +713,7 @@ def play(item):
         if not url: url = scrapertools.find_single_match(data, '<iframe.*?data-src="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, 'window.location.href = "(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, "window.location.href = '(.*?)'")
 
         if '/?id=' in url:
             data = do_downloadpage(url)
@@ -683,7 +749,7 @@ def play(item):
             return itemlist
 
         elif servidor == 'zplayer':
-            url = url + '|' + host
+            url = url + '|' + host_player
 
         itemlist.append(item.clone(url = url, server = servidor))
 

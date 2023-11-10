@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 3.1.02[/COLOR] [COLOR chartreuse] 24 de Octubre de 2023[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 3.1.03[/COLOR] [COLOR chartreuse] 8 de Noviembre de 2023[/B][/COLOR]
 
    [COLOR yellow]CONTACTO:[/COLOR]
       Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
@@ -56,20 +56,21 @@
 
    [COLOR yellow]CANALES TEMPORALMENTE DES-ACTIVADOS:[/COLOR]
       [COLOR slateblue][B]Son los pendientes de su situacion, para evaluar su Re-activacion o Anulacion[/B][/COLOR]
-      DocumaniaTv,  PelisHouse,  PelisplusLat
+      DocumaniaTv
 
    [COLOR yellow]SERVIDORES CON VIAS ALTERNATIVAS:[/COLOR]
-      Clicknupload,  Doodstream,  MegaUp,  Playtube,
-      Streamlare,  Uptobox,  Various,  Vk,  Youtube
+      Clicknupload,  Doodstream,  Gofile,  MegaUp,
+      Playtube,  Streamlare,  Uptobox,  Various,
+      Vk,  Youtube
 
    [COLOR yellow]SERVIDORES CON VIAS ADICIONALES:[/COLOR]
       Desiupload,  Dropload,  Embedgram,  Fastupload,
       Filelions,  Filemoon,  Fileupload,  Hexupload,
-      Krakenfiles,  Lulustream,  Moonplayer,  Mvidoo,
-      Rutube,  Streamhub,  Streamvid,  Streamwish,
-      Tubeload,  Uploadever,  Uploaddo,  Vidello,
-      Videowood,  Vidguard,  Vidspeed,  Vudeo,
-      Yandex,  Youdbox
+      Krakenfiles,  Lulustream,  Moonmov,  Moonplayer,
+      Mvidoo,  Rutube,  Streamhub,  Streamvid,
+      Streamwish,  Tubeload,  Uploadever,  Uploaddo,
+      Vidello,  Videowood,  Vidguard,  Vidspeed,
+      Vudeo,  Yandex,  Youdbox
 
    [COLOR yellow]VIAS ALTERNATIVAS/ADICIONALES QUE PUEDEN NECESITARSE:[/COLOR]
       plugin.video.youtube
