@@ -567,7 +567,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         # Server Various y anulados/controlados
         if apuntar:
-            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions']:
+            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov']:
                 apuntar = False
 
             elif it.server in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza', 'vanfem', 'youtvgratis', 'oceanplay', 'gotovideo.kiev.ua', 'owodeuwu', 'sypl', 'fembed9hd', 'watchse', 'vcdn', 'femoload', 'cubeembed']:
@@ -1003,7 +1003,13 @@ def play_torrent(mediaurl, parent_item):
             if xbmc.getCondVisibility('System.HasAddon("%s")' % client['id']):
                 plugin_url = client['url_magnet'] if 'url_magnet' in client and mediaurl.startswith('magnet:') else client['url']
             else:
-                dialog_ok(config.__addon_name, '[COLOR moccasin][B]Falta instalar el Cliente/Motor Torrent:[/B][/COLOR][COLOR chartreuse][B] ' + client['name'].capitalize() + '[/B][/COLOR]', client['id'])
+                avis_tor = ''
+                if client['name'] == 'pulsar': avis_tor = '[COLOR red][B]Está Obsoleto[/B][/COLOR], '
+                elif client['name'] == 'quasar': avis_tor = '[COLOR red][B]Está Obsoleto[/B][/COLOR], '
+                elif client['name'] == 'stream': avis_tor = '[COLOR red][B]Está Obsoleto[/B][/COLOR], '
+                elif client['name'] == 'xbmctorrent': avis_tor = '[COLOR red][B]Está Obsoleto[/B][/COLOR], '
+
+                dialog_ok(config.__addon_name, avis_tor + '[COLOR moccasin][B]Falta instalar el Cliente/Motor Torrent:[/B][/COLOR][COLOR chartreuse][B] ' + client['name'].capitalize() + '[/B][/COLOR]', client['id'])
                 return False
 
     if plugin_url == '':

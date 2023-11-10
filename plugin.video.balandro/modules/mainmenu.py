@@ -781,14 +781,21 @@ def channels(item):
                 itemlist.append(item.clone( channel='submnuctext', action='submnu_search', title='[B]Buscar Nuevos Proxies[/B]', context=context_proxy_channels,
                                             only_options_proxies = True, thumbnail=config.get_thumb('flame'), text_color='red' ))
 
+            if config.get_setting('sub_mnu_cfg_search', default=True):
+                itemlist.append(item.clone( channel='submnuctext', action='submnu_search', title='[B]Personalizar búsquedas[/B]', context=context_cfg_search, extra = 'mixed', thumbnail=config.get_thumb('settings'), text_color='moccasin' ))
+
             itemlist.append(Item( channel='search', action='search', search_type='all', title='Buscar Dorama ...', thumbnail=config.get_thumb('computer'), search_special = 'dorama', text_color='firebrick' ))
 
             itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = '[B]Todos los canales con contenido Dorama[/B]', group = 'dorama', text_color='firebrick' ))
 
         if item.extra == 'adults' or item.extra == 'anime':
-            if config.get_setting('mnu_search_proxy_channels', default=False):
-                itemlist.append(item.clone( channel='submnuctext', action='submnu_search', title='[B]Buscar Nuevos Proxies[/B]', context=context_proxy_channels,
-                                            only_options_proxies = True, thumbnail=config.get_thumb('flame'), text_color='red' ))
+            if item.extra == 'anime':
+                if config.get_setting('mnu_search_proxy_channels', default=False):
+                    itemlist.append(item.clone( channel='submnuctext', action='submnu_search', title='[B]Buscar Nuevos Proxies[/B]', context=context_proxy_channels,
+                                                only_options_proxies = True, thumbnail=config.get_thumb('flame'), text_color='red' ))
+
+                if config.get_setting('sub_mnu_cfg_search', default=True):
+                    itemlist.append(item.clone( channel='submnuctext', action='submnu_search', title='[B]Personalizar búsquedas[/B]', context=context_cfg_search, extra = 'mixed', thumbnail=config.get_thumb('settings'), text_color='moccasin' ))
 
             if not config.get_setting('adults_password'):
                 itemlist.append(item.clone( channel='helper', action='show_help_adults', title='[COLOR green][B]Información[/B][/COLOR] Parental', thumbnail=config.get_thumb('help') ))

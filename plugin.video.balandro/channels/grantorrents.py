@@ -407,13 +407,18 @@ def play(item):
     logger.info()
     itemlist = []
 
+    domain_memo = config.get_setting('dominio', 'grantorrents', default='')
+
+    if domain_memo: host_player = domain_memo
+    else: host_player = host
+
     url = ''
 
     if '&urlb64=' in item.url:
         new_url = scrapertools.find_single_match(item.url, "&urlb64=(.*?)$")
         url = base64.b64decode(new_url).decode("utf-8")
 
-        if not url.startswith(host):
+        if not url.startswith(host_player):
             resp = httptools.downloadpage(url, follow_redirects=False)
         else:
             resp = httptools.downloadpage_proxy('grantorrents', url, follow_redirects=False)
@@ -424,7 +429,7 @@ def play(item):
             url = resp.headers['location']
 
     elif not item.url.endswith('.torrent'):
-        host_torrent = host[:-1]
+        host_torrent = host_player[:-1]
         url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
 
         if url_base64.endswith('.torrent'): url = url_base64
@@ -443,7 +448,7 @@ def play(item):
 
         # ~ por si viene de enlaces antiguos en la web
         for ant in ant_hosts:
-            url = url.replace(ant, host)
+            url = url.replace(ant, host_player)
 
         if '/dl.grantorrents.com/' in url: url = url.replace('/dl.grantorrents.com/', '/dl.grantorrent.lat/')
 

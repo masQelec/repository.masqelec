@@ -12,17 +12,36 @@ from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 
 
+LINUX = False
+BR = False
 BR2 = False
 
+if PY3:
+    try:
+       import xbmc
+       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
+    except: pass
+ 
 try:
-   from lib import balandroresolver
+   if LINUX:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+          BR2 = True
+       except: pass
+   else:
+       if PY3:
+           from lib import balandroresolver
+           BR = true
+       else:
+          try:
+             from lib import balandroresolver2 as balandroresolver
+             BR2 = True
+          except: pass
 except:
    try:
       from lib import balandroresolver2 as balandroresolver
-
       BR2 = True
-   except:
-      BR2 = None
+   except: pass
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
@@ -152,11 +171,11 @@ def do_make_login_logout(url, post=None):
             data = httptools.downloadpage(url, post=post, raise_weberror=False).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        try:
-            # ~ from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-            if ck_name and ck_value:
-                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+        if BR or BR2:
+            try:
+                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+                if ck_name and ck_value:
+                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, raise_weberror=False).data
@@ -165,8 +184,8 @@ def do_make_login_logout(url, post=None):
                         data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
                     else:
                         data = httptools.downloadpage(url, post=post, raise_weberror=False).data
-        except:
-            pass
+            except:
+                pass
 
     if '<title>Just a moment...</title>' in data:
         platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')

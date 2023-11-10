@@ -45,10 +45,11 @@ def get_video_url(page_url, url_referer=''):
     ini_page_url = page_url
 
     if not '/playtube.' in page_url:
-        platformtools.dialog_notification('Cargando [COLOR cyan][B]Playtube[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
-        time.sleep(int(espera))
-
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            if config.get_setting('servers_time', default=True):
+                platformtools.dialog_notification('Cargando [COLOR cyan][B]Playtube[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
+                time.sleep(int(espera))
+
             try:
                 import_libs('script.module.resolveurl')
 
@@ -67,13 +68,10 @@ def get_video_url(page_url, url_referer=''):
                 logger.error(traceback.format_exc())
 
                 if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
-                    if 'File Not Found or Removed' in traceback.format_exc():
+                    trace = traceback.format_exc()
+                    if 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace:
                         return 'Archivo inexistente ó eliminado'
-                    elif 'The requested video was not found' in traceback.format_exc():
-                        return 'Archivo inexistente ó eliminado'
-                    elif 'No se ha encontrado ningún link al vídeo' in traceback.format_exc():
-                        return 'Fichero sin link al vídeo'
-                    elif 'Unable to locate link':
+                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo'
 
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
@@ -94,6 +92,7 @@ def get_video_url(page_url, url_referer=''):
     data = scrapertools.find_single_match(data, 'sources:\s*\[(.*?)\]')
 
     matches = scrapertools.find_multiple_matches(data, '\{file:"([^"]+)"([^}]*)')
+
     for url, extra in matches:
         lbl = scrapertools.find_single_match(extra, 'label:"([^"]+)')
         if not lbl: lbl = url[-4:]

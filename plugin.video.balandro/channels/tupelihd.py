@@ -10,6 +10,9 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://www.pelitorrent.com/'
 
 
+_players = ['.pelitorrent.']
+
+
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.tupelihd.com/', 'https://senininternetin.com/']
 
@@ -547,19 +550,31 @@ def play(item):
     logger.info()
     itemlist = []
 
+    domain_memo = config.get_setting('dominio', 'tupelihd', default='')
+
+    if domain_memo: host_player = domain_memo
+    else: host_player = host
+
     item.url = item.url.replace('&#038;', '&').replace(' class=', '')
 
     url = ''
 
     if item.other:
-        if not item.url.startswith == host: return itemlist
+        if not host_player in url:
+            for _player in _players:
+                if _player in item.url:
+                    url_avis = item.url
+                    if '/?' in url_avis: url_avis = item.url.split('?')[0]
+
+                    platformtools.dialog_ok(config.__addon_name + ' TuPeliHd', '[COLOR cyan][B]Al parecer el Canal cambió de Dominio.[/B][/COLOR]', '[COLOR yellow][B]' + url_avis + '[/B][/COLOR]', 'Por favor, Reviselo en [COLOR goldenrod][B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]')
+                    return itemlist
 
     if item.server == 'torrent':
         itemlist.append(item.clone( url = item.url, server = 'torrent' ))
         return itemlist
 
     elif item.other == 't':
-        if not item.url.startswith(host):
+        if not item.url.startswith(host_player):
             url = httptools.downloadpage(item.url, only_headers = True, follow_redirects = False).headers.get('location')
         else:
             if config.get_setting('channel_tupelihd_proxies', default=''):

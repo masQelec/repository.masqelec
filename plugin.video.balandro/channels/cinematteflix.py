@@ -114,7 +114,8 @@ def list_all(item):
         else: langs = 'Esp'
 
         title = scrapertools.find_single_match(match, 'rel="bookmark">(.*?)</a>')
-        if not title: title = scrapertools.find_single_match(match, 'href=".*?">(.*?)</a>')
+        if not title: title = scrapertools.find_single_match(match, ' alt="(.*?)"')
+        if not title: title = scrapertools.find_single_match(match, '<a href=".*?">(.*?)</a>')
 
         if not title: continue
 
@@ -135,7 +136,7 @@ def list_all(item):
 
         if not year == '-': title = title.replace('(' + year + ')', '').strip()
 
-        title = title.replace('&#8211;', '').replace('&#8221;', '').replace('&#215;', '')
+        title = title.replace('&#8211;', '').replace('&#8221;', '').replace('&#215;', '').replace('&#039;', '')
 
         if capitulos:
             datos_cap = do_downloadpage(url)
@@ -150,8 +151,7 @@ def list_all(item):
             itemlist.append(item.clone( action = 'list_col', url = url, title = title, thumbnail = thumb, languages = langs, grupo = 'colec',
                                         contentType = 'movie', contentTitle = title, infoLabels={'year': year} ))
 
-    if not '/?s=' in item.url:
-        tmdb.set_infoLabels(itemlist)
+    if not '/?s=' in item.url: tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="(.*?)"')
@@ -227,7 +227,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
 
     links = scrapertools.find_multiple_matches(data, '<div class="jetpack-video-wrapper">.*?src="(.*?)"')
-    links = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
+    if not links: links = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
     ses = 0
 
@@ -235,6 +235,8 @@ def findvideos(item):
         ses += 1
 
         url = url.replace('?feature=oembed', '')
+
+        if url.startswith("//"): url = 'https:' + url
 
         servidor = servertools.get_server_from_url(url)
 

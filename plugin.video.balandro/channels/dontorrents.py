@@ -63,7 +63,7 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.foo/', 'https://dontorrent.hair/', 'https://dontorrent.rsvp/',
              'https://dontorrent.quest/', 'https://dontorrent.nexus/', 'https://dontorrent.bond/',
              'https://dontorrent.tokyo/', 'https://dontorrent.boston/', 'https://dontorrent.rodeo/',
-             'https://dontorrent.durban/', 'https://dontorrent.party/']
+             'https://dontorrent.durban/', 'https://dontorrent.party/', 'https://dontorrent.joburg/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')

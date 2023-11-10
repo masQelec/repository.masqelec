@@ -409,6 +409,8 @@ def findvideos(item):
         if url:
             if url.startswith('//'): url = 'https:' + url
 
+            url = url.replace('&amp;', '&')
+
             if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
             elif '/streamplay.' in url or '/streampiay.' in url: continue
             elif '/watchsb.' in url or '/embedsb.' in url: continue

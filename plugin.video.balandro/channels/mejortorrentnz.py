@@ -85,7 +85,9 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not '/?s=' in url:
-                platformtools.dialog_notification('MejorTorrentNz', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('MejorTorrentNz', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
                     data = httptools.downloadpage_proxy('mejortorrentnz', url, post=post, headers=headers, timeout=timeout).data
@@ -236,7 +238,7 @@ def list_all(item):
 
         title = title.replace('[720p]', '').strip()
 
-        title = title.replace('&#215;', 'x').replace("&#8217;", "'")
+        title = title.replace('&#215;', 'x').replace('&#8211;', '').replace("&#8217;", "'")
 
         titulo = title.split('-')[0].strip()
 
@@ -485,26 +487,30 @@ def play(item):
     logger.info()
     itemlist = []
 
-    if item.hash:
-        url = host + '/torrent_dmbk.php?u=' + item.hash
+    domain_memo = config.get_setting('dominio', 'mejortorrentnz', default='')
 
-        if not url.startswith(host):
-            resp = httptools.downloadpage(url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False)
+    if domain_memo: host_player = domain_memo
+    else: host_player = host
+
+    if item.hash:
+        url = host_player + '/torrent_dmbk.php?u=' + item.hash
+
+        if not url.startswith(host_player):
+            resp = httptools.downloadpage(url, headers={'Referer': host_player + '/download_torrent.php'}, follow_redirects=False)
         else:
             if config.get_setting('channel_mejortorrentnz_proxies', default=''):
-                resp = httptools.downloadpage_proxy('mejortorrentnz', url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False)
+                resp = httptools.downloadpage_proxy('mejortorrentnz', url, headers={'Referer': host_player + '/download_torrent.php'}, follow_redirects=False)
             else:
-                resp = httptools.downloadpage(url, headers={'Referer': host + '/download_torrent.php'}, follow_redirects=False)
+                resp = httptools.downloadpage(url, headers={'Referer': host_player + '/download_torrent.php'}, follow_redirects=False)
 
         link = ''
 
-        if 'location' in resp.headers:
-            link = resp.headers['location']
+        if 'location' in resp.headers: link = resp.headers['location']
 
         if not link:
             return 'Archivo [COLOR plum]No localizado[/COLOR]'
 
-        data = do_downloadpage(link, headers={'Referer': host + '/download_torrent.php'})
+        data = do_downloadpage(link, headers={'Referer': host_player + '/download_torrent.php'})
 
         url = link
 

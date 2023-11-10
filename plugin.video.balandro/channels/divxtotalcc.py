@@ -68,6 +68,17 @@ def do_downloadpage(url, post=None, headers=None):
         else:
             data = httptools.downloadpage(url, post=post, headers=headers).data
 
+        if not data:
+            if not '?q=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DivxTotalCc', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('divxtotalcc', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers).data
+
     return data
 
 
@@ -179,10 +190,9 @@ def list_all(item):
     if not bloque:
         if item.search_type == 'tvshow': bloque = data
 
-    if not bloque:
-        if item.group == 'lasts':
-            if item.search_type == 'movie': bloque = scrapertools.find_single_match(data, '<div class="panel panel-default peliculas-bloque bloque-home">(.*?)>Series</h2>')
-            else: bloque = scrapertools.find_single_match(data, '>Series</h2>(.*?)>Programas</h3>')
+    if item.group == 'lasts':
+        if item.search_type == 'movie': bloque = scrapertools.find_single_match(data, '>Películas</h2>(.*?)>Series</h2>')
+        else: bloque = scrapertools.find_single_match(data, '>Series</h2>(.*?)>Programas</h2>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
     if not matches:
@@ -212,6 +222,8 @@ def list_all(item):
         tipo = 'movie' if '/peliculas/' in url or '/peliculas-' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
+        title = title.replace("&#8217;", "'").replace("&#8230;", ':').replace("&#8211;", ':')
+
         if tipo == 'movie':
             if not item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
@@ -227,10 +239,12 @@ def list_all(item):
 
             titulo = titulo.replace(' - serie', '').strip()
 
-            titulo = titulo.replace(' - serie', '').strip()
-
             if " - " in titulo: SerieName = titulo.split(" - ")[0]
             else: SerieName = titulo
+
+            if item.group == 'lasts':
+                SerieName = scrapertools.find_single_match(url, '/series/(.*?)/')
+                SerieName = SerieName.replace('-', ' ')
 
             itemlist.append(item.clone( action='temporadas', url=url, title=titulo, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': "-" } ))

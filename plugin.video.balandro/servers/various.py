@@ -69,6 +69,10 @@ def get_video_url(page_url, url_referer=''):
               txt_server = 'Uploadever'
               page_url = page_url.replace('/uploadever.com/', '/uploadever.in/')
 
+        elif 'moonmov' in page_url:
+              txt_server = 'Moonplayer'
+              page_url = page_url.replace('/moonmov.pro/', '/filemoon.sx/')
+
         elif 'moonplayer' in page_url:
               txt_server = 'Moonplayer'
               page_url = page_url.replace('/moonplayer.lat/', '/filemoon.sx/')
@@ -112,9 +116,9 @@ def get_video_url(page_url, url_referer=''):
               txt_server = 'Lulustream'
               page_url = page_url.replace('/luluvdo.com/', '/lulustream.com/')
 
-        elif 'turboviplay' in page_url or 'emturbovid' in page_url:
+        elif 'turboviplay' in page_url or 'emturbovid' in page_url or 'tuborstb' in page_url:
               txt_server = 'Turboviplay'
-              page_url = page_url.replace('/turboviplay.com.com/', '/emturbovid.com/')
+              page_url = page_url.replace('/turboviplay.com/', '/emturbovid.com/').replace('/tuborstb.co/', '/emturbovid.com/')
 
         elif 'file-upload' in page_url:
               txt_server = 'Fileupload'
@@ -125,8 +129,9 @@ def get_video_url(page_url, url_referer=''):
               page_url = page_url.replace('/www.vidspeeds.com/', '/vidspeed.cc/')
               page_url = page_url.replace('/embed-', '/')
 
-        platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
-        time.sleep(int(espera))
+        if config.get_setting('servers_time', default=True):
+            platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
+            time.sleep(int(espera))
 
         if txt_server == 'Unknow': return 'Servidor desconocido'
 
@@ -161,16 +166,13 @@ def get_video_url(page_url, url_referer=''):
                     return video_urls
 
             if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
-                if 'File Not Found or Removed' in traceback.format_exc():
+                trace = traceback.format_exc()
+                if 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace:
                     return 'Archivo inexistente ó eliminado'
-                elif 'The requested video was not found' in traceback.format_exc():
-                    return 'Archivo inexistente ó eliminado'
-                elif 'No se ha encontrado ningún link al vídeo' in traceback.format_exc():
+                elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                     return 'Fichero sin link al vídeo'
-                elif 'Unable to locate link':
-                    return 'Fichero sin link al vídeo'
-                elif 'Wrong captcha. Please try again.' in traceback.format_exc():
-                    return 'Captcha erróneo. Intenetelo de nuevo'
+                elif 'Wrong captcha. Please try again.' in trace:
+                    return 'Captcha erróneo. Inténetelo de nuevo'
 
             return 'Sin Respuesta ' + txt_server
     else:

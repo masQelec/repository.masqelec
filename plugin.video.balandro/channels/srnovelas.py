@@ -18,6 +18,38 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
+LINUX = False
+BR = False
+BR2 = False
+
+if PY3:
+    try:
+       import xbmc
+       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
+    except: pass
+ 
+try:
+   if LINUX:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+          BR2 = True
+       except: pass
+   else:
+       if PY3:
+           from lib import balandroresolver
+           BR = true
+       else:
+          try:
+             from lib import balandroresolver2 as balandroresolver
+             BR2 = True
+          except: pass
+except:
+   try:
+      from lib import balandroresolver2 as balandroresolver
+      BR2 = True
+   except: pass
+
+
 host = 'https://meganovelas.online/'
 
 
@@ -86,11 +118,11 @@ def do_downloadpage(url, post=None, headers=None):
             data = httptools.downloadpage(url, post=post, headers=headers).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        try:
-            from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-            if ck_name and ck_value:
-                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+        if BR or BR2:
+            try:
+                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+                if ck_name and ck_value:
+                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
                     data = httptools.downloadpage(url, post=post, headers=headers).data
@@ -99,8 +131,8 @@ def do_downloadpage(url, post=None, headers=None):
                         data = httptools.downloadpage_proxy('srnovelas', url, post=post, headers=headers).data
                     else:
                         data = httptools.downloadpage(url, post=post, headers=headers).data
-        except:
-            pass
+            except:
+                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '?s=' in url:
@@ -481,6 +513,11 @@ def play(item):
     logger.info()
     itemlist = []
 
+    domain_memo = config.get_setting('dominio', 'srnovelas', default='')
+
+    if domain_memo: host_player = domain_memo
+    else: host_player = host
+
     url = item.url
 
     if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
@@ -494,14 +531,14 @@ def play(item):
 
         itemlist.append(item.clone( url = url, server = servidor ))
 
-        httptools.save_cookie('w3tc_referrer', host, 'srnovelas.com')
+        httptools.save_cookie('w3tc_referrer', host_player, 'meganovelas.online')
         return itemlist
 
     CUSTOM_HEADERS = {}
     CUSTOM_HEADERS['Cookie'] = 'w3tc_referrer=' + item.ref_serie
     CUSTOM_HEADERS['Referer'] = item.ref
 
-    httptools.save_cookie('w3tc_referrer', item.ref_serie, 'srnovelas.com')
+    httptools.save_cookie('w3tc_referrer', item.ref_serie, 'meganovelas.online')
 
     data = do_downloadpage(item.url, headers=CUSTOM_HEADERS)
 
@@ -516,7 +553,7 @@ def play(item):
 
            referer = item.url.replace('/?or=', '/?od=')
 
-           if not new_url.startswith(host):
+           if not new_url.startswith(host_player):
                resp = httptools.downloadpage(new_url, headers={'Referer': referer}, follow_redirects=False, only_headers=True)
            else:
                if config.get_setting('channel_srnovelas_proxies', default=''):
@@ -524,9 +561,7 @@ def play(item):
                else:
                    resp = httptools.downloadpage(new_url, headers={'Referer': referer}, follow_redirects=False, only_headers=True)
 
-           resp = httptools.downloadpage(new_url, headers={'Referer': referer}, follow_redirects=False, only_headers=True)
-
-           httptools.save_cookie('w3tc_referrer', host, 'srnovelas.com')
+           httptools.save_cookie('w3tc_referrer', host_player, 'meganovelas.online')
 
            if 'location' in resp.headers:
               url = resp.headers['location']
@@ -548,7 +583,7 @@ def play(item):
 
             itemlist.append(item.clone( url = url, server = servidor ))
 
-    httptools.save_cookie('w3tc_referrer', host, 'srnovelas.com')
+    httptools.save_cookie('w3tc_referrer', host_player, 'meganovelas.online')
 
     return itemlist
 

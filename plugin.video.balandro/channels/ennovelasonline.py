@@ -399,7 +399,8 @@ def findvideos(item):
     elif item.lang == 'Vose': lang = 'Vose'
     else: lang = 'Lat'
 
-    data = do_downloadpage(item.url)
+    data = do_downloadpage(item.url + '?do=watch')
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     values = scrapertools.find_multiple_matches(data, '<form method="post".*?action="(.*?)".*?<input type="hidden".*?name="(.*?)".*?value="(.*?)"')
 
@@ -420,7 +421,8 @@ def findvideos(item):
         if not matches: matches = scrapertools.find_multiple_matches(data1, '<td>Server.*?href="(.*?)"')
 
         for url in matches:
-            if '.ennovelas.' in url: continue
+            if '/ennovelas.' in url: continue
+            elif '.ennovelas.' in url: continue
             elif '/tomatomatela.' in url: continue
             elif '/watching.' in url: continue
             elif '/novelas360.' in url: continue
@@ -472,7 +474,7 @@ def findvideos(item):
            if u_link.startswith('//'): u_link = 'https:' + u_link
 
            if u_link:
-               if '/ennovelas.' in u_link: u_link = ''
+               if '/ennovelas.' in u_link or '.ennovelas.' in u_link: u_link = ''
 
            if u_link:
                if u_link.startswith('https://vk.com/'): u_link = u_link.replace('&amp;', '&')
@@ -491,6 +493,8 @@ def findvideos(item):
            i += 1
 
     # ~ Downloads
+    data = do_downloadpage(item.url + '?do=downloads', headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'})
+
     matches = scrapertools.find_multiple_matches(data, '<td>Server.*?href="(.*?)"')
 
     for url in matches:

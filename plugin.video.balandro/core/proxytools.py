@@ -1970,7 +1970,7 @@ def do_test_proxy(url, proxy, info):
                     else: proxy_ok = True
 
                 if proxy_ok:
-                    if 'ERROR 404 - File not found' in str(resp.data) or 'HTTP Error 404: Not Found' in str(resp.data) or 'HTTP/1.1 400 Bad Request' in str(resp.data) or '<title>Site Blocked</title>' in str(resp.data):
+                    if ' not found' in str(resp.data).lower() or ' bad request' in str(resp.data).lower() or '<title>Site Blocked</title>' in str(resp.data):
                         proxy_ok = False
 
                 if proxy_ok: info['ok'] = True
@@ -2126,18 +2126,50 @@ def obtener_private_list():
 
     proxies = []
 
+    zip_extract = False
+
     proxies_file = os.path.join(config.get_data_path(), private_list)
     existe = filetools.exists(proxies_file)
 
     if not existe:
-        ubicacion_path = xbmcgui.Dialog().browseSingle(3, 'Seleccionar la [COLOR yellow]Carpeta[/COLOR] ubicación del fichero [COLOR yellowgreen]' + private_list + '[/COLOR]', 'files', '', False, False, '')
-        if not ubicacion_path: return proxies
+        if not platformtools.dialog_yesno(config.__addon_name, '[COLOR violet][B]¿ El fichero ya está Des-comprimido ?[/COLOR][/B]'): 
+            ubicacion_path_zip = xbmcgui.Dialog().browseSingle(3, 'Seleccionar la [COLOR yellow]Carpeta[/COLOR] ubicación del fichero [COLOR violet]Lista-proxies.zip[/COLOR]', 'files', '', False, False, '')
+            if not ubicacion_path_zip: return proxies
+
+            proxies_file_zip = filetools.join(ubicacion_path_zip, 'Lista-proxies.zip')
+            existe_zip = filetools.exists(proxies_file_zip)
+
+            if not existe_zip:
+                platformtools.dialog_notification('Buscar proxies', '[B][COLOR %s]Fichero .ZIP No localizado[/COLOR][/B]' % color_alert)
+                time.sleep(1.0)
+                return proxies
+
+            try:
+                import zipfile
+                dir = zipfile.ZipFile(proxies_file_zip, 'r')
+                dir.extractall(ubicacion_path_zip)
+                dir.close()
+            except:
+                import xbmc
+                xbmc.executebuiltin('Extract("%s", "%s")' % (proxies_file_zip, ubicacion_path_zip))
+
+            proxies_file = filetools.join(ubicacion_path_zip, private_list)
+            existe = filetools.exists(proxies_file)
+
+            if existe:
+                zip_extract = True 
+
+                ubicacion_path = ubicacion_path_zip
+
+        if not zip_extract:
+            ubicacion_path = xbmcgui.Dialog().browseSingle(3, 'Seleccionar la [COLOR yellow]Carpeta[/COLOR] ubicación del fichero [COLOR yellowgreen]' + private_list + '[/COLOR]', 'files', '', False, False, '')
+            if not ubicacion_path: return proxies
 
         proxies_file = filetools.join(ubicacion_path, private_list)
         existe = filetools.exists(proxies_file)
 
         if not existe:
-            platformtools.dialog_notification('Buscar proxies', '[B][COLOR %s]No se localiza fichero privado[/COLOR][/B]' % color_alert)
+            platformtools.dialog_notification('Buscar proxies', '[B][COLOR %s]Fichero Privado No localizado[/COLOR][/B]' % color_alert)
             time.sleep(1.0)
             return proxies
 

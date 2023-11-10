@@ -14,27 +14,27 @@
       },
       {
         "pattern": "https://vtube.(?:to|network|clicknplay)/embed-[A-z0-9]+.html",
-        "url": "\\1"
+        "url": "https://vtbe.to/\\1"
       },
       {
         "pattern": "https://vtube.(?:to|network|clicknplay)/([A-z0-9-]+)",
-        "url": "\\1"
+        "url": "https://vtbe.to/\\1"
       },
       {
         "pattern": "https://vtbe.(?:net|to)/embed-[A-z0-9]+.html",
-        "url": "\\1"
+        "url": "https://vtbe.to/\\1"
       },
       {
         "pattern": "https://vtbe.(?:net|to)/([A-z0-9-]+)",
-        "url": "\\1"
+        "url": "https://vtbe.to/\\1"
       },
       {
         "pattern": "https://vtplay.net/embed-[A-z0-9]+.html",
-        "url": "\\1"
+        "url": "https://vtbe.to/\\1"
       },
       {
         "pattern": "https://vtplay.net/([A-z0-9-]+)",
-        "url": "\\1"
+        "url": "https://vtbe.to/\\1"
       }
     ]
   }
