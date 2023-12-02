@@ -508,32 +508,32 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
               el_canal = ('[COLOR cyan][B]Cargando espere ... [/B][/COLOR][B][COLOR %s]' + channel_name) % color_avis
               platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]', time=3000)
 
-           try:
-              data = filetools.read(filename_py)
-           except:
-              el_canal = ('Se ignora este canal en el proceso, no se pudo acceder a su módulo ' + channel_py  + '[B][COLOR %s] en el caso de que requiera proxies, deberá efectuar esta Configuracíon dentro del propio canal.') % color_alert
-              platformtools.dialog_ok(config.__addon_name + ' ' + channel_name , el_canal + '[/COLOR][/B]')
-              return
+          try:
+             data = filetools.read(filename_py)
+          except:
+             el_canal = ('Se ignora este canal en el proceso, no se pudo acceder a su módulo ' + channel_py  + '[B][COLOR %s] en el caso de que requiera proxies, deberá efectuar esta Configuracíon dentro del propio canal.') % color_alert
+             platformtools.dialog_ok(config.__addon_name + ' ' + channel_name , el_canal + '[/COLOR][/B]')
+             return
 
-           part_py = 'def mainlist'
+          part_py = 'def mainlist'
 
-           if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
-           elif 'CLASS ' in data or 'class ' in data: part_py = 'class '
+          if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
+          elif 'CLASS ' in data or 'class ' in data: part_py = 'class '
 
-           elif 'def login' in data: part_py = 'def login'
-           elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
-           elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
+          elif 'def login' in data: part_py = 'def login'
+          elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
+          elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
 
-           bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
-           if 'ant_hosts' in bloc: bloc = scrapertools.find_single_match(data.lower(), '(.*?)ant_hosts')
+          bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
+          if 'ant_hosts' in bloc: bloc = scrapertools.find_single_match(data.lower(), '(.*?)ant_hosts')
 
-           bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
+          bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
 
-           host = scrapertools.find_single_match(str(bloc), ".*?host = '(.*?)'")
-           if not host: host = scrapertools.find_single_match(str(bloc), '.*?host = "(.*?)"')
+          host = scrapertools.find_single_match(str(bloc), ".*?host = '(.*?)'")
+          if not host: host = scrapertools.find_single_match(str(bloc), '.*?host = "(.*?)"')
 
-           if not host: host = scrapertools.find_single_match(bloc, '.*?host.*?"(.*?)"')
-           if not host: host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
+          if not host: host = scrapertools.find_single_match(bloc, '.*?host.*?"(.*?)"')
+          if not host: host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
 
     host = host.strip()
 

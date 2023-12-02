@@ -31,7 +31,7 @@ thumb_tmdb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'chan
 
 context_menu = []
 
-tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
+tit = '[COLOR tan][B]Preferencias Menús[/B][/COLOR]'
 context_menu.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
 tit = '[COLOR %s]Ajustes categoría Menú[/COLOR]' % color_exec
@@ -40,48 +40,48 @@ context_menu.append({'title': tit, 'channel': 'actions', 'action': 'open_setting
 
 context_buscar = []
 
-tit = '[COLOR powderblue][B]Parámetros Buscar[/B][/COLOR]'
+tit = '[COLOR powderblue][B]Preferencias Buscar[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'search', 'action': 'show_help_parameters'})
 
-tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
+tit = '[COLOR tan][B]Preferencias Menús[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
-tit = '[COLOR fuchsia][B]Parámetros Play[/B][/COLOR]'
+tit = '[COLOR fuchsia][B]Preferencias Play[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_play_parameters'})
 
-tit = '[COLOR red][B]Parámetros Proxies[/B][/COLOR]'
+tit = '[COLOR red][B]Preferencias Proxies[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_prx_parameters'})
 
 tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
-tit = '[COLOR %s][B]Últimos Cambios dominios[/B][/COLOR]' % color_exec
+tit = '[COLOR %s][B]Últimos Cambios Dominios[/B][/COLOR]' % color_exec
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
-tit = '[COLOR %s][B]Quitar Dominios memorizados[/B][/COLOR]' % color_alert
+tit = '[COLOR %s][B]Quitar Dominios Memorizados[/B][/COLOR]' % color_alert
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'manto_domains'})
 
-tit = '[COLOR gold][B]Qué canales nunca intervienen[/B][/COLOR]'
+tit = '[COLOR gold][B]Qué Canales No Intervienen[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'channels_no_searchables'})
 
-tit = '[COLOR gray][B]Qué canales están desactivados[/B][/COLOR]'
+tit = '[COLOR gray][B]Qué Canales están Desactivados[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'filters', 'action': 'no_actives'})
 
 tit = '[COLOR greenyellow][B]Buscar Solo en los canales[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_included'})
 
 if config.get_setting('search_included_all', default=''):
-    tit = '[COLOR greenyellow][B]Quitar Solo Búsquedas en canales[/B][/COLOR]'
+    tit = '[COLOR greenyellow][B]Quitar Solo Buscar en Canales[/B][/COLOR]'
     context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_included_del'})
 
-tit = '[COLOR violet][B]Excluir canales[/B][/COLOR]'
+tit = '[COLOR violet][B]Excluir Canales[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_excluded'})
 
 if config.get_setting('search_excludes_all', default=''):
-    tit = '[COLOR violet][B]Quitar canales excluidos[/B][/COLOR]'
+    tit = '[COLOR violet][B]Quitar Canales Excluidos[/B][/COLOR]'
     context_buscar.append({'title': tit, 'channel': 'submnuctext', 'action': '_channels_excluded_del'})
 
-tit = '[COLOR powderblue][B]Global configurar proxies[/B][/COLOR]'
+tit = '[COLOR powderblue][B]Global Configurar Proxies[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'proxysearch', 'action': 'proxysearch_all'})
 
 if config.get_setting('proxysearch_excludes', default=''):
@@ -91,7 +91,7 @@ if config.get_setting('proxysearch_excludes', default=''):
 tit = '[COLOR %s]Información Proxies[/COLOR]' % color_infor
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-tit = '[COLOR %s][B]Quitar proxies actuales[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR %s][B]Quitar Proxies Atuales[/B][/COLOR]' % color_list_proxies
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR %s][B]Información Búsquedas[/B][/COLOR]' % color_infor
@@ -103,7 +103,7 @@ context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'open_setti
 
 context_proxy_channels = []
 
-tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
+tit = '[COLOR tan][B]Preferencias Menús[/B][/COLOR]'
 context_proxy_channels.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
 tit = '[COLOR %s]Información Proxies[/COLOR]' % color_avis
@@ -115,7 +115,7 @@ context_proxy_channels.append({'title': tit, 'channel': 'actions', 'action': 'op
 
 context_cfg_search = []
 
-tit = '[COLOR tan][B]Parámetros Menús[/B][/COLOR]'
+tit = '[COLOR tan][B]Preferencias Menús[/B][/COLOR]'
 context_cfg_search.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
 tit = '[COLOR %s]Ajustes categoría Menú[/COLOR]' % color_exec
@@ -131,10 +131,10 @@ if config.get_setting('cliente_torrent') == 'Seleccionar' or config.get_setting(
 tit = '[COLOR %s][B]Motores torrents instalados[/B][/COLOR]' % color_avis
 context_torrents.append({'title': tit, 'channel': 'helper', 'action': 'show_clients_torrent'})
 
-tit = '[COLOR tan][B]Parámetros Canales[/B][/COLOR]'
+tit = '[COLOR tan][B]Preferencias Canales[/B][/COLOR]'
 context_torrents.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
 
-tit = '[COLOR mediumaquamarine][B]Últimos Cambios dominios[/B][/COLOR]'
+tit = '[COLOR mediumaquamarine][B]Últimos Cambios Dominios[/B][/COLOR]'
 context_torrents.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
 tit = '[COLOR %s]Ajustes categorías Canales, Dominios, Torrents y Buscar[/COLOR]' % color_exec
@@ -144,16 +144,16 @@ context_torrents.append({'title': tit, 'channel': 'actions', 'action': 'open_set
 context_parental = []
 
 if config.get_setting('adults_password'):
-    tit = '[COLOR %s][B]Eliminar Pin parental[/B][/COLOR]' % color_adver
+    tit = '[COLOR %s][B]Eliminar Pin Parental[/B][/COLOR]' % color_adver
     context_parental.append({'title': tit, 'channel': 'actions', 'action': 'adults_password_del'})
 else:
     tit = '[COLOR %s][B]Información Parental[/B][/COLOR]' % color_infor
     context_parental.append({'title': tit, 'channel': 'helper', 'action': 'show_help_adults'})
 
-tit = '[COLOR tan][B]Parámetros Canales[/B][/COLOR]'
+tit = '[COLOR tan][B]Preferencias Canales[/B][/COLOR]'
 context_parental.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
 
-tit = '[COLOR mediumaquamarine][B]Últimos Cambios dominios[/B][/COLOR]'
+tit = '[COLOR mediumaquamarine][B]Últimos Cambios Dominios[/B][/COLOR]'
 context_parental.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
 tit = '[COLOR %s]Ajustes categorías Canales, Parental, y Dominios[/COLOR]' % color_exec
@@ -190,8 +190,9 @@ def mainlist(item):
         if config.get_setting('channels_link_pyse', default=False) or config.get_setting('mnu_series', default=True):
             itemlist.append(item.clone( title = ' - [B]Series[/B]', action = 'submnu_series', thumbnail=config.get_thumb('tvshow'), text_color='hotpink' ))
 
-        if config.get_setting('mnu_documentales', default=True):
-            itemlist.append(item.clone( title = ' - [B]Documentales[/B]', action = 'submnu_docs', thumbnail=config.get_thumb('documentary'), text_color='cyan' ))
+        if not config.get_setting('mnu_simple', default=False):
+            if config.get_setting('mnu_documentales', default=True):
+                itemlist.append(item.clone( title = ' - [B]Documentales[/B]', action = 'submnu_docs', thumbnail=config.get_thumb('documentary'), text_color='cyan' ))
 
         presentar = True
         if config.get_setting('mnu_simple', default=False): presentar = False
@@ -224,6 +225,8 @@ def mainlist(item):
 
     if presentar:
         itemlist.append(item.clone( title = '[B]Idiomas (Audios en los canales):[/B]', action = '', thumbnail=config.get_thumb('idiomas'), text_color='yellowgreen' ))
+
+        itemlist.append(item.clone( channel='helper', action='show_help_audios', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news') ))
 
         itemlist.append(item.clone( channel='helper', action='show_play_parameters', title=' - Qué [COLOR chocolate][B]Ajustes[/B][/COLOR] tiene en preferencias [COLOR fuchsia][B]Play[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
 
@@ -760,8 +763,7 @@ def ch_groups(item):
            elif item.extra == 'tvshows':
                if not 'tvshow' in ch['categories']: continue
 
-
-        if ch['searchable'] == False: # adultos
+        if ch['searchable'] == False:
             if descartar_xxx:
                 if 'adults' in agrupaciones:
                     if item.group == 'news': continue
@@ -770,11 +772,18 @@ def ch_groups(item):
                     elif item.group == 'stars': continue
                     elif item.group == 'vose': continue
                     elif item.group == 'vo': continue
-            elif descartar_anime:
+            else:
+               if config.get_setting('mnu_simple', default=False):
+                   if 'adults' in agrupaciones: continue
+
+            if descartar_anime:
                 if 'anime' in agrupaciones:
                    if item.group == 'anime': continue
                    elif item.group == 'vose': continue
                    elif item.group == 'vo': continue
+            else:
+               if config.get_setting('mnu_simple', default=False):
+                   if 'anime' in agrupaciones: continue
 
             if not config.get_setting('mnu_doramas', default=True):
                 if 'dorama' in ch['clusters']: continue
@@ -784,6 +793,14 @@ def ch_groups(item):
 
             if not config.get_setting('mnu_adultos', default=True):
                 if 'adults' in agrupaciones: continue
+
+        if config.get_setting('mnu_simple', default=False):
+            if str(ch['search_types']) == "['documentary']": continue
+            elif 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+            elif 'dedicada exclusivamente al dorama' in ch['notes'].lower(): continue
+
+            elif 'anime' in agrupaciones: continue
+            elif 'adults' in agrupaciones: continue
 
         action = accion
 
@@ -817,7 +834,7 @@ def ch_groups(item):
 
         if 'proxies' in ch['notes'].lower():
             if config.get_setting(cfg_proxies_channel, default=''):
-                tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+                tit = '[COLOR %s][B]Quitar Proxies del Canal[/B][/COLOR]' % color_list_proxies
                 context.append({'title': tit, 'channel': item.channel, 'action': '_quitar_proxies'})
 
         if ch['searchable']:
@@ -825,29 +842,29 @@ def ch_groups(item):
                 cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
 
                 if config.get_setting(cfg_searchable_channel, default=False):
-                    tit = '[COLOR %s][B]Quitar exclusión en búsquedas[/B][/COLOR]' % color_adver
+                    tit = '[COLOR %s][B]Quitar Exclusión en Buscar[/B][/COLOR]' % color_adver
                     context.append({'title': tit, 'channel': item.channel, 'action': '_quitar_no_searchables'})
                 else:
-                    tit = '[COLOR %s][B]Excluir de búsquedas[/B][/COLOR]' % color_adver
+                    tit = '[COLOR %s][B]Excluir en Buscar[/B][/COLOR]' % color_adver
                     context.append({'title': tit, 'channel': item.channel, 'action': '_poner_no_searchables'})
 
         if ch['status'] != 1:
-            tit = '[COLOR %s][B]Marcar canal como Preferido[/B][/COLOR]' % color_list_prefe
+            tit = '[COLOR %s][B]Marcar Canal como Preferido[/B][/COLOR]' % color_list_prefe
             context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': 1})
 
         if ch['status'] != 0:
             if ch['status'] == 1:
-                tit = '[COLOR %s][B]Des-Marcar canal como Preferido[/B][/COLOR]' % color_list_prefe
+                tit = '[COLOR %s][B]Des-Marcar Canal Preferido[/B][/COLOR]' % color_list_prefe
                 context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': 0})
             elif ch['status'] == -1:
-                tit = '[COLOR %s][B]Des-Marcar canal como Desactivado[/B][/COLOR]' % color_list_inactive
+                tit = '[COLOR %s][B]Des-Marcar Canal Desactivado[/B][/COLOR]' % color_list_inactive
                 context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': 0})
             else:
-                tit = '[COLOR white][B]Marcar canal como Activo[/B][/COLOR]'
+                tit = '[COLOR white][B]Marcar Canal como Activo[/B][/COLOR]'
                 context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': 0})
 
         if ch['status'] != -1:
-            tit = '[COLOR %s][B]Marcar canal como Desactivado[/B][/COLOR]' % color_list_inactive
+            tit = '[COLOR %s][B]Marcar Canal como Desactivado[/B][/COLOR]' % color_list_inactive
             context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': -1})
 
         cfg_domains = False
@@ -858,15 +875,15 @@ def ch_groups(item):
             tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
             context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
-        tit = '[COLOR %s][B]Últimos Cambios dominios[/B][/COLOR]' % color_exec
+        tit = '[COLOR %s][B]Últimos Cambios Dominios[/B][/COLOR]' % color_exec
         context.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
         if cfg_domains:
-            tit = '[COLOR yellowgreen][B]Dominio vigente[/B][/COLOR]'
+            tit = '[COLOR yellowgreen][B]Dominio Vigente[/B][/COLOR]'
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominio_vigente'})
 
             if 'Dispone de varios posibles dominios' in ch['notes']:
-                tit = '[COLOR powderblue][B]Configurar dominio a usar[/B][/COLOR]'
+                tit = '[COLOR powderblue][B]Configurar Dominio a usar[/B][/COLOR]'
                 context.append({'title': tit, 'channel': item.channel, 'action': '_dominios'})
 
             tit = '[COLOR orange][B]Modificar dominio Memorizado[/B][/COLOR]'
@@ -892,22 +909,22 @@ def ch_groups(item):
 
                if presentar:
                    if config.get_setting(cfg_login_channel, default=False):
-                       tit = '[COLOR teal][B]Cerrar sesión[/B][/COLOR]'
+                       tit = '[COLOR teal][B]Cerrar Sesión[/B][/COLOR]'
                        context.append({'title': tit, 'channel': item.channel, 'action': '_credenciales'})
 
         if 'proxies' in ch['notes'].lower():
             if not config.get_setting(cfg_proxies_channel, default=''):
-                tit = '[COLOR %s]Información Proxies[/COLOR]' % color_infor
+                tit = '[COLOR %s][B]Información Proxies[/B][/COLOR]' % color_infor
                 context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-            tit = '[COLOR %s][B]Configurar proxies a usar[/B][/COLOR]' % color_list_proxies
+            tit = '[COLOR %s][B]Configurar Proxies a usar[/B][/COLOR]' % color_list_proxies
             context.append({'title': tit, 'channel': item.channel, 'action': '_proxies'})
 
         if 'notice' in ch['clusters']:
-            tit = '[COLOR tan][B]Aviso del canal[/B][/COLOR]'
+            tit = '[COLOR tan][B]Aviso Canal[/B][/COLOR]'
             context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_' + ch['id']})
 
-        tit = '[COLOR darkorange][B]Test Web del canal[/B][/COLOR]'
+        tit = '[COLOR darkorange][B]Test Web Canal[/B][/COLOR]'
         context.append({'title': tit, 'channel': item.channel, 'action': '_tests'})
 
         if cfg_domains:
@@ -924,18 +941,21 @@ def ch_groups(item):
         titulo = ch['name']
 
         if ch['status'] == -1:
-            titulo += '[I][COLOR %s] (desactivado)[/COLOR][/I]' % color_list_inactive
-            if config.get_setting(cfg_proxies_channel, default=''): titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
+            titulo += '[I][B][COLOR %s] (desactivado)[/COLOR][/I][/B]' % color_list_inactive
+            if config.get_setting(cfg_proxies_channel, default=''): titulo += '[I][B][COLOR %s] (proxies)[/COLOR][/I][/B]' % color_list_proxies
         else:
+            if ch['status'] == 1: titulo += '[I][B][COLOR indianred] (preferido)[/COLOR][/I][/B]'
+            elif 'suggested' in ch['clusters']: titulo += '[I][B][COLOR olivedrab] (sugerido)[/COLOR][/I][/B]'
+
             if config.get_setting(cfg_proxies_channel, default=''):
-                if ch['status'] == 1: titulo += '[I][COLOR %s] (proxies)[/COLOR][/I]' % color_list_proxies
+                if ch['status'] == 1: titulo += '[I][B][COLOR %s] (proxies)[/COLOR][/I][/B]' % color_list_proxies
                 else: color = color_list_proxies
 
         if 'register' in ch['clusters']:
             cfg_user_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_username'
             cfg_pass_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_password'
             if not config.get_setting(cfg_user_channel, default='') or not config.get_setting(cfg_pass_channel, default=''):
-               titulo += '[I][COLOR teal] (cuenta)[/COLOR][/I]'
+               titulo += '[I][B][COLOR teal] (cuenta)[/COLOR][/I][/B]'
             else:
                cfg_login_channel = 'channel_' + ch['id'] + '_' + ch['id'] + '_login'
 
@@ -945,29 +965,35 @@ def ch_groups(item):
                        cfg_dominio_channel = 'channel_' + ch['id'] + '_dominio'
                        if not config.get_setting(cfg_dominio_channel, default=''): presentar = False
 
-                   if presentar: titulo += '[I][COLOR teal] (sesion)[/COLOR][/I]'
+                   if presentar: titulo += '[I][B][COLOR teal] (sesion)[/COLOR][/I][/B]'
                else: titulo += '[I][COLOR teal] (login)[/COLOR][/I]'
 
         if 'current' in ch['clusters']:
             cfg_current_channel = 'channel_' + ch['id'] + '_dominio'
 
-            if config.get_setting(cfg_current_channel, default=False): titulo += '[I][COLOR green] (Dominio)[/COLOR][/I]'
+            if config.get_setting(cfg_current_channel, default=False): titulo += '[I][B][COLOR green] (Dominio)[/COLOR][/I][/B]'
 
         if not PY3:
-            if 'mismatched' in ch['clusters']: titulo += '[I][COLOR coral] (Incompatible)[/COLOR][/I]'
+            if 'mismatched' in ch['clusters']: titulo += '[I][B][COLOR coral] (Incompatible)[/COLOR][/I][/B]'
 
         if 'inestable' in ch['clusters']:
             if config.get_setting('mnu_simple', default=False): continue
             elif config.get_setting('channels_list_no_inestables', default=False): continue
 
-            titulo += '[I][COLOR plum] (inestable)[/COLOR][/I]'
+            titulo += '[I][B][COLOR plum] (inestable)[/COLOR][/I][/B]'
 
         if 'problematic' in ch['clusters']:
             if config.get_setting('mnu_simple', default=False): continue
             elif config.get_setting('mnu_problematicos', default=False): continue
             elif config.get_setting('channels_list_no_problematicos', default=False): continue
 
-            titulo += '[I][COLOR darkgoldenrod] (problemático)[/COLOR][/I]'
+            titulo += '[I][B][COLOR darkgoldenrod] (problemático)[/COLOR][/I][/B]'
+
+        if ch['searchable']:
+            if not ch['status'] == -1:
+                cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
+
+                if config.get_setting(cfg_searchable_channel, default=False): titulo += '[I][B][COLOR yellowgreen] (no buscar)[/COLOR][/I][/B]'
 
         if item.langs:
             if not config.get_setting('mnu_adultos', default=True):

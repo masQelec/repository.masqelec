@@ -29,7 +29,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'serie-completa/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ver-serie/', search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ver-serie/', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings/', search_type = 'tvshow' ))
@@ -342,9 +342,6 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    logger.info()
-    itemlist = []
-
     IDIOMAS = {'mx': 'Lat', 'es': 'Esp', 'en': 'Vose', 'jp': 'Vose'}
 
     data = do_downloadpage(item.url)
@@ -382,37 +379,7 @@ def findvideos(item):
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, dpost = dpost, dnume = dnume, other = other, language = IDIOMAS.get(lang, lang) ))
 
-    # enlaces
-    matches = scrapertools.find_multiple_matches(data, "<tr id='link-'(.*?)</tr>")
-
-    for match in matches:
-        ses += 1
-
-        url = scrapertools.find_single_match(match, "<a href='(.*?)'")
-
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
-        elif 'ul.to' in url: continue
-
-        servidor = servertools.get_server_from_url(url, disabled_servers=True)
-
-        if servidor is None: continue
-
-        servidor = servertools.corregir_servidor(servidor)
-
-        if servertools.is_server_available(servidor):
-            if not servertools.is_server_enabled(servidor): continue
-        else:
-            if not config.get_setting('developer_mode', default=False): continue
-
-        url = servertools.normalize_url(servidor, url)
-
-        if url:
-            qlty = scrapertools.find_single_match(match, "<strong class='quality'>(.*?)</strong>")
-
-            lang = scrapertools.find_single_match(match, " src='.*?/flags/(.*?).png'")
-
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = IDIOMAS.get(lang, lang), quality = qlty ))
+    # downloads recatpcha
 
     if not itemlist:
         if not ses == 0:

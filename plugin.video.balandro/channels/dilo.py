@@ -171,7 +171,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = h_catalogue, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Las de la semana', action = 'list_all', url = h_catalogue+'?sort=mosts-week', search_type = 'tvshow', text_color = 'moccasin' ))
     itemlist.append(item.clone( title = 'Actualizadas', action = 'list_all', url = h_catalogue+'?sort=latest', search_type = 'tvshow' ))

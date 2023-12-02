@@ -192,13 +192,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'peliculas-subtituladas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = ' - [COLOR slateblue]Estrenos[/COLOR]', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - [COLOR cyan]Estrenos[/COLOR]', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Otros idiomas:', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=audio-latino', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = ' - [COLOR slateblue]Estrenos[/COLOR]', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino', search_type = 'movie', ))
+    itemlist.append(item.clone( title = ' - [COLOR cyan]Estrenos[/COLOR]', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino', search_type = 'movie', ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 

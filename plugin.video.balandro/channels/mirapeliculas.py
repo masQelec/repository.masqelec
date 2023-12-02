@@ -171,7 +171,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'repelis/estrenos/', text_color='slateblue' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'repelis/estrenos/', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))

@@ -77,7 +77,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Nuevas temporadas', action = 'list_all', url = host + 'new-season', search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Nuevas temporadas', action = 'list_all', url = host + 'new-season', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'ongoing-series', search_type = 'tvshow' ))
 

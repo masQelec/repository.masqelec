@@ -20,7 +20,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     headers = {'Referer': host}
 
     if '/release-year/' in url: raise_weberror = False
-   
+
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if not data:
@@ -28,11 +28,14 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             if not '?s=' in url:
                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PctMix1', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
-                # ~ 6/11/2023
+                # ~ 30/11/2023
                 # ~ timeout = config.get_setting('channels_repeat', default=30)
-                timeout = 40
+                timeout = 60
 
                 data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+                if not data:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 

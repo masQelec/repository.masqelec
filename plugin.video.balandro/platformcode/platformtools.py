@@ -567,7 +567,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         # Server Various y anulados/controlados
         if apuntar:
-            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov']:
+            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish']:
                 apuntar = False
 
             elif it.server in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza', 'vanfem', 'youtvgratis', 'oceanplay', 'gotovideo.kiev.ua', 'owodeuwu', 'sypl', 'fembed9hd', 'watchse', 'vcdn', 'femoload', 'cubeembed']:
@@ -836,11 +836,11 @@ def play_video(item, parent_item, autoplay=False):
             else:
                 motivo = '[COLOR crimson][B]' + motivo + '[/B][/COLOR]'
 
-            dialog_ok("No puedes ver el vídeo porque ...", motivo, item.url)
+            dialog_ok("No se puede Reproducir porque ...", motivo, item.url)
         return False
 
     if len(video_urls) == 1 and '.rar' in video_urls[0][0]:
-        if not autoplay: dialog_ok("No puedes ver el vídeo porque ...", '[COLOR crimson][B]Está comprimido en formato rar[/B][/COLOR]', item.url)
+        if not autoplay: dialog_ok("No se puede Reproducir porque ...", '[COLOR crimson][B]Está comprimido en formato rar[/B][/COLOR]', item.url)
         return False
 
     opciones = []
@@ -874,7 +874,7 @@ def play_video(item, parent_item, autoplay=False):
             return False
 
         if mpd and not is_mpd_enabled():
-            if not autoplay: dialog_ok(config.__addon_name, '[COLOR moccasin][B]Para ver el formato MPD se require el addon inputstream.adaptive[/B][/COLOR]')
+            if not autoplay: dialog_ok(config.__addon_name, '[COLOR moccasin][B]Para ver el formato MPD se require el AddOn inputstream.adaptive[/B][/COLOR]')
             return False
 
         if item.server == 'torrent':

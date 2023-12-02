@@ -306,11 +306,11 @@ def submnu_search(item):
                                         extra='documentaries', thumbnail=config.get_thumb('stack') ))
 
     elif item.extra == 'torrents':
-        itemlist.append(item.clone( channel='filters', action='channels_excluded', title=' - [COLOR tomato][B]Excluir canales [COLOR blue]Torrent[/COLOR][COLOR tomato]en las búsquedas para [COLOR yellow]Películas y/o Series[/B][/COLOR]',
+        itemlist.append(item.clone( channel='filters', action='channels_excluded', title=' - [COLOR tomato][B]Excluir canales [COLOR blue]Torrent[/COLOR][COLOR tomato]en las búsquedas para [COLOR yellow]Películas y/ó Series[/B][/COLOR]',
                                     extra='torrents', thumbnail=config.get_thumb('stack') ))
 
         if channels_search_excluded_mixed:
-            itemlist.append(item.clone( channel='filters', action='channels_excluded_del', title=' - [COLOR coral][B]Anular los canales [COLOR blue]Torrent[/COLOR][COLOR coral]excluidos en las búsquedas para Películas y/o Series[/B][/COLOR]',
+            itemlist.append(item.clone( channel='filters', action='channels_excluded_del', title=' - [COLOR coral][B]Anular los canales [COLOR blue]Torrent[/COLOR][COLOR coral]excluidos en las búsquedas para Películas y/ó Series[/B][/COLOR]',
                                         extra='torrents', thumbnail=config.get_thumb('stack') ))
 
     else:
@@ -465,6 +465,8 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'elitetorrentnz': domains.manto_domain_elitetorrentnz(item)
 
     elif item.from_channel == 'ennovelas': domains.manto_domain_ennovelas(item)
+
+    elif item.from_channel == 'ennovelasonline': domains.manto_domain_ennovelasonline(item)
 
     elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
 
@@ -669,7 +671,14 @@ def _proxies(item):
 
     refrescar = True
 
-    if item.from_channel == 'animefenix':
+    if item.from_channel == 'allpeliculasse':
+        from channels import allpeliculasse
+        item.channel = 'allpeliculasse'
+        allpeliculasse.configurar_proxies(item)
+
+        if config.get_setting('channel_allpeliculasse_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'animefenix':
         from channels import animefenix
         item.channel = 'animefenix'
         animefenix.configurar_proxies(item)
@@ -801,6 +810,13 @@ def _proxies(item):
         estrenoscinesaa.configurar_proxies(item)
 
         if config.get_setting('channel_estrenoscinesaa_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'filmoves':
+        from channels import filmoves
+        item.channel = 'filmoves'
+        filmoves.configurar_proxies(item)
+
+        if config.get_setting('channel_filmoves_proxies') is None: refrescar = False
 
     elif item.from_channel == 'gnula':
         from channels import gnula
@@ -1004,6 +1020,13 @@ def _proxies(item):
         playdede.configurar_proxies(item)
 
         if config.get_setting('channel_playdede_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'plushd':
+        from channels import plushd
+        item.channel = 'plushd'
+        plushd.configurar_proxies(item)
+
+        if config.get_setting('channel_plushd_proxies') is None: refrescar = False
 
     elif item.from_channel == 'reinventorrent':
         from channels import reinventorrent

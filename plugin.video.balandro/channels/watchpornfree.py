@@ -52,7 +52,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'scenes/' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'category/featured/' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'category/featured/', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host, text_color = 'deepskyblue' ))
 

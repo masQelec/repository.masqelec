@@ -182,7 +182,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/peliculas', search_type = 'movie', tipo = 'index', pagina = 1 ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/peliculas/estrenos', search_type = 'movie', tipo = 'estrenos', pagina = 1, text_color='slateblue' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/peliculas/estrenos', search_type = 'movie', tipo = 'estrenos', pagina = 1, text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Más Vistas', action = 'list_all', url = host + '/peliculas/mas-vistas', search_type = 'movie', page = 0, pagina = 1 ))  
 
@@ -204,7 +204,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/series', search_type = 'tvshow', tipo = 'index', pagina = 1 ))
 
-    itemlist.append(item.clone( title = 'Series con nuevos capítulos', action = 'list_all', url = host + '/series/tendencias', search_type = 'tvshow', pagina = 1, text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Series con nuevos capítulos', action = 'list_all', url = host + '/series/tendencias', search_type = 'tvshow', pagina = 1, text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Más Vistas', action = 'list_all', url = host + '/series/mas-vistas', search_type = 'tvshow', page = 0, pagina = 1 ))
 

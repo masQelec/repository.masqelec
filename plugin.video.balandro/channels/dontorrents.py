@@ -22,7 +22,7 @@ except:
     data_tor_proxy = ''
 
 if data_tor_proxy:
-    tor_proxy = scrapertools.find_single_match(data_tor_proxy, 'Pulse el boton inferior para que se le genere un proxy.*?<a href="(.*?)"')
+    tor_proxy = scrapertools.find_single_match(data_tor_proxy, 'Pulse el boton inferior para que se le genere un proxy.*?<a href="(.*?)".*?>Ingresar al Proxy Generado<')
     if tor_proxy:
         if not tor_proxy.endswith('/'): tor_proxy = tor_proxy + '/'
 
@@ -63,7 +63,8 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.foo/', 'https://dontorrent.hair/', 'https://dontorrent.rsvp/',
              'https://dontorrent.quest/', 'https://dontorrent.nexus/', 'https://dontorrent.bond/',
              'https://dontorrent.tokyo/', 'https://dontorrent.boston/', 'https://dontorrent.rodeo/',
-             'https://dontorrent.durban/', 'https://dontorrent.party/', 'https://dontorrent.joburg/']
+             'https://dontorrent.durban/', 'https://dontorrent.party/', 'https://dontorrent.joburg/',
+             'https://dontorrent.wales/', 'https://dontorrent.nagoya/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -181,7 +182,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/page/1', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'movie', text_color='slateblue' ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
@@ -204,7 +205,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'series/letra-.', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'tvshow', text_color='olive' ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'tvshow', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'En HD (alfabético)', action = 'list_all', url = host + 'series/hd/letra-.', search_type = 'tvshow' ))
 

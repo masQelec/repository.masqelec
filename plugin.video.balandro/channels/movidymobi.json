@@ -3,7 +3,7 @@
   "name": "MovidyMobi",
   "thumbnail": "movidymobi.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast", "lat"],
 
-  "clusters": ["current", "rankings", "years", "docs"],
+  "clusters": ["temporary", "current", "rankings", "years", "docs"],
 
   "notes": "Películas por géneros y año."
 }
