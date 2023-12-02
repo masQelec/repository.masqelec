@@ -150,7 +150,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/peliculas-13/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/ultimos-torrents-3/', search_type = 'movie', text_color='slateblue' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/ultimos-torrents-3/', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/peliculas-hd-3/', search_type = 'movie' ))
 
@@ -169,7 +169,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/series-3/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/ultimos-torrents-3/', search_type = 'tvshow', text_color='olive' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/ultimos-torrents-3/', search_type = 'tvshow', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/series-hd-2/', search_type = 'tvshow' ))
 

@@ -432,6 +432,7 @@ def findvideos(item):
 
             if other == 'netu' or other == 'hqq' or other == 'waaw': continue
             elif other == '1fichier': continue
+            elif other == 'plusclick': continue
 
             other = servertools.corregir_servidor(other)
 

@@ -169,6 +169,9 @@ def login(item):
                    if not item: platformtools.dialog_notification(config.__addon_name, login_ok)
                    else:
                       if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
+
+                   if item.start_ses:
+                       platformtools.dialog_ok(config.__addon_name + ' NextDede', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
                    return True
 
     except:
@@ -188,6 +191,9 @@ def login(item):
     if username in data:
         config.set_setting('nextdede_login', True, 'nextdede')
         if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
+
+        if item.start_ses:
+            platformtools.dialog_ok(config.__addon_name + ' NextDede', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
         return True
 
     platformtools.dialog_notification(config.__addon_name, login_ko)
@@ -204,6 +210,8 @@ def logout(item):
 
         config.set_setting('nextdede_login', False, 'nextdede')
         platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]NextDede Sesión cerrada[/COLOR]')
+
+        platformtools.dialog_ok(config.__addon_name + ' NextDede', '[COLOR yellow][B]Sesión Cerrada[/B][/COLOR].', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] e [COLOR chartreuse][B]Inicie Sesión[/B][/COLOR] de nuevo.')
         return True
 
     platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]NextDede Sin cerrar la Sesión[/B][/COLOR]')
@@ -237,7 +245,7 @@ def acciones(item):
 
     if not config.get_setting('nextdede_login', 'nextdede', default=False):
         if email:
-            itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login' ))
+            itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login', start_ses = True ))
             itemlist.append(Item( channel='domains', action='del_datos_nextdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
@@ -246,6 +254,7 @@ def acciones(item):
 
     if config.get_setting('nextdede_login', 'nextdede', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
+        itemlist.append(Item( channel='domains', action='del_datos_nextdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
 
     platformtools.itemlist_refresh()
 
@@ -288,7 +297,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/discovery?filter={"type": "movie", "sorting": "newest"}', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/movies', search_type = 'movie', text_color='slateblue' ))
+        itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/movies', search_type = 'movie', text_color='cyan' ))
 
         itemlist.append(item.clone( title = 'Últimas agregadas', action = 'list_last', url = host + '/trends', search_type = 'movie' ))
 
@@ -324,9 +333,9 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/discovery?filter={"type": "serie", "sorting": "newest"}', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Nuevas', action = 'list_all', url = host + '/series', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = 'Nuevas', action = 'list_all', url = host + '/series', search_type = 'tvshow', text_color = 'moccasin' ))
 
-        itemlist.append(item.clone( title = 'Últimas agregadas', action = 'list_last', url = host + '/trends', search_type = 'tvshow', text_color = 'olive' ))
+        itemlist.append(item.clone( title = 'Últimas agregadas', action = 'list_last', url = host + '/trends', search_type = 'tvshow', text_color = 'cyan' ))
 
         itemlist.append(item.clone( title = 'Recientes', action = 'list_all', url = host + '/series?filter={"sorting":"newest"}', search_type = 'tvshow' ))
 

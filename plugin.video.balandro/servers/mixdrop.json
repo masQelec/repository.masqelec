@@ -18,6 +18,10 @@
       {
         "pattern": "http(?:s|)://mixdrp.(?:co|to|sx|bz|ch|gl|club|vc|ag)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
+      },
+      {
+        "pattern": "https://mdy48tn97.com/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "url": "https://mixdrop.ag/e/\\1"
       }
     ]
   }

@@ -35,7 +35,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = url_doramas, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone ( title = 'Últimos episodios', action = 'list_all', url = host + 'ultimoscapitulos.php', group = 'last', search_type = 'tvshow', text_color='olive' ))
+    itemlist.append(item.clone ( title = 'Últimos episodios', action = 'list_all', url = host + 'ultimoscapitulos.php', group = 'last', search_type = 'tvshow', text_color='cyan' ))
 
     itemlist.append(item.clone ( title = 'En emisión', action = 'list_lst',
                                  post = {"countries": "", "generos": "", "years": "", "emition": "[\"Si\"]", "submit": ""}, search_type = 'tvshow' ))

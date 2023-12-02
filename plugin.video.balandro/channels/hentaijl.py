@@ -28,7 +28,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'directorio-hentai' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host, group = 'find' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host, group = 'find', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'directorio-hentai?genre[]=71&order=updated' ))
 
@@ -151,7 +151,7 @@ def findvideos(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}', "", data)
 
-    lang = 'Vose'
+    lang = 'Vo'
     if '-latino' in item.url: lang = 'Lat'
 
     matches = re.compile('<iframe src="(.*?)"', re.DOTALL).findall(data)

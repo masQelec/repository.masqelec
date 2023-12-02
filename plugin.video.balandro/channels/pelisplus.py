@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://pelisplushd.so/'
+host = 'https://pelisplusgo.vip/'
 
 
 # ~ por si viene de enlaces guardados
@@ -54,7 +54,8 @@ ant_hosts = ['https://pelisplus.so/', 'https://www1.pelisplus.so/', 'https://www
              'https://www2.pelisplus.cx/', 'https://www3.pelisplus.cx/', 'https://pelisplus.ph/',
              'https://www1.pelisplus.ph/', 'https://www2.pelisplus.ph/', 'https://www3.pelisplus.ph/',
              'https://www4.pelisplus.ph/', 'https://pelisplus.ws/', 'https://www3.pelisplus.ws/',
-             'https://www4.pelisplus.ws/', 'https://pelisplushd.video/', 'https://www1.pelisplushd.video/']
+             'https://www4.pelisplus.ws/', 'https://pelisplushd.video/', 'https://www1.pelisplushd.video/',
+             'https://pelisplushd.so/']
 
 
 domain = config.get_setting('dominio', 'pelisplus', default='')
@@ -187,7 +188,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '?page=', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'estrenos?page=', search_type = 'movie', text_color='slateblue' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'estrenos?page=', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))

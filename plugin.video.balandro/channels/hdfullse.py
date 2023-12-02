@@ -212,7 +212,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( action = 'list_all', title = 'Catálogo', url= host + '/movies', search_type = 'movie' ))
 
-    itemlist.append(item.clone( action = 'list_all', title = 'Estrenos', url = host + '/new-movies', search_type = 'movie', text_color='slateblue' ))
+    itemlist.append(item.clone( action = 'list_all', title = 'Estrenos', url = host + '/new-movies', search_type = 'movie', text_color='cyan' ))
     itemlist.append(item.clone( action = 'list_all', title = 'Actualizadas', url = host + '/updated-movies', search_type = 'movie' ))
 
     itemlist.append(item.clone( action = 'list_all', title = 'Más valoradas', url = host + '/movies/imdb_rating', search_type = 'movie' ))

@@ -39,7 +39,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'top-imdb', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'quality/4k', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'quality/4k', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
 
@@ -57,7 +57,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'episode', group = 'episodes', search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'episode', group = 'episodes', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Temporadas completas', action = 'list_all', url = host + 'tag/tv-series-full-episode', group = 'episodes', search_type = 'tvshow' ))
 

@@ -26,7 +26,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Novedades', action = 'news' ))
 
-    itemlist.append(item.clone ( title = 'Joyas del cine', action = 'list_all', url = host + '/joyas-del-cine.html' ))
+    itemlist.append(item.clone ( title = 'Joyas del cine', action = 'list_all', url = host + '/joyas-del-cine.html', text_color = 'moccasin' ))
 
     itemlist.append(item.clone ( title = 'Por saga', action = 'pelis', grupo = 'sagas' ))
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
