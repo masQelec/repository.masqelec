@@ -91,7 +91,7 @@ def do_downloadpage(url, post=None, headers=None):
                 if hay_proxies:
                     data = httptools.downloadpage_proxy('elifilms', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
-                   data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -391,14 +391,22 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<div id="tab.*?data-src="(.*?)"')
 
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<a class="playxnxx".*?data-url="(.*?)"')
+
     i = 0
 
     for link in matches:
         ses += 1
 
-        other = 'P ' + str(i)
+        servidor = servertools.get_server_from_url(link)
+        servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = link, language = 'Lat', other = other ))
+        other = ''
+        if servidor == 'various': other = servertools.corregir_other(link)
+        else:
+           if servidor == 'directo': other = 'P ' + str(i)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Lat', other = other ))
 
         i += 1
 
@@ -416,9 +424,9 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(srv)
 
         other = srv
-        if not servidor == 'directo': other = ''
+        if not servidor == 'directo': other = 'D'
 		
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', dvid = dvid, language = 'Lat', other = other.capitalize() ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', ref = item.url, dvid = dvid, language = 'Lat', other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -432,16 +440,23 @@ def play(item):
     logger.info()
     itemlist = []
 
-    if item.url:
-        if not item.url.startswith(players):
-            resp = httptools.downloadpage(item.url)
-        else:
-           if config.get_setting('channel_elifilms_proxies', default=''):
-               resp = httptools.downloadpage_proxy('elifilms', item.url)
-           else:
-                resp = httptools.downloadpage(item.url)
+    url = item.url
 
-        url = scrapertools.find_single_match(resp.data, "var url = '(.*?)'")
+    if url:
+        if item.server:
+            if not item.server == 'directo':
+                servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
+
+                url = servertools.normalize_url(servidor, url)
+
+                itemlist.append(item.clone(server = servidor, url = url))
+                return itemlist
+
+    if url:
+        data = do_downloadpage(item.url)
+
+        url = scrapertools.find_single_match(data, "var url = '(.*?)'")
 
         if url:
             servidor = servertools.get_server_from_url(url)
@@ -452,7 +467,25 @@ def play(item):
             if not servidor == 'directo':
                 itemlist.append(item.clone(server = servidor, url = url))
 
-        return itemlist
+            return itemlist
+
+    if item.ref:
+        _domain = ''
+
+        headers = {'Referer': item.ref}
+
+        if item.server == 'torrent': _domain = 'Torrent'
+        elif item.server == 'mediafire': _domain = 'MediaFire'
+        elif item.server == 'mega': _domain = 'Mega'
+        elif item.server == 'megaup': _domain = 'Megaup'
+
+        post = {'url': item.dvid, 'domain': _domain}
+
+        data = do_downloadpage(item.ref, post=post, headers=headers)
+
+        _id = scrapertools.find_single_match(data, '<input type="hidden".*?value="(.*?)"')
+
+        if _id: item.dvid = _id
 
     url = 'https://acortalink.me/s.php?i=' + item.dvid
 

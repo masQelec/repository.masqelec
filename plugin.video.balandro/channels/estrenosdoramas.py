@@ -82,7 +82,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'last_pelis', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'last_pelis', url = host, search_type = 'movie', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'movie' ))
 
@@ -101,11 +101,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/doramas-online/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host + 'category/ultimos-capitulos-online/', search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host + 'category/ultimos-capitulos-online/', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Capítulos recientes', action = 'last_news', url = host, search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Capítulos recientes', action = 'last_news', url = host, search_type = 'tvshow', text_color = 'olivedrab' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'last_series', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimos doramas', action = 'last_series', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'tvshow' ))
 

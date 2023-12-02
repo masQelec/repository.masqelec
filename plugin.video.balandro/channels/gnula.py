@@ -112,11 +112,11 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, group = 'estrenos' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, group = 'estrenos', text_color = 'moccasin' ))
     itemlist.append(item.clone( title = 'Novedades', action = 'list_last', url = host, group = 'novedades' ))
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_last', url = host, group = 'recomendadas' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = url_estrenos, text_color='slateblue' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = url_estrenos, text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Recomendadas', action = 'list_all', url = url_recomendadas ))
 

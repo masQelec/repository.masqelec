@@ -65,8 +65,8 @@ def mainlist(item):
                                     plot = 'Escribir el nombre de una película para buscar su tráiler' ))
 
     if config.get_setting('channels_link_main', default=True):
-        itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR yellow]Película y/o Serie[/COLOR] ...',
-                                    plot = 'Buscar indistintamente películas y/o series en todos los canales' ))
+        itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR yellow]Película y/ó Serie[/COLOR] ...',
+                                    plot = 'Buscar indistintamente películas y/ó series en todos los canales' ))
 
     itemlist.append(item.clone( action='search', search_type='movie', title= ' - Buscar [COLOR deepskyblue]Película[/COLOR] ...',
                                 thumbnail=config.get_thumb('movie'), plot = 'Escribir el nombre de una película para buscarla en los canales de películas' ))
@@ -74,10 +74,11 @@ def mainlist(item):
     itemlist.append(item.clone( action='search', search_type='tvshow', title= ' - Buscar [COLOR hotpink]Serie[/COLOR] ...',
                                 thumbnail=config.get_thumb('tvshow'), plot = 'Escribir el nombre de una serie para buscarla en los canales de series' ))
 
-    if config.get_setting('mnu_documentales', default=True):
-        itemlist.append(item.clone( action='search', search_type='documentary', title= ' - Buscar [COLOR cyan]Documental[/COLOR] ...',
-                                    thumbnail=config.get_thumb('documentary'),
-                                    plot = 'Escribir el nombre de un documental para buscarlo en los canales de documentales' ))
+    if not config.get_setting('mnu_simple', default=False):
+        if config.get_setting('mnu_documentales', default=True):
+            itemlist.append(item.clone( action='search', search_type='documentary', title= ' - Buscar [COLOR cyan]Documental[/COLOR] ...',
+                                        thumbnail=config.get_thumb('documentary'),
+                                        plot = 'Escribir el nombre de un documental para buscarlo en los canales de documentales' ))
 
     if not config.get_setting('mnu_simple', default=False):
         if config.get_setting('mnu_doramas', default=True):

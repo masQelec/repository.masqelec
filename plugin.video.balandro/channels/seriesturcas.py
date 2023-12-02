@@ -50,7 +50,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_list', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_all', url = host + 'category/capitulos-completos/', group = 'capis', search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_all', url = host + 'category/capitulos-completos/', group = 'capis', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Mexicanas (capítulos)', action = 'list_all', url = host + 'category/novelas-mexicanas/', group = 'capis', search_type = 'tvshow' ))
 

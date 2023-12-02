@@ -33,7 +33,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + '/0/'))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + '/0/', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Los mejores', action = 'list_all', url = host + 'best-videos/' ))
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'most-viewed/' ))
@@ -166,6 +166,8 @@ def findvideos(item):
 
     for link in links:
         qlty = scrapertools.find_single_match(link, "(.*?):")
+
+        qlty = qlty.replace('<u>', '').strip()
 
         url = scrapertools.find_single_match(link, 'href="(.*?)"')
 

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wvw.cinecalidad.dad/'
+host = 'https://cine-calidad.mx/'
 
 
 _players = ['https://cinecalidad.', '.cinecalidad.']
@@ -27,7 +27,8 @@ ant_hosts = ['https://cinecalidad.la/', 'https://cinecalidad.fo/', 'https://ww22
              'https://w2.cinecalidad.bz/', 'https://w3.cinecalidad.bz/', 'https://w4.cinecalidad.bz/',
              'https://w5.cinecalidad.bz/', 'https://w6.cinecalidad.bz/', 'https://w7.cinecalidad.bz/',
              'https://w8.cinecalidad.bz/', 'https://w9.cinecalidad.bz/', 'https://w10.cinecalidad.bz/',
-             'https://w11.cinecalidad.bz/', 'https://cinecalidad.zip/', 'https://cinecalidad.dad/']
+             'https://w11.cinecalidad.bz/', 'https://cinecalidad.zip/', 'https://cinecalidad.dad/',
+             'https://wvw.cinecalidad.dad/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadla', default='')
@@ -115,7 +116,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'calidad/4k-ultra-hd-hdr/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'calidad/4k-ultra-hd-hdr/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie' ))
@@ -134,7 +135,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host + 'serie/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host + 'serie/', search_type = 'tvshow', text_color = 'cyan' ))
 
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color='springgreen' ))

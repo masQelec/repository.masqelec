@@ -12,11 +12,12 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www2.dontorrent.fr/'
+host = 'https://www3.dontorrent.fr/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://dontorrent.in/', 'https://dontorrent.tv/', 'https://www1.dontorrent.fr/']
+ant_hosts = ['https://dontorrent.in/', 'https://dontorrent.tv/', 'https://www1.dontorrent.fr/',
+             'https://www2.dontorrent.fr/']
 
 
 domain = config.get_setting('dominio', 'dontorrentsin', default='')
@@ -131,7 +132,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/page/1', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'movie', text_color='slateblue' ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
@@ -154,7 +155,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'series/letra-.', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'tvshow', text_color='olive' ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'tvshow', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'En HD (alfabético)', action = 'list_all', url = host + 'series/hd/letra-.', search_type = 'tvshow' ))
 

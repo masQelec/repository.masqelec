@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Alions,  Awish,  Azipcdn,  Desiupload,  Dlions,  Doodporn,  Dropload,  Dwish,  Embedgram,  Emturbovid,  Embedwish,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Fviplions,  Hexupload,  Krakenfiles,  Lulustream,  Luluvdo,  Mlions,  Moonmov,  Moonplayer,  Mvidoo,  Mwish,  Rutube,  Sfastwish,  Streamhub,  Streamvid,  Streamwish,  Strwish,  Tubeload,  Turboviplay,  Tuborstb,  Uploaddo,  Uploadever,  Vgfplay,  Vid-guard,  Vidello,  Videowood,  Vidguard,  Vidspeed,  V6embed,  Vgembed,  Vembed,  Vudeo,  Wishembed,  Wishfast,  Yadi,  Yandex,  Yodbox,  Youdboox,  Youdbox)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Alions,  Awish,  Azipcdn,  Desiupload,  Dlions,  Doodporn,  Dropload,  Dwish,  Embedgram,  Emturbovid,  Embedwish,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Flaswish,  Fviplions,  Hexupload,  Krakenfiles,  Lulustream,  Luluvdo,  Mlions,  Moonmov,  Moonplayer,  Mvidoo,  Mwish,  Rutube,  Sfastwish,  Streamhub,  Streamvid,  Streamwish,  Strwish,  Tubeload,  Turboviplay,  Tuborstb,  Uploaddo,  Uploadever,  Vgfplay,  Vid-guard,  Vidello,  Videowood,  Vidguard,  Vidspeed,  V6embed,  Vgembed,  Vembed,  Vudeo,  Wishembed,  Wishfast,  Yadi,  Yandex,  Yodbox,  Youdboox,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -113,6 +113,14 @@
         "url": "https://streamhub.to/e/\\2"
       },
       {
+        "pattern": "https://streamhub.top/watch/([0-9a-zA-Z]+)",
+        "url": "https://streamhub.to/e/\\1"
+      },
+      {
+        "pattern": "(https://streamhub.top/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamhub.to/e/\\2"
+      },
+      {
         "pattern": "(https://fastupload.io/)([0-9a-zA-Z]+/file)",
         "url": "https://fastupload.io/\\2"
       },
@@ -177,6 +185,10 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://wishfast.top/([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://wishfast.top/(?:e/|f/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
@@ -186,6 +198,10 @@
       },
       {
         "pattern": "https://doodporn.xyz/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://flaswish.com/(?:e/|d/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
@@ -250,6 +266,14 @@
       },
       {
         "pattern": "https://filelions.online/(?:v/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://filelions.site/(?:v/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://filelions.co/(?:v/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://filelions.to/f/\\1"
       },
       {

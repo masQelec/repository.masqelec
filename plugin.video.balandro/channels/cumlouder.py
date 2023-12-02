@@ -28,7 +28,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host +'/2/', page = 1 ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host +'/2/', page = 1, text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Por repertorio', action = 'repertorios' ))
     itemlist.append(item.clone( title = 'Por canal', action = 'canales' ))
@@ -48,7 +48,7 @@ def repertorios(item):
 
     data = httptools.downloadpage(item.url).data
 
-    patron = '<a onclick=.*?href="([^"]+)".*?data-src="([^"]+)".*?h2 itemprop="name">([^<]+).*?p>([^<]+)</p>'
+    patron = '<div itemprop="itemListElement".*?href="([^"]+)".*?data-src="([^"]+)".*?h2 itemprop="name">([^<]+).*?p>([^<]+)</p>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 

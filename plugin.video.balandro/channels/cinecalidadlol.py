@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://www.cinecalidad.gg/'
+host = 'https://wv.cinecalidad.gg/'
 
 
 _players = ['https://cinecalidad.', '.cinecalidad.']
@@ -72,7 +72,9 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://ww.cinecalidad.men/', 'https://vw.cinecalidad.men/', 'https://wv.cinecalidad.men/',
              'https://vv.cinecalidad.men/', 'https://v.cinecalidad.men/', 'https://v1.cinecalidad.men/',
              'https://v2.cinecalidad.men/', 'https://v3.cinecalidad.men/', 'https://v4.cinecalidad.men/',
-             'https://v5.cinecalidad.men/']
+             'https://v5.cinecalidad.men/', 'https://www.cinecalidad.gg/', 'https://wvw.cinecalidad.gg/',
+             'https://wwv.cinecalidad.gg/', 'https://vww.cinecalidad.gg/', 'https://vvv.cinecalidad.gg/'
+             'https://ww.cinecalidad.gg/', 'https://w.cinecalidad.gg/', 'https://vvw.cinecalidad.gg/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -225,7 +227,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'espana/?ref=es', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host + 'espana/?ref=es', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/?ref=es', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/?ref=es', search_type = 'movie' ))
 
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = ' - [COLOR springgreen]Animes[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/anime/?ref=es', search_type = 'movie' ))
@@ -236,7 +238,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
 
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = ' - [COLOR springgreen]Animes[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/anime/', search_type = 'movie' ))
@@ -257,13 +259,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/?ref=es', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - Últimas', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = ' - [COLOR cyan]Últimas[/COLOR]', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow', group = '?ref=es' ))
 
     itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - Últimas', action = 'destacadas', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = ' - [COLOR cyan]Últimas[/COLOR]', action = 'destacadas', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow' ))
 

@@ -134,7 +134,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'torrents-peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'estrenos', search_type = 'movie', text_color='slateblue' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'estrenos', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
@@ -156,7 +156,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'torrents-series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'estrenos', search_type = 'tvshow', text_color='olive' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'estrenos', search_type = 'tvshow', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))

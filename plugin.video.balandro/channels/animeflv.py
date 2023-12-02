@@ -7,14 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://animeflv.ws/'
+host = 'https://www1.animeflv.ws/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www10.animeflv.cc/', 'https://www3.animeflv.net/', 'https://www3.animeflv.cc/',
              'https://ww3.animeflv.cc/', 'https://animeflv.bz/', 'https://www1.animeflv.bz/',
              'https://www2.animeflv.bz/', 'https://animeflv.so/', 'https://animeflv.vc/',
-             'https://animeflv.sh/']
+             'https://animeflv.sh/', 'https://animeflv.ws/']
 
 
 domain = config.get_setting('dominio', 'animeflv', default='')
@@ -84,9 +84,9 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'browse', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host, search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'browse?genres=all&year=all&status=all&order=1&Tipo=4', search_type = 'tvshow' ))
 
@@ -348,7 +348,7 @@ def findvideos(item):
 
     ses = 0
 
-    for url, server in matches:
+    for url, srv in matches:
         ses += 1
 
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
@@ -399,15 +399,6 @@ def play(item):
     servidor = item.server
 
     url = item.url
-
-    if "/v/" in item.url:
-        data = do_downloadpage(item.url)
-
-        if 'yandex.ru' in data:
-            url = item.url.split('/v/')[0]
-            item.url = item.url.replace(url, 'https://fembed.com')
-
-            url = item.url
 
     if "/streaming.php?" in item.url:
         data = do_downloadpage(item.url)

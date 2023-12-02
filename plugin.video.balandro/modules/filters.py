@@ -53,7 +53,7 @@ def mainlist(item):
     if channels_search_excluded_documentaries: tot_opt_anular += 1
 
     if config.get_setting('channels_link_main', default=True):
-        itemlist.append(item.clone( action = 'channels_excluded', title='Excluir canales en las búsquedas de [COLOR yellow][B]Películas y/o Series[/B][/COLOR]',
+        itemlist.append(item.clone( action = 'channels_excluded', title='Excluir canales en las búsquedas de [COLOR yellow][B]Películas y/ó Series[/B][/COLOR]',
                                     extra = 'mixed', folder = False ))
 
     itemlist.append(item.clone( action = 'channels_excluded', title='Excluir canales en las búsquedas de [COLOR deepskyblue][B]Películas[/B][/COLOR]',
@@ -71,7 +71,7 @@ def mainlist(item):
 
     if config.get_setting('channels_link_main', default=True):
         if channels_search_excluded_mixed:
-            itemlist.append(item.clone( title = '[B]Anular las exclusiones para [COLOR yellow]Películas y/o Series[/COLOR][/B]', action = 'channels_excluded_del',
+            itemlist.append(item.clone( title = '[B]Anular las exclusiones para [COLOR yellow]Películas y/ó Series[/COLOR][/B]', action = 'channels_excluded_del',
                                         extra = 'mixed', folder = False, text_color='coral' ))
 
     if channels_search_excluded_movies:
@@ -742,7 +742,7 @@ def channels_excluded(item):
         cabecera = 'Torrents'
         filtros = {'categories': 'torrent', 'searchable': True}
     elif item.extra == 'mixed':
-        cabecera = 'Películas y/o Series'
+        cabecera = 'Películas y/ó Series'
         filtros = {'searchable': True}
     else:
         cabecera = 'Todos'
@@ -893,7 +893,7 @@ def channels_excluded_del(item):
         txt = 'Torrents'
     elif item.extra == 'mixed':
         canales_excluidos = channels_search_excluded_mixed
-        txt = 'Películas y/o Series'
+        txt = 'Películas y/ó Series'
     else:
         canales_excluidos = channels_search_excluded_all
         txt = 'Películas, Series y Documentales'

@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://www.cinecalidad.so/'
+host = 'https://wv.cinecalidad.so/'
 
 
 _players = ['https://cinecalidad.', '.cinecalidad.']
@@ -60,7 +60,9 @@ ant_hosts = ['https://www.cinecalidad.eu/', 'https://www.cinecalidad.im/', 'http
              'https://wwv.cinecalidad.tf/', 'https://www.cinecalidad.foo/', 'https://vw.cinecalidad.foo/',
              'https://ww.cinecalidad.foo/', 'https://w.cinecalidad.foo/', 'https://wwv.cinecalidad.foo/',
              'https://wv.cinecalidad.foo/', 'https://vwv.cinecalidad.foo/', 'https://wzw.cinecalidad.foo/',
-             'https://v2.cinecalidad.foo/']
+             'https://v2.cinecalidad.foo/', 'https://www.cinecalidad.so/', 'https://wvw.cinecalidad.so/',
+             'https://vww.cinecalidad.so/', 'https://wwv.cinecalidad.so/', 'https://vvv.cinecalidad.so/',
+             'https://ww.cinecalidad.so/', 'https://w.cinecalidad.so/', 'https://vvw.cinecalidad.so/']
 
 domain = config.get_setting('dominio', 'cinecalidad', default='')
 
@@ -207,10 +209,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - [COLOR slateblue]Estrenos[/COLOR]', action = 'list_all', url = host + 'estrenos/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - [COLOR cyan]Estrenos[/COLOR]', action = 'list_all', url = host + 'estrenos/', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Más populares', action = 'list_all', url = host + 'peliculas-populares/', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + '4k/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + '4k/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie' ))
@@ -228,7 +230,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series-populares/', search_type = 'tvshow' ))
 
@@ -713,7 +715,6 @@ def play(item):
         itemlist.append(item.clone(url = url, server = servidor))
 
         return itemlist
-
 
     url = base64.b64decode(item.data_url).decode("utf-8")
 

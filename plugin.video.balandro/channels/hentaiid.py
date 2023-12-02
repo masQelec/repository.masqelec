@@ -112,6 +112,12 @@ def episodios(item):
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
+    if not itemlist:
+        if '<iframe src="' in data or '<IFRAME SRC="':
+            title = item.title
+
+            itemlist.append(item.clone( action = 'findvideos', url = item.url, title = title, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
+            
     return itemlist
 
 
@@ -156,11 +162,15 @@ def findvideos(item):
 
     videos.extend(downloads)
 
+
     for url in videos:
+        if not url.startswith('http'): continue
+
         if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
         elif '/vapley.top/' in url: continue
         elif '/megadl.fr/' in url: continue
         elif '/1fichier.com/' in url: continue
+        elif '/ouo.io' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

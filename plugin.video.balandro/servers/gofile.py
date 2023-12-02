@@ -86,7 +86,7 @@ def get_video_url(page_url, url_referer=''):
 
                 if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
                     trace = traceback.format_exc()
-                    if 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace:
+                    if 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                         return 'Archivo inexistente ó eliminado'
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo'
@@ -96,7 +96,7 @@ def get_video_url(page_url, url_referer=''):
                 return video_urls
 
         else:
-         return 'Vídeo no autorizado'
+         return 'Vídeo no Autorizado, sin ResolveUrl'
 
     info =  scrapertools.find_single_match(str(data), '"contents":"(.*?)"')
 

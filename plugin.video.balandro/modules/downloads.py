@@ -71,7 +71,6 @@ def mainlist(item):
 
         itemlist.append(it)
 
-
     if not itemlist:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Descargas[/COLOR][/B]' % color_exec)
 

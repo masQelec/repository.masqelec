@@ -30,7 +30,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'hentai/' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_list', url = host + 'hentai/estrenos/' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_list', url = host + 'hentai/estrenos/', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'hentai/sin-censura/' ))
 

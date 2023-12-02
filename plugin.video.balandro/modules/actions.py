@@ -10,10 +10,10 @@ else:
     translatePath = xbmc.translatePath
 
 
-import os, re, xbmcgui, xbmc
+import os, re, glob, xbmcgui, xbmc
 
 from platformcode import config, logger, platformtools
-from core import filetools, jsontools
+from core import filetools, jsontools, scrapertools
 
 from core.item import Item
 
@@ -248,7 +248,7 @@ def search_trailers(item):
 def global_proxies(item):
     logger.info()
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow][B]¿ Confirma Obtener Proxies en los canales que los necesiten ?[/B][/COLOR]'):
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow][B]¿ Desea Obtener [COLOR red]Proxies[COLOR yellow] en los canales que los necesiten ?[/B][/COLOR]'):
         from modules import proxysearch
 
         proxysearch.proxysearch_all(item)
@@ -360,6 +360,7 @@ def manto_params(item):
         config.set_setting('channel_elitetorrent_dominio', '')
         config.set_setting('channel_elitetorrentnz_dominio', '')
         config.set_setting('channel_ennovelas_dominio', '')
+        config.set_setting('channel_ennovelasonline_dominio', '')
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
         config.set_setting('channel_estrenosdoramas_dominio', '')
 
@@ -482,7 +483,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '119.0.6045.106')
+        config.set_setting('chrome_last_version', '119.0.6045.200')
 
         config.set_setting('debug', '0')
 
@@ -564,13 +565,30 @@ def manto_favs(item):
     path = translatePath(os.path.join('special://home/userdata', ''))
 
     file_favs = 'favourites.xml'
-
     file = path + file_favs
-
     existe = filetools.exists(file)
 
     if existe == False:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero Favourites Settings[/COLOR][/B]' % color_infor)
+        return
+
+    if existe:
+        txt_favs = ''
+
+        try:
+           with open(os.path.join(path, file_favs), 'r') as f: txt_favs=f.read(); f.close()
+        except:
+           try: txt_favs = open(os.path.join(path, file_favs), encoding="utf8").read()
+           except: pass
+
+        bloque = scrapertools.find_single_match(txt_favs, '<favourites>(.*?)</favourites>')
+
+        matches = bloque.count('<favourite')
+
+        if matches == 0: existe = False
+
+    if existe == False:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Favourites Settings Sin Datos[/COLOR][/B]' % color_exec)
         return
 
     if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero Favourites Settings ?[/B][/COLOR]'):
@@ -644,6 +662,21 @@ def manto_limpiezas(item):
             file_favs = 'favourites.xml'
             file = path_favs + file_favs
             existe = filetools.exists(file)
+
+            if existe:
+                txt_favs = ''
+
+                try:
+                   with open(os.path.join(path, file_favs), 'r') as f: txt_favs=f.read(); f.close()
+                except:
+                   try: txt_favs = open(os.path.join(path, file_favs), encoding="utf8").read()
+                   except: pass
+
+                bloque = scrapertools.find_single_match(txt_favs, '<favourites>(.*?)</favourites>')
+
+                matches = bloque.count('<favourite')
+
+                if matches == 0: existe = False
 
             if existe:
                 manto_favs(item)
@@ -1187,6 +1220,8 @@ def adults_password_del(item):
     try:
        if int(password) == int(config.get_setting('adults_password')):
            txt = 'Si es afirmativa su repuesta a la pregunta formulada, deberá salir y volver a acceder a los Ajustes y si lo desea establecer un nuevo Pin parental.'
+           if item.erase: txt = ''
+
            if platformtools.dialog_yesno(config.__addon_name, txt, '[B][COLOR %s]¿ Desea eliminar el Pin parental memorizado ?[/COLOR][/B]' % color_adver):
                config.set_setting('adults_password', '')
                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Pin anulado[/COLOR][/B]' % color_exec)
@@ -1229,7 +1264,20 @@ def show_ubicacion(item):
     else:
         path = os.path.join(config.get_data_path(), 'downloads')
 
-    platformtools.dialog_textviewer('Ubicación de las Descargas', path)
+    if path.startswith('smb://'):
+        fichs = sorted(filetools.listdir(path))
+        ficheros = [filetools.join(path, fit) for fit in fichs if fit.endswith('.json')]
+    else:
+        path = filetools.join(path, '*.json')
+        ficheros = glob.glob(path)
+        ficheros.sort(key=os.path.getmtime, reverse=False)
+
+    if not ficheros: txt = 'Aún no tiene[CR]'
+    else: txt = 'Hay descargas[CR]'
+
+    txt += '[CR]' + path.replace('*.json', '').replace('.json', '')
+
+    platformtools.dialog_textviewer('Ubicación de las Descargas', txt)
 
 
 def show_servers_alternatives(item):
@@ -1367,6 +1415,10 @@ def opciones_elitetorrentnz(item):
 
 def opciones_ennovelas(item):
     item.from_channel = 'ennovelas'
+    opciones_domains_common(item)
+
+def opciones_ennovelasonline(item):
+    item.from_channel = 'ennovelasonline'
     opciones_domains_common(item)
 
 def opciones_entrepeliculasyseries(item):
@@ -1551,7 +1603,7 @@ def opciones_domains_common(item):
 
     domain = config.get_setting('dominio', id, default='')
 
-    if domain: opciones_dominios.append(platformtools.listitem_to_select('[COLOR darkorange][B]Modificar/Eliminar el dominio memorizado[/B][/COLOR]'))
+    if domain: opciones_dominios.append(platformtools.listitem_to_select('[COLOR darkorange][B]Modificar/Eliminar el Dominio memorizado[/B][/COLOR]'))
     else: opciones_dominios.append(platformtools.listitem_to_select('[COLOR darkorange][B]Informar Nuevo Dominio manualmente[/B][/COLOR]'))
 
     if domain: opciones_dominios.append(platformtools.listitem_to_select('[COLOR powderblue][B]Test Web [COLOR yellow][B] ' + domain + '[/B][/COLOR]'))
@@ -1604,6 +1656,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'elitetorrentnz': domains.manto_domain_elitetorrentnz(item)
 
             elif item.from_channel == 'ennovelas': domains.manto_domain_ennovelas(item)
+
+            elif item.from_channel == 'ennovelasonline': domains.manto_domain_ennovelasonline(item)
 
             elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
 
@@ -1721,6 +1775,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'ennovelas': domains.test_domain_ennovelas(item)
 
+            elif item.from_channel == 'ennovelasonline': domains.test_domain_ennovelasonline(item)
+
             elif item.from_channel == 'entrepeliculasyseries': domains.test_domain_entrepeliculasyseries(item)
 
             elif item.from_channel == 'estrenosdoramas': domains.test_domain_estrenosdoramas(item)
@@ -1816,6 +1872,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'henaojara': helper.show_help_henaojara(item)
 
             elif item.from_channel == 'peliculaspro': helper.show_help_peliculaspro(item)
+
+            elif item.from_channel == 'peliplayhd': helper.show_help_henaojara(item)
 
             elif item.from_channel == 'pelisforte': helper.show_help_pelisforte(item)
 
