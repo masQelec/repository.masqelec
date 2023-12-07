@@ -117,6 +117,10 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('//sbsonic.com/e/', '//streamsb.net/play/').replace('//sbsonic.com/d/', '//streamsb.net/play/')
     elif '//sblona.com/' in page_url:
         page_url = page_url.replace('//sblona.com/e/', '//streamsb.net/play/').replace('//sblona.com/d/', '//streamsb.net/play/')
+    elif '//likessb.com/' in page_url:
+        page_url = page_url.replace('//likessb.com/e/', '//streamsb.net/play/').replace('//likessb.com/d/', '//streamsb.net/play/')
+    elif '//sbnmp.bar/' in page_url:
+        page_url = page_url.replace('//sbnmp.bar/e/', '//streamsb.net/play/').replace('//sbnmp.bar/d/', '//streamsb.net/play/')
 
     data = httptools.downloadpage(page_url).data
 
@@ -124,7 +128,7 @@ def get_video_url(page_url, url_referer=''):
         return 'El fichero no existe o ha sido borrado'
 
     if not "text/javascript'>(eval" in data:
-        platformtools.dialog_notification('Cargando Streamsb', 'Espera requerida de %s segundos' % espera)
+        platformtools.dialog_notification('Cargando [COLOR cyan][B]Streamsb[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
 
         data = httptools.downloadpage(page_url, headers={'Referer': page_url}).data

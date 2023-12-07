@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import re, base64
+import re, base64, time
 
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools
 
@@ -13,8 +13,17 @@ host = 'https://daft.sex/'
 _player = 'https://dxb.to/'
 
 
-def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+espera = config.get_setting('servers_waiting', default=6)
+
+
+def do_downloadpage(url, post=None, headers=None, timeout=None, raise_weberror=True):
+    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout, raise_weberror=raise_weberror).data
+
+    if timeout is None: timeout = config.get_setting('channels_repeat', default=30)
+
+    if not data:
+        platformtools.dialog_notification('DaftSex', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         try:
@@ -22,7 +31,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             ck_name, ck_value = balandroresolver.get_sucuri_cookie(resp.data)
             if ck_name and ck_value:
                 httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout, raise_weberror=raise_weberror).data
         except:
             pass
 
@@ -47,15 +56,15 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color='orange' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, page = 0 ))
+    itemlist.append(item.clone( title = 'Últimos vídeos', action = 'list_all', url = host ))
 
-    itemlist.append(item.clone( title = 'Más caliente', action = 'list_all', url = host + 'hottest'))
+    itemlist.append(item.clone( title = 'Más calientes', action = 'list_all', url = host + 'hottest'))
 
-    itemlist.append(item.clone( title = 'Listas', action = 'listas', url = host + 'browse', page = 0 ))
+    itemlist.append(item.clone( title = 'Listas', action = 'listas', url = host + 'browse' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
-    itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars', page = 0 ))
+    itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars' ))
 
     return itemlist
 
@@ -63,8 +72,6 @@ def mainlist_pelis(item):
 def listas(item):
     logger.info()
     itemlist = []
-
-    if not item.page: item.page = 0
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -81,8 +88,9 @@ def listas(item):
         if next_url:
             next_url = next_url.replace('&amp;', '&')
 
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
-                                        action = 'listas', page = item.page + 1, text_color = 'coral' ))
+            next_url = host + next_url if not url.startswith('http') else host[:-1] + next_url
+
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'listas', text_color = 'coral' ))
 
     return itemlist
 
@@ -110,8 +118,6 @@ def pornstars(item):
     logger.info()
     itemlist = []
 
-    if not item.page: item.page = 0
-
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
@@ -129,8 +135,9 @@ def pornstars(item):
         if next_url:
             next_url = next_url.replace('&amp;', '&')
 
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
-                                        action = 'pornstars', page = item.page + 1, text_color = 'coral' ))
+            next_url = host + next_url if not url.startswith('http') else host[:-1] + next_url
+
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'pornstars', text_color = 'coral' ))
 
     return itemlist
 
@@ -139,21 +146,27 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    if not item.page: item.page = 0
+    data = do_downloadpage(item.url)
 
-    post = {"page": item.page}
-
-    data = do_downloadpage(item.url, post=post)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<div class="video-item video([^"]+)".*?data-thumb="([^"]+)".*?<span class="video-time">([^<]+)<.*?<div class="video-title"[^>]+>([^<]+)<').findall(data)
+    matches = re.compile('<div class="video-item video(.*?)</a></div>').findall(data)
 
-    for video_id, thumb, time, title in matches:
-        url = host + 'watch/%s' % (video_id)
+    for match in matches:
+        video_id = scrapertools.find_single_match(match, '(.*?)"')
+
+        title = scrapertools.find_single_match(match, '<div class="video-title".*?>(.*?)</div>')
+        if not title: title = 'Not Titled'
 
         title = title.replace('&quot;', '').replace('[', '').replace(']', '').strip()
 
+        thumb = scrapertools.find_single_match(match, 'data-thumb="(.*?)"')
+
+        time = scrapertools.find_single_match(match, '<span class="video-time">(.*?)</span>')
+
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
+
+        url = host + 'watch/%s' % (video_id)
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
@@ -161,10 +174,11 @@ def list_all(item):
         next_url = scrapertools.find_single_match(data, '<li><a href="([^"]+)" title="Next page"')
 
         if next_url:
-            itemlist.append(item.clone( title = 'Siguientes ...', url= host + next_url if next_url.startswith('http') else host[:-1] + next_url,
-                                        action = 'list_all', page = item.page + 1, text_color = 'coral' ))
-        else:    
-            itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', page = item.page + 1, text_color = 'coral' ))
+            next_url = next_url.replace('&amp;', '&')
+
+            next_url = host + next_url if not url.startswith('http') else host[:-1] + next_url
+
+            itemlist.append(item.clone( title = 'Siguientes ...', url= next_url, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 
@@ -175,19 +189,21 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    hash = scrapertools.find_single_match(data, 'hash:\s*"([^"]+)"')
-    color = scrapertools.find_single_match(data, 'color:\s*"([^"]+)"')
+    hash = scrapertools.find_single_match(data, 'hash: "(.*?)"')
+    color = scrapertools.find_single_match(data, 'hash:.*?color: "(.*?)"')
 
-    url = _player + 'player/%s?color=%s'  % (hash, color)
+    if not hash or not color: return itemlist
 
-    data = do_downloadpage(url, headers = {'Referer': item.url})
+    url = _player + 'player/%s?color=%s' % (hash, color)
 
-    ids = scrapertools.find_single_match(data, 'id:\s*"([^"]+)"')
+    data = do_downloadpage(url, headers = {'Referer': host})
+
+    ids = scrapertools.find_single_match(data, 'id: "(.*?)"')
     if not ids: return itemlist
 
     id1, id2 = ids.split('_')
 
-    srv =  scrapertools.find_single_match(data, 'server:\s*"([^"]+)')[::-1]
+    srv = scrapertools.find_single_match(data, 'server: "(.*?)"')[::-1]
     srv = base64.b64decode(srv).decode('utf-8')
     if not srv: return itemlist
 
@@ -198,10 +214,16 @@ def findvideos(item):
     c_key = scrapertools.find_single_match(data, 'c_key: "(.*?)"')
     credentials = scrapertools.find_single_match(data, 'credentials: "(.*?)"')
 
-    if credentials:
-        url = srv + '/method/video.get/%s?token=%s&videos=%s&ckey=%s&credentials=%s' % (ids, token, idv, c_key, credentials)
+    e_key = scrapertools.find_single_match(data, 'extra_key: "(.*?)"')
+    partial = scrapertools.find_single_match(data, 'partial: (.*?)}}')
 
-        data = do_downloadpage(url, headers = {'Referer': _player}, raise_weberror=False)
+    if credentials:
+        url = srv + '/method/video.get/%s?token=%s&videos=%s&ckey=%s&credentials=%s&extra_key=%s' % (ids, token, idv, c_key, credentials, e_key)
+
+        platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]Vídeos[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
+        time.sleep(int(espera))
+
+        data = do_downloadpage(url, headers = {'Referer': _player}, timeout = 40, raise_weberror=False)
 
         matches = re.compile('"mp4_(.*?)":"(.*?)"', re.DOTALL).findall(str(data))
 
@@ -210,8 +232,19 @@ def findvideos(item):
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = qlty, url = url, language = 'VO' ))
 
+    elif partial:
+        bloque = scrapertools.find_single_match(str(data), '"quality":(.*?)$')
+
+        if bloque:
+            matches = re.compile('"(.*?)":"(.*?)"', re.DOTALL).findall(str(bloque))
+
+            for qlty, url in matches:
+                url = '%s/videos/%s/%s/%s.mp4?extra_key=%s' % (srv, id1, id2, qlty, e_key)
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = qlty, url = url, language = 'VO', other = 'Partial' ))
+
     else:
-        matches = re.compile('"mp4_\d+":"(\d+).([^"]+)"', re.DOTALL).findall(data)
+        matches = re.compile('"mp4_\d+":"(\d+).([^"]+)"', re.DOTALL).findall(str(data))
 
         for qlty, url in matches:
             url = '%s/videos/%s/%s/%s.mp4?extra=%s' % (srv, id1, id2, qlty, url)

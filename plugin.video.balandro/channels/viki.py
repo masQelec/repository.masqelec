@@ -106,7 +106,10 @@ def list_all(item):
         else:
             if item.search_type == 'movie': continue
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+            if ' (' in title: SerieName = title.split(" (")[0]
+            else: SerieName = title
+
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
         if i == 30: break
 
@@ -162,6 +165,7 @@ def last_epis(item):
 
         if 'Capitulo' in title: SerieName = title.split("Capitulo")[0]
         elif 'Capítulo' in title: SerieName = title.split("Capítulo")[0]
+        elif ': ' in title: SerieName = title.split(": ")[0]
         else: SerieName = title
 
         titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
@@ -461,6 +465,9 @@ def list_search(item):
         if tipo == 'tvshow':
             if not item.search_type == 'all':
                if item.search_type == 'movie': continue
+
+            if ' (' in title: SerieName = title.split(" (")[0]
+            else: SerieName = title
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, 
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
