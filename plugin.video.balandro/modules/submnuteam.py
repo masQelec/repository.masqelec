@@ -1687,7 +1687,7 @@ def resumen_servidores(item):
     inactives = 0
     notsuported = 0
     alternatives = 0
-    aditionals = 27
+    aditionals = 29
     disponibles = 0
 
     path = os.path.join(config.get_runtime_path(), 'servers')
@@ -1760,10 +1760,12 @@ def show_help_alternativas(item):
     txt += '   [COLOR yellow]Gofile[/COLOR][CR]'
     txt += '   [COLOR yellow]MegaUp[/COLOR][CR]'
     txt += '   [COLOR yellow]Playtube[/COLOR][CR]'
+    txt += '   [COLOR yellow]Racaty[/COLOR][CR]'
     txt += '   [COLOR yellow]Streamlare[/COLOR][CR]'
     txt += '   [COLOR yellow]Uptobox[/COLOR][CR]'
     txt += '   [COLOR yellow]Various[/COLOR][CR]'
     txt += '   [COLOR yellow]Vk[/COLOR]'
+    txt += '   [COLOR yellow]Waaw[/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
         cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
@@ -1796,6 +1798,7 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Desiupload[/COLOR][CR]'
     txt += '   [COLOR yellow]Dropload[/COLOR][CR]'
     txt += '   [COLOR yellow]Embedgram[/COLOR][CR]'
+    txt += '   [COLOR yellow]Embedrise[/COLOR][CR]'
     txt += '   [COLOR yellow]Fastupload[/COLOR][CR]'
     txt += '   [COLOR yellow]Filelions[/COLOR][CR]'
     txt += '   [COLOR yellow]Filemoon[/COLOR][CR]'
@@ -1817,6 +1820,7 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Videowood[/COLOR][CR]'
     txt += '   [COLOR yellow]Vidguard[/COLOR][CR]'
     txt += '   [COLOR yellow]Vidspeed[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vkspeed[/COLOR][CR]'
     txt += '   [COLOR yellow]Vudeo[/COLOR][CR]'
     txt += '   [COLOR yellow]Yandex[/COLOR][CR]'
     txt += '   [COLOR yellow]Youdbox[/COLOR]'

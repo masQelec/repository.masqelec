@@ -471,9 +471,7 @@ def findvideos(item):
 
         ses += 1
 
-        if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
-        elif '/player.moovies.in/' in url: continue
-        elif 'mystream.to' in url: continue
+        if 'mystream.' in url: continue
         elif '/watchsb.' in url: continue
 
         if url.startswith('/'): url = host[:-1] + url
@@ -488,8 +486,6 @@ def findvideos(item):
         if servidor == 'directo':
             link_other = scrapertools.find_single_match(data, '<a href="#option' + opt + '">(.*?)</a>')
 
-            if link_other.lower() == 'netu' or link_other.lower() == 'waaw' or link_other.lower() == 'hqq': continue
-
             link_other = normalize_other(link_other)
 
         if servidor == 'various': link_other = servertools.corregir_other(url)
@@ -503,9 +499,7 @@ def findvideos(item):
 
         ses += 1
 
-        if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
-        elif '/player.moovies.in/' in url: continue
-        elif 'mystream.to' in url: continue
+        if 'mystream.' in url: continue
         elif '/watchsb.' in url: continue
 
         if url.startswith('/'): url = host[:-1] + url

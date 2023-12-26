@@ -280,8 +280,7 @@ def findvideos(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu' in url: continue
-        elif '/player.ojearanime.' in url: continue
+        if '/player.ojearanime.' in url: continue
 
         if servidor:
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang), quality = qlty ))

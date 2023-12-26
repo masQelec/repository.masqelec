@@ -57,7 +57,7 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
-    if 'This video has been removed from public access' in data or 'Video not found' in data or '<div class="message_page_title">Error</div>' in data:
+    if 'This video has been removed from public access' in data or 'Video not found' in data or '<div class="message_page_title">Error</div>' in data or 'no encontrado.' in data:
         return 'Archivo inexistente ó eliminado'
 
     if '<p>Por causas ajenas a' in data or '>Por causas ajenas a' in data:
@@ -107,6 +107,9 @@ def get_video_url(page_url, url_referer=''):
                         return 'Archivo inexistente ó eliminado'
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo'
+
+                elif '<urlopen error' in traceback.format_exc():
+                    return 'No se puede establecer la conexión'
 
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 
@@ -165,6 +168,9 @@ def get_video_url(page_url, url_referer=''):
                         return 'Archivo inexistente ó eliminado'
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo'
+
+                elif '<urlopen error' in traceback.format_exc():
+                    return 'No se puede establecer la conexión'
 
                 platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 

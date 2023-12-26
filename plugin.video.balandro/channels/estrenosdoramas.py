@@ -497,8 +497,6 @@ def findvideos(item):
 
         ses += 1
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
@@ -682,9 +680,6 @@ def play(item):
                 return itemlist
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
         if '.estrenosdoramas.' in url: url = ''
         elif '/rumble.' in url: url = ''
 

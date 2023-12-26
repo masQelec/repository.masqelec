@@ -22,6 +22,14 @@
       {
         "pattern": "https://mdy48tn97.com/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
+      },
+      {
+        "pattern": "https://md3b0j6hj.com/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "url": "https://mixdrop.ag/e/\\1"
+      },
+      {
+        "pattern": "https://mdbekjwqa.pw/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "url": "https://mixdrop.ag/e/\\1"
       }
     ]
   }

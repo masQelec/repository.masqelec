@@ -402,6 +402,9 @@ def play(item):
     logger.info()
     itemlist = []
 
+
+    if '/divxto.site/' in item.url or '/www.divxtotal.fi/': return itemlist
+
     if item.other == 'Directo':
         if not item.url.endswith('.torrent'):
             item.url = players + 'download_tt.php?u=' + item.url
@@ -414,13 +417,15 @@ def play(item):
 
             if data:
                 try:
-                   if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                   if '<!DOCTYPE html>' in str(data):
+                       return 'Archivo [COLOR red]Corrupto[/COLOR]'
+                   elif 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
                        return 'Archivo [COLOR red]No encontrado[/COLOR]'
-                   elif '<p>Por causas ajenas a ' in str(data):
+                   elif '<p>Por causas ajenas a' in str(data):
                        if not config.get_setting('proxies', item.channel, default=''):
                            return 'Archivo [COLOR cyan]bloqueado[/COLOR] [COLOR red]Configure los proxies[/COLOR]'
 
-                       return 'Archivo [COLOR red]bloqueado[/COLOR]'
+                       return 'Play archivo [COLOR red]Bloqueado[/COLOR]'
                 except:
                    pass
 
@@ -446,13 +451,15 @@ def play(item):
 
         if data:
             try:
-               if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+               if '<!DOCTYPE html>' in str(data):
+                   return 'Archivo [COLOR red]Corrupto[/COLOR]'
+               elif 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
                    return 'Archivo [COLOR red]No encontrado[/COLOR]'
                elif '<p>Por causas ajenas a ' in str(data):
                    if not config.get_setting('proxies', item.channel, default=''):
                        return 'Archivo [COLOR cyan]bloqueado[/COLOR] [COLOR red]Configure los proxies[/COLOR]'
 
-                   return 'Archivo [COLOR cyan]bloqueado[/COLOR]'
+                   return 'Play archivo [COLOR cyan]Bloqueado[/COLOR]'
             except:
                pass
 

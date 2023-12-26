@@ -391,8 +391,6 @@ def findvideos(item):
                 srv = scrapertools.find_single_match(srv, '<!-- -->. <!-- -->(.*?)<!-- -->').strip()
 
                 if srv:
-                   if srv == 'hqq' or srv ==  'waaw' or srv ==  'netu': continue
-
                    other = ''
 
                    if srv == 'drive': srv ='gvideo'
@@ -425,8 +423,7 @@ def findvideos(item):
         srv = scrapertools.find_single_match(match, '</span>(.*?)</td>').strip()
         srv = srv.replace('<!-- -->', '').strip()
 
-        if srv == 'hqq' or srv ==  'waaw' or srv ==  'netu': continue
-        elif srv == '1fichier': continue
+        if srv == '1fichier': continue
 
         srv = servertools.corregir_servidor(srv)
 

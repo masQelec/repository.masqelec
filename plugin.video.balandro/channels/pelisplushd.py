@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www18.pelisplushd.lat/'
+host = 'https://www19.pelisplushd.lat/'
 
 
 # ~ por si viene de enlaces guardados
@@ -17,7 +17,7 @@ ant_hosts = ['https://pelisplushd.net/', 'https://pelisplushd.to/', 'https://www
              'https://www.pelisplushd.lat/', 'https://www4.pelisplushd.lat/', 'https://www8.pelisplushd.lat/',
              'https://www11.pelisplushd.lat/', 'https://www12.pelisplushd.lat/', 'https://www13.pelisplushd.lat/',
              'https://www14.pelisplushd.lat/', 'https://www15.pelisplushd.lat/', 'https://www16.pelisplushd.lat/',
-             'https://www17.pelisplushd.lat/']
+             'https://www17.pelisplushd.lat/', 'https://www18.pelisplushd.lat/']
 
 
 domain = config.get_setting('dominio', 'pelisplushd', default='')
@@ -471,9 +471,7 @@ def findvideos(item):
 
         ses += 1
 
-        if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
-        elif '/player.moovies.in/' in url: continue
-        elif 'mystream.to' in url: continue
+        if 'mystream.' in url: continue
 
         if url.startswith('/'): url = host[:-1] + url
 
@@ -487,9 +485,7 @@ def findvideos(item):
         if servidor == 'directo':
             link_other = scrapertools.find_single_match(data, '<a href="#option' + opt + '">(.*?)</a>')
 
-            if link_other.lower() == 'netu' or link_other.lower() == 'waaw' or link_other.lower() == 'hqq': continue
-
-            elif link_other.lower() == 'sbfast' or link_other.lower() == 'streamsb': continue
+            if link_other.lower() == 'sbfast' or link_other.lower() == 'streamsb': continue
 
             link_other = normalize_other(link_other)
 
@@ -504,9 +500,7 @@ def findvideos(item):
 
         ses += 1
 
-        if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
-        elif '/player.moovies.in/' in url: continue
-        elif 'mystream.to' in url: continue
+        if 'mystream.' in url: continue
         elif '/watchsb.' in url: continue
 
         if url.startswith('/'): url = host[:-1] + url

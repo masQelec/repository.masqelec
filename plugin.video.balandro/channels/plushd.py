@@ -281,6 +281,8 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
+        title = title.replace('&#039;', "'")
+
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
@@ -454,7 +456,6 @@ def findvideos(item):
         if not url: continue
 
         if 'up.asdasd' in url: continue
-        elif '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
 
         if url.startswith('/'): url = host[:-1] + url
 

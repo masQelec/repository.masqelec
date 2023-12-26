@@ -508,8 +508,6 @@ def findvideos(item):
 
                     return itemlist
 
-                if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
                 if not 'pelispluss' in url and not 'gnula.' in url:
                     servidor = servertools.get_server_from_url(url, disabled_servers=True)
 
@@ -535,9 +533,7 @@ def findvideos(item):
                     for url, srv, lng in matches2:
                         srv = srv.replace('.com', '').replace('.net', '').replace('.cc', '').replace('.to', '').replace('.sx', '')
 
-                        if srv == 'hqq' or srv == 'waaw' or srv == 'netu' in url: continue
-
-                        elif srv == 'nodispounnnerbler': continue
+                        if srv == 'nodispounnnerbler': continue
 
                         srv = servertools.corregir_servidor(srv)
 
@@ -615,9 +611,7 @@ def play(item):
                         url = httptools.downloadpage(link, post = post, follow_redirects=False).headers.get('location', '')
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-        elif 'openload' in url or 'powvideo' in url or 'streamplay' in url or 'rapidvideo' in url or 'streamango' in url or 'verystream' in url or 'vidtodo' in url or 'tutumeme' in url:
+        if 'openload' in url or 'powvideo' in url or 'streamplay' in url or 'rapidvideo' in url or 'streamango' in url or 'verystream' in url or 'vidtodo' in url or 'tutumeme' in url:
             return 'Servidor [COLOR plum]NO soportado[/COLOR]'
 
         if url.startswith('//'): url = 'https:' + url

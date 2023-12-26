@@ -285,8 +285,6 @@ def findvideos(item):
         if url:
             if url.startswith('//'): url = 'https:' + url
 
-            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
             if url.startswith('https://animejl.top/v/'): url = url.replace('https://animejl.top/v/', 'https://vanfem.com/v/')
 
             servidor = servertools.get_server_from_url(url)

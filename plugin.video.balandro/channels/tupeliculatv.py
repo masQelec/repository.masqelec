@@ -239,10 +239,7 @@ def play(item):
        if url:
            url = url.replace('\\', '/').replace('\\/', '/')
 		   
-           if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-               return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
-           elif 'openload' in url or 'powvideo' in url or 'streamplay' in url or 'rapidvideo' in url or 'streamango' in url or 'verystream' in url or 'vidtodo' in url:
+           if 'openload' in url or 'powvideo' in url or 'streamplay' in url or 'rapidvideo' in url or 'streamango' in url or 'verystream' in url or 'vidtodo' in url:
                return 'Servidor [COLOR yellow]NO soportado[/COLOR]'
 
            servidor = servertools.get_server_from_url(url)
@@ -289,7 +286,6 @@ def normalize_other(server):
             if server == 'gamohd': return 'gamovideo'
             elif server == 'goo': return 'gounlimited'
 
-            elif server == 'netutv': server = ''
             elif server == 'powvideo': server = ''
             elif server == 'streamplay': server = ''
             elif server == 'uploadedto': server = ''
@@ -298,7 +294,6 @@ def normalize_other(server):
             elif server == 'byter': server = ''
             elif server == 'powhd': server = ''
             elif server == 'stream': server = ''
-            elif server == 'hqqnew': server = ''
             elif server == 'rapidvideohd': server = ''
             elif server == 'openloadhd': server = ''
             elif server == 'streamangohq': server = ''
@@ -308,8 +303,7 @@ def normalize_other(server):
     else:
         server = servertools.corregir_servidor(server)
 
-        if server == 'netutv': server = ''
-        elif server == 'powvideo': server = ''
+        if server == 'powvideo': server = ''
         elif server == 'streamplay': server = ''
         elif server == 'uploadedto': server = ''
 

@@ -47,6 +47,25 @@ _team = "[COLOR hotpink][B][I] t.me/Balandro_team [/I][/B][/COLOR]"
 
 context_temas = []
 
+try: last_ver = updater.check_addon_version()
+except: last_ver = True
+
+if not last_ver: last_ver = '[I][COLOR %s](desfasada)[/COLOR][/I]' % color_adver
+else: last_ver = ''
+
+last_fix = config.get_addon_version()
+
+if not 'desfasada' in last_ver:
+    if 'fix' in last_fix:
+        tit = '[COLOR %s]Información Fix[/COLOR]' % color_infor
+        context_temas.append({'title': tit, 'channel': 'helper', 'action': 'show_last_fix'})
+
+    tit = '[COLOR %s]Comprobar Actualizaciones Fix[/COLOR]' % color_avis
+    context_temas.append({'title': tit, 'channel': 'actions', 'action': 'check_addon_updates'})
+
+    tit = '[COLOR %s][B]Forzar Actualizaciones Fix[/B][/COLOR]' % color_adver
+    context_temas.append({'title': tit, 'channel': 'actions', 'action': 'check_addon_updates_force'})
+
 tit = '[COLOR red][B]Temas NO Contemplados[/B][/COLOR]'
 context_temas.append({'title': tit, 'channel': 'helper', 'action': 'show_not_contemplated'})
 
@@ -95,7 +114,9 @@ def mainlist(item):
             if matches:
                 itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR tomato][B]ÚLTIMOS CAMBIOS DOMINIOS[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='', title= '[B]AYUDA TEMAS:[/B]', context=context_temas, text_color='lightyellow', folder=False ))
+    title = '[B]AYUDA TEMAS[/B] (%s):  %s' % (config.get_addon_version().replace('.fix', '-Fix'), last_ver)
+
+    itemlist.append(item.clone( action='', title= title, context=context_temas, text_color='lightyellow', folder=False ))
 
     itemlist.append(item.clone( action='submnu_uso', title= ' - [B]USO[/B]', text_color='darkorange', thumbnail=config.get_thumb('addon') ))
 
@@ -274,6 +295,8 @@ def submnu_info(item):
 
     itemlist.append(item.clone( action='show_channels_parameters', title= ' - [COLOR green][B]Información[/B][/COLOR] de sus Preferencias Actuales para [COLOR gold][B]Canales[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
+    itemlist.append(item.clone( action='show_help_audios', title= ' - [COLOR green][B]Información[/B][/COLOR] de sus Preferencias Actuales para [COLOR yellowgreen][B]Idiomas[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+
     if not config.get_setting('mnu_simple', default=False):
         itemlist.append(item.clone( action='show_channels_parameters', title= ' - [COLOR green][B]Información[/B][/COLOR] de sus Preferencias Actuales para [COLOR orange][B]Parental[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
@@ -341,7 +364,12 @@ def submnu_canales(item):
     itemlist.append(item.clone( action='submnu_avisinfo_channels', title= '    - [COLOR aquamarine][B]Avisos[/COLOR] [COLOR green]Información[/B][/COLOR] canales', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='channels_with_notice', title= '    - Qué canales tienen [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     itemlist.append(item.clone( action='channels_with_proxies', title= '    - Qué canales pueden necesitar [COLOR red][B]Proxies[/B][/COLOR]', new_proxies=True, thumbnail=config.get_thumb('stack') ))
+    if config.get_setting('memorize_channels_proxies', default=True):
+        itemlist.append(item.clone( action='channels_with_proxies_memorized', title= ' - Qué [COLOR red]canales[/COLOR] tiene con proxies [COLOR red][B]Memorizados[/B][/COLOR]',
+                                    new_proxies=True, memo_proxies=True, test_proxies=True, thumbnail=config.get_thumb('stack') ))
+
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están [COLOR plum][B]Inestables[/B][/COLOR]', no_stable = True, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales son [COLOR darkgoldenrod][B]Problemátios[/B][/COLOR] (Predominan Sin enlaces Disponibles/Válidos/Soportados)', problematics = True, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales están [COLOR cyan][B]Temporalmente[/B][/COLOR] inactivos', temp_no_active = True, thumbnail=config.get_thumb('stack') ))
@@ -513,6 +541,8 @@ def submnu_play(item):
 
     itemlist.append(item.clone( action='show_server_report', title= ' - Reportar [COLOR gold][B]Reproducción de lista abortada[/B][/COLOR]', thumbnail=config.get_thumb('roadblock') ))
 
+    itemlist.append(item.clone( action='show_not_play', title= ' - ¿ Qué [COLOR goldenrod][B]NO[/B][/COLOR] está contemplado en Balandro ?', thumbnail=config.get_thumb('roadblock') ))
+
     itemlist.append(item.clone( action='show_help_recaptcha', title= ' - ¿ Qué significa Requiere verificación [COLOR red][B]reCAPTCHA[/B][/COLOR] ?', thumbnail=config.get_thumb('roadblock') ))
     itemlist.append(item.clone( action='show_help_acortador', title= ' - ¿ Qué significa Tiene [COLOR plum][B]Acortador[/B][/COLOR] del enlace ?', thumbnail=config.get_thumb('roadblock') ))
 
@@ -618,7 +648,6 @@ def submnu_proxies(item):
         itemlist.append(item.clone( channel='actions', action='manto_yourlist', title= ' - [COLOR red][B]Eliminar[/B][/COLOR] su Fichero [COLOR gold][B]Lista-proxies.txt[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( action='channels_with_proxies', title= ' - Qué canales pueden usar Proxies', new_proxies=True, test_proxies=True, thumbnail=config.get_thumb('stack') ))
-
     if config.get_setting('memorize_channels_proxies', default=True):
         itemlist.append(item.clone( action='channels_with_proxies_memorized', title= ' - Qué [COLOR red]canales[/COLOR] tiene con proxies [COLOR red][B]Memorizados[/B][/COLOR]',
                                     new_proxies=True, memo_proxies=True, test_proxies=True, thumbnail=config.get_thumb('stack') ))
@@ -776,7 +805,6 @@ def submnu_config(item):
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title='[B] - Versión[/B]',  text_color='violet', thumbnail=config.get_thumb('settings') ))
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title='[B] - Contacto[/B]',  text_color='teal', thumbnail=config.get_thumb('settings') ))
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title='[B] - Team[/B]',  text_color='firebrick', thumbnail=config.get_thumb('settings') ))
-    itemlist.append(item.clone( channel='actions', action = 'open_settings', title='[B] - Legal[/B]',  text_color='yellowgreen', thumbnail=config.get_thumb('settings') ))
 
     return itemlist
 
@@ -911,9 +939,9 @@ def submnu_version(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title= '[COLOR cyan][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
-
     itemlist.append(item.clone( action='', title='[B]VERSIONES:[/B]', folder=False, text_color='violet', thumbnail=config.get_thumb('addon') ))
+
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title= ' - [COLOR cyan][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='show_version', title= ' - [COLOR green][B]Información[/B][/COLOR] Versión', thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='show_changelog', title= ' - [COLOR goldenrod][B]Historial[/B][/COLOR] de Versiones', thumbnail=config.get_thumb('news') ))
@@ -1708,7 +1736,6 @@ def show_not_contemplated(item):
     txt += '[CR][COLOR yellowgreen][B] - No Contemplado:[/B][/COLOR][CR]'
     txt += '    - Integración con la [COLOR goldenrod][B]Videoteca[/B][/COLOR] de su Media Center[CR]'
     txt += '    - Motores [COLOR blue][B]Torrent[/B][/COLOR] [COLOR gold][B]Horus / AceStream[/B][/COLOR][CR]'
-    txt += '    - Integración con [COLOR powderblue][B]Cuentas[/B][/COLOR] [COLOR gold][B]Alldebrid, Realdebrid, ó similares[/B][/COLOR][CR]'
     txt += '    - Integración con [COLOR gold][B]Trak.Tv[/B][/COLOR] seguimiento de Películas y/ó Series[CR]'
 
     if not config.get_setting('mnu_simple', default=False):
@@ -1720,6 +1747,7 @@ def show_not_contemplated(item):
 
     txt += '[CR][COLOR gold][B] - Servidores:[/B][/COLOR][CR]'
     txt += '    - Cuentas Premium en el servidor [COLOR darkorange][B]Uptobox[/B][/COLOR][CR]'
+    txt += '    - Integración con [COLOR powderblue][B]Cuentas[/B][/COLOR] [COLOR gold][B]Alldebrid, Realdebrid, ó similares[/B][/COLOR][CR]'
     txt += '    - Algunos Servidores que dada su complejidad para efectuar [COLOR orchid][B]Play[/B][/COLOR] [COLOR gold]No están Soportados[/COLOR][CR]'
 
     txt += '[CR][COLOR cyan][B] - Listas:[/B][/COLOR][CR]'
@@ -1727,6 +1755,19 @@ def show_not_contemplated(item):
     txt += '   - Incluir el [COLOR goldenrod][B]Rating[/B][/COLOR] en los listados de las opciones de los canales[CR]'
 
     platformtools.dialog_textviewer('¿ Qué NO está contemplado/garantizado en Balandro ?', txt)
+
+
+def show_not_play(item):
+    logger.info()
+
+    txt ='[COLOR red][B]¿ Qué temas no están Implementados en Balandro ?[/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR gold][B] - Servidores:[/B][/COLOR][CR]'
+    txt += '    - Cuentas Premium en el servidor [COLOR darkorange][B]Uptobox[/B][/COLOR][CR]'
+    txt += '    - Integración con [COLOR powderblue][B]Cuentas[/B][/COLOR] [COLOR gold][B]Alldebrid, Realdebrid, ó similares[/B][/COLOR][CR]'
+    txt += '    - Algunos Servidores que dada su complejidad para efectuar [COLOR orchid][B]Play[/B][/COLOR] [COLOR gold]No están Soportados[/COLOR][CR]'
+
+    platformtools.dialog_textviewer('¿ Qué NO está contemplado en Balandro ?', txt)
 
 
 def show_not_download(item):
@@ -2342,6 +2383,9 @@ def _menu_parameters():
 
     if not config.get_setting('channels_link_main', default=True):
         txt_disableds += ' - Tiene [COLOR coral][B]Des-Habilitada[/B][/COLOR] la opción del Menú principal [B][COLOR gold]Canales[/COLOR][/B][CR][CR]'
+
+    if config.get_setting('channels_mnu_preferidos', default=False):
+        txt_disableds += ' - Tiene [COLOR plum][B]Habilitada[/B][/COLOR] la opción del Menú principal [B][COLOR gold]Canales Preferidos[/COLOR][/B][CR][CR]'
 
     if not config.get_setting('mnu_idiomas', default=True):
         txt_disableds += ' - Tiene [COLOR coral][B]Des-Habilitada/[B][/COLOR] la opción del Menú principal [B][COLOR limegreen]Idiomas[/COLOR][/B][CR][CR]'
@@ -3699,7 +3743,7 @@ def show_test(item):
 
     txt += ' - [COLOR gold]Fixes sobre última versión:[/COLOR]  %s [CR][CR]' % tex_access_fixes
 
-    txt += ' - [COLOR gold]Versión instalada:[/COLOR]  [COLOR yellow][B]%s[/B][/COLOR]' % config.get_addon_version()
+    txt += ' - [COLOR gold]Versión instalada:[/COLOR]  [COLOR yellow][B]%s[/B][/COLOR]' % config.get_addon_version().replace('.fix', '-Fix')
     if not ult_ver:
         if not access_repo: txt = txt + '[B][I][COLOR %s] (Sin Repositorio)[/COLOR][/I][/B]' % color_alert
         else: txt = txt + '[B][I][COLOR %s] (desfasada)[/COLOR][/I][/B]' % color_alert
@@ -3836,13 +3880,6 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   CliverSite: ' + cliversite_dominio + '[CR]'
            else: tex_dom = '[CR]   CliverSite: ' + cliversite_dominio + '[CR]'
 
-    datos = channeltools.get_channel_parameters('cuevana2')
-    if datos['active']:
-        cuevana2_dominio = config.get_setting('channel_cuevana2_dominio', default='')
-        if cuevana2_dominio:
-           if tex_dom: tex_dom = tex_dom + '   Cuevana2: ' + cuevana2_dominio + '[CR]'
-           else: tex_dom = '[CR]   Cuevana2: ' + cuevana2_dominio + '[CR]'
-
     datos = channeltools.get_channel_parameters('cuevana2esp')
     if datos['active']:
         cuevana2esp_dominio = config.get_setting('channel_cuevana2esp_dominio', default='')
@@ -3962,6 +3999,13 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   Gnula24: ' + gnula24_dominio + '[CR]'
            else: tex_dom = '[CR]   Gnula24: ' + gnula24_dominio + '[CR]'
 
+    datos = channeltools.get_channel_parameters('gnula24h')
+    if datos['active']:
+        gnula24h_dominio = config.get_setting('channel_gnula24h_dominio', default='')
+        if gnula24h_dominio:
+           if tex_dom: tex_dom = tex_dom + '   Gnula24H: ' + gnula24h_dominio + '[CR]'
+           else: tex_dom = '[CR]   Gnula24H: ' + gnula24h_dominio + '[CR]'
+
     datos = channeltools.get_channel_parameters('grantorrent')
     if datos['active']:
         grantorrent_dominio = config.get_setting('channel_grantorrent_dominio', default='')
@@ -4018,12 +4062,12 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   MiTorrent: ' + mitorrent_dominio + '[CR]'
            else: tex_dom = '[CR]   MiTorrent: ' + mitorrent_dominio + '[CR]'
 
-    datos = channeltools.get_channel_parameters('movidymobi')
+    datos = channeltools.get_channel_parameters('nextdede')
     if datos['active']:
-        movidymobi_dominio = config.get_setting('channel_movidymobi_dominio', default='')
-        if movidymobi_dominio:
-           if tex_dom: tex_dom = tex_dom + '   MovidyMobi: ' + movidymobi_dominio + '[CR]'
-           else: tex_dom = '[CR]   MovidyMobi: ' + movidymobi_dominio + '[CR]'
+        nextdede_dominio = config.get_setting('channel_nextdede_dominio', default='')
+        if nextdede_dominio:
+           if tex_dom: tex_dom = tex_dom + '   NextDede: ' + nextdede_dominio + '[CR]'
+           else: tex_dom = '[CR]   NextDede: ' + nextdede_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('peliculaspro')
     if datos['active']:
@@ -4059,6 +4103,13 @@ def show_test(item):
         if pelispanda_dominio:
            if tex_dom: tex_dom = tex_dom + '   PelisPanda: ' + pelispanda_dominio + '[CR]'
            else: tex_dom = '[CR]   PelisPanda: ' + pelispanda_dominio + '[CR]'
+
+    datos = channeltools.get_channel_parameters('pelispedia2me')
+    if datos['active']:
+        pelispedia2me_dominio = config.get_setting('channel_pelispedia2me_dominio', default='')
+        if pelispedia2me_dominio:
+           if tex_dom: tex_dom = tex_dom + '   PelisPedia2Me: ' + pelispedia2me_dominio + '[CR]'
+           else: tex_dom = '[CR]   PelisPedia2Me: ' + pelispedia2me_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('pelispediaws')
     if datos['active']:
@@ -4215,6 +4266,23 @@ def show_test(item):
         if not txt_ch: txt_ch = 'No hay canales que requieran registrarse' 
 
         txt += ' - [COLOR gold]Credenciales:[/COLOR]  %s' % str(txt_ch)
+        txt += '[CR]'
+
+    filtros = {}
+
+    ch_list = channeltools.get_channels_list(filtros=filtros)
+
+    if ch_list:
+        txt_ch = ''
+
+        for ch in ch_list:
+            if not ch['status'] == 1: continue
+
+            txt_ch += ' [COLOR tan]%s[/COLOR][CR]  ' % ch['name']
+
+        if not txt_ch: txt_ch = ' No hay canales preferidos[CR]' 
+        txt += ' - [COLOR gold]Canales Preferidos:[/COLOR][CR]  %s' % str(txt_ch)
+
         txt += '[CR]'
 
     filtros = {}
@@ -4673,9 +4741,371 @@ def show_sets(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No existe settings.xml[/COLOR][/B]' % color_alert)
         return
 
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR cyan][B]¿ Desea Anular las Preferencias Obsoletas en sus Ajustes ?[/B][/COLOR]'):
+        channels_proxies_memorized = config.get_setting('channels_proxies_memorized')
+
+        filtros = {'active': False}
+
+        ch_list = channeltools.get_channels_list(filtros=filtros)
+
+        i = 0
+
+        for ch in ch_list:
+            if config.get_setting('channel_' + ch['id'] + '_status'):
+                i += 1
+                config.set_setting('channel_' + ch['id'] + '_status', '')
+
+            if config.get_setting('show_help_' + ch['id']):
+                i += 1
+                config.set_setting('show_help_' + ch['id'], '')
+           
+            if 'proxies' in ch['notes'].lower():
+                cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
+
+                if config.get_setting(cfg_proxies_channel, default=''):
+                    i += 1
+                    config.set_setting(cfg_proxies_channel, '')
+                    config.set_setting('channel_' + ch['id'] + '_proxytools_max', '')
+                    config.set_setting('channel_' + ch['id'] + '_proxytools_pais', '')
+                    config.set_setting('channel_' + ch['id'] + '_proxytools_provider', '')
+                    config.set_setting('channel_' + ch['id'] + '_proxytools_tipo', '')
+
+                if channels_proxies_memorized:
+                    el_memorizado = "'" + ch['id'] + "'"
+
+                    if el_memorizado in str(channels_proxies_memorized):
+                        i += 1
+                        channels_proxies_memorized = str(channels_proxies_memorized).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                        config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
+
+            if config.get_setting('opc_' + ch['id']):
+                i += 1
+                config.set_setting('opc_' + ch['id'], '')
+
+            if config.get_setting('ac_' + ch['id']):
+                i += 1
+                config.set_setting('ac_' + ch['id'], '')
+
+            if config.get_setting('last_domain_' + ch['id']):
+                i += 1
+                config.set_setting('last_domain_' + ch['id'], '')
+
+            if config.get_setting('ch_' + ch['id'] + '_test'):
+                i += 1
+                config.set_setting('ch_' + ch['id'] + '_test', '')
+
+            if config.get_setting('ch_' + ch['id'] + '_dominio'):
+                i += 1
+                config.set_setting('ch_' + ch['id'] + '_dominio', '')
+
+            if config.get_setting('operative_domains_' + ch['id']):
+                i += 1
+                config.set_setting('operative_domains_' + ch['id'], '')
+
+            if config.get_setting('channel_' + ch['id'] + '_no_searchable'):
+                i += 1
+                config.set_setting('channel_' + ch['id'] + '_no_searchable', '')
+
+        if channels_proxies_memorized:
+            memorizeds = scrapertools.find_multiple_matches(channels_proxies_memorized, "'(.*?)'")
+
+            for memorized in memorizeds:
+                memorized = memorized.lower().strip()
+
+                channel_json = memorized + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+                existe = filetools.exists(filename_json)
+                if not existe: continue
+
+                datos = channeltools.get_channel_parameters(memorized)
+                if datos['active']:
+                    if 'proxies' in datos['notes'].lower():
+                        cfg_proxies_channel = 'channel_' + memorized + '_proxies'
+
+                        if not config.get_setting(cfg_proxies_channel, default=''):
+                            el_memorizado = "'" + memorized + "'"
+
+                            i += 1
+                            channels_proxies_memorized = str(channels_proxies_memorized).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                            config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
+                    continue
+
+                el_memorizado = "'" + memorized + "'"
+
+                i += 1
+                channels_proxies_memorized = str(channels_proxies_memorized).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
+
+        if config.get_setting('autoplay_channels_discarded'):
+            channels_autoplay = config.get_setting('autoplay_channels_discarded')
+
+            sin_autoplay = config.get_setting('autoplay_channels_discarded').split(',')
+
+            for no_autoplay in sin_autoplay:
+                no_autoplay = no_autoplay.lower().strip()
+
+                channel_json = no_autoplay + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+                existe = filetools.exists(filename_json)
+                if not existe: continue
+
+                datos = channeltools.get_channel_parameters(no_autoplay)
+                if datos['active']: continue
+
+                i += 1
+                channels_autoplay = str(channels_autoplay).replace(no_autoplay + ',', '').replace(no_autoplay, '').strip()
+                config.set_setting('autoplay_channels_discarded', channels_autoplay)
+
+        if config.get_setting('search_included_all'):
+            channels_included_all = config.get_setting('search_included_all')
+
+            includes = str(channels_included_all).replace('[', '').replace(']', ',')
+
+            includes = scrapertools.find_multiple_matches(includes, "'(.*?)'")
+
+            for include in includes:
+                include = include.lower().strip()
+
+                channel_json = include + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+                existe = filetools.exists(filename_json)
+                if not existe: continue
+
+                datos = channeltools.get_channel_parameters(include)
+                if datos['active']: continue
+
+                el_memorizado = "'" + include + "'"
+
+                i += 1
+                channels_included_all = str(channels_included_all).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('search_included_all', channels_included_all)
+
+        if config.get_setting('search_excludes_all'):
+            search_excludes_all = config.get_setting('search_excludes_all')
+
+            excludes = str(search_excludes_all).replace('[', '').replace(']', ',')
+
+            excludes = scrapertools.find_multiple_matches(excludes, "'(.*?)'")
+
+            for exclude in excludes:
+                exclude = exclude.lower().strip()
+
+                channel_json = exclude + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+                existe = filetools.exists(filename_json)
+                if not existe: continue
+
+                datos = channeltools.get_channel_parameters(exclude)
+                if datos['active']: continue
+
+                el_memorizado = "'" + exclude + "'"
+
+                i += 1
+                search_excludes_all = str(search_excludes_all).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('search_excludes_all', search_excludes_all)
+
+        if config.get_setting('search_excludes_movies'):
+            search_excludes_movies = config.get_setting('search_excludes_movies')
+
+            excludes = str(search_excludes_movies).replace('[', '').replace(']', ',')
+
+            excludes = scrapertools.find_multiple_matches(excludes, "'(.*?)'")
+
+            for exclude in excludes:
+                exclude = exclude.lower().strip()
+
+                channel_json = exclude + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+                existe = filetools.exists(filename_json)
+                if not existe: continue
+
+                datos = channeltools.get_channel_parameters(exclude)
+                if datos['active']: continue
+
+                el_memorizado = "'" + exclude + "'"
+
+                i += 1
+                search_excludes_movies = str(search_excludes_movies).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('search_excludes_movies', search_excludes_movies)
+
+        if config.get_setting('search_excludes_tvshows'):
+            search_excludes_tvshows = config.get_setting('search_excludes_tvshows')
+
+            excludes = str(search_excludes_tvshows).replace('[', '').replace(']', ',')
+
+            excludes = scrapertools.find_multiple_matches(excludes, "'(.*?)'")
+
+            for exclude in excludes:
+                exclude = exclude.lower().strip()
+
+                channel_json = exclude + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+                existe = filetools.exists(filename_json)
+                if not existe: continue
+
+                datos = channeltools.get_channel_parameters(exclude)
+                if datos['active']: continue
+
+                el_memorizado = "'" + exclude + "'"
+
+                i += 1
+                search_excludes_tvshows = str(search_excludes_tvshows).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('search_excludes_tvshows', search_excludes_tvshows)
+
+        if config.get_setting('search_excludes_documentaries'):
+            search_excludes_documentaries = config.get_setting('search_excludes_documentaries')
+
+            excludes = str(search_excludes_documentaries).replace('[', '').replace(']', ',')
+
+            excludes = scrapertools.find_multiple_matches(excludes, "'(.*?)'")
+
+            for exclude in excludes:
+                exclude = exclude.lower().strip()
+
+                channel_json = exclude + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+                existe = filetools.exists(filename_json)
+                if not existe: continue
+
+                datos = channeltools.get_channel_parameters(exclude)
+                if datos['active']: continue
+
+                el_memorizado = "'" + exclude + "'"
+
+                i += 1
+                search_excludes_documentaries = str(search_excludes_documentaries).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('search_excludes_documentaries', search_excludes_documentaries)
+
+        if config.get_setting('search_excludes_torrents'):
+            search_excludes_torrents = config.get_setting('search_excludes_torrents')
+
+            excludes = str(search_excludes_torrents).replace('[', '').replace(']', ',')
+
+            excludes = scrapertools.find_multiple_matches(excludes, "'(.*?)'")
+
+            for exclude in excludes:
+                exclude = exclude.lower().strip()
+
+                channel_json = exclude + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+                existe = filetools.exists(filename_json)
+                if not existe: continue
+
+                datos = channeltools.get_channel_parameters(exclude)
+                if datos['active']: continue
+
+                el_memorizado = "'" + exclude + "'"
+
+                i += 1
+                search_excludes_torrents = str(search_excludes_torrents).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('search_excludes_torrents', search_excludes_torrents)
+
+        if config.get_setting('search_excludes_mixed'):
+            search_excludes_mixed = config.get_setting('search_excludes_mixed')
+
+            excludes = str(search_excludes_mixed).replace('[', '').replace(']', ',')
+
+            excludes = scrapertools.find_multiple_matches(excludes, "'(.*?)'")
+
+            for exclude in excludes:
+                exclude = exclude.lower().strip()
+
+                channel_json = exclude + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+                existe = filetools.exists(filename_json)
+                if not existe: continue
+
+                datos = channeltools.get_channel_parameters(exclude)
+                if datos['active']: continue
+
+                el_memorizado = "'" + exclude + "'"
+
+                i += 1
+                search_excludes_mixed = str(search_excludes_mixed).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('search_excludes_mixed', search_excludes_mixed)
+
+        if config.get_setting('servers_preferred', default=''):
+            servers_preferred = config.get_setting('servers_preferred')
+
+            servers = scrapertools.find_multiple_matches(servers, "'(.*?)'")
+
+            for server in servers:
+                server_id = server.lower().strip()
+
+                server_json = server_id + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'servers', server_json)
+
+                try:
+                    data = filetools.read(filename_json)
+                    dict_server = jsontools.load(data)
+                except:
+                    continue
+
+                if dict_server['active'] == False: continue
+
+                el_memorizado = "'" + server + "'"
+
+                i += 1
+                servers_preferred = str(servers_preferred).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('servers_preferred', servers_preferred)
+
+        if config.get_setting('servers_unfavored', default=''):
+            servers_unfavored = config.get_setting('servers_unfavored')
+
+            servers = scrapertools.find_multiple_matches(servers, "'(.*?)'")
+
+            for server in servers:
+                server_id = server.lower().strip()
+
+                server_json = server_id + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'servers', server_json)
+
+                try:
+                    data = filetools.read(filename_json)
+                    dict_server = jsontools.load(data)
+                except:
+                    continue
+
+                if dict_server['active'] == False: continue
+
+                el_memorizado = "'" + server + "'"
+
+                i += 1
+                servers_unfavored = str(servers_unfavored).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('servers_unfavored', servers_unfavored)
+
+        if config.get_setting('servers_discarded', default=''):
+            servers_discarded = config.get_setting('servers_discarded')
+
+            servers = scrapertools.find_multiple_matches(servers, "'(.*?)'")
+
+            for server in servers:
+                server_id = server.lower().strip()
+
+                server_json = server_id + '.json'
+                filename_json = os.path.join(config.get_runtime_path(), 'servers', server_json)
+
+                try:
+                    data = filetools.read(filename_json)
+                    dict_server = jsontools.load(data)
+                except:
+                    continue
+
+                if dict_server['active'] == False: continue
+
+                el_memorizado = "'" + server + "'"
+
+                i += 1
+                servers_discarded = str(servers_discarded).replace(el_memorizado + ',', '').replace(el_memorizado, '').strip()
+                config.set_setting('servers_discarded', servers_discarded)
+
+        if i == 0: platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin Preferencias Obsoletas[/B][/COLOR]' % color_exec)
+        else: platformtools.dialog_ok(config.__addon_name, '[B][COLOR %s]Anuladas las Preferencias Obsoletas en sus Ajustes Personalizados.[/B][/COLOR]' % color_avis)
+
     txt = ''
+
     try:
-       with open(os.path.join(file_sets), 'r') as f: txt=f.read(); f.close()
+       with open(os.path.join(file_sets), 'r') as f:txt=f.read(); f.close()
     except:
         try: txt = open(os.path.join(file_sets), encoding="utf8").read()
         except: pass

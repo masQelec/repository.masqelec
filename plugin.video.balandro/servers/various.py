@@ -50,6 +50,7 @@ def get_video_url(page_url, url_referer=''):
         elif 'krakenfiles' in page_url: txt_server = 'Krakenfiles'
         elif 'hexupload' in page_url: txt_server = 'Hexupload'
         elif 'embedgram' in page_url: txt_server = 'Embedgram'
+        elif 'embedrise' in page_url: txt_server = 'Embedrise'
         elif 'streamvid' in page_url: txt_server = 'Streamvid'
         elif 'vidello' in page_url: txt_server = 'Vidello'
 
@@ -81,7 +82,7 @@ def get_video_url(page_url, url_referer=''):
               txt_server = 'Yandex'
               page_url = page_url.replace('/yadi.sk/', '/disk.yandex.ru/')
 
-        elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url:
+        elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url:
               txt_server = 'Streamwish'
               page_url = page_url.replace('/streamwish.com/', '/streamwish.to/').replace('/streamwish.top/', '/streamwish.to/').replace('/streamwish.site/', '/streamwish.to/').replace('/strwish.xyz/', '/streamwish.to/').replace('/embedwish.com/', '/streamwish.to/').replace('/wishembed.pro/', '/streamwish.to/')
               page_url = page_url.replace('/awish.pro/', '/streamwish.to/').replace('/dwish.pro/', '/streamwish.to/').replace('/mwish.pro/', '/streamwish.to/').replace('/wishfast.top/', '/streamwish.to/').replace('sfastwish.com', '/streamwish.to/').replace('/doodporn.xyz/', '/streamwish.to/').replace('/flaswish.com/', '/streamwish.to/')
@@ -129,6 +130,10 @@ def get_video_url(page_url, url_referer=''):
               page_url = page_url.replace('/www.vidspeeds.com/', '/vidspeed.cc/')
               page_url = page_url.replace('/embed-', '/')
 
+        elif 'vkspeed' in page_url or 'vkspeed7' in page_url:
+              txt_server = 'Vkspeed'
+              page_url = page_url.replace('/vkspeed7.com/', '/vkspeed.com/')
+
         if config.get_setting('servers_time', default=True):
             platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
             time.sleep(int(espera))
@@ -142,7 +147,8 @@ def get_video_url(page_url, url_referer=''):
             resuelto = resolveurl.resolve(page_url)
 
             if resuelto:
-                video_urls.append(['mp4', resuelto])
+                if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
+                else: video_urls.append(['mp4', resuelto])
                 return video_urls
 
             color_exec = config.get_setting('notification_exec_color', default='cyan')
@@ -171,8 +177,12 @@ def get_video_url(page_url, url_referer=''):
                     return 'Archivo inexistente ó eliminado'
                 elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                     return 'Fichero sin link al vídeo'
+
                 elif 'Wrong captcha. Please try again.' in trace:
-                    return 'Captcha erróneo. Inténetelo de nuevo'
+                    return 'Captcha erróneo. [COLOR cyan][B]Inténtelo de nuevo[/COLOR]'
+
+            elif '<urlopen error' in traceback.format_exc():
+                return 'No se puede establecer la conexión'
 
             return 'Sin Respuesta ' + txt_server
     else:

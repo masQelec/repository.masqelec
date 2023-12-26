@@ -421,6 +421,7 @@ def findvideos(item):
         other = ''
         if "/um.php" in url: other = 'um'
         elif "/jk.php" in url: other = 'jk'
+        elif '/jksw.php' in url: other =  'jk'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -452,10 +453,11 @@ def play(item):
 
         url_play = scrapertools.find_single_match(data, "swarmId: \'([^\']+)\'")
 
-    elif "/jk.php" in item.url:
+    elif "/jk.php" in item.url or '/jksw.php' in item.url:
         data = do_downloadpage(item.url)
 
         url_play = scrapertools.find_single_match(data, '<source src="(.*?)"')
+        if not url_play: url_play = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
         if not url_play: url_play = scrapertools.find_single_match(data, "video: {.*?url:.*?'(.*?)'")
 
         if host in url_play:

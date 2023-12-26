@@ -52,9 +52,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_all', url = host + 'category/capitulos-completos/', group = 'capis', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Mexicanas (capítulos)', action = 'list_all', url = host + 'category/novelas-mexicanas/', group = 'capis', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Turcas (capítulos)', action = 'list_all', url = host + 'category/series-turcas/', group = 'capis', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'category/news/', group = 'capis', text_color = 'moccasin', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -77,9 +75,6 @@ def list_list(item):
         title = title.capitalize()
 
         if title == 'Capitulos completos': continue
-        elif title == 'Novelas mexicanas': continue
-        elif title == 'Películas turcas': continue
-        elif title == 'Series turcas': continue
 
         itemlist.append(item.clone( action = 'temporadas', title = title, url = url, text_color = 'hotpink',
                                     contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
@@ -200,6 +195,9 @@ def list_all(item):
             if 'subtitulado' in title.lower() or 'subtitulo' in title.lower(): lang = 'Vose'
 
             if '?s=' in item.url or item.group == 'capis':
+                if item.group == 'capis':
+                    if not '-capitulo-' in url: continue
+
                 cap = False
 
                 if 'Capitulos' in title or 'Capítulos' in title or 'Episodes' in title: pass

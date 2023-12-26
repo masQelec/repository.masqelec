@@ -389,7 +389,6 @@ def findvideos(item):
         srv = srv.lower().strip()
 
         if 'youtube' in srv: continue
-        elif 'waaw' in srv or 'hqq' in srv or 'netu' in srv: continue
 
         if 'Latino' in lng: lang = 'Lat'
         elif 'Castellano' in lng or 'Español' in lng: lang = 'Esp'
@@ -427,8 +426,7 @@ def findvideos(item):
 
                             if not url: continue
 
-                            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-                            elif '/hydrax.' in url: continue
+                            if '/hydrax.' in url: continue
 
                             servidor = servertools.get_server_from_url(url)
                             servidor = servertools.corregir_servidor(servidor)
@@ -456,8 +454,7 @@ def findvideos(item):
                     if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
                     if url:
-                        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-                        elif '/hydrax.' in url: continue
+                        if '/hydrax.' in url: continue
                         elif '/media.esplay.one' in url: continue
 
                         servidor = servertools.get_server_from_url(url)
@@ -506,9 +503,6 @@ def play(item):
         if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
         if not url: return itemlist
-
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

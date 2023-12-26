@@ -71,6 +71,7 @@ perpage = 21
 login_ok = '[COLOR chartreuse]PlayDede Login correcto[/COLOR]'
 login_ko = '[COLOR red][B]PlayDede Login incorrecto[/B][/COLOR]'
 no_login = '[COLOR orangered][B]PlayDede Sin acceso Login[/B][/COLOR]'
+start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
 
 datos_ko = '>Registrarme<'
 
@@ -228,8 +229,8 @@ def login(item):
                    else:
                       if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
 
-                   if item.start_ses:
-                       platformtools.dialog_ok(config.__addon_name + ' PlayDede', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
+                   if item:
+                       if item.start_ses: platformtools.dialog_ok(config.__addon_name + ' PlayDede', start_ses_ok)
                    return True
 
        if 'UserOn' in data:
@@ -237,8 +238,8 @@ def login(item):
                config.set_setting('playdede_login', True, 'playdede')
                if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
 
-               if item.start_ses:
-                   platformtools.dialog_ok(config.__addon_name + ' PlayDede', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
+               if item:
+                   if item.start_ses: platformtools.dialog_ok(config.__addon_name + ' PlayDede', start_ses_ok)
            return True
     except:
        platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]PlayDede Sin acceso Web[/B][/COLOR]')
@@ -260,8 +261,8 @@ def login(item):
                    config.set_setting('playdede_login', True, 'playdede')
                    if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
 
-                   if item.start_ses:
-                       platformtools.dialog_ok(config.__addon_name + ' PlayDede', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
+                   if item:
+                       if item.start_ses: platformtools.dialog_ok(config.__addon_name + ' PlayDede', start_ses_ok)
                return True
 
        elif 'alert' in str(jdata):
@@ -270,8 +271,8 @@ def login(item):
                    config.set_setting('playdede_login', True, 'playdede')
                    if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
 
-                   if item.start_ses:
-                       platformtools.dialog_ok(config.__addon_name + ' PlayDede', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
+                   if item:
+                       if item.start_ses: platformtools.dialog_ok(config.__addon_name + ' PlayDede', start_ses_ok)
                return True
 
        else:
@@ -290,8 +291,8 @@ def login(item):
             config.set_setting('playdede_login', True, 'playdede')
             if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
 
-            if item.start_ses:
-                platformtools.dialog_ok(config.__addon_name + ' PlayDede', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
+            if item:
+                if item.start_ses: platformtools.dialog_ok(config.__addon_name + ' PlayDede', start_ses_ok)
         return True
 
     try:
@@ -308,8 +309,8 @@ def login(item):
             config.set_setting('playdede_login', True, 'playdede')
             if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
 
-            if item.start_ses:
-                platformtools.dialog_ok(config.__addon_name + ' PlayDede', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
+            if item:
+                if item.start_ses: platformtools.dialog_ok(config.__addon_name + ' PlayDede', start_ses_ok)
         return True
 
     if not host in str(data): platformtools.dialog_notification(config.__addon_name, no_login)
@@ -927,7 +928,7 @@ def paises(item):
     for pais, title in matches:
         if not pais: continue
 
-        title = title.replace('á', 'Á').replace('é', 'É').replace('i', 'Í').replace('ó', 'Ó').replace('ú', 'Ú')
+        title = title.replace('á', 'Á').replace('é', 'É').replace('i', 'Í').replace('ó', 'Ó').replace('ú', 'Ú').replace('ñ', 'Ñ')
 
         url = url_paises + '?country=' + pais
 

@@ -394,8 +394,6 @@ def findvideos(item):
             if '?source=' in url: url = scrapertools.find_single_match(url, 'source=(.*?)$')
 
             if url:
-                if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 
@@ -422,9 +420,6 @@ def play(item):
             url = scrapertools.find_single_match(data, '<source src="(.*?)"')
 
             if url:
-                if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-                    return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 

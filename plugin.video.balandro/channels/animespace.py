@@ -264,8 +264,6 @@ def findvideos(item):
         if url:
             if url.startswith('//'): url = 'https:' + url
 
-            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 

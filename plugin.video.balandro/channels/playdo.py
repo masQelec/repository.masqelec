@@ -292,9 +292,7 @@ def findvideos(item):
 
             url = url.replace('\\/', '/')
 
-            if 'hqq.' in url or 'waaw.' in url or 'netu.' in url: continue
-
-            elif '.rapidvideo.' in url: continue
+            if '.rapidvideo.' in url: continue
             elif '/cloudemb.' in url or '.fembed.' in url or '/fembad.' in url or 'vanfem' in url: continue
             elif '/tubesb.' in url or '/sbsonic.' in url or '/sbrapid.' in url or '/lvturbo.' in url or '/sbface.' in url or '/sbbrisk.' in url or '/sblona.' in url: continue
             elif 'powvideo' in url: continue
@@ -345,9 +343,7 @@ def findvideos(item):
 
             url = url.replace('\\/', '/')
 
-            if 'hqq.' in url or 'waaw.' in url or 'netu.' in url: continue
-
-            elif '.rapidvideo.' in url: continue
+            if '.rapidvideo.' in url: continue
             elif '/cloudemb.' in url or '.fembed.' in url or '/fembad.' in url or 'vanfem' in url: continue
             elif '/tubesb.' in url or '/sbsonic.' in url or '/sbrapid.' in url or '/lvturbo.' in url or '/sbface.' in url or '/sbbrisk.' in url or '/sblona.' in url: continue
             elif 'powvideo' in url: continue

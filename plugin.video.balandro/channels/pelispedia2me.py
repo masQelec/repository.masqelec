@@ -7,15 +7,57 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.pelispedia2.me/'
+host = 'https://www11.pelispedia2.me/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www.pelispedia2.me/']
+
+
+domain = config.get_setting('dominio', 'pelispedia2me', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'pelispedia2me')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'pelispedia2me')
+    else: host = domain
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/lanzamiento/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'pelispedia2me', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_pelispedia2me', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='pelispedia2me', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_pelispedia2me', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
@@ -25,6 +67,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -116,7 +160,7 @@ def list_all(item):
         else:
            if '(' + year + ')' in title: title = title.replace('(' + year + ')', '').strip()
 
-        title = title.replace('&#8211;', '').replace('&#8217;', '')
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
 
         if ' | ' in title:
             title_alt = title.replace(' | ', ' #')
@@ -165,8 +209,6 @@ def findvideos(item):
         if not servidor: continue
 
         if 'trailer' in servidor: continue
-
-        elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue

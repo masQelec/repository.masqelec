@@ -528,8 +528,6 @@ def findvideos(item):
 
             if url.startswith('//'): url = 'https:' + url
 
-            if '/netu.' in url or '/hqq.' in url or '/waaw.' in url: continue
-
             if url.startswith('https://pelisplay.ioplay?'): url = url.replace('https://pelisplay.ioplay?', 'https://pelisplay.io/play?')
 
             servidor = servertools.get_server_from_url(url)
@@ -761,7 +759,7 @@ def play(item):
                     return itemlist
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url:
+        if '/clonamesta' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
         itemlist.append(item.clone(url = url, server = servidor))

@@ -360,8 +360,6 @@ def findvideos(item):
         if '/1fichier.' in url: continue
         elif '/turbobit.' in url: continue
 
-        elif '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
-
         elif '/cloudemb.' in url or '.fembed.' in url or '/fembad.' in url or 'vanfem' in url: continue
         elif '/tubesb.' in url or '/sbsonic.' in url or '/sbrapid.' in url or '/lvturbo.' in url or '/sbface.' in url or '/sbbrisk.' in url or '/sblona.' in url: continue
 

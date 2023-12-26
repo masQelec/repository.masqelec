@@ -345,9 +345,6 @@ def play(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
         if '/damedamehoy.' in url or '//tomatomatela.' in url:
             url = resuelve_dame_toma(url)
 

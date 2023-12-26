@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import re
-
-from platformcode import config, logger
+from platformcode import logger
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cinekinkihd.freesite.host/'
-
-
-perpage = 15
+host = 'https://cinekinkitv.freesite.host/'
 
 
 def do_downloadpage(url, post=None, headers=None):
@@ -40,34 +35,29 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    if not item.page: item.page = 0
-
     data = do_downloadpage(item.url)
 
-    if not item.group: bloque = scrapertools.find_single_match(data, '</h2>(.*?)CINE QUINQUI ONLINE')
-    else: bloque = scrapertools.find_single_match(data, '<h1(.*?)<h2>')
+    if '/?s=' in item.url: bloque = scrapertools.find_single_match(data, '<h1(.*?)</h2>')
+    else:
+        if not item.group: bloque = scrapertools.find_single_match(data, '</h2>(.*?)CINE QUINQUI ONLINE')
+        else: bloque = scrapertools.find_single_match(data, '<h1(.*?)<h2>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
-    num_matches = len(matches)
-
-    for match in matches[item.page * perpage:]:
+    for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
 
-        title = title.replace('&#8220;', '').replace('&#8221;', '')
+        title = title.replace('&#8220;', '').replace('&#8221;', '').replace('&#8216;', '').replace('&#8217;', '')
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '</h3><span>(.*?)</span>')
         if not year: year = '-'
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = 'Esp',
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
-
-        if len(itemlist) >= perpage: break
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = 'Esp', contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -75,19 +65,11 @@ def list_all(item):
         return itemlist
 
     if itemlist:
-        buscar_next = True
-        if num_matches > perpage:
-            hasta = (item.page * perpage) + perpage
-            if hasta < num_matches:
-                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
-                buscar_next = False
+        next_page = scrapertools.find_single_match(data, '<span class="current">.*?' + "<a href='(.*?)'")
 
-        if buscar_next:
-            next_page = scrapertools.find_single_match(data, '<span class="current">.*?' + "<a href='(.*?)'")
-
-            if next_page:
-                if '/page/' in next_page:
-                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, page = 0, action = 'list_all', text_color='coral' ))
+        if next_page:
+            if '/page/' in next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -99,6 +81,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, '<iframe id="advanced_iframe".*?src="(.*?)"')
+    if not matches: matches = scrapertools.find_multiple_matches(data, "<iframe.*?src='(.*?)'")
 
     for url in matches:
         if url:
@@ -108,7 +91,7 @@ def findvideos(item):
             servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
-  
+
             itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Esp' ))
 
     return itemlist

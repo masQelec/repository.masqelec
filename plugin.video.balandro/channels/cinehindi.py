@@ -152,9 +152,6 @@ def play(item):
     if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

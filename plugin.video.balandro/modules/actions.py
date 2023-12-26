@@ -346,7 +346,6 @@ def manto_params(item):
         config.set_setting('channel_cinecalidadla_dominio', '')
         config.set_setting('channel_cinecalidadlol_dominio', '')
         config.set_setting('channel_cliversite_dominio', '')
-        config.set_setting('channel_cuevana2_dominio', '')
         config.set_setting('channel_cuevana2esp_dominio', '')
         config.set_setting('channel_cuevana3lw_dominio', '')
         config.set_setting('channel_cuevana3video_dominio', '')
@@ -365,6 +364,7 @@ def manto_params(item):
         config.set_setting('channel_estrenosdoramas_dominio', '')
 
         config.set_setting('channel_gnula24_dominio', '')
+        config.set_setting('channel_gnula24h_dominio', '')
         config.set_setting('channel_grantorrent_dominio', '')
         config.set_setting('channel_grantorrents_dominio', '')
 
@@ -379,8 +379,8 @@ def manto_params(item):
         config.set_setting('channel_mejortorrentapp_dominio', '')
         config.set_setting('channel_mejortorrentnz_dominio', '')
         config.set_setting('channel_mitorrent_dominio', '')
-        config.set_setting('channel_movidymobi_dominio', '')
 
+        config.set_setting('channel_nextdede_dominio', '')
         config.set_setting('channel_nextdede_nextdede_login', False)
         config.set_setting('channel_nextdede_nextdede_email', '')
         config.set_setting('channel_nextdede_nextdede_password', '')
@@ -391,6 +391,7 @@ def manto_params(item):
         config.set_setting('channel_pelismaraton_dominio', '')
         config.set_setting('channel_pelismart_dominio', '')
         config.set_setting('channel_pelispanda_dominio', '')
+        config.set_setting('channel_pelispedia2me_dominio', '')
         config.set_setting('channel_pelispediaws_dominio', '')
         config.set_setting('channel_pelisplus_dominio', '')
         config.set_setting('channel_pelisplushd_dominio', '')
@@ -483,7 +484,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '119.0.6045.200')
+        config.set_setting('chrome_last_version', '120.0.6099.71')
 
         config.set_setting('debug', '0')
 
@@ -1272,8 +1273,10 @@ def show_ubicacion(item):
         ficheros = glob.glob(path)
         ficheros.sort(key=os.path.getmtime, reverse=False)
 
-    if not ficheros: txt = 'Aún no tiene[CR]'
-    else: txt = 'Hay descargas[CR]'
+    txt = 'Carpeta de descargas (por defecto [COLOR chocolate][B].../addon_data.../downloads[/B][/COLOR])'
+
+    if not ficheros: txt += '[CR][CR][COLOR yellow][B]Aún no tiene[/B][/COLOR][CR]'
+    else: txt += '[CR][CR][COLOR cyan][B]Hay descargas[/B][/COLOR][CR]'
 
     txt += '[CR]' + path.replace('*.json', '').replace('.json', '')
 
@@ -1369,10 +1372,6 @@ def opciones_cliversite(item):
     item.from_channel = 'cliversite'
     opciones_domains_common(item)
 
-def opciones_cuevana2(item):
-    item.from_channel = 'cuevana2'
-    opciones_domains_common(item)
-
 def opciones_cuevana2esp(item):
     item.from_channel = 'cuevana2esp'
     opciones_domains_common(item)
@@ -1433,6 +1432,10 @@ def opciones_gnula24(item):
     item.from_channel = 'gnula24'
     opciones_domains_common(item)
 
+def opciones_gnula24h(item):
+    item.from_channel = 'gnula24h'
+    opciones_domains_common(item)
+
 def opciones_grantorrent(item):
     item.from_channel = 'grantorrent'
     opciones_domains_common(item)
@@ -1465,10 +1468,6 @@ def opciones_mitorrent(item):
     item.from_channel = 'mitorrent'
     opciones_domains_common(item)
 
-def opciones_movidymobi(item):
-    item.from_channel = 'movidymobi'
-    opciones_domains_common(item)
-
 def opciones_peliculaspro(item):
     item.from_channel = 'peliculaspro'
     opciones_domains_common(item)
@@ -1487,6 +1486,10 @@ def opciones_pelismart(item):
 
 def opciones_pelispanda(item):
     item.from_channel = 'pelispanda'
+    opciones_domains_common(item)
+
+def opciones_pelispedia2me(item):
+    item.from_channel = 'pelispedia2me'
     opciones_domains_common(item)
 
 def opciones_pelispediaws(item):
@@ -1633,8 +1636,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
 
-            elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
-
             elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
 
             elif item.from_channel == 'cuevana3lw': domains.manto_domain_cuevana3lw(item)
@@ -1665,6 +1666,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'gnula24': domains.manto_domain_gnula24(item)
 
+            elif item.from_channel == 'gnula24h': domains.manto_domain_gnula24h(item)
+
             elif item.from_channel == 'grantorrent': domains.manto_domain_grantorrent(item)
 
             elif item.from_channel == 'grantorrents': domains.manto_domain_grantorrents(item)
@@ -1681,7 +1684,7 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'mitorrent': domains.manto_domain_mitorrent(item)
 
-            elif item.from_channel == 'movidymobi': domains.manto_domain_movidymobi(item)
+            elif item.from_channel == 'nextdede': domains.manto_domain_nextdede(item)
 
             elif item.from_channel == 'peliculaspro': domains.manto_domain_peliculaspro(item)
 
@@ -1692,6 +1695,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
 
             elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
+
+            elif item.from_channel == 'pelispedia2me': domains.manto_domain_pelispedia2me(item)
 
             elif item.from_channel == 'pelispediaws': domains.manto_domain_pelispediaws(item)
 
@@ -1751,8 +1756,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cliversite': domains.test_domain_cliversite(item)
 
-            elif item.from_channel == 'cuevana2': domains.test_domain_cuevana2(item)
-
             elif item.from_channel == 'cuevana2esp': domains.test_domain_cuevana2esp(item)
 
             elif item.from_channel == 'cuevana3lw': domains.test_domain_cuevana3lw(item)
@@ -1783,6 +1786,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'gnula24': domains.test_domain_gnula24(item)
 
+            elif item.from_channel == 'gnula24h': domains.test_domain_gnula24h(item)
+
             elif item.from_channel == 'grantorrent': domains.test_domain_grantorrent(item)
 
             elif item.from_channel == 'grantorrents': domains.test_domain_grantorrents(item)
@@ -1799,7 +1804,7 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'mitorrent': domains.test_domain_mitorrent(item)
 
-            elif item.from_channel == 'movidymobi': domains.test_domain_movidymobi(item)
+            elif item.from_channel == 'nextdede': domains.test_domain_nextdede(item)
 
             elif item.from_channel == 'peliculaspro': domains.test_domain_peliculaspro(item)
 
@@ -1810,6 +1815,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
 
             elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
+
+            elif item.from_channel == 'pelispedia2me': domains.test_domain_pelispedia2me(item)
 
             elif item.from_channel == 'pelispediaws': domains.test_domain_pelispediaws(item)
 
@@ -1866,6 +1873,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'ennovelas': helper.show_help_ennovelas(item)
 
             elif item.from_channel == 'entrepeliculasyseries': helper.show_help_entrepeliculasyseries(item)
+
+            elif item.from_channel == 'gnula24h': helper.show_help_gnula24h(item)
 
             elif item.from_channel == 'hdfull': helper.show_help_hdfull(item)
 

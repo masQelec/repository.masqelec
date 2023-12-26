@@ -355,8 +355,7 @@ def findvideos(item):
 
         url = base64.b64decode(url).decode('utf-8')
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-        elif '/lvturbo.' in url: continue
+        if '/lvturbo.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

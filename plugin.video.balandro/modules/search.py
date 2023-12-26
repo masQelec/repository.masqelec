@@ -156,7 +156,7 @@ def mainlist(item):
     itemlist.append(item.clone( channel='filters', title = ' - [COLOR greenyellow][B]Efectuar las búsquedas Solo en determinados canales[/B][/COLOR]',
                                 action = 'mainlist2', thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( channel='filters', title = ' - [COLOR cyan][B]Excluir canales en las búsquedas[/B][/COLOR]', action = 'mainlist',
+    itemlist.append(item.clone( channel='filters', title = ' - [COLOR cyan][B]Excluir canales de las búsquedas[/B][/COLOR]', action = 'mainlist',
                                 thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='', title= '[B]Ajustes:[/B]', folder=False, text_color='goldenrod' ))

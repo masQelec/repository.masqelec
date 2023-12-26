@@ -430,8 +430,7 @@ def findvideos(item):
 
             other = scrapertools.find_single_match(match, '<span>(.*?)</span>').strip().lower()
 
-            if other == 'netu' or other == 'hqq' or other == 'waaw': continue
-            elif other == '1fichier': continue
+            if other == '1fichier': continue
             elif other == 'plusclick': continue
 
             other = servertools.corregir_servidor(other)
@@ -492,9 +491,6 @@ def play(item):
         itemlist.append(item.clone(url = url, server = servidor))
 
         return itemlist
-
-    if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
     servidor = servertools.get_server_from_url(url)
     servidor = servertools.corregir_servidor(servidor)

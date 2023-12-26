@@ -428,9 +428,7 @@ def findvideos(item):
         other = ''
 
         if servidor:
-           if 'hqq' in srv or 'waaw' in srv or 'netu' in srv: continue
-
-           elif srv == 'streamz': servidor = srv
+           if srv == 'streamz': servidor = srv
            elif srv == 'doods': servidor = 'doodstream'
            elif srv == 'streamtape': servidor = 'streamtape'
 
@@ -525,9 +523,6 @@ def play(item):
             url = scrapertools.find_single_match(data, "window.open.*?'(.*?)'")
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

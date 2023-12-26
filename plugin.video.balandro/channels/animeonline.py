@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -553,8 +553,7 @@ def findvideos(item):
 
             url = scrapertools.find_single_match(dat_server, "to_player.*?'(.*?)'")
 
-            if '/netu' in url or '/hqq' in url or '/waaw' in url: continue
-            elif '/saikoudane.' in url: continue
+            if '/saikoudane.' in url: continue
 
             if url:
                 if url == 'undefined': continue

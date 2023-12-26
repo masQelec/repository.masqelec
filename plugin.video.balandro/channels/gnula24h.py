@@ -44,7 +44,19 @@ except:
    except: pass
 
 
-host = 'https://ww3.gnula2h.cc/'
+host = 'https://www11.gnula.cc/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://ww3.gnula2h.cc/']
+
+
+domain = config.get_setting('dominio', 'gnula2h', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'gnula2h')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'gnula2h')
+    else: host = domain
 
 
 def item_configurar_proxies(item):
@@ -80,6 +92,10 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not headers: headers = {'Referer': host}
 
     hay_proxies = False
@@ -122,8 +138,22 @@ def acciones(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
-                                from_channel='gnula24h', folder=False, text_color='chartreuse' ))
+    domain_memo = config.get_setting('dominio', 'gnula2h', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_gnula2h', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='gnula2h', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_gnula24h', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
 
@@ -148,7 +178,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'capitulo/', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ver-episode/', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings/', search_type = 'tvshow' ))
@@ -170,7 +200,7 @@ def generos(item):
 
     bloque = scrapertools.find_single_match(data, '>GÉNERO<(.*?)</ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?>(.*?)</a>')
 
     for url, title in matches:
         if title == 'Novelas': continue
@@ -479,8 +509,6 @@ def findvideos(item):
 
         if 'trailer' in servidor: continue
 
-        elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
-
         servidor = servidor.replace('.tv', '').strip()
 
         lang = scrapertools.find_single_match(match, " src='.*?/flags/(.*?).png'")
@@ -512,9 +540,7 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(match, "<a href='(.*?)'")
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
-        elif 'ul.to' in url: continue
+        if 'ul.to' in url: continue
         elif '.oboom.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
