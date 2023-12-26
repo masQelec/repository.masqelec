@@ -351,8 +351,6 @@ def findvideos(item):
     for url, srv in matches:
         ses += 1
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
         if not url.startswith('http'): url = 'https:' + url
 
         if "/streaming.php?" in url:
@@ -361,8 +359,6 @@ def findvideos(item):
             links = scrapertools.find_multiple_matches(data, '<li class="linkserver".*?data-video="(.*?)"')
 
             for link in links:
-                if '/hqq.' in link or '/waaw.' in link or '/netu.' in link: continue
-
                 servidor = servertools.get_server_from_url(link)
                 servidor = servertools.corregir_servidor(servidor)
 
@@ -411,9 +407,6 @@ def play(item):
         if not url: url = scrapertools.find_single_match(data, '<li class="linkserver".*?data-video="(.*?)"')
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
         if not url.startswith("http"): url = "https:" + url
 
         url = url.replace("\\/", "/")

@@ -264,7 +264,6 @@ def findvideos(item):
              ses += 1
 
              if 'youtube' in srv: continue
-             elif 'waaw' in srv or 'hqq' in srv or 'netu' in srv: continue
 
              if i == 0: lang = idiomas[0]
              elif i == 1: lang = idiomas[1]
@@ -311,10 +310,7 @@ def play(item):
     if vid: url = vid
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
-        if '/cinestart.streams3.com/' in url: return itemlist
+        if '/cinestart.' in url: return itemlist
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

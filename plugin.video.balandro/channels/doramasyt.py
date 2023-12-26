@@ -362,8 +362,7 @@ def findvideos(item):
 
         srv = srv.lower()
 
-        if 'hqq' in srv or 'waaw' in srv or 'netu' in srv: continue
-        elif 'fireload' in srv: continue
+        if 'fireload' in srv: continue
 
         elif 'ok' in srv: srv = 'okru'
         elif 'mixdropco' in srv: srv = 'mixdrop'
@@ -446,9 +445,6 @@ def play(item):
             return 'Servidor [COLOR tan]Videa[/COLOR] NO Soportado'
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

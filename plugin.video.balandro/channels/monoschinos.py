@@ -303,9 +303,7 @@ def findvideos(item):
 
         other = ''
 
-        if 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
-
-        elif servidor == 'puj': continue
+        if servidor == 'puj': continue
 
         elif servidor == 'ok': servidor = 'okru'
         elif servidor == 'zeus': servidor = 'directo'

@@ -364,8 +364,6 @@ def findvideos(item):
 
         if 'trailer' in servidor: continue
 
-        elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
-
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
         else:
@@ -394,8 +392,6 @@ def findvideos(item):
         ses += 1
 
         url = scrapertools.find_single_match(match, "<a href='(.*?)'")
-
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

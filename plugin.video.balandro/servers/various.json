@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Alions,  Awish,  Azipcdn,  Desiupload,  Dlions,  Doodporn,  Dropload,  Dwish,  Embedgram,  Emturbovid,  Embedwish,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Flaswish,  Fviplions,  Hexupload,  Krakenfiles,  Lulustream,  Luluvdo,  Mlions,  Moonmov,  Moonplayer,  Mvidoo,  Mwish,  Rutube,  Sfastwish,  Streamhub,  Streamvid,  Streamwish,  Strwish,  Tubeload,  Turboviplay,  Tuborstb,  Uploaddo,  Uploadever,  Vgfplay,  Vid-guard,  Vidello,  Videowood,  Vidguard,  Vidspeed,  V6embed,  Vgembed,  Vembed,  Vudeo,  Wishembed,  Wishfast,  Yadi,  Yandex,  Yodbox,  Youdboox,  Youdbox)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Alions,  Awish,  Azipcdn,  Desiupload,  Dlions,  Doodporn,  Dropload,  Dwish,  Embedgram,  Embedrise,  Emturbovid,  Embedwish,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Flaswish,  Fviplions,  Hexupload,  Krakenfiles,  Lulustream,  Luluvdo,  Mlions,  Moonmov,  Moonplayer,  Mvidoo,  Mwish,  Rutube,  Sfastwish,  Streamhub,  Streamvid,  Streamwish,  Strwish,  Tubeload,  Turboviplay,  Tuborstb,  Uploaddo,  Uploadever,  Vgfplay,  Vid-guard,  Vidello,  Videowood,  Vidguard,  Vidspeed,  Vkspeed,  Vkspeed7,  V6embed,  Vgembed,  Vembed,  Vudeo,  Wishembed,  Wishfast,  Yadi,  Yandex,  Yodbox,  Youdboox,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -142,6 +142,10 @@
       },
       {
         "pattern": "https://streamwish.com/(?:e/|f/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://streamwish.com/([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
@@ -317,6 +321,10 @@
         "url": "https://embedgram.com.to/f/\\1"
       },
       {
+        "pattern": "https://embedrise.com/(?:v/|d/)([0-9a-zA-Z]+)",
+        "url": "https://embedrise.com/v/\\1"
+      },
+      {
         "pattern": "https://vgfplay.com/(?:e/|v/|d/)([0-9a-zA-Z]+)",
         "url": "https://vgembed.com/e/\\1"
       },
@@ -399,6 +407,14 @@
       {
         "pattern": "https://vidspeed.cc/(?:embed-)([0-9a-zA-Z]+)",
         "url": "https://vidspeed.cc/\\1"
+      },
+      {
+        "pattern": "https://vkspeed.com/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://vkspeed.com/\\1"
+      },
+      {
+        "pattern": "https://vkspeed7.com/(?:embed-)([0-9a-zA-Z]+)",
+        "url": "https://vkspeed.com/\\1"
       }
     ]
   }

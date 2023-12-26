@@ -230,8 +230,7 @@ def findvideos(item):
 
         url = datos[1].replace("\\/", "/")
 
-        if servidor == 'netu': continue
-        elif servidor == 'streamium': continue
+        if servidor == 'streamium': continue
         elif servidor == 'amus': continue
         elif servidor == 'mepu': continue
         elif servidor == 'streamsb': continue

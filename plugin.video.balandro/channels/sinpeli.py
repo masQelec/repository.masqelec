@@ -269,9 +269,6 @@ def findvideos(item):
         servidor = scrapertools.find_single_match(match, "<span>(.*?)</span>").lower()
 
         if 'trailer' in servidor: continue
-        elif 'waaw' in servidor: continue
-        elif 'hqq' in servidor: continue
-        elif 'netu' in servidor: continue
 
         if servidor == 'ok': servidor = 'okru'
 
@@ -303,8 +300,6 @@ def findvideos(item):
                 links = scrapertools.find_multiple_matches(data2, "go_to_player.*?'(.*?)'")
 
                 for link in links:
-                    if '/hqq.' in link or '/waaw.' in link or '/netu.' in link: continue
-
                     servidor = servertools.get_server_from_url(link)
                     servidor = servertools.corregir_servidor(servidor)
 
@@ -352,9 +347,6 @@ def play(item):
     if not url: url = item.url
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

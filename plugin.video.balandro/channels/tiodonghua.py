@@ -242,8 +242,6 @@ def findvideos(item):
 
         srv = srv.lower().strip()
 
-        if srv == 'netu': continue
-
         video = base64.b64decode(d_value).decode("utf-8")
 
         if not video: continue

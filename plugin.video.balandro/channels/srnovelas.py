@@ -520,9 +520,6 @@ def play(item):
 
     url = item.url
 
-    if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-        return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
     servidor = servertools.get_server_from_url(url)
     servidor = servertools.corregir_servidor(servidor)
 
@@ -572,9 +569,6 @@ def play(item):
            if "b'" in str(url): url = scrapertools.find_single_match(str(url), "'(.*?)'")
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

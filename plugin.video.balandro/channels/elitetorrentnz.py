@@ -81,11 +81,12 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'estrenos/', search_type = 'movie', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Últimos estrenos', action = 'list_all', url = host + 'estrenos/', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
 
@@ -99,6 +100,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Últimos estrenos', action = 'list_all', url = host + 'estrenos/', search_type = 'tvshow', text_color='cyan' ))
 
     return itemlist
 
@@ -147,6 +150,19 @@ def generos(item):
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
 
     return sorted(itemlist,key=lambda x: x.title)
+
+
+def anios(item):
+    logger.info()
+    itemlist = []
+
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 1959, -1):
+        itemlist.append(item.clone( title=str(x), url= host + 'estreno//' + str(x) + '/', action='list_all', any = str(x), text_color = 'deepskyblue' ))
+
+    return itemlist
 
 
 def list_all(item):
@@ -203,7 +219,7 @@ def list_all(item):
         tipo = 'movie' if '/peliculas/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        title = title.replace('&#8211;', '').replace('&amp;', '').replace('&#8215;', ' ')
+        title = title.replace('&#8211;', '').replace('&amp;', '').replace('&#8215;', ' ').replace('&#215;', 'x')
 
         if tipo == 'movie':
             if not item.search_type == 'all':

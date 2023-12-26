@@ -108,6 +108,8 @@ def get_servers_itemlist(itemlist):
     for serverid in get_servers_list().keys():
         server_parameters = get_server_parameters(serverid)
 
+        if server_parameters.get("active") == False: continue
+
         # Recorre los patrones
         for pattern in server_parameters.get("find_videos", {}).get("patterns", []):
             # Recorre los resultados
@@ -403,7 +405,9 @@ def get_servers_list():
 def corregir_servidor(servidor):
     servidor = servidor.strip().lower()
 
-    if servidor in ['netutv', 'waaw', 'waaw1', 'waav', 'netu', 'hqq', 'megavideo', 'megaplay']: return 'netutv'
+    if servidor in ['netuplayer', 'netutv', 'waaw1', 'waaws', 'waaw', 'netu', 'hqq', 'megavideo', 'megaplay', 'vidxhot', 'player.moovies.in', 'richhioon', 'woffxxx', 'pornjustx', 'doplay', 'younetu', 'stbnetu', 'ncdn22', 'oyohd']: return 'waaw'
+    # ~ if servidor in ['netutv', 'waaw1', 'waaws', 'waaw', 'netu', 'hqq', 'megavideo', 'megaplay', 'vidxhot', 'player.moovies.in', 'richhioon', 'woffxxx', 'pornjustx']: return 'netutv'
+
     elif servidor in ['powvideo', 'povwideo', 'powvldeo', 'powv1deo', 'povw1deo']: return 'powvideo'
     elif servidor in ['streamplay', 'steamplay', 'streamp1ay']: return 'streamplay'
 
@@ -439,7 +443,7 @@ def corregir_servidor(servidor):
     elif servidor in ['mailru', 'my.mail', 'my.mail.ru', 'my', 'mail', 'mail.ru']: return 'mailru'
 
     elif servidor in ['vidtodo', 'vidto', 'vidtodoo', 'vixtodo']: return 'vidtodo'
-    elif servidor in ['okru', 'ok', 'ok.ru', 'ok-ru', 'ok server', 'okru.link', 'odnoklassniki', 'okrufer']: return 'okru'
+    elif servidor in ['okru', 'ok.ru', 'ok-ru', 'ok server', 'okru.link', 'odnoklassniki', 'okrufer', 'ok']: return 'okru'
     elif servidor in ['streamz', 'streamzz']: return 'streamz'
     elif servidor in ['vevio', 'vev']: return 'vevio'
     elif servidor in ['vsmobi', 'v-s']: return 'vsmobi'
@@ -458,7 +462,7 @@ def corregir_servidor(servidor):
     elif servidor == 'uptostream': return 'uptobox'
     elif servidor == ['pixel']: return 'pixeldrain'
 
-    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish']: return 'various'
+    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7']: return 'various'
 
     else: return servidor
 
@@ -476,6 +480,7 @@ def corregir_other(srv):
     elif 'krakenfiles' in srv: srv = 'Krakenfiles'
     elif 'hexupload' in srv: srv = 'Hexupload'
     elif 'embedgram' in srv: srv = 'Embedgram'
+    elif 'embedrise' in srv: srv = 'Embedrise'
     elif 'streamvid' in srv: srv = 'Streamvid'
 
     elif 'upload.do' in srv or 'uploaddo' in srv: srv = 'Upload'
@@ -508,6 +513,8 @@ def corregir_other(srv):
     elif 'vidello' in srv: srv = 'Vidello'
 
     elif 'vidspeed' in srv or 'vidspeeds' in srv: srv = 'Vidspeed'
+
+    elif 'vkspeed' in srv or 'vkspeed7' in srv: srv = 'Vkspeed'
 
     return srv
 

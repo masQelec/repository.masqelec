@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -19,7 +19,9 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    # ~ itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone ( title = 'Buscar película ...[COLOR plum](excepto en YouTube)[/COLOR]', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+
+    itemlist.append(item.clone ( title = 'YouTube', action = 'youtubes', thumbnail=config.get_thumb('youtube'), search_type = 'movie', text_color = 'moccasin' ))
 
     itemlist.append(item.clone ( title = 'Sagas', action = 'sagas', url = host + 'sagas/', search_type = 'movie' ))
 
@@ -33,13 +35,55 @@ def mainlist_pelis(item):
     return itemlist
 
 
+def youtubes(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone ( title = 'Cine Clásico', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=r9y9RcsBv9k&list=PL5Elc2OLiWk6pkscyMTC6DCbE4GIeqfAe&index=2' ))
+
+    itemlist.append(item.clone ( title = 'Cine Clásico Español', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=OVjZTR0w_n4&list=PLhgZbivoHwSViCGE5ljvi8cYTgouloz_-' ))
+
+    itemlist.append(item.clone ( title = 'Otras de Cine Clásico', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=_ppHqkSS_uQ&list=PL5Elc2OLiWk6pkscyMTC6DCbE4GIeqfAe' ))
+
+    itemlist.append(item.clone ( title = 'Bud Spencer & Terence Hill', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=PuMlIOHBaqg&list=PLy-qmp54bpB2yopTCH_4G5WLnniNQerQf' ))
+
+    itemlist.append(item.clone ( title = 'Cantinflas', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=U5neiehwYMk&list=PLEN1o4MXDPxA-o78qTZRqEU-XgRUyh76u' ))
+
+    itemlist.append(item.clone ( title = 'Westerns', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=1g_SGZn4_-c&list=PLLxxgrF1QnBjEvwkfWLPkr-CLEeEHJuWl' ))
+
+    return itemlist
+
+
+def list_tubes(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+
+    bloque = scrapertools.find_single_match(str(data), '"playlist":.*?"playlist":.*?"title":(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(str(bloque), 'playlistPanelVideoRenderer":.*?simpleText":"(.*?)".*?"videoId":"(.*?)".*?"playlistId"')
+
+    for title, _id in matches:
+        if not _id or not title: continue
+
+        thumb = 'https://i.ytimg.com/vi/' + _id + '/hqdefault.jpg'
+
+        url = 'https://www.youtube.com/watch?v=' + _id
+
+        itemlist.append(item.clone( action = 'findvideos', title = title, url = url, thumbnail = thumb, group = 'youtubes' ))
+
+    return itemlist
+
+
+
 def sagas(item):
     logger.info()
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="col">.*?<a href="(.*?)".*?src="(.*?)".*?alt="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, '<div class="col">.*?<a href="(.*?)".*?data-src="(.*?)".*?alt="(.*?)"')
 
     for url, thumb, title in matches:
         if not title or not url: continue
@@ -47,7 +91,7 @@ def sagas(item):
         itemlist.append(item.clone( action = 'list_films', title = title, url = url, thumbnail = thumb, text_color = 'moccasin' ))
 
     if itemlist:
-        if len(itemlist) == 16:
+        if len(itemlist) <= 16:
             next_page = scrapertools.find_single_match(data, '<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
 
             if next_page:
@@ -166,6 +210,10 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if item.group == 'youtubes':
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'youtube', language = 'Esp', url = item.url ))
+        return itemlist
+
     data = httptools.downloadpage(item.url).data
 
     url = scrapertools.find_single_match(data, '<source src="(.*?)"')
@@ -203,15 +251,12 @@ def list_search(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, '<article id="post-(.*?)</article>')
+    matches = scrapertools.find_multiple_matches(data, '<div><a href="(.*?)".*?">(.*?)</a>')
 
-    for article in matches:
-        url = scrapertools.find_single_match(article, ' href="([^"]+)"')
-        title = scrapertools.find_single_match(article, 'rel="bookmark">(.*?)</a>')
-
+    for url, title in matches:
         if not url or not title: continue
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
+        itemlist.append(item.clone( action = 'list_films', url = url, title = title ))
 
     return itemlist
 

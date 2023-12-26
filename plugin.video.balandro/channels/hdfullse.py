@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -573,7 +573,12 @@ def findvideos(item):
     for idioma, calidad, url, embed in matches:
         ses += 1
 
-        if embed == 'd' and 'uptobox' not in url: continue
+        if embed == 'd':
+            if not 'uptobox' in url: continue
+
+        elif '/powvideo.' in url: continue
+        elif '/streamplay.' in url: continue
+
         elif 'onlystream.tv' in url: url = url.replace('onlystream.tv', 'upstream.to')
         elif 'vev.io' in url: url = url.replace('vev.io', 'streamtape.com/e')
 

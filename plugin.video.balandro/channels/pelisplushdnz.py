@@ -489,8 +489,7 @@ def findvideos(item):
             for link, srv2 in matches2:
                 srv2 = srv2.lower()
 
-                if srv2 == 'netu' or srv2 == 'waaw' or srv2 == 'hqq': continue
-                elif srv2 == '1fichier': continue
+                if srv2 == '1fichier': continue
 
                 if not link: continue
 
@@ -555,11 +554,7 @@ def findvideos(item):
 
             link_other = link_other.lower().strip()
 
-            if link_other == 'netu': continue
-            elif link_other == 'waaw': continue
-            elif link_other == 'hqq': continue
-
-            elif link_other == '1fichier': continue
+            if link_other == '1fichier': continue
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = IDIOMAS.get(lang, lang), other = link_other ))
 

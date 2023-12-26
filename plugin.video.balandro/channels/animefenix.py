@@ -498,8 +498,6 @@ def findvideos(item):
     for url in matches:
         ses += 1
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
@@ -591,9 +589,6 @@ def play(item):
         elif '.fireload.' in url: url = scrapertools.find_single_match(url, 'v=(.*?)$')
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
         if not url.startswith("http"): url = "https:" + url
 
         url = url.replace('&amp;', '&').replace("\\/", "/")

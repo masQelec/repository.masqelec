@@ -106,9 +106,9 @@ def list_all(item):
         if '>Movie<' in match:
             PeliName = title
 
-            if '[Película' in title: PeliName = title.split("[Película")[0]
-            elif '[Latino' in title: PeliName = title.split("[Latino")[0]
-            elif '[Castellano' in title: PeliName = title.split("[Castellano")[0]
+            if '[Película' in PeliName: PeliName = PeliName.split("[Película")[0]
+            elif '[Latino' in PeliName: PeliName = PeliName.split("[Latino")[0]
+            elif '[Castellano' in PeliName: PeliName = PeliName.split("[Castellano")[0]
 
             PeliName = PeliName.strip()
 
@@ -117,11 +117,11 @@ def list_all(item):
         else:
             SerieName = title
 
-            if '[Temporada' in title: SerieName = title.split("[Temporada")[0]
+            if '[Temporada' in SerieName: SerieName = SerieName.split("[Temporada")[0]
 
-            if '[Latino' in title: SerieName = title.split("[Latino")[0]
-            elif '[Castellano' in title: SerieName = title.split("[Castellano")[0]
-            elif '[Subtitulado' in title: SerieName = title.split("[Subtitulado")[0]
+            if '[Latino' in SerieName: SerieName = SerieName.split("[Latino")[0]
+            elif '[Castellano' in SerieName: SerieName = SerieName.split("[Castellano")[0]
+            elif '[Subtitulado' in SerieName: SerieName = SerieName.split("[Subtitulado")[0]
 
             SerieName = SerieName.strip()
 
@@ -261,9 +261,7 @@ def findvideos(item):
 
             if not url.startswith("http"): continue
 
-            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
-            elif 'player.animeyt' in url: continue
+            if 'player.animeyt' in url: continue
             elif 'jetload.' in url: continue
             elif '.tioanime.' in url: continue
             elif '.fembed.' in url: continue

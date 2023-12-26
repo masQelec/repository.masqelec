@@ -147,9 +147,7 @@ def findvideos(item):
 
         srv = srv.lower()
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
-        elif 'jetload.' in url: continue
+        if 'jetload.' in url: continue
         elif '/hydrax.' in url: continue
 
         servidor = servertools.get_server_from_url(url)

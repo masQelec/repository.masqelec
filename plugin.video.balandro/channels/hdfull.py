@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -76,6 +76,7 @@ ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
 
 
 login_ok = '[COLOR chartreuse]HdFull Login correcto[/COLOR]'
+start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
 
 perpage = 20
 
@@ -160,10 +161,12 @@ class login_dialog(xbmcgui.WindowDialog):
 
 
 def do_make_login_logout(url, post=None):
+    domain = config.get_setting('dominio', 'hdfull', default=dominios[0])
+
     hay_proxies = False
     if config.get_setting('channel_hdfull_proxies', default=''): hay_proxies = True
 
-    if not url.startswith(host):
+    if not url.startswith(domain):
         data = httptools.downloadpage(url, post=post, raise_weberror=False).data
     else:
         if hay_proxies:
@@ -176,9 +179,9 @@ def do_make_login_logout(url, post=None):
             try:
                 ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
                 if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                    httptools.save_cookie(ck_name, ck_value, domain.replace('https://', '')[:-1])
 
-                if not url.startswith(host):
+                if not url.startswith(domain):
                     data = httptools.downloadpage(url, post=post, raise_weberror=False).data
                 else:
                     if hay_proxies:
@@ -208,7 +211,7 @@ def login(item):
     data = ''
 
     domain_unknow = False
-	
+
     if domain:
         if domain in dominios:
             if not config.get_setting('dominio', 'hdfull'): config.set_setting('dominio', domain, 'hdfull')
@@ -231,8 +234,8 @@ def login(item):
                 else:
                    if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
 
-                if item.start_ses:
-                    platformtools.dialog_ok(config.__addon_name + ' HdFull', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
+                if item:
+                    if item.start_ses: platformtools.dialog_ok(config.__addon_name + ' HdFull', start_ses_ok)
                 return True
 
     if not username or not password:
@@ -269,8 +272,8 @@ def login(item):
             else:
                 if config.get_setting('notificar_login', default=False): platformtools.dialog_notification(config.__addon_name, login_ok)
 
-            if item.start_ses:
-                platformtools.dialog_ok(config.__addon_name + ' HdFull', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
+            if item:
+                if item.start_ses: platformtools.dialog_ok(config.__addon_name + ' HdFull', start_ses_ok)
             return True
 
     post = {'username': username, 'password': password}
@@ -287,8 +290,8 @@ def login(item):
             if jdata.get('status') == "OK":
                 if not status: config.set_setting('hdfull_login', True, 'hdfull')
 
-                if item.start_ses:
-                    platformtools.dialog_ok(config.__addon_name + ' HdFull', '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
+                if item:
+                    if item.start_ses: platformtools.dialog_ok(config.__addon_name + ' HdFull', start_ses_ok)
                 return True
         except:
             pass
@@ -397,7 +400,7 @@ def do_downloadpage(url, post=None, referer=None):
     hay_proxies = False
     if config.get_setting('channel_hdfull_proxies', default=''): hay_proxies = True
 
-    if not url.startswith(host):
+    if not url.startswith(domain):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
     else:
         if hay_proxies:
@@ -410,9 +413,9 @@ def do_downloadpage(url, post=None, referer=None):
             try:
                 ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
                 if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                    httptools.save_cookie(ck_name, ck_value, domain.replace('https://', '')[:-1])
 
-                if not url.startswith(host):
+                if not url.startswith(domain):
                     data = httptools.downloadpage(url, post=post, raise_weberror=False).data
                 else:
                     if hay_proxies:
@@ -1099,6 +1102,7 @@ def findvideos(item):
              "35": {"t": "s", "d": "https://uptobox.com/%s"},
              "38": {"t": "s", "d": "https://clicknupload.cc/%s"},
              "40": {"t": "s", "d": "https://vidmoly.me/embed-%s.html"},
+             "45": {"t": "s", "d": "https://waaw.to/f/%s"}
              }
 
     # ~ try:
@@ -1142,7 +1146,11 @@ def findvideos(item):
     for idioma, calidad, url, embed in matches:
         ses += 1
 
-        if embed == 'd' and 'uptobox' not in url: continue
+        if embed == 'd':
+            if not 'uptobox' in url: continue
+
+        elif '/powvideo.' in url: continue
+        elif '/streamplay.' in url: continue
 
         if not PY3: calidad = unicode(calidad, 'utf8').upper().encode('utf8')
 

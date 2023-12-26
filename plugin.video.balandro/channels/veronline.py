@@ -262,8 +262,6 @@ def findvideos(item):
             except: url = ''
 
             if url:
-                if '/younetu' in url or '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
-
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 

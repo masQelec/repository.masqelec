@@ -8,7 +8,7 @@ else: PY3 = False
 
 import os, re, time, xbmc, xbmcaddon
 
-from platformcode import config, logger, platformtools
+from platformcode import config, logger, platformtools, updater
 from core import httptools, scrapertools, filetools, jsontools
 
 
@@ -84,7 +84,15 @@ def test_channel(channel_name):
     if config.get_setting('developer_mode', default=False): txt = '[COLOR moccasin][B]Internet:[/COLOR]  [COLOR yellow]Status Developer Mode[/B][/COLOR][CR][CR]'
     else: txt = test_internet()
 
-    txt += '[COLOR moccasin][B]Balandro:[/B][/COLOR] ' + config.get_addon_version() + '[CR][CR]'
+    try: last_ver = updater.check_addon_version()
+    except: last_ver = True
+
+    if not last_ver: last_ver = '[I][COLOR %s](desfasada)[/COLOR][/I]' % color_adver
+    else: last_ver = ''
+
+    last_fix = config.get_addon_version()
+
+    txt += '[COLOR moccasin][B]Balandro:[/B][/COLOR] ' + config.get_addon_version().replace('.fix', '-Fix') + ' ' + last_ver + '[CR][CR]'
 
     txt += '[COLOR moccasin][B]Parámetros:[/B][/COLOR][CR]'
 
@@ -1000,7 +1008,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web:
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or '.ennovelas.' in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1103,7 +1111,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web:
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or '.ennovelas.' in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1437,7 +1445,15 @@ def test_server(server_name):
     else:
         txt = test_internet()
 
-    txt += '[COLOR moccasin][B]Balandro:[/B][/COLOR] ' + config.get_addon_version() + '[CR][CR]'
+    try: last_ver = updater.check_addon_version()
+    except: last_ver = True
+
+    if not last_ver: last_ver = '[I][COLOR %s](desfasada)[/COLOR][/I]' % color_adver
+    else: last_ver = ''
+
+    last_fix = config.get_addon_version()
+
+    txt += '[COLOR moccasin][B]Balandro:[/B][/COLOR] ' + config.get_addon_version().replace('.fix', '-Fix') + ' ' + last_ver + '[CR][CR]'
 
     bloc = dict_server['find_videos']['patterns']
 

@@ -471,8 +471,6 @@ def findvideos(item):
 
         srv = scrapertools.find_single_match(srv_lang, '(.*?)-').lower().strip()
 
-        if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
-
         if not srv == 'descargaonline':
             if servertools.is_server_available(srv):
                 if not servertools.is_server_enabled(srv): continue
@@ -502,8 +500,6 @@ def findvideos(item):
                     matches1 = scrapertools.find_multiple_matches(data1, '<a target=".*?href="(.*?)"')
 
                     for link in matches1:
-                        if '/hqq' in link or '/waaw' in link or '/netu' in link: continue
-
                         servidor = servertools.get_server_from_url(link)
                         servidor = servertools.corregir_servidor(servidor)
 
@@ -526,8 +522,6 @@ def findvideos(item):
         ses += 1
 
         srv = srv.replace(' &amp; ', '').lower().strip()
-
-        if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
 
         if not srv == 'descargaonline':
             if servertools.is_server_available(srv):
@@ -554,8 +548,6 @@ def findvideos(item):
                     matches2 = scrapertools.find_multiple_matches(data2, '<a target=".*?href="(.*?)"')
 
                     for link in matches2:
-                        if '/hqq' in link or '/waaw' in link or '/netu' in link: continue
-
                         servidor = servertools.get_server_from_url(link)
                         servidor = servertools.corregir_servidor(servidor)
 
@@ -597,12 +589,6 @@ def play(item):
         data = do_downloadpage(url)
 
         url = scrapertools.find_single_match(data, 'src="(.*?)"')
-
-        if '/player.' in url:
-            data = do_downloadpage(url)
-
-            if '/hqq' in data or '/waaw' in data or '/netu' in data:
-                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
         if url:
             servidor = servertools.get_server_from_url(url)
