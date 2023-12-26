@@ -411,8 +411,7 @@ def findvideos(item):
 
             url = url.replace('&amp;', '&')
 
-            if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
-            elif '/streamplay.' in url or '/streampiay.' in url: continue
+            if '/streamplay.' in url or '/streampiay.' in url: continue
             elif '/watchsb.' in url or '/embedsb.' in url: continue
             elif '/powvideo.' in url: continue
             elif '/segavid.' in url: continue
@@ -439,8 +438,7 @@ def findvideos(item):
     for url in matches:
         ses += 1
 
-        if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
-        elif '/streamplay.' in url or '/streampiay.' in url: continue
+        if '/streamplay.' in url or '/streampiay.' in url: continue
         elif '/watchsb.' in url or '/embedsb.' in url: continue
         elif '/powvideo.' in url: continue
         elif '/segavid.' in url: continue

@@ -69,7 +69,7 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}", "", data)
 
-    bloque = scrapertools.find_single_match(data, '<div class="col-xs-12 col-md-12 col-lg-9px-3"><ul>(.*?)</ul><div class="clearfix">')
+    bloque = scrapertools.find_single_match(data, '<div class="col-xs-12 col-md-12 col-lg-9.*?<ul>(.*?)</ul><div class="clearfix">')
     if not bloque: bloque = scrapertools.find_single_match(data, '<h4>Busqueda en Hentais:</h4>(.*?)<div class="col-lg-3 col-md-12" >')
 
     matches = re.compile('<a href="([^"]+)".*?<img src="([^"]+)" title="([^"]+)"', re.DOTALL).findall(bloque)
@@ -77,7 +77,7 @@ def list_all(item):
     for url, thumb, title, in matches:
         title = title.replace('][', ' ').replace('[', ' ').replace(']', ' ')
 
-        title = title.replace('&#8211;', '').replace('&#8230;', '')
+        title = title.replace('&#8211;', '').replace('&#8230;', '').replace('&#039;', "'")
 
         if item.group == 'find':
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
@@ -166,11 +166,16 @@ def findvideos(item):
     for url in videos:
         if not url.startswith('http'): continue
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-        elif '/vapley.top/' in url: continue
-        elif '/megadl.fr/' in url: continue
-        elif '/1fichier.com/' in url: continue
-        elif '/ouo.io' in url: continue
+        if '/streamango.' in url: continue
+        elif '/verystream.' in url: continue
+        elif '/openload.' in url: continue
+        elif '/1fichier.' in url: continue
+
+        elif '/vapley.' in url: continue
+        elif '/megadl.' in url: continue
+        elif '/tiny.' in url: continue
+        elif '/bit.' in url: continue
+        elif '/ouo.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

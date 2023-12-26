@@ -51,7 +51,7 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?"><.*?>(.*?)</span>')
 
     for url, title in matches:
-        url = host[:-1] + url
+        if not host in url: url = host[:-1] + url
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
 
@@ -83,9 +83,9 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        thumb = host[:-1] + thumb
+        if not host in thumb: thumb = host[:-1] + thumb
 
-        url = host[:-1] + url
+        if not host in url: url = host[:-1] + url
 
         SerieName = title
 
@@ -125,7 +125,7 @@ def list_all(item):
             next_page = scrapertools.find_single_match(data,'<ul class="pagination">.*?<li>.*?<a href="(.*?)"')
 
             if next_page:
-                next_page = host[:-1] + next_page
+                if not host in next_page: next_page = host[:-1] + next_page
 
                 itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
@@ -150,7 +150,7 @@ def episodios(item):
         url = scrapertools.find_single_match(bloque, '<a href="(.*?)"')
 
         if url:
-            url = host[:-1] + url
+            if not host in url: url = host[:-1] + url
 
             itemlist.append(item.clone( action='findvideos', url = url, title = item.title, contentType = 'movie', contentTitle = item.contentSerieName ))
 
@@ -199,9 +199,9 @@ def episodios(item):
                 else: item.perpage = 50
 
     for url, thumb, title in matches[item.page * item.perpage:]:
-        url = host[:-1] + url
+        if not host in url: url = host[:-1] + url
 
-        thumb = host[:-1] + thumb
+        if not host in thumb: thumb = host[:-1] + thumb
 
         title = title.strip()
 

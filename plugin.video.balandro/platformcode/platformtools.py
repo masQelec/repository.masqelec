@@ -233,7 +233,7 @@ def render_items(itemlist, parent_item):
 
         xbmcplugin.addDirectoryItem(handle=handle, url=item_url, listitem=listitem, isFolder=item.folder)
 
-    # Fijar los tipos de vistas...
+    # Fijar los tipos de vistas
     if parent_item.channel == 'mainmenu' or (parent_item.channel == 'tracking' and parent_item.action in ['mainlist','mainlist_listas']):
         # vista con: Lista amplia, Muro de iconos
         xbmcplugin.setContent(handle, '')
@@ -292,7 +292,7 @@ def set_infolabels(listitem, item, player=False):
     poster_image = item.poster if item.poster != '' else item.thumbnail
     listitem.setArt({'icon': icon_image, 'thumb': item.thumbnail, 'poster': poster_image, 'fanart': item.fanart})
 
-    # Para evitar algunas acciones de kodi en menú contextual (Play, Mark as watched, ...)
+    # Para evitar algunas acciones de kodi en menú contextual (Play, Mark as watched, etc.)
     if not item.folder:
        if item.action == 'configurar_proxies': return
        elif item.action == 'configurar_dominio': return
@@ -567,7 +567,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         # Server Various y anulados/controlados
         if apuntar:
-            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish']:
+            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7']:
                 apuntar = False
 
             elif it.server in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza', 'vanfem', 'youtvgratis', 'oceanplay', 'gotovideo.kiev.ua', 'owodeuwu', 'sypl', 'fembed9hd', 'watchse', 'vcdn', 'femoload', 'cubeembed']:
@@ -579,7 +579,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
             elif it.server in ['sbplay', 'sbplay1', 'sbplay2', 'pelistop', 'sbfast', 'sbfull', 'ssbstream', 'sbthe', 'sbspeed', 'cloudemb', 'tubesb', 'embedsb', 'playersb', 'sbcloud1', 'watchsb', 'viewsb', 'watchmo', 'streamsss', 'sblanh', 'sbanh', 'sblongvu', 'sbchill', 'sbrity', 'sbhight', 'sbbrisk', 'sbface', 'view345', 'sbone', 'sbasian', 'streaamss', 'lvturbo', 'sbnet', 'sbani', 'sbrapid', 'cinestart', 'vidmoviesb', 'sbsonic', 'sblona', 'likessb']:
                 apuntar = False
 
-            elif it.server in ['ddownload', 'dfiles', 'dropapk', 'fileflares', 'filerice', 'fireload', 'katfile', 'megaupload', 'oload', 'pandafiles', 'rockfile', 'turbobit', 'uploadrive', 'uppit', 'userload']:
+            elif it.server in ['ddownload', 'dfiles', 'dropapk', 'fileflares', 'filerice', 'fireload', 'katfile', 'megaupload', 'oload', 'pandafiles', 'rockfile', 'turbobit', 'uploadrive', 'uppit', 'userload', 'qiwi']:
                 apuntar = False
 
         if apuntar:
@@ -702,7 +702,7 @@ def play_from_itemlist(itemlist, parent_item):
     if autoplay:
         esperar_seleccion = False
         num_opciones = float(len(itemlist))
-        p_dialog = dialog_progress_bg('Reproducción con Auto Play', 'Espere por favor...')
+        p_dialog = dialog_progress_bg('Reproducción con Auto Play', 'Espere por favor ...')
         ok_play = False
 
         for i, it in enumerate(itemlist):
@@ -839,9 +839,10 @@ def play_video(item, parent_item, autoplay=False):
             dialog_ok("No se puede Reproducir porque ...", motivo, item.url)
         return False
 
-    if len(video_urls) == 1 and '.rar' in video_urls[0][0]:
-        if not autoplay: dialog_ok("No se puede Reproducir porque ...", '[COLOR crimson][B]Está comprimido en formato rar[/B][/COLOR]', item.url)
-        return False
+    if len(video_urls) == 1:
+        if '.rar' in video_urls[0][0] or '.zip' in video_urls[0][0]:
+            if not autoplay: dialog_ok("No se puede Reproducir porque ...", '[COLOR crimson][B]Está en formato Comprimido[/B][/COLOR]', item.url)
+            return False
 
     opciones = []
 
@@ -936,7 +937,7 @@ def get_video_seleccionado(item, seleccion, video_urls):
 
     # Si hay un tiempo de espera (como en megaupload), lo impone ahora
     if wait_time > 0:
-        continuar = handle_wait(wait_time, item.server, "Cargando vídeo...")
+        continuar = handle_wait(wait_time, item.server, "Cargando vídeo ...")
         if not continuar: mediaurl = ''
 
     return mediaurl, view, mpd
@@ -954,7 +955,7 @@ def handle_wait(time_to_wait, title, text):
         secs += 1
         percent = increment * secs
         secs_left = str((time_to_wait - secs))
-        remaining_display = "Espera " + secs_left + " segundos para iniciar el vídeo..."
+        remaining_display = "Espera " + secs_left + " segundos para iniciar el vídeo ..."
         espera.update(percent, ' ' + text, remaining_display)
         xbmc.sleep(1000)
         if espera.iscanceled():

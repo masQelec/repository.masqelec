@@ -507,8 +507,7 @@ def findvideos(item):
 
             srv = srv.lower().strip()
 
-            if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
-            elif srv == 'fembed': continue
+            if srv == 'fembed': continue
             elif srv == 'streamsb': continue
 
             elif srv == 'ok-ru': srv = 'okru'
@@ -533,8 +532,7 @@ def findvideos(item):
 
             srv = srv.lower().strip()
 
-            if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
-            elif srv == 'fembed': continue
+            if srv == 'fembed': continue
             elif srv == 'streamsb': continue
 
             elif srv == 'ok-ru': srv = 'okru'
@@ -558,8 +556,7 @@ def findvideos(item):
 
             srv = srv.lower().strip()
 
-            if srv == 'hqq' or srv == 'waaw' or srv == 'netu': continue
-            elif srv == 'fembed': continue
+            if srv == 'fembed': continue
             elif srv == 'streamsb': continue
 
             elif srv == 'ok-ru': srv = 'okru'
@@ -625,13 +622,10 @@ def play(item):
 
     if new_url: url = new_url
 
-    if '/cinestart.streams3.com/' in url: url = ''
+    if '/cinestart.' in url: url = ''
     elif '/player.php?' in url: url = ''
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-            return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

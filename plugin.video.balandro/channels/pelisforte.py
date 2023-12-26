@@ -176,6 +176,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ultimas-peliculas/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Harry Potter', action = 'list_all', url = host + 'sg/harry-potter-1670251190', search_type = 'movie', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'sg/marvel-mcu/', search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
@@ -311,6 +312,8 @@ def findvideos(item):
 
             if srv == 'ok': other = 'ok'
 
+            elif srv == 'playpf': servidor = 'directo'
+
             if servidor == 'directo': other = srv
 
             elif servidor == 'various': other = servertools.corregir_other(srv)
@@ -360,7 +363,7 @@ def play(item):
                     data = do_downloadpage(url)
                     url = scrapertools.find_single_match(data, '"url": "(.*?)"')
 
-                if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or 'gounlimited' in url:
+                if 'gounlimited' in url:
                     return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
                 elif '/guayhd.me/' in url:
                     return 'Servidor [COLOR plum]No Soportado[/COLOR]'
@@ -408,7 +411,7 @@ def play(item):
             if not url: url = scrapertools.find_single_match(data, '<IFRAME SRC="(.*?)"')
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or 'gounlimited' in url:
+        if 'gounlimited' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)

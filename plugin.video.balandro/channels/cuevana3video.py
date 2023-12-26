@@ -530,8 +530,6 @@ def findvideos(item):
             if url.startswith('//'): url = 'https:' + url
 
             if url:
-                if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
                 if 'pelisplay' in url:
                     data2 = do_downloadpage(url)
 
@@ -547,7 +545,6 @@ def findvideos(item):
                             url = servertools.normalize_url(servidor, link2)
 
                             if '/clonamesta' in url: continue
-                            elif '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url: continue
 
                             if servidor == 'directo' or servidor == 'various':
                                 link_other = normalize_other(url)
@@ -568,7 +565,6 @@ def findvideos(item):
                 url = servertools.normalize_url(servidor, url)
 
                 if '/clonamesta' in url: continue
-                elif '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url: continue
 
                 if servidor == 'directo' or servidor == 'various':
                     link_other = normalize_other(url)
@@ -604,7 +600,7 @@ def findvideos(item):
 
                            url = servertools.normalize_url(servidor, link2)
 
-                           if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url: continue
+                           if '/clonamesta' in url: continue
 
                            if servidor == 'directo' or servidor == 'various': link_other = normalize_other(url)
                            else: link_other = 'play'
@@ -862,7 +858,7 @@ def play(item):
                     return itemlist
 
     if url:
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/clonamesta' in url:
+        if '/clonamesta' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
         itemlist.append(item.clone(url = url, server = servidor))

@@ -111,7 +111,7 @@ def mainlist2(item):
                                 extra = 'included', folder = False ))
 
     if channels_search_included:
-        itemlist.append(item.clone( title = '[COLOR coral][B]Anular Todos los canales[/COLOR][/B] En las búsquedas de Solo determinados canales',
+        itemlist.append(item.clone( title = '[COLOR coral][B]Anular Todos los canales[/COLOR][/B] en las búsquedas de Solo determinados canales',
                                     action = 'channels_excluded_del', extra = 'included', folder = False, text_color='yellow' ))
 
     platformtools.itemlist_refresh()
@@ -825,7 +825,11 @@ def channels_excluded(item):
 
         if channels_search:
             channels_preselct = str(channels_search).replace('[', '').replace(']', ',')
-            if ("'" + ch['id'] + "'") in str(channels_preselct): info = info + '[COLOR violet][B]EXCLUIDO [/B][/COLOR]'
+
+            if item.extra == 'included': tex_ch = '[COLOR yellow][B]INCLUIDO [/B][/COLOR]'
+            else: tex_ch = '[COLOR violet][B]EXCLUIDO [/B][/COLOR]'
+
+            if ("'" + ch['id'] + "'") in str(channels_preselct): info = info + tex_ch
 
         if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
         elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
@@ -876,7 +880,8 @@ def channels_excluded_del(item):
     logger.info()
 
     if item.extra == 'included':
-        canales_excluidos = channels_search_included
+        cfg_includes = 'search_included_all'
+        canales_excluidos = config.get_setting(cfg_includes, default='')
         txt = 'Todos'
 
     elif item.extra == 'movies':
@@ -903,18 +908,48 @@ def channels_excluded_del(item):
     txt_excluidos = ''
 
     for orden_nro, id_canal in canales_excluidos:
+        if not id_canal: continue
+
         if not txt_excluidos: txt_excluidos = id_canal.capitalize()
         else: txt_excluidos += (', ' + id_canal.capitalize())
 
+        if item.only_one:
+            if not id_canal == item.from_channel: continue
+
+            if item.extra == 'included':
+               if platformtools.dialog_yesno(config.__addon_name + ' [COLOR greenyellow][B]Inclusiones[/B][/COLOR]', '[COLOR plum]' + id_canal + '[/COLOR]', '[COLOR red]¿ Desea Quitar el canal memorizado de Solo Buscar en ? [COLOR yellow] ' + txt + '[/COLOR]'):
+                   channels_search_included = config.get_setting(cfg_includes, default='')
+
+                   el_memorizado = "'" + id_canal + "'"
+
+                   if el_memorizado in channels_search_included:
+                       channels_search_included = str(channels_search_included).replace(el_memorizado, '').strip()
+                       config.set_setting(cfg_includes, channels_search_included)
+
+                   platformtools.itemlist_refresh()
+                   return
+
+    if not item.extra == 'included':
+        if txt_excluidos:
+            if not platformtools.dialog_yesno(config.__addon_name + ' [COLOR cyan][B]Exclusiones[/B][/COLOR]', '[COLOR plum][B]' + str(txt_excluidos) + '[/B][/COLOR]', '[COLOR red][B]¿ Desea anular los canales memorizados para excluirlos en las búsquedas de ? [COLOR yellow] ' + txt + '[/B][/COLOR]'):
+                return
+
     if item.extra == 'included':
-        if not platformtools.dialog_yesno(config.__addon_name + ' [COLOR greenyellow][B]Inclusiones[/B][/COLOR]', '[COLOR plum]' + str(txt_excluidos) + '[/COLOR]', '[COLOR red]¿ Desea anular los canales memorizados para Incluirlos de Nuevo en las búsquedas de ? [COLOR yellow] ' + txt + '[/COLOR]'):
-            return
+        if txt_excluidos:
+            if not platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]Inclusiones[/B][/COLOR]', '[COLOR plum][B]' + str(txt_excluidos) + '[/B][/COLOR]', '[COLOR red][B]¿ Desea anular los canales memorizados para Incluirlos de Nuevo en las búsquedas de ? [COLOR yellow] ' + txt + '[/B][/COLOR]'):
+                return
 
-    else:
-        if not platformtools.dialog_yesno(config.__addon_name + ' [COLOR cyan][B]Exclusiones[/B][/COLOR]', '[COLOR plum]' + str(txt_excluidos) + '[/COLOR]', '[COLOR red]¿ Desea anular los canales memorizados para excluirlos en las búsquedas de ? [COLOR yellow] ' + txt + '[/COLOR]'):
-            return
+        channels_search_included = config.get_setting(cfg_includes, default='')
 
-    if item.extra == 'included': config.set_setting(cfg_search_included, '')
+        if txt_excluidos:
+            el_memorizado = "'" + txt_excluidos + "'"
+            el_memorizado = el_memorizado.lower().strip()
+
+            if el_memorizado in channels_search_included:
+                channels_search_included = str(channels_search_included).replace(el_memorizado, '').strip()
+                config.set_setting(cfg_includes, channels_search_included)
+        else:
+            config.set_setting(cfg_search_included, '')
 
     elif item.extra == 'movies': config.set_setting(cfg_search_excluded_movies, '')
     elif item.extra == 'tvshows': config.set_setting(cfg_search_excluded_tvshows, '')

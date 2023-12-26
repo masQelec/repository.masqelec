@@ -342,8 +342,7 @@ def findvideos(item):
         if url:
             if url.startswith('//'): url = 'https:' + url
 
-            if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
-            elif '.estrenosdoramas.' in url: continue
+            if '.estrenosdoramas.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -372,7 +371,7 @@ def play(item):
        url = httptools.downloadpage(item.url, follow_redirects=False).headers.get('location', '')
 
        if url:
-           if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or '/gounlimited.' in url:
+           if '/gounlimited.' in url:
                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
            if url.startswith('https://odysee.com'):

@@ -162,7 +162,7 @@ def list_all(item):
         else:
            if '(' + year + ')' in title: title = title.replace('(' + year + ')', '').strip()
 
-        title = title.replace('&#8211;', '').replace('&#8217;', '')
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
 
         titulo = title
 
@@ -208,8 +208,6 @@ def findvideos(item):
         if not servidor: continue
 
         if 'trailer' in servidor: continue
-
-        elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue

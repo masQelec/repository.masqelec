@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast", "lat"],
 
-  "clusters": ["temporary", "current", "rankings", "years", "docs"],
+  "clusters": ["current", "rankings", "years", "docs"],
 
-  "notes": "Películas por géneros y año."
+  "notes": "Web CERRADA. Películas por géneros y año."
 }

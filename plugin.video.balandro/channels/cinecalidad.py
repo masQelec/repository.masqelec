@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://wv.cinecalidad.so/'
+host = 'https://cinecalidad.fi/'
 
 
 _players = ['https://cinecalidad.', '.cinecalidad.']
@@ -62,7 +62,8 @@ ant_hosts = ['https://www.cinecalidad.eu/', 'https://www.cinecalidad.im/', 'http
              'https://wv.cinecalidad.foo/', 'https://vwv.cinecalidad.foo/', 'https://wzw.cinecalidad.foo/',
              'https://v2.cinecalidad.foo/', 'https://www.cinecalidad.so/', 'https://wvw.cinecalidad.so/',
              'https://vww.cinecalidad.so/', 'https://wwv.cinecalidad.so/', 'https://vvv.cinecalidad.so/',
-             'https://ww.cinecalidad.so/', 'https://w.cinecalidad.so/', 'https://vvw.cinecalidad.so/']
+             'https://ww.cinecalidad.so/', 'https://w.cinecalidad.so/', 'https://vvw.cinecalidad.so/',
+             'https://wv.cinecalidad.so/', 'https://vvvv.cinecalidad.so/', 'https://wvvv.cinecalidad.so/']
 
 domain = config.get_setting('dominio', 'cinecalidad', default='')
 
@@ -563,7 +564,6 @@ def findvideos(item):
             if servidor == "trailer": continue
 
             elif servidor == 'veri': continue
-            elif servidor == 'netu': continue
             elif servidor == 'player': continue
             elif servidor == 'vip': continue
 
@@ -575,6 +575,8 @@ def findvideos(item):
 
             elif servidor == 'ok': servidor = 'okru'
 
+            elif servidor == 'google': servidor = 'gvideo'
+            elif servidor == 'drive': servidor = 'gvideo'
             elif servidor == 'google drive': servidor = 'gvideo'
 
             elif servidor == 'streamwish':
@@ -617,7 +619,6 @@ def findvideos(item):
             if servidor == "subtítulos" or servidor == 'subtitulos': continue
 
             elif servidor == 'veri': continue
-            elif servidor == 'netu': continue
 
             elif servidor == 'bittorrent': servidor = 'torrent'
 
@@ -626,6 +627,8 @@ def findvideos(item):
             elif 'voesx' in servidor: servidor = 'voe'
             elif servidor == 'maxplay': servidor = 'voe'
 
+            elif servidor == 'google': servidor = 'gvideo'
+            elif servidor == 'drive': servidor = 'gvideo'
             elif servidor == 'google drive': servidor = 'gvideo'
 
             if servertools.is_server_available(servidor):
@@ -651,7 +654,6 @@ def findvideos(item):
                 if servidor == "subtítulos" or servidor == 'subtitulos': continue
 
                 elif servidor == 'veri': continue
-                elif servidor == 'netu': continue
 
                 elif servidor == 'bittorrent': servidor = 'torrent'
 
@@ -722,14 +724,19 @@ def play(item):
 
     servidor = item.server
 
-    if not host_player in url:
-        for _player in _players:
-            if _player in url:
-                url_avis = url
-                if '/?' in url_avis: url_avis = url.split('?')[0]
+    # ~ por si esta en ant_hosts
+    if url.startswith("http"):
+        for ant in ant_hosts:
+            url = url.replace(ant, host_player)
 
-                platformtools.dialog_ok(config.__addon_name + ' CineCalidad', '[COLOR cyan][B]Al parecer el Canal cambió de Dominio.[/B][/COLOR]', '[COLOR yellow][B]' + url_avis + '[/B][/COLOR]', 'Por favor, Reviselo en [COLOR goldenrod][B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]')
-                return itemlist
+        if not host_player in url:
+            for _player in _players:
+                if _player in url:
+                    url_avis = url
+                    if '/?' in url_avis: url_avis = url.split('?')[0]
+
+                    platformtools.dialog_ok(config.__addon_name + ' CineCalidad', '[COLOR cyan][B]Al parecer el Canal cambió de Dominio.[/B][/COLOR]', '[COLOR yellow][B]' + url_avis + '[/B][/COLOR]', 'Por favor, Reviselo en [COLOR goldenrod][B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]')
+                    return itemlist
 
     if url:
         if host_player in url:
@@ -742,9 +749,6 @@ def play(item):
             if not url: url = scrapertools.find_single_match(data, "window.location.href = '(.*?)'")
 
             url = url.replace('&amp;', '&')
-
-            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
             if servidor == 'mega':
                if url.startswith('#'): url = 'https://mega.nz/' + url

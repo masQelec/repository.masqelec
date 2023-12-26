@@ -360,8 +360,6 @@ def findvideos(item):
 
         if 'trailer' in servidor: continue
 
-        elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
-
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
         else:

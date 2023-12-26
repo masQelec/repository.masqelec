@@ -130,8 +130,6 @@ def findvideos(item):
     for url, lang_srv in matches:
         ses += 1
 
-        if '/netu.' in url or '/hqq.' in url or '/waaw.' in url: continue
-
         lang = ''
 
         if ' - ' in lang_srv: lang = scrapertools.find_single_match(lang_srv, '.*?-(.*?)-').strip()
@@ -144,8 +142,6 @@ def findvideos(item):
            matches2 = scrapertools.find_multiple_matches(data2, '<li class="linkserver".*?data-video="(.*?)"')
 
            for match in matches2:
-               if '/netu.' in match or '/hqq.' in match or '/waaw.' in match: continue
-
                servidor = servertools.get_server_from_url(match)
                servidor = servertools.corregir_servidor(servidor)
 

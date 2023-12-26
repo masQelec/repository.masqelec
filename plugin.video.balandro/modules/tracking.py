@@ -102,7 +102,7 @@ def addFavourite(item):
         if item.contentType == 'movie': done, msg = trackingtools.scrap_and_save_movie(item.clone())
         else: done, msg = trackingtools.scrap_and_save_tvshow(item.clone())
     except:
-        msg = '[B][COLOR yellow]Comprobar modulos (.scrap_and_save_....)[/COLOR][/B]'
+        msg = '[B][COLOR yellow]Comprobar modulos (.scrap_and_save_...)[/COLOR][/B]'
 
     if not done:
         platformtools.dialog_ok(config.__addon_name, '[B][COLOR red]No se pudieron añadir los enlaces[/COLOR][/B]', msg)

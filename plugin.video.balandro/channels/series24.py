@@ -139,7 +139,7 @@ def generos(item):
 
     bloque = scrapertools.find_single_match(data, '>GÉNERO<(.*?)</ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?>(.*?)</a>')
 
     for url, title in matches:
         if config.get_setting('descartar_anime', default=False):
@@ -454,8 +454,6 @@ def findvideos(item):
 
         if 'trailer' in servidor: continue
 
-        elif 'hqq' in servidor or 'waaw' in servidor or 'netu' in servidor: continue
-
         servidor = servidor.replace('.tv', '').strip()
 
         lang = scrapertools.find_single_match(match, " src='.*?/flags/(.*?).png'")
@@ -487,9 +485,7 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(match, "<a href='(.*?)'")
 
-        if '/hqq.' in url or '/waaw.' in url or '/netu.' in url: continue
-
-        elif 'ul.to' in url: continue
+        if 'ul.to' in url: continue
         elif '.oboom.' in url: continue
 
         servidor = servertools.get_server_from_url(url, disabled_servers=True)

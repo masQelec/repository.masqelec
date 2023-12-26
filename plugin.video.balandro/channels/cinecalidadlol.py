@@ -590,7 +590,7 @@ def findvideos(item):
 
             srv = srv.lower().strip()
 
-            if srv == 'netu' or srv == 'waaw' or srv == 'hqq': continue
+            if srv == 'vip': continue
             elif '1fichier' in srv: continue
 
             servidor = servertools.get_server_from_url(url)
@@ -659,7 +659,9 @@ def findvideos(item):
             elif 'utorrent' in servidor: servidor = 'torrent'
             elif 'torrent' in servidor: servidor = 'torrent'
 
+            elif servidor == 'google': servidor = 'gvideo'
             elif servidor == 'drive': servidor = 'gvideo'
+            elif servidor == 'google drive': servidor = 'gvideo'
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
@@ -695,17 +697,18 @@ def play(item):
     servidor = item.server
 
     # ~ por si esta en ant_hosts
-    for ant in ant_hosts:
-        url = url.replace(ant, host_player)
+    if url.startswith("http"):
+        for ant in ant_hosts:
+            url = url.replace(ant, host_player)
 
-    if not host_player in url:
-        for _player in _players:
-            if _player in url:
-                url_avis = url
-                if '/?' in url_avis: url_avis = url.split('?')[0]
+        if not host_player in url:
+            for _player in _players:
+                if _player in url:
+                    url_avis = url
+                    if '/?' in url_avis: url_avis = url.split('?')[0]
 
-                platformtools.dialog_ok(config.__addon_name + ' CineCalidadLol', '[COLOR cyan][B]Al parecer el Canal cambió de Dominio.[/B][/COLOR]', '[COLOR yellow][B]' + url_avis + '[/B][/COLOR]', 'Por favor, Reviselo en [COLOR goldenrod][B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]')
-                return itemlist
+                    platformtools.dialog_ok(config.__addon_name + ' CineCalidadLol', '[COLOR cyan][B]Al parecer el Canal cambió de Dominio.[/B][/COLOR]', '[COLOR yellow][B]' + url_avis + '[/B][/COLOR]', 'Por favor, Reviselo en [COLOR goldenrod][B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]')
+                    return itemlist
 
     if host_player in url or str(_players) in url:
         data = do_downloadpage(url)
@@ -724,9 +727,6 @@ def play(item):
 
         if url:
             url = url.replace('&amp;', '&')
-
-            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
-                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
             if url:
                 servidor = servertools.get_server_from_url(url)

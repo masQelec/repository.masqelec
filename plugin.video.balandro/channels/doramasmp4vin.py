@@ -109,6 +109,7 @@ def list_all(item):
     data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, '</h1>(.*?)</h2>')
+    if not bloque: bloque = scrapertools.find_single_match(data, '</h1>(.*?)<div class="copy"')
 
     matches = re.compile('<article(.*?)</article>').findall(bloque)
     if not matches: matches = re.compile('<ul class="item se episodes"(.*?)</ul>').findall(bloque)
@@ -175,6 +176,7 @@ def last_epis(item):
     data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, '</h1>(.*?)</h2>')
+    if not bloque: bloque = scrapertools.find_single_match(data, '</h1>(.*?)<div class="copy"')
 
     matches = re.compile('<ul class="item se episodes"(.*?)</ul>').findall(bloque)
 
@@ -352,9 +354,7 @@ def findvideos(item):
 
                 if new_url: url = new_url
 
-            if '/hqq.' in url or '/netu.' in url or '/waaw.' in url: continue
-
-            elif '/cuevana3.nu' in url: continue
+            if '/cuevana3.nu' in url: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)

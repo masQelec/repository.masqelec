@@ -204,6 +204,8 @@ def findvideos(item):
 
         if not url or not servidor: continue
 
+        if servidor == 'qiwi': continue
+
         quality = 'HD'
         lang = 'Esp'
 
