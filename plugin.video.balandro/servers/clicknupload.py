@@ -56,6 +56,8 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
+    if not data: return video_urls
+
     if 'File Not Found' in data:
         return 'Archivo inexistente ó eliminado'
 

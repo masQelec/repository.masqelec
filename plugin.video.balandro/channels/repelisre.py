@@ -329,7 +329,7 @@ def clean_title(title):
     logger.info()
 
     title = title.replace('\\u00e1', 'a').replace('\\u00c1', 'a').replace('\\u00e9', 'e').replace('\\u00ed', 'i').replace('\\u00f3', 'o').replace('\\u00fa', 'u')
-    title = title.replace('\\u00f1', 'ñ').replace('\\u00bf', '¿').replace('\\u00a1', '¡').replace('\\u00ba', 'º')
+    title = title.replace('\\u00f1', 'ñ').replace('\\u00bf', '¿').replace('\\u00a1', '¡').replace('\\u00ba', 'º').replace('\\u2013', '-')
     title = title.replace('\\u00eda', 'a').replace('\\u00f3n', 'o').replace('\\u00fal', 'u').replace('\\u00e0', 'a')
     title = title.replace('\\u00c9', 'E').replace('\\u00da', 'U')
     title = title.replace("\\u00f3", "o").replace("\\u00ed", "i").replace("\\u00f1", "ñ").replace("&#8217;", "").replace("\\u00e1", "a").replace("\\u00e9", "e").replace("\\", "")

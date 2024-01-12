@@ -3,7 +3,7 @@
   "name": "SeriesMovil",
   "thumbnail": "seriesmovil.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["kids", "vos"],
 
-  "notes": "Web ANULADA. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Series por Géneros."
 }

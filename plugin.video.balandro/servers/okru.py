@@ -89,8 +89,10 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
-    if "copyrightsRestricted" in data or "COPYRIGHTS_RESTRICTED" in data or "LIMITED_ACCESS" in data:
+    if "copyrightsRestricted" in data or "COPYRIGHTS_RESTRICTED" in data or "copyrights_rstricted" in data or "limited_access" in data or "LIMITED_ACCESS" in data:
         return 'Archivo eliminado Violación Copyright'
+    elif 'author of this video has not been found or is blocked' in data:
+        return 'Autor del vídeo inexistente ó bloqueado'
     elif "notFound" in data:
         return 'Archivo inexistente ó eliminado'
 

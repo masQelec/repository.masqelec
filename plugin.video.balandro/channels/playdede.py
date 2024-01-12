@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -71,7 +71,7 @@ perpage = 21
 login_ok = '[COLOR chartreuse]PlayDede Login correcto[/COLOR]'
 login_ko = '[COLOR red][B]PlayDede Login incorrecto[/B][/COLOR]'
 no_login = '[COLOR orangered][B]PlayDede Sin acceso Login[/B][/COLOR]'
-start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
+start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR], Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
 
 datos_ko = '>Registrarme<'
 
@@ -330,7 +330,9 @@ def logout(item):
         config.set_setting('playdede_login', False, 'playdede')
         platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Sesión cerrada[/COLOR]')
 
-        platformtools.dialog_ok(config.__addon_name + ' PlayDede', '[COLOR yellow][B]Sesión Cerrada[/B][/COLOR].', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] e [COLOR chartreuse][B]Inicie Sesión[/B][/COLOR] de nuevo.')
+        if item:
+            if item.category: 
+                platformtools.dialog_ok(config.__addon_name + ' PlayDede', '[COLOR yellow][B]Sesión Cerrada[/B][/COLOR].', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] e [COLOR chartreuse][B]Inicie Sesión[/B][/COLOR] de nuevo.')
         return True
 
     platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]PlayDede Sin cerrar la Sesión[/B][/COLOR]')
@@ -464,6 +466,8 @@ def acciones(item):
     if not config.get_setting('playdede_login', 'playdede', default=False):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login', start_ses = True ))
+
+            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
             itemlist.append(Item( channel='domains', action='del_datos_playdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
@@ -472,6 +476,8 @@ def acciones(item):
 
     if config.get_setting('playdede_login', 'playdede', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
+
+        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
         itemlist.append(Item( channel='domains', action='del_datos_playdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
 
     itemlist.append(item_configurar_proxies(item))
@@ -1490,14 +1496,13 @@ def findvideos(item):
         ses += 1
 
         sid = scrapertools.find_single_match(match, 'data-loadPlayer="(.*?)"')
-        if not sid: sid = scrapertools.find_single_match(match, 'data-loadplayer="(.*?)"')
+        if not sid: sid = scrapertools.find_single_match(match, "data-loadplayer='(.*?)'")
 
         server = scrapertools.find_single_match(match, '<h3>(.*?)</h3>')
 
         if not server or not sid: continue
 
-        if server == 'waaw': continue
-        elif server == 'powvideo': continue
+        if server == 'powvideo': continue
         elif server == 'streamplay': continue
         elif server == 'alternativo': continue
         elif server == 'userload': continue
@@ -1532,8 +1537,7 @@ def findvideos(item):
 
         if not url or not server: continue
 
-        if server == 'waaw': continue
-        elif server == 'powvideo': continue
+        if server == 'powvideo': continue
         elif server == 'streamplay': continue
         elif server == 'alternativo': continue
         elif server == 'userload': continue
@@ -1564,10 +1568,13 @@ def findvideos(item):
 
         if not url or not server: continue
 
+        if '>recomendado<' in server: continue
+
         if '/ul.' in url: continue
         elif '/1fichier.' in url: continue
         elif '/ddownload.' in url: continue
         elif '/userload.' in url: continue
+        elif '/clk.' in url: continue
 
         if 'https://netload.cc/st?' in url:
              url = scrapertools.find_single_match(url, '&url=(.*?)$')
@@ -1734,6 +1741,15 @@ def clean_title(title, url):
         if titulo: title = titulo
 
     return title
+
+
+def shuw_credenciales(item):
+    logger.info()
+
+    username = config.get_setting('playdede_username', 'playdede', default='')
+    password = config.get_setting('playdede_password', 'playdede', default='')
+
+    platformtools.dialog_ok(config.__addon_name + ' PlayDede - Credenciales', 'User..:  [COLOR yellow][B]' + username, '[/B][/COLOR]Pass.:  [COLOR yellow][B]' + password + '[/B][/COLOR]')
 
 
 def search(item, texto):

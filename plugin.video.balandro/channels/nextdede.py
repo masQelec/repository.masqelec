@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
 import os, re, xbmcgui
 
 from platformcode import config, logger, platformtools
@@ -7,22 +12,58 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
+LINUX = False
+BR = False
+BR2 = False
+
+if PY3:
+    try:
+       import xbmc
+       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
+    except: pass
+
+try:
+   if LINUX:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+          BR2 = True
+       except: pass
+   else:
+       if PY3:
+           from lib import balandroresolver
+           BR = true
+       else:
+          try:
+             from lib import balandroresolver2 as balandroresolver
+             BR2 = True
+          except: pass
+except:
+   try:
+      from lib import balandroresolver2 as balandroresolver
+      BR2 = True
+   except: pass
+
+
 dominios = [
-         'https://nextdede.com',
-         'https://nextdede.top'
+         'https://nextdede.tv'
          ]
 
 
 host = config.get_setting('dominio', 'nextdede', default=dominios[0])
 
 
-_auth = 'c320057b61ca0b28047dd5e1982c8162'
+ant_hosts = ['https://nextdede.com', 'https://nextdede.top']
+
+
+if host in str(ant_hosts): config.set_setting('dominio', dominios[0], 'nextdede')
+
+useragent = httptools.get_user_agent()
 
 
 login_ok = '[COLOR chartreuse]NextDede Login correcto[/COLOR]'
 login_ko = '[COLOR red][B]NextDede Login incorrecto[/B][/COLOR]'
 no_login = '[COLOR orangered][B]NextDede Sin acceso Login[/B][/COLOR]'
-start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
+start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR], Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
 
 
 class login_dialog(xbmcgui.WindowDialog):
@@ -132,9 +173,41 @@ class login_dialog(xbmcgui.WindowDialog):
 def do_make_login_logout(url, post=None, headers=None):
     domain = config.get_setting('dominio', 'nextdede', default=dominios[0])
 
-    httptools.save_cookie('Auth', _auth, domain.replace('https://', ''))
+    hay_proxies = False
+    if config.get_setting('channel_nextdede_proxies', default=''): hay_proxies = True
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+    if not url.startswith(domain):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+    else:
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('nextdede', url, post=post, headers=headers, raise_weberror=False).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        if BR or BR2:
+            try:
+                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+                if ck_name and ck_value:
+                    httptools.save_cookie(ck_name, ck_value, domain.replace('https://', '')[:-1])
+
+                if not url.startswith(domain):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+                else:
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('nextdede', url, post=post, headers=headers, raise_weberror=False).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+            except:
+                pass
+
+    if '<title>Just a moment...</title>' in data:
+        platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
+    elif '"Recaptcha v3 site key"' in data:
+        platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]ReCaptcha[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -160,7 +233,7 @@ def login(item):
 
             if username:
                 if password:
-                    data = do_make_login_logout(domain + '/login')
+                    data = do_make_login_logout(domain + '/auth/login')
                     if not data: return False
         else:
             domain_unknow = True
@@ -189,7 +262,7 @@ def login(item):
            if domain_unknow: platformtools.dialog_notification(config.__addon_name + ' - NextDede', 'Comprobar Dominio [COLOR moccasin]' + domain + '[/COLOR]')
            return False
 
-       token = scrapertools.find_single_match(data, 'name="_TOKEN" value="(.*?)"')
+       token = scrapertools.find_single_match(data, '"csrf_token":"(.*?)"')
 
        user = scrapertools.find_single_match(data, username).strip()
 
@@ -214,9 +287,28 @@ def login(item):
         platformtools.dialog_notification(config.__addon_name, no_login)
         return False
 
-    post = {'email': email, 'password': password, '_ACTION': 'login', '_TOKEN': token}
+    post = {'email': email, 'password': password, 'remember': 'true'}
 
-    data = do_make_login_logout(domain + '/login', post=post, headers={'Referer': domain + '/login', 'Connection': 'keep-alive'})
+    headers = dict()
+    headers["User-Agent"] = useragent
+
+    headers["Accept"] = "application/json"
+    headers["Accept-Encoding"] = "gzip, deflate, br"
+
+    headers["Connection"] = "keep-alive"
+    headers["Content-Type"] = "application/json"
+
+    headers["Accept-Language"] = "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3"
+    headers["Sec-Fetch-Dest"] = "empty"
+    headers["Sec-Fetch-Mode"] = "cors"
+    headers["Sec-Fetch-Mode"] = "same-origin"
+
+    # ~ headers["XSRF-TOKEN"] = "eyJpdiI6IkhXU01oK3c0R0VDaVdqV09FTWdWUEE9PSIsInZhbHVlIjoiZmFpc0R6cU1UUUJTc0RwWjBIMWNJNUl1RWdZQm1VQ2kydU5KMnBtZURQNkI4Slc1NUUwZVdiVWUvcnVFVHdRdWg1ekZ6UTFmbXcwbzJEUGI1VmYxNUtRWkI0VklLTXRGVTNyVWNKaUF6aHZIMXR0cThSV2NucGFyNFVrMUM3Y0QiLCJtYWMiOiI0ZTgwMDY3ZWY1OWE5NGZkNGMzOTI5NzdmZGE1NTVlNjhjNzBhMTg4OWI3OTIwYTMyMTBiYTBjMzZjZGQyZmZjIiwidGFnIjoiIn0="
+    # ~ headers["nextdede_session"] = "eyJpdiI6Im12eEMxSis4czl2M3JnYndxTFZYNVE9PSIsInZhbHVlIjoiMTFhNGdOZ1lTVmd1QWtxc1lHRXR2VXJCVWcwRENNMUhHRWRnSjd2TVNNVGVPVWFJcUtxS1ZBU21IVjBDQTMrUXN6Y1UzVkJnek53ZWgrbFlrZEN5TDg5TFRVNHYxSXJaanRPNk9rTkVFaUN2WjJUWmRSYjJHY1R4VEtlMjBWb20iLCJtYWMiOiJjZDcyMzQ1NjI3YzhmOGMwNzBmOWUwMDA1YWRlNjM4NjFmMzFmMjcyZjU3Y2RlZGRkYTczMzBkMjVhMzNkZDMxIiwidGFnIjoiIn0="
+
+    headers["Referer"] = domain + '/acceder'
+
+    data = do_make_login_logout(domain + '/auth/login', post=post, headers=headers)
 
     if not data: return False
 
@@ -240,12 +332,14 @@ def logout(item):
     email = config.get_setting('nextdede_email', 'nextdede', default='')
 
     if email:
-        data = do_make_login_logout(domain + '/logout')
+        data = do_make_login_logout(domain + '/auth/logout')
 
         config.set_setting('nextdede_login', False, 'nextdede')
         platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]NextDede Sesión cerrada[/COLOR]')
 
-        platformtools.dialog_ok(config.__addon_name + ' NextDede', '[COLOR yellow][B]Sesión Cerrada[/B][/COLOR].', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] e [COLOR chartreuse][B]Inicie Sesión[/B][/COLOR] de nuevo.')
+        if item:
+            if item.category: 
+                platformtools.dialog_ok(config.__addon_name + ' NextDede', '[COLOR yellow][B]Sesión Cerrada[/B][/COLOR].', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] e [COLOR chartreuse][B]Inicie Sesión[/B][/COLOR] de nuevo.')
         return True
 
     platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]NextDede Sin cerrar la Sesión[/B][/COLOR]')
@@ -272,6 +366,42 @@ def configurar_dominio(item):
     return True
 
 
+def item_configurar_proxies(item):
+    dominio = config.get_setting('dominio', 'nextdede', default=dominios[0])
+
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_nextdede_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + dominio + ' necesitarás un proxy.'
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    dominio = config.get_setting('dominio', 'nextdede', default=dominios[0])
+
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, dominio)
+
+
 def do_downloadpage(url, post=None, headers=None, referer=None):
     username = config.get_setting('nextdede_username', 'nextdede', default='')
 
@@ -281,16 +411,53 @@ def do_downloadpage(url, post=None, headers=None, referer=None):
 
     domain = config.get_setting('dominio', 'nextdede', default=dominios[0])
 
+    # ~ por si viene de enlaces guardados posteriores
+    for ant in ant_hosts:
+        url = url.replace(ant, domain)
+
     # ~ por si viene de opcion menu pral. Generos
     if not domain in url:
         for dom in dominios:
             url = url.replace(dom, domain)
 
-    httptools.save_cookie('Auth', _auth, domain.replace('https://', ''))
-
     if not headers: headers= {'Referer': domain}
 
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    hay_proxies = False
+    if config.get_setting('channel_nextdede_proxies', default=''): hay_proxies = True
+
+    if not url.startswith(domain):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+    else:
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('nextdede', url, post=post, headers=headers, raise_weberror=False).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        if BR or BR2:
+            try:
+                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
+                if ck_name and ck_value:
+                    httptools.save_cookie(ck_name, ck_value, domain.replace('https://', '')[:-1])
+
+                if not url.startswith(domain):
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+                else:
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('nextdede', url, post=post, headers=headers, raise_weberror=False).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
+            except:
+                pass
+
+    if not '/search/' in url:
+        if '<title>Just a moment...</title>' in data:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+            return ''
+
+        elif '"Recaptcha v3 site key"' in data:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]ReCapctha[COLOR orangered] Protection[/B][/COLOR]')
+            return ''
 
     return data
 
@@ -321,6 +488,8 @@ def acciones(item):
     if not config.get_setting('nextdede_login', 'nextdede', default=False):
         if email:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login', start_ses = True ))
+
+            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
             itemlist.append(Item( channel='domains', action='del_datos_nextdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
@@ -329,9 +498,15 @@ def acciones(item):
 
     if config.get_setting('nextdede_login', 'nextdede', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
+
+        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
         itemlist.append(Item( channel='domains', action='del_datos_nextdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
 
     itemlist.append(item_configurar_dominio(item))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_nextdede', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     platformtools.itemlist_refresh()
 
@@ -823,6 +998,16 @@ def findvideos(item):
             return
 
     return itemlist
+
+
+def shuw_credenciales(item):
+    logger.info()
+
+    email = config.get_setting('nextdede_email', 'nextdede', default='')
+    password = config.get_setting('nextdede_password', 'nextdede', default='')
+    username = config.get_setting('nextdede_username', 'nextdede', default='')
+
+    platformtools.dialog_ok(config.__addon_name + ' NextDede - Credenciales', 'Email:  [COLOR yellow][B]' + email, '[/B][/COLOR]Pass.:  [COLOR yellow][B]' + password, '[/B][/COLOR]User..:  [COLOR yellow][B]' + username + '[/B][/COLOR]')
 
 
 def search(item, texto):

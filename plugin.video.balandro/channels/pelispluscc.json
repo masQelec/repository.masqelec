@@ -3,7 +3,7 @@
   "name": "PelisPlusCc",
   "thumbnail": "pelispluscc.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["news", "rankings", "years", "lasts", "docs", "anime", "dorama", "vos"],
 
-  "notes": "Web ANULADA. Películas por géneros y años. Series por Géneros."
+  "notes": "Películas por géneros y años. Series por Géneros."
 }
