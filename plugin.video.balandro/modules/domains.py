@@ -21,9 +21,9 @@ from modules import tester
 
 channels_currents = [
         'animefenix', 'animeflv', 'animeid', 'animeonline',
-        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cliversite', 'cuevana2esp', 'cuevana3lw', 'cuevana3video',
+        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cliversite', 'cuevana2', 'cuevana2esp', 'cuevana3lw', 'cuevana3video',
         'divxtotal', 'dontorrents', 'dontorrentsin', 'doramedplay',
-        'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelas', 'ennovelasonline', 'entrepeliculasyseries', 'estrenosdoramas',
+        'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelas', 'ennovelasonline', 'ennovelastv', 'entrepeliculasyseries', 'estrenosdoramas',
         'gnula24', 'gnula24h', 'grantorrent', 'grantorrents',
         'hdfull', 'hdfullse', 'henaojara',
         'mejortorrentapp', 'mejortorrentnz', 'mitorrent',
@@ -38,6 +38,7 @@ channels_currents = [
         ]
 
 dominioshdfull = [
+         'https://hd-full.in/',
          'https://hd-full.im/',
          'https://hd-full.one/',
          'https://hdfull.icu/',
@@ -422,6 +423,52 @@ def test_domain_cliversite(item):
         tester.test_channel('CliverSite')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - CliverSite', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
+def manto_domain_cuevana2(item):
+    logger.info()
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana2[/B][/COLOR]' % color_exec)
+
+    channel_json = 'cuevana2.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_cuevana2(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('cuevana2')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('Cuevana2')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - Cuevana2', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_cuevana2esp(item):
@@ -1070,6 +1117,52 @@ def test_domain_ennovelasonline(item):
         tester.test_channel('EnNovelasOnline')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - EnNovelasOnline', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
+def manto_domain_ennovelastv(item):
+    logger.info()
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EnNovelasTv[/B][/COLOR]' % color_exec)
+
+    channel_json = 'ennovelastv.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_ennovelastv(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('ennovelastv')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('EnNovelasTv')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - EnNovelasTv', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_entrepeliculasyseries(item):
@@ -3848,6 +3941,16 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://': return
 
+    elif id == 'cuevana2':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Cuevana2  -->  [COLOR %s]https://???.cuevana2.???/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://': return
+
     elif id == 'cuevana2esp':
         config.set_setting('user_test_channel', '')
 
@@ -3964,6 +4067,16 @@ def manto_domain_common(item, id, name):
         if not domain: domain = 'https://'
 
         new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio EnNovelasOnline  -->  [COLOR %s]https://??.ennovelas.online/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://': return
+
+    elif id == 'ennovelastv':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio EnNovelasTv  -->  [COLOR %s]https://?.ennovelas-tv.com/[/COLOR]' % color_avis)
 
         if new_domain is None: return
         elif new_domain == 'https://': return

@@ -3,7 +3,7 @@
   "name": "SeriesTurcas",
   "thumbnail": "seriesturcas.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["problematic", "lasts", "vos", "tales"],
 
-  "notes": "Web dedicada principalmente en Novelas. Películas y Series"
+  "notes": "Web ANULADA. Web dedicada principalmente en Novelas. Películas y Series"
 }

@@ -298,7 +298,7 @@ def findvideos(item):
             elif 'powvideo' in url: continue
             elif 'streamplay' in url: continue
 
-            elif '/vidsrc.to' in url: continue
+            elif '/vidsrc.' in url: continue
 
             url = url.replace('/.html', '/')
 
@@ -349,7 +349,7 @@ def findvideos(item):
             elif 'powvideo' in url: continue
             elif 'streamplay' in url: continue
 
-            elif '/vidsrc.to' in url: continue
+            elif '/vidsrc.' in url: continue
 
             url = url.replace('/.html', '/')
 

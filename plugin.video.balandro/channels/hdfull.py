@@ -49,6 +49,7 @@ except:
 
 
 dominios = [
+         'https://hd-full.in/',
          'https://hd-full.im/',
          'https://hd-full.one/',
          'https://hdfull.icu/',
@@ -75,8 +76,11 @@ ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
              'https://hdfull.digital/']
 
 
+if host in str(ant_hosts): config.set_setting('dominio', dominios[0], 'hdfull')
+
+
 login_ok = '[COLOR chartreuse]HdFull Login correcto[/COLOR]'
-start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR]', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
+start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR], Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
 
 perpage = 20
 
@@ -313,7 +317,9 @@ def logout(item):
 
     platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]HdFull Sesión cerrada[/COLOR]')
 
-    platformtools.dialog_ok(config.__addon_name + ' HdFull', '[COLOR yellow][B]Sesión Cerrada[/B][/COLOR].', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] e [COLOR chartreuse][B]Inicie Sesión[/B][/COLOR] de nuevo.')
+    if item:
+        if item.category: 
+            platformtools.dialog_ok(config.__addon_name + ' HdFull', '[COLOR yellow][B]Sesión Cerrada[/B][/COLOR].', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] e [COLOR chartreuse][B]Inicie Sesión[/B][/COLOR] de nuevo.')
 
 
 def item_configurar_dominio(item):
@@ -416,12 +422,12 @@ def do_downloadpage(url, post=None, referer=None):
                     httptools.save_cookie(ck_name, ck_value, domain.replace('https://', '')[:-1])
 
                 if not url.startswith(domain):
-                    data = httptools.downloadpage(url, post=post, raise_weberror=False).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
                 else:
                     if hay_proxies:
-                        data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
+                        data = httptools.downloadpage_proxy('hdfull', url, post=post, headers=headers, raise_weberror=False).data
                     else:
-                        data = httptools.downloadpage(url, post=post, raise_weberror=False).data
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
             except:
                 pass
 
@@ -473,6 +479,8 @@ def acciones(item):
     if not config.get_setting('hdfull_login', 'hdfull', default=False):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login', start_ses = True ))
+
+            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
             itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
@@ -481,6 +489,8 @@ def acciones(item):
 
     if config.get_setting('hdfull_login', 'hdfull', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
+
+        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
         itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
 
     itemlist.append(item_configurar_dominio(item))
@@ -1309,6 +1319,15 @@ def list_listas(item):
                 itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, pageaction = 'list_listas', text_color = 'coral' ))
 
     return itemlist
+
+
+def shuw_credenciales(item):
+    logger.info()
+
+    username = config.get_setting('hdfull_username', 'hdfull', default='')
+    password = config.get_setting('hdfull_password', 'hdfull', default='')
+
+    platformtools.dialog_ok(config.__addon_name + ' HdFull - Credenciales', 'User..:  [COLOR yellow][B]' + username, '[/B][/COLOR]Pass.:  [COLOR yellow][B]' + password + '[/B][/COLOR]')
 
 
 def search(item, texto):

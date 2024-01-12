@@ -513,6 +513,8 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
 
+    elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
+
     elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
 
     elif item.from_channel == 'cuevana3lw': domains.manto_domain_cuevana3lw(item)
@@ -536,6 +538,8 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'ennovelas': domains.manto_domain_ennovelas(item)
 
     elif item.from_channel == 'ennovelasonline': domains.manto_domain_ennovelasonline(item)
+
+    elif item.from_channel == 'ennovelastv': domains.manto_domain_ennovelastv(item)
 
     elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
 
@@ -786,6 +790,13 @@ def _proxies(item):
 
         if config.get_setting('channel_cliversite_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'cuevana2':
+        from channels import cuevana2
+        item.channel = 'cuevana2'
+        cuevana2.configurar_proxies(item)
+
+        if config.get_setting('channel_cuevana2_proxies') is None: refrescar = False
+
     elif item.from_channel == 'cuevana2esp':
         from channels import cuevana2esp
         item.channel = 'cuevana2esp'
@@ -820,13 +831,6 @@ def _proxies(item):
         divxtotal.configurar_proxies(item)
 
         if config.get_setting('channel_divxtotal_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'divxtotalcc':
-        from channels import divxtotalcc
-        item.channel = 'divxtotalcc'
-        divxtotalcc.configurar_proxies(item)
-
-        if config.get_setting('channel_divxtotalcc_proxies') is None: refrescar = False
 
     elif item.from_channel == 'dontorrents':
         from channels import dontorrents
@@ -989,6 +993,13 @@ def _proxies(item):
 
         if config.get_setting('channel_mirapeliculas_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'nextdede':
+        from channels import nextdede
+        item.channel = 'nextdede'
+        nextdede.configurar_proxies(item)
+
+        if config.get_setting('channel_nextdede_proxies') is None: refrescar = False
+
     elif item.from_channel == 'naranjatorrent':
         from channels import naranjatorrent
         item.channel = 'naranjatorrent'
@@ -1093,6 +1104,13 @@ def _proxies(item):
         plushd.configurar_proxies(item)
 
         if config.get_setting('channel_plushd_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'ppeliculas':
+        from channels import ppeliculas
+        item.channel = 'ppeliculas'
+        ppeliculas.configurar_proxies(item)
+
+        if config.get_setting('channel_ppeliculas_proxies') is None: refrescar = False
 
     elif item.from_channel == 'reinventorrent':
         from channels import reinventorrent
@@ -1205,6 +1223,13 @@ def _proxies(item):
         yestorrent.configurar_proxies(item)
 
         if config.get_setting('channel_yestorrent_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'zonaleros':
+        from channels import zonaleros
+        item.channel = 'zonaleros'
+        zonaleros.configurar_proxies(item)
+
+        if config.get_setting('channel_zonaleros_proxies') is None: refrescar = False
 
     else:
         platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Falta _Proxies[/B][/COLOR]' % color_alert)

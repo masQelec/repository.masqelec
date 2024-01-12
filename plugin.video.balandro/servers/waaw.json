@@ -49,7 +49,7 @@
         "url": "https://waaw.to/watch_video.php?v=\\1"
       },
       {
-        "pattern": "(?:hqq|megaplay|netu).(?:ac|tv|watch|to|cc|wiztube.xyz)/player/embed_player.php?vid=([A-z0-9]+)",
+        "pattern": "(?:hqq|waaw|netu|waaw1|megaplay|pbtube|wiztube).(?:ac|tv|watch|to|cc|xyz)/player/embed_player.php?vid=([A-z0-9]+)",
         "url": "https://waaw.to/watch_video.php?v=\\1"
       },
       {

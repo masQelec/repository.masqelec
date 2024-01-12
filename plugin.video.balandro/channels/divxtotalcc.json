@@ -3,7 +3,7 @@
   "name": "DivxTotalCc",
   "thumbnail": "divxtotalcc.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["problematic", "torrents", "news", "lasts", "qualityes", "kids", "docs", "anime", "3d"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas por géneros y calidad. También series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web ANULADA. Canal con enlaces Torrent exclusivamente. Películas por géneros y calidad. También series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

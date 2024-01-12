@@ -1,15 +1,15 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 3.1.05[/COLOR] [COLOR chartreuse] 20 de Diciembre de 2023[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.00[/COLOR] [COLOR chartreuse] 7 de Enero de 2024[/B][/COLOR]
 
  [COLOR yellow]CONTACTO:[/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
     Telegram  [COLOR aquamarine][B][I]t.me/balandro_asesor[/I][/B][/COLOR]  Asesoramiento, Dudas, Consultas, etc.
 
  [COLOR yellow]FUENTE:[/COLOR]
-    Fuente  [COLOR deepskyblue][B][I]https://balandro-tk.github.io/balandro/[/I][/B][/COLOR]  Repositorio, Add-On, Scripts
+    Fuente  [COLOR deepskyblue][B][I]https://repobal.github.io/base/[/I][/B][/COLOR]  Repositorio, Add-On, Scripts
 
  [COLOR yellow]DESARROLLO:[/COLOR]
     Telegram [COLOR aqua][B][I] t.me/balandro_team [/I][/B][/COLOR]  Unirse al Equipo de Desarrollo
-    Fuentes  [COLOR olivedrab][B][I]https://github.com/balandro-tk/balandro-addon[/I][/B][/COLOR]  Mantenimiento Add-On
+    Fuentes  [COLOR olivedrab][B][I]https://github.com/repobal[/I][/B][/COLOR]  Mantenimiento Add-On
     Incorporaciones [COLOR indianred][B]Solo con Enlace de Invitacion, solicitarlo en Foro o Telegram[/B][/COLOR]
 
  [COLOR yellow]MEDIA CENTERS:[/COLOR]
@@ -29,15 +29,11 @@
 
  [COLOR yellow]MODIFICACIONES:[/COLOR]
     [COLOR moccasin][B]Correcciones:[/B][/COLOR]
-       Bugs de la version anterior
+       Errores detectados
+       Revision generalizada
        Generos: Re-configurados
-
-       Canales:
-          Revision generalizada
-          Anulados las webs cerradas
-       Servidores:
-          Revision generalizada
-          Anulados las webs cerradas
+       Canales: Anulados las webs cerradas o inoperativas
+       Servidores: Anulados las webs cerradas o inoperativas
 
     [COLOR moccasin][B]Novedades:[/B][/COLOR]
        Canales: Sin novedades
@@ -53,8 +49,7 @@
  [COLOR yellow]CANALES PROBLEMATICOS:[/COLOR]
     [COLOR springgreen][B]Son en los que Predominan Sin enlaces Disponibles, Invalidos y/o Servidores No Soportados[/B][/COLOR]
     CiberDocumentales,  CineDeAntes,  CinematteFlix,
-    DivxTotalCc,  RetroTv,  SeriesRetro,  SeriesTurcas,
-    SigloXX,  TuPeliculaTv
+    RetroTv,  SeriesRetro,  SigloXX,  TuPeliculaTv
 
  [COLOR yellow]CANALES INESTABLES:[/COLOR]
     [COLOR springgreen][B]Son los pendientes de su evolucion, para decidir su Situacion Definitiva[/B][/COLOR]
@@ -62,7 +57,7 @@
 
  [COLOR yellow]CANALES TEMPORALMENTE DES-ACTIVADOS:[/COLOR]
     [COLOR springgreen][B]Son los pendientes de su situacion, para decidir su Re-activacion o Anulacion[/B][/COLOR]
-    DocumaniaTv
+    DocumaniaTv,  NextDede
 
  [COLOR yellow]SERVIDORES VIAS ALTERNATIVAS/ADICIONALES QUE PUEDEN NECESITARSE:[/COLOR]
     plugin.video.youtube

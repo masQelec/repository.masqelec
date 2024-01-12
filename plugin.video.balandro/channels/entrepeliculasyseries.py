@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -98,6 +98,8 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
         url = url.replace(ant, host)
+
+    if not headers: headers = {'Referer': url, 'Connection': 'keep-alive'}
 
     hay_proxies = False
     if config.get_setting('channel_entrepeliculasyseries_proxies', default=''): hay_proxies = True
@@ -353,9 +355,9 @@ def list_all(item):
                 buscar_next = False
 
         if buscar_next:
-            if "<span aria-current='page' class='current'>" in data:
+            if '<span aria-current="page" class="current">' in data:
                 if '>Ultima »</a>' in data:
-                    next_page_link = scrapertools.find_single_match(data, "<span aria-current='page' class='current'>.*?href=(.*?)>")
+                    next_page_link = scrapertools.find_single_match(data, '<span aria-current="page" class="current">.*?href="(.*?)"')
 
                     if next_page_link != '':
                         next_page_link =  next_page_link.replace('"', '')

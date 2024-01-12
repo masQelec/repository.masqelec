@@ -346,6 +346,7 @@ def manto_params(item):
         config.set_setting('channel_cinecalidadla_dominio', '')
         config.set_setting('channel_cinecalidadlol_dominio', '')
         config.set_setting('channel_cliversite_dominio', '')
+        config.set_setting('channel_cuevana2_dominio', '')
         config.set_setting('channel_cuevana2esp_dominio', '')
         config.set_setting('channel_cuevana3lw_dominio', '')
         config.set_setting('channel_cuevana3video_dominio', '')
@@ -360,6 +361,7 @@ def manto_params(item):
         config.set_setting('channel_elitetorrentnz_dominio', '')
         config.set_setting('channel_ennovelas_dominio', '')
         config.set_setting('channel_ennovelasonline_dominio', '')
+        config.set_setting('channel_ennovelastv_dominio', '')
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
         config.set_setting('channel_estrenosdoramas_dominio', '')
 
@@ -484,7 +486,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '120.0.6099.71')
+        config.set_setting('chrome_last_version', '120.0.6099.130')
 
         config.set_setting('debug', '0')
 
@@ -1372,6 +1374,10 @@ def opciones_cliversite(item):
     item.from_channel = 'cliversite'
     opciones_domains_common(item)
 
+def opciones_cuevana2(item):
+    item.from_channel = 'cuevana2'
+    opciones_domains_common(item)
+
 def opciones_cuevana2esp(item):
     item.from_channel = 'cuevana2esp'
     opciones_domains_common(item)
@@ -1418,6 +1424,10 @@ def opciones_ennovelas(item):
 
 def opciones_ennovelasonline(item):
     item.from_channel = 'ennovelasonline'
+    opciones_domains_common(item)
+
+def opciones_ennovelastv(item):
+    item.from_channel = 'ennovelastv'
     opciones_domains_common(item)
 
 def opciones_entrepeliculasyseries(item):
@@ -1636,6 +1646,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
 
+            elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
+
             elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
 
             elif item.from_channel == 'cuevana3lw': domains.manto_domain_cuevana3lw(item)
@@ -1659,6 +1671,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'ennovelas': domains.manto_domain_ennovelas(item)
 
             elif item.from_channel == 'ennovelasonline': domains.manto_domain_ennovelasonline(item)
+
+            elif item.from_channel == 'ennovelastv': domains.manto_domain_ennovelastv(item)
 
             elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
 
@@ -1756,6 +1770,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cliversite': domains.test_domain_cliversite(item)
 
+            elif item.from_channel == 'cuevana2': domains.test_domain_cuevana2(item)
+
             elif item.from_channel == 'cuevana2esp': domains.test_domain_cuevana2esp(item)
 
             elif item.from_channel == 'cuevana3lw': domains.test_domain_cuevana3lw(item)
@@ -1779,6 +1795,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'ennovelas': domains.test_domain_ennovelas(item)
 
             elif item.from_channel == 'ennovelasonline': domains.test_domain_ennovelasonline(item)
+
+            elif item.from_channel == 'ennovelastv': domains.test_domain_ennovelastv(item)
 
             elif item.from_channel == 'entrepeliculasyseries': domains.test_domain_entrepeliculasyseries(item)
 

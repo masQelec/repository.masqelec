@@ -447,7 +447,7 @@ def corregir_servidor(servidor):
     elif servidor in ['streamz', 'streamzz']: return 'streamz'
     elif servidor in ['vevio', 'vev']: return 'vevio'
     elif servidor in ['vsmobi', 'v-s']: return 'vsmobi'
-    elif servidor in ['doodstream', 'dood', 'dooood', 'ds2play', 'doods']: return 'doodstream'
+    elif servidor in ['doodstream', 'dood', 'dooood', 'ds2play', 'doods', 'ds2video', 'd0o0d']: return 'doodstream'
     elif servidor in ['archiveorg', 'archive.org', 'archive']: return 'archiveorg'
     elif servidor in ['youtube', 'youtu']: return 'youtube'
     elif servidor in ['mp4upload', 'mp4up']: return 'mp4upload'
@@ -462,7 +462,7 @@ def corregir_servidor(servidor):
     elif servidor == 'uptostream': return 'uptobox'
     elif servidor == ['pixel']: return 'pixeldrain'
 
-    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7']: return 'various'
+    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'hexload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhidepro', 'hxfile', 'drop', 'embedv', 'vgplayer']: return 'various'
 
     else: return servidor
 
@@ -478,7 +478,9 @@ def corregir_other(srv):
     elif 'fastupload' in srv: srv = 'Fastupload'
     elif 'dropload' in srv: srv = 'Dropload'
     elif 'krakenfiles' in srv: srv = 'Krakenfiles'
-    elif 'hexupload' in srv: srv = 'Hexupload'
+
+    elif 'hexupload' in srv or 'hexload' in srv: srv = 'Hexupload'
+
     elif 'embedgram' in srv: srv = 'Embedgram'
     elif 'embedrise' in srv: srv = 'Embedrise'
     elif 'streamvid' in srv: srv = 'Streamvid'
@@ -492,7 +494,7 @@ def corregir_other(srv):
     elif 'moonplayer' in srv: srv = 'Moonplayer'
     elif 'yadi' in srv: srv = 'Yandex'
 
-    elif 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv or 'wishfast' in srv or 'doodporn' in srv or 'sfastwish' in srv or 'flaswish' in srv: srv = 'Streamwish'
+    elif 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv or 'wishfast' in srv or 'doodporn' in srv or 'sfastwish' in srv or 'flaswish' in srv or 'obeywish' in srv: srv = 'Streamwish'
 
     elif 'desiupload' in srv: srv = 'Desiupload'
 
@@ -502,7 +504,7 @@ def corregir_other(srv):
 
     elif 'vudeo' in srv: srv = 'Vudeo'
 
-    elif 'vidguard' in srv or 'vgfplay' in srv or 'vgembed' in srv or 'v6embed' in srv or 'vembed' in srv or 'vid-guard' in srv: srv = 'Vidguard'
+    elif 'vidguard' in srv or 'vgfplay' in srv or 'vgembed' in srv or 'v6embed' in srv or 'vembed' in srv or 'vid-guard' in srv or 'embedv' in srv or 'vgplayer' in srv: srv = 'Vidguard'
 
     elif 'lulustream' in srv or 'luluvdo' in srv: srv = 'Lulustream'
 
@@ -515,6 +517,14 @@ def corregir_other(srv):
     elif 'vidspeed' in srv or 'vidspeeds' in srv: srv = 'Vidspeed'
 
     elif 'vkspeed' in srv or 'vkspeed7' in srv: srv = 'Vkspeed'
+
+    elif 'twitch' in srv: srv = 'Twitch'
+
+    elif 'vidhidepro' in srv: srv = 'Vidhidepro'
+
+    elif 'hxfile' in srv: srv = 'Hxfile'
+
+    elif 'drop' in srv: srv = 'Drop'
 
     return srv
 

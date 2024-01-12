@@ -23,7 +23,6 @@ def get_video_url(page_url, url_referer=''):
 
     subtitulo = scrapertools.find_single_match(data, 'tracks\s*:\s*\[{file:"(.*?)"')
     if "http" not in subtitulo and subtitulo != '':
-        # ~ subtitulo = "http://fastplay.cc" + subtitulo
         subtitulo = "http://fastplay.to" + subtitulo
 
     if videos:

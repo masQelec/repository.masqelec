@@ -48,13 +48,13 @@ def get_video_url(page_url, url_referer=''):
         elif 'fastupload' in page_url: txt_server = 'Fastupload'
         elif 'dropload' in page_url: txt_server = 'Dropload'
         elif 'krakenfiles' in page_url: txt_server = 'Krakenfiles'
-        elif 'hexupload' in page_url: txt_server = 'Hexupload'
         elif 'embedgram' in page_url: txt_server = 'Embedgram'
         elif 'embedrise' in page_url: txt_server = 'Embedrise'
         elif 'streamvid' in page_url: txt_server = 'Streamvid'
         elif 'vidello' in page_url: txt_server = 'Vidello'
-
         elif 'upload.do' in page_url: txt_server = 'Uploaddo'
+        elif 'hxfile' in page_url: txt_server = 'Hxfile'
+        elif 'drop' in page_url: txt_server = 'Drop'
 
         elif 'filemoon' in page_url:
               txt_server = 'Filemoon'
@@ -82,10 +82,10 @@ def get_video_url(page_url, url_referer=''):
               txt_server = 'Yandex'
               page_url = page_url.replace('/yadi.sk/', '/disk.yandex.ru/')
 
-        elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url:
+        elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url:
               txt_server = 'Streamwish'
               page_url = page_url.replace('/streamwish.com/', '/streamwish.to/').replace('/streamwish.top/', '/streamwish.to/').replace('/streamwish.site/', '/streamwish.to/').replace('/strwish.xyz/', '/streamwish.to/').replace('/embedwish.com/', '/streamwish.to/').replace('/wishembed.pro/', '/streamwish.to/')
-              page_url = page_url.replace('/awish.pro/', '/streamwish.to/').replace('/dwish.pro/', '/streamwish.to/').replace('/mwish.pro/', '/streamwish.to/').replace('/wishfast.top/', '/streamwish.to/').replace('sfastwish.com', '/streamwish.to/').replace('/doodporn.xyz/', '/streamwish.to/').replace('/flaswish.com/', '/streamwish.to/')
+              page_url = page_url.replace('/awish.pro/', '/streamwish.to/').replace('/dwish.pro/', '/streamwish.to/').replace('/mwish.pro/', '/streamwish.to/').replace('/wishfast.top/', '/streamwish.to/').replace('sfastwish.com', '/streamwish.to/').replace('/doodporn.xyz/', '/streamwish.to/').replace('/flaswish.com/', '/streamwish.to/').replace('/obeywish.com/', '/streamwish.to/')
 
         elif 'desiupload' in page_url:
               txt_server = 'Desiupload'
@@ -109,9 +109,9 @@ def get_video_url(page_url, url_referer=''):
               txt_server = 'Vudeo'
               page_url = page_url.replace('/vudeo.net/', '/vudeo.co/').replace('/vudeo.io/', '/vudeo.co/')
 
-        elif 'vidguard' in page_url or 'vgfplay' in page_url or 'vgembed' in page_url or 'v6embed' in page_url or 'vembed' in page_url or 'vid-guard' in page_url:
+        elif 'vidguard' in page_url or 'vgfplay' in page_url or 'vgembed' in page_url or 'v6embed' in page_url or 'vembed' in page_url or 'vid-guard' in page_url or 'embedv':
               txt_server = 'Vidguard'
-              page_url = page_url.replace('/vidguard.to/', '/vgembed.com/').replace('/vgfplay.com/', '/vgembed.com/').replace('/vgfplay.xyz/', '/vgembed.com/').replace('/v6embed.xyz/', '/vgembed.com/').replace('/vembed.net/', '/vgembed.com/').replace('/vid-guard.com/', '/vgembed.com/')
+              page_url = page_url.replace('/vidguard.to/', '/vgembed.com/').replace('/vgfplay.com/', '/vgembed.com/').replace('/vgfplay.xyz/', '/vgembed.com/').replace('/vgplayer.xyz/', '/vgembed.com/').replace('/v6embed.xyz/', '/vgembed.com/').replace('/vembed.net/', '/vgembed.com/').replace('/vembed.org/', '/vgembed.com/').replace('/vid-guard.com/', '/vgembed.com/').replace('/embedv.net/', '/vgembed.com/')
 
         elif 'lulustream' in page_url or 'luluvdo' in page_url:
               txt_server = 'Lulustream'
@@ -127,12 +127,24 @@ def get_video_url(page_url, url_referer=''):
 
         elif 'vidspeed' in page_url or 'vidspeeds' in page_url:
               txt_server = 'Vidspeed'
-              page_url = page_url.replace('/www.vidspeeds.com/', '/vidspeed.cc/')
+              page_url = page_url.replace('/www.vidspeeds.com/', '/vidspeed.cc/').replace('/vidspeeds.com/', '/vidspeed.cc/')
               page_url = page_url.replace('/embed-', '/')
 
         elif 'vkspeed' in page_url or 'vkspeed7' in page_url:
               txt_server = 'Vkspeed'
               page_url = page_url.replace('/vkspeed7.com/', '/vkspeed.com/')
+
+        elif 'hexupload' in page_url or 'hexload' in page_url:
+              txt_server = 'Hexupload'
+              page_url = page_url.replace('/hexload.com/', '/hexupload.net/')
+
+        elif 'twitch' in page_url:
+              txt_server = 'Twitch'
+              page_url = page_url.replace('/player.twitch.tv/', '/www.twitch.tv/')
+
+        elif 'vidhidepro' in page_url:
+              txt_server = 'Vidhidepro'
+              page_url = page_url.replace('/vidhidepro.com/v/', '/vidhidepro.com/s/').replace('/vidhidepro.com/f/', '/vidhidepro.com/s/').replace('/vidhidepro.com/embed/', '/vidhidepro.com/s/')
 
         if config.get_setting('servers_time', default=True):
             platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
@@ -148,7 +160,8 @@ def get_video_url(page_url, url_referer=''):
 
             if resuelto:
                 if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
-                else: video_urls.append(['mp4', resuelto])
+                elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
+                else: video_urls.append(['', resuelto])
                 return video_urls
 
             color_exec = config.get_setting('notification_exec_color', default='cyan')
