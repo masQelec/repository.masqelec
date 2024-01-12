@@ -31,7 +31,7 @@ color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 
 _foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/ [/I][/B][/COLOR]"
-_source = "[COLOR coral][B][I] https://balandro-tk.github.io/balandro/ [/I][/B][/COLOR]"
+_source = "[COLOR coral][B][I] https://repobal.github.io/base/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 
 _team = "[COLOR hotpink][B][I] t.me/balandro_team [/I][/B][/COLOR]"
@@ -105,9 +105,10 @@ def submnu_team(item):
     itemlist.append(item.clone( action='submnu_developers', title=' - [B]Developers[/B]', thumbnail=config.get_thumb('team'), text_color='firebrick' ))
 
     try: last_ver = updater.check_addon_version()
-    except: last_ver = True
+    except: last_ver = None
 
-    if not last_ver: last_ver = '[I][COLOR %s](desfasada)[/COLOR][/I]' % color_adver
+    if last_ver is None: last_ver = '[B][I][COLOR %s](sin acceso)[/COLOR][/I][/B]' % color_alert
+    elif not last_ver: last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
     else: last_ver = ''
 
     title = '[COLOR chocolate][B]Ajustes [COLOR powderblue]Preferencias[/B][/COLOR] (%s)  %s' % (config.get_addon_version(), last_ver)
@@ -741,7 +742,7 @@ def submnu_developers(item):
 
     itemlist.append(item.clone( channel='helper', action='', title= '[COLOR firebrick][B][I]Desarrollo [COLOR powderblue]Fuentes[/COLOR]:[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('team') ))
 
-    itemlist.append(item.clone( channel='helper', action='', title= ' - Fuentes [COLOR darkorange][B]github.com/balandro-tk/balandro-addon[/B][/COLOR]', thumbnail=config.get_thumb('telegram'), folder=False ))
+    itemlist.append(item.clone( channel='helper', action='', title= ' - Fuentes [COLOR darkorange][B]github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('telegram'), folder=False ))
 
     itemlist.append(item.clone( channel='helper', action='', title= '[COLOR firebrick][B][I]Desarrollo [COLOR powderblue]Telegram[/COLOR]:[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('team') ))
 
@@ -1687,7 +1688,7 @@ def resumen_servidores(item):
     inactives = 0
     notsuported = 0
     alternatives = 0
-    aditionals = 29
+    aditionals = 30
     disponibles = 0
 
     path = os.path.join(config.get_runtime_path(), 'servers')
@@ -1764,7 +1765,7 @@ def show_help_alternativas(item):
     txt += '   [COLOR yellow]Streamlare[/COLOR][CR]'
     txt += '   [COLOR yellow]Uptobox[/COLOR][CR]'
     txt += '   [COLOR yellow]Various[/COLOR][CR]'
-    txt += '   [COLOR yellow]Vk[/COLOR]'
+    txt += '   [COLOR yellow]Vk[/COLOR][CR]'
     txt += '   [COLOR yellow]Waaw[/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
@@ -1796,6 +1797,7 @@ def show_help_adicionales(item):
     txt += '[CR][CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
 
     txt += '   [COLOR yellow]Desiupload[/COLOR][CR]'
+    txt += '   [COLOR yellow]Drop[/COLOR][CR]'
     txt += '   [COLOR yellow]Dropload[/COLOR][CR]'
     txt += '   [COLOR yellow]Embedgram[/COLOR][CR]'
     txt += '   [COLOR yellow]Embedrise[/COLOR][CR]'
@@ -1803,6 +1805,7 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Filelions[/COLOR][CR]'
     txt += '   [COLOR yellow]Filemoon[/COLOR][CR]'
     txt += '   [COLOR yellow]Fileupload[/COLOR][CR]'
+    txt += '   [COLOR yellow]Hxfile[/COLOR][CR]'
     txt += '   [COLOR yellow]Hexupload[/COLOR][CR]'
     txt += '   [COLOR yellow]Krakenfiles[/COLOR][CR]'
     txt += '   [COLOR yellow]Lulustream[/COLOR][CR]'
@@ -1814,12 +1817,14 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Streamvid[/COLOR][CR]'
     txt += '   [COLOR yellow]Streamwish[/COLOR][CR]'
     txt += '   [COLOR yellow]Tubeload[/COLOR][CR]'
+    txt += '   [COLOR yellow]Twitch[/COLOR][CR]'
     txt += '   [COLOR yellow]Uploadever[/COLOR][CR]'
     txt += '   [COLOR yellow]Uploaddo[/COLOR][CR]'
     txt += '   [COLOR yellow]Vidello[/COLOR][CR]'
     txt += '   [COLOR yellow]Videowood[/COLOR][CR]'
     txt += '   [COLOR yellow]Vidguard[/COLOR][CR]'
     txt += '   [COLOR yellow]Vidspeed[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vidhidepro[/COLOR][CR]'
     txt += '   [COLOR yellow]Vkspeed[/COLOR][CR]'
     txt += '   [COLOR yellow]Vudeo[/COLOR][CR]'
     txt += '   [COLOR yellow]Yandex[/COLOR][CR]'

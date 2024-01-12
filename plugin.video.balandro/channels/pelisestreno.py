@@ -143,9 +143,6 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    logger.info()
-    itemlist = []
-
     IDIOMAS = {'Latino': 'Lat', 'Castellano': 'Esp', 'Subtitulado': 'Vose', 'Inglés': 'Vo'}
 
     data = do_downloadpage(item.url)

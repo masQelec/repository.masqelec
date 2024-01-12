@@ -164,6 +164,7 @@ def list_all(item):
 
         title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "").strip()
         title = title.replace('&#8216;', "").replace('&#8217;', "").strip()
+        title = title.replace('&amp;', '&')
 
         thumb = scrapertools.find_single_match(match, 'data-img="(.*?)"')
         if not thumb: thumb = scrapertools.find_single_match(match, 'url\((.*?)\)')
@@ -443,12 +444,52 @@ def findvideos(item):
     elif item.lang == 'Vose': lang = 'Vose'
     else: lang = 'Lat'
 
+    data = do_downloadpage(item.url)
+
+    ses = 0
+
+    # ~ embeds
+    matches = scrapertools.find_multiple_matches(data, 'data-title="Opción.*?data-src="(.*?)"')
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<iframe.*?data-src="(.*?)"')
+
+    for url in matches:
+        ses += 1
+
+        url = url.strip()
+
+        if '/likessb.' in url: continue
+
+        if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
+
+        elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
+
+        elif 'api.mycdn.moe/dl/?uptobox=' in url: url = url.replace('api.mycdn.moe/dl/?uptobox=', 'uptobox.com/')
+
+        elif url.startswith('http://vidmoly/'): url = url.replace('http://vidmoly/w/', 'https://vidmoly/embed-').replace('http://vidmoly/', 'https://vidmoly/')
+
+        elif url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+        elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
+        elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
+        elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
+        elif url.startswith('https://novelas360.cyou/'): url = url.replace('/novelas360.cyou/', '/waaw.to/')
+
+        url = url.replace('&amp;', '&')
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        other = ''
+
+        if servidor == 'various': other = servertools.corregir_other(url)
+
+        if not servidor == 'directo':
+            itemlist.append(Item( channel=item.channel, action = 'play', server = servidor, url = url, language = lang, other = other.capitalize() ))
+
+    # ~ links
     data = do_downloadpage(item.url + '?do=watch')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     values = scrapertools.find_multiple_matches(data, '<form method="post".*?action="(.*?)".*?<input type="hidden".*?name="(.*?)".*?value="(.*?)"')
-
-    ses = 0
 
     for link, type, value in values:
         ses += 1
@@ -460,17 +501,12 @@ def findvideos(item):
 
         data1 = do_downloadpage(link, post = post, headers = {'Referer': item.url} )
 
-        matches = scrapertools.find_multiple_matches(data1, "<iframe src='(.*?)'")
-        if not matches: matches = scrapertools.find_multiple_matches(data1, '<iframe src="(.*?)"')
+        matches = scrapertools.find_multiple_matches(data1, "<iframe.*?src='(.*?)'")
+        if not matches: matches = scrapertools.find_multiple_matches(data1, '<iframe.*?src="(.*?)"')
         if not matches: matches = scrapertools.find_multiple_matches(data1, '<td>Server.*?href="(.*?)"')
 
         for url in matches:
-            if '/ennovelas.' in url: continue
-            elif '.ennovelas.' in url: continue
-            elif '/tomatomatela.' in url: continue
-            elif '/watching.' in url: continue
-            elif '/novelas360.' in url: continue
-            elif '/telegram.' in url: continue
+            if '/wp-admin/' in url: continue
 
             if url.startswith('//'): url = 'https:' + url
 
@@ -480,7 +516,15 @@ def findvideos(item):
 
             elif 'api.mycdn.moe/dl/?uptobox=' in url: url = url.replace('api.mycdn.moe/dl/?uptobox=', 'uptobox.com/')
 
-            elif url.startswith('http://vidmoly'): url = url.replace('http://vidmoly', 'https://vidmoly').replace('/w/', '/embed-')
+            elif url.startswith('http://vidmoly/'): url = url.replace('http://vidmoly/w/', 'https://vidmoly/embed-').replace('http://vidmoly/', 'https://vidmoly/')
+
+            elif url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+            elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
+            elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
+            elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
+            elif url.startswith('https://novelas360.cyou/'): url = url.replace('/novelas360.cyou/', '/waaw.to/')
+
+            url = url.replace('&amp;', '&')
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -517,11 +561,18 @@ def findvideos(item):
 
            if u_link.startswith('//'): u_link = 'https:' + u_link
 
-           if u_link:
-               if '/ennovelas.' in u_link or '.ennovelas.' in u_link: u_link = ''
+           if '/wp-admin/' in u_link: u_link = ''
 
            if u_link:
-               if u_link.startswith('https://vk.com/'): u_link = u_link.replace('&amp;', '&')
+               if u_link.startswith('https://sr.ennovelas.net/'): u_link = u_link.replace('/sr.ennovelas.net/', '/waaw.to/')
+               elif u_link.startswith('https://video.ennovelas.net/'): u_link = u_link.replace('/video.ennovelas.net/', '/waaw.to/')
+               elif u_link.startswith('https://reproductor.telenovelas-turcas.com.es/'): u_link = u_link.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
+               elif u_link.startswith('https://novelas360.cyou/player/'): u_link = u_link.replace('/novelas360.cyou/player/', '/waaw.to/')
+               elif u_link.startswith('https://novelas360.cyou/'): u_link = u_link.replace('/novelas360.cyou/', '/waaw.to/')
+
+               elif u_link.startswith('https://vk.com/'): u_link = u_link.replace('&amp;', '&')
+
+               u_link = u_link.replace('&amp;', '&')
 
                servidor = servertools.get_server_from_url(u_link)
                servidor = servertools.corregir_servidor(servidor)
@@ -542,6 +593,18 @@ def findvideos(item):
     matches = scrapertools.find_multiple_matches(data, '<td>Server.*?href="(.*?)"')
 
     for url in matches:
+        ses += 1
+
+        if '/wp-admin/' in url: continue
+
+        if url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+        elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
+        elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
+        elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
+        elif url.startswith('https://novelas360.cyou/'): url = url.replace('/novelas360.cyou/', '/waaw.to/')
+
+        url = url.replace('&amp;', '&')
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

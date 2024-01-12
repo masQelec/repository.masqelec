@@ -3,7 +3,7 @@
   "name": "DangoToons",
   "thumbnail": "dangotoons.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["lat"],
 
-  "clusters": ["problematic", "infantil", "classic", "rankings", "kids", "anime"],
+  "clusters": ["infantil", "classic", "rankings", "kids", "anime"],
 
-  "notes": "Web ANULADA. Series clásicas en idioma orignal de emisión. Series por Géneros."
+  "notes": "Series clásicas en idioma orignal de emisión. Series por Géneros."
 }

@@ -470,10 +470,11 @@ def mainlist(item):
                 itemlist.append(item.clone( channel='downloads', action='mainlist', title='[B]Descargas[/B]', context=context_descargas, thumbnail=config.get_thumb('downloads'), text_color='seagreen' ))
 
     try: last_ver = updater.check_addon_version()
-    except: last_ver = True
+    except: last_ver = None
 
-    if not last_ver:
-        last_ver = '[I][COLOR %s](desfasada)[/COLOR][/I]' % color_adver
+    if last_ver is None: last_ver = '[B][I][COLOR %s](sin acceso)[/COLOR][/I][/B]' % color_alert
+    elif not last_ver:
+        last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
         if not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')):
             platformtools.dialog_notification(config.__addon_name, '[COLOR yellow][B]Versión Desfasada del Add-On[/COLOR][/B]')
     else: last_ver = ''

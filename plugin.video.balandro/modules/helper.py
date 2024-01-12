@@ -25,8 +25,8 @@ from core import channeltools, filetools, servertools, httptools, scrapertools, 
 from modules import filters
 
 
-ADDON_REPO_ADDONS = 'https://balandro-tk.github.io/balandro/'
-ADDON_UPDATES_JSON = 'https://raw.githubusercontent.com/balandro-tk/addon_updates/main/updates.json'
+ADDON_REPO_ADDONS = 'https://repobal.github.io/base/'
+ADDON_UPDATES_JSON = 'https://pastebin.com/raw/zW6MYy4C'
 
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
@@ -38,8 +38,8 @@ descartar_xxx = config.get_setting('descartar_xxx', default=False)
 descartar_anime = config.get_setting('descartar_anime', default=False)
 
 _foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/ [/I][/B][/COLOR]"
-_source = "[COLOR coral][B][I] https://balandro-tk.github.io/balandro/ [/I][/B][/COLOR]"
-_scripts = "[COLOR mediumaquamarine][B][I] https://balandro-tk.github.io/balandro/scripts/ [/I][/B][/COLOR]"
+_source = "[COLOR coral][B][I] https://repobal.github.io/base/ [/I][/B][/COLOR]"
+_scripts = "[COLOR mediumaquamarine][B][I] https://repobal.github.io/base/scripts/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 
 _team = "[COLOR hotpink][B][I] t.me/Balandro_team [/I][/B][/COLOR]"
@@ -48,9 +48,10 @@ _team = "[COLOR hotpink][B][I] t.me/Balandro_team [/I][/B][/COLOR]"
 context_temas = []
 
 try: last_ver = updater.check_addon_version()
-except: last_ver = True
+except: last_ver = None
 
-if not last_ver: last_ver = '[I][COLOR %s](desfasada)[/COLOR][/I]' % color_adver
+if last_ver is None: last_ver = '[B][I][COLOR %s](sin acceso)[/COLOR][/I][/B]' % color_alert
+elif not last_ver: last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
 else: last_ver = ''
 
 last_fix = config.get_addon_version()
@@ -114,7 +115,7 @@ def mainlist(item):
             if matches:
                 itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR tomato][B]ÚLTIMOS CAMBIOS DOMINIOS[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
-    title = '[B]AYUDA TEMAS[/B] (%s):  %s' % (config.get_addon_version().replace('.fix', '-Fix'), last_ver)
+    title = '[B]AYUDA TEMAS [COLOR chartreuse](%s)[/B]:  %s' % (config.get_addon_version().replace('.fix', '-Fix'), last_ver)
 
     itemlist.append(item.clone( action='', title= title, context=context_temas, text_color='lightyellow', folder=False ))
 
@@ -393,6 +394,10 @@ def submnu_avisinfo_channels(item):
     datos = channeltools.get_channel_parameters('hdfull')
     if datos['active']:
         itemlist.append(item.clone( action='show_help_hdfull', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HdFull[/B][/COLOR]', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
+
+    datos = channeltools.get_channel_parameters('nextdede')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_nextdede', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]PlayDede[/B][/COLOR]', thumbnail=config.get_thumb('nextdede', 'thumb', 'channels') ))
 
     datos = channeltools.get_channel_parameters('playdede')
     if datos['active']:
@@ -678,7 +683,7 @@ def submnu_torrents(item):
               cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
               tex_tor += '  [COLOR yellow][B]' + cod_version + '[/B][/COLOR]'
 
-        itemlist.append(item.clone( action = '', title= 'Cliente/Motor Habitual asignado ' + '[COLOR fuchsia][B] ' + tex_tor, thumbnail=config.get_thumb('torrents') ))
+        itemlist.append(item.clone( action = '', title= 'Cliente/Motor Habitual asignado ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR]', thumbnail=config.get_thumb('torrents') ))
 
     itemlist.append(item.clone( action='show_torrents_parameters', title= ' - [COLOR green][B]Información[/B][/COLOR] sobre sus [COLOR chocolate][B]Preferencias[/B][/COLOR] Actuales', thumbnail=config.get_thumb('news') ))
 
@@ -971,7 +976,7 @@ def submnu_desarrollo(item):
 
     itemlist.append(item.clone( action='', title= '[COLOR firebrick][B]Desarrollo [COLOR powderblue]Fuentes[/COLOR]:[/B]', folder=False, thumbnail=config.get_thumb('team') ))
 
-    itemlist.append(item.clone( action='', title= ' - Fuentes [COLOR darkorange][B]https://github.com/balandro-tk/balandro-addon[/B][/COLOR]', thumbnail=config.get_thumb('team'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Fuentes [COLOR darkorange][B]https://github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('team'), folder=False ))
 
     itemlist.append(item.clone( action='', title= '[COLOR firebrick][B]Desarrollo [COLOR powderblue]Telegram[/COLOR]:[/B]', folder=False, thumbnail=config.get_thumb('team') ))
 
@@ -1162,7 +1167,7 @@ def show_help_miscelanea(item):
 
     txt += '[COLOR gold][B]BALANDRO:[/B][/COLOR][CR]'
 
-    txt += '  Fuente [COLOR yellow]Balandro[/COLOR]:  [COLOR plum][B]https://balandro-tk.github.io/balandro/[/B][/COLOR][CR]'
+    txt += '  Fuente [COLOR yellow]Balandro[/COLOR]:  [COLOR plum][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
     txt += '  para obtener [COLOR yellowgreen]Repositorio, Add-On, Scripts, etc.[/COLOR][CR][CR]'
 
     txt += '  Foro:  [COLOR coral][B]www.mimediacenter.info/foro/[/B][/COLOR][CR]'
@@ -1173,7 +1178,7 @@ def show_help_miscelanea(item):
 
     txt += '[COLOR gold][B]DESARROLLO BALANDRO:[/B][/COLOR][CR]'
 
-    txt += '  [COLOR firebrick]Fuentes Desarrollo[/COLOR] [COLOR yellow]Balandro[/COLOR]:  [COLOR darkorange][B]https://github.com/balandro-tk/balandro-addon[/B][/COLOR][CR]'
+    txt += '  [COLOR firebrick]Fuentes Desarrollo[/COLOR] [COLOR yellow]Balandro[/COLOR]:  [COLOR darkorange][B]https://github.com/repobal[/B][/COLOR][CR]'
     txt += '  para [COLOR orange]Mantenimiento del Add-On, Scripts, etc.[/COLOR][CR][CR]'
 
     txt += '  [COLOR chartreuse]Telegram[/COLOR]:  [COLOR lightblue][B]t.me/Balandro_team[/B][/COLOR][CR]'
@@ -1291,6 +1296,10 @@ def show_help_mirapeliculas(item):
     item.notice = 'mirapeliculas'
     show_help_canales(item)
 
+def show_help_nextdede(item):
+    item.notice = 'nextdede'
+    show_help_canales(item)
+
 def show_help_peliculaspro(item):
     item.notice = 'peliculaspro'
     show_help_canales(item)
@@ -1319,6 +1328,10 @@ def show_help_playdede(item):
     item.notice = 'playdede'
     show_help_canales(item)
 
+def show_help_ppeliculas(item):
+    item.notice = 'ppeliculas'
+    show_help_canales(item)
+
 def show_help_rojotorrent(item):
     item.notice = 'rojotorrent'
     show_help_canales(item)
@@ -1343,6 +1356,10 @@ def show_help_torrentpelis(item):
     item.notice = 'torrentpelis'
     show_help_canales(item)
 
+def show_help_zonaleros(item):
+    item.notice = 'zonaleros'
+    show_help_canales(item)
+
 def show_help_resto(item):
     item.notice = ''
     show_help_canales(item)
@@ -1362,14 +1379,14 @@ def show_help_canales(item):
     else:
          txt = '[B][COLOR cyan]El webmaster del [COLOR yellow]Canal[/COLOR] ha activado un nivel más de protección con [COLOR orangered]CloudFlare[/COLOR][/B][CR]'
 
-    if item.notice == 'hdfull' or item.notice == 'hdfullse' or item.notice == 'playdede':
-       txt += '[COLOR gold][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
+    if item.notice == 'hdfull' or item.notice == 'hdfullse' or item.notice == 'playdede' or item.notice == 'nextdede' or item.notice == 'entrepeliculasyseries' or item.notice == 'zonaleros':
+       txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
 
        if item.notice == 'hdfull':
            txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominioshdfull.com[/COLOR][/B][CR]'
        elif item.notice == 'hdfullse':
            txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]hdfull.pm[/COLOR][/B][CR]'
-       else:
+       elif item.notice == 'playdede':
            txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominiosplaydede.com[/COLOR][CR]'
 
     txt += '[CR][COLOR goldenrod][B]  Desconocemos si será Temporal ó Definitivo.[/B][/COLOR][CR]'
@@ -1377,7 +1394,7 @@ def show_help_canales(item):
     txt += '[CR][COLOR plum][B]  Ya ocurrió alguna vez en el pasado y al cabo de un cierto tiempo lo retiró.[/B][/COLOR][CR]'
 
     txt += '[CR][COLOR aquamarine][B]  Por ello, si no os funciona correctamente, pues hay que tener paciencia,'
-    txt += '[CR]  e ir probando uno a uno, los Proveedores de proxies, en [COLOR red]Configurar proxies a usar ...[/B][/COLOR][CR]'
+    txt += '[CR]  e ir probando uno a uno, los [/COLOR][COLOR limegreen]Proveedores de proxies[/COLOR][COLOR aquamarine], en [COLOR red]Configurar proxies a usar ...[/B][/COLOR][CR]'
 
     txt += '[CR][COLOR yellowgreen][B]Ó bien prescindir/desactivar el canal hasta que se estabilize posiblemente en un futuro.[/B][/COLOR]'
 
@@ -3411,11 +3428,13 @@ def show_help_domains(item):
     txt = ''
 
     if item.category == 'DonTorrents':
-        txt += '[COLOR lime]Puede acceder a su Telegram ó bien través de un navegador web a[/COLOR] [B][COLOR greenyellow]t.me/s/DonTorrent[/COLOR][/B][CR][CR]'
+        txt += '[COLOR lime]Puede acceder a su Telegram ó bien través de un navegador web a[/COLOR] [B][COLOR greenyellow]t.me/DonTorrent[/COLOR][/B][CR][CR]'
     elif item.category == 'HdFull':
         txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominioshdfull.com[/COLOR][/B][CR][CR]'
     elif item.category == 'HdFullSe':
         txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]hdfull.pm[/COLOR][/B][CR][CR]'
+    elif item.category == 'NextDede':
+        txt += '[COLOR lime]Puede acceder a su Telegram ó bien través de un navegador web a[/COLOR] [B][COLOR greenyellow]t.me/NextdedeOficial[/COLOR][/B][CR][CR]'
     elif item.category == 'PlayDede':
         txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominiosplaydede.com[/COLOR][/B][CR][CR]'
 
@@ -3462,9 +3481,9 @@ def show_help_torrents(item):
     txt += '        [COLOR goldenrod][B]repository.elementum[/B][/COLOR]  ó  [COLOR goldenrod][B]repository.elementumorg[/B][/COLOR]'
 
     txt += '[CR][CR]     Puede obtener estos [COLOR limegreen][B]Repositorios[/B][/COLOR] desde [COLOR chartreuse][B]Nuestra Fuente[/B][/COLOR], carpeta [COLOR gold][B]Scripts[/B][/COLOR].[CR]'
-    txt += '        Fuente  [COLOR darkorange][B]https://balandro-tk.github.io/balandro/[/B][/COLOR][CR]'
+    txt += '        Fuente  [COLOR darkorange][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
 
-    txt += '        Scripts  [COLOR mediumaquamarine][B]https://balandro-tk.github.io/balandro/scripts/[/B][/COLOR][CR]'
+    txt += '        Scripts  [COLOR mediumaquamarine][B]https://repobal.github.io/base/scripts/[/B][/COLOR][CR]'
 
     txt += '[CR]         - [COLOR lightblue][B]Carpeta Kodi18:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] hasta 18.x[/B][/COLOR][CR]'
     txt += '            - [COLOR goldenrod][B] repository.elementum [/B][/COLOR][CR]'
@@ -3581,9 +3600,9 @@ def show_help_vias(item):
     txt += '    - [COLOR yellow][B]repository.resolveurl[/B][/COLOR][CR]'
 
     txt += '[CR]*) Algunos puede obtenerlos desde [COLOR chartreuse][B]Nuestra Fuente[/B][/COLOR], carpeta [COLOR gold][B]Scripts[/B][/COLOR].[CR]'
-    txt += '    Fuente  [COLOR darkorange][B]https://balandro-tk.github.io/balandro/[/B][/COLOR][CR]'
+    txt += '    Fuente  [COLOR darkorange][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
 
-    txt += '    Scripts  [COLOR mediumaquamarine][B]https://balandro-tk.github.io/balandro/scripts/[/B][/COLOR][CR]'
+    txt += '    Scripts  [COLOR mediumaquamarine][B]https://repobal.github.io/base/scripts/[/B][/COLOR][CR]'
 
     txt += '[CR]     - [COLOR lightblue][B]Carpeta Kodi18:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] hasta 18.x[/B][/COLOR][CR]'
     txt += '        - [COLOR goldenrod][B] plugin.video.youtube [/B][/COLOR][CR]'
@@ -3686,7 +3705,9 @@ def show_test(item):
     if hay_repo:
         try:
            data = httptools.downloadpage(ADDON_REPO_ADDONS).data
-           if data: access_repo = True
+           if data:
+               if '<h1>404</h1>' in data: tex_access_repo = '[COLOR red][B][I]No Accesible[/I][/B][/COLOR]'
+               else: access_repo = True
         except: tex_access_repo = '[COLOR red][B]No se pudo comprobar[/B][/COLOR]'
 
     ult_ver = ''
@@ -3707,7 +3728,8 @@ def show_test(item):
             try:
                data = httptools.downloadpage(ADDON_UPDATES_JSON).data
                if data:
-                   access_fixes = True
+                   if '404: Not Found' in data: acces_fixes = '[COLOR red][B][I]No Accesibles[/I][/B][/COLOR]'
+                   else: access_fixes = True
                    if 'addon_version' not in data or 'fix_version' not in data: access_fixes = None
             except: tex_access_fixes = '[COLOR red][B]No se pudo comprobar[/B][/COLOR]'
 
@@ -3722,15 +3744,14 @@ def show_test(item):
 
     txt += ' - [COLOR gold]Repositorio:[/COLOR]  %s [CR][CR]' % tex_repo
     tex_access_repo = ' Accesible'
-    if access_repo == False:
-        if tex_access_repo == '': tex_access_repo = '[COLOR red][B] Sin conexión, No accesible [/B][/COLOR]'
+    if access_repo == False: tex_access_repo = '[COLOR red][B][I] No Accesible [/I][/B][/COLOR]'
 
     txt += ' - [COLOR gold]Conexión con repositorio:[/COLOR]  %s [CR][CR]' % tex_access_repo
 
     if access_last_ver: tex_access_last_ver = ' Versión correcta '
     else:
         if not ult_ver:
-            if not access_repo: tex_access_last_ver = '[I][B][COLOR %s] No accesible [/COLOR][/B][/I]' % color_alert
+            if not access_repo: tex_access_last_ver = '[I][B][COLOR %s] No Accesible [/COLOR][/B][/I]' % color_alert
             else: tex_access_last_ver = '[B][COLOR %s] Accesible desde Repositorio [/COLOR][/B]' % color_exec
         else: tex_access_last_ver = '[I][B][COLOR %s] (desfasada)[/COLOR][/B][/I]' % color_alert
 
@@ -3739,13 +3760,13 @@ def show_test(item):
     if not tex_access_fixes:
         tex_access_fixes = ' Accesibles'
         if access_fixes == None: tex_access_fixes = '[COLOR yellow] Sin actualizaciones tipo Fix pendientes [/COLOR]'
-        elif access_fixes == False: tex_access_fixes = '[I][B][COLOR %s] Fixes sobre última versión, No accesibles [/COLOR][/B][/I]' % color_adver
+        elif access_fixes == False: tex_access_fixes = '[I][B][COLOR red] No Accesibles [/COLOR][/B][/I]'
 
     txt += ' - [COLOR gold]Fixes sobre última versión:[/COLOR]  %s [CR][CR]' % tex_access_fixes
 
     txt += ' - [COLOR gold]Versión instalada:[/COLOR]  [COLOR yellow][B]%s[/B][/COLOR]' % config.get_addon_version().replace('.fix', '-Fix')
     if not ult_ver:
-        if not access_repo: txt = txt + '[B][I][COLOR %s] (Sin Repositorio)[/COLOR][/I][/B]' % color_alert
+        if not access_repo: txt = txt + '[B][I][COLOR %s] Sin Acceso al Repositorio[/COLOR][/I][/B]' % color_alert
         else: txt = txt + '[B][I][COLOR %s] (desfasada)[/COLOR][/I][/B]' % color_alert
 
     txt += '[CR][CR]'
@@ -3880,6 +3901,13 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   CliverSite: ' + cliversite_dominio + '[CR]'
            else: tex_dom = '[CR]   CliverSite: ' + cliversite_dominio + '[CR]'
 
+    datos = channeltools.get_channel_parameters('cuevana2')
+    if datos['active']:
+        cuevana2_dominio = config.get_setting('channel_cuevana2_dominio', default='')
+        if cuevana2_dominio:
+           if tex_dom: tex_dom = tex_dom + '   Cuevana2: ' + cuevana2_dominio + '[CR]'
+           else: tex_dom = '[CR]   Cuevana2: ' + cuevana2_dominio + '[CR]'
+
     datos = channeltools.get_channel_parameters('cuevana2esp')
     if datos['active']:
         cuevana2esp_dominio = config.get_setting('channel_cuevana2esp_dominio', default='')
@@ -3977,6 +4005,13 @@ def show_test(item):
         if ennovelasonline_dominio:
            if tex_dom: tex_dom = tex_dom + '   EnNovelasOnline: ' + ennovelasonline_dominio + '[CR]'
            else: tex_dom = '[CR]   EnNovelasOnline: ' + ennovelasonline_dominio + '[CR]'
+
+    datos = channeltools.get_channel_parameters('ennovelastv')
+    if datos['active']:
+        ennovelastv_dominio = config.get_setting('channel_ennovelastv_dominio', default='')
+        if ennovelastv_dominio:
+           if tex_dom: tex_dom = tex_dom + '   EnNovelasTv: ' + ennovelastv_dominio + '[CR]'
+           else: tex_dom = '[CR]   EnNovelasTv: ' + ennovelastv_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('entrepeliculasyseries')
     if datos['active']:
@@ -4244,9 +4279,15 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   YesTorrent: ' + yestorrent_dominio + '[CR]'
            else: tex_dom = '[CR]   YesTorrent: ' + yestorrent_dominio + '[CR]'
 
-    if tex_dom:
-        txt += ' - [COLOR gold]Dominios:[/COLOR]  [COLOR springgreen]%s[/COLOR][CR]' % str(tex_dom).replace('https://', '').replace('/', '')
+    datos = channeltools.get_channel_parameters('zonaleros')
+    if datos['active']:
+        zonaleros_dominio = config.get_setting('channel_zonaleros_dominio', default='')
+        if zonaleros_dominio:
+           if tex_dom: tex_dom = tex_dom + '   ZonaLeros: ' + zonaleros_dominio + '[CR]'
+           else: tex_dom = '[CR]   ZonaLeros: ' + zonaleros_dominio + '[CR]'
 
+    if tex_dom:
+        txt += ' - [COLOR gold]Dominios:[/COLOR]  [COLOR springgreen]%s[/COLOR][CR]' % str(tex_dom)
 
     filtros = {'clusters': 'register'}
 
@@ -4579,9 +4620,9 @@ def show_test(item):
 
     if not ult_ver:
         if not access_repo:
-            platformtools.dialog_ok(config.__addon_name, '[COLOR cyan][B]Versión instalada sin repositorio[/COLOR][COLOR yellow] ' + config.get_addon_version() + '[/B][/COLOR]', '[COLOR violet][B]Instale la última Versión del Repositorio [/COLOR][/B]')
+            platformtools.dialog_ok(config.__addon_name, '[COLOR cyan][B]Versión instalada [COLOR red][I]Sin Acceso al Repositorio [/I][/COLOR][COLOR yellow] ' + config.get_addon_version() + '[/B][/COLOR]', '[COLOR violet][B]Instale la última Versión del Repositorio [/COLOR][/B]')
         else:
-            platformtools.dialog_ok(config.__addon_name, '[COLOR cyan][B]Versión instalada desfasada[/COLOR][COLOR yellow] ' + config.get_addon_version() + '[/B][/COLOR]', '[COLOR violet][B]Instale la última Versión disponible del Add-On[/COLOR][/B]')
+            platformtools.dialog_ok(config.__addon_name, '[COLOR cyan][B]Versión instalada desfasada [/COLOR][COLOR yellow] ' + config.get_addon_version() + '[/B][/COLOR]', '[COLOR violet][B]Instale la última Versión disponible del Add-On[/COLOR][/B]')
 
     platformtools.dialog_textviewer('Test status sistema', txt)
 
