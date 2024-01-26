@@ -52,7 +52,7 @@ def do_downloadpage(url, post=None, headers=None):
     if not data:
         if url.startswith(host):
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CieCalidadLa', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 

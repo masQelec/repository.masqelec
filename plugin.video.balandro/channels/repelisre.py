@@ -36,7 +36,7 @@ def do_downloadpage(url, ref, post=None, headers=None):
         headers["limit"] = "25" 
         headers["Sec-Fetch-Dest"] = "empty"
         headers["Sec-Fetch-Mode"] = "cors"
-        headers["Sec-Fetch-Mode"] = "same-origin"
+        headers["Sec-Fetch-Site"] = "same-origin"
 
         headers["Referer"] = ref
 
@@ -291,7 +291,8 @@ def findvideos(item):
         if '/cinestart.' in url: continue
         elif '/1fichier.' in url: continue
 
-        if url.endswith('.srt'): continue
+        if host in url: continue
+        elif url.endswith('.srt'): continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

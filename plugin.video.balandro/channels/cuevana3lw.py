@@ -15,12 +15,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cuevana.la'
+host = 'https://wvv1.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://cuevana3.law', 'https://pro.cuevana8.vip', 'https://cuevana8.vip',
-             'https://cuevana8.online']
+             'https://cuevana8.online', 'https://cuevana.la', 'https://www.cuevana.la',
+             'https://ww2.cuevana3.law']
 
 domain = config.get_setting('dominio', 'cuevana3lw', default='')
 

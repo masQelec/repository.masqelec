@@ -1166,7 +1166,7 @@ msgid "Use name of production company as Studio for shows"
 msgstr "Använd namn på produktionsföretag som studio för serier"
 
 msgctxt "#30418"
-msgid "Show number of unwatched episodes in Shows/Seasons"
+msgid "Calculate number of unwatched episodes in Shows/Seasons"
 msgstr "Visa antal osedda avsnitt i serier/säsonger"
 
 msgctxt "#30421"

@@ -342,7 +342,7 @@ msgstr "Исходящие интерфейсы"
 
 msgctxt "#30092"
 msgid "Use fallback fanart if fanart wasn't found"
-msgstr "Использовать фанарт по умолчанию"
+msgstr "Использовать резервный фанарт, если фанарт не был найден"
 
 msgctxt "#30093"
 msgid "Disable notification sound"
@@ -976,7 +976,7 @@ msgstr "Синхронизировать Список просмотра из Tr
 
 msgctxt "#30365"
 msgid "Sync items from user lists into Kodi library"
-msgstr "Синхронизировать Мой Список из Trakt в библиотеку"
+msgstr "Синхронизировать Мои Списки из Trakt в библиотеку"
 
 msgctxt "#30366"
 msgid "Sync watched states from Trakt into Kodi library"
@@ -1163,8 +1163,8 @@ msgid "Use name of production company as Studio for shows"
 msgstr "Использовать имя продюсерской компании как имя студии для шоу"
 
 msgctxt "#30418"
-msgid "Show number of unwatched episodes in Shows/Seasons"
-msgstr "Показывать количество непросмотренных серий в Сериале/Сезоне"
+msgid "Calculate number of unwatched episodes in Shows/Seasons"
+msgstr "Вычислять количество непросмотренных серий в Сериале/Сезоне"
 
 msgctxt "#30421"
 msgid "Load torrents from torrents folder on startup"

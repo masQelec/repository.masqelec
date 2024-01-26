@@ -141,7 +141,8 @@ def generos(item):
     matches = re.compile('<td>\s*<strong>([^<]+)</strong>\s*\[<a href="([^"]+)"', re.DOTALL).findall(data)
 
     for title, url in matches:
-        if url in [it.url for it in itemlist]: continue # descartar repetidos
+        # ~ descartar repetidos
+        if url in [it.url for it in itemlist]: continue
 
         itemlist.append(item.clone( title=title, url=url, action='list_all', text_color = 'deepskyblue' ))
 
@@ -154,6 +155,7 @@ def idiomas(item):
 
     # ~ Enlaces por idioma según las preferencias del usuario en servidores
     idio = {'Esp': ['Castellano', 'VC'], 'Lat': ['Latino', 'VL'], 'VO': ['Subtitulado', 'VS']}
+
     prefs = config.get_lang_preferences()
     prefs = sorted(prefs.items(), key=lambda p: p[1])
 
@@ -178,7 +180,7 @@ def list_all(item):
     patron += '<img src="([^"]+)"></span></a>(.*?)<br'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    # ~  reducir lista según idioma
+    # ~ reducir lista según idioma
     if item.filtro_lang:
         matches = list(filter(lambda m: '(%s)' % item.filtro_lang in m[3], matches))
 
@@ -191,7 +193,8 @@ def list_all(item):
             # ~ descartar palabras demasiado cortas (la, de, los, etc)
             palabras = list(filter(lambda p: len(p) > 3, buscado.split(' ')))
 
-            if len(palabras) == 0: return [] # ~ No hay palabras a buscar
+             # ~ No hay palabras a buscar
+            if len(palabras) == 0: return []
 
             def contiene(texto, palabras):
                 found = False
@@ -217,6 +220,8 @@ def list_all(item):
             elif len(langs) > 0:
                 quality = span
                 break
+
+        title = title.replace('&#8217;', "'")
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=', '.join(langs), qualities=quality,
                                     contentType='movie', contentTitle=title, infoLabels={'year': year} ))
@@ -247,11 +252,10 @@ def list_last(item):
 
     matches = re.compile('<a href="(.*?)".*?alt="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
 
-    #if item.filtro_lang:
-    #    matches = list(filter(lambda m: '(%s)' % item.filtro_lang in m[3], matches))
-
     for url, title, thumb in list(matches):
         title = title.replace('Poster pequeño de', '').replace('Poster pequeño', '').strip()
+
+        title = title.replace('&#8217;', "'")
 
         titulo = title
 
@@ -330,8 +334,9 @@ def findvideos(item):
     return itemlist
 
 
-# ~ No hay buscador propio en la web, usan el buscador genérico de google en su site.
 def search(item, texto):
+    # ~ No hay buscador propio en la web, usan el buscador genérico de google en su site.
+
     logger.info()
     itemlist2 = []
     itemlist3 = []
@@ -343,31 +348,32 @@ def search(item, texto):
         item.url = url_estrenos
         itemlist = list_all(item)
 
-        if itemlist:
-            item.url = host
-            item.group = 'estrenos'
-            itemlist2 = list_last(item)
+        if not itemlist:
+            if not config.get_setting('channel_gnula_proxies', default=''):
+               item.url = host
+               item.group = 'estrenos'
+               itemlist2 = list_last(item)
 
-            for it2 in itemlist2:
-                if it2.url not in [it.url for it in itemlist]:
-                    itemlist.append(it2)
+               for it2 in itemlist2:
+                   if it2.url not in [it.url for it in itemlist]:
+                       itemlist.append(it2)
 
-            if itemlist2:
-                item.url = host
-                item.group = 'novedades'
-                itemlist3 = list_last(item)
+               if not itemlist2:
+                   item.url = host
+                   item.group = 'novedades'
+                   itemlist3 = list_last(item)
 
-                for it3 in itemlist3:
-                    if it3.url not in [it.url for it in itemlist]:
-                        itemlist.append(it3)
+                   for it3 in itemlist3:
+                       if it3.url not in [it.url for it in itemlist]:
+                           itemlist.append(it3)
 
-            if not itemlist2 and not itemlist3:
-                item.url = url_recomendadas
-                itemlist4 = list_all(item)
+               if not itemlist2 and not itemlist3:
+                   item.url = url_recomendadas
+                   itemlist4 = list_all(item)
 
-                for it4 in itemlist4:
-                    if it4.url not in [it.url for it in itemlist]:
-                        itemlist.append(it4)
+                   for it4 in itemlist4:
+                       if it4.url not in [it.url for it in itemlist]:
+                           itemlist.append(it4)
 
         return itemlist
 

@@ -7,6 +7,23 @@
     - Source is open, so you can fork everything.
     - Some bug fixes or updates can come, to keep things working and have the latest versions.
 
+[B][COLOR red]0.1.99[/COLOR][/B]
+    - Fixed libtorrent peer fingerprints.
+    - Fixed issue with auto-selecting wrong episode file from season torrent.
+    - Extended `season` payload going to search addons.
+    - Fixed issue with selecting least popular images, instead of most popular ones.
+    - Fixed issue with not being able to write to special paths in Kodi, i.e. `special://...`.
+    - Fixed issue with counting number of episodes and watched episodes.
+    - Fixed issue with not properly moving torrent files after download is complete.
+    - Fixed issue with overwriting buffer priorities when using files.
+    - Fixed issue with syncing Trakt lists when syncs are disabled.
+    - Thanks to @antonsoroko, @vasilky3, @burekas7
+
+[B][COLOR red]0.1.98[/COLOR][/B]
+    - Newer Go version is used.
+    - Fixed issue with adding multi-file torrent from Web.
+    - Fixed issue with leaving torrents in libtorrent that are not resolved.
+
 [B][COLOR red]0.1.97[/COLOR][/B]
     - Reverted detection of memory on running device (new method was not correctly getting memory size on arm devices).
     - Added a check for network locations when deciding where to write strm files (to skip network locations).

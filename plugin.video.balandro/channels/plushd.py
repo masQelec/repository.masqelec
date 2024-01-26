@@ -441,21 +441,27 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, 'data-server="(.*?)".*?<span>(.*?)</span>')
 
-    logger.info("check-00-plushd: %s" % matches)
-
     ses = 0
 
     for opt, srv in matches:
         ses += 1
 
-        url = base64.b64decode(opt).decode('utf-8')
+        url = base64.b64encode(opt.encode("utf-8")).decode('utf-8')
+
+        if not url: continue
+
+        if not 'http' in url: url = host + 'player/' + url
 
         data = do_downloadpage(url)
 
-        url = scrapertools.find_single_match(data,"(?i)Location.href = '([^']+)'")
+        url = scrapertools.find_single_match(data, "(?i)Location.href = '([^']+)'")
         if not url: continue
 
-        if 'up.asdasd' in url: continue
+        if 'up.asdasd' in url:
+            url = scrapertools.find_single_match(url, '.site(.*?)$')
+            if not url: continue
+
+            url = 'https://netu.to' + url
 
         if url.startswith('/'): url = host[:-1] + url
 

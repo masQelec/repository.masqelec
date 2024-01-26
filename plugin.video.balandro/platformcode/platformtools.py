@@ -567,7 +567,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         # Server Various y anulados/controlados
         if apuntar:
-            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhidepro', 'hxfile', 'drop', 'embedv', 'vgplayer']:
+            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhidepro', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja']:
                 apuntar = False
 
             elif it.server in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza', 'vanfem', 'youtvgratis', 'oceanplay', 'gotovideo.kiev.ua', 'owodeuwu', 'sypl', 'fembed9hd', 'watchse', 'vcdn', 'femoload', 'cubeembed']:
@@ -579,7 +579,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
             elif it.server in ['sbplay', 'sbplay1', 'sbplay2', 'pelistop', 'sbfast', 'sbfull', 'ssbstream', 'sbthe', 'sbspeed', 'cloudemb', 'tubesb', 'embedsb', 'playersb', 'sbcloud1', 'watchsb', 'viewsb', 'watchmo', 'streamsss', 'sblanh', 'sbanh', 'sblongvu', 'sbchill', 'sbrity', 'sbhight', 'sbbrisk', 'sbface', 'view345', 'sbone', 'sbasian', 'streaamss', 'lvturbo', 'sbnet', 'sbani', 'sbrapid', 'cinestart', 'vidmoviesb', 'sbsonic', 'sblona', 'likessb']:
                 apuntar = False
 
-            elif it.server in ['ddownload', 'dfiles', 'dropapk', 'fileflares', 'filerice', 'fireload', 'katfile', 'megaupload', 'oload', 'pandafiles', 'rockfile', 'turbobit', 'uploadrive', 'uppit', 'userload', 'qiwi']:
+            elif it.server in ['ddownload', 'dfiles', 'dropapk', 'fileflares', 'filerice', 'fireload', 'katfile', 'megaupload', 'oload', 'pandafiles', 'rockfile', 'turbobit', 'uploadrive', 'uppit', 'qiwi']:
                 apuntar = False
 
         if apuntar:

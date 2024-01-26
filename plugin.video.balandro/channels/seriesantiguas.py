@@ -76,6 +76,9 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = "Las de los 90's", action = 'list_all', url = host + 'media-category/90s/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = "Las de los 2000's", action = 'list_all', url = host + 'media-category/00s/', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = "Halloween", action = 'episodios', url = host + 'ver/halloween/', special = 'special', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = "Navidad", action = 'episodios', url = host + 'ver/navidad/', special = 'special', search_type = 'tvshow' ))
+
     return itemlist
 
 
@@ -103,6 +106,15 @@ def list_all(item):
         title = scrapertools.find_single_match(match, '<h2 class="progression-video-title">(.*?)</h2>')
 
         if not url or not title: continue
+
+        if '/ver/mtv/' in url: continue
+        elif '/ver/tooncast/' in url: continue
+        elif '/ver/disney-channel/' in url: continue
+        elif '/ver/cartoon-network/' in url: continue
+        elif '/ver/nick/' in url: continue
+
+        elif 'ver/halloween/' in url: continue
+        elif 'ver/navidad/' in url: continue
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -202,10 +214,13 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<div id="progression-studios-season-video-list-' + str(item.contentSeason) + '(.*?)</div></div></div></div></div>')
-    if not bloque: bloque = scrapertools.find_single_match(data, '<div id="progression-studios-season-video-list-' + str(item.contentSeason) + '(.*?)<div class="clearfix-pro">')
+    if not item.special:
+        bloque = scrapertools.find_single_match(data, '<div id="progression-studios-season-video-list-' + str(item.contentSeason) + '(.*?)</div></div></div></div></div>')
+        if not bloque: bloque = scrapertools.find_single_match(data, '<div id="progression-studios-season-video-list-' + str(item.contentSeason) + '(.*?)<div class="clearfix-pro">')
+    else: bloque = data
 
     matches = scrapertools.find_multiple_matches(bloque, '<div class="progression-studios-season-item">(.*?)><div class="clearfix-pro">')
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<div class="progression-studios-season-item">(.*?)<div class="clearfix-pro">')
 
     if not matches: matches = scrapertools.find_multiple_matches(data, "<div class='post hentry'>(.*?)</div></div>")
 
@@ -254,8 +269,9 @@ def episodios(item):
         if item.old: item.perpage = sum_parts
 
     for epis in matches[item.page * item.perpage:]:
-        if not item.old:
-            if not '-temporada-' + str(item.contentSeason) in epis: continue
+        if not item.special:
+            if not item.old:
+                if not '-temporada-' + str(item.contentSeason) in epis: continue
 
         url = scrapertools.find_single_match(epis, '<a href="([^"]+)"')
 

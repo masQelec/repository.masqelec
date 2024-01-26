@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://wv.cinecalidad.gg/'
+host = 'https://vwv.cinecalidad.gg/'
 
 
 _players = ['https://cinecalidad.', '.cinecalidad.']
@@ -74,7 +74,8 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://v2.cinecalidad.men/', 'https://v3.cinecalidad.men/', 'https://v4.cinecalidad.men/',
              'https://v5.cinecalidad.men/', 'https://www.cinecalidad.gg/', 'https://wvw.cinecalidad.gg/',
              'https://wwv.cinecalidad.gg/', 'https://vww.cinecalidad.gg/', 'https://vvv.cinecalidad.gg/'
-             'https://ww.cinecalidad.gg/', 'https://w.cinecalidad.gg/', 'https://vvw.cinecalidad.gg/']
+             'https://ww.cinecalidad.gg/', 'https://w.cinecalidad.gg/', 'https://vvw.cinecalidad.gg/',
+             'https://wv.cinecalidad.gg/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -138,12 +139,12 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidadLoL', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
-                    data = httptools.downloadpage_proxy('cinecalidadla', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    data = httptools.downloadpage_proxy('cinecalidadlol', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 

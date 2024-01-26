@@ -12,12 +12,12 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www4.dontorrent.fr/'
+host = 'https://www5.dontorrent.fr/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://dontorrent.in/', 'https://dontorrent.tv/', 'https://www1.dontorrent.fr/',
-             'https://www2.dontorrent.fr/', 'https://www3.dontorrent.fr/']
+             'https://www2.dontorrent.fr/', 'https://www3.dontorrent.fr/', 'https://www4.dontorrent.fr/']
 
 
 domain = config.get_setting('dominio', 'dontorrentsin', default='')
