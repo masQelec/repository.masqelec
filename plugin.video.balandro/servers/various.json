@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Azipcdn,  Desiupload,  Doodporn,  Dropl  Dropload,  Embedgram,  Embedrise,  Emturbovid,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Hxfile,  Hexupload,  Krakenfiles,  Lulustream,  Mvidoo,  Rutube,  Streamhub,  Streamvid,  Streamwish,  Tubeload,  Turboviplay,  Twitch,  Uploaddo,  Uploadever,  Vidello,  Videowood,  Vidguard,  Vidhidepro,  Vidspeed,  Vkspeed,  Vudeo,  Yandex,  Youdbox)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Azipcdn,  Desiupload,  Doodporn,  Dropl  Dropload,  Embedgram,  Embedrise,  Emturbovid,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Hxfile,  Hexupload,  Krakenfiles,  Lulustream,  Mvidoo,  Rutube,  Streamhub,  Streamvid,  Streamwish,  Tubeload,  Turboviplay,  Twitch,  Uploaddo,  Uploadever,  Uploadraja,  Userload,  Vidello,  Videowood,  Vidguard,  Vidhidepro,  Vidspeed,  Vkspeed,  Vudeo,  Yandex,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -463,6 +463,14 @@
       {
         "pattern": "https://drop.download/([0-9a-zA-Z]+)",
         "url": "https://drop.download/\\1"
+      },
+      {
+        "pattern": "https://userload.co/(?:e/|f/|embed/)([0-9a-zA-Z]+)",
+        "url": "https://userload.co/\\1"
+      },
+      {
+        "pattern": "https://uploadraja.com/([0-9a-zA-Z]+)",
+        "url": "https://uploadraja.com/\\1"
       }
     ]
   }

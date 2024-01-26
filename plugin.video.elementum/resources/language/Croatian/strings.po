@@ -1180,7 +1180,7 @@ msgid "Use name of production company as Studio for shows"
 msgstr "Koristi naziv producentske kuće za Studio TV serija"
 
 msgctxt "#30418"
-msgid "Show number of unwatched episodes in Shows/Seasons"
+msgid "Calculate number of unwatched episodes in Shows/Seasons"
 msgstr "Prikaži broj neodgledanih epizoda u Serije/Sezone"
 
 msgctxt "#30421"

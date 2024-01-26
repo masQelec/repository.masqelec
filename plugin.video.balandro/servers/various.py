@@ -55,6 +55,8 @@ def get_video_url(page_url, url_referer=''):
         elif 'upload.do' in page_url: txt_server = 'Uploaddo'
         elif 'hxfile' in page_url: txt_server = 'Hxfile'
         elif 'drop' in page_url: txt_server = 'Drop'
+        elif 'userload' in page_url: txt_server = 'Userload'
+        elif 'uploadraja' in page_url: txt_server = 'Uuloadraja'
 
         elif 'filemoon' in page_url:
               txt_server = 'Filemoon'
@@ -180,7 +182,7 @@ def get_video_url(page_url, url_referer=''):
                 url = scrapertools.find_single_match(str(data), 'file:"(.*?)"')
 
                 if url:
-                    # ~ 13/10/2023  Directo pq falla ReslveUrl
+                    # ~ 13/10/2023  Directo pq falla ResolveUrl
                     video_urls = [[url[-4:], url]]
                     return video_urls
 

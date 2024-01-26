@@ -95,7 +95,7 @@ def list_all(item):
         if not year: year = scrapertools.find_single_match(match, '</h3></pan>(.*?)</span>')
 
         if year: title = title.replace('(', year + ')').strip()
-        else:year = '-'
+        else: year = '-'
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, infoLabels={'year': year} ))
 
@@ -141,7 +141,7 @@ def findvideos(item):
 
         url = url.replace('\\/', '/')
 
-        if not url: coninue
+        if not url: continue
 
         if '/openload.' in url: continue
         elif '.fembed.' in url: continue

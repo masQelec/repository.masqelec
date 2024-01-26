@@ -1095,7 +1095,16 @@ def ch_groups(item):
                 search_type = 'all'
                 if item.extra == 'documentaries': search_type = 'documentary'
 
-                itemlist.append(Item( channel='search', action='search', search_type=search_type, title='[B][COLOR yellow]Buscar ...[/COLOR] (Solo en los canales de esta agrupación)[/B]',
+                tipo = ''
+                if item.group == 'docs': tipo = '[COLOR cyan]Documental[/COLOR]'
+                elif item.group == 'kids': tipo = '[COLOR lightyellow]Infantil[/COLOR]'
+                elif item.group == 'tales': tipo = '[COLOR limegreen]Novela[/COLOR]'
+                elif item.group == 'torrents': tipo = '[COLOR blue]Torrent[/COLOR]'
+                elif item.group == 'dorama': tipo = '[COLOR firebrick]Dorama[/COLOR]'
+                elif item.group == 'anime': tipo = '[COLOR springgreen]Anime[/COLOR]'
+                elif item.group == 'adults': tipo = '[COLOR orange]+18[/COLOR]'
+
+                itemlist.append(Item( channel='search', action='search', search_type=search_type, title='[B][COLOR yellow]Buscar ' + tipo + ' [COLOR yellow]...' + '[/COLOR] (Solo en los canales de esta Lista)[/B]',
 	                                  context=context_buscar, only_channels_group = canales, group = item.group, only = item.only, search_special = item.search_special,
                                       thumbnail=config.get_thumb('search'), sort = 'B', text_color='magenta' ))
 

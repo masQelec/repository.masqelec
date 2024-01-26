@@ -291,6 +291,9 @@ def submnu_info(item):
 
     itemlist.append(item.clone( action='', title= '[B]INFO:[/B]', text_color='turquoise', folder=False, thumbnail=config.get_thumb('settings') ))
 
+    itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= ' - Resumen [COLOR gold][B]Canales[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= ' - Resumen [COLOR fuchsia][B]Servidores[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
+
     itemlist.append(item.clone( action='show_menu_parameters', title= ' - [COLOR green][B]Información[/B][/COLOR] de sus Preferencias Actuales para [COLOR tan][B]Menús[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='show_mnu_specials', title= ' - [COLOR green][B]Información[/B][/COLOR] de sus Preferencias Actuales para [COLOR plum][B]Sub-Menús[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
@@ -343,7 +346,7 @@ def submnu_canales(item):
     if config.get_setting('developer_mode', default=False):
         itemlist.append(item.clone( action='show_channels_list', title= ' - [COLOR gold][B]Todos[/B][/COLOR] los Canales', tipo = 'all', thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= ' - Resúmenes y Distribución', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= ' - Resumen y Distribución Canales', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='show_channels_parameters', title=' - Qué [COLOR chocolate][B]Ajustes[/B][/COLOR] tiene en preferencias para Mostrar los Canales', thumbnail=config.get_thumb('settings') ))
 
@@ -391,17 +394,29 @@ def submnu_avisinfo_channels(item):
 
     itemlist.append(item.clone( action='', title= '[B]AVISOS INFORMACIÓN CANALES:[/B]', text_color='gold', folder=False, thumbnail=config.get_thumb('stack') ))
 
+    datos = channeltools.get_channel_parameters('entrepeliculasyseries')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_entrepeliculasyseries', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]EntrePeliculasySeries[/B][/COLOR]', thumbnail=config.get_thumb('entrepeliculasyseries', 'thumb', 'channels') ))
+
     datos = channeltools.get_channel_parameters('hdfull')
     if datos['active']:
         itemlist.append(item.clone( action='show_help_hdfull', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HdFull[/B][/COLOR]', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
 
+    datos = channeltools.get_channel_parameters('hdfullse')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_hdfullse', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HdFullSe[/B][/COLOR]', thumbnail=config.get_thumb('hdfullse', 'thumb', 'channels') ))
+
     datos = channeltools.get_channel_parameters('nextdede')
     if datos['active']:
-        itemlist.append(item.clone( action='show_help_nextdede', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]PlayDede[/B][/COLOR]', thumbnail=config.get_thumb('nextdede', 'thumb', 'channels') ))
+        itemlist.append(item.clone( action='show_help_nextdede', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]NextDede[/B][/COLOR]', thumbnail=config.get_thumb('nextdede', 'thumb', 'channels') ))
 
     datos = channeltools.get_channel_parameters('playdede')
     if datos['active']:
         itemlist.append(item.clone( action='show_help_playdede', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]PlayDede[/B][/COLOR]', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+
+    datos = channeltools.get_channel_parameters('zonaleros')
+    if datos['active']:
+        itemlist.append(item.clone( action='show_help_zonaleros', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]ZonaLeros[/B][/COLOR]', thumbnail=config.get_thumb('zonaleros', 'thumb', 'channels') ))
 
     itemlist.append(item.clone( action='show_help_resto', title= ' - Posible [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] en el resto de los [COLOR gold][B]Canales[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
@@ -540,7 +555,7 @@ def submnu_play(item):
     if config.get_setting('developer_mode', default=False):
         itemlist.append(item.clone( action='show_servers_list', title= ' - [COLOR darkorange][B]Todos[/B][/COLOR] los Servidores', tipo = 'all', thumbnail=config.get_thumb('bolt') ))
 
-    itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= ' - Resúmenes y Distribución', thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= ' - Resumen y Distribución Servidores', thumbnail=config.get_thumb('bolt') ))
 
     itemlist.append(item.clone( action='show_play_parameters', title=' - Qué [COLOR chocolate][B]Ajustes[/B][/COLOR] tiene en preferencias [COLOR fuchsia][B]Play[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
 
@@ -635,7 +650,9 @@ def submnu_proxies(item):
 
     if config.get_setting('proxies_vias', default=False): 
         itemlist.append(item.clone( action='proxies_show_vias', title= ' - [COLOR green][B]Información[/B][/COLOR] Lista [COLOR aqua][B]Vías Alternativas[/B][/COLOR] de Proveedores de proxies', thumbnail=config.get_thumb('settings') ))
-        itemlist.append(item.clone( channel='submnuteam', action='test_tplus', title= ' - Asignar proveedor de proxies[COLOR goldenrod][B]TPlus[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
+
+        if config.get_setting('developer_mode', default=False):
+            itemlist.append(item.clone( channel='submnuteam', action='test_tplus', title= ' - Asignar proveedor de proxies[COLOR goldenrod][B]TPlus[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
 
     itemlist.append(item.clone( action='show_help_recommended', title= ' - Qué Proveedores de proxies están [COLOR lime][B]Recomendados[/B][/COLOR]', thumbnail=config.get_thumb('flame') ))
 
@@ -711,6 +728,8 @@ def submnu_buscar(item):
     itemlist = []
 
     itemlist.append(item.clone( action='', title='[B]BUSCAR:[/B]', folder=False, text_color='yellow', thumbnail=config.get_thumb('magnifyingglass') ))
+
+    itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= ' - Resumen y Distribución Canales', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='show_help_bucle', title = ' - Si las Búsquedas hacen [COLOR yellow][B]Bucle[/COLOR][/B] (solicitan de nuevo el texto a localizar)' ))
 
@@ -901,9 +920,10 @@ def submnu_sistema(item):
     itemlist.append(item.clone( action='show_test', title= ' - Test [COLOR yellow][B]Status[/B][/COLOR] del sistema', thumbnail=config.get_thumb('addon') ))
     itemlist.append(item.clone( channel='actions', title= ' - Comprobar el estado de su [COLOR gold][B]Internet[/B][/COLOR]', action = 'test_internet', thumbnail=config.get_thumb('crossroads') ))
 
-    itemlist.append(item.clone( channel='submnuteam', action='submnu_canales', title= ' - Test [COLOR gold][B]Canales[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( channel='submnuteam', action='submnu_servidores', title= ' - Test [COLOR fuchsia][B]Servidores[/B][/COLOR]', thumbnail=config.get_thumb('flame') ))
-    itemlist.append(item.clone( channel='submnuteam', action='submnu_proxies', title= ' - Test [COLOR red][B]Proxies[/B][/COLOR]', thumbnail=config.get_thumb('flame') ))
+    if config.get_setting('developer_mode', default=False):
+        itemlist.append(item.clone( channel='submnuteam', action='submnu_canales', title= ' - Test [COLOR gold][B]Canales[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+        itemlist.append(item.clone( channel='submnuteam', action='submnu_servidores', title= ' - Test [COLOR fuchsia][B]Servidores[/B][/COLOR]', thumbnail=config.get_thumb('flame') ))
+        itemlist.append(item.clone( channel='submnuteam', action='submnu_proxies', title= ' - Test [COLOR red][B]Proxies[/B][/COLOR]', thumbnail=config.get_thumb('flame') ))
 
     path = os.path.join(config.get_data_path(), 'Lista-proxies.txt')
 
@@ -953,8 +973,8 @@ def submnu_version(item):
 
     itemlist.append(item.clone( action='', title='[B]RESUMENES:[/B]', folder=False, text_color='violet', thumbnail=config.get_thumb('addon') ))
 
-    itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= ' -  Distribución de [COLOR gold][B]Canales[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
-    itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= ' -  Distribución de [COLOR fuchsia][B]Servidores[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= ' -  Resumen y Distribución [COLOR gold][B]Canales[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= ' -  Resumen y Distribución [COLOR fuchsia][B]Servidores[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
     return itemlist
 
@@ -1154,7 +1174,8 @@ def show_help_miscelanea(item):
     logger.info()
 
     txt = '[COLOR gold][B]KODI Media Center:[/B][/COLOR][CR]'
-    txt += '  Versiones soportadas:  [COLOR darkorange][B]21.x,  20.x,  19.x,  18.x  y  17.x[/B][/COLOR][CR][CR]'
+    txt += '  [B][COLOR tan]Kodi Versiones Oficiales Soportadas:[/COLOR][/B][CR]'
+    txt += '  [COLOR darkorange][B]21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia y  17.x Krypton[/B][/COLOR][CR][CR]'
 
     txt += '  Kodi [COLOR yellow]Oficial[/COLOR]:  [COLOR plum][B]kodi.tv/download/[/B][/COLOR][CR]'
     txt += '  para obtener la [COLOR yellowgreen]Última versión[/COLOR] de este Media Center[CR][CR]'
@@ -1326,6 +1347,10 @@ def show_help_pepecinetop(item):
 
 def show_help_playdede(item):
     item.notice = 'playdede'
+    show_help_canales(item)
+
+def show_help_playdo(item):
+    item.notice = 'playdo'
     show_help_canales(item)
 
 def show_help_ppeliculas(item):
@@ -3639,7 +3664,7 @@ def show_help_elementum(item):
 def show_legalidad(item):
     logger.info()
 
-    txt = '[COLOR yellow]*)[B] Balandro [COLOR moccasin][B] es Totalmente [I] GRATUITO [/I], si Pagó por este Add-On le [I] ENGAÑARON, [/I][/B][/COLOR]'
+    txt = '[COLOR yellow]*)[B] Balandro es un Navegador de páginas Webs [COLOR moccasin][B]y  es Totalmente [I] GRATUITO [/I], si Pagó por este Add-On le [I] ENGAÑARON, [/I][/B][/COLOR]'
     txt += '[COLOR lightblue][B] y tiene como objeto, permitir visualizar Películas, Series, Documentales, etc... [/B][/COLOR]'
     txt += '[COLOR lightblue][B] Todo a través de Internet y directamente desde su Sistema Media Center.[/B][/COLOR]'
 
@@ -3653,7 +3678,10 @@ def show_legalidad(item):
 
     txt += '[CR][CR]*)[COLOR mediumaquamarine][B] Este Add-On es un proyecto sin ánimo de Lucro y con Fines Educativos, por lo tanto está Prohibida su Venta en solitario ó como parte de Software Integrado en cualquier dispositivo, es exclusivamente para un uso Docente y Personal.[/B][/COLOR]'
 
-    txt += '[CR][CR]*)[COLOR chartreuse][B] Versiones de este Add-On desde el año 2018.[/B][/COLOR]'
+    txt += '[CR][CR]*)[COLOR moccasin][B]Navega con Kodi por Páginas Webs para poder ver sus contenidos de manera fácil.[/B][/COLOR]'
+    txt += '[CR]  [COLOR chartreuse][B] Versiones de este Add-On desde el año 2018.[/B][/COLOR]'
+
+    txt += '[CR][CR]*)[COLOR aqua][B]Los Propietarios y Distribuidores de este Add-On no Proveen ni Distribuyen Ningún Contenido Mostrado por el Add-On, ni Tienen Afiliación alguna con los Proveedores/Webs de contenidos.[/B][/COLOR]'
 
     txt += '[CR][CR]*)[COLOR red][B][I] Queda totalmente Prohibida su Re-Distribución, sin la Autorización Fehaciente de sus Creadores.[/I][/B][/COLOR]'
 
@@ -4041,6 +4069,13 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   Gnula24H: ' + gnula24h_dominio + '[CR]'
            else: tex_dom = '[CR]   Gnula24H: ' + gnula24h_dominio + '[CR]'
 
+    datos = channeltools.get_channel_parameters('gnulatop')
+    if datos['active']:
+        gnulatop_dominio = config.get_setting('channel_gnulatop_dominio', default='')
+        if gnulatop_dominio:
+           if tex_dom: tex_dom = tex_dom + '   GnulaTop: ' + gnulatop_dominio + '[CR]'
+           else: tex_dom = '[CR]   GnulaTop: ' + gnulatop_dominio + '[CR]'
+
     datos = channeltools.get_channel_parameters('grantorrent')
     if datos['active']:
         grantorrent_dominio = config.get_setting('channel_grantorrent_dominio', default='')
@@ -4194,6 +4229,13 @@ def show_test(item):
         if playdede_dominio:
            if tex_dom: tex_dom = tex_dom + '   PlayDede: ' + playdede_dominio + '[CR]'
            else: tex_dom = '[CR]   PlayDede: ' + playdede_dominio + '[CR]'
+
+    datos = channeltools.get_channel_parameters('playdo')
+    if datos['active']:
+        playdo_dominio = config.get_setting('channel_playdo_dominio', default='')
+        if playdo_dominio:
+           if tex_dom: tex_dom = tex_dom + '   PlayDo: ' + playdo_dominio + '[CR]'
+           else: tex_dom = '[CR]   PlayDo: ' + playdo_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('poseidonhd2')
     if datos['active']:

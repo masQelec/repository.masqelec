@@ -12,6 +12,38 @@ from platformcode import config, logger, platformtools, updater
 from core import httptools, scrapertools, filetools, jsontools
 
 
+LINUX = False
+BR = False
+BR2 = False
+
+if PY3:
+    try:
+       import xbmc
+       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
+    except: pass
+
+try:
+   if LINUX:
+       try:
+          from lib import balandroresolver2 as balandroresolver
+          BR2 = True
+       except: pass
+   else:
+       if PY3:
+           from lib import balandroresolver
+           BR = true
+       else:
+          try:
+             from lib import balandroresolver2 as balandroresolver
+             BR2 = True
+          except: pass
+except:
+   try:
+      from lib import balandroresolver2 as balandroresolver
+      BR2 = True
+   except: pass
+
+
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
 color_adver = config.get_setting('notification_adver_color', default='violet')
@@ -819,6 +851,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
     headers = {}
 
     if channel_id == 'playdo':
+        host_acces = host_acces + 'api/search'
         useragent = httptools.get_user_agent()
         headers = {"User-Agent": useragent + " pddkit/2023"}
 
@@ -832,14 +865,14 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, timeout=timeout, raise_weberror=False, bypass_cloudflare=False)
 
         if '<title>You are being redirected...</title>' in response.data or '<title>Just a moment...</title>' in response.data:
-            try:
-                from lib import balandroresolver
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(response.data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                    response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
-            except:
-                pass
+            if BR or BR2:
+                try:
+                    ck_name, ck_value = balandroresolver.get_sucuri_cookie(response.data)
+                    if ck_name and ck_value:
+                        httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                        response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+                except:
+                    pass
 
         if not response.data:
             if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification(channel_name.capitalize(), '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
@@ -881,14 +914,14 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, timeout=timeout, raise_weberror=False, bypass_cloudflare=False)
 
         if '<title>You are being redirected...</title>' in response.data or '<title>Just a moment...</title>' in response.data:
-            try:
-                from lib import balandroresolver
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(response.data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                    response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
-            except:
-                pass
+            if BR or BR2:
+                try:
+                    ck_name, ck_value = balandroresolver.get_sucuri_cookie(response.data)
+                    if ck_name and ck_value:
+                        httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
+                        response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
+                except:
+                    pass
 
         if not response.data:
             if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification(channel_name.capitalize(), '[COLOR cyan]Re-Intentanto acceso[/COLOR]')

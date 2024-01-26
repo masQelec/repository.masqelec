@@ -21,11 +21,11 @@
         "url": "https://vtbe.to/\\1"
       },
       {
-        "pattern": "https://vtbe.(?:net|to)/embed-[A-z0-9]+.html",
+        "pattern": "https://vtbe.(?:net|to|network)/embed-[A-z0-9]+.html",
         "url": "https://vtbe.to/\\1"
       },
       {
-        "pattern": "https://vtbe.(?:net|to)/([A-z0-9-]+)",
+        "pattern": "https://vtbe.(?:net|to|network)/([A-z0-9-]+)",
         "url": "https://vtbe.to/\\1"
       },
       {

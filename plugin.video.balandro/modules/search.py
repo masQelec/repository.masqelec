@@ -458,17 +458,31 @@ def do_search(item, tecleado):
 
     progreso = platformtools.dialog_progress('Buscando ' + '[B][COLOR yellow]' + tecleado + '[/B][/COLOR]', '...')
 
-    # status para descartar desactivados por el usuario
+    # ~ status para descartar desactivados por el usuario
     if item.search_special == 'anime' or item.search_special == 'dorama':
         filtros = { 'searchable': False, 'status': 0 }
     else:
-        filtros = { 'searchable': True, 'status': 0 }
+        if item.only_channels_group:
+            if item.group == 'dorama': filtros = { 'status': 0 }
+            elif item.group == 'anime': filtros = { 'status': 0 }
+            else: filtros = { 'searchable': True, 'status': 0 }
+        else: filtros = { 'searchable': True, 'status': 0 }
 
-    if item.search_type != 'all': filtros['search_types'] = item.search_type
+    if item.search_type != 'all':
+        if item.only_channels_group:
+            if not item.group == 'docs': filtros['search_types'] = item.search_type
+        else: filtros['search_types'] = item.search_type
+    else:
+        if item.only_channels_group:
+            if not item.group == 'tales':
+                if not item.group == 'torrents':
+                    if not item.group == 'dorama':
+                        if not item.group == 'anime':
+                            filtros['search_types'] = item.search_type
 
     ch_list = channeltools.get_channels_list(filtros=filtros)
 
-    # descartar from_channel (búsqueda en otros canales)
+    # ~ descartar from_channel (búsqueda en otros canales)
     if item.from_channel != '':
         ch_list = [ch for ch in ch_list if ch['id'] != item.from_channel]
 
@@ -674,7 +688,7 @@ def do_search(item, tecleado):
     config.set_setting('sin_resp', 'si')
 
     if item.from_channel != '': 
-        # Búsqueda exacta en otros/todos canales de una peli/serie : mostrar sólo las coincidencias exactas
+        # ~ Búsqueda exacta en otros/todos canales de una peli/serie : mostrar sólo las coincidencias exactas
         tecleado_lower = tecleado.lower()
 
         for ch in ch_list:
@@ -712,7 +726,7 @@ def do_search(item, tecleado):
                     itemlist.append(it)
 
     else:
-        # Búsqueda parecida en todos los canales : link para acceder a todas las coincidencias y previsualización de n enlaces por canal
+        # ~ Búsqueda parecida en todos los canales : link para acceder a todas las coincidencias y previsualización de n enlaces por canal
         nro = 0
 
         titulo = ''

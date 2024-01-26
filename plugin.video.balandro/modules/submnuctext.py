@@ -909,6 +909,13 @@ def _proxies(item):
 
         if config.get_setting('channel_gnula24h_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'gnulatop':
+        from channels import gnulatop
+        item.channel = 'gnulatop'
+        gnulatop.configurar_proxies(item)
+
+        if config.get_setting('channel_gnulatop_proxies') is None: refrescar = False
+
     elif item.from_channel == 'grantorrent':
         from channels import grantorrent
         item.channel = 'grantorrent'
@@ -1097,6 +1104,13 @@ def _proxies(item):
         playdede.configurar_proxies(item)
 
         if config.get_setting('channel_playdede_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'playdo':
+        from channels import playdo
+        item.channel = 'playdo'
+        playdo.configurar_proxies(item)
+
+        if config.get_setting('channel_playdo_proxies') is None: refrescar = False
 
     elif item.from_channel == 'plushd':
         from channels import plushd

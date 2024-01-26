@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -256,6 +256,8 @@ def list_all(item):
         title = scrapertools.find_single_match(article, '<h3 class="Title">(.*?)</h3>')
 
         if not url or not title: continue
+
+        if title == 'CATÁLOGO PELICULAS': continue
 
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         if thumb.startswith('//'): thumb = 'https:' + thumb
