@@ -38,6 +38,10 @@
       {
         "pattern": "uqload.io/(?:embed-|)([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.to/(?:embed-|)([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
       }
     ]
   }

@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -152,6 +152,11 @@ def do_downloadpage(url, post=None, headers=None):
             except:
                 pass
 
+    if '<title>Just a moment...</title>' in data:
+        if not '?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -177,6 +182,8 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='manto_domain_cinecalidad', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_cinecalidad', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
 
     platformtools.itemlist_refresh()
 
@@ -316,7 +323,7 @@ def list_all(item):
 
         url = url.replace('\\/', '/')
 
-        if '-1-ano' in url or '-premium-12-meses' in url or '/netflix/a-day-without-a-mexican/' in url: continue
+        if '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url: continue
 
         if not url or not title: continue
 
@@ -578,6 +585,7 @@ def findvideos(item):
             elif servidor == 'google': servidor = 'gvideo'
             elif servidor == 'drive': servidor = 'gvideo'
             elif servidor == 'google drive': servidor = 'gvideo'
+            elif servidor == 'netu': servidor = 'waaw'
 
             elif servidor == 'streamwish':
                   other = servidor.capitalize()

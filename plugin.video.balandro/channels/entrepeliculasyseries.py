@@ -293,7 +293,7 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        title = title.replace('&#8211;', '').replace('&#039;', "'").strip()
+        title = title.replace('&#8211;', '').replace('&#039;', "'").replace('&#8230;', ' &').replace('&amp;', '&').strip()
 
         tipo = 'movie' if '/movies/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -492,6 +492,11 @@ def findvideos(item):
         other = ''
 
         if servidor == 'various': other = servertools.corregir_other(url)
+
+        if servidor == 'directo':
+            if config.get_setting('developer_mode', default=False):
+                other = url.split("/")[2]
+                other = other.replace('https:', '').strip()
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
 

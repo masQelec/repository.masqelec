@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.01[/COLOR] [COLOR chartreuse] 24 de Enero de 2024[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.02[/COLOR] [COLOR chartreuse] 22 de Febrero de 2024[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
@@ -42,10 +42,6 @@
  [COLOR yellowgreen][B]CANALES QUE REQUIEREN REGISTRARSE (Cuenta):[/B][/COLOR]
     HdFull,  NextDede,  PlayDede
 
- [COLOR slateblue][B]CANALES QUE PUEDEN SER INCOMPATIBLES:[/B][/COLOR]
-    [COLOR lime][B]Con Media Centers anteriores a 19.x, podrian NO resultar operativos[/B][/COLOR]
-    SeriesPapayaXyz
-
  [COLOR greenyellow][B]CANALES PROBLEMATICOS:[/B][/COLOR]
     [COLOR springgreen][B]Son en los que Predominan Sin enlaces Disponibles, Invalidos y/o Servidores No Soportados[/B][/COLOR]
     CiberDocumentales,  CineDeAntes,  CinematteFlix,
@@ -53,16 +49,14 @@
 
  [COLOR cyan][B]CANALES INESTABLES:[/B][/COLOR]
     [COLOR springgreen][B]Son los pendientes de su evolucion, para decidir su Situacion Definitiva[/B][/COLOR]
-    HenaOjara
+    MiraPeliculas
 
  [COLOR darkcyan][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR]
     [COLOR springgreen][B]Son los pendientes de su situacion, para decidir su Re-activacion o Anulacion[/B][/COLOR]
     [B][COLOR moccasin] DocumaniaTv [COLOR lime] www.documaniatv.com [I][COLOR olivedrab] Player [/I][/B][/COLOR]
-    [B][COLOR moccasin] FrozenLayer [COLOR lime] www.frozen-layer.com [I][COLOR red] En Mantenimiento [/I][/B][/COLOR]
-    [B][COLOR moccasin] GranTorrents [COLOR lime] grantorrent.lat [I][COLOR red] Dominio Caducado [/I][/B][/COLOR]
+    [B][COLOR moccasin] DoramedPlay [COLOR lime] doramedplay.cc [I][COLOR red] Host Error [/I][/B][/COLOR]
     [B][COLOR moccasin] NextDede [COLOR lime] nextdede.tv [I][COLOR greenyellow] Cambio Estructural [/I][/B][/COLOR]
-    [B][COLOR moccasin] TorrentPelis [COLOR lime] torrentpelis.org [I][COLOR red] Dominio Caducado [/I][/B][/COLOR]
-
+ 
  [COLOR gold][B]SERVIDORES VIAS ALTERNATIVAS/ADICIONALES QUE PUEDEN NECESITARSE:[/B][/COLOR]
     plugin.video.youtube
     script.module.resolveurl

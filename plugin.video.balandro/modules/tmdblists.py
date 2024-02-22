@@ -15,19 +15,24 @@ def mainlist(item):
 
     item.category = 'TMDB'
 
-    itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información[/B][/COLOR] TMDB', folder=False, thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información [COLOR violet]TMDB[/B][/COLOR]', folder=False, thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( action='personas', search_type='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...', thumbnail=config.get_thumb('search'),
-                                plot = 'Escribir el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
+    itemlist.append(item.clone( action='personas', search_type='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
 
-    itemlist.append(item.clone( action='personas', search_type='crew', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...', thumbnail=config.get_thumb('search'),
-                                plot = 'Escribir el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
+    itemlist.append(item.clone( action='personas', search_type='crew', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
+
+    itemlist.append(item.clone( action='listado_personas', search_type='person', extra = 'popular', title=' - [COLOR limegreen]Más populares[/COLOR]', thumbnail=config.get_thumb('search') ))
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( action='listado_personas', search_type='person', extra = 'popular', title=' - [COLOR limegreen]Personas[/COLOR] más populares' ))
+    if not config.get_setting('mnu_simple', default=False):
+        if config.get_setting('mnu_pelis', default=True):
+            itemlist.append(item.clone( action='search', title=' - Buscar [COLOR deepskyblue]película[/COLOR] ...', search_type='movie', thumbnail=config.get_thumb('search') ))
+
+        if config.get_setting('mnu_series', default=True):
+            itemlist.append(item.clone( action='search', title=' - Buscar [COLOR hotpink]serie[/COLOR] ...', search_type='tvshow', thumbnail=config.get_thumb('search') ))
 
     presentar = True
     if item.search_type == 'tvshow': presentar = False
@@ -36,12 +41,10 @@ def mainlist(item):
        if item.search_type == 'movie': presentar = False
 
     if presentar:
-        itemlist.append(item.clone( title = '[B]Películas:[/B]', thumbnail=config.get_thumb('movie'), action = '', text_color='deepskyblue' ))
+        itemlist.append(item.clone( title = '[B]Películas:[/B]', action = '', text_color='deepskyblue' ))
 
         if config.get_setting('search_extra_trailers', default=False):
-            itemlist.append(item.clone( channel='trailers', action='search', title=' - Buscar en [COLOR darkgoldenrod]Tráilers[/COLOR] ...', thumbnail=config.get_thumb('search') ))
-
-        itemlist.append(item.clone( action='search', title=' - Buscar [COLOR deepskyblue]título[/COLOR] ...', search_type='movie', thumbnail=config.get_thumb('search') ))
+            itemlist.append(item.clone( channel='trailers', action='search', title=' - Buscar en [COLOR darkgoldenrod]Tráilers[/COLOR] ...', thumbnail=config.get_thumb('trailers') ))
 
         itemlist.append(item.clone( action='listado', search_type='movie', extra = 'now_playing', title='   - En cartelera', thumbnail=config.get_thumb('novedades') ))
         itemlist.append(item.clone( action='listado', search_type='movie', extra = 'popular', title='   - Más populares', thumbnail=config.get_thumb('besttvshows') ))
@@ -60,9 +63,7 @@ def mainlist(item):
        if item.search_type == 'tvshow': presentar = False
 
     if presentar:
-        itemlist.append(item.clone( title = '[B]Series:[/B]', thumbnail=config.get_thumb('tvshow'), action = '', text_color='hotpink' ))
-
-        itemlist.append(item.clone( action='search', title=' - Buscar [COLOR hotpink]título[/COLOR] ...', search_type='tvshow', thumbnail=config.get_thumb('search') ))
+        itemlist.append(item.clone( title = '[B]Series:[/B]', action = '', text_color='hotpink' ))
 
         itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'on_the_air', title='   - En emisión' ))
         itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'popular', title='   - Más populares', thumbnail=config.get_thumb('besttvshows') ))
@@ -112,11 +113,9 @@ def lista(item, elementos):
         titulo = elemento['title'] if 'title' in elemento else elemento['name']
 
         if 'title' in elemento:
-            itemlist.append(item.clone( channel='search', action = 'search', buscando = texto_busqueda(titulo), from_channel = item.channel, title = titulo, search_type = 'movie', 
-                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'tmdb_id': elemento['id']} ))
+            itemlist.append(item.clone( channel='search', action = 'search', buscando = texto_busqueda(titulo), from_channel = item.channel, title = titulo, search_type = 'movie', contentType = 'movie', contentTitle = titulo, infoLabels = {'tmdb_id': elemento['id']} ))
         else:
-            itemlist.append(item.clone( channel='search', action = 'search', buscando = texto_busqueda(titulo), from_channel = item.channel, title = titulo, search_type = 'tvshow', 
-                                        contentType = 'tvshow', contentSerieName = titulo, infoLabels = {'tmdb_id': elemento['id']} ))
+            itemlist.append(item.clone( channel='search', action = 'search', buscando = texto_busqueda(titulo), from_channel = item.channel, title = titulo, search_type = 'tvshow', contentType = 'tvshow', contentSerieName = titulo, infoLabels = {'tmdb_id': elemento['id']} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -268,11 +267,9 @@ def personas(item):
         if len(elementos) == 0:
             platformtools.dialog_notification(tecleado, '[COLOR coral]Sin resultados[/COLOR]')
             return
-
         elif len(elementos) == 1:
             item.person_id = elementos[0]['id']
             item.category = elementos[0]['name']
-
         else:
             opciones = []; opciones_ids = [];
             for elemento in elementos:
@@ -294,8 +291,7 @@ def personas(item):
                 opciones_ids.append(elemento['id'])
 
             ret = platformtools.dialog_select('Selecciona la persona que buscas', opciones, useDetails=True)
-            if ret == -1: 
-                return
+            if ret == -1: return
 
             item.person_id = opciones_ids[ret]
             item.category = opciones[ret].getLabel()
@@ -321,11 +317,9 @@ def personas(item):
         if 'character' in elemento: sufijo += '[LIGHT][COLOR gray][I]%s[/I][/COLOR][/LIGHT]' % elemento['character']
 
         if 'title' in elemento:
-            itemlist.append(item.clone( channel='search', action = 'search', buscando = texto_busqueda(titulo), from_channel = item.channel, title = titulo, fmt_sufijo=sufijo, search_type = 'movie',
-                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'tmdb_id': elemento['id']} ))
+            itemlist.append(item.clone( channel='search', action = 'search', buscando = texto_busqueda(titulo), from_channel = item.channel, title = titulo, fmt_sufijo=sufijo, search_type = 'movie', contentType = 'movie', contentTitle = titulo, infoLabels = {'tmdb_id': elemento['id']} ))
         else:
-            itemlist.append(item.clone( channel='search', action = 'search', buscando = texto_busqueda(titulo), from_channel = item.channel, title = titulo, fmt_sufijo=sufijo, search_type = 'tvshow',
-                                        contentType = 'tvshow', contentSerieName = titulo, infoLabels = {'tmdb_id': elemento['id']} ))
+            itemlist.append(item.clone( channel='search', action = 'search', buscando = texto_busqueda(titulo), from_channel = item.channel, title = titulo, fmt_sufijo=sufijo, search_type = 'tvshow', contentType = 'tvshow', contentSerieName = titulo, infoLabels = {'tmdb_id': elemento['id']} ))
 
         if len(itemlist) >= perpage: break
 
@@ -356,8 +350,7 @@ def listado_personas(item):
         thumb = ''
         if elemento['profile_path']: thumb = thumbs + 't/p/w235_and_h235_face%s' % elemento['profile_path']
 
-        itemlist.append(item.clone( action = 'personas', person_id = elemento['id'], search_type = 'cast', page = 1, 
-                                    title = elemento['name'], thumbnail = thumb, plot = info, category = elemento['name'], text_color='moccasin' ))
+        itemlist.append(item.clone( action = 'personas', person_id = elemento['id'], search_type = 'cast', page = 1, title = elemento['name'], thumbnail = thumb, plot = info, category = elemento['name'], text_color='moccasin' ))
 
     if len(itemlist) > 0:
         itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, text_color='coral' ))
@@ -396,8 +389,7 @@ def search(item, texto):
 
             tmdb_id = result['id']
 
-            new_item = Item( channel='search', action='search', title=title, buscando=title, thumbnail=thumb,
-                                               search_type=search_type, contentTitle=contentTitle, contentSerieName=contentSerieName, from_channel=item.channel, infoLabels = {'tmdb_id': tmdb_id} )
+            new_item = Item( channel='search', action='search', title=title, buscando=title, thumbnail=thumb, search_type=search_type, contentTitle=contentTitle, contentSerieName=contentSerieName, from_channel=item.channel, infoLabels = {'tmdb_id': tmdb_id} )
 
             itemlist.append(new_item)
 

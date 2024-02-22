@@ -41,6 +41,8 @@ def get_video_url(page_url, url_referer=''):
     logger.info("url=" + page_url)
     video_urls = []
 
+    if '/watch_video.php?v=/watch_video.php?v=' in page_url: page_url = page_url.replace('/watch_video.php?v=/watch_video.php?v=', '/watch_video.php?v=')
+
     ini_page_url = page_url
 
     if not xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
@@ -9,8 +8,9 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://ultrapelishd.net/'
 
 
-
 def do_downloadpage(url, post=None, headers=None):
+    if not headers: headers = {'Referer': host}
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -118,7 +118,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, "<li id='player-option-(.*?)</span>")
+    matches = scrapertools.find_multiple_matches(data, "<li id='player-option-(.*?)</span></li>")
 
     ses = 0
 
@@ -126,7 +126,9 @@ def findvideos(item):
         ses += 1
 
         d_type = scrapertools.find_single_match(match, "data-type='(.*?)'")
+
         d_post = scrapertools.find_single_match(match, "data-post='(.*?)'")
+
         d_nume = scrapertools.find_single_match(match, "data-nume='(.*?)'")
 
         if not d_type or not d_post or not d_nume: continue
@@ -137,7 +139,7 @@ def findvideos(item):
 
         data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post)
 
-        url = scrapertools.find_single_match(data, '"embed_url":.*?"(.*?)"')
+        url = scrapertools.find_single_match(str(data), '"embed_url":.*?"(.*?)"')
 
         url = url.replace('\\/', '/')
 
@@ -161,8 +163,8 @@ def findvideos(item):
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
-            else:
-               if not config.get_setting('developer_mode', default=False): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
 
         other = servidor
 

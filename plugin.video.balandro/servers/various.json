@@ -213,6 +213,10 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://cdnwish.com/(?:e/|f/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://krakenfiles.com/(?:view/|embed-video/)([0-9a-zA-Z]+)",
         "url": "https://krakenfiles.com/embed-video/\\1"
       },
@@ -326,6 +330,10 @@
       },
       {
         "pattern": "https://vudeo.co/(?:embed-|)([0-9a-zA-Z]+)",
+        "url": "https://vudeo.co/\\1"
+      },
+      {
+        "pattern": "https://vudeo.ws/(?:embed-|)([0-9a-zA-Z]+)",
         "url": "https://vudeo.co/\\1"
       },
       {
@@ -454,6 +462,10 @@
       },
       {
         "pattern": "https://vidhidepro.com/(?:s/|v/|f/|embed/)([0-9a-zA-Z]+)",
+        "url": "https://vidhidepro.com/s/\\1"
+      },
+      {
+        "pattern": "https://vidhidevip.com/(?:s/|v/|f/|embed/)([0-9a-zA-Z]+)",
         "url": "https://vidhidepro.com/s/\\1"
       },
       {

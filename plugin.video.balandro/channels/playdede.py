@@ -467,7 +467,7 @@ def acciones(item):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login', start_ses = True ))
 
-            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
+            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales', thumbnail=config.get_thumb('pencil') ))
             itemlist.append(Item( channel='domains', action='del_datos_playdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
@@ -477,7 +477,7 @@ def acciones(item):
     if config.get_setting('playdede_login', 'playdede', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
 
-        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
+        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales', thumbnail=config.get_thumb('pencil') ))
         itemlist.append(Item( channel='domains', action='del_datos_playdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
 
     itemlist.append(item_configurar_proxies(item))
@@ -1755,7 +1755,7 @@ def clean_title(title, url):
     return title
 
 
-def shuw_credenciales(item):
+def show_credenciales(item):
     logger.info()
 
     username = config.get_setting('playdede_username', 'playdede', default='')

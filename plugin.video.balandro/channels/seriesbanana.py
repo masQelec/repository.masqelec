@@ -92,7 +92,7 @@ def temporadas(item):
         title = 'Temporada ' + season
 
         if len(matches) == 1:
-            if not config.get_setting('channels_seasons', default=True):
+            if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
             item.page = 0

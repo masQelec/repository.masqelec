@@ -293,6 +293,9 @@ def list_all(item):
 
     if not item.page: item.page = 0
 
+    year = '-'
+    if '/year/' in item.url: year = scrapertools.find_single_match(item.url, "/year/(.*?)/")
+
     if item.search_post: data = do_downloadpage(item.url, post=item.search_post)
     else: data = do_downloadpage(item.url)
 
@@ -323,13 +326,13 @@ def list_all(item):
                 if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = ', '.join(languages), fmt_sufijo = sufijo,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
+                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
             itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, languages = ', '.join(languages), fmt_sufijo = sufijo,
-                                        contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': '-'} ))
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
         if len(itemlist) >= perpage: break
 
@@ -529,20 +532,27 @@ def findvideos(item):
     data_js = do_downloadpage(host + '/static/style/js/jquery.hdfull.view.min.js')
 
     keys = scrapertools.find_multiple_matches(data_js, 'JSON.parse\(atob.*?substrings\((.*?)\)')
+
     if not keys: 
         keys = scrapertools.find_multiple_matches(data_js, 'JSON.*?\]\((0x[0-9a-f]+)\)\);')
+        if not keys: keys = scrapertools.find_multiple_matches(data_js, 'JSON.*?\]\(([0-9]+)\)\);')
+
         if keys: 
             for i, key in enumerate(keys): keys[i] = int(key, 16)
 
-        else: keys = scrapertools.find_multiple_matches(data_js, 'JSON.*?\]\(([0-9]+)\)\);')
+    if not keys:
+        if config.get_setting('developer_mode', default=False): platformtools.dialog_notification(config.__addon_name + ' HdFullSe', '[COLOR red][B]Faltan Keys[/B][/COLOR]')
+
+    provs = ''
 
     data_js = do_downloadpage(host + '/static/js/providers.js')
 
-    try:
-        provs = balandroresolver.hdfull_providers(data_js)
-        if not provs: return itemlist
-    except:
-        return itemlist
+    try: provs = balandroresolver.hdfull_providers(data_js)
+    except: pass
+
+    if not provs:
+        if config.get_setting('developer_mode', default=False):
+            if not str(provs) == '[]': platformtools.dialog_notification(config.__addon_name + ' HdFullSe', '[COLOR red][B]Faltan Provs[/B][/COLOR]')
 
     data = do_downloadpage(item.url)
 
@@ -555,9 +565,15 @@ def findvideos(item):
            data_decrypt = jsontools.load(balandroresolver.obfs(base64.b64decode(data_obf), 126 - int(key)))
            if data_decrypt: break
         except:
-           return itemlist
+           pass
+
+    if not data_decrypt:
+        if config.get_setting('developer_mode', default=False):
+            if not str(data_decrypt) == '[]': platformtools.dialog_notification(config.__addon_name + ' HdFullSe', '[COLOR red][B]Faltan Decrypts[/B][/COLOR]')
 
     matches = []
+
+    ses = 0
 
     for match in data_decrypt:
         if match['provider'] in provs:
@@ -566,9 +582,9 @@ def findvideos(item):
                 url = eval(provs[match['provider']][1].replace('_code_', "match['code']"))
                 matches.append([match['lang'], match['quality'], url, embed])
             except:
-                pass
-
-    ses = 0
+                ses += 1
+        else:
+            ses += 1
 
     for idioma, calidad, url, embed in matches:
         ses += 1
@@ -581,6 +597,7 @@ def findvideos(item):
 
         elif 'onlystream.tv' in url: url = url.replace('onlystream.tv', 'upstream.to')
         elif 'vev.io' in url: url = url.replace('vev.io', 'streamtape.com/e')
+        elif 'waaw.tv' in url: url = url.replace('/watch_video.php?v=', '/e/')
 
         try:
             calidad = unicode(calidad, 'utf8').upper().encode('utf8')

@@ -15,13 +15,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wvv1.cuevana3.vip'
+host = 'https://vwv3.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://cuevana3.law', 'https://pro.cuevana8.vip', 'https://cuevana8.vip',
              'https://cuevana8.online', 'https://cuevana.la', 'https://www.cuevana.la',
-             'https://ww2.cuevana3.law']
+             'https://ww2.cuevana3.law', 'https://wvv1.cuevana3.vip', 'https://new.cuevana3.vip']
 
 domain = config.get_setting('dominio', 'cuevana3lw', default='')
 
@@ -31,12 +31,67 @@ if domain:
     else: host = domain
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_cuevana3lw_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    hay_proxies = False
+    if config.get_setting('channel_cuevana3lw_proxies', default=''): hay_proxies = True
+
+    timeout = None
+    if host in url:
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+    else:
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('cuevana3lw', url, post=post, headers=headers, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            if not '/?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Cuevana3Lw', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('cuevana3lw', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                   data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     return data
 
@@ -61,6 +116,8 @@ def acciones(item):
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_cuevana3lw', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     platformtools.itemlist_refresh()
 
@@ -91,7 +148,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/movies/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/category/estrenos/', search_type = 'movie', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/category/page-peliculas-de-estrenos/?type=movies', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -404,7 +461,7 @@ def findvideos(item):
         if not links: continue
 
         for url in links:
-            trembed = url.replace('&#038;', '&')
+            trembed = url.replace('&#038;', '&').replace('&amp;', '&').replace('#038;', '')
 
             data = do_downloadpage(trembed)
 
@@ -415,7 +472,7 @@ def findvideos(item):
                 if vid.startswith('//'): vid = 'https:' + vid
 
                 if '/play?' in vid or '/streamhd?' in vid:
-                    vid = vid.replace('&amp;', '&')
+                    vid = vid.replace('&#038;', '&').replace('&amp;', '&').replace('#038;', '')
 
                     data = do_downloadpage(vid)
 
@@ -493,7 +550,7 @@ def play(item):
     logger.info()
     itemlist = []
 
-    url = item.url.replace('&#038;', '&').replace('&amp;', '&')
+    url = item.url.replace('&#038;', '&').replace('&amp;', '&').replace('#038;', '')
 
     if not item.server:
         item.url = url

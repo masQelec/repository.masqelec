@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www11.series24.cc/'
+host = 'https://w-ww.series24.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.series24.cc/', 'https://www1.series24.cc/', 'https://ww3.series24.cc/',
-            'https://ww2.series24.cc/']
+            'https://ww2.series24.cc/', 'https://www11.series24.cc/']
 
 
 domain = config.get_setting('dominio', 'series24', default='')
@@ -137,7 +137,9 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Novelas', action = 'list_all', url = host + 'series-genero/novelas/', search_type = 'tvshow', text_color='limegreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow', text_color='moccasin' ))
 
     return itemlist
 
@@ -159,6 +161,21 @@ def generos(item):
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'hotpink' ))
 
     return sorted(itemlist, key=lambda it: it.title)
+
+
+def anios(item):
+    logger.info()
+    itemlist = []
+
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 1969, -1):
+        url = host + 'series-de/' + str(x) + '/'
+
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'hotpink' ))
+
+    return itemlist
 
 
 def plataformas(item):

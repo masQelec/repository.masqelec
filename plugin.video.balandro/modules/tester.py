@@ -745,7 +745,7 @@ def test_channel(channel_name):
 
        if not 'code: [COLOR springgreen][B]200' in txt:
            if not channels_unsatisfactory == 'unsatisfactory':
-               if '[COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]' in txt:
+               if txt_verif in txt:
                    avis_causas = txt_verif
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
@@ -1042,7 +1042,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or '.ennovelas.' in new_web:
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1050,7 +1050,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     new_web = ''
 
                     if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
-                        txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]"
+                        txt += '[CR]comprobar: ' + txt_verif
 
                 if response.headers:
                     txt += '[CR][CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
@@ -1145,7 +1145,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or '.ennovelas.' in new_web:
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1153,7 +1153,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     new_web = ''
 
                     if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
-                        txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]"
+                        txt += '[CR]comprobar: ' + txt_verif
 
                 if new_web:
                     if '/cgi-sys/suspendedpage.cgi' in new_web: txt += '[CR]status: [COLOR red][B]' + new_web + '[/B][/COLOR]'
@@ -1229,6 +1229,9 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
+                        if channel_id == 'playdo':
+                            if '{"status":' in str(response.data): txt += txt_verif 
+
                         if 'actuales:' in txt:
                             if 'Sin proxies' in txt: txt += txt_proxs
                             else:
@@ -1237,12 +1240,14 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += txt_routs
 
-                    txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
+                    if channel_id == 'playdo':
+                        if not '{"status":' in str(response.data): txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
+                    else:
+                        txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
 
                 if not '/cgi-sys/suspendedpage.cgi' or not '/wp-admin/install.php' in new_web:
                     txt += '[CR][CR][COLOR moccasin][B]Datos:[/B][/COLOR][CR]'
                     txt += str(response.data).strip() + '[CR]'
-
 
     if 'active: True' in txt:
         if 'Invisible Captcha' in txt or 'Obtenga nuevos proxies' in txt or 'Host error' in txt or 'No se puede establecer una' in txt or 'Cloudflare' in txt or 'Protection' in txt or 'Unknow' in txt or 'invalid:' in txt:
@@ -1725,7 +1730,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
                 new_web = ''
 
                 if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
-                    txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]"
+                    txt += '[CR]comprobar: ' + txt_verif
 
             elif new_web:
                 if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':

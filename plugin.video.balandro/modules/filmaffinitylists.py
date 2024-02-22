@@ -26,20 +26,21 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información[/B][/COLOR] Filmaffinity', folder=False, thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información [COLOR violet]Filmaffinity[/B][/COLOR]', folder=False, thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( action='listas', search_type='person', stype='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...', thumbnail=config.get_thumb('search'),
-                                plot = 'Escribir el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
+    itemlist.append(item.clone( action='listas', search_type='person', stype='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
 
-    itemlist.append(item.clone( action='listas', search_type='person', stype='director', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...', thumbnail=config.get_thumb('search'),
-                                plot = 'Escribir el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
+    itemlist.append(item.clone( action='listas', search_type='person', stype='director', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
     itemlist.append(item.clone( action='listas', search_type='all', stype='title', title=' - Buscar [COLOR yellow]película y/ó serie[/COLOR] ...', thumbnail=config.get_thumb('search') ))
-    itemlist.append(item.clone( action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]documental[/COLOR] ...', thumbnail=config.get_thumb('search') ))
+
+    if not config.get_setting('mnu_simple', default=False):
+        if config.get_setting('mnu_documentales', default=True):
+            itemlist.append(item.clone( action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]documental[/COLOR] ...', thumbnail=config.get_thumb('documentary') ))
 
     por_plataforma = False
     por_tema = False
@@ -54,10 +55,10 @@ def mainlist(item):
         por_plataforma = True
         por_tema = True
 
-        itemlist.append(item.clone( title = '[B]Películas:[/B]', thumbnail=config.get_thumb('movie'), action = '', text_color='deepskyblue' ))
+        itemlist.append(item.clone( title = '[B]Películas:[/B]', action = '', text_color='deepskyblue' ))
 
         if config.get_setting('search_extra_trailers', default=False):
-            itemlist.append(item.clone( channel='trailers', action='search', title=' - Buscar en [COLOR darkgoldenrod]Tráilers[/COLOR] ...', thumbnail=config.get_thumb('search') ))
+            itemlist.append(item.clone( channel='trailers', action='search', title=' - Buscar en [COLOR darkgoldenrod]Tráilers[/COLOR] ...', thumbnail=config.get_thumb('trailers') ))
 
         itemlist.append(item.clone( title = ' - En cartelera', action = 'list_all', url = host + 'cat_new_th_es.html', thumbnail=config.get_thumb('novedades'), search_type = 'movie' ))
 
@@ -87,7 +88,7 @@ def mainlist(item):
             por_tema = True
             itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php' ))
 
-        itemlist.append(item.clone( title = '[B]Series:[/B]', thumbnail=config.get_thumb('tvshow'), action = '', text_color='hotpink' ))
+        itemlist.append(item.clone( title = '[B]Series:[/B]', action = '', text_color='hotpink' ))
 
         itemlist.append(item.clone( title = ' - Premios Emmy', action = 'emmy_ediciones', url = host + 'award_data.php?award_id=emmy&year=', thumbnail=config.get_thumb('emmys'), search_type = 'tvshow' ))
 
@@ -104,13 +105,13 @@ def mainlist(item):
 
         if not config.get_setting('mnu_simple', default=False):
             if config.get_setting('mnu_documentales', default=True):
-                itemlist.append(item.clone( title = '[B]Documentales:[/B]', thumbnail=config.get_thumb('documentary'), action = '', text_color='cyan' ))
+                itemlist.append(item.clone( title = '[B]Documentales:[/B]', action = '', text_color='cyan' ))
 
                 itemlist.append(item.clone( title = ' - Los mejores', action = 'list_sel', url = host + ruta_sel + '&notvse=1', cod_genre = 'DO', thumbnail=config.get_thumb('bestdocumentaries'), search_type = 'all' ))
 
     if not item.search_type:
         if config.get_setting('channels_link_main', default=True):
-            itemlist.append(item.clone( title = '[B]Películas y Series:[/B]', thumbnail=config.get_thumb('bookshelf'), action = '', text_color='yellow' ))
+            itemlist.append(item.clone( title = '[B]Películas y Series:[/B]', action = '', text_color='teal' ))
 
             itemlist.append(item.clone( title = ' - Novedades a la venta', action = 'list_all', url = host + 'cat_new_sa_es.html', thumbnail=config.get_thumb('novedades'), search_type = 'all' ))
             itemlist.append(item.clone( title = ' - Novedades en alquiler', action = 'list_all', url = host + 'cat_new_re_es.html', thumbnail=config.get_thumb('novedades'), search_type = 'all' ))
@@ -708,6 +709,7 @@ def sagas(item):
             url = url.replace(prev_page, '')
 
             next_page = item.page + 1
+
             itemlist.append(item.clone( title = 'Siguientes ...', url = url + '?p=' + str(next_page), action = 'sagas', page = next_page, text_color='coral' ))
 
     return itemlist
@@ -939,14 +941,12 @@ def _sagas(item):
 
     return sagas(item)
 
-
 def _bestmovies(item):
     logger.info()
 
     item.url = host + ruta_sel + '&notvse=1&nodoc=1'
 
     return list_sel(item)
-
 
 def _besttvshows(item):
     logger.info()
@@ -956,7 +956,6 @@ def _besttvshows(item):
 
     return list_sel(item)
 
-
 def _bestdocumentaries(item):
     logger.info()
 
@@ -965,18 +964,15 @@ def _bestdocumentaries(item):
 
     return list_sel(item)
 
-
 def _genres(item):
     logger.info()
 
     return generos(item)
 
-
 def _years(item):
     logger.info()
 
     return anios(item)
-
 
 def _themes(item):
     logger.info()
@@ -984,7 +980,6 @@ def _themes(item):
     item.url = host + 'topics.php'
 
     return temas(item)
-
 
 def _navidad(item):
     logger.info()

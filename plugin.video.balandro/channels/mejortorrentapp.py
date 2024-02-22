@@ -7,14 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www10.mejortorrent.rip'
+host = 'https://www11.mejortorrent.rip'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://www1.mejortorrent.rip',
              'https://www2.mejortorrent.rip', 'https://www3.mejortorrent.rip', 'https://www4.mejortorrent.rip',
              'https://www5.mejortorrent.rip', 'https://www6.mejortorrent.rip', 'https://www7.mejortorrent.rip',
-             'https://www8.mejortorrent.rip', 'https://www9.mejortorrent.rip']
+             'https://www8.mejortorrent.rip', 'https://www9.mejortorrent.rip', 'https://www10.mejortorrent.rip']
 
 
 domain = config.get_setting('dominio', 'mejortorrentapp', default='')
@@ -187,7 +187,7 @@ def mainlist_documentales(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/documentales/', search_type = 'documentary' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/public/torrents/', search_type = 'documentary', text_color='darkcyan' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/public/torrents/', search_type = 'documentary', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_list', url = host + '/busqueda/', search_type = 'documentary' ))
 
@@ -321,16 +321,13 @@ def list_all(item):
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty,
                                         contentType='movie', contentTitle=titulo, infoLabels={'year': '-'} ))
 
-            continue
-
-        if item.search_type == 'tvshow':
+        elif item.search_type == 'tvshow':
             if " Temporada" in title: SerieName = title.split(" Temporada")[0]
             else: SerieName = title
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, qualities=qlty,
-                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
-
-            continue
+            if SerieName:
+                itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, qualities=qlty,
+                                            contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
 
         else:
             if "(" in title: titulo = title.split("(")[0]
@@ -428,7 +425,7 @@ def list_list(item):
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
 
-        if item.search_type == 'tvshow':
+        elif item.search_type == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
@@ -444,7 +441,7 @@ def list_list(item):
             itemlist.append(item.clone( action='episodios', url = url, title = title, fmt_sufijo = sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': year} ))
 
-        if item.search_type == 'documentary':
+        else:
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 

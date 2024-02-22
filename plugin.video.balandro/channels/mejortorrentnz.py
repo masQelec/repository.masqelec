@@ -150,7 +150,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/peliculas-13/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/ultimos-torrents-3/', search_type = 'movie', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/ultimos-torrents-3/', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/peliculas-hd-3/', search_type = 'movie' ))
 
@@ -169,7 +169,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/series-3/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host + '/ultimos-torrents-3/', search_type = 'tvshow', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/ultimos-torrents-3/', search_type = 'tvshow', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/series-hd-2/', search_type = 'tvshow' ))
 
@@ -188,7 +188,7 @@ def mainlist_documentales(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/documentales-3/', search_type = 'documentary' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/ultimos-torrents-3/', search_type = 'documentary', text_color='darkcyan' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/ultimos-torrents-3/', search_type = 'documentary', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'documentary' ))
 
@@ -251,11 +251,21 @@ def list_all(item):
             titulo = titulo.replace('4K', '').replace('[HDRip]', '').replace('[BluRay', '').replace('[MicroHD', '').strip()
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=titulo, infoLabels={'year': '-'} ))
-        else:
+
+        elif item.search_type == 'tvshow':
             if " Temporada" in title: SerieName = title.split(" Temporada")[0]
             else: SerieName = title
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
+            if SerieName:
+                itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
+
+        else:
+            if "(" in title: titulo = title.split("(")[0]
+            else: titulo = title
+
+            titulo = titulo.strip()
+
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail=thumb, contentType = 'movie', contentTitle = titulo, contentExtra = 'documentary', infoLabels={'year': "-"} ))
 
         if len(itemlist) >= perpage: break
 
@@ -279,7 +289,7 @@ def list_all(item):
     return itemlist
 
 
-def list_last(item):
+def list_list(item):
     logger.info()
     itemlist = []
 
