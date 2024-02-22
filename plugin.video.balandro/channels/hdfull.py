@@ -49,6 +49,8 @@ except:
 
 
 dominios = [
+         'https://hd-full.co/',
+         'https://hd-full.biz/',
          'https://hd-full.in/',
          'https://hd-full.im/',
          'https://hd-full.one/',
@@ -56,7 +58,6 @@ dominios = [
          'https://hdfull.quest/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
-         'https://hdfull.store/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://new.hdfull.one/'
@@ -73,7 +74,7 @@ ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
              'https://hdfull.fun/', 'https://hdfull.top/', 'https://hdfull.vip/',
              'https://hdfull.wtf/', 'https://hdfull.gdn/', 'https://hdfull.cloud/',
              'https://hdfull.video/', 'https://hdfull.work/', 'https://hdfull.life/',
-             'https://hdfull.digital/']
+             'https://hdfull.digital/', 'https://hdfull.store/']
 
 
 if host in str(ant_hosts): config.set_setting('dominio', dominios[0], 'hdfull')
@@ -480,7 +481,7 @@ def acciones(item):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login', start_ses = True ))
 
-            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
+            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = '', thumbnail=config.get_thumb('pencil') ))
             itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
@@ -490,7 +491,7 @@ def acciones(item):
     if config.get_setting('hdfull_login', 'hdfull', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
 
-        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
+        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales', thumbnail=config.get_thumb('pencil') ))
         itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
 
     itemlist.append(item_configurar_dominio(item))
@@ -863,7 +864,7 @@ def temporadas(item):
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    # ~  Temporadas ocultas pero son accesibles en la mayoria de los casos
+    # ~ Temporadas ocultas pero son accesibles en la mayoria de los casos
     seasons_hiden = False
 
     if matches:
@@ -937,7 +938,7 @@ def temporadas(item):
         itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, sid = sid, referer = item.url, page = 0,
                                     contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
 
-    # ~  Temporadas ocultas No detectadas
+    # ~ Temporadas ocultas No detectadas
     if not seasons_hiden:
         if itemlist:
             if sid:
@@ -965,7 +966,7 @@ def temporadas(item):
                 except:
                     pass
 
-    # Alguna serie de una sola temporada que no la tiene identificada
+    # ~ Alguna serie de una sola temporada que no esta identificada
     if len(itemlist) == 0:
         itemlist.append(item.clone( action='episodios', url = item.url + '/temporada-1', title = 'Temporada 1',
                                     sid = sid, referer = item.url, page = 0, contentType = 'season', contentSeason = 1, text_color = 'tan' ))
@@ -1084,12 +1085,29 @@ def findvideos(item):
     data_js = do_downloadpage(dominio + 'templates/hdfull/js/jquery.hdfull.view.min.js')
 
     key = scrapertools.find_single_match(data_js, 'JSON.parse\(atob.*?substrings\((.*?)\)')
+
     if not key: 
         key = scrapertools.find_single_match(data_js, 'JSON.*?\]\((0x[0-9a-f]+)\)\);')
-        if key: key = int(key, 16)
-        else: key = scrapertools.find_single_match(data_js, 'JSON.*?\]\(([0-9]+)\)\);')
+        if not key: key = scrapertools.find_single_match(data_js, 'JSON.*?\]\(([0-9]+)\)\);')
+        if not key: key = scrapertools.find_single_match(data_js, '((0x[0-9a-f]+)\)\);')
+
+    # ~ 14/2/2024 Emergency Key Forced
+    if key: key = int(key, 16)
+    else: key = 14
+
+    if not key:
+        if config.get_setting('developer_mode', default=False): platformtools.dialog_notification(config.__addon_name + ' HdFull', '[COLOR red][B]Falta Key[/B][/COLOR]')
 
     data_js = do_downloadpage(dominio + 'js/providers.js')
+
+    # ~ 31/12/2021
+    # ~     provs = ''
+
+    # ~ try: provs = balandroresolver.hdfull_providers(data_js)
+    # ~ except: pass
+
+    # ~ if not provs:
+    # ~     if config.get_setting('developer_mode', default=False): platformtools.dialog_notification(config.__addon_name + ' HdFull', '[COLOR red][B]Faltan Provs[/B][/COLOR]')
 
     # ~ 31/7/2022  "22": {"t": "d", "d": "https://mexa.sh/%s"},
     # ~ 15/8/2022  "7": {"t": "s", "d": "https://watchsb.com/%s.html"},
@@ -1115,20 +1133,19 @@ def findvideos(item):
              "45": {"t": "s", "d": "https://waaw.to/f/%s"}
              }
 
-    # ~ try:
-        # ~ provs = balandroresolver.hdfull_providers(data_js)
-        # ~ if not provs: return itemlist
-    # ~ except:
-        # ~ return itemlist
-
     data = do_downloadpage(item.url, referer = dominio)
 
     data_obf = scrapertools.find_single_match(data, "var ad\s*=\s*'([^']+)")
 
+    data_decrypt = ''
+
     try:
-       data_decrypt = jsontools.load(balandroresolver.obfs(base64.b64decode(data_obf), 126 - int(key)))
-    except:
-       return itemlist
+        data_decrypt = jsontools.load(balandroresolver.obfs(base64.b64decode(data_obf), 126 - int(key)))
+    except: pass
+
+    if not data_decrypt:
+        if config.get_setting('developer_mode', default=False):
+            if not str(data_decrypt) == '[]': platformtools.dialog_notification(config.__addon_name + ' HdFull', '[COLOR red][B]Faltan Decrypts[/B][/COLOR]')
 
     ses = 0
 
@@ -1137,19 +1154,19 @@ def findvideos(item):
     for match in data_decrypt:
         if match['provider'] in provs:
             # ~ 31/12/2021
+            # ~ try:
+               # ~ embed = provs[match['provider']][0]
+               # ~ url = eval(provs[match['provider']][1].replace('_code_', "match['code']"))
+               # ~ matches.append([match['lang'], match['quality'], url, embed])
+            # ~ except:
+               # ses += 1
+
             try:
                 embed = provs[match["provider"]]["t"]
                 url = provs[match["provider"]]["d"] % match["code"]
                 matches.append([match["lang"], match["quality"], url, embed])
             except:
                 ses += 1
-
-            # ~ try:
-               # ~ embed = provs[match['provider']][0]
-               # ~ url = eval(provs[match['provider']][1].replace('_code_', "match['code']"))
-               # ~ matches.append([match['lang'], match['quality'], url, embed])
-            # ~ except:
-               # ~ pass
         else:
             ses += 1
 
@@ -1321,7 +1338,7 @@ def list_listas(item):
     return itemlist
 
 
-def shuw_credenciales(item):
+def show_credenciales(item):
     logger.info()
 
     username = config.get_setting('hdfull_username', 'hdfull', default='')

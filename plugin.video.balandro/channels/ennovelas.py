@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://m.ennovelas.net/'
+host = 'https://k.ennovelas.net/'
 
 
 # ~ por si viene de enlaces guardados
@@ -52,7 +52,8 @@ ant_hosts = ['https://ennovelas.net/', 'https://w.ennovelas.net/', 'https://ww.e
              'https://e.ennovelas.net/', 'https://a.ennovelas.net/', 'https://b.ennovelas.net/',
              'https://s.ennovelas.net/', 'https://i.ennovelas.net/', 'https://d.ennovelas.net/',
              'https://f.ennovelas.net/', 'https://t.ennovelas.net/', 'https://n.ennovelas.net/',
-             'https://v.ennovelas.net/', 'https://o.ennovelas.net/', 'https://u.ennovelas.net/']
+             'https://v.ennovelas.net/', 'https://o.ennovelas.net/', 'https://u.ennovelas.net/',
+             'https://m.ennovelas.net/']
 
 
 domain = config.get_setting('dominio', 'ennovelas', default='')
@@ -211,7 +212,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'telenovelas/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'novelas-completas/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_epis', url = host + 'episodes/', search_type = 'tvshow', text_color = 'cyan' ))
 
@@ -323,7 +324,7 @@ def list_all(item):
 
         title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "").strip()
         title = title.replace('&#8216;', "").replace('&#8217;', "").replace('&#8230;', "").strip()
-        title = title.replace('&amp;', '&')
+        title = title.replace('&#038;', '&').replace('&amp;', '&')
 
         SerieName = title
 

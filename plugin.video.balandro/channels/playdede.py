@@ -467,7 +467,7 @@ def acciones(item):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login', start_ses = True ))
 
-            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
+            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales', thumbnail=config.get_thumb('pencil') ))
             itemlist.append(Item( channel='domains', action='del_datos_playdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
@@ -477,7 +477,7 @@ def acciones(item):
     if config.get_setting('playdede_login', 'playdede', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
 
-        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
+        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales', thumbnail=config.get_thumb('pencil') ))
         itemlist.append(Item( channel='domains', action='del_datos_playdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
 
     itemlist.append(item_configurar_proxies(item))
@@ -1498,14 +1498,13 @@ def findvideos(item):
         sid = scrapertools.find_single_match(match, 'data-loadPlayer="(.*?)"')
         if not sid: sid = scrapertools.find_single_match(match, "data-loadplayer='(.*?)'")
 
-        server = scrapertools.find_single_match(match, '<h3>(.*?)</h3>')
+        server = scrapertools.find_single_match(match, '<h3>(.*?)</h3>').lower().strip()
 
         if not server or not sid: continue
 
         if server == 'powvideo': continue
         elif server == 'streamplay': continue
         elif server == 'alternativo': continue
-        elif server == 'userload': continue
 
         lang = scrapertools.find_single_match(match, 'data-lang="(.*?)"')
 
@@ -1521,6 +1520,8 @@ def findvideos(item):
         elif server == 'streamhub': other = 'Streamhub'
         elif server == 'uploaddo': other = 'Uploaddo'
         elif server == 'vembed': other = 'Vidguard'
+        elif server == 'hexupload': other = 'Hexupload'
+        elif server == 'userload': other = 'Userload'
         else: other = ''
 
         server = servertools.corregir_servidor(server)
@@ -1537,10 +1538,11 @@ def findvideos(item):
 
         if not url or not server: continue
 
+        server = server.lower().strip()
+
         if server == 'powvideo': continue
         elif server == 'streamplay': continue
         elif server == 'alternativo': continue
-        elif server == 'userload': continue
 
         if lang.lower() == 'espsub': lang = 'Vose'
 
@@ -1552,6 +1554,8 @@ def findvideos(item):
         elif server == 'streamhub': other = 'Streamhub'
         elif server == 'uploaddo': other = 'Uploaddo'
         elif server == 'vembed': other = 'Vidguard'
+        elif server == 'hexupload': other = 'Hexupload'
+        elif server == 'userload': other = 'Userload'
         else: other = 'E'
 
         server = servertools.corregir_servidor(server)
@@ -1568,13 +1572,17 @@ def findvideos(item):
 
         if not url or not server: continue
 
+        server = server.lower().strip()
+
         if '>recomendado<' in server: continue
 
         if '/ul.' in url: continue
         elif '/1fichier.' in url: continue
         elif '/ddownload.' in url: continue
-        elif '/userload.' in url: continue
         elif '/clk.' in url: continue
+        elif '/rapidgator' in url: continue
+        elif '/katfile' in url: continue
+        elif '/nitro' in url: continue
 
         if 'https://netload.cc/st?' in url:
              url = scrapertools.find_single_match(url, '&url=(.*?)$')
@@ -1586,8 +1594,12 @@ def findvideos(item):
 
         server = servertools.corregir_servidor(server)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = lang, quality = qlty, other = 'D' ))
+        other = 'D'
 
+        if not server == 'directo':
+            if server == 'various': other = servertools.corregir_other(server)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = lang, quality = qlty, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -1743,7 +1755,7 @@ def clean_title(title, url):
     return title
 
 
-def shuw_credenciales(item):
+def show_credenciales(item):
     logger.info()
 
     username = config.get_setting('playdede_username', 'playdede', default='')

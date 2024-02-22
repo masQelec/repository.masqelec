@@ -44,11 +44,11 @@ except:
    except: pass
 
 
-host = 'https://www11.gnula.cc/'
+host = 'https://w-ww.gnula.cc/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://ww3.gnula2h.cc/']
+ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/']
 
 
 domain = config.get_setting('dominio', 'gnula2h', default='')
@@ -99,7 +99,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if not headers: headers = {'Referer': host}
 
     hay_proxies = False
-    if config.get_setting('channel_animefenix_proxies', default=''): hay_proxies = True
+    if config.get_setting('channel_gnula24h_proxies', default=''): hay_proxies = True
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -108,6 +108,17 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+        if not data:
+            if not '/?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Gnula24H', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         if BR or BR2:
@@ -185,9 +196,10 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Novelas', action = 'list_all', url = host + 'genero/novelas/', search_type = 'tvshow', text_color='limegreen' ))
 
-    itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow', text_color='moccasin' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow', text_color='moccasin' ))
 
     return itemlist
 
@@ -211,6 +223,21 @@ def generos(item):
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'hotpink' ))
 
     return sorted(itemlist, key=lambda it: it.title)
+
+
+def anios(item):
+    logger.info()
+    itemlist = []
+
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 1969, -1):
+        url = host + 'release/' + str(x) + '/'
+
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'hotpink' ))
+
+    return itemlist
 
 
 def plataformas(item):
@@ -258,7 +285,7 @@ def plataformas(item):
     for opc, tit in productoras:
         url = host + 'network/' + opc + '/'
 
-        itemlist.append(item.clone( title = tit, action = 'list_all', url = url, text_color = 'hotpink' ))
+        itemlist.append(item.clone( title = tit, action = 'list_all', url = url, text_color = 'moccasin' ))
 
     return itemlist
 

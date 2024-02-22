@@ -46,7 +46,7 @@ except:
    except: pass
 
 
-host = 'https://www1.grantorrent.wf/'
+host = 'https://www2.grantorrent.wf/'
 
 
 # ~ por si viene de enlaces guardados
@@ -56,7 +56,8 @@ ant_hosts = ['http://grantorrent.net/', 'https://grantorrent1.com/', 'https://gr
              'https://grantorrent.online/', 'https://grantorrentt.com/', 'https://grantorrent.nl/',
              'https://grantorrent.ch/', 'https://grantorrent.ac/', 'https://grantorrent.re/',
              'https://grantorrent.se/', 'https://grantorrent.si/', 'https://grantorrent.fi/',
-             'https://grantorrent.bz/', 'https://grantorrent.zip/', 'https://www1.grantorrent.pm/']
+             'https://grantorrent.bz/', 'https://grantorrent.zip/', 'https://www1.grantorrent.pm/',
+             'https://www1.grantorrent.wf/']
 
 
 domain = config.get_setting('dominio', 'grantorrent', default='')

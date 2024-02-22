@@ -52,7 +52,7 @@ def do_downloadpage(url, post=None, headers=None):
     if not data:
         if url.startswith(host):
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CieCalidadLa', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -204,8 +204,7 @@ def list_all(item):
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        if '-1-ano' in url: continue
-        elif '-premium-12-meses' in url: continue
+        if '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url: continue
 
         if not url or not title: continue
 
@@ -441,6 +440,7 @@ def findvideos(item):
             elif servidor == 'google': servidor = 'gvideo'
             elif servidor == 'drive': servidor = 'gvideo'
             elif servidor == 'google drive': servidor = 'gvideo'
+            elif servidor == 'netu': servidor = 'waaw'
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue

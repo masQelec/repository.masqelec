@@ -12,12 +12,13 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www4.dontorrent.fr/'
+host = 'https://www6.dontorrent.fr/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://dontorrent.in/', 'https://dontorrent.tv/', 'https://www1.dontorrent.fr/',
-             'https://www2.dontorrent.fr/', 'https://www3.dontorrent.fr/']
+             'https://www2.dontorrent.fr/', 'https://www3.dontorrent.fr/', 'https://www4.dontorrent.fr/',
+             'https://www5.dontorrent.fr/']
 
 
 domain = config.get_setting('dominio', 'dontorrentsin', default='')
@@ -174,7 +175,7 @@ def mainlist_documentary(item):
 
     itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'documentales/letra-.', search_type = 'documentary'))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary', text_color='darkcyan' ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = host + 'documentales', search_type = 'documentary' ))
 
@@ -264,7 +265,8 @@ def list_all(item):
             if " - " in title: SerieName = title.split(" - ")[0]
             else: SerieName = title
 
-            itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': "-"} ))
+            if SerieName:
+                itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': "-"} ))
 
     else:
         matches = re.compile(r"<a href='([^']+)'>([^<]+)").findall(data)

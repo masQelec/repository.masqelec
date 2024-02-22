@@ -301,11 +301,25 @@ def proxysearch_all(item):
         if not 'proxies' in ch['notes'].lower(): continue
 
         if config.get_setting('mnu_simple', default=False):
-            if 'inestable' in ch['clusters']: continue
+            if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+            elif 'exclusivamente al dorama' in ch['notes'].lower(): continue
+            elif 'exclusivamente al anime' in ch['notes'].lower(): continue
+            elif '+18' in ch['notes']: continue
+
+            elif 'inestable' in ch['clusters']: continue
             elif 'problematic' in ch['clusters']: continue
         else:
             if not config.get_setting('mnu_torrents', default=False) or config.get_setting('search_no_exclusively_torrents', default=False):
                 if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+
+            if not config.get_setting('mnu_doramas', default=True):
+                if 'exclusivamente al dorama' in ch['notes'].lower(): continue
+
+            if not config.get_setting('mnu_animes', default=True):
+                if 'exclusivamente al anime' in ch['notes'].lower(): continue
+
+            if not config.get_setting('mnu_adultos', default=True):
+                if '+18' in ch['notes']: continue
 
             if config.get_setting('mnu_problematicos', default=False):
                 if 'problematic' in ch['clusters']: continue
@@ -352,6 +366,24 @@ def proxysearch_all(item):
         if ch_list:
            for ch in ch_list:
                if not 'proxies' in ch['notes'].lower(): continue
+
+               if not config.get_setting('mnu_torrents', default=False) or config.get_setting('search_no_exclusively_torrents', default=False):
+                   if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+
+               if not config.get_setting('mnu_doramas', default=True):
+                   if 'exclusivamente al dorama' in ch['notes'].lower(): continue
+
+               if not config.get_setting('mnu_animes', default=True):
+                   if 'exclusivamente al anime' in ch['notes'].lower(): continue
+
+               if not config.get_setting('mnu_adultos', default=True):
+                   if '+18' in ch['notes']: continue
+
+               if config.get_setting('mnu_problematicos', default=False):
+                   if 'problematic' in ch['clusters']: continue
+
+               if config.get_setting('search_no_inestables', default=False):
+                   if 'inestable' in ch['clusters']: continue
 
                if channels_excludes:
                    channels_preselct = str(channels_excludes).replace('[', '').replace(']', ',')
@@ -543,10 +575,20 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
         platformtools.dialog_ok(config.__addon_name, el_canal + '[/COLOR][/B]')
         return
 
+    headers = {}
+
+    if channel_id == 'playdo':
+        host = host + 'api/search'
+        useragent = httptools.get_user_agent()
+        headers = {"User-Agent": useragent + " pddkit/2023"}
+
     cfg_proxies_channel = 'channel_' + channel_id + '_proxies'
 
     if not config.get_setting(cfg_proxies_channel, default=''):
-        response = httptools.downloadpage(host, raise_weberror=False)
+        response = httptools.downloadpage(host, headers=headers, raise_weberror=False)
+
+        if channel_id == 'playdo':
+           if '{"status":' in str(response.data): return
 
         if response.sucess == True:
             if len(response.data) > 999:
@@ -561,7 +603,10 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
                 platformtools.dialog_notification(config.__addon_name, el_canal)
                 return
     else:
-        response = httptools.downloadpage(host, raise_weberror=False)
+        response = httptools.downloadpage(host, headers=headers, raise_weberror=False)
+
+        if channel_id == 'playdo':
+            if '{"status":' in str(response.data): return
 
         if response.sucess == True:
             if len(response.data) > 999:

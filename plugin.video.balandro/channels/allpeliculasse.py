@@ -126,12 +126,17 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+
     return itemlist
 
 
 def generos(item):
     logger.info()
     itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     data = do_downloadpage(host)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -143,9 +148,11 @@ def generos(item):
     for url, tit in matches:
         if tit == '4k UHD': continue
 
+        if item.search_type == 'tvshow': url = url.replace('/category/', '/genre_series/')
+
         tit = tit.replace('&amp;', '&')
 
-        itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color='deepskyblue' ))
+        itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = text_color ))
 
     return itemlist
 

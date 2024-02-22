@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -510,7 +510,6 @@ def last_epis(item):
             break
 
     tmdb.set_infoLabels(itemlist)
-
 
     # ~ Peliculas
     for new_item in itemlist:

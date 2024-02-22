@@ -7,11 +7,11 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www11.pelispedia2.me/'
+host = 'https://www.pelispedia2.top/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.pelispedia2.me/']
+ant_hosts = ['https://www.pelispedia2.me/', 'https://www11.pelispedia2.me/']
 
 
 domain = config.get_setting('dominio', 'pelispedia2me', default='')

@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Azipcdn,  Desiupload,  Doodporn,  Dropl  Dropload,  Embedgram,  Embedrise,  Emturbovid,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Hxfile,  Hexupload,  Krakenfiles,  Lulustream,  Mvidoo,  Rutube,  Streamhub,  Streamvid,  Streamwish,  Tubeload,  Turboviplay,  Twitch,  Uploaddo,  Uploadever,  Vidello,  Videowood,  Vidguard,  Vidhidepro,  Vidspeed,  Vkspeed,  Vudeo,  Yandex,  Youdbox)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Azipcdn,  Desiupload,  Doodporn,  Dropl  Dropload,  Embedgram,  Embedrise,  Emturbovid,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Hxfile,  Hexupload,  Krakenfiles,  Lulustream,  Mvidoo,  Rutube,  Streamhub,  Streamvid,  Streamwish,  Tubeload,  Turboviplay,  Twitch,  Uploaddo,  Uploadever,  Uploadraja,  Userload,  Vidello,  Videowood,  Vidguard,  Vidhidepro,  Vidspeed,  Vkspeed,  Vudeo,  Yandex,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -213,6 +213,10 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://cdnwish.com/(?:e/|f/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://krakenfiles.com/(?:view/|embed-video/)([0-9a-zA-Z]+)",
         "url": "https://krakenfiles.com/embed-video/\\1"
       },
@@ -326,6 +330,10 @@
       },
       {
         "pattern": "https://vudeo.co/(?:embed-|)([0-9a-zA-Z]+)",
+        "url": "https://vudeo.co/\\1"
+      },
+      {
+        "pattern": "https://vudeo.ws/(?:embed-|)([0-9a-zA-Z]+)",
         "url": "https://vudeo.co/\\1"
       },
       {
@@ -457,12 +465,24 @@
         "url": "https://vidhidepro.com/s/\\1"
       },
       {
+        "pattern": "https://vidhidevip.com/(?:s/|v/|f/|embed/)([0-9a-zA-Z]+)",
+        "url": "https://vidhidepro.com/s/\\1"
+      },
+      {
         "pattern": "https://hxfile.co/(?:embed-|)([0-9a-zA-Z]+)",
         "url": "https://hxfile.co/\\1"
       },
       {
         "pattern": "https://drop.download/([0-9a-zA-Z]+)",
         "url": "https://drop.download/\\1"
+      },
+      {
+        "pattern": "https://userload.co/(?:e/|f/|embed/)([0-9a-zA-Z]+)",
+        "url": "https://userload.co/\\1"
+      },
+      {
+        "pattern": "https://uploadraja.com/([0-9a-zA-Z]+)",
+        "url": "https://uploadraja.com/\\1"
       }
     ]
   }

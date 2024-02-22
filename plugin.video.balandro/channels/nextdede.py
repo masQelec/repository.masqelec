@@ -44,6 +44,22 @@ except:
    except: pass
 
 
+useragent = httptools.get_user_agent()
+
+custom_headers = dict()
+custom_headers["User-Agent"] = useragent
+
+custom_headers["Accept"] = "application/json"
+custom_headers["Accept-Encoding"] = "gzip, deflate, br"
+custom_headers["Accept-Language"] = "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3"
+custom_headers["Connection"] = "keep-alive"
+custom_headers["Content-Type"] = "application/json"
+
+custom_headers["Sec-Fetch-Dest"] = "empty"
+custom_headers["Sec-Fetch-Mode"] = "cors"
+custom_headers["Sec-Fetch-Site"] = "same-origin"
+
+
 dominios = [
          'https://nextdede.tv'
          ]
@@ -173,6 +189,10 @@ class login_dialog(xbmcgui.WindowDialog):
 def do_make_login_logout(url, post=None, headers=None):
     domain = config.get_setting('dominio', 'nextdede', default=dominios[0])
 
+    if not headers:
+        headers = custom_headers
+        headers["Referer"] = domain + '/acceder'
+
     hay_proxies = False
     if config.get_setting('channel_nextdede_proxies', default=''): hay_proxies = True
 
@@ -233,7 +253,12 @@ def login(item):
 
             if username:
                 if password:
-                    data = do_make_login_logout(domain + '/auth/login')
+                    post = {'email': email, 'password': password, 'remember': 'true'}
+
+                    headers = custom_headers
+                    headers["Referer"] = domain + '/acceder'
+
+                    data = do_make_login_logout(domain + '/auth/login', post=post, headers=headers)
                     if not data: return False
         else:
             domain_unknow = True
@@ -255,14 +280,27 @@ def login(item):
     username = config.get_setting('nextdede_username', 'nextdede', default='')
 
     token = ''
+    data = ''
 
     try:
-       data = do_make_login_logout(domain)
-       if not data:
+       headers = custom_headers
+       headers["Referer"] = ''
+
+       data1 = do_make_login_logout(domain, headers = {})
+       if not data1:
            if domain_unknow: platformtools.dialog_notification(config.__addon_name + ' - NextDede', 'Comprobar Dominio [COLOR moccasin]' + domain + '[/COLOR]')
            return False
 
-       token = scrapertools.find_single_match(data, '"csrf_token":"(.*?)"')
+       token = scrapertools.find_single_match(data1, '"csrf_token":"(.*?)"')
+
+       if username:
+           if password:
+               post = {'email': email, 'password': password, 'remember': 'true'}
+
+               headers = custom_headers
+               headers["Referer"] = domain + '/acceder'
+
+               data = do_make_login_logout(domain + '/auth/login', post=post, headers=headers)
 
        user = scrapertools.find_single_match(data, username).strip()
 
@@ -289,23 +327,7 @@ def login(item):
 
     post = {'email': email, 'password': password, 'remember': 'true'}
 
-    headers = dict()
-    headers["User-Agent"] = useragent
-
-    headers["Accept"] = "application/json"
-    headers["Accept-Encoding"] = "gzip, deflate, br"
-
-    headers["Connection"] = "keep-alive"
-    headers["Content-Type"] = "application/json"
-
-    headers["Accept-Language"] = "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3"
-    headers["Sec-Fetch-Dest"] = "empty"
-    headers["Sec-Fetch-Mode"] = "cors"
-    headers["Sec-Fetch-Mode"] = "same-origin"
-
-    # ~ headers["XSRF-TOKEN"] = "eyJpdiI6IkhXU01oK3c0R0VDaVdqV09FTWdWUEE9PSIsInZhbHVlIjoiZmFpc0R6cU1UUUJTc0RwWjBIMWNJNUl1RWdZQm1VQ2kydU5KMnBtZURQNkI4Slc1NUUwZVdiVWUvcnVFVHdRdWg1ekZ6UTFmbXcwbzJEUGI1VmYxNUtRWkI0VklLTXRGVTNyVWNKaUF6aHZIMXR0cThSV2NucGFyNFVrMUM3Y0QiLCJtYWMiOiI0ZTgwMDY3ZWY1OWE5NGZkNGMzOTI5NzdmZGE1NTVlNjhjNzBhMTg4OWI3OTIwYTMyMTBiYTBjMzZjZGQyZmZjIiwidGFnIjoiIn0="
-    # ~ headers["nextdede_session"] = "eyJpdiI6Im12eEMxSis4czl2M3JnYndxTFZYNVE9PSIsInZhbHVlIjoiMTFhNGdOZ1lTVmd1QWtxc1lHRXR2VXJCVWcwRENNMUhHRWRnSjd2TVNNVGVPVWFJcUtxS1ZBU21IVjBDQTMrUXN6Y1UzVkJnek53ZWgrbFlrZEN5TDg5TFRVNHYxSXJaanRPNk9rTkVFaUN2WjJUWmRSYjJHY1R4VEtlMjBWb20iLCJtYWMiOiJjZDcyMzQ1NjI3YzhmOGMwNzBmOWUwMDA1YWRlNjM4NjFmMzFmMjcyZjU3Y2RlZGRkYTczMzBkMjVhMzNkZDMxIiwidGFnIjoiIn0="
-
+    headers = custom_headers
     headers["Referer"] = domain + '/acceder'
 
     data = do_make_login_logout(domain + '/auth/login', post=post, headers=headers)
@@ -332,7 +354,10 @@ def logout(item):
     email = config.get_setting('nextdede_email', 'nextdede', default='')
 
     if email:
-        data = do_make_login_logout(domain + '/auth/logout')
+        headers = custom_headers
+        headers["Referer"] = domain + '/'
+
+        data = do_make_login_logout(domain + '/logout', headers = headers)
 
         config.set_setting('nextdede_login', False, 'nextdede')
         platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]NextDede Sesión cerrada[/COLOR]')
@@ -489,7 +514,7 @@ def acciones(item):
         if email:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login', start_ses = True ))
 
-            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
+            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales', thumbnail=config.get_thumb('pencil') ))
             itemlist.append(Item( channel='domains', action='del_datos_nextdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
@@ -499,7 +524,7 @@ def acciones(item):
     if config.get_setting('nextdede_login', 'nextdede', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
 
-        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'shuw_credenciales', thumbnail=config.get_thumb('pencil') ))
+        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales', thumbnail=config.get_thumb('pencil') ))
         itemlist.append(Item( channel='domains', action='del_datos_nextdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
 
     itemlist.append(item_configurar_dominio(item))
@@ -1000,7 +1025,7 @@ def findvideos(item):
     return itemlist
 
 
-def shuw_credenciales(item):
+def show_credenciales(item):
     logger.info()
 
     email = config.get_setting('nextdede_email', 'nextdede', default='')

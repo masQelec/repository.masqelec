@@ -144,7 +144,7 @@ if providers_preferred:
             break
 
     if not provs_ok:
-        platformtools.dialog_ok(config.__addon_name, 'Tiene informados en ajustes [COLOR wheat][B]Proveedores Preferidos[/B][/COLOR] de proxies [COLOR coral][B]Desconocidos[/B][/COLOR].', 'No se tendrán en cuenta [COLOR yellow][B]Ninguno de ellos y se anulan[/B][/COLOR].', '[COLOR red]Preferidos: [COLOR violet][B]' + str(providers_preferred + '[/B][/COLOR]'))
+        platformtools.dialog_ok(config.__addon_name + ' - Ajustes', 'Tiene informados en Ajustes [COLOR wheat][B]Proveedores Preferidos[/B][/COLOR] de proxies [COLOR coral][B]Desconocidos[/B][/COLOR].', 'No se tendrán en cuenta [COLOR yellow][B]Ninguno de ellos y se anulan[/B][/COLOR].', '[COLOR red]Preferidos: [COLOR violet][B]' + str(providers_preferred + '[/B][/COLOR]'))
         providers_preferred = ''
 
 
@@ -190,7 +190,7 @@ def configurar_proxies_canal(canal, url):
             else:
                if proxies_actuales:
                    if proxies_proces:
-                       if not platformtools.dialog_yesno(config.__addon_name, 'Existen proxies memorizados en el canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea iniciar una nueva búsqueda de proxies en todos los proveedores ?[/B][/COLOR]'):
+                       if not platformtools.dialog_yesno(config.__addon_name + ' - Proxies', 'Existen proxies memorizados en el canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea iniciar una nueva búsqueda de proxies en todos los proveedores ?[/B][/COLOR]'):
                            procesar = False
 
             if procesar:
@@ -221,7 +221,7 @@ def configurar_proxies_canal(canal, url):
             else:
                if proxies_actuales:
                    if proxies_proces:
-                       if not platformtools.dialog_yesno(config.__addon_name, 'Existen proxies memorizados en el canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea iniciar una nueva búsqueda de proxies con el proveedor configurado en los Ajustes categoria proxies ?[/B][/COLOR] ' + '[COLOR red][B] ' + provider_fijo.capitalize() + '[/COLOR][/B]' ):
+                       if not platformtools.dialog_yesno(config.__addon_name, 'Existen proxies memorizados en el canal [COLOR yellow][B]' + canal.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea iniciar una nueva búsqueda de Proxies con el Proveedor configurado en sus Ajustes categoria Proxies ?[/B][/COLOR] ' + '[COLOR red][B] ' + provider_fijo.capitalize() + '[/COLOR][/B]' ):
                            procesar = False
 
             if procesar:
@@ -283,7 +283,7 @@ def configurar_proxies_canal(canal, url):
         else: texto = '[COLOR plum]Modificar proxies manualmente[/COLOR]'
 
         acciones.append(platformtools.listitem_to_select(texto, lbl, ''))
-        acciones.append(platformtools.listitem_to_select('[COLOR yellow]Buscar nuevos proxies[/COLOR]', 'Buscar con parámetros actuales (Guardará los mejores)'))
+        acciones.append(platformtools.listitem_to_select('[COLOR yellow]Buscar nuevos proxies[/COLOR]', 'Buscar con parámetros actuales [COLOR darkcyan][B](Guardará los mejores)[/B][/COLOR]'))
         acciones.append(platformtools.listitem_to_select('[COLOR cyan]Parámetros búsquedas[/COLOR] proveedor, tipo, país, ...', '[COLOR goldenrod][B]%s[/B][/COLOR], [COLOR darkorange]%s[/COLOR], [COLOR chocolate]%s[/COLOR], [COLOR darkgoldenrod]%d[/COLOR]' % (provider, tipo_proxy, pais_proxy, max_proxies), ''))
 
         if proxies: acciones.append(platformtools.listitem_to_select('[COLOR red]Quitar proxies[/COLOR]', 'Suprimir proxies actuales para probar el canal sin ellos'))
@@ -294,7 +294,7 @@ def configurar_proxies_canal(canal, url):
             if hay_private:
                 acciones.append(platformtools.listitem_to_select('[COLOR red]Eliminar lista actual [COLOR cyan] ' + private_list + '[/COLOR]', '[COLOR goldenrod][B]Solo si obtuvo una Nueva Lista[/B][/COLOR]'))
 
-        acciones.append(platformtools.listitem_to_select('[COLOR yellowgreen]Ajustes categoría proxies[/COLOR]', '[COLOR mediumaquamarine]Si la modifica debe abandonar por cancelar[/COLOR]'))
+        acciones.append(platformtools.listitem_to_select('[COLOR yellowgreen]Ajustes categoría proxies[/COLOR]', '[COLOR mediumaquamarine]Si los modifica deberá abandonar por cancelar[/COLOR]'))
 
         if proxies_help: acciones.append(platformtools.listitem_to_select('[COLOR green]Ayuda[/COLOR]', 'Informacion sobre la gestión de proxies'))
 
@@ -1075,7 +1075,7 @@ def _buscar_proxies(canal, url, provider, procesar):
     if not all_providers_proxies:
         if not proxies:
             if providers_preferred:
-                platformtools.dialog_ok('Buscar proxies ' + provider.capitalize(), 'Tiene informados en ajustes [COLOR wheat][B]Proveedores Preferidos[/B][/COLOR] de proxies.', '[COLOR yellow][B]Sin proxies según sus parámetros actuales.[/B][/COLOR]', '[COLOR red]Preferidos: [COLOR violet][B]' + str(providers_preferred + '[/B][/COLOR]'))
+                platformtools.dialog_ok('Buscar proxies ' + provider.capitalize(), 'Tiene informados en Ajustes [COLOR wheat][B]Proveedores Preferidos[/B][/COLOR] de proxies.', '[COLOR yellow][B]Sin proxies según sus parámetros actuales.[/B][/COLOR]', '[COLOR red]Preferidos: [COLOR violet][B]' + str(providers_preferred + '[/B][/COLOR]'))
             else:
                platformtools.dialog_notification('Buscar proxies ' + provider.capitalize(), '[B][COLOR %s]Sin proxies según parámetros[/COLOR][/B]' % color_adver)
             return False
@@ -1201,7 +1201,7 @@ def sin_news_proxies(provider, proxies_actuales, procesar):
     if avisar:
         texto_mensaje = ''
         if proxies_actuales: texto_mensaje = '[COLOR yellow][B]Se conservan los proxies almacenados.[/B][/COLOR]'
-        platformtools.dialog_ok('Búsqueda proxies en [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '[COLOR yellow][B]No se ha obtenido ningún proxy válido con este proveedor.[/B][/COLOR]', texto_mensaje, '[COLOR coral][B]Puede intentar obtener nuevos proxies, cambiando de proveedor, en los parámetros para buscar proxies.[/B][/COLOR]')
+        platformtools.dialog_ok('Búsqueda proxies en [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '[COLOR yellow][B]No se obtuvo ningún proxy válido con este Proveedor.[/B][/COLOR]', texto_mensaje, '[COLOR coral][B]Puede intentar obtener nuevos Proxies, cambiando de Proveedor, en los Parámetros para Buscar Proxies.[/B][/COLOR]')
 
 
 def top_news_proxies(provider, proxies_actuales, valor, procesar):
@@ -1222,8 +1222,8 @@ def top_news_proxies(provider, proxies_actuales, valor, procesar):
 
     if avisar:
         texto_mensaje = ''
-        if proxies_actuales: texto_mensaje = '[COLOR yellow][B]El tiempo de espera acceso al canal podría ser muy elevado.[/B][/COLOR]'
-        platformtools.dialog_ok('Búsqueda proxies en [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '[COLOR yellow][B]Se han obtenido ' + str(valor) + ' proxies válidos con este proveedor.[/B][/COLOR]', texto_mensaje, '[COLOR coral][B]Puede intentar obtener menos proxies, cambiando de proveedor, en los parámetros para buscar proxies.[/B][/COLOR]')
+        if proxies_actuales: texto_mensaje = '[COLOR yellow][B]El tiempo de espera de acceso al canal podría ser muy elevado.[/B][/COLOR]'
+        platformtools.dialog_ok('Búsqueda proxies en [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '[COLOR yellow][B]Se han obtenido ' + str(valor) + ' proxies válidos con este Proveedor.[/B][/COLOR]', texto_mensaje, '[COLOR coral][B]Puede intentar obtener menos Proxies, cambiando de Proveedor, en los Parámetros para Buscar Proxies.[/B][/COLOR]')
 
 
 def _dailyproxylists_com(url, tipo_proxy, pais_proxy, max_proxies):
@@ -2084,7 +2084,7 @@ def show_help_proxies():
     from modules import helper
 
     if providers_preferred:
-        platformtools.dialog_ok(config.__addon_name, 'Tiene informados en sus ajustes [COLOR cyan]Proveedores Preferidos[/COLOR] de proxies.')
+        platformtools.dialog_ok(config.__addon_name + ' - Ajustes', 'Tiene informados en sus Ajustes [COLOR cyan]Proveedores Preferidos[/COLOR] de Proxies.')
         helper.show_help_providers(item)
 
     helper.show_help_proxies(item)
@@ -2114,7 +2114,7 @@ def configuracion_general():
 
     config.__settings__.openSettings()
 
-    platformtools.dialog_ok(config.__addon_name, '[COLOR yellow]Si efectuó alguna variación el sus ajustes de proxies.', '[COLOR cyan][B]Recuerde, que para que los cambios surtan efecto, deberá abandonar el proceso de configurar proxies e ingresar de nuevo en el.[/B][/COLOR]')
+    platformtools.dialog_ok(config.__addon_name + ' - Ajustes', '[COLOR yellow][B]Si efectuó alguna variación en sus Ajustes de Proxies.[/COLOR][/B]', '[COLOR cyan][B]Recuerde, que para que los [COLOR gold]Cambios Surtan Efecto[/COLOR][COLOR cyan], deberá Abandonar el proceso de Configurar Proxies e ingresar de nuevo en el.[/B][/COLOR]')
 
     platformtools.itemlist_refresh()
 
@@ -2132,7 +2132,7 @@ def obtener_private_list():
     existe = filetools.exists(proxies_file)
 
     if not existe:
-        if not platformtools.dialog_yesno(config.__addon_name, '[COLOR violet][B]¿ El fichero ya está Des-comprimido ?[/COLOR][/B]'): 
+        if not platformtools.dialog_yesno(config.__addon_name, '[COLOR violet][B]¿ El fichero [COLOR cyan]Lista-proxies.zip[/COLOR][COLOR violet] ya está Des-comprimido ?[/COLOR][/B]'): 
             ubicacion_path_zip = xbmcgui.Dialog().browseSingle(3, 'Seleccionar la [COLOR yellow]Carpeta[/COLOR] ubicación del fichero [COLOR violet]Lista-proxies.zip[/COLOR]', 'files', '', False, False, '')
             if not ubicacion_path_zip: return proxies
 
@@ -2178,8 +2178,22 @@ def obtener_private_list():
 
             origen = filetools.join(ubicacion_path, private_list)
             destino = filetools.join(proxies_file)
-            if not filetools.copy(origen, destino, silent=False): platformtools.dialog_ok(config.__addon_name, 'Error, no se ha podido copiar el fichero', origen, destino)
-            else: platformtools.dialog_notification('Fichero copiado', proxies_file)
+
+            if not filetools.copy(origen, destino, silent=False):
+                platformtools.dialog_ok(config.__addon_name + ' - Lista-proxies.txt', '[COLOR red][B]Error, no se ha podido copiar el fichero[/B][/COLOR]', origen, destino)
+                return proxies
+            else:
+                platformtools.dialog_notification('Fichero copiado', proxies_file)
+
+                if zip_extract:
+                    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Desea Eliminar el fichero [COLOR yellow]Lista-proxies.txt [COLOR red]ya [COLOR yellow]Copiado[COLOR red] ?[/B][/COLOR]'):
+                        filetools.remove(origen)
+                        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Lista-proxies.zip eliminado[/B][/COLOR]' % color_exec)
+
+                    if platformtools.dialog_yesno(config.__addon_name + ' - ZIP DESCARGADO', '[COLOR red][B]¿ Desea Eliminar el fichero [COLOR cyan]Lista-proxies.zip [COLOR red]descargado ?[/B][/COLOR]'):
+                        origen = origen.replace('.txt', '.zip')
+                        filetools.remove(origen)
+                        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Lista-proxies.zip eliminado[/B][/COLOR]' % color_exec)
 
     data = filetools.read(proxies_file)
     data = re.sub(r'(?m)^#.*\n?', '', data)

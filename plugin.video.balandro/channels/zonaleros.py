@@ -262,7 +262,7 @@ def list_all(item):
 
         if not title or not url: continue
 
-        title = title.replace('Ver', '').replace('ver', '').replace('&#039;', "'").strip()
+        title = title.replace('Ver', '').replace('ver', '').replace('Descargar', '').replace('descargar', '').replace('&#039;', "'").strip()
 
         thumb = scrapertools.find_single_match(match, 'src="([^"]+)"')
 

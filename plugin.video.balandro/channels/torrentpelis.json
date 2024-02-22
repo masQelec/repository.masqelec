@@ -3,7 +3,7 @@
   "name": "TorrentPelis",
   "thumbnail": "torrentpelis.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["onlyone", "current", "notice", "torrents", "rankings", "lists", "docs", "vos"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web CERRADA. Canal con enlaces Torrent exclusivamente. Películas por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

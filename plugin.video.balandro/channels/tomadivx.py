@@ -142,7 +142,7 @@ def mainlist_documentary(item):
 
     itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'documentales/letra-.', search_type = 'documentary'))
 
-    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary', text_color='darkcyan' ))
+    itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = host + 'documentales', search_type = 'documentary' ))
 
@@ -222,7 +222,8 @@ def list_all(item):
             if " - " in title: SerieName = title.split(" - ")[0]
             else: SerieName = title
 
-            itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':"-"} ))
+            if SerieName:
+                itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':"-"} ))
 
     else:
         matches = re.compile(r"<a href='([^']+)'>([^<]+)").findall(data)

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www20.pelisplushd.lat/'
+host = 'https://ww1.pelisplushd.lat/'
 
 
 # ~ por si viene de enlaces guardados
@@ -17,7 +17,8 @@ ant_hosts = ['https://pelisplushd.net/', 'https://pelisplushd.to/', 'https://www
              'https://www.pelisplushd.lat/', 'https://www4.pelisplushd.lat/', 'https://www8.pelisplushd.lat/',
              'https://www11.pelisplushd.lat/', 'https://www12.pelisplushd.lat/', 'https://www13.pelisplushd.lat/',
              'https://www14.pelisplushd.lat/', 'https://www15.pelisplushd.lat/', 'https://www16.pelisplushd.lat/',
-             'https://www17.pelisplushd.lat/', 'https://www18.pelisplushd.lat/', 'https://www19.pelisplushd.lat/']
+             'https://www17.pelisplushd.lat/', 'https://www18.pelisplushd.lat/', 'https://www19.pelisplushd.lat/',
+             'https://www20.pelisplushd.lat/', 'https://www21.pelisplushd.lat/']
 
 
 domain = config.get_setting('dominio', 'pelisplushd', default='')
@@ -516,6 +517,35 @@ def findvideos(item):
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other ))
 
+    matches = scrapertools.find_multiple_matches(data, 'data-tr="(.*?)".*? <!-- -->(.*?)<!-- -->')
+
+    for url, srv in matches:
+        if not url: continue
+
+        ses += 1
+
+        if url.startswith('/'): url = host[:-1] + url
+
+        link_other = srv
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = lang, other = link_other ))
+
+    # ~ downloads
+    matches = scrapertools.find_multiple_matches(data, '<span class="Num".*? <!-- -->(.*?)</td>.*?href="(.*?)"')
+
+    for srv, url in matches:
+        if not url: continue
+
+        ses += 1
+
+        if srv == '1fichier': continue
+
+        if url.startswith('/'): url = host[:-1] + url
+
+        link_other = srv
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = lang, other = link_other + ' D' ))
+
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
@@ -528,6 +558,7 @@ def normalize_other(url):
     if 'pelisplus' in url: link_other = 'plus'
     elif 'damedamehoy' in url: link_other = 'dame'
     elif 'tomatomatela' in url: link_other = 'dame'
+    elif 'plustream' in url: link_other = 'plustream'
     else:
        if config.get_setting('developer_mode', default=False): link_other = url
        else: link_other = ''
@@ -557,13 +588,15 @@ def play(item):
         url = resuelve_dame_toma(item.url)
 
         if url:
-            itemlist.append(item.clone(url=url , server='directo'))
+            itemlist.append(item.clone(url = url, server = 'directo'))
             return itemlist
 
     elif item.server == 'directo':
         data = do_downloadpage(url)
 
         urls = scrapertools.find_multiple_matches(data, "sources:\[{file:.*?\'(.*?)\',label")
+        if not urls: urls = scrapertools.find_multiple_matches(data, "var url = '(.*?)'")
+        if not urls: urls = scrapertools.find_multiple_matches(data, 'let url = "(.*?)"')
 
         for url in urls:
             if not 'error' in url:

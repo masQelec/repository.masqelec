@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://wv.cinecalidad.gg/'
+host = 'https://wow.cinecalidad.gg/'
 
 
 _players = ['https://cinecalidad.', '.cinecalidad.']
@@ -74,7 +74,9 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://v2.cinecalidad.men/', 'https://v3.cinecalidad.men/', 'https://v4.cinecalidad.men/',
              'https://v5.cinecalidad.men/', 'https://www.cinecalidad.gg/', 'https://wvw.cinecalidad.gg/',
              'https://wwv.cinecalidad.gg/', 'https://vww.cinecalidad.gg/', 'https://vvv.cinecalidad.gg/'
-             'https://ww.cinecalidad.gg/', 'https://w.cinecalidad.gg/', 'https://vvw.cinecalidad.gg/']
+             'https://ww.cinecalidad.gg/', 'https://w.cinecalidad.gg/', 'https://vvw.cinecalidad.gg/',
+             'https://wv.cinecalidad.gg/', 'https://vwv.cinecalidad.gg/', 'https://wwc.cinecalidad.gg/',
+             'https://cww.cinecalidad.gg/', 'https://oww.cinecalidad.gg/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -138,12 +140,12 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidadLoL', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
-                    data = httptools.downloadpage_proxy('cinecalidadla', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    data = httptools.downloadpage_proxy('cinecalidadlol', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
@@ -342,7 +344,7 @@ def list_all(item):
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        if '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url: continue
+        if '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url: continue
 
         if not url or not title: continue
 
@@ -615,6 +617,8 @@ def findvideos(item):
                 elif srv == 'voe': servidor = 'voe'
                 elif srv == 'doods' or srv == 'doostream': servidor = 'doodstream'
 
+                elif srv == 'netu': servidor = 'waaw'
+
                 else: servidor = servertools.corregir_servidor(srv)
 
             if servidor == 'various': other = srv.capitalize()
@@ -694,6 +698,8 @@ def play(item):
 
     url = item.url
 
+    url = url.replace('/netu.cinecalidad.com.mx/', '/waaw.to/')
+
     servidor = item.server
 
     # ~ por si esta en ant_hosts
@@ -729,6 +735,8 @@ def play(item):
             url = url.replace('&amp;', '&')
 
             if url:
+                url = url.replace('/netu.cinecalidad.com.mx/', '/waaw.to/')
+
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 

@@ -486,6 +486,7 @@ def normalize_other(url):
     elif 'damedamehoy' in url: link_other = 'dame'
     elif 'apialfa' in url: link_other = 'apialfa'
     elif 'tomatomatela' in url: link_other = 'dame'
+    elif 'plustream' in url: link_other = 'plustream'
     else:
        if config.get_setting('developer_mode', default=False): link_other = url
        else: link_other = ''

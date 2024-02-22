@@ -47,7 +47,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'tags/' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'xnxx-tags/' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars/' ))
 
     return itemlist
@@ -80,12 +80,12 @@ def categorias(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<div class="box">.*?<a href="(.*?)".*?src="(.*?)".*?">(.*?)</a>', re.DOTALL).findall(data)
+    bloque = scrapertools.find_single_match(data, '>Categories<(.*?)Categories<p>')
+
+    matches = re.compile('<a href="(.*?)".*?src="(.*?)".*?<figcaption>(.*?)</figcaption>', re.DOTALL).findall(bloque)
 
     for url, thumb, title in matches:
         if title == 'All Videos': continue
-
-        title = title.replace('</figcaption>', '').strip()
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'tan' ))
 
@@ -98,14 +98,20 @@ def pornstars(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<div class="box">.*?<a href="(.*?)".*?src="(.*?)".*?">(.*?)</a>', re.DOTALL).findall(data)
+    bloque = scrapertools.find_single_match(data, '>Pornstars</h1>(.*?)</main>')
 
-    for url, thumb, title in matches:
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
+    matches = re.compile('<a(.*?)</a></div>', re.DOTALL).findall(bloque)
 
-    matches2 = re.compile('<figure class="gallery-item">.*?src="(.*?)".*?alt="(.*?)".*?<a href="(.*?)"', re.DOTALL).findall(data)
+    for match in matches:
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
-    for thumb, title, url in matches2:
+        title = scrapertools.find_single_match(match, '<figcaption>(.*?)</figcaption>')
+        if not title: title = scrapertools.find_single_match(match, 'class="wp-caption-text gallery-caption">(.*?)</a>')
+
+        if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
 
     return sorted(itemlist, key=lambda x: x.title)
@@ -117,9 +123,18 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<div class="post-preview-styling">.*?<a href="(.*?)".*?title="(.*?)".*?data-src="(.*?)".*?<p>(.*?)</p>', re.DOTALL).findall(data)
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
 
-    for url, title, thumb, time in matches:
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        title = scrapertools.find_single_match(match, 'title="(.*?)"')
+
+        if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        time = scrapertools.find_single_match(match, '<p>(.*?)</p>')
+
         title = title.replace('&#8217;', '').replace('&#8211;', '&').replace('&#038;', '&')
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
@@ -142,13 +157,23 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<iframe.*?-src="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
 
     for link in matches:
+        if '//a.' in link: continue
+
         if host in link:
             data2 = do_downloadpage(link)
 
             url = scrapertools.find_single_match(data2, '<source type="video/mp4".*?src="(.*?)"')
+
+            if url:
+                url += '|Referer=%s' % item.url
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'Vo' ))
+
+        if 'player-x.php?' in link:
+            url = scrapertools.find_single_match(data, 'mp4="(.*?)"')
 
             if url:
                 url += '|Referer=%s' % item.url
