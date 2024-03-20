@@ -92,7 +92,7 @@ def list_all(item):
         titulo = "[COLOR tan]%s[/COLOR] %s" % (duration, title)
 
         src = video["src"]
-        thumb = src.get('domain', domain) + src.get('pathMedium', domain)+"1.jpg"
+        thumb = src.get('domain', domain) + src.get('pathMedium', domain) + "1.jpg"
 
         url = video["urls_CDN"]
         url = url.get('480', domain)

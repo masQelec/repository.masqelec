@@ -284,6 +284,9 @@ context_usual.append({'title': tit, 'channel': 'helper', 'action': 'show_channel
 tit = '[COLOR mediumaquamarine][B]Últimos Cambios Dominios[/B][/COLOR]'
 context_usual.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
+tit = '[COLOR yellow][B]Preferencias Buscar[/B][/COLOR]'
+context_usual.append({'title': tit, 'channel': 'search', 'action': 'show_help_parameters'})
+
 tit = '[COLOR powderblue][B]Global Configurar Proxies[/B][/COLOR]'
 context_usual.append({'title': tit, 'channel': 'proxysearch', 'action': 'proxysearch_all'})
 
@@ -941,6 +944,9 @@ def ch_groups(item):
             elif 'anime' in agrupaciones: continue
             elif 'adults' in agrupaciones: continue
 
+        if not config.get_setting('mnu_torrents', default=True):
+            if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+
         action = accion
 
         if item.group == 'documentaries':
@@ -950,12 +956,12 @@ def ch_groups(item):
         elif item.group == 'dorama':
             if item.only == 'doramas':
                 if 'dorama' in ch['clusters']:
-                    if not 'Web dedicada exclusivamente al dorama' in ch['notes']: continue
+                    if not 'dedicada exclusivamente al dorama' in ch['notes'].lower(): continue
 
         elif item.group == 'anime':
             if item.only == 'animes':
                 if 'anime' in ch['clusters']:
-                    if not 'Web dedicada exclusivamente al anime' in ch['notes']: continue
+                    if not 'dedicada exclusivamente al anime' in ch['notes'].lower(): continue
 
             if 'anime' in ch['notes'].lower(): action = 'mainlist_anime'
             else:

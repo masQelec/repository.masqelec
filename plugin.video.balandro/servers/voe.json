@@ -3,6 +3,7 @@
   "name": "Voe",
 
   "active": true,
+  "notes": "Alternative vía: Script.Module.ResolveUrl",
 
   "find_videos": {
     "ignore_urls": [],
@@ -105,6 +106,10 @@
       },
       {
         "pattern": "https://prefulfilloverdoor.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://jayservicestuff.com/(?:e/|)([A-z0-9]+)",
         "url": "https://voe.sx/e/\\1"
       }
     ]

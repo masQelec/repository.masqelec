@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://homecine.tv'
+host = 'https://www3.homecine.tv'
 
 
 def item_configurar_proxies(item):
@@ -80,6 +80,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://homecine.tv']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     hay_proxies = False
     if config.get_setting('channel_homecine_proxies', default=''): hay_proxies = True
 

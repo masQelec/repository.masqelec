@@ -68,7 +68,7 @@ def generos(item):
     else: text_color = 'hotpink'
 
     data = httptools.downloadpage(host).data
-   
+
     patron = 'class="menu-item menu-item-type-taxonomy menu-item-object-category.*?<a href="(.*?)">(.*?)</a>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
@@ -375,27 +375,32 @@ def findvideos(item):
 
     ses = 0
 
-    for opt, servidor, lang_qlty in matches:
+    for opt, srv, lang_qlty in matches:
         ses += 1
 
-        servidor = servidor.replace('<strong>', '').replace('</strong>', '')
-        servidor = servertools.corregir_servidor(servidor)
+        srv = srv.replace('<strong>', '').replace('</strong>', '')
+        srv = servertools.corregir_servidor(srv)
 
         url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src="(.*?)"')
-        if not url: url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src=&quot;(.*?)&quot;')
 
-        if url.startswith('//') == True: url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src=&quot;(.*?)&quot;')
+        if not url or url == 'https://':
+            url = scrapertools.find_single_match(str(data).replace('src=&quot;', 'src="').replace('&quot;', '"'), ' id="Opt' + str(opt) + '".*?src="(.*?)"')
 
-        if not servidor or not url: continue
+        if url.startswith('//') == True: 
+            url = scrapertools.find_single_match(str(data).replace('src=&quot;', 'src="').replace('&quot;', '"'), ' id="Opt' + str(opt) + '"".*?src="(.*?)"')
 
-        if 'opción' in servidor or 'servidor' in servidor:
-            link_other = servidor
+        if not srv or not url: continue
+
+        servidor = srv
+
+        if 'opción' in srv or 'servidor' in srv:
+            link_other = srv
             servidor = 'directo'
-        elif servidor == 'anavids':
-            link_other = servidor
+        elif srv == 'anavids':
+            link_other = srv
             servidor = 'directo'
-        elif servidor == 'blenditall':
-            link_other = servidor
+        elif srv == 'blenditall':
+            link_other = srv
             servidor = 'directo'
 
         else: link_other = ''

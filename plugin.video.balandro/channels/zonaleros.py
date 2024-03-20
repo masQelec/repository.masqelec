@@ -214,9 +214,15 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
 
     for url, title in matches:
+        if not config.get_setting('descartar_anime', default=False):
+            if title == 'Anime': continue
+
+        if config.get_setting('descartar_xxx', default=False):
+            if title == 'Eroticos': continue
+
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = text_color ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def anios(item):

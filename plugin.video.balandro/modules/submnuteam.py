@@ -284,23 +284,7 @@ def submnu_team_info(item):
     existe = filetools.exists(path)
 
     if existe:
-        txt_status = ''
-
-        try:
-           with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
-        except:
-           try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
-           except: pass
-
-        if txt_status:
-            bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
-
-            matches = bloque.count('[COLOR lime]')
-
-            if matches:
-                itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR aqua][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
-
-    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR aqua][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+        itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR aqua][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='resumen_canales', title='[COLOR gold][B]Canales[/B][/COLOR] Resúmenes y Distribución', thumbnail=config.get_thumb('stack') ))
 
@@ -864,7 +848,7 @@ def submnu_canales(item):
     itemlist.append(item.clone( action='', title='[B]TESTS CANALES[/B]', text_color='gold' ))
 
     itemlist.append(item.clone( action='test_all_webs', title=' - Posibles [B][COLOR gold]Insatisfactorios[/B][/COLOR]', unsatisfactory = True ))
-    itemlist.append(item.clone( action='test_alfabetico', title=' - Insatisfactorios desde un canal [B][COLOR powderblue]letra inicial[/B][/COLOR]', unsatisfactory = True ))
+    itemlist.append(item.clone( action='test_alfabetico', title=' - [COLOR gold]Insatisfactorios[/COLOR] desde un canal [B][COLOR powderblue]letra inicial[/B][/COLOR]', unsatisfactory = True ))
 
     itemlist.append(item.clone( action='test_all_webs', title=' - Todos' ))
 
@@ -882,7 +866,7 @@ def submnu_servidores(item):
     itemlist.append(item.clone( action='', title='[B]TESTS SERVIDORES[/B]', text_color='fuchsia' ))
 
     itemlist.append(item.clone( action='test_all_srvs', title=' - Posibles [B][COLOR fuchsia]Insatisfactorios[/B][/COLOR]', unsatisfactory = True ))
-    itemlist.append(item.clone( action='test_alfabetico', title=' - Insatisfactorios desde un servidor [B][COLOR powderblue]letra inicial[/B][/COLOR]', unsatisfactory = True ))
+    itemlist.append(item.clone( action='test_alfabetico', title=' - [COLOR fuchsia]Insatisfactorios[/COLOR] desde un servidor [B][COLOR powderblue]letra inicial[/B][/COLOR]', unsatisfactory = True ))
 
     itemlist.append(item.clone( action='test_all_srvs', title=' - Todos' ))
 
@@ -1177,8 +1161,8 @@ def test_all_webs(item):
     config.set_setting('user_test_channel', '')
 
     if not item.letra:
-        if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Canales Insatisfactorios ?'
-        else: text = '¿ Iniciar Test Web de Todos los Canales ?'
+        if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Canales [B][COLOR gold]Insatisfactorios[/B][/COLOR] ?'
+        else: text = '¿ Iniciar Test Web de [B][COLOR gold]TODOS[/B][/COLOR] los Canales ?'
 
         if not platformtools.dialog_yesno(config.__addon_name, text): return
 
@@ -1440,8 +1424,8 @@ def test_all_srvs(item):
     config.set_setting('developer_test_servers', '')
 
     if not item.letra:
-        if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Servidores Insatisfactorios ?'
-        else: text = '¿ Iniciar Test Web de Todos los Servidores ?'
+        if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Servidores [B][COLOR fuchsia]Insatisfactorios[/B][/COLOR] ?'
+        else: text = '¿ Iniciar Test Web de [B][COLOR fuchsia]TODOS[/B][/COLOR] los Servidores ?'
 
         if not platformtools.dialog_yesno(config.__addon_name, text): return
 
@@ -1598,45 +1582,67 @@ def show_help_addons(item):
 def show_sistema(item):
     logger.info()
 
-    txt = ''
+    txt = '[COLOR goldenrod][B]PREFERENCIAS SISTEMA:[/B][/COLOR][CR]'
 
-    txt += 'Comprobar existencia Balandro Repo: '
+    txt += ' - Comprobar existencia Balandro Repo: '
 
     if config.get_setting('check_repo', default=True): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
-    else: txt += '[COLOR yellow][B] Des-Activado[/B][/COLOR][CR]'
+    else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    txt += 'Comprobar Fixes al Iniciar su Media Center: '
+    txt += ' - Comprobar Fixes al Iniciar su Media Center: '
 
     if config.get_setting('addon_update_atstart', default=True): txt += '[COLOR yellow][B]Activado[/B][/COLOR][CR]'
     else: txt += '[COLOR red][B]Des-Activado[/B][/COLOR][CR]'
 
-    txt += 'Eliminar su fichero de Cookies al Iniciar su Media Center: '
+    txt += ' - Eliminar su fichero de Cookies al Iniciar su Media Center: '
 
     if config.get_setting('erase_cookies', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
-    else: txt += '[COLOR yellow][B] Des-Activado[/B][/COLOR][CR]'
+    else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    txt += 'Obtener y Usar la versión más Reciente/Estable de Chrome/Chromium: '
+    txt += ' - Obtener y Usar la versión más Reciente/Estable de Chrome/Chromium: '
 
     if config.get_setting('ver_stable_chrome', default=True): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
-    else: txt += '[COLOR yellow][B] Des-Activado[/B][/COLOR][CR]'
+    else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    if config.get_setting('chrome_last_version', default=''): txt += '[CR][COLOR yellow][B]Versión Chrome/Chromium: [/COLOR][COLOR cyan]' + config.get_setting('chrome_last_version') + ' [/B][/COLOR][CR]'
+    if config.get_setting('chrome_last_version', default=''): txt += '[CR][COLOR yellow][B] - Versión Chrome/Chromium: [/COLOR][COLOR cyan]' + config.get_setting('chrome_last_version') + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B]Timeout [/B](tiempo máximo de espera en los Accesos)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B] - Timeout [/B](tiempo máximo de espera en los Accesos)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
 
-    txt += '[CR]Confirmar con el Botón pulsar [OK] en ciertas Notificaciones: '
+    txt += '[CR] - Confirmar con el Botón pulsar [OK] en ciertas Notificaciones: '
 
     if config.get_setting('notification_d_ok', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
-    else: txt += '[COLOR yellow][B] Des-Activado[/B][/COLOR][CR]'
+    else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    txt += 'Emitir un Sonido al mostrar Avisos/Notificaciones: '
+    txt += ' - Emitir un Sonido al mostrar Avisos/Notificaciones: '
 
     if config.get_setting('notification_beep', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
-    else: txt += '[COLOR yellow][B] Des-Activado[/B][/COLOR][CR]'
+    else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B]Tiempo de espera en los Reintentos [/B](en el acceso a ciertos Canales)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B] - Tiempo de espera en los Reintentos [/B](en el acceso a ciertos Canales)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B]Tiempo de espera [/B](en el acceso a ciertos Servidores)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B] - Tiempo de espera [/B](en el acceso a ciertos Servidores)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR goldenrod][B]PREFERENCIAS NOTIFICACIONES CANALES:[/B][/COLOR][CR]'
+
+    txt += ' - Notificar los Re-Intentos de acceso en los Canales: '
+
+    if config.get_setting('channels_re_charges', default=True): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
+    else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
+
+    txt += ' - Presentar Sin Notificar Todas las Películas en las Listas Especiales: '
+
+    if config.get_setting('channels_charges_movies', default=True): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
+    else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
+
+    txt += ' - Notificar cuando No existan Temporadas ó tan solo haya Una: '
+
+    if config.get_setting('channels_seasons', default=True): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
+    else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
+
+    txt += ' - Presentar Sin Notificar Todos los Episodios en cada Temporada: '
+
+    if config.get_setting('channels_charges', default=True): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
+    else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
     platformtools.dialog_textviewer('Información Ajustes del Sistema', txt)
 
@@ -1963,8 +1969,9 @@ def resumen_servidores(item):
     total = 0
     inactives = 0
     notsuported = 0
+    outservice = 0
     alternatives = 0
-    aditionals = 35
+    aditionals = 36
     disponibles = 0
 
     path = os.path.join(config.get_runtime_path(), 'servers')
@@ -1992,6 +1999,7 @@ def resumen_servidores(item):
            notes = ''
 
         if "requiere" in notes.lower(): notsuported += 1
+        elif "out of service" in notes.lower(): outservice += 1
 
         if not dict_server['name'] == 'various':
             if "alternative" in notes.lower(): alternatives += 1
@@ -2003,16 +2011,23 @@ def resumen_servidores(item):
     txt += '    ' + str(inactives) + '  [COLOR coral]Inactivos[/COLOR][CR]'
     txt += '    ' + str(notsuported) + '  [COLOR fuchsia]Sin Soporte[/COLOR][CR]'
 
+    if outservice > 0: txt += '      ' + str(outservice) + '  [COLOR plum]Sin Servicio[/COLOR][CR]'
+
+    txt += '[CR]  ' + str(disponibles) + '  [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
+
+    operativos = disponibles
+
+    if outservice > 0:
+        operativos = disponibles - outservice
+        txt += '  ' + str(operativos) + '  [COLOR goldenrod][B]Operativos[/B][/COLOR][CR]'
+
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        txt += '[CR][COLOR gold][B]RESOLVEURL:[/B][/COLOR][CR]'
+        txt += '[CR][COLOR goldenrod][B]RESOLVEURL:[/B][/COLOR][CR]'
 
         txt += '    ' + str(alternatives) + '  [COLOR green]Vías alternativas[/COLOR][CR]'
         txt += '    ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
 
-    txt += '[CR]  ' + str(disponibles) + '  [COLOR gold][B]Disponibles[/B][/COLOR]'
-
-    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        accesibles = (disponibles + aditionals)
+        accesibles = (operativos + aditionals)
         txt += '[CR]  ' + str(accesibles) + '  [COLOR powderblue][B]Accesibles[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Resúmenes Servidores y su Distribución', txt)
@@ -2033,15 +2048,21 @@ def show_help_alternativas(item):
     txt += '[CR][CR] - Qué servidores tienen [COLOR goldenrod][B]Vías Alternativas[/B][/COLOR] a través de [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
 
     txt += '   [COLOR yellow]Clicknupload[/COLOR][CR]'
+    txt += '   [COLOR yellow]Cloudvideo[/COLOR][CR]'
     txt += '   [COLOR yellow]Doodstream[/COLOR][CR]'
+    txt += '   [COLOR yellow]Flashx[/COLOR][CR]'
     txt += '   [COLOR yellow]Gofile[/COLOR][CR]'
     txt += '   [COLOR yellow]MegaUp[/COLOR][CR]'
     txt += '   [COLOR yellow]Playtube[/COLOR][CR]'
     txt += '   [COLOR yellow]Racaty[/COLOR][CR]'
     txt += '   [COLOR yellow]Streamlare[/COLOR][CR]'
     txt += '   [COLOR yellow]Uptobox[/COLOR][CR]'
+    txt += '   [COLOR yellow]Userscloud[/COLOR][CR]'
     txt += '   [COLOR yellow]Various[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vimeo[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vidmoly[/COLOR][CR]'
     txt += '   [COLOR yellow]Vk[/COLOR][CR]'
+    txt += '   [COLOR yellow]Voe[/COLOR][CR]'
     txt += '   [COLOR yellow]Waaw[/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
@@ -2081,11 +2102,11 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Filelions[/COLOR][CR]'
     txt += '   [COLOR yellow]Filemoon[/COLOR][CR]'
     txt += '   [COLOR yellow]Fileupload[/COLOR][CR]'
+    txt += '   [COLOR yellow]Goodstream[/COLOR][CR]'
     txt += '   [COLOR yellow]Hxfile[/COLOR][CR]'
     txt += '   [COLOR yellow]Hexupload[/COLOR][CR]'
     txt += '   [COLOR yellow]Krakenfiles[/COLOR][CR]'
     txt += '   [COLOR yellow]Lulustream[/COLOR][CR]'
-    txt += '   [COLOR yellow]Moonmov[/COLOR][CR]'
     txt += '   [COLOR yellow]Moonplayer[/COLOR][CR]'
     txt += '   [COLOR yellow]Mvidoo[/COLOR][CR]'
     txt += '   [COLOR yellow]Rutube[/COLOR][CR]'
@@ -2093,6 +2114,7 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Streamvid[/COLOR][CR]'
     txt += '   [COLOR yellow]Streamwish[/COLOR][CR]'
     txt += '   [COLOR yellow]Tubeload[/COLOR][CR]'
+    txt += '   [COLOR yellow]Turboviplay[/COLOR][CR]'
     txt += '   [COLOR yellow]Twitch[/COLOR][CR]'
     txt += '   [COLOR yellow]Uploaddo[/COLOR][CR]'
     txt += '   [COLOR yellow]Uploadever[/COLOR][CR]'
@@ -2101,8 +2123,8 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Vidello[/COLOR][CR]'
     txt += '   [COLOR yellow]Videowood[/COLOR][CR]'
     txt += '   [COLOR yellow]Vidguard[/COLOR][CR]'
-    txt += '   [COLOR yellow]Vidspeed[/COLOR][CR]'
     txt += '   [COLOR yellow]Vidhidepro[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vidspeed[/COLOR][CR]'
     txt += '   [COLOR yellow]Vkspeed[/COLOR][CR]'
     txt += '   [COLOR yellow]Vudeo[/COLOR][CR]'
     txt += '   [COLOR yellow]Yandex[/COLOR][CR]'

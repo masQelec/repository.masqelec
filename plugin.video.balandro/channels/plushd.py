@@ -98,7 +98,8 @@ def mainlist(item):
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
-    itemlist.append(item.clone( title = 'Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
+    if config.get_setting('mnu_doramas', default=False):
+        itemlist.append(item.clone( title = 'Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
 
     return itemlist
 
@@ -132,7 +133,8 @@ def mainlist_series(item):
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
-    itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'doramas?page=', search_type = 'tvshow', text_color = 'firebrick' ))
+    if config.get_setting('mnu_doramas', default=False):
+        itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'doramas?page=', search_type = 'tvshow', text_color = 'firebrick' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))

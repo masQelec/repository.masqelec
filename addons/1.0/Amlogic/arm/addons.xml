@@ -1082,7 +1082,7 @@ v5.2.14 (2017-01-23)
     </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="4.0.02" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="Balandro" version="4.0.03" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -1095,10 +1095,14 @@ v5.2.14 (2017-01-23)
     <summary>Balandro es un Navegador de páginas Webs</summary>
     <assets>
       <icon>icon.png</icon>
-      <fanart>fanart.png</fanart>
+      <fanart>fanart.jpg</fanart>
+      <screenshot>resources/screenshots/1.jpg</screenshot>
+      <screenshot>resources/screenshots/2.jpg</screenshot>
+      <screenshot>resources/screenshots/3.jpg</screenshot>
+      <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.02[/COLOR][COLOR chartreuse]  Febrero de 2024[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.03[/COLOR][COLOR chartreuse]  Marzo de 2024[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]
@@ -1117,6 +1121,10 @@ v5.2.14 (2017-01-23)
     [COLOR blue][B]Agradecimientos:[/B][/COLOR]
         Cita destacada a los miembros de Balandro Team
         Mención especial al grupo de Balandro Checkers
+
+    [COLOR yellowgreen][B]Reconocimientos:[/B][/COLOR]
+        A los creadores de Elementum,  InputStream adaptive,
+        ResolveUrl  y  YouTube plugin
 
     [COLOR cyan][B]Canales:[/B][/COLOR]
         Revisión Generalizada

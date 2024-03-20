@@ -110,7 +110,7 @@ def pornstars(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
 
@@ -157,7 +157,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<iframe.*?-src="(.*?)"', re.DOTALL).findall(data)
 
     for link in matches:
         if '//a.' in link: continue

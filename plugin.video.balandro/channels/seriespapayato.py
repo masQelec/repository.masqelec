@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://papayaseries.net/'
+host = 'https://www3.papayaseries.net/'
 
 
 def item_configurar_proxies(item):
@@ -81,7 +81,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, referer=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://seriespapaya.to/']
+    ant_hosts = ['https://seriespapaya.to/', 'https://papayaseries.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

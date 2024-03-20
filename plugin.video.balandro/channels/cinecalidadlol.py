@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://wow.cinecalidad.gg/'
+host = 'https://wwm.cinecalidad.gg/'
 
 
 _players = ['https://cinecalidad.', '.cinecalidad.']
@@ -76,7 +76,8 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://wwv.cinecalidad.gg/', 'https://vww.cinecalidad.gg/', 'https://vvv.cinecalidad.gg/'
              'https://ww.cinecalidad.gg/', 'https://w.cinecalidad.gg/', 'https://vvw.cinecalidad.gg/',
              'https://wv.cinecalidad.gg/', 'https://vwv.cinecalidad.gg/', 'https://wwc.cinecalidad.gg/',
-             'https://cww.cinecalidad.gg/', 'https://oww.cinecalidad.gg/']
+             'https://cww.cinecalidad.gg/', 'https://oww.cinecalidad.gg/', 'https://wow.cinecalidad.gg/',
+             'https://woo.cinecalidad.gg/', 'https://oow.cinecalidad.gg/', 'https://wwe.cinecalidad.gg/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')
@@ -344,7 +345,8 @@ def list_all(item):
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        if '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url: continue
+        if url.startswith('/?post_id='): continue
+        elif '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url: continue
 
         if not url or not title: continue
 
@@ -617,7 +619,9 @@ def findvideos(item):
                 elif srv == 'voe': servidor = 'voe'
                 elif srv == 'doods' or srv == 'doostream': servidor = 'doodstream'
 
-                elif srv == 'netu': servidor = 'waaw'
+                elif srv == 'netu' or servidor == 'hqq': servidor = 'waaw'
+
+                elif '/okru.' in url: servidor = 'okru'
 
                 else: servidor = servertools.corregir_servidor(srv)
 
@@ -757,6 +761,11 @@ def play(item):
         elif 'magnet:?' in url:
             itemlist.append(item.clone( url = url, server = 'torrent' ))
             return itemlist
+
+        if servidor == 'directo':
+            if not url.startswith('http'): return itemlist
+
+            if '/okru.' in url: servidor = 'okru'
 
         elif servidor == 'zplayer':
             url = url + '|' + host_player

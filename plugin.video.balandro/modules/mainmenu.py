@@ -614,6 +614,9 @@ def channels(item):
 
     context_search = []
 
+    tit = '[COLOR yellow][B]Preferencias Buscar[/B][/COLOR]'
+    context_search.append({'title': tit, 'channel': 'search', 'action': 'show_help_parameters'})
+
     tit = '[COLOR powderblue][B]Global Configurar Proxies[/B][/COLOR]'
     context_search.append({'title': tit, 'channel': 'proxysearch', 'action': 'proxysearch_all'})
 
@@ -1024,7 +1027,7 @@ def channels(item):
 
         if not item.extra == 'all':
             if config.get_setting('search_extra_trailers', default=False):
-                if 'Web dedicada exclusivamente a los tráilers' in ch['notes']: continue
+                if 'dedicada exclusivamente a los tráilers' in ch['notes'].lower(): continue
 
         if item.extra == 'prefereds':
             if not ch['status'] == 1: continue
@@ -1111,7 +1114,7 @@ def channels(item):
                 if str(ch['search_types']) == "['documentary']": continue
 
             if not config.get_setting('mnu_novelas', default=True):
-                if 'exclusivamente en Novelas' in ch['notes']: continue
+                if 'exclusivamente en novelas' in ch['notes'].lower(): continue
 
         elif item.extra == 'infantil':
             if not 'infantil' in ch['clusters']: continue
@@ -1121,7 +1124,7 @@ def channels(item):
 
         elif item.extra == 'dorama':
             if ch['searchable'] == True: continue
-            if not 'dorama' in ch['clusters']: continue
+            elif not 'dorama' in ch['clusters']: continue
 
         else:
            if config.get_setting('mnu_simple', default=False):
@@ -1140,7 +1143,7 @@ def channels(item):
                        if str(ch['search_types']) == "['documentary']": continue
 
                    elif not config.get_setting('mnu_novelas', default=True):
-                       if 'exclusivamente en Novelas' in ch['notes']: continue
+                       if 'exclusivamente en novelas' in ch['notes'].lower(): continue
 
            else:
               if not config.get_setting('mnu_documentales', default=True):
@@ -1150,23 +1153,23 @@ def channels(item):
                   if 'infantil' in ch['clusters']: continue
 
               if not config.get_setting('mnu_novelas', default=True):
-                  if 'exclusivamente en Novelas' in ch['notes']: continue
-                  if 'tales' in ch['clusters']: continue
+                  if 'exclusivamente en novelas' in ch['notes'].lower(): continue
+                  elif 'tales' in ch['clusters']: continue
 
               if not config.get_setting('mnu_torrents', default=True):
-                  if 'enlaces Torrent exclusivamente' in ch['notes']: continue
+                  if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
 
               if not config.get_setting('mnu_doramas', default=True):
                   if ch['searchable'] == False: continue
-                  if 'dorama' in ch['clusters']: continue
+                  elif 'dorama' in ch['clusters']: continue
 
               if not config.get_setting('mnu_animes', default=True):
                   if ch['searchable'] == False: continue
-                  if 'anime' in ch['clusters']: continue
+                  elif 'anime' in ch['clusters']: continue
 
               if not config.get_setting('mnu_adultos', default=True):
                   if ch['searchable'] == False: continue
-                  if 'adults' in ch['clusters']: continue
+                  elif 'adults' in ch['clusters']: continue
 
         context = []
 

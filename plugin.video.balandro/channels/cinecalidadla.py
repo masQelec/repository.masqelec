@@ -339,7 +339,7 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, 'data-season="' + str(item.contentSeason) + '"(.*?)</script>')
+    bloque = scrapertools.find_single_match(data, 'data-season="' + str(item.contentSeason) + '.*?id="script-season-' + str(item.contentSeason) + '.*?"(.*?)</script>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'src="(.*?)".*?<div class="numerando">EP(.*?)</div>.*?<a href="(.*?)"')
 
@@ -440,7 +440,7 @@ def findvideos(item):
             elif servidor == 'google': servidor = 'gvideo'
             elif servidor == 'drive': servidor = 'gvideo'
             elif servidor == 'google drive': servidor = 'gvideo'
-            elif servidor == 'netu': servidor = 'waaw'
+            elif servidor == 'netu' or servidor == 'hqq': servidor = 'waaw'
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
@@ -635,7 +635,12 @@ def play(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        if servidor == 'zplayer':  url = url + '|' + host_player
+        if servidor == 'directo':
+            if not url.startswith('http'): return itemlist
+
+            if '/okru.' in url: servidor = 'okru'
+
+        elif servidor == 'zplayer':  url = url + '|' + host_player
 
         itemlist.append(item.clone(url = url, server = servidor))
 

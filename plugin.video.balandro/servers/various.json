@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Azipcdn,  Desiupload,  Doodporn,  Dropl  Dropload,  Embedgram,  Embedrise,  Emturbovid,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Hxfile,  Hexupload,  Krakenfiles,  Lulustream,  Mvidoo,  Rutube,  Streamhub,  Streamvid,  Streamwish,  Tubeload,  Turboviplay,  Twitch,  Uploaddo,  Uploadever,  Uploadraja,  Userload,  Vidello,  Videowood,  Vidguard,  Vidhidepro,  Vidspeed,  Vkspeed,  Vudeo,  Yandex,  Youdbox)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Azipcdn,  Desiupload,  Doodporn,  Drop  Dropload,  Embedgram,  Embedrise,  Emturbovid,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Goodstream,  Hxfile,  Hexupload,  Krakenfiles,  Lulustream,  Moonplayer, Mvidoo,  Rutube,  Streamhub,  Streamvid,  Streamwish,  Tubeload,  Turboviplay,  Twitch,  Uploaddo,  Uploadever,  Uploadraja,  Userload,  Vidello,  Videowood,  Vidguard,  Vidhidepro,  Vidspeed,  Vkspeed,  Vudeo,  Yandex,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -189,11 +189,11 @@
         "url": "https://streamwish.to/\\1"
       },
       {
-        "pattern": "https://wishfast.top/([0-9a-zA-Z]+)",
+        "pattern": "https://wishfast.top/(?:e/|f/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
-        "pattern": "https://wishfast.top/(?:e/|f/)([0-9a-zA-Z]+)",
+        "pattern": "https://wishfast.top/([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
@@ -294,6 +294,10 @@
       },
       {
         "pattern": "https://filelions.co/(?:v/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://filelions.top/(?:v/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://filelions.to/f/\\1"
       },
       {
@@ -483,6 +487,14 @@
       {
         "pattern": "https://uploadraja.com/([0-9a-zA-Z]+)",
         "url": "https://uploadraja.com/\\1"
+      },
+      {
+        "pattern": "https://goodstream.uno/(?:video/embed/)([0-9a-zA-Z]+)",
+        "url": "https://goodstream.uno/\\1"
+      },
+      {
+        "pattern": "https://goodstream.uno/([0-9a-zA-Z]+)",
+        "url": "https://goodstream.uno/\\1"
       }
     ]
   }

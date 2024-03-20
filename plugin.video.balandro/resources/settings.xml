@@ -240,7 +240,6 @@
 		<setting id="ch_dontorrents_dominio" type="action" label="DonTorrents [COLOR darkorange][B]Informar ó Modificar[/B][/COLOR] el dominio" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_dontorrents)"/>
 
         <setting id="opc_dontorrentsin" type="action" label="[COLOR gold]DonTorrentsIn[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_dontorrentsin)"/>
-        <setting id="opc_doramedplay" type="action" label="[COLOR gold]DoramedPlay[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_doramedplay)"/>
 
         <setting id="opc_elifilms" type="action" label="[COLOR gold]EliFilms[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_elifilms)"/>
         <setting id="opc_elitetorrent" type="action" label="[COLOR gold]EliteTorrent[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_elitetorrent)"/>

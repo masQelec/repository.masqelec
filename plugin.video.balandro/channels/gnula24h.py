@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -44,11 +44,11 @@ except:
    except: pass
 
 
-host = 'https://w-ww.gnula.cc/'
+host = 'https://ww-w.gnula.cc/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/']
+ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/', 'https://w-ww.gnula.cc/']
 
 
 domain = config.get_setting('dominio', 'gnula2h', default='')

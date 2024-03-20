@@ -42,9 +42,11 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'peliculas/populares?page=', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes?page=', search_type = 'movie', text_color='springgreen' ))
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes?page=', search_type = 'movie', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'generos/dorama?page=', search_type = 'movie', text_color='firebrick' ))
+    if config.get_setting('mnu_doramas', default=False):
+        itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'generos/dorama?page=', search_type = 'movie', text_color='firebrick' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -64,9 +66,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series/populares?page=', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes?page=', search_type = 'tvshow', text_color='springgreen' ))
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes?page=', search_type = 'tvshow', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'generos/dorama?page=', search_type = 'tvshow', text_color='firebrick' ))
+    if config.get_setting('mnu_doramas', default=False):
+        itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'generos/dorama?page=', search_type = 'tvshow', text_color='firebrick' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))

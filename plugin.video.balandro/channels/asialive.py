@@ -39,7 +39,8 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'audio-espanol/', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'audio-latino/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'movie', text_color='springgreen' ))
+    if not config.get_setting('descartar_anime', default=False):
+       itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'movie', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -62,7 +63,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'audio-espanol/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'audio-latino/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color='springgreen' ))
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
