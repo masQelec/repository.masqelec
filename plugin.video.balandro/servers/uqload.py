@@ -18,6 +18,9 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
+    if 'File was deleted' in data:
+        return 'Archivo inexistente ó eliminado'
+
     bloque = scrapertools.find_single_match(data, 'sources\s*:\s*\[(.*?)\]')
     matches = scrapertools.find_multiple_matches(bloque, '(http.*?)"')
 

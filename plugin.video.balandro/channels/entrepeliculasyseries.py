@@ -245,6 +245,9 @@ def generos(item):
         if config.get_setting('descartar_anime', default=False):
             if title == 'Anime': continue
 
+        if not config.get_setting('mnu_doramas', default=False):
+            if title == 'Dorama': continue
+
         title = title.replace('&amp;', '&')
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = text_color ))

@@ -582,8 +582,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'dontorrentsin': domains.manto_domain_dontorrentsin(item)
 
-    elif item.from_channel == 'doramedplay': domains.manto_domain_doramedplay(item)
-
     elif item.from_channel == 'elifilms': domains.manto_domain_elifilms(item)
 
     elif item.from_channel == 'elitetorrent': domains.manto_domain_elitetorrent(item)
@@ -875,13 +873,6 @@ def _proxies(item):
         cuevana3video.configurar_proxies(item)
 
         if config.get_setting('channel_cuevana3video_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'dilo':
-        from channels import dilo
-        item.channel = 'dilo'
-        dilo.configurar_proxies(item)
-
-        if config.get_setting('channel_dilo_proxies') is None: refrescar = False
 
     elif item.from_channel == 'divxatope':
         from channels import divxatope

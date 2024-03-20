@@ -49,17 +49,18 @@ except:
 
 
 dominios = [
+         'https://hd-full.lol/',
          'https://hd-full.co/',
          'https://hd-full.biz/',
          'https://hd-full.in/',
          'https://hd-full.im/',
          'https://hd-full.one/',
-         'https://hdfull.icu/',
-         'https://hdfull.quest/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
+         'https://hdfull.quest/',
+         'https://hdfull.icu/',
          'https://new.hdfull.one/'
          ]
 

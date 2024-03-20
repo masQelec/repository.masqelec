@@ -246,6 +246,9 @@ def episodios(item):
     if not matches: matches = re.compile("<li class='mark-.*?data-src='(.*?)'.*?</div><div class='numerando'>(.*?)</div>.*?<a href='(.*?)'", re.DOTALL).findall(bloque)
     if not matches: matches = re.compile('<li class="mark-.*?data-src="(.*?)".*?</div><div class="numerando">(.*?)</div>.*?<a href="(.*?)"', re.DOTALL).findall(bloque)
 
+    if not matches: matches = re.compile("<li class='mark-.*?<img src='(.*?)'.*?</div><div class='numerando'>(.*?)</div>.*?<a href='(.*?)'", re.DOTALL).findall(bloque)
+    if not matches: matches = re.compile('<li class="mark-.*?<img src="(.*?)".*?</div><div class="numerando">(.*?)</div>.*?<a href="(.*?)"', re.DOTALL).findall(bloque)
+
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 

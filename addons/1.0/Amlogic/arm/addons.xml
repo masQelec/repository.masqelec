@@ -305,7 +305,7 @@ v0.5.9 (2022-03-22)
   </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="4.0.02" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="Balandro" version="4.0.03" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -318,10 +318,14 @@ v0.5.9 (2022-03-22)
     <summary>Balandro es un Navegador de páginas Webs</summary>
     <assets>
       <icon>icon.png</icon>
-      <fanart>fanart.png</fanart>
+      <fanart>fanart.jpg</fanart>
+      <screenshot>resources/screenshots/1.jpg</screenshot>
+      <screenshot>resources/screenshots/2.jpg</screenshot>
+      <screenshot>resources/screenshots/3.jpg</screenshot>
+      <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.02[/COLOR][COLOR chartreuse]  Febrero de 2024[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.03[/COLOR][COLOR chartreuse]  Marzo de 2024[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]
@@ -340,6 +344,10 @@ v0.5.9 (2022-03-22)
     [COLOR blue][B]Agradecimientos:[/B][/COLOR]
         Cita destacada a los miembros de Balandro Team
         Mención especial al grupo de Balandro Checkers
+
+    [COLOR yellowgreen][B]Reconocimientos:[/B][/COLOR]
+        A los creadores de Elementum,  InputStream adaptive,
+        ResolveUrl  y  YouTube plugin
 
     [COLOR cyan][B]Canales:[/B][/COLOR]
         Revisión Generalizada
@@ -430,7 +438,7 @@ v0.5.9 (2022-03-22)
   </extension>
 </addon>
 
-<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="20.1.106" provider-name="Team CoreELEC">
+<addon id="service.tvheadend43" name="Tvheadend Server 4.3" version="20.9.100" provider-name="Team CoreELEC">
   <requires><import addon="xbmc.python" version="3.0.0"/>
 
   </requires>

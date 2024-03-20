@@ -186,7 +186,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title='Novelas', action = 'mainlist_series', text_color = 'limegreen' ))
-    itemlist.append(item.clone( title='Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
+
+    if config.get_setting('mnu_doramas', default=False):
+        itemlist.append(item.clone( title='Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
 
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title='Animes', action = 'mainlist_series', text_color = 'springgreen' ))
@@ -218,6 +220,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( action = 'list_all', title = 'Más valoradas', url = host + '/movies/imdb_rating', search_type = 'movie' ))
 
     itemlist.append(item.clone( action = 'list_all', title = 'Por alfabético', url = host + '/movies/abc', search_type = 'movie' ))
+
     itemlist.append(item.clone( action = 'generos', title = 'Por género', search_type = 'movie' ))
     itemlist.append(item.clone( action = 'anios', title = 'Por año', search_type = 'movie' ))
 
@@ -237,7 +240,9 @@ def mainlist_series(item):
     itemlist.append(item.clone( action = 'list_all', title = 'Más valoradas', url= host + '/tv-shows/imdb_rating', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( action = 'list_all', title = 'Novelas', url = host + '/tv-tags/soap', search_type = 'tvshow', text_color='limegreen' ))
-    itemlist.append(item.clone( action = 'list_all', title = 'Doramas', url = host + '/tv-tags/dorama', search_type = 'tvshow', text_color='firebrick' ))
+
+    if config.get_setting('mnu_doramas', default=False):
+        itemlist.append(item.clone( action = 'list_all', title = 'Doramas', url = host + '/tv-tags/dorama', search_type = 'tvshow', text_color='firebrick' ))
 
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( action = 'list_all', title = 'Animes', url = host + '/tv-tags/anime', search_type = 'tvshow', text_color='springgreen' ))
@@ -268,6 +273,9 @@ def generos(item):
 
         if config.get_setting('descartar_anime', default=False):
             if title == 'Anime': continue
+
+        if not config.get_setting('mnu_doramas', default=False):
+            if title == 'Dorama': continue
 
         itemlist.append(item.clone( title = title, url = host + url, action = 'list_all', text_color = text_color ))
 

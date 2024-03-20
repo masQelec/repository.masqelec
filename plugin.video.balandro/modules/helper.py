@@ -151,6 +151,9 @@ context_usual.append({'title': tit, 'channel': 'helper', 'action': 'show_channel
 tit = '[COLOR mediumaquamarine][B]Últimos Cambios Dominios[/B][/COLOR]'
 context_usual.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
+tit = '[COLOR yellow][B]Preferencias Buscar[/B][/COLOR]'
+context_usual.append({'title': tit, 'channel': 'search', 'action': 'show_help_parameters'})
+
 tit = '[COLOR powderblue][B]Global Configurar Proxies[/B][/COLOR]'
 context_usual.append({'title': tit, 'channel': 'proxysearch', 'action': 'proxysearch_all'})
 
@@ -962,7 +965,11 @@ def submnu_play(item):
     itemlist.append(item.clone( action='show_help_vias', title= ' - ¿ Dónde obtener Add-Ons para Vías Alternativas ?', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='show_help_vias', title= ' - [COLOR green][B]Información[/B][/COLOR] vía alternativa [COLOR goldenrod][B]ResolveUrl[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
-    itemlist.append(item.clone( action='show_help_vias', title= ' - [COLOR green][B]Información[/B][/COLOR] vía alternativa [COLOR goldenrod][B]Youtube[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
+
+    if not PY3:
+        itemlist.append(item.clone( action='show_help_youtube', title= ' - [COLOR red][B]Incompatibilidad[/B][/COLOR] vía alternativa [COLOR goldenrod][B]Youtube[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
+    else:
+        itemlist.append(item.clone( action='show_help_vias', title= ' - [COLOR green][B]Información[/B][/COLOR] vía alternativa [COLOR goldenrod][B]Youtube[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
        itemlist.append(item.clone( action='show_servers_list', title= '    - Qué servidores tienen [COLOR yellow][B]Vías Alternativas[/B][/COLOR]', tipo = 'alternativos', thumbnail=config.get_thumb('bolt') ))
@@ -975,6 +982,7 @@ def submnu_play(item):
     itemlist.append(item.clone( action='submnu_avisinfo_servers', title= '    - [COLOR aquamarine][B]Avisos[/COLOR] [COLOR green]Información[/B][/COLOR] servidores', thumbnail=config.get_thumb('bolt') ))
     itemlist.append(item.clone( action='show_servers_list', title= '    - Qué servidores se detectan pero [COLOR fuchsia][B]No están Soportados[/B][/COLOR]', tipo = 'sinsoporte', thumbnail=config.get_thumb('roadblock') ))
     itemlist.append(item.clone( action='show_help_not_programed', title= '    - ¿ Qué significa [COLOR red][B]Sin enlaces soportados[/B][/COLOR] ?', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='show_servers_list', title= '    - Qué servidores están [COLOR plum][B]Sin Servicio[/B][/COLOR]', tipo = 'outservice', thumbnail=config.get_thumb('bolt') ))
     itemlist.append(item.clone( action='show_servers_list', title= '    - Qué servidores están [COLOR coral][B]Inactivos[/B][/COLOR]', tipo = 'inactivos', thumbnail=config.get_thumb('bolt') ))
 
     if config.get_setting('developer_mode', default=False):
@@ -1075,9 +1083,8 @@ def submnu_torrents(item):
     itemlist.append(item.clone( action='show_clients_torrent', title= ' - Clientes/Motores externos torrent [COLOR gold][B]Soportados[/B][/COLOR]', thumbnail=config.get_thumb('cloud') ))
 
     if config.get_setting('mnu_torrents', default=True):
-        if PY3:
-            if xbmc.getCondVisibility('System.HasAddon("plugin.video.elementum")'):
-                itemlist.append(item.clone( action='show_help_elementum', title= ' - [COLOR green][B]Información[/B][/COLOR] Motor Torrent [COLOR goldenrod][B]Elementum[/B][/COLOR]', thumbnail=config.get_thumb('elementum') ))
+        if xbmc.getCondVisibility('System.HasAddon("plugin.video.elementum")'):
+            itemlist.append(item.clone( action='show_help_elementum', title= ' - [COLOR green][B]Información[/B][/COLOR] Motor Torrent [COLOR goldenrod][B]Elementum[/B][/COLOR]', thumbnail=config.get_thumb('elementum') ))
 
         itemlist.append(item.clone( action='channels_only_torrents', title= ' - Qué canales pueden contener archivos Torrent', thumbnail=config.get_thumb('stack') ))
         itemlist.append(item.clone( action='channels_exclusively_torrents', title= ' - Qué canales tienen enlaces Torrent [COLOR goldenrod][B]Exclusivamente[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
@@ -1580,7 +1587,7 @@ def show_servers_unsoported(item):
 def show_help_miscelanea(item):
     logger.info()
 
-    txt = '[COLOR gold][B]KODI Media Center:[/B][/COLOR][CR]'
+    txt = '[COLOR gold][B]KODI MEDIA CENTER:[/B][/COLOR][CR]'
     txt += '  [B][COLOR tan]Kodi Versiones Oficiales Soportadas:[/COLOR][/B][CR]'
     txt += '  [COLOR darkorange][B]21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia y  17.x Krypton[/B][/COLOR][CR][CR]'
 
@@ -1612,6 +1619,15 @@ def show_help_miscelanea(item):
     txt += '  [COLOR chartreuse]Telegram[/COLOR]:  [COLOR lightblue][B]t.me/Balandro_team[/B][/COLOR][CR]'
     txt += '  para unirse al [COLOR yellowgreen]Equipo de desarrollo[/COLOR][CR][CR]'
 
+    txt += '[COLOR blue][B]AGRADECIMIENTOS:[/B][/COLOR][CR]'
+
+    txt += '  Cita destacada a los miembros de Balandro Team[CR]'
+    txt += '  Mención especial al grupo de Balandro Checkers[CR][CR]'
+
+    txt += '[COLOR yellowgreen][B]RECONOCIMIENTOS:[/B][/COLOR][CR]'
+
+    txt += '  A los creadores de Elementum,  InputStream adaptive,[CR]'
+    txt += '  ResolveUrl  y  YouTube Plugin[CR]'
 
     platformtools.dialog_textviewer('Información Miscelánea', txt)
 
@@ -1706,10 +1722,6 @@ def show_help_cinecalidadlol(item):
 
 def show_help_cuevana3video(item):
     item.notice = 'cuevana3video'
-    show_help_canales(item)
-
-def show_help_dilo(item):
-    item.notice = 'dilo'
     show_help_canales(item)
 
 def show_help_ennovelas(item):
@@ -1954,6 +1966,20 @@ def show_help_uptobox(item):
     txt += '[CR][CR]*) Hay servidores que limitan el [B][COLOR gold]tiempo máximo de visionado diario[/COLOR][/B] (aprox. 150 minutos).'
 
     platformtools.dialog_textviewer('Información servidor Uptobox', txt)
+
+
+def show_help_youtube(item):
+    logger.info()
+
+    if not servertools.is_server_available('youtube'):
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El servidor está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    txt = '*) Si su Media Center es una versión anterior a [COLOR gold][B]19.x[/COLOR][/B][CR][CR]'
+
+    txt += '*) [COLOR yellow][B]No hay solución para este servidor, y tampoco podrá visualizar Traílers[/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Información servidor Youtube', txt)
 
 
 def show_server_report(item):
@@ -2437,7 +2463,9 @@ def show_help_proxies(item):
 def show_help_metodos(item):
     logger.info()
 
-    txt = '[COLOR gold][B]Método 1:[/B][/COLOR][CR]'
+    txt = '[COLOR yellowgreen][B]Solo proceder si el [/COLOR][COLOR darkorange]Test Wed del Canal[/COLOR][COLOR yellowgreen] da el aviso de que en ese canal ya [/COLOR][COLOR darkorange]No se Necesitan[/B][/COLOR][CR][CR]'
+
+    txt += '[COLOR gold][B]Método 1:[/B][/COLOR][CR]'
 
     txt += 'En el Listado de Canales, pulsación sostenida sobre el Nombre del canal y ahí [COLOR red][B]Quitar los proxies[/B][/COLOR][CR][CR]'
 
@@ -3938,14 +3966,19 @@ def show_help_semillas(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún No Instalado[/COLOR][/B]' % color_alert)
         return
 
-    txt = '*) Los archivos Torrent se proveen de [COLOR gold]Semillas[/COLOR] usuarios que están Online con las partes de ese archivo.'
+    txt = '*) Los archivos Torrent se proveen de [COLOR gold][B]Semillas[/B][/COLOR] usuarios que están Online con las partes de ese archivo.'
 
-    txt += '[CR][CR] Por ejemplo, en la pantalla de seguimiento de [COLOR gold]Elememtum[/COLOR], comprobar el dato [COLOR gold][B]S:[/B][/COLOR]'
-    txt += '  si ese dato contiene [COLOR yellow][B]0[/B][/COLOR], significará que no hay [COLOR gold]Semillas[/COLOR].'
+    txt += '[CR]    Los Usuarios que tengan ese archivo [COLOR goldenrod][B]NO[/B][/COLOR] han de ser necesariamente [COLOR goldenrod][B]SOLO[/B][/COLOR] de Balandro.'
+    txt += '[CR]    Estas partes residen en los [COLOR goldenrod][B]EQUIPOS[/B][/COLOR] de cada uno de los usuarios que tengan ese archivo Torrent.'
 
-    txt += '[CR][CR]  Si NO apareciera la pantalla de seguimiento de [COLOR gold]Elememtum[/COLOR] [COLOR red][B]No hay ningún usuario Online[/B][/COLOR]'
+    txt += '[CR][CR]*) Si [COLOR goldenrod][B]TODAS[/B][/COLOR] las partes no están [COLOR goldenrod][B]ONLINE[/B][/COLOR], [COLOR gold][B]Elememtum[/B][/COLOR] cierra por [COLOR red][B]Time Out[/B][/COLOR], para no perder el tiempo.'
 
-    txt += '[CR][CR]*) Por lo tanto, tocará esperar, a que estén Onlime [COLOR gold]Todos los Usuarios[/COLOR] con las partes de ese archivo para efectuar el Play.'
+    txt += '[CR]    Por ejemplo, en la pantalla de seguimiento de [COLOR gold][B]Elememtum[/B][/COLOR], comprobar el dato [COLOR goldenrod][B]S:[/B][/COLOR]'
+    txt += '[CR]    si ese dato contiene [COLOR red][B]0[/B][/COLOR], significará que no hay [COLOR gold][B]Semillas[/B][/COLOR].'
+
+    txt += '[CR][CR]    Si [COLOR red][B]NO[/B][/COLOR] apareciera la pantalla de seguimiento de [COLOR gold][B]Elememtum[/B][/COLOR] [COLOR red][B]No hay ningún usuario Online[/B][/COLOR]'
+
+    txt += '[CR][CR]*) Por lo tanto, tocará esperar, a que estén Onlime [COLOR gold][B]Todos los Usuarios[/B][/COLOR] con las partes para efectuar el Play.'
 
     platformtools.dialog_textviewer('Información archivos Torrent (Semillas)', txt)
 
@@ -3994,18 +4027,8 @@ def show_torrents_parameters(item):
 
     txt += ' - [COLOR gold][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR][CR]'
 
-    if PY3:
-        if xbmc.getCondVisibility('System.HasAddon("plugin.video.elementum")'):
-           txt += '[COLOR blue][B]INFORMACIÓN SEMILLAS:[/B][/COLOR][CR]'
-
-           txt += '  *) Los archivos Torrent se proveen de [COLOR gold]Semillas[/COLOR] usuarios que están Online con las partes de ese archivo.'
-
-           txt += '[CR][CR]    Por ejemplo, en la pantalla de seguimiento de [COLOR gold]Elememtum[/COLOR], comprobar el dato [COLOR gold][B]S:[/B][/COLOR]'
-           txt += '    si ese dato contiene [COLOR yellow][B]0[/B][/COLOR], significará que no hay [COLOR gold]Semillas[/COLOR].'
-
-           txt += '[CR][CR]      Si NO apareciera la pantalla de seguimiento de [COLOR gold]Elememtum[/COLOR] [COLOR red][B]No hay ningún usuario Online[/B][/COLOR]'
-
-           txt += '[CR][CR]  *) Por lo tanto, tocará esperar, a que estén Onlime [COLOR gold]Todos los Usuarios[/COLOR] con las partes de ese archivo para efectuar el Play.'
+    if xbmc.getCondVisibility('System.HasAddon("plugin.video.elementum")'):
+        txt += '[COLOR blue][B]VER[/B][/COLOR] Información Archivos Torrent [COLOR goldenrod][B]SEMILLAS[/B][/COLOR] en la Ayuda de [COLOR blue][B]TORRENTS[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Parámetros Actuales en Torrents', txt)
 
@@ -4414,13 +4437,6 @@ def show_test(item):
         if dontorrentsin_dominio:
            if tex_dom: tex_dom = tex_dom + '   DonTorrentsIn: ' + dontorrentsin_dominio + '[CR]'
            else: tex_dom = '[CR]   DonTorrentsIn: ' + dontorrentsin_dominio + '[CR]'
-
-    datos = channeltools.get_channel_parameters('doramedplay')
-    if datos['active']:
-        doramedplay_dominio = config.get_setting('channel_doramedplay_dominio', default='')
-        if doramedplay_dominio:
-           if tex_dom: tex_dom = tex_dom + '   DoramedPlay: ' + doramedplay_dominio + '[CR]'
-           else: tex_dom = '[CR]   DoramedPlay: ' + doramedplay_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('elifilms')
     if datos['active']:

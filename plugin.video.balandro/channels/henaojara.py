@@ -44,14 +44,15 @@ except:
    except: pass
 
 
-host = 'https://www.henaojara.com/'
+host = 'https://wvw.henaojara.com/'
 
 
 _players = ['.henaojara.']
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://henaojara.com/', 'https://henaojara2.com/', 'https://www1.henaojara.com/']
+ant_hosts = ['https://henaojara.com/', 'https://henaojara2.com/', 'https://www1.henaojara.com/',
+             'https://www.henaojara.com/']
 
 
 domain = config.get_setting('dominio', 'henaojara', default='')

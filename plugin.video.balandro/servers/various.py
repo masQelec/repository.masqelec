@@ -58,6 +58,11 @@ def get_video_url(page_url, url_referer=''):
         elif 'userload' in page_url: txt_server = 'Userload'
         elif 'uploadraja' in page_url: txt_server = 'Uuloadraja'
 
+        elif 'goodstream' in page_url:
+              txt_server = 'Goodstream'
+
+              if not '/video/embed/' in page_url: page_url = page_url.replace('/goodstream.uno/', '/goodstream.uno/video/embed/')
+
         elif 'filemoon' in page_url:
               txt_server = 'Filemoon'
               page_url = page_url.replace('/filemoon.to/', '/filemoon.sx/').replace('/filemoon.in/', '/filemoon.sx/').replace('/filemoon.nl/', '/filemoon.sx/').replace('/filemoon.wf/', '/filemoon.sx/').replace('/filemoon.eu/', '/filemoon.sx/').replace('/filemoon.art/', '/filemoon.sx/').replace('/filemoon.link/', '/filemoon.sx/').replace('/filemoon.top/', '/filemoon.sx/')
@@ -95,7 +100,7 @@ def get_video_url(page_url, url_referer=''):
 
         elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url:
               txt_server = 'Filelions'
-              page_url = page_url.replace('/filelions.com/', '/filelions.to/').replace('/filelions.live/', '/filelions.to/').replace('/filelions.xyz/', '/filelions.to/').replace('/filelions.online/', '/filelions.to/').replace('/filelions.site/', '/filelions.to/').replace('/filelions.co/', '/filelions.to/')
+              page_url = page_url.replace('/filelions.com/', '/filelions.to/').replace('/filelions.live/', '/filelions.to/').replace('/filelions.xyz/', '/filelions.to/').replace('/filelions.online/', '/filelions.to/').replace('/filelions.site/', '/filelions.to/').replace('/filelions.co/', '/filelions.to/').replace('/filelions.top/', '/filelions.to/')
               page_url = page_url.replace('/azipcdn.com/', '/filelions.to/')
               page_url = page_url.replace('/alions.pro/', '/filelions.to/').replace('/dlions.pro/', '/filelions.to/').replace('/mlions.pro/', '/filelions.to/').replace('/fviplions.com/', '/filelions.to/')
 
@@ -109,7 +114,11 @@ def get_video_url(page_url, url_referer=''):
 
         elif 'vudeo' in page_url:
               txt_server = 'Vudeo'
-              page_url = page_url.replace('/vudeo.net/', '/vudeo.co/').replace('/vudeo.io/', '/vudeo.co/').replace('/vudeo.ws/', '/vudeo.co/')
+              page_url = page_url.replace('/vudeo.net/', '/vudeo.ws/').replace('/vudeo.io/', '/vudeo..ws/').replace('/vudeo.co/', '/vudeo.ws/')
+
+        elif 'hexupload' in page_url or 'hexload' in page_url:
+              txt_server = 'Hexupload'
+              page_url = page_url.replace('/hexload.com/', '/hexupload.net/')
 
         elif 'vidguard' in page_url or 'vgfplay' in page_url or 'vgembed' in page_url or 'v6embed' in page_url or 'vembed' in page_url or 'vid-guard' in page_url or 'embedv':
               txt_server = 'Vidguard'
@@ -135,10 +144,6 @@ def get_video_url(page_url, url_referer=''):
         elif 'vkspeed' in page_url or 'vkspeed7' in page_url:
               txt_server = 'Vkspeed'
               page_url = page_url.replace('/vkspeed7.com/', '/vkspeed.com/')
-
-        elif 'hexupload' in page_url or 'hexload' in page_url:
-              txt_server = 'Hexupload'
-              page_url = page_url.replace('/hexload.com/', '/hexupload.net/')
 
         elif 'twitch' in page_url:
               txt_server = 'Twitch'

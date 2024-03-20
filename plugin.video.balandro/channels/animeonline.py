@@ -585,7 +585,7 @@ def findvideos(item):
 
                 link_other = link_other.replace('www.', '').replace('.com', '').replace('.net', '').replace('.org', '').replace('.top', '').replace('.do', '')
                 link_other = link_other.replace('.co', '').replace('.cc', '').replace('.sh', '').replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '')
-                link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.sx', '').replace('.online', '')
+                link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.ag', '').replace('.sx', '').replace('.online', '')
 
                 if servidor == 'various': other = servertools.corregir_other(link_other)
                 else:

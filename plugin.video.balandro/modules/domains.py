@@ -22,7 +22,7 @@ from modules import tester
 channels_currents = [
         'animefenix', 'animeflv', 'animeid', 'animeonline',
         'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cliversite', 'cuevana2', 'cuevana2esp', 'cuevana3lw', 'cuevana3video',
-        'divxtotal', 'dontorrents', 'dontorrentsin', 'doramedplay',
+        'divxtotal', 'dontorrents', 'dontorrentsin',
         'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelas', 'ennovelasonline', 'ennovelastv', 'entrepeliculasyseries', 'estrenosdoramas',
         'gnula24', 'gnula24h', 'grantorrent',
         'hdfull', 'hdfullse', 'henaojara',
@@ -38,17 +38,18 @@ channels_currents = [
         ]
 
 dominioshdfull = [
+         'https://hd-full.lol/',
          'https://hd-full.co/',
          'https://hd-full.biz/',
          'https://hd-full.in/',
          'https://hd-full.im/',
          'https://hd-full.one/',
-         'https://hdfull.icu/',
-         'https://hdfull.quest/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
-         'https://hdfull.org/'
+         'https://hdfull.org/',
+         'https://hdfull.quest/',
+         'https://hdfull.icu/',
          ]
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -841,53 +842,6 @@ def test_domain_dontorrentsin(item):
         tester.test_channel('DonTorrentsIn')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - DonTorrentsIn', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
-def manto_domain_doramedplay(item):
-    logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando DoramedPlay[/B][/COLOR]' % color_exec)
-
-    channel_json = 'doramedplay.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_doramedplay(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('doramedplay')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('DoramedPlay')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - DoramedPlay', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
 
 
 def manto_domain_elifilms(item):
@@ -3873,16 +3827,6 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://': return
-
-    elif id == 'doramedplay':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://doramedplay.'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio DoramedPlay  -->  [COLOR %s]https://doramedplay..??/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://doramedplay.': return
 
     elif id == 'elifilms':
         config.set_setting('user_test_channel', '')

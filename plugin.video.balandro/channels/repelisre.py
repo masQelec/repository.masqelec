@@ -107,7 +107,7 @@ def generos(item):
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, ref = ref, group = 'genres', text_color = 'deepskyblue' ))
 
-    return itemlist
+    return sorted(itemlist,key=lambda x: x.title)
 
 
 def list_all(item):

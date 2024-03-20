@@ -44,7 +44,11 @@ except:
    except: pass
 
 
-host = 'https://www.sinpeli.com/'
+host = 'https://sinpeli.com/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www.sinpeli.com/']
 
 
 def item_configurar_proxies(item):
@@ -80,6 +84,10 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     hay_proxies = False
     if config.get_setting('channel_sinpeli_proxies', default=''): hay_proxies = True
 

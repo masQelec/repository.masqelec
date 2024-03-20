@@ -354,7 +354,6 @@ def manto_params(item):
         config.set_setting('channel_divxtotal_dominio', '')
         config.set_setting('channel_dontorrents_dominio', '')
         config.set_setting('channel_dontorrentsin_dominio', '')
-        config.set_setting('channel_doramedplay_dominio', '')
 
         config.set_setting('channel_elifilms_dominio', '')
         config.set_setting('channel_elitetorrent_dominio', '')
@@ -483,7 +482,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '121.0.6167.185')
+        config.set_setting('chrome_last_version', '122.0.6261.112')
 
         config.set_setting('debug', '0')
 
@@ -1399,10 +1398,6 @@ def opciones_dontorrentsin(item):
     item.from_channel = 'dontorrentsin'
     opciones_domains_common(item)
 
-def opciones_doramedplay(item):
-    item.from_channel = 'doramedplay'
-    opciones_domains_common(item)
-
 def opciones_elifilms(item):
     item.from_channel = 'elifilms'
     opciones_domains_common(item)
@@ -1645,8 +1640,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'dontorrentsin': domains.manto_domain_dontorrentsin(item)
 
-            elif item.from_channel == 'doramedplay': domains.manto_domain_doramedplay(item)
-
             elif item.from_channel == 'elifilms': domains.manto_domain_elifilms(item)
 
             elif item.from_channel == 'elitetorrent': domains.manto_domain_elitetorrent(item)
@@ -1762,8 +1755,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'dontorrents': domains.test_domain_dontorrents(item)
 
             elif item.from_channel == 'dontorrentsin': domains.test_domain_dontorrentsin(item)
-
-            elif item.from_channel == 'doramedplay': domains.test_domain_doramedplay(item)
 
             elif item.from_channel == 'elifilms': domains.test_domain_elifilms(item)
 

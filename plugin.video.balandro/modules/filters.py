@@ -1062,6 +1062,9 @@ def show_servers_list(item):
     elif item.tipo == 'sinsoporte':
         cabecera = 'Servidores No Soportados'
         filtro = False
+    elif item.tipo == 'outservice':
+        cabecera = 'Servidores Sin Servicio'
+        filtro = True
     else:
         cabecera = 'Todos los Servidores'
         filtro = None
@@ -1105,11 +1108,13 @@ def show_servers_list(item):
            notes = ''
 
         if item.tipo == 'sinsoporte':
-            if not "Requiere" in notes: continue
+            if not "requiere" in notes.lower(): continue
+        elif item.tipo == 'outservice':
+            if not "out of service" in notes.lower(): continue
         elif item.tipo == 'alternativos':
-            if not "Alternative" in notes: continue
+            if not "alternative" in notes.lower(): continue
 
-            add_on = scrapertools.find_single_match(notes, 'vía:(.*?)$').strip().lower()
+            add_on = scrapertools.find_single_match(notes.lower(), 'vía:(.*?)$').strip().lower()
             if ' (' in add_on: add_on = scrapertools.find_single_match(add_on, '(.*?) ').strip().lower()
 
             if xbmc.getCondVisibility('System.HasAddon("%s")' % add_on): exists_addon = ' [COLOR tan][B] Instalada [/B]'
@@ -1236,8 +1241,8 @@ def show_channels_list(item):
             if 'temporary' in ch['clusters']: info = info + '[COLOR pink][B] Temporalmente Inactivo [/B][/COLOR]'
             else:
                info = info + '[COLOR red][B] Inactivo [/B][/COLOR]'
-               if 'web anulada.' in ch['notes'].lower(): info = info + '[COLOR pink][B] ANULADO[/B][/COLOR]'
-               elif 'web cerrada.' in ch['notes'].lower(): info = info + '[COLOR gold][B] CERRADO[/B][/COLOR]'
+               if 'web anulada' in ch['notes'].lower(): info = info + '[COLOR pink][B] ANULADO[/B][/COLOR]'
+               elif 'web cerrada' in ch['notes'].lower(): info = info + '[COLOR gold][B] CERRADO[/B][/COLOR]'
                elif 'canal privado' in ch['notes'].lower(): info = info + '[COLOR grey][B] PRIVADO[/B][/COLOR]'
 
         elif ch['searchable'] == False: info = info + '[COLOR coral][B] No búsquedas [/B][/COLOR]'

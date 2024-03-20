@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w-ww.gnula24.xyz/'
+host = 'https://c1.gnula24.xyz/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.gnula24.xyz/', 'https://www3.gnula24.xyz/', 'https://ww2.gnula24.xyz/',
-             'https://www11.gnula24.xyz/']
+             'https://www11.gnula24.xyz/', 'https://w-ww.gnula24.xyz/']
 
 
 domain = config.get_setting('dominio', 'gnula24', default='')
