@@ -44,11 +44,11 @@ except:
    except: pass
 
 
-host = 'https://animefenix.tv/'
+host = 'https://www3.animefenix.tv/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.animefenix.com/', 'https://www.animefenix.tv/']
+ant_hosts = ['https://www.animefenix.com/', 'https://www.animefenix.tv/', 'https://animefenix.tv/']
 
 
 domain = config.get_setting('dominio', 'animefenix', default='')
@@ -489,11 +489,11 @@ def findvideos(item):
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    ses = 0
-
     srvs = scrapertools.find_multiple_matches(data, '<a title="(.*?)" href="(.*?)"')
 
     matches = re.compile(r"tabsArray\['\d+'\] = \".*?src='(?:\.\.|)([^']+)", re.DOTALL).findall(data)
+
+    ses = 0
 
     for url in matches:
         ses += 1
@@ -511,7 +511,9 @@ def findvideos(item):
             serv = srv.lower()
             break
 
-        if serv == 'gamo': servidor = 'gamovideo'
+        if serv == 'fireload': continue
+
+        elif serv == 'gamo': servidor = 'gamovideo'
         elif serv == 'ru': servidor = 'okru'
         elif serv == 'burst': servidor = 'burstcloud'
         elif serv == 'yourupload': servidor = 'yourupload'
@@ -525,9 +527,10 @@ def findvideos(item):
             serv = 'filelions'
 
         if serv == servidor: serv = ''
+        elif serv == 'ru': serv = ''
+        elif serv == 'burst': serv = ''
 
-        if not serv == 'fireload':
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose', other = serv ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose', other = serv ))
 
     if not itemlist:
         if not ses == 0:

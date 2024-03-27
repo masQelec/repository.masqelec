@@ -11,6 +11,8 @@ def get_video_url(page_url, url_referer=''):
 
     if not 'http' in page_url: return video_urls
 
+    if '/mixdrop.co/' in page_url: page_url = page_url.replace('/mixdrop.co/', '/mixdrop.ag/')
+
     headers = {'Referer': page_url.replace('mixdrop.ag/e/', 'mixdrop.ag/f/')}
     data = httptools.downloadpage(page_url, headers=headers).data
 
@@ -21,7 +23,7 @@ def get_video_url(page_url, url_referer=''):
     if url:
         if url.startswith('/e/'): url = 'https://mixdrop.ag' + url
         data = httptools.downloadpage(url).data
-
+ 
     packed = scrapertools.find_multiple_matches(data, "(?s)eval(.*?)\s*</script>")
 
     for pack in packed:

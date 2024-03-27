@@ -26,7 +26,7 @@ from modules import filters
 
 
 ADDON_REPO_ADDONS = 'https://repobal.github.io/base/'
-ADDON_UPDATES_JSON = 'https://pastebin.com/raw/zW6MYy4C'
+ADDON_UPDATES_JSON = 'https://raw.githubusercontent.com/repobal/fix/main/updates.json'
 
 
 color_list_prefe = config.get_setting('channels_list_prefe_color', default='gold')

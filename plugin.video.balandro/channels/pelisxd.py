@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -237,29 +237,42 @@ def findvideos(item):
 
     matches = re.compile('href="#options-(.*?)">.*?<span class="server">(.*?)</span>', re.DOTALL).findall(data)
 
-    for option, servidor in matches:
-        servidor = servidor.lower()
+    for option, srv in matches:
+        srv = srv.lower()
 
-        if '-' in servidor:
-            servidor = servidor.strip()
-            lang = scrapertools.find_single_match(servidor, '.*?-(.*?)$').strip()
-            servidor = scrapertools.find_single_match(servidor, '(.*?)-')
+        if '-' in srv:
+            srv = srv.strip()
+            lang = scrapertools.find_single_match(srv, '.*?-(.*?)$').strip()
+            srv = scrapertools.find_single_match(srv, '(.*?)-')
         else:
             lang = item.languages
 
-        servidor = servertools.corregir_servidor(servidor)
+        servidor = servertools.corregir_servidor(srv)
 
         if servidor == 'embed': continue
 
         elif servidor == 'player': servidor = 'directo'
+        elif servidor == 'd000d': servidor = 'doodstream'
 
         bloque = scrapertools.find_single_match(data, '<div id="options-' + str(option) + '"(.*?)</div>')
 
         url = scrapertools.find_single_match(str(bloque), '<iframe src="(.*?)"')
         if not url: url = scrapertools.find_single_match(str(bloque), '<iframe data-src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(str(bloque), 'src="(.*?)"')
+
+        if 'data:image' in url:
+            url = scrapertools.find_single_match(data, '<div id="options-' + str(option) + '".*?<iframe loading=.*?data-lazy-src="(.*?)"')
 
         if url:
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang) ))
+            url = url.replace('&#038;', '&').replace('&amp;', '&')
+
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(srv)
+            elif servidor == 'directo':
+               if config.get_setting('developer_mode', default=False): other = url
+               else: continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
 
     return itemlist
 
@@ -293,7 +306,8 @@ def play(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(item.clone(url = url, server = servidor))
+        if not servidor == 'directo':
+            itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

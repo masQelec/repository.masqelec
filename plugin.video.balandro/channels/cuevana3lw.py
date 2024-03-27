@@ -8,21 +8,22 @@ else:
     import urllib.parse as urlparse
 
 
-import re, time
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://pro.cuevana3.vip'
+host = 'https://ww3l.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://cuevana3.law', 'https://pro.cuevana8.vip', 'https://cuevana8.vip',
              'https://cuevana8.online', 'https://cuevana.la', 'https://www.cuevana.la',
              'https://ww2.cuevana3.law', 'https://wvv1.cuevana3.vip', 'https://new.cuevana3.vip',
-             'https://vwv3.cuevana3.vip', 'https://vww3.cuevana3.vip']
+             'https://vwv3.cuevana3.vip', 'https://vww3.cuevana3.vip', 'https://pro.cuevana3.vip',
+             'https://ww3i.cuevana3.vip']
 
 domain = config.get_setting('dominio', 'cuevana3lw', default='')
 

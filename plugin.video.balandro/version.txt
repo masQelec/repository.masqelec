@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.03[/COLOR] [COLOR chartreuse] 14 de Marzo de 2024[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.04[/COLOR] [COLOR chartreuse] 24 de Marzo de 2024[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
@@ -53,9 +53,9 @@
 
  [COLOR darkcyan][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR]
     [COLOR springgreen][B]Son los pendientes de su situacion, para decidir su Re-activacion o Anulacion[/B][/COLOR]
-    [B][COLOR moccasin] DocumaniaTv [COLOR lime] www.documaniatv.com [I][COLOR olivedrab] Player [/I][/B][/COLOR]
-    [B][COLOR moccasin] NextDede [COLOR lime] nextdede.tv [I][COLOR greenyellow] Cambio Estructural [/I][/B][/COLOR]
- 
+    DocumaniaTv [COLOR moccasin][B] www.documaniatv.com [/COLOR][COLOR olivedrab][I] Player [/I][/B][/COLOR]
+    NextDede [COLOR moccasin][B] nextdede.tv [/COLOR][COLOR greenyellow][I] Cambio Estructural [/I][/B][/COLOR]
+
  [COLOR gold][B]SERVIDORES VIAS ALTERNATIVAS/ADICIONALES QUE PUEDEN NECESITARSE:[/B][/COLOR]
     plugin.video.youtube
     script.module.resolveurl

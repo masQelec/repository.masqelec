@@ -559,6 +559,9 @@ def findvideos(item):
                 if url == 'undefined': continue
 
                 if url.startswith('https:/streamwish.'): url = url.replace('https:/streamwish.', 'https://streamwish.')
+                elif url.startswith('https://filemooon.'): url = url.replace('https://filemooon.', 'https://filemoon.')
+
+                if '/netuplayer.top/' in url: url = url.replace('/netuplayer.top/', '/netu.to/')
 
                 if 'Sub Español' in dat_server: lang = 'Vose'
                 elif 'Sub Latino' in dat_server: lang = 'Vose'

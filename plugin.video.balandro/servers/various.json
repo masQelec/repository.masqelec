@@ -61,6 +61,18 @@
         "url": "\\1"
       },
       {
+        "pattern": "https://fmoonembed.pro/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://embedmoon.xyz/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://moonjscdn.info/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
         "pattern": "https://moonmov.pro/e/([0-9a-zA-Z]+)",
         "url": "https://filemoon.sx/e/\\1"
       },
@@ -214,6 +226,14 @@
       },
       {
         "pattern": "https://cdnwish.com/(?:e/|f/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://asnwish.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://jodwish.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
@@ -469,7 +489,7 @@
         "url": "https://vidhidepro.com/s/\\1"
       },
       {
-        "pattern": "https://vidhidevip.com/(?:s/|v/|f/|embed/)([0-9a-zA-Z]+)",
+        "pattern": "https://vidhidevip.com/(?:s/|v/|f/|d/|embed/)([0-9a-zA-Z]+)",
         "url": "https://vidhidepro.com/s/\\1"
       },
       {

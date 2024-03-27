@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://wwm.cinecalidad.gg/'
+host = 'https://mww.cinecalidad.gg/'
 
 
 _players = ['https://cinecalidad.', '.cinecalidad.']
@@ -77,7 +77,8 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://ww.cinecalidad.gg/', 'https://w.cinecalidad.gg/', 'https://vvw.cinecalidad.gg/',
              'https://wv.cinecalidad.gg/', 'https://vwv.cinecalidad.gg/', 'https://wwc.cinecalidad.gg/',
              'https://cww.cinecalidad.gg/', 'https://oww.cinecalidad.gg/', 'https://wow.cinecalidad.gg/',
-             'https://woo.cinecalidad.gg/', 'https://oow.cinecalidad.gg/', 'https://wwe.cinecalidad.gg/']
+             'https://woo.cinecalidad.gg/', 'https://oow.cinecalidad.gg/', 'https://wwe.cinecalidad.gg/',
+             'https://wwm.cinecalidad.gg/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')

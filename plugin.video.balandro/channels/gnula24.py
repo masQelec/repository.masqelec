@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://c1.gnula24.xyz/'
+host = 'https://www.seriesgod.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.gnula24.xyz/', 'https://www3.gnula24.xyz/', 'https://ww2.gnula24.xyz/',
-             'https://www11.gnula24.xyz/', 'https://w-ww.gnula24.xyz/']
+             'https://www11.gnula24.xyz/', 'https://w-ww.gnula24.xyz/', 'https://c1.gnula24.xyz/']
 
 
 domain = config.get_setting('dominio', 'gnula24', default='')
@@ -129,7 +129,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ver-episodio/', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ver-episode/', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings/', search_type = 'tvshow' ))
@@ -244,6 +244,7 @@ def list_all(item):
         url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
 
         title = scrapertools.find_single_match(match, '<h4>(.*?)</h4>')
+        if not title: title = scrapertools.find_single_match(match, ' alt="(.*?)"')
 
         if not url or not title: continue
 

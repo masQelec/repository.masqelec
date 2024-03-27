@@ -217,6 +217,10 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'genero/dorama/', search_type = 'tvshow', text_color = 'firebrick' ))
+
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'genero/animacion/', search_type = 'tvshow', text_color = 'springgreen' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
     return itemlist
@@ -296,7 +300,7 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        title = title.replace('&#8211;', '').replace('&#039;', "'").replace('&#8230;', ' &').replace('&amp;', '&').strip()
+        title = title.replace('&#8211;', '').replace('&#039;', "'").replace('&#8230;', ' &').replace('&amp;', '&').replace('&#8217;s', "'").strip()
 
         tipo = 'movie' if '/movies/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -481,6 +485,8 @@ def findvideos(item):
            url = scrapertools.find_single_match(data1, '<a href="(.*?)"')
 
         if not url: continue
+        elif url == '#': continue
+
         elif '/1fichier.' in url: continue
         elif '/short.' in url: continue
 

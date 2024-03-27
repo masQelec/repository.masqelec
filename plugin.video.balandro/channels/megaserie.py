@@ -23,7 +23,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -500,6 +500,8 @@ def findvideos(item):
                     matches1 = scrapertools.find_multiple_matches(data1, '<a target=".*?href="(.*?)"')
 
                     for link in matches1:
+                        if 'https://player.megaxserie.me/f/' in link: link = link.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
+
                         servidor = servertools.get_server_from_url(link)
                         servidor = servertools.corregir_servidor(servidor)
 
@@ -548,6 +550,8 @@ def findvideos(item):
                     matches2 = scrapertools.find_multiple_matches(data2, '<a target=".*?href="(.*?)"')
 
                     for link in matches2:
+                        if 'https://player.megaxserie.me/f/' in link: link = link.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
+
                         servidor = servertools.get_server_from_url(link)
                         servidor = servertools.corregir_servidor(servidor)
 
@@ -591,6 +595,8 @@ def play(item):
         url = scrapertools.find_single_match(data, 'src="(.*?)"')
 
         if url:
+            if 'https://player.megaxserie.me/f/' in url: url = url.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
+
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 

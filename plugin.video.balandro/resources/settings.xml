@@ -74,7 +74,7 @@
         <setting id="show_mnu_parameters1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_menu_parameters)"/>
         <setting id="mnu_simple" type="bool" label="Activar [COLOR tan][B][I]Menú [COLOR yellow]Simplificado[/I][/B][/COLOR]" default="false"/>
 
-        <setting label="Opciones Menú:" type="lsep"/>
+        <setting label="Selecciones Menú:" type="lsep"/>
 
         <setting id="mnu_opciones" type="bool" label="Opciones" default="false"/>
         <setting id="mnu_sugeridos" type="bool" label="Añadir opción [COLOR aquamarine][B]Sugeridos[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="true" visible="eq(-1,true)"/>
@@ -97,7 +97,7 @@
         <setting id="mnu_problematicos" type="bool" label="Añadir opción [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] (solo canales que Predominan Sin enlaces Disponibles/Válidos/Soportados)" default="false" visible="eq(-18,true)"/>
         <setting id="mnu_desactivados" type="bool" label="Añadir opción [COLOR gray][B]Desactivados[/B][/COLOR] (solo canales que tenga Desactivados)" default="false" visible="eq(-19,true)"/>
 
-        <setting label="Opciones Preferidos y Descargas en el Principal:" type="lsep"/>
+        <setting label="Preferidos y Descargas en el Principal:" type="lsep"/>
 
         <setting id="ord_opciones" type="bool" label="Opciones" default="false"/>
         <setting id="mnu_preferidos" type="bool" label="Añadir la opción [COLOR wheat][B]Preferidos[/B][/COLOR] ([COLOR tan][B][I]Menú[/B] Predeterminado[/I][/COLOR])" default="true" visible="eq(-1,true)"/>
@@ -885,7 +885,7 @@
 
         <setting id="show_help_miscelanea2" type="action" label="[COLOR moccasin][B]Miscelanéa[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_miscelanea)"/>
 
-        <setting label="Informaciones Generales:" type="lsep"/>
+        <setting label="Temas Generales:" type="lsep"/>
 
         <setting id="show_not_contemplated1" type="action" label="[COLOR yellow][B]¿ Qué NO está contemplado/garantizado en Balandro ?[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_not_contemplated)"/>
         <setting id="show_help_faq1" type="action" label="[COLOR tomato][B]Preguntas[/B][/COLOR] Frecuentes" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_faq)"/>
@@ -933,11 +933,11 @@
         <setting id="team_opc" type="bool" label="Opciones" default="false"/>
         <setting id="show_help_miscelanea5" type="action" label="[COLOR moccasin][B]Miscelanéa[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_miscelanea)"/>
         <setting id="show_help_notice" type="action" label="[COLOR aqua][B]Comunicado[/B][/COLOR] Oficial de Balandro" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_notice)"/>
-        <setting id="show_dev_notes" type="action" label="Notas para [COLOR goldenrod][B]Developers[/B][/COLOR] (Desarrolladores)" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_dev_notes)"/>
-        <setting id="developer_mode" type="bool" label="Activar el Modo de ejecución en [COLOR darkorange][B]Desarrollo[/B][/COLOR]" visible="eq(-4,true)" default="false"/>
+        <setting id="developer_mode" type="bool" label="Activar el Modo de ejecución en [COLOR darkorange][B]Desarrollo[/B][/COLOR]" visible="eq(-3,true)" default="false"/>
+        <setting id="show_dev_notes" type="action" label="Notas para [COLOR goldenrod][B]Developers[/B][/COLOR] (Desarrolladores)" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_dev_notes)"/>
 
         <setting label="Fuente:" type="lsep"/>
-        <setting id="_dfon" type="text" label="[B]Código Fuente Desarrollo [I]https://github.com/repobal[/I][/B]" enable="false"/>
+        <setting id="_dfon" type="text" label="[B]Código Fuente Desarrollo [I]https://github.com/repobal[/I][/B]" enable="false" visible="true"/>
 
         <setting label="Balandro Team (Equipo de Desarrollo):" type="lsep"/>
         <setting id="_team1" type="text" label="[B]Equipo Desarrollo Telegram [I]t.me/balandro_team[/I][/B]" enable="false" visible="true"/>

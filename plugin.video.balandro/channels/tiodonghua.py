@@ -30,7 +30,9 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'donghua/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'donghua/', search_type = 'tvshow' )) 
+
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'episodios/', group = 'epis', search_type = 'tvshow', text_color = 'cyan' ))
 
@@ -66,7 +68,7 @@ def generos(item):
     ]
 
     for opc, tit in opciones:
-        itemlist.append(item.clone( title=tit, url = host + '/genero//' + opc + '/', action = 'list_all', text_color = 'springgreen' ))
+        itemlist.append(item.clone( title=tit, url = host + '/genero/' + opc + '/', action = 'list_all', text_color = 'springgreen' ))
 
     return itemlist
 
@@ -130,7 +132,7 @@ def list_all(item):
 
     if itemlist:
         if '<div class="pagination">' in data:
-            next_page = scrapertools.find_single_match(data,'<div class="pagination">.*?<span class="current">.*?' + "href='(.*?)'")
+            next_page = scrapertools.find_single_match(data,'<div class="pagination">.*?<span class="current">.*?ref="(.*?)"')
 
             if next_page:
                 if '/page/' in next_page:
@@ -149,6 +151,7 @@ def episodios(item):
     data = do_downloadpage(item.url)
 
     epis = scrapertools.find_multiple_matches(data, "<li class='mark-.*?data-src='(.*?)'.*?<div class='numerando'>(.*?)</div>.*?<a href='(.*?)'>(.*?)</a>")
+    if not epis: epis = scrapertools.find_multiple_matches(data, '<li class="mark-.*?src="(.*?)".*?<div class="numerando">(.*?)</div>.*?<a href="(.*?)">(.*?)</a>')
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(epis)
@@ -217,17 +220,20 @@ def findvideos(item):
     data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, "<li id='player-option-(.*?)</span></li>")
-
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<li id="player-option-(.*?)</span></li>')
     ses = 0
 
     for match in matches:
         ses += 1
 
         d_type = scrapertools.find_single_match(match, "data-type='(.*?)'")
+        if not d_type: d_type = scrapertools.find_single_match(match, 'data-type="(.*?)"')
 
         d_post = scrapertools.find_single_match(match, "data-post='(.*?)'")
+        if not d_post: d_post = scrapertools.find_single_match(match, 'data-post="(.*?)"')
 
         d_nume = scrapertools.find_single_match(match, "data-nume='(.*?)'")
+        if not d_nume: d_nume = scrapertools.find_single_match(match, 'data-nume="(.*?)"')
 
         if not d_type or not d_post or not d_nume: continue
 
@@ -237,10 +243,11 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(data, '"embed_url":.*?"(.*?)"')
 
-        if '<iframe' in url:
+        if '<iframe' in url or '<IFRAME':
              data = str(data).replace('=\\', '=').replace('\\"', '/"')
 
              url = scrapertools.find_single_match(str(data), '<iframe.*?src="(.*?)"')
+             if not url: url = scrapertools.find_single_match(str(data), '<IFRAME.*?SRC="(.*?)"')
 
         url = url.replace('\\/', '/')
 

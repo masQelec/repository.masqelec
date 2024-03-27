@@ -198,6 +198,7 @@ def episodios(item):
 
     for match in matches[item.page * item.perpage:]:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
         title = scrapertools.find_single_match(match, '<div class="name">(.*?)</div>').strip()
 
         if not url or not title: continue
@@ -209,7 +210,8 @@ def episodios(item):
         epis = scrapertools.find_single_match(match, '<div class="type"><span>(.*?)</span>').lower().strip()
         epis = epis.replace('ep', '').strip()
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
+                                    contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break

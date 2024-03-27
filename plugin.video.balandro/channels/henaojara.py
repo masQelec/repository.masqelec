@@ -649,6 +649,7 @@ def findvideos(item):
 
                     if srv == 'fembed': continue
                     elif srv == 'streamsb': continue
+                    elif srv == 'nyuu': continue
 
                     if srv == 'netuplayer' or srv == 'netu' or srv == 'hqq': servidor = 'waaw'
 
@@ -777,7 +778,7 @@ def play(item):
            url = ''
 
     elif '/go.php?v=' in url:
-        url = scrapertools.find_single_match(url, 'v=(.*?)$')
+          url = scrapertools.find_single_match(url, 'v=(.*?)$')
 
     else:
         data = do_downloadpage(url)
@@ -819,10 +820,13 @@ def play(item):
         if '.mystream.' in url:
             return 'Servidor [COLOR tan]Cerrado[/COLOR]'
 
+        if '/player.streamhj.top/' in url: url = url.replace('/player.streamhj.top/', '/netu.to/')
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         other = servertools.corregir_other(url)
+
         if other == 'Streamwish': servidor = 'various'
         elif other == 'Filelions': servidor = 'various'
         elif other == 'Filemoon': servidor = 'various'
