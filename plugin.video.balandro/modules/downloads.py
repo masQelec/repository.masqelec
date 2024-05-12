@@ -94,7 +94,9 @@ def mainlist(item):
               pass
 
     if not elem == 0:
-        itemlist.append(item.clone( title = '[B]Ajustes:[/B]', action = '', thumbnail=config.get_thumb('help'), text_color='seagreen' ))
+        itemlist.append(item.clone( title = '[B]INFORMACIÓN:[/B]', action = '', thumbnail=config.get_thumb('help'), text_color='seagreen' ))
+
+        itemlist.append(item.clone( channel='actions', title = '[COLOR red][B]Eliminar Todas las Descargas[/B][/COLOR]', action = 'manto_folder_downloads', thumbnail=config.get_thumb('downloads') ))
 
     itemlist.append(item.clone( title = '[B]Ubicación actual de las[/B] [COLOR seagreen][B]Descargas[/B][/COLOR]', action = 'show_folder_downloads', thumbnail=config.get_thumb('downloads') ))
 
@@ -103,6 +105,8 @@ def mainlist(item):
     itemlist.append(item.clone( channel='helper', action = 'show_help_usb', title = '¿ [B]Se puede Descargar directamente en una[/B] [COLOR goldenrod][B]Unidad USB[/B][/COLOR] ?', thumbnail=config.get_thumb('usb') ))
 
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] categoría [COLOR seagreen][B]Descargas[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
+
+    platformtools.itemlist_refresh()
 
     return itemlist
 
@@ -286,7 +290,7 @@ def save_download(item):
         if notification_d_ok:
             platformtools.dialog_ok(config.__addon_name, 'Error al descargar')
         else:
-            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Error al descargar[/COLOR][/B]' % color_exec)
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Error al descargar[/COLOR][/B]' % color_alert)
 
 
 # ~ (parecido a platformtools.play_video pero para descargar)
@@ -370,14 +374,16 @@ def download_video(item, parent_item):
         else:
             num_epis = parent_item.contentEpisodeNumber
 
-            if 'Capitulo' in num_epis: num_epis = num_epis.replace('Capitulo', '').strip()
-            elif 'Capítulo' in num_epis: num_epis = num_epis.replace('Capítulo', '').strip()
-            elif 'capitulo' in num_epis: num_epis = num_epis.replace('capitulo', '').strip()
-            elif 'capítulo' in num_epis: num_epis = num_epis.replace('capítulo', '').strip()
-            elif 'Episodio' in num_epis: num_epis = num_epis.replace('Episodio', '').strip()
-            elif 'episodio' in num_epis: num_epis = num_epis.replace('episodio', '').strip()
+            nro_epis = str(num_epis)
 
-            if '-' in num_epis: num_epis = num_epis.replace('-', '').strip()
+            if 'Capitulo' in nro_epis: num_epis = num_epis.replace('Capitulo', '').strip()
+            elif 'Capítulo' in nro_epis: num_epis = num_epis.replace('Capítulo', '').strip()
+            elif 'capitulo' in nro_epis: num_epis = num_epis.replace('capitulo', '').strip()
+            elif 'capítulo' in nro_epis: num_epis = num_epis.replace('capítulo', '').strip()
+            elif 'Episodio' in nro_epis: num_epis = num_epis.replace('Episodio', '').strip()
+            elif 'episodio' in nro_epis: num_epis = num_epis.replace('episodio', '').strip()
+
+            if '-' in nro_epis: num_epis = num_epis.replace('-', '').strip()
 
             try: nro_epis = int(num_epis)
             except: logger.error("Comprobar Número del Episodio: %s" % num_epis)

@@ -23,7 +23,7 @@ channels_currents = [
         'animefenix', 'animeflv', 'animeid', 'animeonline',
         'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cliversite', 'cuevana2', 'cuevana2esp', 'cuevana3lw', 'cuevana3video',
         'divxtotal', 'dontorrents', 'dontorrentsin',
-        'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelas', 'ennovelasonline', 'ennovelastv', 'entrepeliculasyseries', 'estrenosdoramas',
+        'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelas', 'ennovelastv', 'entrepeliculasyseries', 'estrenosdoramas',
         'gnula24', 'gnula24h', 'grantorrent',
         'hdfull', 'hdfullse', 'henaojara',
         'mejortorrentapp', 'mejortorrentnz', 'mitorrent',
@@ -38,6 +38,8 @@ channels_currents = [
         ]
 
 dominioshdfull = [
+         'https://hd-full.me/',
+         'https://hd-full.vip/',
          'https://hd-full.lol/',
          'https://hd-full.co/',
          'https://hd-full.biz/',
@@ -52,6 +54,16 @@ dominioshdfull = [
          'https://hdfull.icu/',
          ]
 
+dominiosnextdede = [
+         'https://nextdede.us',
+         'https://nextdede.tv',
+         'https://nextdede.top'
+         ]
+
+dominiosplaydede = [
+         'https://playdede.us/'
+         ]
+
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
 color_adver = config.get_setting('notification_adver_color', default='violet')
@@ -61,8 +73,6 @@ color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 def manto_domain_animefenix(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando AnimeFenix[/B][/COLOR]' % color_exec)
 
     channel_json = 'animefenix.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -86,6 +96,8 @@ def manto_domain_animefenix(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando AnimeFenix[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -107,8 +119,6 @@ def test_domain_animefenix(item):
 
 def manto_domain_animeflv(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando AnimeFlv[/B][/COLOR]' % color_exec)
 
     channel_json = 'animeflv.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -132,6 +142,8 @@ def manto_domain_animeflv(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando AnimeFlv[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -153,8 +165,6 @@ def test_domain_animeflv(item):
 
 def manto_domain_animeid(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando AnimeId[/B][/COLOR]' % color_exec)
 
     channel_json = 'animeid.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -178,6 +188,8 @@ def manto_domain_animeid(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando AnimeId[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -199,8 +211,6 @@ def test_domain_animeid(item):
 
 def manto_domain_animeonline(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando AnimeOnline[/B][/COLOR]' % color_exec)
 
     channel_json = 'animeonline.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -224,6 +234,8 @@ def manto_domain_animeonline(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando AnimeOnline[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -245,8 +257,6 @@ def test_domain_animeonline(item):
 
 def manto_domain_cinecalidad(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando CineCalidad[/B][/COLOR]' % color_exec)
 
     channel_json = 'cinecalidad.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -270,6 +280,8 @@ def manto_domain_cinecalidad(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando CineCalidad[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -291,8 +303,6 @@ def test_domain_cinecalidad(item):
 
 def manto_domain_cinecalidadla(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando CineCalidadLa[/B][/COLOR]' % color_exec)
 
     channel_json = 'cinecalidadla.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -316,6 +326,8 @@ def manto_domain_cinecalidadla(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando CineCalidadLa[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -337,8 +349,6 @@ def test_domain_cinecalidadla(item):
 
 def manto_domain_cinecalidadlol(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando CineCalidadLol[/B][/COLOR]' % color_exec)
 
     channel_json = 'cinecalidadlol.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -362,6 +372,8 @@ def manto_domain_cinecalidadlol(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando CineCalidadLol[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -383,8 +395,6 @@ def test_domain_cinecalidadlol(item):
 
 def manto_domain_cliversite(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando CliverSite[/B][/COLOR]' % color_exec)
 
     channel_json = 'cliversite.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -408,6 +418,8 @@ def manto_domain_cliversite(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando CliverSite[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -429,8 +441,6 @@ def test_domain_cliversite(item):
 
 def manto_domain_cuevana2(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana2[/B][/COLOR]' % color_exec)
 
     channel_json = 'cuevana2.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -454,6 +464,8 @@ def manto_domain_cuevana2(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana2[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -475,8 +487,6 @@ def test_domain_cuevana2(item):
 
 def manto_domain_cuevana2esp(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana2Esp[/B][/COLOR]' % color_exec)
 
     channel_json = 'cuevana2esp.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -500,6 +510,8 @@ def manto_domain_cuevana2esp(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana2Esp[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -521,8 +533,6 @@ def test_domain_cuevana2esp(item):
 
 def manto_domain_cuevana3lw(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana3Lw[/B][/COLOR]' % color_exec)
 
     channel_json = 'cuevana3lw.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -546,6 +556,8 @@ def manto_domain_cuevana3lw(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana3Lw[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -567,8 +579,6 @@ def test_domain_cuevana3lw(item):
 
 def manto_domain_cuevana3video(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana3Video[/B][/COLOR]' % color_exec)
 
     channel_json = 'cuevana3video.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -592,6 +602,8 @@ def manto_domain_cuevana3video(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana3Video[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -614,8 +626,6 @@ def test_domain_cuevana3video(item):
 def manto_domain_divxtotal(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando DivxTotal[/B][/COLOR]' % color_exec)
-
     channel_json = 'divxtotal.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -637,6 +647,8 @@ def manto_domain_divxtotal(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando DivxTotal[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -662,8 +674,6 @@ def last_domain_dontorrents(item):
 
     domain = config.get_setting('dominio', 'dontorrents', default='')
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
-
     channel_json = 'dontorrents.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -684,6 +694,8 @@ def last_domain_dontorrents(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     last_domain = ''
 
@@ -754,8 +766,6 @@ def last_domain_dontorrents(item):
 def manto_domain_dontorrents(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando DonTorrents[/B][/COLOR]' % color_exec)
-
     channel_json = 'dontorrents.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -778,8 +788,9 @@ def manto_domain_dontorrents(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando DonTorrents[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
-    return
 
 
 def test_domain_dontorrents(item):
@@ -800,8 +811,6 @@ def test_domain_dontorrents(item):
 
 def manto_domain_dontorrentsin(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando DonTorrentsIn[/B][/COLOR]' % color_exec)
 
     channel_json = 'dontorrentsin.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -825,6 +834,8 @@ def manto_domain_dontorrentsin(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando DonTorrentsIn[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -846,8 +857,6 @@ def test_domain_dontorrentsin(item):
 
 def manto_domain_elifilms(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EliFilms[/B][/COLOR]' % color_exec)
 
     channel_json = 'elifilms.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -871,6 +880,8 @@ def manto_domain_elifilms(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EliFilms[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -892,8 +903,6 @@ def test_domain_elifilms(item):
 
 def manto_domain_elitetorrent(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EliteTorrent[/B][/COLOR]' % color_exec)
 
     channel_json = 'elitetorrent.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -917,6 +926,8 @@ def manto_domain_elitetorrent(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EliteTorrent[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -938,8 +949,6 @@ def test_domain_elitetorrent(item):
 
 def manto_domain_elitetorrentnz(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EliteTorrentNz[/B][/COLOR]' % color_exec)
 
     channel_json = 'elitetorrentnz.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -963,6 +972,8 @@ def manto_domain_elitetorrentnz(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EliteTorrentNz[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -984,8 +995,6 @@ def test_domain_elitetorrentnz(item):
 
 def manto_domain_ennovelas(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EnNovelas[/B][/COLOR]' % color_exec)
 
     channel_json = 'ennovelas.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -1009,6 +1018,8 @@ def manto_domain_ennovelas(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EnNovelas[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -1028,56 +1039,8 @@ def test_domain_ennovelas(item):
         platformtools.dialog_notification(config.__addon_name + ' - EnNovelas', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def manto_domain_ennovelasonline(item):
-    logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EnNovelasOnline[/B][/COLOR]' % color_exec)
-
-    channel_json = 'ennovelasonline.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_ennovelasonline(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('ennovelasonline')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('EnNovelasOnline')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - EnNovelasOnline', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
 def manto_domain_ennovelastv(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EnNovelasTv[/B][/COLOR]' % color_exec)
 
     channel_json = 'ennovelastv.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -1101,6 +1064,8 @@ def manto_domain_ennovelastv(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EnNovelasTv[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -1122,8 +1087,6 @@ def test_domain_ennovelastv(item):
 
 def manto_domain_entrepeliculasyseries(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EntrePeliculasySeries[/B][/COLOR]' % color_exec)
 
     channel_json = 'entrepeliculasyseries.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -1147,6 +1110,8 @@ def manto_domain_entrepeliculasyseries(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EntrePeliculasySeries[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -1168,8 +1133,6 @@ def test_domain_entrepeliculasyseries(item):
 
 def manto_domain_estrenosdoramas(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EstrenosDoramas[/B][/COLOR]' % color_exec)
 
     channel_json = 'estrenosdoramas.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -1193,6 +1156,8 @@ def manto_domain_estrenosdoramas(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando EstrenosDoramas[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -1212,11 +1177,8 @@ def test_domain_estrenosdoramas(item):
         platformtools.dialog_notification(config.__addon_name + ' - EstrenosDoramas', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-
 def manto_domain_gnula24(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Gnula24[/B][/COLOR]' % color_exec)
 
     channel_json = 'gnula24.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -1240,6 +1202,8 @@ def manto_domain_gnula24(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Gnula24[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -1261,8 +1225,6 @@ def test_domain_gnula24(item):
 
 def manto_domain_gnula24h(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Gnula24H[/B][/COLOR]' % color_exec)
 
     channel_json = 'gnula24h.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -1286,6 +1248,8 @@ def manto_domain_gnula24h(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Gnula24H[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -1307,8 +1271,6 @@ def test_domain_gnula24h(item):
 
 def manto_domain_grantorrent(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando GranTorrent[/B][/COLOR]' % color_exec)
 
     channel_json = 'grantorrent.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -1332,6 +1294,8 @@ def manto_domain_grantorrent(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando GranTorrent[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -1354,8 +1318,6 @@ def test_domain_grantorrent(item):
 def latest_domains_hdfull(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando dominios[/B][/COLOR]' % color_exec)
-
     channel_json = 'hdfull.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -1377,6 +1339,7 @@ def latest_domains_hdfull(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando dominios[/B][/COLOR]' % color_exec)
 
     # ~ web para saber el ultimo dominio vigente en actions
     # ~ web  'https://dominioshdfull.com/'
@@ -1414,14 +1377,6 @@ def latest_domains_hdfull(item):
 def last_domain_hdfull(item):
     logger.info()
 
-    domain = config.get_setting('dominio', 'hdfull', default='')
-
-    if not domain:
-        platformtools.dialog_notification(config.__addon_name + '[COLOR yellow][B] HdFull[/B][/COLOR]', '[B][COLOR %s]Falta Configurar el Dominio a usar ...[/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name + ' - HdFull', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
-
     channel_json = 'hdfull.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -1444,51 +1399,54 @@ def last_domain_hdfull(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
-    if domain:
-        if domain == 'https://new.hdfull.one/':
-            platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Dominio especial correcto[/B][/COLOR]' % color_infor)
-            return
+    domain = config.get_setting('dominio', 'hdfull', default='')
 
+    if not domain:
+        platformtools.dialog_notification(config.__addon_name + '[COLOR yellow][B] HdFull[/B][/COLOR]', '[B][COLOR %s]Falta Configurar el Dominio a usar ...[/COLOR][/B]' % color_alert)
+        return
+
+    if domain == 'https://new.hdfull.one/':
+        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Dominio especial correcto[/B][/COLOR]' % color_infor)
+        return
+
+    platformtools.dialog_notification(config.__addon_name + ' - HdFull', '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
     # ~ webs  0)-'https://dominioshdfull.com/'  1)-'https://new.hdfull.one/'
 
-
     last_domain = ''
     latest_domain = ''
 
-    if domain:
-        try:
-           host_domain = 'https://dominioshdfull.com/'
+    try:
+       host_domain = 'https://dominioshdfull.com/'
 
-           data = httptools.downloadpage(host_domain).data
+       data = httptools.downloadpage(host_domain).data
 
-           latest_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
+       latest_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
 
-           if not latest_domain:
-               operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
+       if not latest_domain:
+           operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
 
-               if not operative_domains:
-                   operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
+           if not operative_domains:
+               operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
 
-                   if operative_domains_unescape:
-                       operative_domains_unescape = unquote(str(operative_domains_unescape))
+               if operative_domains_unescape:
+                   operative_domains_unescape = unquote(str(operative_domains_unescape))
 
-                       operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
+                   operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
 
-                   if operative_domains: latest_domain = operative_domains[0]
+               if operative_domains: latest_domain = operative_domains[0]
 
-           if not latest_domain: latest_domain = dominioshdfull[0]
+       if not latest_domain: latest_domain = dominioshdfull[0]
 
-           if latest_domain:
-               latest_domain = latest_domain.replace('login', '')
-               if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
-        except:
-           latest_domain = ''
+       if latest_domain:
+           latest_domain = latest_domain.replace('login', '')
+           if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
+    except:
+       latest_domain = ''
 
     if latest_domain:
         if latest_domain == domain: last_domain = latest_domain
-
 
     if not last_domain:
         try:
@@ -1609,8 +1567,6 @@ def operative_domains_hdfull(item):
 
     domain = config.get_setting('dominio', 'hdfull', default='')
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
-
     channel_json = 'hdfull.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -1632,10 +1588,10 @@ def operative_domains_hdfull(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar tods los dominios operativos
     # ~ web  0)-'https://dominioshdfull.com/'
-
 
     last_domain = ''
 
@@ -1716,6 +1672,28 @@ def operative_domains_hdfull(item):
 def del_datos_hdfull(item):
     logger.info()
 
+    channel_json = 'hdfull.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
     username = config.get_setting('hdfull_username', 'hdfull', default='')
     password = config.get_setting('hdfull_password', 'hdfull', default='')
 
@@ -1732,8 +1710,6 @@ def del_datos_hdfull(item):
 
 def manto_domain_hdfull(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando HdFull[/B][/COLOR]' % color_exec)
 
     channel_json = 'hdfull.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -1757,8 +1733,9 @@ def manto_domain_hdfull(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando HdFull[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
-    return
 
 
 def test_domain_hdfull(item):
@@ -1788,8 +1765,6 @@ def last_domain_hdfullse(item):
 
     domain = config.get_setting('dominio', 'hdfullse', default='')
 
-    platformtools.dialog_notification(config.__addon_name + ' - HdFullSe', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
-
     channel_json = 'hdfullse.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -1811,10 +1786,10 @@ def last_domain_hdfullse(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name + ' - HdFullSe', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
     # ~ web 0)-'https://hdfull.pm'
-
 
     last_domain = ''
     latest_domain = ''
@@ -1917,8 +1892,6 @@ def operative_domains_hdfullse(item):
 
     domain = config.get_setting('dominio', 'hdfullse', default='')
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
-
     channel_json = 'hdfullse.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -1940,10 +1913,10 @@ def operative_domains_hdfullse(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
     # ~ web 0)-'https://hdfull.pm'
-
 
     try:
        host_domain = 'https://hdfull.pm'
@@ -2007,8 +1980,6 @@ def operative_domains_hdfullse(item):
 def manto_domain_hdfullse(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando HdFullSe[/B][/COLOR]' % color_exec)
-
     channel_json = 'hdfullse.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2030,6 +2001,8 @@ def manto_domain_hdfullse(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando HdFullSe[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2053,8 +2026,6 @@ def test_domain_hdfullse(item):
 def manto_domain_henaojara(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando HenaOjara[/B][/COLOR]' % color_exec)
-
     channel_json = 'henaojara.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2076,6 +2047,8 @@ def manto_domain_henaojara(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando HenaOjara[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2099,8 +2072,6 @@ def test_domain_henaojara(item):
 def manto_domain_mejortorrentapp(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando MejorTorrentApp[/B][/COLOR]' % color_exec)
-
     channel_json = 'mejortorrentapp.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2122,6 +2093,8 @@ def manto_domain_mejortorrentapp(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando MejorTorrentApp[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2145,8 +2118,6 @@ def test_domain_mejortorrentapp(item):
 def manto_domain_mejortorrentnz(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando MejorTorrentNz[/B][/COLOR]' % color_exec)
-
     channel_json = 'mejortorrentnz.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2168,6 +2139,8 @@ def manto_domain_mejortorrentnz(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando MejorTorrentNz[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2191,8 +2164,6 @@ def test_domain_mejortorrentnz(item):
 def manto_domain_mitorrent(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando MiTorrent[/B][/COLOR]' % color_exec)
-
     channel_json = 'mitorrent.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2214,6 +2185,8 @@ def manto_domain_mitorrent(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando MiTorrent[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2237,8 +2210,6 @@ def test_domain_mitorrent(item):
 def manto_domain_peliculaspro(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PeliculasPro[/B][/COLOR]' % color_exec)
-
     channel_json = 'peliculaspro.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2260,6 +2231,8 @@ def manto_domain_peliculaspro(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PeliculasPro[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2283,8 +2256,6 @@ def test_domain_peliculaspro(item):
 def manto_domain_pelisforte(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisForte[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelisforte.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2306,6 +2277,8 @@ def manto_domain_pelisforte(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisForte[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2329,8 +2302,6 @@ def test_domain_pelisforte(item):
 def manto_domain_pelismaraton(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisMaraton[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelismaraton.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2352,6 +2323,8 @@ def manto_domain_pelismaraton(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisMaraton[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2375,8 +2348,6 @@ def test_domain_pelismaraton(item):
 def manto_domain_pelismart(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisMart[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelismart.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2398,6 +2369,8 @@ def manto_domain_pelismart(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisMart[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2421,8 +2394,6 @@ def test_domain_pelismart(item):
 def manto_domain_pelispanda(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPanda[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelispanda.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2444,6 +2415,8 @@ def manto_domain_pelispanda(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPanda[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2467,8 +2440,6 @@ def test_domain_pelispanda(item):
 def manto_domain_pelispedia2me(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPedia2Me[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelispedia2me.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2490,6 +2461,8 @@ def manto_domain_pelispedia2me(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPedia2Me[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2513,8 +2486,6 @@ def test_domain_pelispedia2me(item):
 def manto_domain_pelispediaws(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPediaWs[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelispediaws.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2536,6 +2507,8 @@ def manto_domain_pelispediaws(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPediaWs[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2559,8 +2532,6 @@ def test_domain_pelispediaws(item):
 def manto_domain_pelisplus(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlus[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelisplus.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2582,6 +2553,8 @@ def manto_domain_pelisplus(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlus[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2605,8 +2578,6 @@ def test_domain_pelisplus(item):
 def manto_domain_pelisplushd(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlusHd[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelisplushd.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2628,6 +2599,8 @@ def manto_domain_pelisplushd(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlusHd[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2651,8 +2624,6 @@ def test_domain_pelisplushd(item):
 def manto_domain_pelisplushdlat(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlusHdLat[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelisplushdlat.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2674,6 +2645,8 @@ def manto_domain_pelisplushdlat(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlusHdLat[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2697,8 +2670,6 @@ def test_domain_pelisplushdlat(item):
 def manto_domain_pelisplushdnz(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlusHdNz[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelisplushdnz.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2720,6 +2691,8 @@ def manto_domain_pelisplushdnz(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlusHdNz[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -2743,8 +2716,6 @@ def test_domain_pelisplushdnz(item):
 def manto_domain_pelispluslat(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlusLat[/B][/COLOR]' % color_exec)
-
     channel_json = 'pelispluslat.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2767,6 +2738,8 @@ def manto_domain_pelispluslat(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PelisPlusLat[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -2786,30 +2759,67 @@ def test_domain_pelispluslat(item):
         platformtools.dialog_notification(config.__addon_name + ' - PelisPlusLat', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def del_datos_nextdede(item):
+def latest_domains_nextdede(item):
     logger.info()
 
-    email = config.get_setting('nextdede_email', 'nextdede', default='')
-    password = config.get_setting('nextdede_password', 'nextdede', default='')
-    username = config.get_setting('nextdede_username', 'nextdede', default='')
+    channel_json = 'nextdede.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
-    if not email:
-        if not password:
-            if not username:
-                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Nextdede Sin credenciales[/B][/COLOR]' % color_exec)
-                return
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
 
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma eliminar sus credenciales de NextDede ?[/B][/COLOR]'):
-        config.set_setting('channel_nextdede_nextdede_login', False)
-        config.set_setting('channel_nextdede_nextdede_email', '')
-        config.set_setting('channel_nextdede_nextdede_password', '')
-        config.set_setting('channel_nextdede_nextdede_username', '')
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando dominios[/B][/COLOR]' % color_exec)
+
+    # ~ web para saber el ultimo dominio vigente en actions
+    # ~ web  'https://dominiosnextdede.com/'
+
+    last_domain = ''
+    latest_domain = ''
+
+    try:
+       host_domain = 'https://dominiosnextdede.com/'
+
+       data = httptools.downloadpage(host_domain).data
+
+       latest_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
+
+       if not latest_domain: latest_domain = dominiosnextdede[0]
+
+       if latest_domain:
+           latest_domain = latest_domain.replace('login', '')
+           if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
+    except:
+       latest_domain = ''
+
+    if latest_domain: last_domain = latest_domain
+
+    if not last_domain:
+        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
+
+        xbmc.sleep(1000)
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://dominiosnextdede.com[/B][/COLOR]')
+        return
+
+    platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio es ', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
 
 
-def manto_domain_nextdede(item):
+def last_domain_nextdede(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando NextDede[/B][/COLOR]' % color_exec)
 
     channel_json = 'nextdede.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -2833,8 +2843,309 @@ def manto_domain_nextdede(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    domain = config.get_setting('dominio', 'nextdede', default='')
+
+    if not domain:
+        platformtools.dialog_notification(config.__addon_name + '[COLOR yellow][B] Nextdede[/B][/COLOR]', '[B][COLOR %s]Falta Configurar el Dominio a usar ...[/COLOR][/B]' % color_alert)
+        return
+
+    platformtools.dialog_notification(config.__addon_name + ' - Nextdede', '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
+
+    # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
+    # ~ webs  0)-'https://dominiosnextdede.com/'
+
+    last_domain = ''
+    latest_domain = ''
+
+    try:
+       host_domain = 'https://dominiosnextdede.com/'
+
+       data = httptools.downloadpage(host_domain).data
+
+       latest_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
+
+       if not latest_domain:
+           operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
+
+           if not operative_domains:
+               operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
+
+               if operative_domains_unescape:
+                   operative_domains_unescape = unquote(str(operative_domains_unescape))
+
+                   operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
+
+               if operative_domains: latest_domain = operative_domains[0]
+
+       if not latest_domain: latest_domain = dominiosnextdede[0]
+
+       if latest_domain:
+           latest_domain = latest_domain.replace('login', '')
+           if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
+    except:
+       latest_domain = ''
+
+    if latest_domain:
+        if latest_domain == domain: last_domain = latest_domain
+
+    if not last_domain:
+        try:
+           host_domain = 'https://dominiosnextdede.com/'
+
+           data = httptools.downloadpage(host_domain).data
+
+           last_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
+
+           if not last_domain:
+               operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
+
+               if not operative_domains:
+                   operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
+
+                   if operative_domains_unescape:
+                       operative_domains_unescape = unquote(str(operative_domains_unescape))
+
+                       operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
+
+                   last_domain = operative_domains[0]
+
+           if not last_domain: last_domain = dominiosnextdede[0]
+
+           if last_domain:
+               last_domain = last_domain.replace('login', '')
+               if not last_domain.endswith('/'): last_domain = last_domain + '/'
+        except:
+           last_domain = ''
+
+    if not last_domain:
+        if not domain in str(dominiosnextdede):
+            platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
+
+            xbmc.sleep(1000)
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://dominiosnextdede.com[/B][/COLOR]')
+            return
+
+
+    host_channel = ''
+    config.set_setting('user_test_channel', 'host_channel')
+
+    try:
+        localize = tester.test_channel('NextDede')
+    except:
+        localize = ''
+
+    if config.get_setting('user_test_channel', default=''):
+        host_channel = config.get_setting('user_test_channel', default='')
+        if not host_channel.startswith('https://'): host_channel = ''
+	
+        config.set_setting('user_test_channel', '')
+
+        if host_channel:
+            if host_channel == item.host_canal:
+                if item.host_canal == last_domain:
+                    platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR gold][B]El dominio/host del canal es correcto.[/B]', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+                    return
+
+    if host_channel:
+        if not domain:
+            if last_domain in host_channel:
+                 platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+                 return
+
+    if domain == last_domain:
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+        return
+
+    nom_dom = domain
+    txt_dom = 'Último Dominio memorizado incorrecto.'
+    if not domain:
+        nom_dom = 'Sin información'
+        txt_dom = 'Aún No hay ningún Dominio memorizado.'
+
+    if not last_domain: last_domain = dominiosnextdede[0]
+
+    if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Vigente:           [COLOR cyan][B]' + last_domain + '[/B][/COLOR]'): 
+        config.set_setting('dominio', last_domain, 'nextdede')
+
+        if not item.desde_el_canal:
+            if not item.from_action == 'mainlist':
+                platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Último dominio vigente memorizado, pero aún NO guardado.[/COLOR]', '[COLOR cyan][B]Recuerde, que para que el cambio surta efecto deberá abandonar los Ajustes de Balandro a través de su correspondiente botón --> OK[/B][/COLOR]')
+
+
+def operative_domains_nextdede(item):
+    logger.info()
+
+    domains = []
+
+    domain = config.get_setting('dominio', 'nextdede', default='')
+
+    channel_json = 'nextdede.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
+
+    # ~ web para comprobar tods los dominios operativos
+    # ~ web  0)-'https://dominiosnextdede.com/'
+
+    last_domain = ''
+
+    try:
+       host_domain = 'https://dominiosnextdede.com/'
+
+       data = httptools.downloadpage(host_domain).data
+
+       operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
+
+       if not operative_domains:
+           operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
+
+           if operative_domains_unescape:
+               operative_domains_unescape = unquote(str(operative_domains_unescape))
+
+               operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
+
+       if not operative_domains: operative_domains = dominiosnextdede
+
+    except:
+       platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Acceso Dominios Operativos[/B][/COLOR]' % color_alert)
+       return
+
+    i = -1
+    preselect = 0
+
+    for operative in operative_domains:
+        i += 1
+
+        if not operative.endswith('/'): operative = operative + '/'
+
+        if operative == domain: preselect = i
+
+        domains.append(operative)
+
+    if not domains:
+        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Sin Dominios Operativos[/B][/COLOR]' % color_alert)
+        return
+
+    sel_domain = ''
+
+    ret = platformtools.dialog_select('NextDede - Dominios Operativos', domains, preselect = preselect)
+
+    if ret == -1: return False
+
+    sel_domain = domains[ret]
+
+    nom_dom = domain
+    txt_dom = 'Dominio memorizado incorrecto.'
+    if not domain:
+        nom_dom = 'Sin información'
+        txt_dom = 'Aún No hay ningún Dominio memorizado.'
+
+    if not sel_domain:
+        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Comprobación Dominio[/B][/COLOR]' % color_alert)
+        return
+
+    if domain == sel_domain:
+        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Dominio correcto[/B][/COLOR]' % color_infor)
+        return
+
+    if not last_domain: last_domain = dominiosnextdede[0]
+
+    if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Seleccionado:   [COLOR cyan][B]' + sel_domain + '[/B][/COLOR]'): 
+        config.set_setting('dominio', sel_domain, 'nextdede')
+
+        if not item.desde_el_canal:
+            if not item.from_action == 'mainlist':
+                platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Último dominio vigente memorizado, pero aún NO guardado.[/COLOR]', '[COLOR cyan][B]Recuerde, que para que el cambio surta efecto deberá abandonar los Ajustes de Balandro a través de su correspondiente botón --> OK[/B][/COLOR]')
+
+
+def del_datos_nextdede(item):
+    logger.info()
+
+    channel_json = 'nextdede.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    email = config.get_setting('nextdede_email', 'nextdede', default='')
+    password = config.get_setting('nextdede_password', 'nextdede', default='')
+    username = config.get_setting('nextdede_username', 'nextdede', default='')
+
+    if not email:
+        if not password:
+            if not username:
+                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Nextdede Sin credenciales[/B][/COLOR]' % color_exec)
+                return
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma eliminar sus credenciales de NextDede ?[/B][/COLOR]'):
+        config.set_setting('channel_nextdede_nextdede_login', False)
+        config.set_setting('channel_nextdede_nextdede_email', '')
+        config.set_setting('channel_nextdede_nextdede_password', '')
+        config.set_setting('channel_nextdede_nextdede_username', '')
+
+
+def manto_domain_nextdede(item):
+    logger.info()
+
+    channel_json = 'nextdede.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando NextDede[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
-    return
 
 
 def test_domain_nextdede(item):
@@ -2858,8 +3169,6 @@ def last_domain_playdede(item):
 
     domain = config.get_setting('dominio', 'playdede', default='')
 
-    platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
-
     channel_json = 'playdede.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2881,9 +3190,10 @@ def last_domain_playdede(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ webs  0)-'https://dominiosplaydede.com/'
+    # ~ webs  0)-'https://dominiosplaydede.com/' ó Telegram t.me/NextdedeOficial
 
     last_domain = ''
     latest_domain = ''
@@ -2901,7 +3211,7 @@ def last_domain_playdede(item):
         platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
         xbmc.sleep(1000)
-        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://twitter.com/playdedeoficial[/B][/COLOR]')
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://dominiosplaydede.com[/B][/COLOR] ó [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B]')
         return
 
 
@@ -2971,8 +3281,6 @@ def operative_domains_playdede(item):
 
     domain = ''
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
-
     channel_json = 'playdede.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -2994,10 +3302,10 @@ def operative_domains_playdede(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar tods los dominios operativos
     # ~ web  0)-'https://dominiosplaydede.com/'
-
 
     sel_domain = ''
 
@@ -3080,6 +3388,28 @@ def operative_domains_playdede(item):
 def del_datos_playdede(item):
     logger.info()
 
+    channel_json = 'playdede.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
     username = config.get_setting('playdede_username', 'playdede', default='')
     password = config.get_setting('playdede_password', 'playdede', default='')
 
@@ -3096,8 +3426,6 @@ def del_datos_playdede(item):
 
 def manto_domain_playdede(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Playdede[/B][/COLOR]' % color_exec)
 
     channel_json = 'playdede.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -3121,6 +3449,8 @@ def manto_domain_playdede(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Playdede[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -3142,8 +3472,6 @@ def test_domain_playdede(item):
 
 def manto_domain_poseidonhd2(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PoseidonHd2[/B][/COLOR]' % color_exec)
 
     channel_json = 'poseidonhd2.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -3167,6 +3495,8 @@ def manto_domain_poseidonhd2(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PoseidonHd2[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -3188,8 +3518,6 @@ def test_domain_poseidonhd2(item):
 
 def manto_domain_series24(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Series24[/B][/COLOR]' % color_exec)
 
     channel_json = 'series24.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -3213,6 +3541,8 @@ def manto_domain_series24(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Series24[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -3234,8 +3564,6 @@ def test_domain_series24(item):
 
 def manto_domain_seriesantiguas(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SeriesAntiguas[/B][/COLOR]' % color_exec)
 
     channel_json = 'seriesantiguas.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -3259,6 +3587,8 @@ def manto_domain_seriesantiguas(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SeriesAntiguas[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -3280,8 +3610,6 @@ def test_domain_seriesantiguas(item):
 
 def manto_domain_serieskao(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SeriesKao[/B][/COLOR]' % color_exec)
 
     channel_json = 'serieskao.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -3305,6 +3633,8 @@ def manto_domain_serieskao(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SeriesKao[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -3326,8 +3656,6 @@ def test_domain_serieskao(item):
 
 def manto_domain_seriesmetro(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SeriesMetro[/B][/COLOR]' % color_exec)
 
     channel_json = 'seriesmetro.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -3351,6 +3679,8 @@ def manto_domain_seriesmetro(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SeriesMetro[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -3372,8 +3702,6 @@ def test_domain_seriesmetro(item):
 
 def manto_domain_srnovelas(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SrNovelas[/B][/COLOR]' % color_exec)
 
     channel_json = 'srnovelas.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -3397,6 +3725,8 @@ def manto_domain_srnovelas(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SrNovelas[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -3418,8 +3748,6 @@ def test_domain_srnovelas(item):
 
 def manto_domain_subtorrents(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SubTorrents[/B][/COLOR]' % color_exec)
 
     channel_json = 'subtorrents.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -3443,6 +3771,8 @@ def manto_domain_subtorrents(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SubTorrents[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -3464,8 +3794,6 @@ def test_domain_subtorrents(item):
 
 def manto_domain_todotorrents(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando TodoTorrents[/B][/COLOR]' % color_exec)
 
     channel_json = 'todotorrents.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -3489,6 +3817,8 @@ def manto_domain_todotorrents(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando TodoTorrents[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -3510,8 +3840,6 @@ def test_domain_todotorrents(item):
 
 def manto_domain_yestorrent(item):
     logger.info()
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando YesTorrent[/B][/COLOR]' % color_exec)
 
     channel_json = 'yestorrent.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -3535,6 +3863,8 @@ def manto_domain_yestorrent(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando YesTorrent[/B][/COLOR]' % color_exec)
+
     manto_domain_common(item, id, name)
 
 
@@ -3557,8 +3887,6 @@ def test_domain_yestorrent(item):
 def manto_domain_tupelihd(item):
     logger.info()
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando TuPeliHd[/B][/COLOR]' % color_exec)
-
     channel_json = 'tupelihd.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -3580,6 +3908,8 @@ def manto_domain_tupelihd(item):
         el_canal = ('[B][COLOR %s] ' + name) % color_avis
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando TuPeliHd[/B][/COLOR]' % color_exec)
 
     manto_domain_common(item, id, name)
 
@@ -3864,16 +4194,6 @@ def manto_domain_common(item, id, name):
         if not domain: domain = 'https://'
 
         new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio EnNovelas  -->  [COLOR %s]https://??.ennovelas.???/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://': return
-
-    elif id == 'ennovelasonline':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio EnNovelasOnline  -->  [COLOR %s]https://??.ennovelas.online/[/COLOR]' % color_avis)
 
         if new_domain is None: return
         elif new_domain == 'https://': return

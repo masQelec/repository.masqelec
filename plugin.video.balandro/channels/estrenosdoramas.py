@@ -7,11 +7,11 @@ from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 
 
-host = 'https://www25.estrenosdoramas.net/'
+host = 'https://www26.estrenosdoramas.net/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www23.estrenosdoramas.net/', 'https://www24.estrenosdoramas.net/']
+ant_hosts = ['https://www23.estrenosdoramas.net/', 'https://www24.estrenosdoramas.net/', 'https://www25.estrenosdoramas.net/']
 
 
 domain = config.get_setting('dominio', 'estrenosdoramas', default='')

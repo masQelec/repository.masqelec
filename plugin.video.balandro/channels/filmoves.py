@@ -48,7 +48,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     if 'suggest?que=' in url: headers = {'Referer': host, 'x-requested-with': 'XMLHttpRequest'}
 
-    if '/year_pelicula/' in url: raise_weberror = False
+    if '/peliculas-' in url: raise_weberror = False
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -196,6 +196,8 @@ def list_all(item):
 
         year = scrapertools.find_single_match(match, '<span class="YearPosition".*?">(.*?)</span>')
         if not year: year = '-'
+
+        if '/peliculas-' in item.url: year = scrapertools.find_single_match(item.url, "/peliculas-(.*?)$")
 
         title = title.replace('&#039;', "'").replace('&amp;', '&')
 

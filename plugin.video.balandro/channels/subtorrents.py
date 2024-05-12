@@ -23,7 +23,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -46,13 +46,13 @@ except:
    except: pass
 
 
-host = 'https://www.subtorrents.eu/'
+host = 'https://www1.subtorrents.zip/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.subtorrents.nl/', 'https://www.subtorrents.ch/', 'https://www.subtorrents.nz/',
              'https://www.subtorrents.in/', 'https://www.subtorrents.li/', 'https://www.subtorrents.do/',
-             'https://www.subtorrents.re/']
+             'https://www.subtorrents.re/', 'https://www.subtorrents.eu/']
 
 
 domain = config.get_setting('dominio', 'subtorrents', default='')

@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -44,11 +44,11 @@ except:
    except: pass
 
 
-host = 'https://pelisforte.nu/'
+host = 'https://www1.pelisforte.se/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://pelisforte.co/']
+ant_hosts = ['https://pelisforte.co/', 'https://pelisforte.nu/']
 
 domain = config.get_setting('dominio', 'pelisforte', default='')
 
@@ -107,6 +107,17 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             data = httptools.downloadpage_proxy('pelisforte', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+        if not data:
+            if not '?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PelisForte', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('pelisforte', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         if BR or BR2:
@@ -235,7 +246,7 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '<h1(.*?)>TOP<')
+    bloque = scrapertools.find_single_match(data, '<h1(.*?)>PELISFORTE Status<')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
@@ -250,9 +261,12 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="Year">(.*?)</span>')
-        if not year:  year ='-'
+        if not year:
+            if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)$")
+            else: year ='-'
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -313,6 +327,7 @@ def findvideos(item):
             if srv == 'ok': other = 'ok'
 
             elif srv == 'playpf': servidor = 'directo'
+            elif srv == 'ds': servidor = 'directo'
 
             if servidor == 'directo': other = srv
 

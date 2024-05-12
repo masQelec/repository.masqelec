@@ -11,7 +11,8 @@ host = 'https://smartpelis.tv/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://pelismart.tv/', 'https://smartpeli.com/', 'https://smartpeli.tv/']
+ant_hosts = ['https://pelismart.tv/', 'https://smartpeli.com/', 'https://www3.smartpeli.com/',
+             'https://smartpeli.tv/']
 
 
 domain = config.get_setting('dominio', 'pelismart', default='')

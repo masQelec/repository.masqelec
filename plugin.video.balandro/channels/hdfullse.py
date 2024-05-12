@@ -125,7 +125,7 @@ def do_downloadpage(url, post = None, referer = None):
             data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
-            if not '/search' in url:
+            if not '/search/' in url:
                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('HdFullSe', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
@@ -134,6 +134,11 @@ def do_downloadpage(url, post = None, referer = None):
                     data = httptools.downloadpage_proxy('hdfullse', url, post=post, headers=headers, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/search/' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -154,7 +159,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_hdfullse', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='hdfullse', folder=False, text_color='chartreuse' ))
 
-    itemlist.append(Item( channel='domains', action='operative_domains_hdfullse', title='Comprobar [B]Dominio Operativo Vigentes[/B]',
+    itemlist.append(Item( channel='domains', action='operative_domains_hdfullse', title='Comprobar [B]Dominio Operativo Vigente[/B]',
                           desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='mediumaquamarine' ))
 
     itemlist.append(Item( channel='domains', action='last_domain_hdfullse', title='[B]Comprobar último dominio vigente[/B]',

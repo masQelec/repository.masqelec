@@ -13,7 +13,8 @@ color_exec  = config.get_setting('notification_exec_color', default='cyan')
 def plus_proxies(proxies, max_proxies):
     logger.info()
 
-    if config.get_setting('proxies_vias', default=False): tplus = config.get_setting('proxies_tplus')
+    if config.get_setting('proxies_tplus', default='32'): tplus = config.get_setting('proxies_tplus')
+    elif config.get_setting('proxies_vias', default=False): tplus = config.get_setting('proxies_tplus')
     else:
         tipos_plus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37]
 
@@ -44,11 +45,11 @@ def plus_proxies(proxies, max_proxies):
     elif tplus == 13: url_provider = 'https://www.freeproxy.world'
     elif tplus == 14: url_provider = 'https://www.freeproxy.world/?type=&anonymity'
 
-    elif tplus == 15: url_provider = 'https://hidemyna.me/en/proxy-list/'
+    elif tplus == 15: url_provider = 'https://hidemy.io/en/proxy-list/'
 
     elif tplus == 16: url_provider = 'https://list.proxylistplus.com/Fresh-HTTP-Proxy-List-1'
 
-    elif tplus == 17: url_provider = 'https://proxyservers.pro/'
+    elif tplus == 17: url_provider = 'https://www.proxy-list.download/api/v1/get?type=https'
 
     elif tplus == 18: url_provider = 'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt'
 
@@ -180,20 +181,6 @@ def plus_proxies(proxies, max_proxies):
             proxies_plus.append(prox + ':' + port)
 
     elif tplus == 16:
-        el_provider = '[B][COLOR %s] Proxyservers[/B][/COLOR]' % color_exec
-        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
-
-        enlaces = scrapertools.find_multiple_matches(str(resp.data), 'td><img src=".*?<td>(.*?)</td>.*?<td>(.*?)</td>')
-
-        for prox, port in enlaces:
-            prox = prox.strip()
-            port = port.strip()
-
-            if not prox or not port: continue
-
-            proxies_plus.append(prox + ':' + port)
-
-    elif tplus == 17:
         el_provider = '[B][COLOR %s] Proxylistplus[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
 
@@ -234,7 +221,7 @@ def plus_proxies(proxies, max_proxies):
         for prox in enlaces:
             proxies_plus.append(prox)
 
-    elif tplus == 24 or tplus == 25:
+    elif tplus == 17 or tplus == 24 or tplus == 25:
         el_provider = '[B][COLOR %s] Proxy-list.download[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
 
@@ -644,3 +631,12 @@ def z_coderduck(url, tipo_proxy, pais_proxy, max_proxies):
 
     return proxies
 
+
+def z_tplus(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    proxies = []
+
+    proxies = plus_proxies(proxies, max_proxies)
+
+    return proxies

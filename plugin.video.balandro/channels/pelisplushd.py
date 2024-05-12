@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww1.pelisplushd.lat/'
+host = 'https://ww3.pelisplushd.lat/'
 
 
 # ~ por si viene de enlaces guardados
@@ -18,7 +18,8 @@ ant_hosts = ['https://pelisplushd.net/', 'https://pelisplushd.to/', 'https://www
              'https://www11.pelisplushd.lat/', 'https://www12.pelisplushd.lat/', 'https://www13.pelisplushd.lat/',
              'https://www14.pelisplushd.lat/', 'https://www15.pelisplushd.lat/', 'https://www16.pelisplushd.lat/',
              'https://www17.pelisplushd.lat/', 'https://www18.pelisplushd.lat/', 'https://www19.pelisplushd.lat/',
-             'https://www20.pelisplushd.lat/', 'https://www21.pelisplushd.lat/']
+             'https://www20.pelisplushd.lat/', 'https://www21.pelisplushd.lat/', 'https://ww1.pelisplushd.lat/',
+             'https://ww2.pelisplushd.lat/' ]
 
 
 domain = config.get_setting('dominio', 'pelisplushd', default='')
@@ -70,6 +71,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if config.get_setting('channel_pelisplushd_proxies', default=''): hay_proxies = True
 
     if '/year/' in url: raise_weberror = False
+
     # ~ en la web da error 404 Not found
     elif 'peliculas?page=' in url: raise_weberror = False
 
@@ -294,17 +296,27 @@ def list_all(item):
             if ' (' in title: title = title.replace(' (' + year + ')', '').strip()
             elif ' [' in title: title = title.replace(' [' + year + ']', '').strip()
 
+        if '/year/' in item.url:
+            year = scrapertools.find_single_match(item.url, "/year/(.*?)$")
+            if year: year = scrapertools.find_single_match(year, "(.*?)page=")
+
+            year = year.replace('?', '')
+
+        if not year: year = '-'
+
         if '/pelicula/' in url:
             if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
         else:
             if item.search_type == 'movie': continue
 
             if item.group == 'animes':
                 if not '/anime/' in url: continue
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -516,7 +528,8 @@ def findvideos(item):
 
         link_other = ''
 
-        if servidor == 'various': link_other = servertools.corregir_other(url)
+        if servidor == 'directo': link_other = normalize_other(url)
+        elif servidor == 'various': link_other = servertools.corregir_other(url)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other ))
 

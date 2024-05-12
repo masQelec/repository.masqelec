@@ -234,7 +234,7 @@ def render_items(itemlist, parent_item):
         xbmcplugin.addDirectoryItem(handle=handle, url=item_url, listitem=listitem, isFolder=item.folder)
 
     # Fijar los tipos de vistas
-    if parent_item.channel == 'mainmenu' or (parent_item.channel == 'tracking' and parent_item.action in ['mainlist','mainlist_listas']):
+    if parent_item.channel == 'mainmenu' or (parent_item.channel == 'tracking' and parent_item.action in ['mainlist', 'mainlist_listas']):
         # vista con: Lista amplia, Muro de iconos
         xbmcplugin.setContent(handle, '')
     elif parent_item.channel == 'tracking' and parent_item.action in ['mainlist_series', 'mainlist_doramas', 'mainlist_animes', 'mainlist_episodios', 'serie_temporadas', 'serie_episodios']:
@@ -567,7 +567,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         # Server Various y anulados/controlados
         if apuntar:
-            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhidepro', 'vidhidevip', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream']:
+            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'swhoi', 'listeamed']:
                 apuntar = False
 
             elif it.server in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza', 'vanfem', 'youtvgratis', 'oceanplay', 'gotovideo.kiev.ua', 'owodeuwu', 'sypl', 'fembed9hd', 'watchse', 'vcdn', 'femoload', 'cubeembed']:
@@ -986,14 +986,14 @@ def play_torrent(mediaurl, parent_item):
     if cliente_torrent == 'Seleccionar':
         from modules import filters
 
-        ret = filters.show_clients_torrent(parent_item)
+        ret = filters.show_clients_torrent_no_obsoletes(parent_item)
 
         if ret == -1: return False
         else:
            cliente_torrent = ret[0]
 
            if xbmc.getCondVisibility('System.HasAddon("%s")' % ret[1]):
-               if dialog_yesno(config.__addon_name, 'Selecionado: [COLOR yellow][B]' + cliente_torrent.capitalize() + '[/B][/COLOR]', '[COLOR greenyellow][B]¿ Desea asignar este Cliente/Motor torrent, como motor habitual para no volver a seleccionarlo más ?[/B][/COLOR]'): 
+               if dialog_yesno(config.__addon_name, 'Selecionado: [COLOR yellow][B]' + cliente_torrent.capitalize() + '[/B][/COLOR]', '[COLOR cyan][B]¿ Desea asignar este Cliente/Motor torrent, como motor habitual para no volver a seleccionarlo más ?[/B][/COLOR]'): 
                    config.set_setting('cliente_torrent', cliente_torrent.capitalize())
 
     cliente_torrent = cliente_torrent.lower()

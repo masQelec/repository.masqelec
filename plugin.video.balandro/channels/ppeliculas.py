@@ -508,7 +508,7 @@ def corregir_servidor(servidor):
 
      servidor = servidor.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
      servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.xx', '')
-     servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').strip()
+     servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').replace('.uno', '').strip()
 
      return servidor
 
@@ -519,108 +519,110 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    patron = '<li id="player-option-.*?'
-    patron += 'data-post="(.*?)".*?data-type="(.*?)".*?data-nume="(.*?)".*?<span class="title">(.*?)</span>.*?<span class="server">(.*?)</span>'
-
-    matches = scrapertools.find_multiple_matches(data, patron)
-
     ses = 0
 
     # ~ orden post
-    for _post, _type, _nume, qlty_lang, _server in matches:
-        ses += 1
+    if 'class="dooplay_player_option" data-post="' in data:
+        patron = '<li id="player-option-.*?'
+        patron += 'data-post="(.*?)".*?data-type="(.*?)".*?data-nume="(.*?)".*?<span class="title">(.*?)</span>.*?<span class="server">(.*?)</span>'
 
-        url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
+        matches = scrapertools.find_multiple_matches(data, patron)
 
-        if 'Latino' in qlty_lang:
-            qlty = qlty_lang.replace('Latino', '').strip()
-            lang = 'Lat'
-        elif 'Castellano' in qlty_lang or 'Español' in qlty_lang:
-            qlty = qlty_lang.replace('Castellano', '').strip()
-            lang = 'Esp'
-        elif 'Subtitulado' in qlty_lang or 'VOSE' in qlty_lang:
-            qlty = qlty_lang.replace('Subtitulado', '').strip()
-            lang = 'Vose'
-        else:
-            qlty = qlty_lang
-            lang = '?'
+        for _post, _type, _nume, qlty_lang, _server in matches:
+            ses += 1
 
-        if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
+            url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
-        other = corregir_servidor(_server)
+            if 'Latino' in qlty_lang:
+                qlty = qlty_lang.replace('Latino', '').strip()
+                lang = 'Lat'
+            elif 'Castellano' in qlty_lang or 'Español' in qlty_lang:
+                qlty = qlty_lang.replace('Castellano', '').strip()
+                lang = 'Esp'
+            elif 'Subtitulado' in qlty_lang or 'VOSE' in qlty_lang:
+                qlty = qlty_lang.replace('Subtitulado', '').strip()
+                lang = 'Vose'
+            else:
+                qlty = qlty_lang
+                lang = '?'
 
-        if 'youtube' in other: continue
+            if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
 
-        if 'earn4files' in other: continue
-        elif 'uploadbuzz' in other: continue
+            other = corregir_servidor(_server)
 
-        if other == qlty: qlty = ''
+            if 'youtube' in other: continue
 
-        if url.startswith('https://player.pepeliculas.org/'):
-            url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
-            other == 'waaw'
+            if 'earn4files' in other: continue
+            elif 'uploadbuzz' in other: continue
 
-        servidor = servertools.corregir_servidor(other)
+            if other == qlty: qlty = ''
 
-        if servertools.is_server_available(other):
-            if not servertools.is_server_enabled(other): continue
-        else:
-            if not config.get_setting('developer_mode', default=False): continue
+            if url.startswith('https://player.pepeliculas.org/'):
+                url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
+                other == 'waaw'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url,
-                              other = other.capitalize(), language = lang, quality = qlty ))
+            servidor = servertools.corregir_servidor(other)
+
+            if servertools.is_server_available(other):
+                if not servertools.is_server_enabled(other): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url,
+                                  other = other.capitalize(), language = lang, quality = qlty ))
 
     # ~ orden type
-    patron = '<li id="player-option-.*?'
-    patron += 'data-type="(.*?)".*?data-post="(.*?)".*?data-nume="(.*?)".*?<span class="title">(.*?)</span>.*?<span class="server">(.*?)</span>'
+    if 'class="dooplay_player_option" data-type="' in data:
+        patron = '<li id="player-option-.*?'
+        patron += 'data-type="(.*?)".*?data-post="(.*?)".*?data-nume="(.*?)".*?<span class="title">(.*?)</span>.*?<span class="server">(.*?)</span>'
 
-    matches = scrapertools.find_multiple_matches(data, patron)
+        matches = scrapertools.find_multiple_matches(data, patron)
 
-    for _type, _post, _nume, qlty_lang, _server in matches:
-        ses += 1
+        for _type, _post, _nume, qlty_lang, _server in matches:
+            ses += 1
 
-        url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
+            url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
-        if 'Latino' in qlty_lang:
-            qlty = qlty_lang.replace('Latino', '').strip()
-            lang = 'Lat'
-        elif 'Castellano' in qlty_lang or 'Español' in qlty_lang:
-            qlty = qlty_lang.replace('Castellano', '').strip()
-            lang = 'Esp'
-        elif 'Subtitulado' in qlty_lang or 'VOSE' in qlty_lang:
-            qlty = qlty_lang.replace('Subtitulado', '').strip()
-            lang = 'Vose'
-        else:
-            qlty = qlty_lang
-            lang = '?'
+            if 'Latino' in qlty_lang:
+                qlty = qlty_lang.replace('Latino', '').strip()
+                lang = 'Lat'
+            elif 'Castellano' in qlty_lang or 'Español' in qlty_lang:
+                qlty = qlty_lang.replace('Castellano', '').strip()
+                lang = 'Esp'
+            elif 'Subtitulado' in qlty_lang or 'VOSE' in qlty_lang:
+                qlty = qlty_lang.replace('Subtitulado', '').strip()
+                lang = 'Vose'
+            else:
+                qlty = qlty_lang
+                lang = '?'
 
-        if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
-		
-        other = corregir_servidor(_server)
+            if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
 
-        if 'youtube' in other: continue
+            other = corregir_servidor(_server)
 
-        if 'earn4files' in other: continue
-        elif 'uploadbuzz' in other: continue
+            if 'youtube' in other: continue
 
-        if other == qlty: qlty = ''
+            if 'earn4files' in other: continue
+            elif 'uploadbuzz' in other: continue
 
-        if url.startswith('https://player.pepeliculas.org/'):
-            url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
-            other == 'waaw'
+            if other == qlty: qlty = ''
 
-        servidor = servertools.corregir_servidor(other)
+            if url.startswith('https://player.pepeliculas.org/'):
+                url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
+                other == 'waaw'
 
-        if servertools.is_server_available(other):
-            if not servertools.is_server_enabled(other): continue
-        else:
-            if not config.get_setting('developer_mode', default=False): continue
+            servidor = servertools.corregir_servidor(other)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url,
-                              other = other.capitalize(), language = lang, quality = qlty ))
+            if servertools.is_server_available(other):
+                if not servertools.is_server_enabled(other): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, ref = item.url,
+                                  other = other.capitalize(), language = lang, quality = qlty ))
 
     # ~ Ver
-    if 'Ver en línea' in data: 
+    if 'Ver en línea' in data:
         patron = '<tr id="link-.*?<img src=.*?'
         patron += 'domain=(.*?)">.*?<a href="(.*?)".*?target="_blank">(.*?)</a>.*?<strong class="quality">(.*?)</strong>.*?</td><td>(.*?)</td>'
 
@@ -667,18 +669,20 @@ def findvideos(item):
         for domain, url, tipo, qlty, lang in matches:
             ses += 1
 
-            if not tipo == 'Descarga': continue
+            if not tipo: continue
 
             servidor = corregir_servidor(domain)
 
             if 'earn4files' in servidor: continue
             elif 'uploadbuzz' in servidor: continue
+            elif 'multiup' in servidor: continue
 
             elif 'nitro.' in servidor: continue
             elif '1fichier.' in servidor: continue
-            elif 'multiup' in servidor: continue
+            elif 'turbobit.' in servidor: continue
 
             elif servidor == 'filemoon': servidor = 'various'
+            elif servidor == 'utorrent': servidor = 'torrent'
 
             if url.startswith('https://player.pepeliculas.org/'): url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
 
@@ -686,10 +690,6 @@ def findvideos(item):
             elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
             elif lang == 'Subtitulado' or lang == 'VOSE': lang = 'Vose'
             else: lang = '?'
-
-            servidor = servertools.get_server_from_url(url, disabled_servers=True)
-
-            if servidor is None: continue
 
             servidor = servertools.corregir_servidor(servidor)
 
@@ -736,6 +736,7 @@ def play(item):
         if url.startswith('//'): url = 'https:' + url
 
         if url.startswith('https://player.pepeliculas.org/'): url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
+        elif url.startswith('https://hqq.tv/player/embed_player.php?'): url = url.replace('https://hqq.tv/player/embed_player.php?', 'https://waaw.to/watch_video.php?v=')
 
     if url:
         servidor = servertools.get_server_from_url(url)

@@ -10,8 +10,10 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://asialiveaction.com/'
 
 
-def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    if '/estrenos/' in url: raise_weberror = False
+
+    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     return data
 
@@ -46,7 +48,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
 
     return itemlist
@@ -189,6 +190,8 @@ def list_all(item):
         tipo = 'movie' if 'Movie' in type else 'tvshow'
 
         sufijo = '' if item.search_type != 'all' else tipo
+
+        if '/estrenos/' in item.url: year = scrapertools.find_single_match(item.url, "/estrenos/(.*?)/")
 
         if tipo == 'movie':
             if not item.search_type == 'all':

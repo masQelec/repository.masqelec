@@ -61,7 +61,8 @@ def get_video_url(page_url, url_referer=''):
 
     if video_srcs:
         for url in video_srcs:
-            video_urls.append(['mp4', url])
+            if 'http' in url:
+                video_urls.append(['mp4', url])
 
     if not video_urls:
         try:

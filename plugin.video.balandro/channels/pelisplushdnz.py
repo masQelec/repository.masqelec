@@ -290,19 +290,29 @@ def list_all(item):
             if ' (' in title: title = title.replace(' (' + year + ')', '').strip()
             elif ' [' in title: title = title.replace(' [' + year + ']', '').strip()
 
+        if '/year/' in item.url:
+            year = scrapertools.find_single_match(item.url, "/year/(.*?)$")
+            if year: year = scrapertools.find_single_match(year, "(.*?)page=")
+
+            year = year.replace('?', '')
+
+        if not year: year = '-'
+
         title = title.replace("&#039;", "'")
 
         if '/pelicula/' in url:
             if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
         else:
             if item.search_type == 'movie': continue
 
             if item.group == 'animes':
                 if not '/anime/' in url: continue
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -486,9 +496,9 @@ def findvideos(item):
         if srv == 'moe':
             data2 = do_downloadpage(url)
 
-            matches2 = scrapertools.find_multiple_matches(data2, '<li onclick="' + "go_to_player.*?'(.*?)'.*?<span>(.*?)</span>")
+            matches2 = scrapertools.find_multiple_matches(data2, '<li onclick="' + "go_to_player.*?'(.*?)'.*?" + 'data-lang="(.*?)".*?<span>(.*?)</span>')
 
-            for link, srv2 in matches2:
+            for link, lng, srv2 in matches2:
                 srv2 = srv2.lower()
 
                 if srv2 == '1fichier': continue
@@ -505,6 +515,9 @@ def findvideos(item):
                     link = 'https://uptobox.com/' + link
 
                 servidor = servertools.get_server_from_url(link)
+
+                if lng == '1': lang = 'Esp'
+                elif lng == '2': lang = 'Vose'
 
                 other = ''
 
@@ -532,9 +545,12 @@ def findvideos(item):
                     servidor = 'directo'
                     other = 'plusvip'
 
+                if 'plustream' in link: other = 'plustream'
+
                 if servidor == 'various': other = servertools.corregir_other(link)
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = link, language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = link,
+                                      language = IDIOMAS.get(lang, lang), other = other.capitalize() ))
 
             continue
 
@@ -558,7 +574,10 @@ def findvideos(item):
 
             if link_other == '1fichier': continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = IDIOMAS.get(lang, lang), other = link_other ))
+            if 'plustream' in url: link_other = 'plustream'
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
+	                          language = IDIOMAS.get(lang, lang), other = link_other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

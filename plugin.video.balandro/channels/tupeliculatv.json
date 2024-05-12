@@ -3,7 +3,7 @@
   "name": "TuPeliculaTv",
   "thumbnail": "tupeliculatv.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["problematic", "adults", "languages", "qualityes", "years", "kids", "docs", "vos", "3d"],
 
-  "notes": "Películas por idioma, géneros, año y calidad."
+  "notes": "Web ANULADA. Películas por idioma, géneros, año y calidad."
 }

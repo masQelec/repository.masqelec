@@ -25,6 +25,34 @@ config.set_setting('proxysearch_process', '')
 config.set_setting('proxysearch_process_proxies', '')
 
 
+dominioshdfull = [
+         'https://hd-full.me/',
+         'https://hd-full.vip/',
+         'https://hd-full.lol/',
+         'https://hd-full.co/',
+         'https://hd-full.biz/',
+         'https://hd-full.in/',
+         'https://hd-full.im/',
+         'https://hd-full.one/',
+         'https://hdfull.today/',
+         'https://hdfull.sbs/',
+         'https://hdfull.one/',
+         'https://hdfull.org/',
+         'https://hdfull.quest/',
+         'https://hdfull.icu/',
+         ]
+
+dominiosnextdede = [
+         'https://nextdede.us',
+         'https://nextdede.tv',
+         'https://nextdede.top'
+         ]
+
+dominiosplaydede = [
+         'https://playdede.us/'
+         ]
+
+
 channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
@@ -536,10 +564,6 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
     if not esta_en_poe:
        if dominio: host = dominio
        else:
-          if channel_id == 'playdede':
-              el_canal = ('[COLOR cyan][B]Cargando espere ... [/B][/COLOR][B][COLOR %s]' + channel_name) % color_avis
-              platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]', time=3000)
-
           try:
              data = filetools.read(filename_py)
           except:
@@ -547,25 +571,42 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
              platformtools.dialog_ok(config.__addon_name + ' ' + channel_name , el_canal + '[/COLOR][/B]')
              return
 
-          part_py = 'def mainlist'
+          if not host:
+              if channel_id == 'hdfull': host = dominioshdfull[0] 
 
-          if 'CLONES ' in data or 'clones ' in data: part_py = 'clones '
-          elif 'CLASS ' in data or 'class ' in data: part_py = 'class '
+              elif channel_id == 'nextdede': host = dominiosnextdede[0] 
 
-          elif 'def login' in data: part_py = 'def login'
-          elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
-          elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
+              elif channel_id == 'playdede': host = dominiosplaydede[0]
 
-          bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
-          if 'ant_hosts' in bloc: bloc = scrapertools.find_single_match(data.lower(), '(.*?)ant_hosts')
+          if not host:
+              part_py = 'def mainlist'
 
-          bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
+              if 'ver_stable_chrome' in data: part_py = 'ver_stable_chrome'
 
-          host = scrapertools.find_single_match(str(bloc), ".*?host = '(.*?)'")
-          if not host: host = scrapertools.find_single_match(str(bloc), '.*?host = "(.*?)"')
+              elif 'CLONES =' in data or 'clones =' in data: part_py = 'clones  ='
+              elif 'CLASS login_' in data or 'class login_' in data: part_py = 'class login_'
 
-          if not host: host = scrapertools.find_single_match(bloc, '.*?host.*?"(.*?)"')
-          if not host: host = scrapertools.find_single_match(bloc, ".*?host.*?'(.*?)'")
+              elif 'def do_make_login_logout' in data: part_py = 'def do_make_login_logout'
+              elif 'def login' in data: part_py = 'def login'
+              elif 'def logout' in data: part_py = 'def logout'
+
+              elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
+              elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
+
+              bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
+              bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
+
+              host = scrapertools.find_single_match(str(bloc), "host = '(.*?)'")
+              if not host: host = scrapertools.find_single_match(str(bloc), 'host = "(.*?)"')
+
+              if not host: host = scrapertools.find_single_match(str(bloc), "dominios =.*?'(.*?)'")
+              if not host: host = scrapertools.find_single_match(str(bloc), 'dominios =.*?"(.*?)"')
+
+              if not host: host = scrapertools.find_single_match(str(bloc), "host.*?'(.*?)'")
+              if not host: host = scrapertools.find_single_match(str(bloc), 'host.*?"(.*?)"')
+
+              ant_hosts = scrapertools.find_single_match(str(bloc), 'ant_hosts.*?=.*?(.*?)]')
+              if not ant_hosts: ant_hosts = scrapertools.find_single_match(str(bloc), "ant_hosts.*?=.*?(.*?)]")
 
     host = host.strip()
 

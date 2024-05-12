@@ -292,17 +292,27 @@ def list_all(item):
             if ' (' in title: title = title.replace(' (' + year + ')', '').strip()
             elif ' [' in title: title = title.replace(' [' + year + ']', '').strip()
 
+        if '/year/' in item.url:
+            year = scrapertools.find_single_match(item.url, "/year/(.*?)$")
+            if year: year = scrapertools.find_single_match(year, "(.*?)page=")
+
+            year = year.replace('?', '')
+
+        if not year: year = '-'
+
         if '/pelicula/' in url:
             if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
         else:
             if item.search_type == 'movie': continue
 
             if item.group == 'animes':
                 if not '/anime/' in url: continue
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -495,9 +505,9 @@ def findvideos(item):
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other ))
 
-    matches = scrapertools.find_multiple_matches(data, 'data-url="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, 'data-url="(.*?)".*?data-name="(.*?)"')
 
-    for url in matches:
+    for url, lng in matches:
         if not url: continue
 
         ses += 1
@@ -511,6 +521,9 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
+
+        if lng == 'Subtitulado': lang = 'Vose'
+        elif lng == 'Español': lang = 'Esp'
 
         link_other = ''
 

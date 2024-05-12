@@ -60,15 +60,20 @@ custom_headers["Sec-Fetch-Mode"] = "cors"
 custom_headers["Sec-Fetch-Site"] = "same-origin"
 
 
+# ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
+# ~ webs  0)-'https://dominiosnextdede.com/'
+
 dominios = [
-         'https://nextdede.tv'
+         'https://nextdede.us',
+         'https://nextdede.tv',
+         'https://nextdede.top'
          ]
 
 
 host = config.get_setting('dominio', 'nextdede', default=dominios[0])
 
 
-ant_hosts = ['https://nextdede.com', 'https://nextdede.top']
+ant_hosts = ['https://nextdede.com']
 
 
 if host in str(ant_hosts): config.set_setting('dominio', dominios[0], 'nextdede')
@@ -504,6 +509,13 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='domains', action='test_domain_nextdede', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='nextdede', folder=False, text_color='chartreuse' ))
+
+    if email:
+        itemlist.append(Item( channel='domains', action='operative_domains_nextdede', title='[B]Dominios Operativo Vigente[/B]',
+                              desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='mediumaquamarine' ))
+
+        itemlist.append(Item( channel='domains', action='last_domain_nextdede', title='[B]Comprobar último dominio vigente[/B]',
+                              desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'

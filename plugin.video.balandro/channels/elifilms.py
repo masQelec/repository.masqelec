@@ -421,6 +421,8 @@ def findvideos(item):
         if 'trailer' in srv: continue
         elif '1fichier' in srv: continue
 
+        if srv == 'utorrent': srv = 'torrent'
+
         servidor = servertools.corregir_servidor(srv)
 
         other = srv

@@ -1337,6 +1337,15 @@ def show_channels_list(item):
         canal = canales[ret]
         tests_channels(canal[0], canal[1], canal[2])
 
+def show_clients_torrent_no_obsoletes(item):
+    logger.info()
+
+    item.no_obsoletes = True
+
+    sel_ret = show_clients_torrent(item)
+
+    return sel_ret
+
 def show_clients_torrent(item):
     logger.info()
 
@@ -1360,6 +1369,12 @@ def show_clients_torrent(item):
             else: exists_torrent = ' [COLOR yellow][B] Instalado [/B]'
         else: exists_torrent = ' [COLOR red][B] No instalado [/B]'
 
+        if item.no_obsoletes:
+            if client_name == 'Pulsar': continue
+            elif client_name == 'Quasar': continue
+            elif client_name == 'Stream': continue
+            elif client_name == 'Xbmctorrent': continue
+
         if client_name == 'Elementum': client_recommended = '[COLOR limegreen][B]  Recomendado[/B][/COLOR]'
         elif client_name == 'Pulsar': client_recommended = '[COLOR goldenrod][B]  Obsoleto[/B][/COLOR]'
         elif client_name == 'Quasar': client_recommended = '[COLOR goldenrod][B]  Obsoleto[/B][/COLOR]'
@@ -1371,7 +1386,10 @@ def show_clients_torrent(item):
 
         torrents.append((client_name, client_id + exists_torrent))
 
-    ret = platformtools.dialog_select('Clientes/Motores externos para [COLOR yellow]Torrents[/COLOR]', opciones_torrent, useDetails=True)
+    txt = 'Clientes/Motores externos para [COLOR yellow]Torrents[/COLOR]'
+    if item.no_obsoletes: txt = '[COLOR cyan]Seleccionar[/COLOR] Cliente/Motor externo para Torrent'
+
+    ret = platformtools.dialog_select(txt, opciones_torrent, useDetails=True)
 
     if ret == -1: return ret
 	
@@ -1386,7 +1404,10 @@ def show_clients_torrent(item):
             if not cliente_torrent == name:
                 platformtools.dialog_ok(torrent[0], torrent[1] + '[/COLOR]', 'Por favor, asignelo como [COLOR coral]Cliente/Motor Torrent Habitual[/COLOR]')
         else:
-            platformtools.dialog_ok(torrent[0], torrent[1] + '[/COLOR]', '[COLOR yellowgreen][B]No lo puede Asignar, falta instalarlo[/B][/COLOR]')
+            if name == 'Pulsar' or name == 'Quasar' or name == 'Stream' or name == 'Xbmctorrent':
+                platformtools.dialog_ok(torrent[0], torrent[1] + '[/COLOR]', '[COLOR cyan][B]No lo puede Asignar, está Obsoleto[/B][/COLOR]')
+            else:
+                platformtools.dialog_ok(torrent[0], torrent[1] + '[/COLOR]', '[COLOR yellowgreen][B]No lo puede Asignar, falta instalarlo[/B][/COLOR]')
             return -1
 
     return sel_ret

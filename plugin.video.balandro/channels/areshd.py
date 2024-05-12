@@ -312,6 +312,8 @@ def play(item):
     if url:
         if '/cinestart.' in url: return itemlist
 
+        elif url.startswith("https://okru.cx/?h="): return itemlist
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

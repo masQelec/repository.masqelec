@@ -143,6 +143,12 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
+        year = '-'
+        if '/peliculas-' in item.url:
+            year = scrapertools.find_single_match(item.url, "/peliculas-(.*?)page=")
+            year = year.replace('?', '').strip()
+            if not year: year = '-'
+
         if '/serie/' in url:
             if item.search_type == 'movie': continue
 
@@ -153,12 +159,14 @@ def list_all(item):
 
             SerieName = SerieName.strip()
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
         else:
             if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

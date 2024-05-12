@@ -73,12 +73,40 @@ timeout = config.get_setting('httptools_timeout', default=15)
 
 espera = config.get_setting('servers_waiting', default=6)
 
+dominioshdfull = [
+         'https://hd-full.me/',
+         'https://hd-full.vip/',
+         'https://hd-full.lol/',
+         'https://hd-full.co/',
+         'https://hd-full.biz/',
+         'https://hd-full.in/',
+         'https://hd-full.im/',
+         'https://hd-full.one/',
+         'https://hdfull.today/',
+         'https://hdfull.sbs/',
+         'https://hdfull.one/',
+         'https://hdfull.org/',
+         'https://hdfull.quest/',
+         'https://hdfull.icu/',
+         ]
+
+
+dominiosnextdede = [
+         'https://nextdede.us',
+         'https://nextdede.tv',
+         'https://nextdede.top'
+         ]
+
+dominiosplaydede = [
+         'https://playdede.us/'
+         ]
+
 
 channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
-channels_despised = ['beeg', 'cuevana3in', 'hdfullse', 'pelispluscc', 'pelisplushdlat', 'playdo']
+channels_despised = ['beeg', 'cuevana3in', 'hdfullse', 'pelisplushdlat', 'playdo']
 
 servers_poe = [ 'directo', 'm3u8hls', 'torrent' ]
 
@@ -108,10 +136,6 @@ def test_channel(channel_name):
         if not 'temporary' in str(params['clusters']):
             platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
             return
-
-    if channel_id == 'hdfull' or channel_id == 'nextdede' or channel_id == 'playdede':
-        el_canal = ('[COLOR olivedrab][B]Cargando Info [/B][/COLOR][B][COLOR %s]' + channel_name) % color_infor
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
 
     if config.get_setting('developer_mode', default=False): txt = '[COLOR moccasin][B]Internet:[/COLOR]  [COLOR yellow]Status Developer Mode[/B][/COLOR][CR][CR]'
     else: txt = test_internet()
@@ -613,10 +637,6 @@ def test_channel(channel_name):
 
        if dominio: host = dominio
        else:
-          if channel_id == 'playdede':
-              el_canal = ('[COLOR cyan][B]Cargando espere ... [/B][/COLOR][B][COLOR %s]' + channel_name) % color_avis
-              platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]', time=3000)
-
           try:
              data = filetools.read(filename_py)
           except:
@@ -632,31 +652,42 @@ def test_channel(channel_name):
              platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
              return
 
-          part_py = 'def mainlist'
+          if not host:
+              if channel_id == 'hdfull': host = dominioshdfull[0] 
 
-          if 'ver_stable_chrome' in data: part_py = 'ver_stable_chrome'
+              elif channel_id == 'nextdede': host = dominiosnextdede[0] 
 
-          elif 'CLONES =' in data or 'clones =' in data: part_py = 'clones  ='
-          elif 'CLASS login_' in data or 'class login_' in data: part_py = 'class login_'
+              elif channel_id == 'playdede': host = dominiosplaydede[0]
 
-          elif 'def do_make_login_logout' in data: part_py = 'def do_make_login_logout'
-          elif 'def login' in data: part_py = 'def login'
-          elif 'def logout' in data: part_py = 'def logout'
+          if not host:
+              part_py = 'def mainlist'
 
-          elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
-          elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
+              if 'ver_stable_chrome' in data: part_py = 'ver_stable_chrome'
 
-          bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
-          bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
+              elif 'CLONES =' in data or 'clones =' in data: part_py = 'clones  ='
+              elif 'CLASS login_' in data or 'class login_' in data: part_py = 'class login_'
 
-          host = scrapertools.find_single_match(str(bloc), "host = '(.*?)'")
-          if not host: host = scrapertools.find_single_match(str(bloc), 'host = "(.*?)"')
+              elif 'def do_make_login_logout' in data: part_py = 'def do_make_login_logout'
+              elif 'def login' in data: part_py = 'def login'
+              elif 'def logout' in data: part_py = 'def logout'
 
-          if not host: host = scrapertools.find_single_match(str(bloc), "host.*?'(.*?)'")
-          if not host: host = scrapertools.find_single_match(str(bloc), 'host.*?"(.*?)"')
+              elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
+              elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
 
-          ant_hosts = scrapertools.find_single_match(str(bloc), 'ant_hosts.*?=.*?(.*?)]')
-          if not ant_hosts: ant_hosts = scrapertools.find_single_match(str(bloc), "ant_hosts.*?=.*?(.*?)]")
+              bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
+              bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
+
+              host = scrapertools.find_single_match(str(bloc), "host = '(.*?)'")
+              if not host: host = scrapertools.find_single_match(str(bloc), 'host = "(.*?)"')
+
+              if not host: host = scrapertools.find_single_match(str(bloc), "dominios =.*?'(.*?)'")
+              if not host: host = scrapertools.find_single_match(str(bloc), 'dominios =.*?"(.*?)"')
+
+              if not host: host = scrapertools.find_single_match(str(bloc), "host.*?'(.*?)'")
+              if not host: host = scrapertools.find_single_match(str(bloc), 'host.*?"(.*?)"')
+
+              ant_hosts = scrapertools.find_single_match(str(bloc), 'ant_hosts.*?=.*?(.*?)]')
+              if not ant_hosts: ant_hosts = scrapertools.find_single_match(str(bloc), "ant_hosts.*?=.*?(.*?)]")
 
     host = host.strip()
 
@@ -1013,6 +1044,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             elif '<title>Just a moment...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR][COLOR red][B] Protection[/B][/COLOR]'
             elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
             elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
+            elif 'se encuentra en mantenimiento' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
             else:
                if len(response.data) > 0:
                    txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR][CR]'
@@ -1042,7 +1074,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web:
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1145,7 +1177,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web:
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
