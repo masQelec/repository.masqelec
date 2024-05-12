@@ -96,6 +96,9 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    raise_weberror = True
+    if '/release/' in url: raise_weberror = False
+
     hay_proxies = False
     if config.get_setting('channel_entrepeliculasyseries_proxies', default=''): hay_proxies = True
 
@@ -104,12 +107,12 @@ def do_downloadpage(url, post=None, headers=None):
         if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
         if hay_proxies:
-            data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, timeout=timeout).data
+            data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         else:
-            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
         if not data:
             if not '?s=' in url:
@@ -118,9 +121,9 @@ def do_downloadpage(url, post=None, headers=None):
                 timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
-                    data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, timeout=timeout).data
+                    data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         if BR or BR2:
@@ -130,12 +133,12 @@ def do_downloadpage(url, post=None, headers=None):
                     httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
                 if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     if hay_proxies:
-                        data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, timeout=timeout).data
+                        data = httptools.downloadpage_proxy('entrepeliculasyseries', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                     else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
             except:
                pass
 
@@ -299,6 +302,8 @@ def list_all(item):
 
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
+
+        if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
 
         title = title.replace('&#8211;', '').replace('&#039;', "'").replace('&#8230;', ' &').replace('&amp;', '&').replace('&#8217;s', "'").strip()
 

@@ -110,6 +110,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'peliculas-populares/', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'hd-4k/', search_type = 'movie', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
@@ -206,7 +208,9 @@ def list_all(item):
             if ' (' in title: title = title.replace(' (' + year + ')', '').strip()
             elif ' [' in title: title = title.replace(' [' + year + ']', '').strip()
 
-        title = title.replace('&#8217;', "'").replace('&#038;', '&')
+        title = title.replace('&#8217;', "'").replace('&#038;', '&').replace('&#8211;', '').replace('&#8230;', ' ').strip()
+
+        if '/year_pelicula/' in item.url: year = scrapertools.find_single_match(item.url, "/year_pelicula/(.*?)/")
 
         tipo = 'tvshow' if '/series/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -226,6 +230,8 @@ def list_all(item):
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
+
+    if '/peliculas-populares/' in item.url: return itemlist
 
     if itemlist:
         if "<div class='pagination" in data:

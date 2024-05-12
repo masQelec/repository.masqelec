@@ -224,7 +224,7 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(bloque, '(.*?)</div></div></a>')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
         title = scrapertools.find_single_match(match, '<p>(.*?)</p>')
 
         if not url or not title: continue
@@ -237,6 +237,8 @@ def list_all(item):
 
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
+
+        if '/year/' in item.url: year = scrapertools.find_single_match(item.url, "/year/(.*?)/")
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo

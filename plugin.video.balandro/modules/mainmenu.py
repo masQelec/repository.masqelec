@@ -400,7 +400,7 @@ def mainlist(item):
         elif config.get_setting('channels_link_pyse', default=False): presentar = True
 
         if presentar:
-            itemlist.append(item.clone( channel='filmaffinitylists', action='_oscars', title='[B]Premios Oscar ' + str(current_year) + '[/B]', text_color='deepskyblue', thumbnail=config.get_thumb('oscars'), plot = 'Las películas nominadas a los premios Oscars' ))
+            itemlist.append(item.clone( channel='filmaffinitylists', action='_oscars', title='[B]Premios Oscar ' + str(current_year) + '[/B]', text_color='deepskyblue', thumbnail=config.get_thumb('oscars'), plot = 'Las películas nominadas/galardonadas en los premios Oscars' ))
 
     elif current_month == 10:
         presentar = False
@@ -409,7 +409,7 @@ def mainlist(item):
         elif config.get_setting('channels_link_pyse', default=False): presentar = True
 
         if presentar:
-            itemlist.append(item.clone( channel='filmaffinitylists', action='_emmys', title='[B]Premios Emmy ' + str(current_year) + '[/B]', text_color='hotpink', thumbnail=config.get_thumb('emmys'), plot = 'Las Series nominadas a los premios Emmy' ))
+            itemlist.append(item.clone( channel='filmaffinitylists', action='_emmys', title='[B]Premios Emmy ' + str(current_year) + '[/B]', text_color='hotpink', thumbnail=config.get_thumb('emmys'), plot = 'Las Series nominadas/galardonadas en los premios Emmy' ))
 
     elif current_month == 11:
         presentar = False
@@ -460,7 +460,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='', title=mnu_type, context=context_menu, thumbnail=config.get_thumb('addon'), text_color='tan' ))
 
     if config.get_setting('mnu_sugeridos', default=True):
-        itemlist.append(item.clone( action='channels', extra='suggested', title=' - Sugeridos', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='aquamarine' ))
+        itemlist.append(item.clone( action='channels', extra='suggested', title=' - Sugeridos', context=context_usual, thumbnail=config.get_thumb('suggested'), text_color='aquamarine' ))
 
     if config.get_setting('channels_link_main', default=True):
         itemlist.append(item.clone( action='channels', extra='all', title=' - Canales', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='gold' ))
@@ -485,7 +485,8 @@ def mainlist(item):
            itemlist.append(item.clone( action='channels', extra='mixed', title=' - [B]Películas y Series[/B]', context=context_usual, no_docs = True, thumbnail=config.get_thumb('booklet'), text_color='teal' ))
 
         if config.get_setting('mnu_generos', default=True):
-           itemlist.append(item.clone( channel='submnuctext', action='submnu_genres', title= ' - Géneros', context=context_generos, thumbnail=config.get_thumb('genres'), text_color='thistle' ))
+            plot = 'Canales con géneros cinematográficos'
+            itemlist.append(item.clone( channel='submnuctext', action='submnu_genres', title= ' - Géneros', context=context_generos, plot=plot, thumbnail=config.get_thumb('genres'), text_color='thistle' ))
 
         if config.get_setting('mnu_documentales', default=True):
             itemlist.append(item.clone( action='channels', extra='documentaries', title=' - Documentales', context=context_usual, thumbnail=config.get_thumb('documentary'), text_color='cyan' ))
@@ -529,6 +530,8 @@ def mainlist(item):
 
     try: last_ver = updater.check_addon_version()
     except: last_ver = None
+
+    logger.info("check-00-last_ver: %s" % last_ver)
 
     if last_ver is None: last_ver = '[B][I][COLOR gray](fixes off)[/COLOR][/I][/B]'
     elif not last_ver:
@@ -666,7 +669,7 @@ def channels(item):
            itemlist.append(item.clone( channel='generos', action='mainlist', title= '[B]Géneros[/B]', tip_sel = 'movie', context=context_generos, thumbnail=config.get_thumb('genres'), text_color='thistle' ))
 
         item.category = 'Canales con Películas'
-        itemlist.append(item.clone( action='', title='[B]- [I]Películas:[/I][/B]', context=context_usual, thumbnail=config.get_thumb('movie'), text_color='tan' ))
+        itemlist.append(item.clone( action='', title='[B]- [I]Películas:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('movie'), text_color='tan' ))
 
         accion = 'mainlist_pelis'
         filtros = {'categories': 'movie'}
@@ -701,7 +704,7 @@ def channels(item):
            itemlist.append(item.clone( channel='generos', action='mainlist', title= '[B]Géneros[/B]', tip_sel = 'tvshow', context=context_generos, thumbnail=config.get_thumb('genres'), text_color='thistle' ))
 
         item.category = 'Canales con Series'
-        itemlist.append(item.clone( action='', title='[B]- [I]Series:[/I][/B]', context=context_usual, thumbnail=config.get_thumb('tvshow'), text_color='tan' ))
+        itemlist.append(item.clone( action='', title='[B]- [I]Series:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('tvshow'), text_color='tan' ))
 
         accion = 'mainlist_series'
         filtros = {'categories': 'tvshow'}
@@ -733,7 +736,7 @@ def channels(item):
         itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = '[B]Todos los canales con temática Documental[/B]', group = 'docs', text_color='cyan' ))
 
         item.category = 'Canales con Documentales'
-        itemlist.append(item.clone( action='', title='[B]- [I]Documentales:[/I][/B]', context=context_usual, thumbnail=config.get_thumb('documentary'), text_color='tan' ))
+        itemlist.append(item.clone( action='', title='[B]- [I]Documentales:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('documentary'), text_color='tan' ))
 
         accion = 'mainlist'
         filtros = {'categories': 'documentary', 'searchable': True}
@@ -771,7 +774,7 @@ def channels(item):
            itemlist.append(item.clone( channel='generos', action='mainlist', title= '[B]Géneros[/B]', tip_sel = 'all', context=context_generos, thumbnail=config.get_thumb('genres'), text_color='thistle' ))
 
         item.category = 'Canales con Películas y Series (ambos contenidos)'
-        itemlist.append(item.clone( action='', title='[B]- [I]Películas y Series:[/I][/B]', context=context_usual, thumbnail=config.get_thumb('booklet'), text_color='tan' ))
+        itemlist.append(item.clone( action='', title='[B]- [I]Películas y Series:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('booklet'), text_color='tan' ))
 
         accion = 'mainlist'
         filtros = {}
@@ -811,7 +814,7 @@ def channels(item):
         itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = '[B]Canales que pueden tener enlaces Torrents[/B]', group = 'torrents', text_color='blue' ))
 
         item.category = 'Canales con archivos Torrents'
-        itemlist.append(item.clone( action='', title='[B]- [I]Torrents:[/I][/B]', context=context_torrents, thumbnail=config.get_thumb('torrents'), text_color='tan' ))
+        itemlist.append(item.clone( action='', title='[B]- [I]Torrents:[/I][/B]', context=context_torrents, plot=item.category, thumbnail=config.get_thumb('torrents'), text_color='tan' ))
 
         accion = 'mainlist'
         filtros = {'categories': 'torrent'}
@@ -879,23 +882,23 @@ def channels(item):
 
         elif item.extra == 'suggested':
            item.category = 'Solo los Canales Sugeridos'
-           itemlist.append(item.clone( action='', title='[B]- [I]Sugeridos:[/I][/B]', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='tan' ))
+           itemlist.append(item.clone( action='', title='[B]- [I]Sugeridos:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('suggested'), text_color='tan' ))
 
         elif item.extra == 'proxies': item.category = 'Solo los Canales con Proxies Memorizados'
 
         elif item.extra == 'disableds':
            item.category = 'Solo los Canales que estén Desactivados'
-           itemlist.append(item.clone( action='', title='[B]- [I]Desactivados:[/I][/B]', context=context_desactivados, thumbnail=config.get_thumb('stack'), text_color='tan' ))
+           itemlist.append(item.clone( action='', title='[B]- [I]Desactivados:[/I][/B]', context=context_desactivados, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='tan' ))
 
         elif item.extra == 'problematics': item.category = 'Solo los Canales que sean Problemáticos (Predominan Sin enlaces Disponibles/Válidos/Soportados)'
 
         elif not item.extra == 'groups':
            if item.extra == 'prefereds':
                item.category = 'Solo los Canales Preferidps'
-               itemlist.append(item.clone( action='', title='[B]- [I]Canales Preferidos:[/I][/B]', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='tan' ))
+               itemlist.append(item.clone( action='', title='[B]- [I]Canales Preferidos:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='tan' ))
            else:
                item.category = 'Todos los Canales'
-               itemlist.append(item.clone( action='', title='[B]- [I]Canales:[/I][/B]', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='tan' ))
+               itemlist.append(item.clone( action='', title='[B]- [I]Canales:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='tan' ))
 
         else: item.category = 'Canales con Agrupaciones (Novedades, Estrenos, Temáticas, Países, Años, Plataformas, Productoras, Géneros, etc.)'
 
@@ -930,7 +933,7 @@ def channels(item):
 
             itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = '[B]Todos los canales con contenido Infantil[/B]', group = 'kids', text_color='lightyellow' ))
 
-            itemlist.append(item.clone( action='', title='[B]- [I]Infantiles:[/I][/B]', context=context_usual, thumbnail=config.get_thumb('booklet'), text_color='tan' ))
+            itemlist.append(item.clone( action='', title='[B]- [I]Infantiles:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('booklet'), text_color='tan' ))
 
         if item.extra == 'tales':
             if config.get_setting('mnu_search_proxy_channels', default=False):
@@ -954,7 +957,7 @@ def channels(item):
 
             itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = '[B]Todos los canales con contenido de Novelas[/B]', group = 'tales', text_color='limegreen' ))
 
-            itemlist.append(item.clone( action='', title='[B]- [I]Novelas:[/I][/B]', context=context_usual, thumbnail=config.get_thumb('booklet'), text_color='tan' ))
+            itemlist.append(item.clone( action='', title='[B]- [I]Novelas:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('booklet'), text_color='tan' ))
 
         if item.extra == 'dorama':
             if config.get_setting('mnu_search_proxy_channels', default=False):
@@ -970,7 +973,7 @@ def channels(item):
 
             itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = '[B]Todos los canales con contenido Dorama[/B]', group = 'dorama', text_color='firebrick' ))
 
-            itemlist.append(item.clone( action='', title='[B]- [I]Doramas:[/I][/B]', context=context_usual, thumbnail=config.get_thumb('computer'), text_color='tan' ))
+            itemlist.append(item.clone( action='', title='[B]- [I]Doramas:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('computer'), text_color='tan' ))
 
         if item.extra == 'adults' or item.extra == 'anime':
             if item.extra == 'anime':
@@ -993,23 +996,23 @@ def channels(item):
             if item.extra == 'adults':
                 itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = '[B]Todos los canales que pueden tener vídeos para Adultos[/B]', group = 'adults', text_color='orange' ))
 
-                itemlist.append(item.clone( action='', title='[B]- [I]Adultos:[/I][/B]', context=context_parental, thumbnail=config.get_thumb('adults'), text_color='tan' ))
+                itemlist.append(item.clone( action='', title='[B]- [I]Adultos:[/I][/B]', context=context_parental, plot=item.category, thumbnail=config.get_thumb('adults'), text_color='tan' ))
 
             if item.extra == 'anime':
                 itemlist.append(Item( channel='search', action='search', search_type='all', title='[B]Buscar Anime ...[/B]', thumbnail=config.get_thumb('anime'), search_special = 'anime', text_color='springgreen' ))
 
                 itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = '[B]Todos los canales con contenido Anime[/B]', group = 'anime', text_color='springgreen' ))
 
-                itemlist.append(item.clone( action='', title='[B]- [I]Animes:[/I][/B]', context=context_parental, thumbnail=config.get_thumb('anime'), text_color='tan' ))
+                itemlist.append(item.clone( action='', title='[B]- [I]Animes:[/I][/B]', context=context_parental, plot=item.category, thumbnail=config.get_thumb('anime'), text_color='tan' ))
 
         if item.extra == 'proxies' or item.extra == 'problematics':
             itemlist.append(item.clone( channel='actions', action='open_settings', title='[COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR tan][B]Menú)[/B][/COLOR]', context=context_config, folder=False, thumbnail=config.get_thumb('settings') ))
 
             if item.extra == 'proxies':
-                itemlist.append(item.clone( action='', title='[B]- [I]Proxies:[/I][/B]', context=context_proxy_channels, thumbnail=config.get_thumb('stack'), text_color='tan' ))
+                itemlist.append(item.clone( action='', title='[B]- [I]Proxies:[/I][/B]', context=context_proxy_channels, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='tan' ))
 
             if item.extra == 'problematics':
-                itemlist.append(item.clone( action='', title='[B]- [I]Problemáticos:[/I][/B]', context=context_desactivados, thumbnail=config.get_thumb('stack'), text_color='tan' ))
+                itemlist.append(item.clone( action='', title='[B]- [I]Problemáticos:[/I][/B]', context=context_desactivados, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='tan' ))
 
         accion = 'mainlist'
         filtros = {}

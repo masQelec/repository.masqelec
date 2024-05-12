@@ -113,6 +113,7 @@ def list_all(item):
 
         if 'Season' in title: SerieName = title.split("Season")[0]
         if 'Movie' in title: SerieName = title.split("Movie")[0]
+        if '(TV)' in title: SerieName = title.split("(TV)")[0]
 
         SerieName = SerieName.strip()
 

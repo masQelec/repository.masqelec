@@ -269,6 +269,8 @@ def list_all(item):
         if year: title = title.replace('(' + year +')', '').strip()
         else: year = '-'
 
+        if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
+
         tipo = 'movie' if '/peliculas/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 

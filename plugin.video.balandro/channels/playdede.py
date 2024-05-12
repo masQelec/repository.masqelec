@@ -48,7 +48,7 @@ host = 'https://playdede.us/'
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-# ~ webs  0)-'https://dominiosplaydede.com/'
+# ~ webs  0)-'https://dominiosplaydede.com/' ó Telegram t.me/NextdedeOficial
 
 
 # ~ por si viene de enlaces guardados posteriores
@@ -1522,6 +1522,7 @@ def findvideos(item):
         elif server == 'vembed': other = 'Vidguard'
         elif server == 'hexupload': other = 'Hexupload'
         elif server == 'userload': other = 'Userload'
+        elif server == 'streamruby': other = 'Streamruby'
         else: other = ''
 
         server = servertools.corregir_servidor(server)

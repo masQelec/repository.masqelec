@@ -160,6 +160,8 @@ def list_all(item):
         else:
            if '(' + year + ')' in title: title = title.replace('(' + year + ')', '').strip()
 
+        if '/lanzamiento/' in item.url: year = scrapertools.find_single_match(item.url, "/lanzamiento/(.*?)/")
+
         title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
 
         if ' | ' in title:

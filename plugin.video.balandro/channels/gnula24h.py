@@ -97,6 +97,8 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    if '/release/' in url: raise_weberror = False
+
     if not headers: headers = {'Referer': host}
 
     hay_proxies = False
@@ -308,7 +310,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8217;', '')
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s")
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -316,7 +318,10 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+        if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
+
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

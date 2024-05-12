@@ -249,19 +249,22 @@ def list_all(item):
         tipo = 'tvshow' if '/series/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
+        year = '-'
+        if '/years/' in item.url: year = scrapertools.find_single_match(item.url, "/years/(.*?)/")
+
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
-                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
+                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
         if tipo == 'movie':
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, qualities=qlty, fmt_sufijo=sufijo,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

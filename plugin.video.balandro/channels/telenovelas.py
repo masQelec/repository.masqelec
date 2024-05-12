@@ -45,7 +45,7 @@ def generos(item):
        ('accion', 'Acción'),
        ('action-adventure', 'Acción & Aventura'),
        ('animacion', 'Animación'),
-       ('avemtura', 'Avemtura'),
+       ('avemtura', 'Aventura'),
        ('ciencia-ficcion', 'Ciencia Ficción'),
        ('comedia', 'Comedia'),
        ('comedy', 'Comedy'),

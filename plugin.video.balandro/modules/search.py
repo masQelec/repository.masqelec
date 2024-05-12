@@ -57,17 +57,17 @@ def mainlist(item):
     if config.get_setting('search_extra_main', default=False):
         itemlist.append(item.clone( action='', title= '[B]Búsquedas por Título en TMDB:[/B]', folder=False, text_color='violet', thumbnail=thumb_tmdb ))
 
-        itemlist.append(item.clone( channel='tmdblists', action='search', search_type='movie', title= ' - Buscar [COLOR deepskyblue]Película[/COLOR] ...', thumbnail=config.get_thumb('movie'), plot = 'Indicar el nombre de una película para buscarla en The Movie Database' ))
+        itemlist.append(item.clone( channel='tmdblists', action='search', search_type='movie', title= ' - Buscar [COLOR deepskyblue]Película[/COLOR] ...', thumbnail=config.get_thumb('movie'), plot = 'Indicar el título de una película para buscarla en The Movie Database' ))
 
-        itemlist.append(item.clone( channel='tmdblists', action='search', search_type='tvshow', title= ' - Buscar [COLOR hotpink]Serie[/COLOR] ...', thumbnail=config.get_thumb('tvshow'), plot = 'Indicar el nombre de una serie para buscarla en The Movie Database' ))
+        itemlist.append(item.clone( channel='tmdblists', action='search', search_type='tvshow', title= ' - Buscar [COLOR hotpink]Serie[/COLOR] ...', thumbnail=config.get_thumb('tvshow'), plot = 'Indicar el título de una serie para buscarla en The Movie Database' ))
 
         itemlist.append(item.clone( action='', title= '[B]Búsquedas por Título en Filmaffinity:[/B]', folder=False, text_color='violet', thumbnail=thumb_filmaffinity ))
 
-        itemlist.append(item.clone( channel='filmaffinitylists', action='listas', search_type='all', stype='title', title=' - Buscar [COLOR yellow]Película y/ó Serie[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de una película ó serie para buscarla en Filmaffinity' ))
+        itemlist.append(item.clone( channel='filmaffinitylists', action='listas', search_type='all', stype='title', title=' - Buscar [COLOR yellow]Película y/ó Serie[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el título de una película ó serie para buscarla en Filmaffinity' ))
 
         if not config.get_setting('mnu_simple', default=False):
             if config.get_setting('mnu_documentales', default=True):
-                itemlist.append(item.clone( channel='filmaffinitylists', action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]Documental[/COLOR] ...', thumbnail=config.get_thumb('documentary') ))
+                itemlist.append(item.clone( channel='filmaffinitylists', action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]Documental[/COLOR] ...', thumbnail=config.get_thumb('documentary'), plot = 'Indicar el título de un documental para buscarlo en Filmaffinity' ))
 
     titulo = '[B]Búsquedas por Titulo:[/B]'
     if config.get_setting('search_extra_main', default=False): titulo = '[B]Búsquedas por Título en los Canales:[/B]'
@@ -75,34 +75,34 @@ def mainlist(item):
     itemlist.append(item.clone( action='', title= titulo, folder=False, text_color='chartreuse', thumbnail=config.get_thumb('stack') ))
 
     if config.get_setting('search_extra_trailers', default=False):
-         itemlist.append(item.clone( channel='trailers', action='search', title= ' - Buscar [COLOR darkgoldenrod]Tráiler[/COLOR]', thumbnail=config.get_thumb('trailers'), plot = 'Indicar el nombre de una película para buscar su tráiler' ))
+         itemlist.append(item.clone( channel='trailers', action='search', title= ' - Buscar [COLOR darkgoldenrod]Tráiler[/COLOR]', thumbnail=config.get_thumb('trailers'), plot = 'Indicar el título de una película para buscar su tráiler' ))
 
     if config.get_setting('channels_link_main', default=True):
-        itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR yellow]Película y/ó Serie[/COLOR] ...', plot = 'Buscar indistintamente películas y/ó series en todos los canales' ))
+        itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR yellow]Película y/ó Serie[/COLOR] ...', plot = 'Indicar el título para Buscarlo indistintamente en películas y/ó series en todos los canales' ))
 
     if not config.get_setting('mnu_simple', default=False):
         if config.get_setting('mnu_pelis', default=True):
-            itemlist.append(item.clone( action='search', search_type='movie', title= ' - Buscar [COLOR deepskyblue]Película[/COLOR] ...', thumbnail=config.get_thumb('movie'), plot = 'Indicar el nombre de una película para buscarla en los canales de películas' ))
+            itemlist.append(item.clone( action='search', search_type='movie', title= ' - Buscar [COLOR deepskyblue]Película[/COLOR] ...', thumbnail=config.get_thumb('movie'), plot = 'Indicar el título de una película para buscarla en los canales de películas' ))
 
         if config.get_setting('mnu_series', default=True):
-            itemlist.append(item.clone( action='search', search_type='tvshow', title= ' - Buscar [COLOR hotpink]Serie[/COLOR] ...', thumbnail=config.get_thumb('tvshow'), plot = 'Indicar el nombre de una serie para buscarla en los canales de series' ))
+            itemlist.append(item.clone( action='search', search_type='tvshow', title= ' - Buscar [COLOR hotpink]Serie[/COLOR] ...', thumbnail=config.get_thumb('tvshow'), plot = 'Indicar el título de una serie para buscarla en los canales de series' ))
 
         if config.get_setting('mnu_documentales', default=True):
-            itemlist.append(item.clone( action='search', search_type='documentary', title= ' - Buscar [COLOR cyan]Documental[/COLOR] ...', thumbnail=config.get_thumb('documentary'), plot = 'Indicar el nombre de un documental para buscarlo en los canales de documentales' ))
+            itemlist.append(item.clone( action='search', search_type='documentary', title= ' - Buscar [COLOR cyan]Documental[/COLOR] ...', thumbnail=config.get_thumb('documentary'), plot = 'Indicar el título de un documental para buscarlo en los canales de documentales' ))
 
         if config.get_setting('mnu_doramas', default=True):
-            itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR firebrick]Dorama[/COLOR] ...',  thumbnail=config.get_thumb('computer'), search_special = 'dorama', plot = 'Indicar el nombre de un dorama para buscarlo Solo en los canales exlusivos de Doramas' ))
+            itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR firebrick]Dorama[/COLOR] ...',  thumbnail=config.get_thumb('computer'), search_special = 'dorama', plot = 'Indicar el título de un dorama para buscarlo Solo en los canales exlusivos de Doramas' ))
 
         if config.get_setting('mnu_animes', default=True):
             if not config.get_setting('descartar_anime', default=True):
-               itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR springgreen]Anime[/COLOR] ...', thumbnail=config.get_thumb('anime'), search_special = 'anime', plot = 'Indicar el nombre de un anime para buscarlo Solo en los canales exlusivos de Animes' ))
+               itemlist.append(item.clone( action='search', search_type='all', title= ' - Buscar [COLOR springgreen]Anime[/COLOR] ...', thumbnail=config.get_thumb('anime'), search_special = 'anime', plot = 'Indicar el título de un anime para buscarlo Solo en los canales exlusivos de Animes' ))
 
     if config.get_setting('search_extra_main', default=False):
         itemlist.append(item.clone( action='', title= '[B]Búsquedas Especiales:[/B]', folder=False, text_color='yellowgreen' ))
 
         itemlist.append(item.clone( channel='tmdblists', action='mainlist', title= ' - Búsquedas y listas en [COLOR violet]TMDB[/COLOR]', thumbnail=thumb_tmdb, plot = 'Buscar personas y ver listas de películas y series de la base de datos de The Movie Database' ))
 
-        itemlist.append(item.clone( channel='filmaffinitylists', action='mainlist', title= ' - Búsquedas y listas en [COLOR violet]Filmaffinity[/COLOR]', thumbnail=thumb_filmaffinity, plot = 'Buscar personas y ver listas de películas, series, documentales, etc. de Filmaffinity' ))
+        itemlist.append(item.clone( channel='filmaffinitylists', action='mainlist', title= ' - Búsquedas y listas en [COLOR violet]Filmaffinity[/COLOR]', thumbnail=thumb_filmaffinity, plot = 'Buscar personas y ver listas de películas, series ó documentales de Filmaffinity' ))
 
     if config.get_setting('search_extra_proxies', default=True):
         itemlist.append(item.clone( action='', title= '[B]Búsquedas en canales con Proxies:[/B]', folder=False, thumbnail=config.get_thumb('stack'), text_color='red' ))
@@ -362,6 +362,7 @@ def show_help_parameters(item):
         if not hay_lastest: txt += '[CR]   [COLOR cyan][B]Sin textos memorizados[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información sobre sus parámetros de búsquedas', txt)
+
     return True
 
 
@@ -377,6 +378,8 @@ def show_help(item):
     txt += 'Desde los Ajustes [COLOR yellow][B]categoría Buscar[/B][/COLOR] se puede definir [COLOR chartreuse][B] los Resultados que se Previsualizan para cada canal[/B][/COLOR].'
     txt += ' Si por ejemplo el canal devuelve 15 resultados y se previsualizan 2, entrar en el enlace del [COLOR gold][B]Nombre del canal[/B][/COLOR] de la búsqueda para verlos todos.'
 
+    txt += '[CR][CR]En cada web/canal el [COLOR cyan][B]Tiempo de Respuesta[/B][/COLOR] puede ser elevado y más aún si tiene Proxies Configurados.'
+
     txt += '[CR][CR]Según cada web/canal su buscador puede permitir diferenciar por [COLOR teal][B]Películas y/ó Series ó No[/B][/COLOR].'
 
     txt += '[CR][CR][COLOR yellowgreen][B]También es variable la sensibilidad de la búsqueda (si busca sólo en el Título ó también en la Sinopsis, el tratamiento si hay varias palabras, si devuelve muchos ó pocos resultados, etc.)[/B][/COLOR]'
@@ -386,6 +389,7 @@ def show_help(item):
     txt += '[CR][CR]Desde cualquier [COLOR teal][B]Película ó Serie[/B][/COLOR] guardada en [COLOR tan][B]Preferidos[/B][/COLOR], si al acceder se produce un error en la web, se ofrece un diálogo para volver a buscar esa referencia ([COLOR gold][B]Misma/Parecida/Similar[/B][/COLOR]) en los demás canales ó en el mismo canal (por si los enlaces ya no funcionan).'
 
     platformtools.dialog_textviewer('Información sobre búsquedas', txt)
+
     return True
 
 

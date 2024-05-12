@@ -49,6 +49,8 @@ except:
 
 
 dominios = [
+         'https://hd-full.me/',
+         'https://hd-full.vip/',
          'https://hd-full.lol/',
          'https://hd-full.co/',
          'https://hd-full.biz/',
@@ -1092,8 +1094,10 @@ def findvideos(item):
         if not key: key = scrapertools.find_single_match(data_js, 'JSON.*?\]\(([0-9]+)\)\);')
         if not key: key = scrapertools.find_single_match(data_js, '((0x[0-9a-f]+)\)\);')
 
-    # ~ 14/2/2024 Emergency Key Forced
-    if key: key = int(key, 16)
+    # ~ 9/4/2024 Emergency Key Forced
+    if key:
+        key = int(key, 16)
+        if not key < 20: key = 14
     else: key = 14
 
     if not key:

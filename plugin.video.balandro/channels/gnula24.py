@@ -7,12 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.seriesgod.cc/'
+host = 'https://ww-w.seriesgod.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.gnula24.xyz/', 'https://www3.gnula24.xyz/', 'https://ww2.gnula24.xyz/',
-             'https://www11.gnula24.xyz/', 'https://w-ww.gnula24.xyz/', 'https://c1.gnula24.xyz/']
+             'https://www11.gnula24.xyz/', 'https://w-ww.gnula24.xyz/', 'https://c1.gnula24.xyz/',
+             'https://www.seriesgod.cc/']
 
 
 domain = config.get_setting('dominio', 'gnula24', default='')
@@ -59,6 +60,8 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
         url = url.replace(ant, host)
+
+    if '/release/' in url: raise_weberror = False
 
     if not headers: headers = {'Referer': host}
 
@@ -248,7 +251,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8217;', '')
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s")
 
         title = re.sub(r" \(.*?\)| \| .*", "", title)
 
@@ -258,7 +261,10 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+        if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
+
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

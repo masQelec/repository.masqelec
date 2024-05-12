@@ -110,6 +110,17 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
+        if not data:
+            if not '?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PelisMaraton', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('pelismaraton', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         if BR or BR2:
             try:
@@ -272,6 +283,8 @@ def list_all(item):
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
         if not year: year = '-'
+
+        if '/pelicula-año/' in item.url: year = scrapertools.find_single_match(item.url, "/pelicula-año/(.*?)/")
 
         qlty = scrapertools.find_single_match(match, '<span class="quality">(.*?)</span>')
 

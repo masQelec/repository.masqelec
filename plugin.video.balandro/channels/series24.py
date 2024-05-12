@@ -60,6 +60,8 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    if '/series-de/' in url: raise_weberror = False
+
     if not headers: headers = {'Referer': host}
 
     hay_proxies = False
@@ -253,7 +255,9 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        title = title.replace('&#038;', '').replace('&#8211;', '').replace("&#8217;", "'")
+        if '/series-de/' in item.url: year = scrapertools.find_single_match(item.url, "/series-de/(.*?)/")
+
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s")
 
         titulo = title
 

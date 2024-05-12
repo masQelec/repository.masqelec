@@ -30,11 +30,11 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'donghua/', search_type = 'tvshow' )) 
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'donghua/', group = 'donghua', search_type = 'tvshow' )) 
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color = 'springgreen' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'episodios/', group = 'last_epis', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'episodios/', group = 'epis', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', group = 'animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Donghuas', action = 'list_all', url = host + 'genero/donghua/', search_type = 'tvshow', text_color = 'moccasin' ))
 
@@ -68,7 +68,17 @@ def generos(item):
     ]
 
     for opc, tit in opciones:
-        itemlist.append(item.clone( title=tit, url = host + '/genero/' + opc + '/', action = 'list_all', text_color = 'springgreen' ))
+        group = ''
+
+        if opc == 'action-adventure': group = 'donghua'
+        elif opc == 'animacion': group = 'donghua'
+        elif opc == 'comedia': group = 'donghua'
+        elif opc == 'drama': group = 'donghua'
+        elif opc == 'sci-fi-fantasy': group = 'donghua'
+
+        elif opc == 'anime-japones': group = 'generos'
+
+        itemlist.append(item.clone( title=tit, url = host + 'genero/' + opc + '/', action = 'list_all', group = group, text_color = 'springgreen' ))
 
     return itemlist
 
@@ -80,7 +90,11 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>Lo mas Popular<')
+    if item.group == 'animes':
+         bloque = scrapertools.find_single_match(data, '>Nuevos Episodios<(.*?)>Recomendaciones<')
+    else:
+         bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>Lo mas Popular<')
+
     if not bloque: bloque = data
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
@@ -119,12 +133,31 @@ def list_all(item):
         elif '>T6' in match: season = 5
         else: season = 1
 
-        if item.group == 'epis':
-            epi = scrapertools.find_single_match(match, '>Episodio(.*?)</span>').strip()
+        if item.group == 'last_epis':
+            if 'Episodio' in SerieName: SerieName = SerieName.split("Episodio")[0]
+
+            epi = scrapertools.find_single_match(match, '>Episodio(.*?)</a>').strip()
+
+            title = title.replace('Episodio ', '[COLOR goldenrod]Episodio [/COLOR]')
 
             itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
-                                        contentType = 'episode', contentSeason = season, contentEpisodeNumber = epi ))
+                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epi ))
         else:
+            if item.group == 'donghua': url = url.replace('/donghua/', '/anime/anime/')
+
+            elif item.group == 'generos': url = url.replace('/donghua/', '/anime/anime/')
+
+            elif item.group == 'animes':
+                epi = scrapertools.find_single_match(match, '<span class="epx">Ep(.*?)</span>').strip()
+
+                if not epi: epi = 1
+                season = 1
+
+                itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                            contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epi ))
+
+                continue
+
             itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, infoLabels={'year': year},
                                         contentSerieName = SerieName, contentType = 'tvshow', contentSeason = season  ))
 
@@ -133,6 +166,16 @@ def list_all(item):
     if itemlist:
         if '<div class="pagination">' in data:
             next_page = scrapertools.find_single_match(data,'<div class="pagination">.*?<span class="current">.*?ref="(.*?)"')
+
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
+
+        elif '<div class="hpage">' in data:
+            if 'Previous' in data:
+                next_page = scrapertools.find_single_match(data,'<div class="hpage">.*?Previous.*?ref="(.*?)"')
+            else:
+                next_page = scrapertools.find_single_match(data,'<div class="hpage">.*?ref="(.*?)"')
 
             if next_page:
                 if '/page/' in next_page:
@@ -152,6 +195,27 @@ def episodios(item):
 
     epis = scrapertools.find_multiple_matches(data, "<li class='mark-.*?data-src='(.*?)'.*?<div class='numerando'>(.*?)</div>.*?<a href='(.*?)'>(.*?)</a>")
     if not epis: epis = scrapertools.find_multiple_matches(data, '<li class="mark-.*?src="(.*?)".*?<div class="numerando">(.*?)</div>.*?<a href="(.*?)">(.*?)</a>')
+
+    if not epis:
+        if item.group == 'donghua' or item.group == 'generos':
+            bloque = scrapertools.find_single_match(data, '</a></div><div class="inepcx">(.*?)</a></li></ul>')
+
+            if '<div class="eplister">': bloque = scrapertools.find_single_match(bloque, '<div class="eplister">(.*?)$')
+
+            links = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
+
+            for url in links:
+                epi = scrapertools.find_single_match(bloque, '<a href="' + url + '".*?<div class="epl-num">(.*?)</div>').strip()
+
+                if not epi: epi = 1
+                item.contentSeason = 1
+
+                titulo = '%sx%s - %s' % (str(item.contentSeason), epi, item.contentSerieName)
+
+                itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
+                                            contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
+
+            return itemlist
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(epis)
@@ -243,7 +307,7 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(data, '"embed_url":.*?"(.*?)"')
 
-        if '<iframe' in url or '<IFRAME':
+        if '<iframe' in url or '<IFRAME' in url:
              data = str(data).replace('=\\', '=').replace('\\"', '/"')
 
              url = scrapertools.find_single_match(str(data), '<iframe.*?src="(.*?)"')
@@ -254,6 +318,7 @@ def findvideos(item):
         if not url: continue
 
         if '/terabox.' in url: continue
+        elif '/nephobox.' in url: continue
         elif '.modagamers.' in url: continue
         elif 'cuyplay.com' in url: continue
         elif 'digitalxona.com' in url: continue
@@ -265,6 +330,8 @@ def findvideos(item):
         elif 'likessb.com' in url: continue
 
         if 'http:' in url: url = url.replace('http:', 'https:')
+
+        if not 'https:' in url: url = 'https:' + url
 
         if 'es.png' in match: lang = 'Esp'
         elif 'mx.png' in match: lang = 'Lat'
@@ -295,6 +362,15 @@ def findvideos(item):
                 other = other.replace('https:', '').strip()
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
+
+    if '<strong>DL</strong>' in data:
+        url = scrapertools.find_single_match(data, '<strong>DL</strong>.*?<a href="(.*?)"')
+
+        if url:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose' ))
 
     if not itemlist:
         if not ses == 0:

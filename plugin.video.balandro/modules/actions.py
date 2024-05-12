@@ -234,8 +234,17 @@ def search_trailers(item):
             if len(video_urls) > 0:
                 xbmc.Player().play(video_urls[0][1])
                 xbmc.sleep(1000)
-                while not xbmc.Monitor().abortRequested() and xbmc.Player().isPlaying():
-                    xbmc.sleep(1000)
+
+                # ~ 5/4/24
+                # ~ while not xbmc.Monitor().abortRequested() and xbmc.Player().isPlaying():
+                # ~       xbmc.sleep(1000)
+
+                while not xbmc.Monitor().abortRequested():
+                      xbmc.sleep(1000)
+                      if xbmc.Player().isPlaying():
+                         if len(video_urls) == 1: break
+                         else: xbmc.sleep(1000)
+                      else: xbmc.sleep(1000)
             else:
                 la_notif = ('[B][COLOR %s]') % color_alert
                 la_notif += ('No se pudo reproducir el tráiler[/B][/COLOR]')
@@ -243,7 +252,6 @@ def search_trailers(item):
                 platformtools.dialog_notification(resultados[ret]['name'], la_notif, time=3000, sound=False)
 
             if len(resultados) == 1: break
-
 
 def global_proxies(item):
     logger.info()
@@ -359,7 +367,6 @@ def manto_params(item):
         config.set_setting('channel_elitetorrent_dominio', '')
         config.set_setting('channel_elitetorrentnz_dominio', '')
         config.set_setting('channel_ennovelas_dominio', '')
-        config.set_setting('channel_ennovelasonline_dominio', '')
         config.set_setting('channel_ennovelastv_dominio', '')
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
         config.set_setting('channel_estrenosdoramas_dominio', '')
@@ -482,7 +489,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '123.0.6312.58')
+        config.set_setting('chrome_last_version', '123.0.6367.113')
 
         config.set_setting('debug', '0')
 
@@ -1414,10 +1421,6 @@ def opciones_ennovelas(item):
     item.from_channel = 'ennovelas'
     opciones_domains_common(item)
 
-def opciones_ennovelasonline(item):
-    item.from_channel = 'ennovelasonline'
-    opciones_domains_common(item)
-
 def opciones_ennovelastv(item):
     item.from_channel = 'ennovelastv'
     opciones_domains_common(item)
@@ -1464,6 +1467,10 @@ def opciones_mejortorrentnz(item):
 
 def opciones_mitorrent(item):
     item.from_channel = 'mitorrent'
+    opciones_domains_common(item)
+
+def opciones_nextdede(item):
+    item.from_channel = 'nextdede'
     opciones_domains_common(item)
 
 def opciones_peliculaspro(item):
@@ -1648,8 +1655,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'ennovelas': domains.manto_domain_ennovelas(item)
 
-            elif item.from_channel == 'ennovelasonline': domains.manto_domain_ennovelasonline(item)
-
             elif item.from_channel == 'ennovelastv': domains.manto_domain_ennovelastv(item)
 
             elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
@@ -1763,8 +1768,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'elitetorrentnz': domains.test_domain_elitetorrentnz(item)
 
             elif item.from_channel == 'ennovelas': domains.test_domain_ennovelas(item)
-
-            elif item.from_channel == 'ennovelasonline': domains.test_domain_ennovelasonline(item)
 
             elif item.from_channel == 'ennovelastv': domains.test_domain_ennovelastv(item)
 

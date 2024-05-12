@@ -123,6 +123,8 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = '[B]PREFERIDOS:[/B]', action = '', text_color='wheat' ))
 
+    elem = 0
+
     db = trackingtools.TrackingData()
     count_movies = db.get_movies_count()
     count_shows = db.get_shows_count()
@@ -133,13 +135,15 @@ def mainlist(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Preferidos[/COLOR][/B]' % color_exec)
 
         try:
-           preferidos_path = filetools.join(config.get_data_path(), 'tracking_dbs')
-           filetools.rmdirtree(preferidos_path)
+            preferidos_path = filetools.join(config.get_data_path(), 'tracking_dbs')
+            filetools.rmdirtree(preferidos_path)
         except:
-           pass
+            pass
     else:
         if not count_movies == 0:
             itemlist.append(item.clone( title = '[COLOR deepskyblue][B]Películas[/B][/COLOR] (%d)' % count_movies, action = 'mainlist_pelis', thumbnail=config.get_thumb('movie') ))
+
+            elem += 1
 
         if not count_shows == 0:
             tit = '[COLOR %s][B]Información New Episodes[/B][/COLOR]' % color_exec
@@ -150,19 +154,27 @@ def mainlist(item):
 
             itemlist.append(item.clone( title = '[COLOR hotpink][B]Series[/B][/COLOR] (%d)' % count_shows, action = 'mainlist_series', context=context, thumbnail=config.get_thumb('tvshow') ))
 
+            elem += 1
+
         if not count_episodes == 0:
             itemlist.append(item.clone( title = '[COLOR cyan][B]Episodios recientes[/B][/COLOR] (%d)' % count_episodes, action = 'mainlist_episodios', thumbnail=config.get_thumb('cloud') ))
 
+            elem += 1
+
         itemlist.append(item.clone( title='[B]Gestionar listas[/B]', action='mainlist_listas', text_color='goldenrod' )) 
 
-    if not len(itemlist) == 1:
-        itemlist.append(item.clone( title = '[B]Ajustes:[/B]', action = '', thumbnail=config.get_thumb('help'), text_color='wheat' ))
+    if not elem == 0:
+        itemlist.append(item.clone( title = '[B]INFORMACIÓN:[/B]', action = '', thumbnail=config.get_thumb('help'), text_color='wheat' ))
+
+        itemlist.append(item.clone( channel='actions', title = '[COLOR red][B]Eliminar Todos los Preferidos[/B][/COLOR]', action = 'manto_tracking_dbs', thumbnail=config.get_thumb('videolibrary') ))
 
     itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] ¿ Cómo funciona ?', action = 'show_help_tracking', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] Búsqueda automática de [COLOR cyan][B]Nuevos Episodios[/B][/COLOR]', action = 'show_help_tracking_update', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( channel='actions', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] categoría [COLOR wheat][B]Preferidos[/B][/COLOR]', action = 'open_settings', thumbnail=config.get_thumb('settings') ))
+
+    platformtools.itemlist_refresh()
 
     return itemlist
 

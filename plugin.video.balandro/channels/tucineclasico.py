@@ -62,7 +62,7 @@ def anios(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)"[^>]*>([^<]+)</a>')
     for url, title in matches:
-        itemlist.append(item.clone( action='list_all', title=title, url=url ))
+        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
 
     for ano in range(1948, 1921, -1):
         itemlist.append(item.clone( action = 'list_all', title = str(ano), url = host + 'lanzamiento/' + str(ano) + '/', text_color = 'deepskyblue' ))
@@ -105,9 +105,12 @@ def list_all(item):
 
         if ('(' + year + ')') in title: title = title.replace(('(' + year + ')'), '')
 
+        if '/lanzamiento/' in item.url: year = scrapertools.find_single_match(item.url, "/lanzamiento/(.*?)/")
+
         plot = scrapertools.find_single_match(article, '<div class="texto">(.*?)</div>')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                    contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
 
         if len(itemlist) >= perpage: break
 

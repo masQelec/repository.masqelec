@@ -523,6 +523,8 @@ def list_all(item):
         year = scrapertools.find_single_match(info, 'rel="tag">(\d{4})<')
         if not year: year = '-'
 
+        if '/release-year/' in item.url: year = scrapertools.find_single_match(item.url, "/release-year/(.*?)/")
+
         qlty = scrapertools.find_single_match(info, '-quality">(.*?)</div>')
 
         tipo = 'tvshow' if '/series/' in url else 'movie'

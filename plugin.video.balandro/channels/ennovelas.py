@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://ennovelas.io/'
+host = 'https://a.ennovelas.io/'
 
 
 # ~ por si viene de enlaces guardados
@@ -53,7 +53,7 @@ ant_hosts = ['https://ennovelas.net/', 'https://w.ennovelas.net/', 'https://ww.e
              'https://s.ennovelas.net/', 'https://i.ennovelas.net/', 'https://d.ennovelas.net/',
              'https://f.ennovelas.net/', 'https://t.ennovelas.net/', 'https://n.ennovelas.net/',
              'https://v.ennovelas.net/', 'https://o.ennovelas.net/', 'https://u.ennovelas.net/',
-             'https://m.ennovelas.net/', 'https://k.ennovelas.net/' ]
+             'https://m.ennovelas.net/', 'https://k.ennovelas.net/', 'https://ennovelas.io/']
 
 
 domain = config.get_setting('dominio', 'ennovelas', default='')
@@ -115,6 +115,18 @@ def do_downloadpage(url, post=None, headers=None):
             data = httptools.downloadpage_proxy('ennovelas', url, post=post, headers=headers, raise_weberror=raise_weberror).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+        if not data:
+            if not '/search/' in url:
+                if not '/temp/ajax/iframe.php?id=' in url:
+                    if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('EnNovelas', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                    timeout = config.get_setting('channels_repeat', default=30)
+
+                    if hay_proxies:
+                        data = httptools.downloadpage_proxy('ennovelas', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    else:
+                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         if BR or BR2:
@@ -256,18 +268,18 @@ def paises(item):
     itemlist = []
 
     itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'genre/novelas-americanas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'genre/novelas-argentinas-online-gratis/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'genre/novelas-brasilenas-online-gratis/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'genre/telenovelas-chilenas-online-gratis/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'genre/novelas-argentinas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'genre/novelas-brasilenas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'genre/telenovelas-chilenas/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'genre/novelas-colombianas/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'genre/novelas-espanolas/', lang = 'Esp', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Filipinas', action = 'list_all', url = host + 'genre/novelas-filipinas-online-gratis/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'India', action = 'list_all', url = host + 'genre/novelas-indias-online-gratis/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'genre/novelas-mexicanaas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'genre/novelas-peruanas-online-gratis/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Reino unido', action = 'list_all', url = host + 'genre/novelas-reino-unido-online-gratis/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'genre/series-turcas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'genre/novelas-venezolanas-online-gratis/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Filipinas', action = 'list_all', url = host + 'genre/novelas-filipinas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'India', action = 'list_all', url = host + 'genre/novelas-indias/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'genre/novelas-mexicanas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'genre/novelas-peruanas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Reino unido', action = 'list_all', url = host + 'genre/novelas-reino-unido/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'genre/series-y-novelas-turcas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'genre/novelas-venezolanas/', text_color='moccasin' ))
 
     return itemlist
 
@@ -350,12 +362,15 @@ def list_all(item):
         tipo = 'movie' if '/movies/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
+        year = '-'
+        if '/years/' in item.url: year = scrapertools.find_single_match(item.url, "/years/(.*?)/")
+
         if tipo == 'movie':
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType = 'movie', contentTitle = SerieName, infoLabels={'year': '-'} ))
+                                        contentType = 'movie', contentTitle = SerieName, infoLabels={'year': year} ))
 
         if tipo == 'tvshow':
             if not item.search_type == "all":
@@ -376,15 +391,15 @@ def list_all(item):
 
                     title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
 
-                    itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo, infoLabels={'year': '-'},
-                                                contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+                    itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
+                                                contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': year} ))
                     continue
 
                 else:
                     title = title.replace('Temporada', '[COLOR tan]Temporada[/COLOR]')
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -664,6 +679,57 @@ def findvideos(item):
     data = do_downloadpage(item.url + '?do=watch')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    # ~ links iframes
+    iframes = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
+
+    for iframe in iframes:
+        servidor = servertools.get_server_from_url(iframe)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor,iframe )
+
+        other = ''
+        if servidor == 'various': other = servertools.corregir_other(url)
+
+        if not servidor == 'directo':
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
+
+    # ~ links onclick
+    t_link = scrapertools.find_single_match(data, 'var vo_theme_dir = "(.*?)"')
+    id_link = scrapertools.find_single_match(data, 'vo_postID = "(.*?)"')
+
+    if t_link and id_link:
+        clicks = scrapertools.find_multiple_matches(str(data), 'onclick="getServer.*?this.id,(.*?),(.*?);')
+
+        for opt, srv in clicks:
+            srv = srv.replace(')', '')
+
+            data0 = do_downloadpage(t_link + '/temp/ajax/iframe2.php?id=' + id_link + '&video=' + opt + '&serverId=' + srv, headers = {'Referer': item.url, 'x-requested-with': 'XMLHttpRequest'} )
+
+            data0 = data0.strip()
+
+            if not data0: continue
+
+            u_link = scrapertools.find_single_match(data0, '<iframe.*?src="(.*?)"')
+            if not u_link: u_link = scrapertools.find_single_match(data0, '<IFRAME.*?SRC="(.*?)"')
+
+            if u_link:
+                if u_link.startswith('//'): u_link = 'https:' + u_link
+
+                u_link = u_link.replace('&amp;', '&')
+
+                servidor = servertools.get_server_from_url(u_link)
+                servidor = servertools.corregir_servidor(servidor)
+
+                u_link = servertools.normalize_url(servidor, u_link)
+
+                other = ''
+                if servidor == 'various': other = servertools.corregir_other(u_link)
+
+                if not servidor == 'directo':
+                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
+
+    # ~ links values
     values = scrapertools.find_multiple_matches(data, '<form method="post".*?action="(.*?)".*?<input type="hidden".*?name="(.*?)".*?value="(.*?)"')
 
     for link, type, value in values:
@@ -716,6 +782,7 @@ def findvideos(item):
             if not servidor == 'directo':
                 itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
+    # ~ links post
     t_link = scrapertools.find_single_match(data, 'var vo_theme_dir = "(.*?)"')
     id_link = scrapertools.find_single_match(data, 'vo_postID = "(.*?)"')
 

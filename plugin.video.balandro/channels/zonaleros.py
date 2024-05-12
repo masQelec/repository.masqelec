@@ -128,7 +128,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                pass
 
     if '<title>Just a moment...</title>' in data:
-        if not '?s=' in url:
+        if not 'search?q=' in url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
         return ''
 

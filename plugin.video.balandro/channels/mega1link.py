@@ -112,6 +112,8 @@ def list_all(item):
         if year: title = title = title.replace(' ' + year, '').replace(' (' + year + ')', '').strip()
         else: year = '-'
 
+        if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
+
         qlty = scrapertools.find_single_match(article, '<span class=quality>(.*?)</span>')
         qlty = re.sub(' -$', '', qlty)
 

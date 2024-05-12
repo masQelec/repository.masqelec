@@ -111,6 +111,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'espana/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie', group = '?ref=es' ))
 
     itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
 
@@ -180,7 +181,10 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1969, -1):
+    top_year = 1939
+    if item.group == '?ref=es': top_year = 1999
+
+    for x in range(current_year, top_year, -1):
         url = host + 'fecha/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color='deepskyblue' ))
@@ -218,8 +222,6 @@ def list_all(item):
         else:
             year = '-'
 
-        if not year: year = '-'
-
         title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
 
         tipo = 'tvshow' if '/serie/' in url or '/anime/' in url else 'movie'
@@ -233,6 +235,10 @@ def list_all(item):
         if '/espana/' in item.url:
             if not '?castellano=sp' in item.url: url = url + '?castellano=sp'
 
+        if '/fecha/' in item.url: year = scrapertools.find_single_match(item.url, "/fecha/(.*?)/")
+
+        if not year: year = '-'
+
         if tipo == 'movie':
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
@@ -245,7 +251,7 @@ def list_all(item):
                 if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = title,  infoLabels = {'year': '-'} ))
+                                        contentType = 'tvshow', contentSerieName = title,  infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

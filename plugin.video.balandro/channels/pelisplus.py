@@ -21,7 +21,7 @@ if PY3:
        import xbmc
        if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
     except: pass
- 
+
 try:
    if LINUX:
        try:
@@ -272,16 +272,24 @@ def list_all(item):
         year = scrapertools.find_single_match(match, '<span class="year text-center">(.*?)</span>')
         if year: title = title.replace('(' + year + ')', '').strip()
 
+        if '/peliculas-' in item.url:
+            year = scrapertools.find_single_match(item.url, "/peliculas-(.*?)$")
+            if year: year = scrapertools.find_single_match(year, "(.*?)page=")
+
+            year = year.replace('?', '')
+            
         if not year: year = '-'
 
         if '/serie/' in url:
             if item.search_type == 'movie': continue
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
         else:
             if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

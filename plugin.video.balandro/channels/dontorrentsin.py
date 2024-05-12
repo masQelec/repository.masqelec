@@ -12,14 +12,14 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www9.dontorrent.link/'
+host = 'https://www10.dontorrent.link/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://dontorrent.in/', 'https://dontorrent.tv/', 'https://www1.dontorrent.fr/',
              'https://www2.dontorrent.fr/', 'https://www3.dontorrent.fr/', 'https://www4.dontorrent.fr/',
              'https://www5.dontorrent.fr/', 'https://www6.dontorrent.fr/', 'https://www7.dontorrent.fr/',
-             'https://www8.dontorrent.fr/']
+             'https://www8.dontorrent.fr/', 'https://www9.dontorrent.link/']
 
 
 domain = config.get_setting('dominio', 'dontorrentsin', default='')
@@ -381,8 +381,9 @@ def list_post(item):
     matches = re.compile(patron).findall(data)
 
     for url, title, info, thumb in matches:
-        if "(" in title: titulo = title.split("(")[0]
-        else: titulo = title
+        titulo = title
+        if "[4K]" in title: titulo = title.split("[4K]")[0]
+        elif "(" in title: titulo = title.split("(")[0]
 
         itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, thumbnail=thumb if "http" in thumb else "https:" + thumb,
                                             contentType=item.contentType, contentTitle=titulo, infoLabels={'year': "-", 'plot': info} ))
