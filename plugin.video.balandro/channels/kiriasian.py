@@ -8,10 +8,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://kiriasian.com/'
+host = 'https://kissasians.bar/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://kiriasian.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not headers: headers = {'Referer': host}
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
@@ -20,25 +26,22 @@ def do_downloadpage(url, post=None, headers=None):
 
 
 def mainlist(item):
-    return mainlist_animes(item)
+    return mainlist_series(item)
 
 
-def mainlist_animes(item):
+def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_anime', default=False): return
+    itemlist.append(item.clone( title = 'Buscar dorama ...', action = 'search', search_type = 'tvshow', text_color='firebrick' ))
 
-    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'anime/', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host + 'anime/?status=&type=&order=update', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos doramas', action = 'list_all', url = host + 'series/?status=&type=&order=update', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos',  search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por alfabético (A - Z)', action = 'list_all', url = host + '/series/?status=&type=&order=title', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -49,40 +52,12 @@ def generos(item):
 
     data = do_downloadpage(host)
 
-    bloque = scrapertools.find_single_match(data, '<h3>Generos</h3>(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '<ul class="genre">(.*?)</ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title=.*?">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title=".*?">(.*?)</a>')
 
     for url, title in matches:
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
-
-    return itemlist
-
-
-def anios(item):
-    logger.info()
-    itemlist = []
-
-    from datetime import datetime
-    current_year = int(datetime.today().year)
-
-    for x in range(current_year, 1979, -1):
-        url = host + 'season/invierno-' + str(x) + '/'
-
-        itemlist.append(item.clone( title = str(x), url = url , action='list_all', text_color='springgreen' ))
-
-    return itemlist
-
-
-def alfabetico(item):
-    logger.info()
-    itemlist = []
-
-    for letra in '#ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-        if letra == '#': url = host + 'a-z/?show=0-9'
-        else: url = host + 'a-z/?show=' + letra
-
-        itemlist.append(item.clone( action = 'list_all', title = letra, url = url, text_color = 'springgreen' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='firebrick' ))
 
     return itemlist
 
@@ -135,7 +110,7 @@ def list_all(item):
 
         if next_page:
             if '?page=' in next_page:
-                next_page = host + 'anime/' + next_page
+                next_page = host + 'series/' + next_page
 
                 itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
@@ -150,6 +125,7 @@ def episodios(item):
     if not item.perpage: item.perpage = 50
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     epis = scrapertools.find_multiple_matches(data, '<li data-index=".*?<a href="(.*?)".*?<div class="epl-num">(.*?)</div>.*?<div class="epl-title">(.*?)</div>')
 
@@ -198,16 +174,20 @@ def episodios(item):
     for url, epi, title in epis[item.page * item.perpage:]:
         titulo = '%sx%s - %s' % (str(item.contentSeason), epi, title)
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
+        if len(epi) == 1: orden = '0' + epi
+        else: orden = epi
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, orden = orden,
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
 
         if len(itemlist) >= item.perpage:
             break
 
     if itemlist:
         if len(epis) > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, text_color='coral', orden = '10000' ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda i: i.orden)
 
 
 def findvideos(item):
@@ -219,7 +199,7 @@ def findvideos(item):
     ses = 0
 
     # ~ Enlaces
-    bloque = scrapertools.find_single_match(data,'>Seleccionar servidor de vídeo</option>(.*?)</select>')
+    bloque = scrapertools.find_single_match(data,'>Select Video Server<(.*?)</select>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<option value="(.*?)".*?data-index="(.*?)".*?>(.*?)</option>')
 
@@ -235,64 +215,48 @@ def findvideos(item):
         url = scrapertools.find_single_match(video,'<iframe src="(.*?)"')
 
         if url:
-            servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
+            if '/play.php?' in url:
+                if not 'http' in url: url = 'https:' + url
 
-            other = ''
-            if servidor == 'various': other = servertools.corregir_other(url)
+                data2 = do_downloadpage(url)
 
-            if servidor == 'directo':
-                if not config.get_setting('developer_mode', default=False): continue
-                other = url.split("/")[2]
-                other = other.replace('https:', '').strip()
+                matches2 = scrapertools.find_multiple_matches(data2, '<li class="linkserver".*?data-video="(.*?)"')
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = other ))
+                for vid in matches2:
+                    servidor = servertools.get_server_from_url(vid)
+                    servidor = servertools.corregir_servidor(servidor)
 
-    # ~ Download
-    matches = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
+                    other = ''
+                    if servidor == 'various': other = servertools.corregir_other(vid)
 
-    for url in matches:
-        ses += 1
+                    if servidor == 'directo':
+                        if not config.get_setting('developer_mode', default=False): continue
+                        other = vid.split("/")[2]
+                        other = other.replace('https:', '').strip()
 
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = vid, language = 'Vose', other = other ))
 
-        url = servertools.normalize_url(servidor, url)
+                continue
 
-        other = 'D'
-        if servidor == 'various': other = servertools.corregir_other(url) + ' D'
+            if not 'http' in url: ses = ses - 1
+            else:
+                servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
 
-        if servidor == 'directo':
-            if not config.get_setting('developer_mode', default=False): continue
-            other = url.split("/")[2]
-            other = other.replace('https:', '').strip()
+                other = ''
+                if servidor == 'various': other = servertools.corregir_other(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = other ))
+                if servidor == 'directo':
+                    if not config.get_setting('developer_mode', default=False): continue
+                    other = url.split("/")[2]
+                    other = other.replace('https:', '').strip()
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = other ))
 
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
-
-    return itemlist
-
-
-def play(item):
-    logger.info()
-    itemlist = []
-
-    servidor = item.server
-
-    url = item.url
-
-    if 'https://v.tioanime.com/' in url: return itemlist
-
-    servidor = servertools.get_server_from_url(url)
-    servidor = servertools.corregir_servidor(servidor)
-
-    url = servertools.normalize_url(servidor, url)
-
-    itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

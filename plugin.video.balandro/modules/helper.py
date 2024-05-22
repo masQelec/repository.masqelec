@@ -1595,7 +1595,7 @@ def show_help_miscelanea(item):
 
     txt = '[COLOR gold][B]KODI MEDIA CENTER:[/B][/COLOR][CR]'
     txt += '  [B][COLOR tan]Kodi Versiones Oficiales Soportadas:[/COLOR][/B][CR]'
-    txt += '  [COLOR darkorange][B]21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia  y  17.x Krypton[/B][/COLOR][CR][CR]'
+    txt += '  [COLOR darkorange][B]22.x (P...),  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia  y  17.x Krypton[/B][/COLOR][CR][CR]'
 
     txt += '  Kodi [COLOR yellow]Oficial[/COLOR]:  [COLOR plum][B]kodi.tv/download/[/B][/COLOR][CR]'
     txt += '  para obtener la [COLOR yellowgreen]Última versión[/COLOR] de este Media Center[CR][CR]'
@@ -1732,6 +1732,14 @@ def show_help_cinecalidadlol(item):
     item.notice = 'cinecalidadlol'
     show_help_canales(item)
 
+def show_help_cuevana3lw(item):
+    item.notice = 'cuevana3lw'
+    show_help_canales(item)
+
+def show_help_cuevana3pro(item):
+    item.notice = 'cuevana3pro'
+    show_help_canales(item)
+
 def show_help_cuevana3video(item):
     item.notice = 'cuevana3video'
     show_help_canales(item)
@@ -1828,6 +1836,10 @@ def show_help_seriespapayato(item):
     item.notice = 'seriespapayato'
     show_help_canales(item)
 
+def show_help_seriesretro(item):
+    item.notice = 'seriesretro'
+    show_help_canales(item)
+
 def show_help_srnovelas(item):
     item.notice = 'srnovelas'
     show_help_canales(item)
@@ -1871,6 +1883,10 @@ def show_help_canales(item):
        elif item.notice == 'playdede':
           txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominiosplaydede.com[/COLOR][/B][CR]'
           txt += '[COLOR yellow]  ó su[COLOR yellow][B] Telegram[/B] [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B][CR]'
+
+    elif item.notice == 'cuevana3lw' or item.notice == 'cuevana3pro':
+       txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
+       txt += '[COLOR yellow][B][CR]Además efectuan control de acceso que puede [COLOR indianred]Bloquear[/COLOR] la Web incluso con el uso [COLOR red]Proxies[/COLOR].[/COLOR][/B][CR]'
 
     txt += '[CR][COLOR goldenrod][B]  Desconocemos si será Temporal ó Definitivo.[/B][/COLOR][CR]'
 
@@ -4433,6 +4449,13 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   Cuevana3Lw: ' + cuevana3lw_dominio + '[CR]'
            else: tex_dom = '[CR]   CuevanaLw: ' + cuevana3lw_dominio + '[CR]'
 
+    datos = channeltools.get_channel_parameters('cuevana3pro')
+    if datos['active']:
+        cuevana3pro_dominio = config.get_setting('channel_cuevana3pro_dominio', default='')
+        if cuevana3pro_dominio:
+           if tex_dom: tex_dom = tex_dom + '   Cuevana3Pro: ' + cuevana3pro_dominio + '[CR]'
+           else: tex_dom = '[CR]   CuevanaPro: ' + cuevana3pro_dominio + '[CR]'
+
     datos = channeltools.get_channel_parameters('cuevana3video')
     if datos['active']:
         cuevana3video_dominio = config.get_setting('channel_cuevana3video_dominio', default='')
@@ -5160,6 +5183,8 @@ def get_plataforma(txt):
     elif kver.startswith('19.'): ver = '19 - Matrix'
     elif kver.startswith('20.'): ver = '20 - Nexus'
     elif kver.startswith('21.'): ver = '21 - Omega'
+    elif kver.startswith('22.'): ver = '21 - (P...)'
+
     else: ver = 'Desconocido'
 
     txt += ' - [COLOR gold][B]Versión:[/B][/COLOR]  ' + ver + '[CR][CR]'

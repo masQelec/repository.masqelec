@@ -407,6 +407,10 @@ def findvideos(item):
 
         matches = scrapertools.find_multiple_matches(data1, "<iframe.*?src='(.*?)'")
         if not matches: matches = scrapertools.find_multiple_matches(data1, '<iframe.*?src="(.*?)"')
+
+        if not matches: matches = scrapertools.find_multiple_matches(data1, "<IFRAME.*?SRC='(.*?)'")
+        if not matches: matches = scrapertools.find_multiple_matches(data1, '<IFRAME.*?SRC="(.*?)"')
+
         if not matches: matches = scrapertools.find_multiple_matches(data1, '<td>Server.*?href="(.*?)"')
 
         for url in matches:
@@ -532,7 +536,10 @@ def findvideos(item):
         enlaces1 = scrapertools.find_multiple_matches(data, "<iframe.*?src='(.*?)'")
         enlaces2 = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
-        enlaces = enlaces1 + enlaces2
+        enlaces3 = scrapertools.find_multiple_matches(data, "<IFRAME.*?SRC='(.*?)'")
+        enlaces4 = scrapertools.find_multiple_matches(data, '<IFRAME.*?SRC="(.*?)"')
+
+        enlaces = enlaces1 + enlaces2 + enlaces3 + enlaces4
 
         for enlace in enlaces:
             ses += 1

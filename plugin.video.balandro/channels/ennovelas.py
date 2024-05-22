@@ -44,16 +44,16 @@ except:
    except: pass
 
 
-host = 'https://a.ennovelas.io/'
+host = 'https://ennovelas.net/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://ennovelas.net/', 'https://w.ennovelas.net/', 'https://ww.ennovelas.net/',
-             'https://e.ennovelas.net/', 'https://a.ennovelas.net/', 'https://b.ennovelas.net/',
-             'https://s.ennovelas.net/', 'https://i.ennovelas.net/', 'https://d.ennovelas.net/',
-             'https://f.ennovelas.net/', 'https://t.ennovelas.net/', 'https://n.ennovelas.net/',
-             'https://v.ennovelas.net/', 'https://o.ennovelas.net/', 'https://u.ennovelas.net/',
-             'https://m.ennovelas.net/', 'https://k.ennovelas.net/', 'https://ennovelas.io/']
+ant_hosts = ['https://w.ennovelas.net/', 'https://ww.ennovelas.net/', 'https://e.ennovelas.net/',
+             'https://a.ennovelas.net/', 'https://b.ennovelas.net/', 'https://s.ennovelas.net/',
+             'https://i.ennovelas.net/', 'https://d.ennovelas.net/', 'https://f.ennovelas.net/',
+             'https://t.ennovelas.net/', 'https://n.ennovelas.net/', 'https://v.ennovelas.net/',
+             'https://o.ennovelas.net/', 'https://u.ennovelas.net/', 'https://m.ennovelas.net/',
+             'https://k.ennovelas.net/', 'https://ennovelas.io/', 'https://a.ennovelas.io/']
 
 
 domain = config.get_setting('dominio', 'ennovelas', default='')
@@ -681,6 +681,7 @@ def findvideos(item):
 
     # ~ links iframes
     iframes = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
+    if not iframes: iframes = scrapertools.find_multiple_matches(data, '<IFRAME.*?SRC="(.*?)"')
 
     for iframe in iframes:
         servidor = servertools.get_server_from_url(iframe)
@@ -744,6 +745,10 @@ def findvideos(item):
 
         matches = scrapertools.find_multiple_matches(data1, "<iframe.*?src='(.*?)'")
         if not matches: matches = scrapertools.find_multiple_matches(data1, '<iframe.*?src="(.*?)"')
+
+        if not matches: matches = scrapertools.find_multiple_matches(data1, "<IFRAME.*?SRC='(.*?)'")
+        if not matches: matches = scrapertools.find_multiple_matches(data1, '<IFRAME.*?SRC="(.*?)"')
+
         if not matches: matches = scrapertools.find_multiple_matches(data1, '<td>Server.*?href="(.*?)"')
 
         for url in matches:

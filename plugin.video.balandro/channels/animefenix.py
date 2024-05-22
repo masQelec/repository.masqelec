@@ -44,11 +44,11 @@ except:
    except: pass
 
 
-host = 'https://www3.animefenix.tv/'
+host = 'https://www.animefenix.tv/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.animefenix.com/', 'https://www.animefenix.tv/', 'https://animefenix.tv/']
+ant_hosts = ['https://www.animefenix.com/', 'https://animefenix.tv/', 'https://www3.animefenix.tv/']
 
 
 domain = config.get_setting('dominio', 'animefenix', default='')

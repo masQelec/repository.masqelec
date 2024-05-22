@@ -305,7 +305,7 @@ v0.5.9 (2022-03-22)
   </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="4.0.05" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="Balandro" version="4.0.06" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -325,11 +325,11 @@ v0.5.9 (2022-03-22)
       <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.05[/COLOR][COLOR chartreuse]  Mayo de 2024[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.06[/COLOR][COLOR chartreuse]  Mayo de 2024[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]
-        [COLOR plum][B]21.x Omega,  20.x Nexus,  19.x Matrix,[/B][/COLOR]
+        [COLOR plum][B]]22.x (P...),  21.x Omega,  20.x Nexus,  19.x Matrix,[/B][/COLOR]
         [COLOR plum][B]18.x Leia  y  17.x Krypton[/B][/COLOR]
 
     [COLOR springgreen][B]Fuente[/COLOR]  [COLOR cyan]https://repobal.github.io/base/[/B][/COLOR]
@@ -946,12 +946,12 @@ updated translations</news>
     </extension>
 </addon>
 
-<addon id="repository.balandro" name="[COLOR aqua]Balandro[/COLOR] Repo" version="4.0.0" provider-name="Team Balandro">
+<addon id="repository.balandro" name="[COLOR aqua]Balandro[/COLOR] Repo" version="4.0.1" provider-name="Team Balandro">
 
     <extension point="xbmc.addon.repository" name="balandro repo">
         <dir>
-            <info>https://pastebin.com/raw/Lktm2YS0</info>
-            <checksum>https://pastebin.com/raw/asquZ060</checksum>
+            <info>https://raw.githubusercontent.com/repobal/base/main/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/repobal/base/main/addons.xml.md5</checksum>
             <datadir zip="true">https://raw.githubusercontent.com/repobal/base/main/</datadir>
         </dir>
     </extension>
@@ -962,7 +962,7 @@ updated translations</news>
           <icon>icon.png</icon>
        </assets>
        <news>
-       [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.0[/COLOR][COLOR red]  Enero 2024[/B][/COLOR]
+       [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.1[/COLOR][COLOR red]  Marzo 2024[/B][/COLOR]
 
        [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
            [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]

@@ -5,7 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import os, re, xbmcgui
+import re, xbmcgui
 
 from platformcode import config, logger, platformtools
 from core.item import Item

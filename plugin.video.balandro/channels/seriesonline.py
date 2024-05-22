@@ -102,6 +102,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-online.html', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
@@ -201,6 +203,46 @@ def list_all(item):
         if next_page:
             if '/page-' in next_page:
                 itemlist.append(item.clone( title = 'Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
+
+    return itemlist
+
+
+def last_epis(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
+
+    bloque = scrapertools.find_single_match(data, '>Nuevos Capítulos(.*?)>Nuevos Temporadas')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<li>(.*?)</li>')
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, '<a href=".*?">(.*?)<span>')
+
+        if not url or not title: continue
+
+        title = title.replace('&#039;', "'")
+
+        SerieName = scrapertools.find_single_match(title, '(.*?)- T').strip()
+
+        season = scrapertools.find_single_match(title, '- T(.*?)Capítulo').strip()
+
+        if not season: season = 1
+
+        epis = scrapertools.find_single_match(title, 'Capítulo(.*?)</span>').strip()
+
+        if not epis: epis = 1
+
+        title = title.replace('Capítulo ', '[COLOR goldenrod]Capítulo [/COLOR]')
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, infoLabels={'year': '-'},
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -360,6 +402,8 @@ def findvideos(item):
                 url = ''
 
             if url:
+                url = url.replace('/younetu.com/player/', '/waaw.to/')
+
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 

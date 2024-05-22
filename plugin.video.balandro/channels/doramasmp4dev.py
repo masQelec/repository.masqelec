@@ -246,7 +246,12 @@ def episodios(item):
                 else: item.perpage = 50
 
     for url, epis, title, in matches[item.page * item.perpage:]:
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
+        orden = epis.replace('Cap ', '').strip()
+
+        if len(orden) == 1: orden = '0' + orden
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = title, orden = orden,
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -255,9 +260,9 @@ def episodios(item):
 
     if itemlist:
         if len(matches) > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page= item.page + 1, perpage = item.perpage, text_color='coral' ))
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page= item.page + 1, perpage = item.perpage, text_color='coral', orden = '10000' ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda i: i.orden)
 
 
 def findvideos(item):
@@ -294,6 +299,8 @@ def findvideos(item):
     matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
     for url in matches:
+        if '/googleads.' in url: continue
+
         ses += 1
 
         if url.startswith("//"): url = 'https:' + url

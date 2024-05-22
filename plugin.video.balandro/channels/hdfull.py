@@ -49,6 +49,7 @@ except:
 
 
 dominios = [
+         'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',

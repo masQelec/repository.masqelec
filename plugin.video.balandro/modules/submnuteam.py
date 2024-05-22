@@ -1093,7 +1093,7 @@ def test_tplus(item):
 
     preselect = tplus_actual
     ret = platformtools.dialog_select('[COLOR cyan][B]Proveedores Proxies Tplus[/B][/COLOR]', opciones_tplus, preselect=preselect)
-    if ret == -1: return
+    if ret == -1: return -1
 
     if opciones_tplus[ret] == 'openproxy.space http': proxies_tplus = '0'
     elif opciones_tplus[ret] == 'openproxy.space socks4': proxies_tplus = '1'
@@ -1109,9 +1109,9 @@ def test_tplus(item):
     elif opciones_tplus[ret] == 'proxy-list.download socks4': proxies_tplus = '11'
     elif opciones_tplus[ret] == 'proxy-list.download socks5': proxies_tplus = '12'
     elif opciones_tplus[ret] == 'freeproxy.world': proxies_tplus = '13'
-    elif opciones_tplus[ret] == 'freeproxy.world nonymity': proxies_tplus = '14'
+    elif opciones_tplus[ret] == 'freeproxy.world anonymity': proxies_tplus = '14'
     elif opciones_tplus[ret] == 'hidemyna.me.en': proxies_tplus = '15'
-    elif opciones_tplus[ret] == 'lis.proxylistplus.com': proxies_tplus = '16'
+    elif opciones_tplus[ret] == 'list.proxylistplus.com': proxies_tplus = '16'
     elif opciones_tplus[ret] == 'proxyservers.pro': proxies_tplus = '17'
     elif opciones_tplus[ret] == 'TheSpeedX': proxies_tplus = '18'
     elif opciones_tplus[ret] == 'proxyscan.io http': proxies_tplus = '19'
@@ -1950,7 +1950,7 @@ def resumen_canales(item):
     txt += '  ' + str(pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
 
     txt += '[CR]  ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
-    txt += '    ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
+    txt += '  ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
     txt += '    ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
     txt += '  ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
     txt += '  ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
@@ -1960,13 +1960,13 @@ def resumen_canales(item):
 
     txt += '[CR][COLOR powderblue][B]DISTRIBUCIÓN CANALES DISPONIBLES PARA BÚSQUEDAS:[/B][/COLOR][CR]'
 
-    txt += '  ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
-    txt += '  ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
-    txt += '  ' + str(bus_pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
-    txt += '  ' + str(bus_documentales) + ' [COLOR cyan]Temática Documental[/COLOR][CR]'
-    txt += '  ' + str(bus_torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
-    txt += '  ' + str(bus_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
-    txt += '  ' + str(bus_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
+    txt += '   ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+    txt += '   ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+    txt += '   ' + str(bus_pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
+    txt += ' ' + str(bus_documentales) + ' [COLOR cyan]Temática Documental[/COLOR][CR]'
+    txt += '   ' + str(bus_torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
+    txt += '   ' + str(bus_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
+    txt += '   ' + str(bus_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
 
     platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución', txt)
 
@@ -1981,7 +1981,7 @@ def resumen_servidores(item):
     notsuported = 0
     outservice = 0
     alternatives = 0
-    aditionals = 36
+    aditionals = 39
     disponibles = 0
 
     path = os.path.join(config.get_runtime_path(), 'servers')
@@ -2021,7 +2021,7 @@ def resumen_servidores(item):
     txt += '    ' + str(inactives) + '  [COLOR coral]Inactivos[/COLOR][CR]'
     txt += '    ' + str(notsuported) + '  [COLOR fuchsia]Sin Soporte[/COLOR][CR]'
 
-    if outservice > 0: txt += '      ' + str(outservice) + '  [COLOR plum]Sin Servicio[/COLOR][CR]'
+    if outservice > 0: txt += '      ' + str(outservice) + '  [COLOR red]Sin Servicio[/COLOR][CR]'
 
     txt += '[CR]  ' + str(disponibles) + '  [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
 
@@ -2075,6 +2075,7 @@ def show_help_alternativas(item):
     txt += '   [COLOR yellow]Vk[/COLOR][CR]'
     txt += '   [COLOR yellow]Voe[/COLOR][CR]'
     txt += '   [COLOR yellow]Waaw[/COLOR][CR]'
+    txt += '   [COLOR yellow]Zures[/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
         cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
@@ -2109,6 +2110,7 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Dropload[/COLOR][CR]'
     txt += '   [COLOR yellow]Embedgram[/COLOR][CR]'
     txt += '   [COLOR yellow]Embedrise[/COLOR][CR]'
+    txt += '   [COLOR yellow]Emturbovid[/COLOR][CR]'
     txt += '   [COLOR yellow]Fastupload[/COLOR][CR]'
     txt += '   [COLOR yellow]Filelions[/COLOR][CR]'
     txt += '   [COLOR yellow]Filemoon[/COLOR][CR]'
@@ -2118,8 +2120,8 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Hexupload[/COLOR][CR]'
     txt += '   [COLOR yellow]Krakenfiles[/COLOR][CR]'
     txt += '   [COLOR yellow]Lulustream[/COLOR][CR]'
-    txt += '   [COLOR yellow]Moonplayer[/COLOR][CR]'
     txt += '   [COLOR yellow]Mvidoo[/COLOR][CR]'
+    txt += '   [COLOR yellow]Qiwi[/COLOR][CR]'
     txt += '   [COLOR yellow]Rumble[/COLOR][CR]'
     txt += '   [COLOR yellow]Rutube[/COLOR][CR]'
     txt += '   [COLOR yellow]Streamhub[/COLOR][CR]'

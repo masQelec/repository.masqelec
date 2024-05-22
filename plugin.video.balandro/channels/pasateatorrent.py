@@ -360,7 +360,7 @@ def search(item, texto):
     logger.info()
     try:
         if item.search_type == 'tvshow':
-            item.url = host + '/series/?s=' + texto.replace(" ", "+")
+            item.url = host + 'series/?s=' + texto.replace(" ", "+")
         else:
             item.url = host + '?s=' + texto.replace(" ", "+")
         return list_all(item)

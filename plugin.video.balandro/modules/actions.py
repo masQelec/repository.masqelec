@@ -357,6 +357,7 @@ def manto_params(item):
         config.set_setting('channel_cuevana2_dominio', '')
         config.set_setting('channel_cuevana2esp_dominio', '')
         config.set_setting('channel_cuevana3lw_dominio', '')
+        config.set_setting('channel_cuevana3pro_dominio', '')
         config.set_setting('channel_cuevana3video_dominio', '')
 
         config.set_setting('channel_divxtotal_dominio', '')
@@ -489,7 +490,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '123.0.6367.113')
+        config.set_setting('chrome_last_version', '125.0.6422.60')
 
         config.set_setting('debug', '0')
 
@@ -1389,6 +1390,10 @@ def opciones_cuevana3lw(item):
     item.from_channel = 'cuevana3lw'
     opciones_domains_common(item)
 
+def opciones_cuevana3pro(item):
+    item.from_channel = 'cuevana3pro'
+    opciones_domains_common(item)
+
 def opciones_cuevana3video(item):
     item.from_channel = 'cuevana3video'
     opciones_domains_common(item)
@@ -1639,6 +1644,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cuevana3lw': domains.manto_domain_cuevana3lw(item)
 
+            elif item.from_channel == 'cuevana3pro': domains.manto_domain_cuevana3pro(item)
+
             elif item.from_channel == 'cuevana3video': domains.manto_domain_cuevana3video(item)
 
             elif item.from_channel == 'divxtotal': domains.manto_domain_divxtotal(item)
@@ -1753,6 +1760,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cuevana3lw': domains.test_domain_cuevana3lw(item)
 
+            elif item.from_channel == 'cuevana3pro': domains.test_domain_cuevana3pro(item)
+
             elif item.from_channel == 'cuevana3video': domains.test_domain_cuevana3video(item)
 
             elif item.from_channel == 'divxtotal': domains.test_domain_divxtotal(item)
@@ -1852,6 +1861,10 @@ def opciones_domains_common(item):
             elif item.from_channel == 'animeonline': helper.show_help_animeonline(item)
 
             elif item.from_channel == 'cinecalidadlol': helper.show_help_cinecalidadlol(item)
+
+            elif item.from_channel == 'cuevana3lw': helper.show_help_cuevana3lw(item)
+
+            elif item.from_channel == 'cuevana3pro': helper.show_help_cuevana3pro(item)
 
             elif item.from_channel == 'cuevana3video': helper.show_help_cuevana3video(item)
 
