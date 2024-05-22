@@ -26,6 +26,7 @@ config.set_setting('proxysearch_process_proxies', '')
 
 
 dominioshdfull = [
+         'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
@@ -39,7 +40,7 @@ dominioshdfull = [
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://hdfull.quest/',
-         'https://hdfull.icu/',
+         'https://hdfull.icu/'
          ]
 
 dominiosnextdede = [

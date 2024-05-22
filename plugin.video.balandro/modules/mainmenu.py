@@ -739,7 +739,7 @@ def channels(item):
         itemlist.append(item.clone( action='', title='[B]- [I]Documentales:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('documentary'), text_color='tan' ))
 
         accion = 'mainlist'
-        filtros = {'categories': 'documentary', 'searchable': True}
+        filtros = {'categories': 'documentary'}
 
     elif item.extra == 'mixed':
         if config.get_setting('mnu_search_proxy_channels', default=False):

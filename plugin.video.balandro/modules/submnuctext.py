@@ -584,6 +584,8 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'cuevana3lw': domains.manto_domain_cuevana3lw(item)
 
+    elif item.from_channel == 'cuevana3pro': domains.manto_domain_cuevana3pro(item)
+
     elif item.from_channel == 'cuevana3video': domains.manto_domain_cuevana3video(item)
 
     elif item.from_channel == 'divxtotal': domains.manto_domain_divxtotal(item)
@@ -882,6 +884,13 @@ def _proxies(item):
 
         if config.get_setting('channel_cuevana3lw_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'cuevana3pro':
+        from channels import cuevana3pro
+        item.channel = 'cuevana3pro'
+        cuevana3pro.configurar_proxies(item)
+
+        if config.get_setting('channel_cuevana3pro_proxies') is None: refrescar = False
+
     elif item.from_channel == 'cuevana3video':
         from channels import cuevana3video
         item.channel = 'cuevana3video'
@@ -1085,6 +1094,13 @@ def _proxies(item):
 
         if config.get_setting('channel_naranjatorrent_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'onlinetv':
+        from channels import onlinetv
+        item.channel = 'onlinetv'
+        onlinetv.configurar_proxies(item)
+
+        if config.get_setting('channel__onlinetv_proxies') is None: refrescar = False
+
     elif item.from_channel == 'peliplayhd':
         from channels import peliplayhd
         item.channel = 'peliplayhd'
@@ -1246,6 +1262,13 @@ def _proxies(item):
 
         if config.get_setting('channel_seriespapayato_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'seriesretro':
+        from channels import seriesretro
+        item.channel = 'seriesretro'
+        seriesretro.configurar_proxies(item)
+
+        if config.get_setting('channel_seriesretro_proxies') is None: refrescar = False
+
     elif item.from_channel == 'seriesplus':
         from channels import seriesplus
         item.channel = 'seriesplus'
@@ -1253,12 +1276,26 @@ def _proxies(item):
 
         if config.get_setting('channel_seriesplus_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'seriestv':
+        from channels import seriestv
+        item.channel = 'seriestv'
+        seriestv.configurar_proxies(item)
+
+        if config.get_setting('channel_seriestv_proxies') is None: refrescar = False
+
     elif item.from_channel == 'srnovelas':
         from channels import srnovelas
         item.channel = 'srnovelas'
         srnovelas.configurar_proxies(item)
 
         if config.get_setting('channel_srnovelas_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'star':
+        from channels import star
+        item.channel = 'star'
+        star.configurar_proxies(item)
+
+        if config.get_setting('channel_star_proxies') is None: refrescar = False
 
     elif item.from_channel == 'subtorrents':
         from channels import subtorrents

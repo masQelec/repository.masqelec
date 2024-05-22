@@ -232,6 +232,7 @@
         <setting id="opc_cuevana2" type="action" label="[COLOR gold]Cuevana2[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana2)"/>
         <setting id="opc_cuevana2esp" type="action" label="[COLOR gold]Cuevana2Esp[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana2esp)"/>
         <setting id="opc_cuevana3lw" type="action" label="[COLOR gold]Cuevana3Lw[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana3lw)"/>
+        <setting id="opc_cuevana3pro" type="action" label="[COLOR gold]Cuevana3Pro[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana3pro)"/>
         <setting id="opc_cuevana3video" type="action" label="[COLOR gold]Cuevana3Video[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana3video)"/>
 
         <setting id="opc_divxtotal" type="action" label="[COLOR gold]DixTotal[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_divxtotal)"/>
@@ -468,7 +469,7 @@
 
         <setting id="proxp_vias" type="bool" label="Opciones" default="false"/>
         <setting id="proxies_vias" type="bool" label="Gestionar [COLOR yellow][B]Vías alternativas[/B][/COLOR] si no se obtubieron suficientes proxies a analizar" default="false" visible="eq(-1,true)"/>
-        <setting id="proxies_tplus" type="labelenum" label="Seleccionar código de la Via Alternativa (requiere acivar la gestión)" values="0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37" default="32" visible="eq(-2,true)"/>
+        <setting id="proxies_tplus" type="labelenum" label="Seleccionar código de la Via Alternativa (requiere activar la [COLOR yellow][B]Gestión[/B][/COLOR])" values="0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37" default="32" visible="eq(-2,true)"/>
         <setting id="proxies_show_vias" type="action" label="Información Lista [COLOR aqua][B]Vías alternativas[/B][/COLOR] de Proveedores de proxies" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=proxies_show_vias)"/>
 
         <setting label="Solicitudes al Procesar:" type="lsep"/>

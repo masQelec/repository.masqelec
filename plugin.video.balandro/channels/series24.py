@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w-ww.series24.cc/'
+host = 'https://ww-w.series24.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.series24.cc/', 'https://www1.series24.cc/', 'https://ww3.series24.cc/',
-            'https://ww2.series24.cc/', 'https://www11.series24.cc/']
+            'https://ww2.series24.cc/', 'https://www11.series24.cc/', 'https://w-ww.series24.cc/']
 
 
 domain = config.get_setting('dominio', 'series24', default='')

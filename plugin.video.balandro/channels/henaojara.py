@@ -663,6 +663,7 @@ def findvideos(item):
                     elif srv == 'filelions': servidor = 'various'
                     elif srv == 'filemoon': servidor = 'various'
                     elif srv == 'streamvid': servidor = 'various'
+                    elif srv == 'vidhide': servidor = 'various'
 
                     elif srv == 'ok': servidor = 'okru'
                     elif srv == 'dood': servidor = 'doodstream'
@@ -691,6 +692,7 @@ def findvideos(item):
             elif other == 'filelions': servidor = 'various'
             elif other == 'filemoon': servidor = 'various'
             elif other == 'streamvid': servidor = 'various'
+            elif other == 'vidhide': servidor = 'various'
 
             elif other == 'ok': servidor = 'okru'
             elif other == 'dood': servidor = 'doodstream'
@@ -729,6 +731,7 @@ def findvideos(item):
         elif srv == 'filelions': other = 'various'
         elif srv == 'filemoon': other = 'various'
         elif srv == 'streamvid': other = 'various'
+        elif srv == 'vidhide': other = 'various'
 
         elif srv == 'ok': other = 'okru'
         elif srv == 'dood': other = 'doodstream'
@@ -744,6 +747,7 @@ def findvideos(item):
                elif srv == 'filelions': servidor = 'various'
                elif srv == 'filemoon': servidor = 'various'
                elif srv == 'streamvid': servidor = 'various'
+               elif srv == 'vidhide': servidor = 'various'
                else:
                   servidor = 'directo'
                   other = 'D' + str(nro)

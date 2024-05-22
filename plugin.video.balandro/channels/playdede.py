@@ -5,7 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import os, re, xbmcgui
+import re, xbmcgui
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -822,8 +822,6 @@ def idiomas(item):
                     login(item)
                     data = do_downloadpage(url)
 
-    username = config.get_setting('playdede_username', 'playdede', default='')
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<ul class="Alenguajes Ageneros">(.*?)<ul class="Acalidades Ageneros">')
@@ -872,8 +870,6 @@ def calidades(item):
                     login(item)
                     data = do_downloadpage(url)
 
-    username = config.get_setting('playdede_username', 'playdede', default='')
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<ul class="Acalidades Ageneros">(.*?)<select id="countries"')
@@ -921,8 +917,6 @@ def paises(item):
                     logout(item)
                     login(item)
                     data = do_downloadpage(url)
-
-    username = config.get_setting('playdede_username', 'playdede', default='')
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
@@ -1628,6 +1622,9 @@ def play(item):
 
             url_play = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
             if not url_play: url_play = scrapertools.find_single_match(data, "<iframe src='(.*?)'")
+
+            if not url_play: url_play = scrapertools.find_single_match(data, 'var url = "(.*?)"')
+            if not url_play: url_play = scrapertools.find_single_match(data, "var url = '(.*?)'")
 
     else:
         url_play = item.url

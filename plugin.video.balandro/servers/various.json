@@ -3,7 +3,7 @@
   "name": "Various",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Azipcdn,  Bembed,  Desiupload,  Doodporn,  Drop,  Dropload,  Embedgram,  Embedrise,  Emturbovid,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Goodstream,  Hxfile,  Hexupload,  Krakenfiles,  Lulustream,  Moonplayer,  Mvidoo,  Rumble,  Rutube,  Streamhub,  Streamvid,  Streamruby,  Streamwish,  Tubeload,  Turboviplay,  Twitch,  Uploaddo,  Uploadever,  Uploadraja,  Userload,  Vidello,  Videowood,  Vidguard,  Vidhide,  Vidspeed,  Vkspeed,  Vudeo,  Yandex,  Youdbox)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Azipcdn,  Bembed,  Desiupload,  Doodporn,  Drop,  Dropload,  Embedgram,  Embedrise,  Emturbovid,  Fastupload,  Filelions,  Filemoon,  Fileupload,  Goodstream,  Hxfile,  Hexupload,  Krakenfiles,  Lulustream,  Moonplayer,  Mvidoo,  Qiwi,  Rumble,  Rutube,  Streamhub,  Streamvid,  Streamruby,  Streamwish,  Tubeload,  Turboviplay,  Twitch,  Uploaddo,  Uploadever,  Uploadraja,  Userload,  Vidello,  Videowood,  Vidguard,  Vidhide,  Vidspeed,  Vkspeed,  Vudeo,  Yandex,  Youdbox)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -229,6 +229,10 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://fsdcmo.sbs/(?:e/|f/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://asnwish.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
@@ -449,6 +453,10 @@
         "url": "https://streamvid.cc/\\1"
       },
       {
+        "pattern": "https://streamvid.co/(?:embed-|)([0-9a-zA-Z]+)",
+        "url": "https://streamvid.cc/\\1"
+      },
+      {
         "pattern": "https://upload.do/(?:embed-|e/|d/)([0-9a-zA-Z]+)",
         "url": "https://upload.do/\\1"
       },
@@ -545,6 +553,10 @@
         "url": "https://filelions.to/f/\\1"
       },
       {
+        "pattern": "https://fdewsdc.sbs/(?:s/|v/|f/|d/|embed/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
         "pattern": "https://streamruby.com/(?:embed-|e/|d/)([0-9a-zA-Z]+)",
         "url": "\\1"
       },
@@ -562,6 +574,10 @@
       },
       {
         "pattern": "https://rubystm.com/(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://qiwi.gg/(?:file/)([0-9a-zA-Z]+)",
         "url": "\\1"
       }
     ]

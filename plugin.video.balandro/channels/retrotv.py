@@ -10,9 +10,6 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://retrotv.org/'
 
 
-perpage = 20
-
-
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -114,14 +111,11 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    if not item.page: item.page = 0
-
     data = httptools.downloadpage(item.url).data
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
-    num_matches = len(matches)
 
-    for match in matches[item.page * perpage:]:
+    for match in matches:
         title = scrapertools.find_single_match(match, '<h3 class="Title">(.*?)</h3>')
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
@@ -152,28 +146,18 @@ def list_all(item):
             itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = name, infoLabels = {'year': year} ))
 
-        if len(itemlist) >= perpage: break
-
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        buscar_next = True
-        if num_matches > perpage:
-            hasta = (item.page * perpage) + perpage
-            if hasta < num_matches:
-                itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, action='list_all', text_color='coral' ))
-                buscar_next = False
+        if '<div class="wp-pagenavi">' in data:
+            if '<a class="page-numbers"' in data:
+                next_page = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
 
-        if buscar_next:
-            if '<div class="wp-pagenavi">' in data:
-                if '<a class="page-numbers"' in data:
-                    next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
+                if next_page:
+                    next_page = next_page.strip()
 
-                    if next_url:
-                        next_url = next_url.strip()
-
-                        if '/page/' in next_url:
-                            itemlist.append(item.clone( action = 'list_all', page = 0, url = next_url, title = 'Siguientes ...', text_color='coral' ))
+                    if '/page/' in next_page:
+                        itemlist.append(item.clone( action = 'list_all', url = next_page, title = 'Siguientes ...', text_color='coral' ))
 
     return itemlist
 
@@ -185,7 +169,6 @@ def list_alfa(item):
     data = httptools.downloadpage(item.url).data
 
     matches = scrapertools.find_multiple_matches(data, '<td><span class="Num">(.*?)</tr>')
-    num_matches = len(matches)
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
@@ -240,12 +223,13 @@ def list_epis(item):
     if itemlist:
         if '<div class="wp-pagenavi">' in data:
              if '<a class="page-numbers"' in data:
-                next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
+                next_page = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
 
-                if next_url:
-                    next_url = next_url.strip()
-                    if '/page/' in next_url:
-                        itemlist.append(item.clone (url = next_url, title = 'Siguientes ...', action = 'list_epis', text_color='coral' ))
+                if next_page:
+                    next_page = next_page.strip()
+
+                    if '/page/' in next_page:
+                        itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_epis', text_color='coral' ))
 
     return itemlist
 
@@ -498,7 +482,7 @@ def play(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        if servidor:
+        if servidor != 'directo':
             url = servertools.normalize_url(servidor, url)
             itemlist.append(item.clone(url = url, server = servidor))
 

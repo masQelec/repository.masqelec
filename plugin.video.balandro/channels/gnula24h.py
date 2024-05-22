@@ -44,12 +44,12 @@ except:
    except: pass
 
 
-host = 'https://www1.gnula.cc/'
+host = 'https://w-w-w.gnula.cc/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/', 'https://w-ww.gnula.cc/'
-             'https://ww-w.gnula.cc/']
+ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/', 'https://w-ww.gnula.cc/',
+             'https://ww-w.gnula.cc/', 'https://www1.gnula.cc/']
 
 
 domain = config.get_setting('dominio', 'gnula2h', default='')

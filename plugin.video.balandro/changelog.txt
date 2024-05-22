@@ -2,6 +2,11 @@
 
 [COLOR yellow][B]2024[/B][/COLOR]
 
+4.0.06 [COLOR darkorange] 20 de Mayo de 2024[/COLOR]
+    Correcciones: Errores detectados
+    Generos: Re-configurados
+    Canales y Servidores: Sin variaciones
+
 4.0.05 [COLOR darkorange] 3 de Mayo de 2024[/COLOR]
     Correcciones: Errores detectados
     Generos: Re-configurados
