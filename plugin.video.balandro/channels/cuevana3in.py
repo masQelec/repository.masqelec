@@ -8,13 +8,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.cuevana3.in/'
+host = 'https://www1.cuevana3.in/'
 
 
 perpage = 25
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.cuevana3.in/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -150,7 +156,8 @@ def findvideos(item):
                if servidor == 'various': other = servertools.corregir_other(match)
 
                if not servidor == 'directo':
-                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = match, server = servidor, language = IDIOMAS.get(lang, lang), other = other ))
+                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = match,
+                                         server = servidor, language = IDIOMAS.get(lang, lang), other = other ))
 
            continue
 
@@ -159,15 +166,51 @@ def findvideos(item):
 
         other = ''
 
+        if 'HD' in lang:
+            other = scrapertools.find_single_match(lang, 'HD.*?(.*?)$').strip()
+            lang = '?'
+
         if servidor == 'various': other = servertools.corregir_other(url)
 
-        if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = IDIOMAS.get(lang, lang), other = other ))
+        #if not servidor == 'directo':
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url,
+                              server = servidor, language = IDIOMAS.get(lang, lang), other = other ))
 
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if item.server == 'directo':
+        data = do_downloadpage(url)
+
+        new_url = scrapertools.find_single_match(data, "var url = '(.*?)'")
+
+        if new_url: url = new_url
+
+    if url:
+        if '/plustream.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
 

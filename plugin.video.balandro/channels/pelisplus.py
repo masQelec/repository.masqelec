@@ -670,6 +670,10 @@ def play(item):
 
         url = servertools.normalize_url(servidor, url)
 
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
         itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
@@ -730,6 +734,8 @@ def list_search(item):
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
+
+    # ~ solo devuelve una pagina
 
     return itemlist
 

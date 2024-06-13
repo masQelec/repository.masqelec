@@ -3,7 +3,7 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Gostream,  Letsupload,  Liivideo,  Myupload,  Oneupload,  Pandafiles,  Rovideo,  Send,  Streamable,  Streamdav,  Streamgzzz,  Streamoupload,  Tusfiles,  Uploadbaz,  Uploadflix,  Uploady,  Veev,  Veoh,  Vidbob,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vipss,  Vkprime,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohh,  Oneupload,  Pandafiles,  Rovideo,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  Tusfiles,  Uploadbaz,  Uploadflix,  Uploady,  Veev,  Veoh,  Vidbob,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vipss,  Vkprime,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -69,6 +69,10 @@
         "url": "\\1"
       },
       {
+        "pattern": "https://neohd.xyz/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
         "pattern": "https://oneupload.to/([0-9a-zA-Z]+)",
         "url": "\\1"
       },
@@ -94,6 +98,10 @@
       },
       {
         "pattern": "https://streamdav.com/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://streamcool.pro/([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
@@ -146,6 +154,10 @@
       },
       {
         "pattern": "https://vidpro.net/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://vidstore.me/([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {

@@ -82,7 +82,7 @@ def categorias(item):
 
         url = host + url + '?&detallada=true'
 
-        itemlist.append(item.clone( title = title.capitalize(), action = 'list_lst', url = url, text_color = 'hotpink' ))
+        itemlist.append(item.clone( title = title.capitalize(), action = 'list_lst', url = url, text_color = 'springgreen' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -94,7 +94,7 @@ def alfabetico(item):
     for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0':
         url = host + '/animes/lista/letra/' + letra + '?&detallada=true'
 
-        itemlist.append(item.clone( title = letra, action = 'list_lst', url = url, text_color = 'hotpink' ))
+        itemlist.append(item.clone( title = letra, action = 'list_lst', url = url, text_color = 'springgreen' ))
 
     return itemlist
 
@@ -304,17 +304,20 @@ def findvideos(item):
         if not servidor == 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = match, server = servidor, language = 'Vose' ))
 
-
     if not itemlist:
         matches = scrapertools.find_multiple_matches(data, 'FlashVars.*?text=https.*?https(.*?)">')
         if not matches:
-            if 'FlashVars="text=' in data: ses += 1
+            matches = scrapertools.find_multiple_matches(data, 'tr class="enlaces">.*?">(.*?)</td>')
+
+            if not matches:
+               if 'FlashVars="text=' in data or 'tr class="enlaces">' in data: ses += 1
 
         if matches:
            for match in matches:
                ses += 1
 
-               url = 'https' + match
+               if not 'http' in match: url = 'https' + match
+               else: url = match
 
                if url.endswith('.torrent'): servidor = 'torrent'
                elif url.startswith('magnet:?'): servidor = 'torrent'

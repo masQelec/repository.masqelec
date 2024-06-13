@@ -319,6 +319,12 @@ def play(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
         if not servidor == 'directo':
             itemlist.append(item.clone(url = url, server = servidor))
 

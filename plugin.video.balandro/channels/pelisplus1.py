@@ -378,6 +378,7 @@ def findvideos(item):
                 elif '/nitro' in url: continue
 
                 elif '/viewsb.' in url: continue
+                elif '/www.fembed.' in url: continue
 
                 url = url.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
 
@@ -399,6 +400,9 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, source)
+
+        if '/viewsb.' in url: continue
+        elif '/www.fembed.' in url: continue
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(url)
@@ -460,6 +464,14 @@ def list_search(item):
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if '<div class="pagination">' in data:
+            next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
+
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color='coral' ))
 
     return itemlist
 

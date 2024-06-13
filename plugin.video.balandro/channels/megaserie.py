@@ -82,9 +82,6 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if url.startswith(host):
-        if not headers: headers = {'Referer': host}
-
     if '/release/' in url: raise_weberror = False
 
     hay_proxies = False
@@ -364,6 +361,8 @@ def temporadas(item):
 
     tmdb.set_infoLabels(itemlist)
 
+    return sorted(itemlist,key=lambda x: x.title)
+
     return itemlist
 
 
@@ -508,8 +507,11 @@ def findvideos(item):
                         if servidor != 'directo':
                             link = servertools.normalize_url(servidor, link)
 
+                            other = ''
+                            if servidor == 'various': other = servertools.corregir_other(link)
+
                             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
-                                                  language = IDIOMAS.get(lang, lang)))
+                                                  language = IDIOMAS.get(lang, lang, other = other )))
 
                     continue
 
@@ -560,8 +562,11 @@ def findvideos(item):
                         if servidor != 'directo':
                             link = servertools.normalize_url(servidor, link)
 
+                            other = ''
+                            if servidor == 'various': other = servertools.corregir_other(link)
+
                             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
-                                                  language = IDIOMAS.get(lang, lang), quality = qlty ))
+                                                  language = IDIOMAS.get(lang, lang), quality = qlty, other = other ))
 
                     continue
 
@@ -584,8 +589,11 @@ def findvideos(item):
                 if servidor != 'directo':
                     link = servertools.normalize_url(servidor, link)
 
+                    other = ''
+                    if servidor == 'various': other = servertools.corregir_other(link)
+
                     itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
-                                          language = IDIOMAS.get(lang, lang), quality = qlty ))
+                                          language = IDIOMAS.get(lang, lang), quality = qlty, other = other ))
 
                     continue
 
@@ -632,6 +640,10 @@ def play(item):
 
             url = servertools.normalize_url(servidor, new_url)
 
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
+
             if servidor != 'directo':
                 itemlist.append(item.clone( url = url, server = servidor ))
 
@@ -649,6 +661,10 @@ def play(item):
             servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
+
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
 
             if servidor != 'directo':
                 itemlist.append(item.clone( url = url, server = servidor ))
@@ -672,6 +688,10 @@ def play(item):
             servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
+
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
 
             if servidor != 'directo':
                 itemlist.append(item.clone( url = url, server = servidor ))

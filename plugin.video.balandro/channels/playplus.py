@@ -450,6 +450,10 @@ def list_last(item):
 
             if not 'x' in titulo: titulo = titulo + ' ' + str(season) + 'x' + str(epis)
 
+            if 'Https' in titulo:
+                titulo = titulo.replace('Https', '').strip()
+                titulo = title
+
             SerieName = SerieName.replace('  ', ' ')
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,

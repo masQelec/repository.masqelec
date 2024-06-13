@@ -463,18 +463,24 @@ def findvideos(item):
             elif 'mivideoplay' in srv:
                 servidor = 'directo'
                 other = 'mivideoplay'
-            elif 'jodwish' in srv:
-                servidor = 'directo'
-                other = 'jodwish'
-            elif 'fmoonembed' in srv:
-                servidor = 'directo'
-                other = 'fmoonembed'
             elif 'peliplaymoon' in srv:
                 servidor = 'directo'
                 other = 'peliplaymoon'
+            elif 'fmoonembed' in srv:
+                servidor = 'directo'
+                other = 'fmoonembed'
             elif 'embedmoon' in srv:
                 servidor = 'directo'
                 other = 'embedmoon'
+            elif 'jodwish' in srv:
+                servidor = 'directo'
+                other = 'jodwish'
+            elif 'swhoi' in srv:
+                servidor = 'directo'
+                other = 'swhoi'
+            elif 'swdyu' in srv:
+                servidor = 'directo'
+                other = 'swdyu'
 
             if servidor == srv: other = ''
             elif not servidor == 'directo':
@@ -501,10 +507,13 @@ def play(item):
     url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
-    if item.other == 'Peliplaywish' or item.other == 'Mivideoplay' or item.other == 'Jodwish' or item.other == 'Peliplaymoon' or item.other == 'Embedmoon':
-        data = do_downloadpage(url)
+    if item.other == 'Peliplaywish' or item.other == 'Mivideoplay' or item.other == 'Peliplaymoon' or item.other == 'Fmoonembed' or item.other == 'Embedmoon' or item.other == 'Jodwish' or item.other == 'Swhoi' or item.other == 'Swdyu':
+        if '/?trembed' in url:
+            data = do_downloadpage(url)
 
-        url = scrapertools.find_single_match(str(data), 'link: "(.*?)"')
+            url = scrapertools.find_single_match(str(data), 'link: "(.*?)"')
+            if not url: url = scrapertools.find_single_match(str(data), "location.href = '(.*?)'")
+            if not url: url = scrapertools.find_single_match(str(data), 'sources:.*?file:.*?"(.*?)"')
 
     if url:
         if '//e/' in url: url = url.replace('//e/', '/e/')
@@ -514,7 +523,12 @@ def play(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        itemlist.append(item.clone(server = servidor, url = url))
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        if not servidor == 'directo':
+            itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
 

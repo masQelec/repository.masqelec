@@ -165,7 +165,7 @@ def show_help_parameters(item):
 
     txt += ' - [B][COLOR gold]Canales[/COLOR][/B] que nunca intervienen en las busquedas:'
     txt += '[CR][COLOR darkorange][B]    CineDeAntes,  CineLibreOnline,  CineMatteFlix,  Frozenlayer,'
-    txt += '[CR]    SeoDiv,  SigloXX,  Trailers,  TvSeries,  YouTubeDocs[/B][/COLOR]'
+    txt += '[CR]    SeoDiv,  SeriesBiblicas,  SigloXX,  Trailers,  TvSeries,  YouTubeDocs[/B][/COLOR]'
 
     if not config.get_setting('mnu_documentales', default=True): txt += '[CR][CR] - Los canales de [B][COLOR cyan]Documentales[/COLOR][/B] jamás intervendrán en las busquedas'
 

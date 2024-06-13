@@ -21,7 +21,7 @@ from modules import tester
 
 channels_currents = [
         'animefenix', 'animeflv', 'animeid', 'animeonline',
-        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cliversite', 'cuevana2', 'cuevana2esp', 'cuevana3lw', 'cuevana3pro', 'cuevana3video',
+        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cliversite', 'cuevana2', 'cuevana2esp', 'cuevana3pro', 'cuevana3video',
         'divxtotal', 'dontorrents', 'dontorrentsin',
         'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelas', 'ennovelastv', 'entrepeliculasyseries', 'estrenosdoramas',
         'gnula24', 'gnula24h', 'grantorrent',
@@ -530,52 +530,6 @@ def test_domain_cuevana2esp(item):
         tester.test_channel('Cuevana2Esp')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - Cuevana2Esp', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
-def manto_domain_cuevana3lw(item):
-    logger.info()
-
-    channel_json = 'cuevana3lw.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana3Lw[/B][/COLOR]' % color_exec)
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_cuevana3lw(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('cuevana3lw')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('Cuevana3Lw')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - Cuevana3Lw', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_cuevana3pro(item):
@@ -4155,16 +4109,6 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://': return
 
-    elif id == 'cuevana3lw':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Cuevana3Lw  -->  [COLOR %s]https://cuevana?.???[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://': return
-
     elif id == 'cuevana3pro':
         config.set_setting('user_test_channel', '')
 
@@ -4653,7 +4597,6 @@ def manto_domain_common(item, id, name):
 
         if not new_domain.endswith('/'):
             if id == 'cliversite': pass
-            elif id == 'cuevana3lw': pass
             elif id == 'cuevana3pro': pass
             elif id == 'cuevana3video': pass
             elif id == 'hdfullse': pass
@@ -4664,7 +4607,6 @@ def manto_domain_common(item, id, name):
         else:
             avisar = False
             if id == 'cliversite': avisar = True
-            elif id == 'cuevana3lw': avisar = True
             elif id == 'cuevana3pro': avisar = True
             elif id == 'cuevana3video': avisar = True
             elif id == 'hdfullse': avisar = True

@@ -119,8 +119,12 @@ def list_all(item):
 
         plot = scrapertools.find_single_match(article, '<div class=texto>(.*?)</div>')
 
+        PeliTitle = title
+
+        if "DVDrip" in PeliTitle: PeliTitle = PeliTitle.split("DVDrip")[0]
+
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, 
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
+                                    contentType='movie', contentTitle=PeliTitle, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -162,14 +166,14 @@ def findvideos(item):
         url = scrapertools.find_single_match(lin, '<a href="(.*?)"')
         if not url: url = scrapertools.find_single_match(lin, "<a href='(.*?)'")
 
-        server = servertools.corregir_servidor(scrapertools.find_single_match(lin, "domain=([^.']+)"))
+        servidor = scrapertools.find_single_match(lin, "domain=([^.']+)")
 
-        if not url or not server: continue
+        if not url or not servidor: continue
 
-        if server == 'soon': continue
+        if servidor == 'soon': continue
 
-        if servertools.is_server_available(server):
-            if not servertools.is_server_enabled(server): continue
+        if servertools.is_server_available(servidor):
+            if not servertools.is_server_enabled(servidor): continue
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
@@ -179,8 +183,11 @@ def findvideos(item):
 
         lang = scrapertools.find_single_match(lin, "<td>([^<]+)")
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, 
-                              language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty) ))
+        other = ''
+        if servidor == 'various': other = servertools.corregir_other(servidor)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
+                              language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -208,9 +215,14 @@ def play(item):
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 
+                if servidor == 'directo':
+                    new_server = servertools.corregir_other(url).lower()
+                    if not new_server.startswith("http"): servidor = new_server
+
                 if servidor and servidor != 'directo':
                     url = servertools.normalize_url(servidor, url)
-                    itemlist.append(item.clone( url=url, server=servidor ))
+
+                    itemlist.append(item.clone(url=url, server=servidor ))
     else:
         itemlist.append(item.clone())
 

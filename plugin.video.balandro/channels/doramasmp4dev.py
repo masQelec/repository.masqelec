@@ -127,6 +127,7 @@ def list_all(item):
         titulo = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('capitulo', '[COLOR goldenrod]Capitulo[/COLOR]')
 
         titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('capítulo', '[COLOR goldenrod]Capitulo[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Episodio[/COLOR]').replace('episodio', '[COLOR goldenrod]Episodio[/COLOR]')
 
         if '[COLOR goldenrod]Capitulo[/COLOR]' in titulo:
             season = 1

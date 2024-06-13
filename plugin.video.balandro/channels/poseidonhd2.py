@@ -400,7 +400,7 @@ def findvideos(item):
                    elif srv == 'filemoon': other = srv
                    elif srv == 'streamwish': other = srv
                    elif srv == 'filelions': other = srv
-                   elif srv == 'player' or srv == 'embed':
+                   elif srv == 'player' or srv == 'embed' or srv == 'plustream':
                       other = srv
                       srv = ''
 
@@ -519,16 +519,26 @@ def play(item):
     if url_final:
         if item.server == 'openplay':
             url_final = url_final.replace('/openplay.openplay.vip/player.php?data=', '/player.openplay.vip/player.php?id=')
-        elif item.server == 'zplayer':
-            url_final = url_final + '|' + host
-        elif item.other.lower() == 'player':
-            servidor, url_final = get_link_player(servidor, url_final)
+
+        elif item.server == 'zplayer': url_final = url_final + '|' + host
+
+        elif item.other.lower() == 'player': servidor, url_final = get_link_player(servidor, url_final)
+
         elif item.other.lower() == 'embed':
-            if '.mystream.' in url_final: servidor = 'mystream'
+            if '.mystream.' in url_final: url_final = ''
 
         url = url_final
 
     if url:
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
         itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist

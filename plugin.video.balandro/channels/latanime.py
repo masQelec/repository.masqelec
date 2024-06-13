@@ -117,13 +117,26 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'emision?p=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por idioma', action = 'generos', group = 'idiomas', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por categorías', action = 'categorias', group = 'cats', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def idiomas(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'animes?fecha=false&genero=false&letra=false&categoria=castellano', search_type = 'tvshow', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'Catalán', action = 'list_all', url = host + 'animes?fecha=false&genero=false&letra=false&categoria=catalan', search_type = 'tvshow', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'animes?fecha=false&genero=false&letra=false&categoria=latino', search_type = 'tvshow', text_color='moccasin' ))
 
     return itemlist
 
@@ -139,7 +152,7 @@ def categorias(item):
 
     bloque = scrapertools.find_single_match(data, 'name="categoria"(.*?)>Categoria<')
 
-    matches = re.compile('<option value="(.*?)">(.*?)</option>').findall(bloque)
+    matches = re.compile('<optionvalue="(.*?)">(.*?)</option>').findall(bloque)
 
     for categoria, title in matches:
         if title == "Seleccionar": continue
@@ -151,7 +164,7 @@ def categorias(item):
 
         url = url_cat + '?fecha=false&genero=false&letra=false&categoria=' + categoria
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -160,39 +173,26 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    if item.group == 'idiomas': text_color = 'moccasin'
-    else: text_color = 'springgreen'
-
     url_genre = host + 'animes'
 
     data = do_downloadpage(url_genre)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, 'name="genero"(.*?)>Géneros<')
+    bloque = scrapertools.find_single_match(data, 'name="genero"(.*?)</select>')
 
-    matches = re.compile('<option value="(.*?)">(.*?)</option>').findall(bloque)
+    matches = re.compile('<optionvalue="(.*?)">(.*?)</option>').findall(bloque)
 
     for genre, title in matches:
         title = title.strip()
 
         if title == 'Seleccionar': continue
 
-        if item.group == 'idiomas':
-            if title == 'Castellano': pass
-            elif title == 'Latino': pass
-            else: continue
-        else:
-            if title == 'Castellano': continue
-            elif title == 'Latino': continue
+        if title == 'Castellano': continue
+        elif title == 'Latino': continue
 
         url = url_genre + '?fecha=false&genero=' + genre + '&letra=false&categoria=false'
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = text_color ))
-
-    if item.group == 'idiomas':
-        url = url_genre + '?fecha=false&genero=false&letra=false&categoria=catalan'
-
-        itemlist.append(item.clone( title = 'Catalán', action = 'list_all', url = url, text_color = text_color ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -261,7 +261,7 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        title = title.replace('&#039;s', "'s")
+        title = title.replace('&#039;s', "'s").replace('&quot;', '').strip()
 
         SerieName = title
 

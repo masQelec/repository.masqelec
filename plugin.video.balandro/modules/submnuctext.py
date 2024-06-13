@@ -582,8 +582,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
 
-    elif item.from_channel == 'cuevana3lw': domains.manto_domain_cuevana3lw(item)
-
     elif item.from_channel == 'cuevana3pro': domains.manto_domain_cuevana3pro(item)
 
     elif item.from_channel == 'cuevana3video': domains.manto_domain_cuevana3video(item)
@@ -877,13 +875,6 @@ def _proxies(item):
 
         if config.get_setting('channel_cuevana2esp_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'cuevana3lw':
-        from channels import cuevana3lw
-        item.channel = 'cuevana3lw'
-        cuevana3lw.configurar_proxies(item)
-
-        if config.get_setting('channel_cuevana3lw_proxies') is None: refrescar = False
-
     elif item.from_channel == 'cuevana3pro':
         from channels import cuevana3pro
         item.channel = 'cuevana3pro'
@@ -960,6 +951,13 @@ def _proxies(item):
         estrenoscinesaa.configurar_proxies(item)
 
         if config.get_setting('channel_estrenoscinesaa_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'eztv':
+        from channels import eztv
+        item.channel = 'eztv'
+        eztv.configurar_proxies(item)
+
+        if config.get_setting('channel_eztv_proxies') is None: refrescar = False
 
     elif item.from_channel == 'filmoves':
         from channels import filmoves
@@ -1072,13 +1070,6 @@ def _proxies(item):
         mejortorrentnz.configurar_proxies(item)
 
         if config.get_setting('channel_mejortorrentnz_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'mirapeliculas':
-        from channels import mirapeliculas
-        item.channel = 'mirapeliculas'
-        mirapeliculas.configurar_proxies(item)
-
-        if config.get_setting('channel_mirapeliculas_proxies') is None: refrescar = False
 
     elif item.from_channel == 'nextdede':
         from channels import nextdede

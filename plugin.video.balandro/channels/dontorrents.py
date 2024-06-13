@@ -15,6 +15,8 @@ from core import httptools, scrapertools, tmdb
 
 host = 'https://4144-don.mirror.pm/'
 
+# ~ 7/6/24 last domain  'https://dontorrent.sbs/'
+
 
 try:
     data_tor_proxy = httptools.downloadpage('https://donproxies.com/').data
@@ -70,7 +72,7 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.cooking/', 'https://dontorrent.cyou/', 'https://dontorrent.agency/',
              'https://dontorrent.skin/', 'https://dontorrent.directory/', 'https://dontorrent.boutique/',
              'https://dontorrent.miami/', 'https://dontorrent.business/', 'https://dontorrent.clothing/',
-             'https://dontorrent.icu/']
+             'https://dontorrent.icu/', 'https://dontorrent.fyi/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')

@@ -447,6 +447,7 @@ def findvideos(item):
             elif servidor == 'drive': servidor = 'gvideo'
             elif servidor == 'google drive': servidor = 'gvideo'
             elif servidor == 'netu' or servidor == 'hqq': servidor = 'waaw'
+            elif servidor == 'd0o0d' or servidor == 'do0od' or servidor == 'd0000d' or servidor == 'd000d': servidor = 'doodstream'
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
@@ -646,7 +647,10 @@ def play(item):
 
             if '/okru.' in url: servidor = 'okru'
 
-        elif servidor == 'zplayer':  url = url + '|' + host_player
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        if servidor == 'zplayer':  url = url + '|' + host_player
 
         itemlist.append(item.clone(url = url, server = servidor))
 

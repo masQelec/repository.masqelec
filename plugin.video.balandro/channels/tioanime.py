@@ -78,7 +78,7 @@ def anios(item):
 
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1949, -1):
+    for x in range(current_year, 1999, -1):
         url = url_anios + str(x) + '%2C' + str(x) + '&status=2&sort=recent'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color='springgreen' ))
@@ -122,7 +122,8 @@ def list_all(item):
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = 1))
 
         else:
-            itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

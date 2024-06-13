@@ -9,15 +9,15 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "http(?:s|)://mixdrop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "pattern": "http(?:s|)://mixdrop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
       },
       {
-        "pattern": "http(?:s|)://mixdroop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "pattern": "http(?:s|)://mixdroop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
       },
       {
-        "pattern": "http(?:s|)://mixdrp.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si)|nu/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "pattern": "http(?:s|)://mixdrp.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si||nu|ms)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
       },
       {
@@ -49,11 +49,7 @@
         "url": "https://mixdrop.ag/e/\\1"
       },
       {
-        "pattern": "https://mixdrop21.net/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
-        "url": "https://mixdrop.ag/e/\\1"
-      },
-      {
-        "pattern": "https://mixdrop23.net/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "pattern": "https://mdzsmutpcvykb.net/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
       }
     ]

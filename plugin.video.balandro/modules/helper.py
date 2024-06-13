@@ -727,7 +727,34 @@ def submnu_canales(item):
     itemlist.append(item.clone( action='show_help_register', title= '    - [COLOR green][B]Información[/B][/COLOR] webs que requieren [COLOR gold][B]Registrarse[/B][/COLOR] (Cuenta)', thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales requieren [COLOR teal][B]Cuenta[/B][/COLOR]', cta_register = True ))
 
-    itemlist.append(item.clone( action='', title= '[B][I]CANALES SITUACIÖN:[/I][/B]', text_color='goldenrod', folder=False ))
+    itemlist.append(item.clone( action='', title= '[B][I]CANALES SITUACIÓN:[/I][/B]', text_color='goldenrod', folder=False ))
+
+    txt_status = ''
+
+    try:
+       with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+    except:
+       try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+       except: pass
+
+    if txt_status:
+        bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+        matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+        if not '[COLOR moccasin]' in str(matches): matches = ''
+
+        if matches:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_incidencias', title= '    - Canales[COLOR tan][B] Con Incidencias[/B][/COLOR]' ))
+
+        bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+        matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+        if not '[COLOR moccasin]' in str(matches): matches = ''
+
+        if matches:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= '    - Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]' ))
 
     itemlist.append(item.clone( action='submnu_avisinfo_channels', title= '    - [COLOR aquamarine][B]Avisos[/COLOR] [COLOR green]Información[/B][/COLOR] canales' ))
 
@@ -1732,10 +1759,6 @@ def show_help_cinecalidadlol(item):
     item.notice = 'cinecalidadlol'
     show_help_canales(item)
 
-def show_help_cuevana3lw(item):
-    item.notice = 'cuevana3lw'
-    show_help_canales(item)
-
 def show_help_cuevana3pro(item):
     item.notice = 'cuevana3pro'
     show_help_canales(item)
@@ -1782,10 +1805,6 @@ def show_help_latanime(item):
 
 def show_help_megaserie(item):
     item.notice = 'megaserie'
-    show_help_canales(item)
-
-def show_help_mirapeliculas(item):
-    item.notice = 'mirapeliculas'
     show_help_canales(item)
 
 def show_help_nextdede(item):
@@ -1884,7 +1903,7 @@ def show_help_canales(item):
           txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominiosplaydede.com[/COLOR][/B][CR]'
           txt += '[COLOR yellow]  ó su[COLOR yellow][B] Telegram[/B] [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B][CR]'
 
-    elif item.notice == 'cuevana3lw' or item.notice == 'cuevana3pro':
+    elif item.notice == 'cuevana3pro':
        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
        txt += '[COLOR yellow][B][CR]Además efectuan control de acceso que puede [COLOR indianred]Bloquear[/COLOR] la Web incluso con el uso [COLOR red]Proxies[/COLOR].[/COLOR][/B][CR]'
 
@@ -4441,13 +4460,6 @@ def show_test(item):
         if cuevana2esp_dominio:
            if tex_dom: tex_dom = tex_dom + '   Cuevana2Esp: ' + cuevana2esp_dominio + '[CR]'
            else: tex_dom = '[CR]   Cuevana2Esp: ' + cuevana2esp_dominio + '[CR]'
-
-    datos = channeltools.get_channel_parameters('cuevana3lw')
-    if datos['active']:
-        cuevana3lw_dominio = config.get_setting('channel_cuevana3lw_dominio', default='')
-        if cuevana3lw_dominio:
-           if tex_dom: tex_dom = tex_dom + '   Cuevana3Lw: ' + cuevana3lw_dominio + '[CR]'
-           else: tex_dom = '[CR]   CuevanaLw: ' + cuevana3lw_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('cuevana3pro')
     if datos['active']:

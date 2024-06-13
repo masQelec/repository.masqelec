@@ -286,6 +286,36 @@ def submnu_team_info(item):
     if existe:
         itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR aqua][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
+        txt_status = ''
+
+        try:
+           with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+        except:
+           try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+           except: pass
+
+        if txt_status:
+            bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+            matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+            if not '[COLOR moccasin]' in str(matches): matches = ''
+
+            if matches:
+                itemlist.append(item.clone( action='resumen_incidencias', title='[COLOR gold][B]Canales[/COLOR][COLOR tan] Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+            bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+            matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+            if not '[COLOR moccasin]' in str(matches): matches = ''
+
+            if matches:
+                itemlist.append(item.clone( action='resumen_no_accesibles', title='[COLOR gold][B]Canales[/COLOR][COLOR indianred] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+    if config.get_setting('memorize_channels_proxies', default=True):
+        itemlist.append(item.clone( channel='helper',  action='channels_with_proxies_memorized', title= '[COLOR gold][B]Canales[/COLOR][COLOR red][B] Con Proxies[/B][/COLOR]', new_proxies=True, memo_proxies=True, test_proxies=True, thumbnail=config.get_thumb('stack') ))
+
     itemlist.append(item.clone( action='resumen_canales', title='[COLOR gold][B]Canales[/B][/COLOR] Resúmenes y Distribución', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='resumen_servidores', title='[COLOR fuchsia][B]Servidores[/B][/COLOR] Resúmenes y Distribución', thumbnail=config.get_thumb('bolt') ))
@@ -1753,6 +1783,7 @@ def resumen_canales(item):
     onlyones = 0
     searchables = 0
     status = 0
+    con_proxies = 0
 
     bus_pelisyseries = 0
     bus_pelis = 0
@@ -1929,7 +1960,16 @@ def resumen_canales(item):
             if matches:
                 status = matches
 
-                txt += '       ' + str(status) + ' [COLOR tan]Problemas Acceso Dominio[/COLOR][CR]'
+                txt += '       ' + str(status) + ' [COLOR tan]Con Incidencias[/COLOR][CR]'
+
+            bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+            matches = bloque.count('[COLOR lime]')
+
+            if matches:
+                status = matches
+
+                txt += '       ' + str(status) + ' [COLOR indianred]Probablemente No Accesibles[/COLOR][CR]'
 
     txt += '[CR]  ' + str(disponibles) + ' [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
 
@@ -1938,6 +1978,20 @@ def resumen_canales(item):
         txt += '  ' + str(accesibles) + ' [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
 
     if not no_actives == 0: txt += '  ' + str(no_actives) + ' [COLOR gray][B]Desactivados[/B][/COLOR][CR]'
+
+    filtros = {}
+
+    ch_list = channeltools.get_channels_list(filtros=filtros)
+
+    if ch_list:
+        for ch in ch_list:
+            cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
+
+            if not config.get_setting(cfg_proxies_channel, default=''): continue
+
+            con_proxies += 1
+
+        if con_proxies > 0: txt += '          [COLOR red]Con Proxies Informados[/COLOR] ' +  str(con_proxies) + '[CR]'
 
     txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN CANALES DISPONIBLES:[/B][/COLOR][CR]'
 
@@ -1969,6 +2023,62 @@ def resumen_canales(item):
     txt += '   ' + str(bus_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
 
     platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución', txt)
+
+
+def resumen_incidencias(item):
+    logger.info()
+
+    txt = ''
+
+    try:
+       with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+    except:
+       try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+       except: pass
+
+    if txt_status:
+        bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+        matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+        for match in matches:
+            match = match.strip()
+
+            if '[COLOR moccasin]' in match: txt += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    if not txt:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No Hay Incidencias[/COLOR][/B]' % color_exec)
+        return
+
+    platformtools.dialog_textviewer('Canales Con Incidencias', txt)
+
+
+def resumen_no_accesibles(item):
+    logger.info()
+
+    txt = ''
+
+    try:
+       with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+    except:
+       try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+       except: pass
+
+    if txt_status:
+        bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+        matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+        for match in matches:
+            match = match.strip()
+
+            if '[COLOR moccasin]' in match: txt += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    if not txt:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No Hay No Accesibles[/COLOR][/B]' % color_exec)
+        return
+
+    platformtools.dialog_textviewer('Canales No Accesibles', txt)
 
 
 def resumen_servidores(item):
@@ -2029,7 +2139,7 @@ def resumen_servidores(item):
 
     if outservice > 0:
         operativos = disponibles - outservice
-        txt += '  ' + str(operativos) + '  [COLOR goldenrod][B]Operativos[/B][/COLOR][CR]'
+        txt += '    ' + str(operativos) + '  [COLOR goldenrod][B]Operativos[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         txt += '[CR][COLOR goldenrod][B]RESOLVEURL:[/B][/COLOR][CR]'

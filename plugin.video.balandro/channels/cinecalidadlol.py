@@ -820,8 +820,10 @@ def play(item):
 
             if '/okru.' in url: servidor = 'okru'
 
-        elif servidor == 'zplayer':
-            url = url + '|' + host_player
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        if servidor == 'zplayer': url = url + '|' + host_player
 
         itemlist.append(item.clone(url = url, server = servidor))
 

@@ -88,6 +88,9 @@ def get_video_url(page_url, url_referer=''):
         elif "KeyError: 'obf_link'" in traceback.format_exc():
             return 'KeyError [COLOR red][B]obf_link[/COLOR]'
 
+        elif "AttributeError: 'int'" in traceback.format_exc():
+            return 'AttributeError [COLOR red][B]get_int[/COLOR]'
+
         elif '<urlopen error' in traceback.format_exc():
             return 'No se puede establecer la conexión'
 

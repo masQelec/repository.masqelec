@@ -163,7 +163,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-4/', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -494,18 +494,24 @@ def play(item):
     host_torrent = host[:-1]
     url_base64 = decrypters.decode_url_base64(url, host_torrent)
 
-    if item.other.lower() == 'torrent':
-        itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+    if item.server == 'torrent' or 'torrent' in item.other.lower():
+        if url_base64.endswith('.torrent'):
+            itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
         return itemlist
 
     if url:
-        if '/s.php?': return itemlist
+        if '/s.php?':
+            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
 
         if not servidor == 'directo':
             itemlist.append(item.clone(server = servidor, url = url))

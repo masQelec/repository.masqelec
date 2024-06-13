@@ -115,6 +115,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+    itemlist.append(item.clone( title = 'Animes', action = 'mainlist_series', text_color = 'springgreen' ))
 
     return itemlist
 
@@ -146,6 +147,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes/', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
@@ -226,7 +229,7 @@ def list_all(item):
 
         qlty = scrapertools.find_single_match(match, '<ul class="card__list">.*?<li>(.*?)</li>')
 
-        tipo = 'tvshow' if '/series/' in url else 'movie'
+        tipo = 'tvshow' if '/series/' in url or '/animes/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
         year = '-'

@@ -546,10 +546,11 @@ def findvideos(item):
 
                             if '/clonamesta' in url: continue
 
+                            link_other = ''
+
                             if servidor == 'directo' or servidor == 'various':
                                 link_other = normalize_other(url)
                                 if link_other == '': continue
-                            else: link_other = 'play'
 
                             if not config.get_setting('developer_mode', default=False):
                                 if link_other == 'hydrax': continue
@@ -566,10 +567,11 @@ def findvideos(item):
 
                 if '/clonamesta' in url: continue
 
+                link_other = ''
+
                 if servidor == 'directo' or servidor == 'various':
                     link_other = normalize_other(url)
                     if link_other == '': continue
-                else: link_other = ''
 
                 if not config.get_setting('developer_mode', default=False):
                     if link_other == 'hydrax': continue
@@ -602,8 +604,9 @@ def findvideos(item):
 
                            if '/clonamesta' in url: continue
 
+                           link_other = ''
+
                            if servidor == 'directo' or servidor == 'various': link_other = normalize_other(url)
-                           else: link_other = 'play'
 
                            if not config.get_setting('developer_mode', default=False):
                                if link_other == 'hydrax': continue
@@ -618,8 +621,9 @@ def findvideos(item):
 
             url = servertools.normalize_url(servidor, url)
 
+            link_other = ''
+
             if servidor == 'directo' or servidor == 'various': link_other = normalize_other(url)
-            else: link_other = ''
 
             if not config.get_setting('developer_mode', default=False):
                 if link_other == 'hydrax': link_other = ''
@@ -651,6 +655,8 @@ def normalize_other(url):
     elif 'streamwish' in url: link_other = 'Streamwish'
     elif 'filemoon' in url: link_other = 'Filemoon'
     elif 'filelions' in url: link_other = 'Filelions'
+    elif 'plustream' in url: link_other = 'Plustream'
+    elif 'vidhidepro' in url: link_other = 'Vidhidepro'
 
     else:
        if config.get_setting('developer_mode', default=False):
@@ -860,6 +866,15 @@ def play(item):
     if url:
         if '/clonamesta' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

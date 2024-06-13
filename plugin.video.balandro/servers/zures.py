@@ -3,6 +3,10 @@
 import xbmc, time
 
 from platformcode import config, logger, platformtools
+from core import scrapertools
+
+
+espera = config.get_setting('servers_waiting', default=6)
 
 
 def import_libs(module):
@@ -36,8 +40,51 @@ def get_video_url(page_url, url_referer=''):
     ini_page_url = page_url
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+        txt_server = 'Unknow'
+
+        if 'allviid' in page_url: txt_server = 'Allviid'
+        elif 'cloudfile' in page_url: txt_server = 'Cloudfile'
+        elif 'cloudmail' in page_url: txt_server = 'Cloudmail'
+        elif 'dailyuploads' in page_url: txt_server = 'Dailyuploads'
+        elif 'darkibox' in page_url: txt_server = 'Darkibox'
+        elif 'dembed' in page_url: txt_server = 'Dembed'
+        elif 'downace' in page_url: txt_server = 'Downace'
+        elif 'fastdrive' in page_url: txt_server = 'Fastdrive'
+        elif 'fastplay' in page_url: txt_server = 'Fastplay'
+        elif 'gostream' in page_url: txt_server = ''
+        elif 'letsupload' in page_url: txt_server = 'Gostream'
+        elif 'liivideo' in page_url: txt_server = 'Liivideo'
+        elif 'myupload' in page_url: txt_server = 'Myupload'
+        elif 'neohd' in page_url: txt_server = 'Neohd'
+        elif 'oneupload' in page_url: txt_server = 'Oneupload'
+        elif 'pandafiles' in page_url: txt_server = 'Pandafiles'
+        elif 'rovideo' in page_url: txt_server = 'Rovideo'
+        elif 'send' in page_url: txt_server = 'Send'
+        elif 'streamable' in page_url: txt_server = 'Streamable'
+        elif 'streamdav' in page_url: txt_server = 'Streamdav'
+        elif 'streamcool' in page_url: txt_server = 'Streamcool'
+        elif 'streamgzzz' in page_url: txt_server = 'Streamgzzz'
+        elif 'streamoupload' in page_url: txt_server = 'Streamoupload'
+        elif 'tusfiles' in page_url: txt_server = 'Tusfiles'
+        elif 'uploadbaz' in page_url: txt_server = 'Uploadbaz'
+        elif 'uploadflix' in page_url: txt_server = 'Uploadflix'
+        elif 'uploady' in page_url: txt_server = 'Uploady'
+        elif 'veev' in page_url: txt_server = 'Veev'
+        elif 'veoh' in page_url: txt_server = 'Veoh'
+        elif 'vidbob' in page_url: txt_server = 'Vidbob'
+        elif 'vidlook' in page_url: txt_server = 'Vidlook'
+        elif 'vidmx' in page_url: txt_server = 'Vidmx'
+        elif 'vido' in page_url: txt_server = 'Vido'
+        elif 'vidpro' in page_url: txt_server = 'Vidpro'
+        elif 'vipss' in page_url: txt_server = 'Vipss'
+        elif 'vkprime' in page_url: txt_server = 'Vkprime'
+        elif 'worlduploads' in page_url: txt_server = 'Worlduploads'
+        elif 'ztreamhub' in page_url: txt_server = 'Ztreamhub'
+
+        if txt_server == 'Unknow': return 'Servidor desconocido'
+
         if config.get_setting('servers_time', default=True):
-            platformtools.dialog_notification('Cargando [COLOR cyan][B]Zures[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
+            platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
             time.sleep(int(espera))
 
         try:
@@ -53,6 +100,9 @@ def get_video_url(page_url, url_referer=''):
                 else: video_urls.append(['', resuelto])
                 return video_urls
 
+            color_exec = config.get_setting('notification_exec_color', default='cyan')
+            el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
+            el_srv += ('ResolveUrl[/B][/COLOR]')
             platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 
         except:
@@ -69,6 +119,9 @@ def get_video_url(page_url, url_referer=''):
             elif '<urlopen error' in traceback.format_exc():
                 return 'No se puede establecer la conexión'
 
+            color_exec = config.get_setting('notification_exec_color', default='cyan')
+            el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
+            el_srv += ('ResolveUrl[/B][/COLOR]')
             platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
     else:
        return 'Falta [COLOR red]ResolveUrl[/COLOR]'

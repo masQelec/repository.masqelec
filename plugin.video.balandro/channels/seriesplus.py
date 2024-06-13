@@ -537,6 +537,10 @@ def play(item):
 
         url = servertools.normalize_url(servidor, url)
 
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
         itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
@@ -568,6 +572,17 @@ def list_search(item):
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+         if '<span class="current">' in data:
+             patron = '<span class="current">.*?'
+             patron += "href='(.*?)'"
+
+             next_page = scrapertools.find_single_match(data, patron)
+
+             if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color='coral' ))
 
     return itemlist
 

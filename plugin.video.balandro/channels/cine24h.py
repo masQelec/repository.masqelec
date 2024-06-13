@@ -429,7 +429,8 @@ def findvideos(item):
         if not 'http' in url: continue
 
         if url:
-           itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url, language = lang, quality = qlty, other = other.capitalize() ))
+           itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = 'directo', url = url,
+                                 language = lang, quality = qlty, other = other.capitalize() ))
 
     # ~ downloads
     matches = scrapertools.find_multiple_matches(data, '<span class="Num">.*?href="(.*?)"')
@@ -473,22 +474,23 @@ def play(item):
 
         new_url = scrapertools.find_single_match(data, 'src="(.*?)"')
 
-        if 'mystream.' in data: new_url = ''
-        elif 'gounlimited.' in data: new_url = ''
-        elif 'jetload.' in data: new_url = ''
-
         if new_url: url = new_url
 
     if url:
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
         if 'mystream.' in url: servidor = ''
         elif 'gounlimited.' in url: servidor = ''
         elif 'jetload.' in url: servidor = ''
 
-        if servidor:
+        if url:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
             url = servertools.normalize_url(servidor, url)
+
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
+
             itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
