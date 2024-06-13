@@ -27,7 +27,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone ( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/?get=movies' ))
     itemlist.append(item.clone ( title = 'Más valoradas', action = 'list_all', url = host + '22-2/?get=movies' ))
 
-    itemlist.append(item.clone ( title = 'Subtitulado', action = 'list_all', url = host + 'genero/version-original-subtitulada/?get=movies' ))
+    itemlist.append(item.clone ( title = 'Subtitulado', action = 'list_all', url = host + 'genero/version-original-subtitulada/?get=movies', text_color = 'moccasin' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))

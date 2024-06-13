@@ -7,13 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://doramaflixs.one/'
+host = 'https://doramastv.cam/'
 
 
 perpage = 30
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://doramaflixs.one/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -275,6 +281,8 @@ def findvideos(item):
         ses += 1
 
         if url.startswith("//"): url = 'https:' + url
+
+        url = url.replace('/7/', '/e/')
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

@@ -5,7 +5,6 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-
 import re
 
 from platformcode import config, logger, platformtools
@@ -45,11 +44,12 @@ except:
    except: pass
 
 
-host = 'https://wlv.cuevana3.vip'
+host = 'https://wn3.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://cuevana3.vip', 'https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip']
+ant_hosts = ['https://cuevana3.vip', 'https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip',
+             'https://wlv.cuevana3.vip', 'https://wli3.cuevana3.vip', 'https://wnv3.cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')
@@ -660,7 +660,10 @@ def findvideos(item):
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other.capitalize() ))
 
     # ~ iframes 2do
-    matches = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
+    matches1 = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
+    matches2 = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
+
+    matches = matches1 + matches1
 
     for url in matches:
         ses += 1
@@ -673,7 +676,45 @@ def findvideos(item):
         elif 'Inglés' in data: lang = 'Vo'
         else: lang = '?'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = '', title = '', url = url, language = lang ))
+        data5 = do_downloadpage(url)
+
+        matches5 = scrapertools.find_multiple_matches(data5, '<iframe.*?src="(.*?)"')
+
+        for match in matches5:
+            if match.startswith('//'): match = 'https:' + match
+
+            data6 = do_downloadpage(match)
+
+            links = scrapertools.find_multiple_matches(data6, '<li class="linkserver".*?data-video="(.*?)"')
+
+            if links:
+                for url in links:
+                    if '/hydrax.' in url: continue
+                    elif '/terabox.' in url: continue
+
+                    if url.startswith('//'): url = 'https:' + url
+
+                    servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.corregir_servidor(servidor)
+
+                    url = servertools.normalize_url(servidor, url)
+
+                    other = ''
+                    if servidor == 'various': other = servertools.corregir_other(url)
+
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
+
+                continue
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        other = ''
+        if servidor == 'various': other = servertools.corregir_other(url)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -689,7 +730,7 @@ def play(item):
 
     url = item.url.replace('&#038;', '&').replace('&amp;', '&').replace('#038;', '')
 
-    if not item.server:
+    if item.server == 'directo':
         item.url = url
 
         data = do_downloadpage(item.url)
@@ -699,12 +740,22 @@ def play(item):
 
         if not url: return itemlist
 
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
+        if '/pelisplay.' in url: url = ''
 
-        url = servertools.normalize_url(servidor, url)
+        if url:
+            if '/terabox.' in url or '/hydrax.' in url:
+                return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
-        itemlist.append(item.clone(server = servidor, url = url))
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            url = servertools.normalize_url(servidor, url)
+
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
+
+            itemlist.append(item.clone(server = servidor, url = url))
 
         return itemlist
 

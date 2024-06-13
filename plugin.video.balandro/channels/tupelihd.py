@@ -14,7 +14,7 @@ _players = ['.pelitorrent.']
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.tupelihd.com/', 'https://senininternetin.com/', 'https://pelitorrent.xyz/'
+ant_hosts = ['https://www.tupelihd.com/', 'https://senininternetin.com/', 'https://pelitorrent.xyz/',
              'https://pelitorrent.com/']
 
 
@@ -272,7 +272,7 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '<h1(.*?)<h3')
+    bloque = scrapertools.find_single_match(data, '<h1(.*?)</section>')
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
@@ -633,6 +633,10 @@ def play(item):
        else:
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
+
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
 
             if servidor and servidor != 'directo':
                 url = servertools.normalize_url(servidor, url)

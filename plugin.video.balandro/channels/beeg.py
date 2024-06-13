@@ -91,12 +91,13 @@ def list_all(item):
             id = video["file"]['id']
             thumb = video["fc_facts"][0]['fc_thumbs']
 
-            stuff = video["file"]["stuff"]
+            title = scrapertools.find_single_match(str(video), "'cd_value': '(.*?)'")
+            if not title: title = scrapertools.find_single_match(str(video), "'cd_value':.*?" + "(.*?)")
+            if not title: title = id
 
-            title = stuff["sf_name"]
             stime = video["file"]["fl_duration"]
         except:
-            continue
+           continue
 
         thumb = "https://thumbs-015.externulls.com/videos/%s/%s.jpg" % (str(id), str(thumb[0]))
 

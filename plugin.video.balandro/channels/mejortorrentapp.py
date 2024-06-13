@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www15.mejortorrent.rip'
+host = 'https://www17.mejortorrent.zip'
 
 
 # ~ por si viene de enlaces guardados
@@ -16,7 +16,7 @@ ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://ww
              'https://www5.mejortorrent.rip', 'https://www6.mejortorrent.rip', 'https://www7.mejortorrent.rip',
              'https://www8.mejortorrent.rip', 'https://www9.mejortorrent.rip', 'https://www10.mejortorrent.rip',
              'https://www11.mejortorrent.rip', 'https://www12.mejortorrent.rip', 'https://www13.mejortorrent.rip',
-             'https://www14.mejortorrent.rip']
+             'https://www14.mejortorrent.rip', 'https://www15.mejortorrent.rip', 'https://www16.mejortorrent.rip']
 
 
 domain = config.get_setting('dominio', 'mejortorrentapp', default='')
@@ -458,7 +458,7 @@ def list_list(item):
             if '4K' in titulo: titulo = title.replace('[4K]', '').replace('4K', '').strip()
             elif '3D' in titulo: titulo = title.replace('[3D]', '').replace('3D', '').strip()
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
+            itemlist.append(item.clone( action = 'episodios', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
 
         if len(itemlist) >= perpage: break
@@ -488,6 +488,7 @@ def episodios(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '>Episodios:(.*?)</tbody>')
 
@@ -509,7 +510,7 @@ def episodios(item):
            pass
 
         if not tempo == 0:
-           break
+            break
 
     i = 0
 

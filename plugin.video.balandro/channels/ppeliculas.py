@@ -287,14 +287,13 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        if not item.group == 'destacadas':
-            next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '.*?</a><a href="(.*?)".*?><span')
-            if not next_page: next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '<a href="(.*?)".*?><span')
-            if not next_page: next_page = scrapertools.find_single_match(data, '<div class="resppages">.*?<a href="(.*?)".*?><span')
+        if '<div class="pagination">' in data:
+            if not item.group == 'destacadas':
+                next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
 
-            if next_page:
-                if '/page/' in next_page:
-                    itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
+                if next_page:
+                    if '/page/' in next_page:
+                        itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
 
     return itemlist
 
@@ -381,13 +380,12 @@ def last_epis(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '.*?</a><a href="(.*?)".*?><span')
-        if not next_page: next_page = scrapertools.find_single_match(data, "<div class='resppages'>" + '<a href="(.*?)".*?><span')
-        if not next_page: next_page = scrapertools.find_single_match(data, '<div class="resppages">.*?<a href="(.*?)".*?><span')
+        if '<div class="pagination">' in data:
+            next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
 
-        if next_page:
-            if '/page/' in next_page:
-                itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'last_epis', text_color = 'coral'))
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'last_epis', text_color = 'coral'))
 
     return itemlist
 
@@ -506,8 +504,8 @@ def corregir_servidor(servidor):
 
      servidor = servidor.lower()
 
-     servidor = servidor.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '')
-     servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.xx', '')
+     servidor = servidor.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '').replace('.sx', '')
+     servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.xx', '').replace('.click', '')
      servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').replace('.uno', '').strip()
 
      return servidor
@@ -531,6 +529,11 @@ def findvideos(item):
         for _post, _type, _nume, qlty_lang, _server in matches:
             ses += 1
 
+            if 'youtube' in _server: continue
+
+            elif 'earn4files' in _server: continue
+            elif 'uploadbuzz' in _server: continue
+
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
             if 'Latino' in qlty_lang:
@@ -549,11 +552,6 @@ def findvideos(item):
             if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
 
             other = corregir_servidor(_server)
-
-            if 'youtube' in other: continue
-
-            if 'earn4files' in other: continue
-            elif 'uploadbuzz' in other: continue
 
             if other == qlty: qlty = ''
 
@@ -581,6 +579,11 @@ def findvideos(item):
         for _type, _post, _nume, qlty_lang, _server in matches:
             ses += 1
 
+            if 'youtube' in _server: continue
+
+            elif 'earn4files' in _server: continue
+            elif 'uploadbuzz' in _server: continue
+
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
             if 'Latino' in qlty_lang:
@@ -599,11 +602,6 @@ def findvideos(item):
             if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
 
             other = corregir_servidor(_server)
-
-            if 'youtube' in other: continue
-
-            if 'earn4files' in other: continue
-            elif 'uploadbuzz' in other: continue
 
             if other == qlty: qlty = ''
 
@@ -638,6 +636,8 @@ def findvideos(item):
             if 'earn4files' in servidor: continue
             elif 'uploadbuzz' in servidor: continue
 
+            if 'gofile' in servidor: servidor = 'gofile'
+	
             if url.startswith('https://player.pepeliculas.org/'): url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
 
             if lang == 'Latino': lang = 'Lat'
@@ -680,6 +680,8 @@ def findvideos(item):
             elif 'nitro.' in servidor: continue
             elif '1fichier.' in servidor: continue
             elif 'turbobit.' in servidor: continue
+
+            elif 'gofile' in servidor: servidor = 'gofile'
 
             elif servidor == 'filemoon': servidor = 'various'
             elif servidor == 'utorrent': servidor = 'torrent'
@@ -744,6 +746,10 @@ def play(item):
 
         if servidor == 'zplayer': url = url + '|' + host
 
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
         itemlist.append(item.clone( url=url, server=servidor))
 
     return itemlist
@@ -791,6 +797,14 @@ def list_search(item):
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if '<div class="pagination">' in data:
+            next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
+
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_search', text_color = 'coral'))
 
     return itemlist
 

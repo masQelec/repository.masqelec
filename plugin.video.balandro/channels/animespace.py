@@ -24,11 +24,6 @@ host = 'https://animespace.club/'
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
-    # ~ 30/11/2023
-    if data.startswith("b'"):
-        if not 'search?q=' in url: platformtools.dialog_notification('AnimeSpace', '[COLOR red]Re-direcciona a Web Maliciosa[/COLOR]')
-        data = ''
-
     return data
 
 
@@ -65,7 +60,7 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    text_color = 'springgreen'
+    text_color = 'moccasin'
 
     itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'categoria/anime', search_type = 'tvshow', text_color=text_color ))
     itemlist.append(item.clone( title = 'Caricaturas', action = 'list_all', url = host + 'categoria/caricaturas', search_type = 'tvshow', text_color=text_color ))
@@ -167,6 +162,8 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
+    data = data.replace('&#039;s', "'s").strip()
+
     anime_info = eval(scrapertools.find_single_match(data, "var anime_info = ([^;]+);"))
 
     if not anime_info: return itemlist
@@ -255,7 +252,12 @@ def findvideos(item):
         if "/stream/" in url:
             new_data = do_downloadpage(url)
 
-            url = scrapertools.find_single_match(new_data, '<source src="([^"]+)"')
+            url = scrapertools.find_single_match(new_data, 'var redir = "([^"]+)"')
+            if not url: url = scrapertools.find_single_match(new_data, '<source src="([^"]+)"')
+
+            if '.googleapis.' in url:
+                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language='Vose', other ='Google' ))
+                continue
 
         else:
             url = scrapertools.find_single_match(url, '.*?url=([^&]+)?')

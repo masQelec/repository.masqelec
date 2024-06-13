@@ -98,7 +98,7 @@ def pornstars(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Pornstars</h1>(.*?)</main>')
+    bloque = scrapertools.find_single_match(data, '>Pornstars</h1>(.*?)</footer>')
 
     matches = re.compile('<a(.*?)</a></div>', re.DOTALL).findall(bloque)
 
@@ -110,7 +110,7 @@ def pornstars(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
 
@@ -124,6 +124,7 @@ def list_all(item):
     data = do_downloadpage(item.url)
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
+    if not matches: matches = re.compile('<div class="col-xs-(.*?)</div></div></div>', re.DOTALL).findall(data)
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
@@ -156,8 +157,12 @@ def findvideos(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<iframe.*?-src="(.*?)"', re.DOTALL).findall(data)
+    matches1 = re.compile('<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
+    matches2 = re.compile('<source type="video/mp4".*?src="(.*?)"', re.DOTALL).findall(data)
+
+    matches = matches1 + matches2
 
     for link in matches:
         if '//a.' in link: continue
@@ -187,8 +192,7 @@ def findvideos(item):
 
         if not 'http' in link: link = 'https:' + link
 
-        if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Vo' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Vo' ))
 
     return itemlist
 

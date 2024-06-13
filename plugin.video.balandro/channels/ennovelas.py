@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://ennovelas.net/'
+host = 'https://ennovelas.site/'
 
 
 # ~ por si viene de enlaces guardados
@@ -53,7 +53,8 @@ ant_hosts = ['https://w.ennovelas.net/', 'https://ww.ennovelas.net/', 'https://e
              'https://i.ennovelas.net/', 'https://d.ennovelas.net/', 'https://f.ennovelas.net/',
              'https://t.ennovelas.net/', 'https://n.ennovelas.net/', 'https://v.ennovelas.net/',
              'https://o.ennovelas.net/', 'https://u.ennovelas.net/', 'https://m.ennovelas.net/',
-             'https://k.ennovelas.net/', 'https://ennovelas.io/', 'https://a.ennovelas.io/']
+             'https://k.ennovelas.net/', 'https://ennovelas.io/', 'https://a.ennovelas.io/',
+             'https://ennovelas.net/']
 
 
 domain = config.get_setting('dominio', 'ennovelas', default='')

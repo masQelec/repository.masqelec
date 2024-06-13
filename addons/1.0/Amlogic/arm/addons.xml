@@ -305,7 +305,7 @@ v0.5.9 (2022-03-22)
   </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="4.0.06" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="Balandro" version="4.0.07" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -325,7 +325,7 @@ v0.5.9 (2022-03-22)
       <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.06[/COLOR][COLOR chartreuse]  Mayo de 2024[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.07[/COLOR][COLOR chartreuse]  Junio de 2024[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]

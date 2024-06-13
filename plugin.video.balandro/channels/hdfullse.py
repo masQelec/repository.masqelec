@@ -398,7 +398,7 @@ def temporadas(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, title, thumb, retitle in matches:
-        numtempo = scrapertools.find_single_match(title, 'Temporadas (\d+)')
+        numtempo = scrapertools.find_single_match(retitle, 'Temporadas (\d+)$')
         if not numtempo: numtempo = scrapertools.find_single_match(url, '-(\d+)$')
 
         if not numtempo: continue
@@ -435,6 +435,10 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
+        if not ('/season-' + numtempo) in url:
+            new_url = scrapertools.find_single_match(url, '(.*?)/season-')
+            url = new_url + '/season-' + numtempo
+
         itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, referer = item.url, page = 0,
                                     contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
 
@@ -467,7 +471,7 @@ def episodios(item):
     patron += '"name">(.*?)<.*?'
     patron += '</b>(.*?)</h5>'
 
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile(patron, re.DOTALL).findall(bloque)
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -581,8 +585,9 @@ def findvideos(item):
            pass
 
     if not data_decrypt:
-        if config.get_setting('developer_mode', default=False):
-            if not str(data_decrypt) == '[]': platformtools.dialog_notification(config.__addon_name + ' HdFullSe', '[COLOR red][B]Faltan Decrypts[/B][/COLOR]')
+        if str(data_decrypt) == '':
+            if config.get_setting('developer_mode', default=False):
+                if not str(data_decrypt) == '[]': platformtools.dialog_notification(config.__addon_name + ' HdFullSe', '[COLOR red][B]Faltan Decrypts[/B][/COLOR]')
 
     matches = []
 

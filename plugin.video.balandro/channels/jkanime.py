@@ -168,7 +168,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
@@ -420,8 +420,11 @@ def findvideos(item):
 
         other = ''
         if "/um.php" in url: other = 'um'
+        elif "/um2.php" in url: other = 'um2'
+        elif "/umv.php" in url: other = 'umv'
+
         elif "/jk.php" in url: other = 'jk'
-        elif '/jksw.php' in url: other =  'jk'
+        elif '/jksw.php' in url: other =  'jksw'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -445,8 +448,8 @@ def play(item):
 
     url_play = item.url
 
-    if "/um.php" in item.url or "/um2.php" in item.url:
-        item.url = item.url.replace('/um2.php', '/um.php')
+    if "/um.php" in item.url or "/um2.php" in item.url or '/umv.php' in item.url:
+        item.url = item.url.replace('/um2.php', '/um.php').replace('/umv.php', '/um.php')
 
         headers = {"Referer": item.url}
         data = do_downloadpage(item.url, headers = headers)
@@ -485,6 +488,10 @@ def play(item):
         servidor = servertools.corregir_servidor(servidor)
 
         url_play = servertools.normalize_url(servidor, url_play)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url_play).lower()
+            if not new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = url_play, server = servidor))
 

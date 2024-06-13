@@ -61,6 +61,10 @@
         "url": "\\1"
       },
       {
+        "pattern": "(https://filemoon.lat/(?:e/|d/)[0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
         "pattern": "https://fmoonembed.pro/(?:e/|d/)([0-9a-zA-Z]+)",
         "url": "https://filemoon.sx/e/\\1"
       },
@@ -246,6 +250,10 @@
       },
       {
         "pattern": "https://swhoi.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://swdyu.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
@@ -505,15 +513,19 @@
         "url": "https://www.twitch.tv/\\1"
       },
       {
-        "pattern": "https://vidhide.com/(?:s/|v/|f/|d/|embed/)([0-9a-zA-Z]+)",
+        "pattern": "https://vidhide.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://vidhidepro.com/s/\\1"
       },
       {
-        "pattern": "https://vidhidepro.com/(?:s/|v/|f/|d/|embed/)([0-9a-zA-Z]+)",
+        "pattern": "https://vidhidepro.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://vidhidepro.com/s/\\1"
       },
       {
-        "pattern": "https://vidhidevip.com/(?:s/|v/|f/|d/|embed/)([0-9a-zA-Z]+)",
+        "pattern": "https://vidhidevip.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://vidhidepro.com/s/\\1"
+      },
+      {
+        "pattern": "https://vidhidepre.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://vidhidepro.com/s/\\1"
       },
       {
@@ -577,8 +589,8 @@
         "url": "\\1"
       },
       {
-        "pattern": "https://qiwi.gg/(?:file/)([0-9a-zA-Z]+)",
-        "url": "\\1"
+        "pattern": "https://qiwi.gg/(?:file/)(.*)",
+        "url": "https://qiwi.gg/file/\\1"
       }
     ]
   }

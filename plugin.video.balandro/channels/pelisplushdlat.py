@@ -317,8 +317,14 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        if len(itemlist) == 24:
-            itemlist.append(item.clone (url = item.url, page = item.page + 1, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
+        if '<ul class="pagination' in data:
+            next_page = scrapertools.find_single_match(data, '<ul class="pagination.*?<li class="page-item active".*?<a class="page-link" href="(.*?)"')
+
+            if next_page:
+                if 'page=' in next_page:
+                    next_page = host[:-1] + next_page
+
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -571,6 +577,9 @@ def play(item):
 
     url = item.url
 
+    if '/plustream.' in url:
+        return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
     if item.other == 'dame':
         url = resuelve_dame_toma(item.url)
 
@@ -585,19 +594,35 @@ def play(item):
 
         for url in urls:
             if not 'error' in url:
-                if '/pelisloadtop.com/' in url: continue
+                if '/pelisloadtop.' in url: continue
+                elif '/plustream.' in url: continue
 
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 
                 url = servertools.normalize_url(servidor, url)
 
+                if servidor == 'directo':
+                    new_server = servertools.corregir_other(url).lower()
+                    if not new_server.startswith("http"): servidor = new_server
+
+                if servidor == 'directo': continue
+
                 itemlist.append(item.clone( url = url, server = servidor ))
+
+                break
     else:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        if '/plustream.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         itemlist.append(item.clone( url = url, server = servidor ))
 
@@ -656,6 +681,16 @@ def list_search(item):
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if '<ul class="pagination' in data:
+            next_page = scrapertools.find_single_match(data, '<ul class="pagination.*?<li class="page-item active".*?<a class="page-link" href="(.*?)"')
+
+            if next_page:
+                if 'page=' in next_page:
+                    next_page = host[:-1] + next_page
+
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color='coral' ))
 
     return itemlist
 

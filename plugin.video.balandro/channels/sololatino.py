@@ -382,6 +382,9 @@ def findvideos(item):
 
             if not url: continue
 
+            if '/plustream.' in url: continue
+            elif '/embedsito.' in url: continue
+
             if 'data-lang="0"' in link: lang = 'Lat'
             elif 'data-lang="1"' in link: lang = 'Esp'
             elif 'data-lang="2"' in link: lang = 'Vose'

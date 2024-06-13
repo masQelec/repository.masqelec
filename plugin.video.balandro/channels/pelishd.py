@@ -149,17 +149,19 @@ def findvideos(item):
     ses = 0
 
     if '<div class="tab-content">' in data:
-        bloque = scrapertools.find_single_match(data, '<div class="tab-content">.*?</center>')
+        bloque = scrapertools.find_single_match(data, '<div class="tab-content">(.*?)</center>')
 
         downs = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
 
         for down in downs:
             ses += 1
 
+            if down.startswith('https://vip.'): continue
+
             data1 = httptools.downloadpage(down).data
 
             data1 = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data1)
-            bloque1 = scrapertools.find_single_match(data1, '<div class="tab_container">.*?<li>')
+            bloque1 = scrapertools.find_single_match(data1, '<div class="tab_container">(.*?)<li>')
 
             links = scrapertools.find_multiple_matches(bloque1, 'href="(.*?)"')
 
@@ -185,6 +187,15 @@ def findvideos(item):
                 servidor = servertools.corregir_servidor(servidor)
 
                 if servidor == 'various': other = servertools.corregir_other(url)
+
+                if url.startswith('https://mega.nz/file/'):
+                     _url1 = scrapertools.find_single_match(url, '/file/(.*?)#')
+
+                     if _url1:
+                         _url2 = scrapertools.find_single_match(url, '#(.*?)$')
+
+                         if _url2:
+                             url = 'https://mega.nz/#!' + _url1 + '!' + _url2
 
                 itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
@@ -250,6 +261,14 @@ def list_search(item):
                                     contentType='movie', contentTitle=PeliName, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if '<span class="current">' in data:
+            next_page = scrapertools.find_single_match(data, '<span class="current">.*?href="(.*?)"')
+
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_search', url = next_page, text_color='coral' ))
 
     return itemlist
 

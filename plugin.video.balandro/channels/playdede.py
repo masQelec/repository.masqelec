@@ -1630,7 +1630,18 @@ def play(item):
         url_play = item.url
 
     if url_play:
-        itemlist.append(item.clone(url = url_play.replace("\\/", "/")))
+        url_play = url_play.replace("\\/", "/")
+
+        servidor = servertools.get_server_from_url(url_play)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url_play)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url_play).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        itemlist.append(item.clone(url = url_play, server = servidor))
 
     return itemlist
 

@@ -811,6 +811,15 @@ def test_channel(channel_name):
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
+               elif 'Dominio Expirado' in txt:
+                   avis_causas = txt_false
+
+                   avis_causas = '[COLOR goldenrod][B]El Dominio de la Web está Expirado.[/B][/COLOR]'
+
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                   avisado = True
+
+
     txt = txt.replace('[CR][CR][CR]', '[CR][CR]')
 
     if channels_unsatisfactory == 'unsatisfactory':
@@ -818,6 +827,7 @@ def test_channel(channel_name):
             if 'Se pueden Eliminar los Proxies' in txt: return txt
             elif 'Falso Positivo.' in txt: return txt
             elif 'invalid:' in txt: return txt
+            elif 'Dominio Expirado' in txt: return txt
             return ''
         else:
             if 'Se pueden Eliminar los Proxies' in txt: return txt
@@ -1141,6 +1151,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                         if invalid:
                             txt = txt.replace('[CR]quitar: ' + txt_quita, '[CR]quitar: [COLOR orangered][B]NO se pueden Eliminar los Proxies del Canal[/COLOR]')
                             txt += "[CR]invalid: [COLOR goldenrod][B]Acceso sin Host Válido en los datos.[/B][/COLOR]"
+                    else:
+                        if 'This domain has expired.' in str(response.data): txt += "[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]"
 
                 elif channel_id in str(channels_despised):
                     if not 'Sugerencias:' in txt:

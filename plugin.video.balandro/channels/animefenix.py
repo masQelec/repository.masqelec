@@ -238,7 +238,7 @@ def categorias(item):
 
         url = "%s?order=%s&page=1" % (url_cat, categoria)
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -518,6 +518,7 @@ def findvideos(item):
         elif serv == 'burst': servidor = 'burstcloud'
         elif serv == 'yourupload': servidor = 'yourupload'
         elif serv == 'mp4upload': servidor = 'mp4upload'
+        elif serv == 'sendvid': servidor = 'sendvid'
 
         if serv == 'stream2':
             servidor = 'various'
@@ -587,7 +588,8 @@ def play(item):
 
             url = scrapertools.find_single_match(data, '"file":"([^"]+)"')
 
-        elif 'terabox.' in url: url = ''
+        elif 'terabox.' in url:
+              return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         elif '.fireload.' in url: url = scrapertools.find_single_match(url, 'v=(.*?)$')
 
@@ -600,6 +602,10 @@ def play(item):
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

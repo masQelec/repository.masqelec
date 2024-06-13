@@ -137,7 +137,7 @@ def anios(item):
     if item.search_type == 'movie': url_any = host + 'doramas?categoria=pelicula&fecha='
     else: url_any = host + 'doramas?categoria=dorama&fecha='
 
-    for x in range(current_year, 1981, -1):
+    for x in range(current_year, 1999, -1):
         url = url_any + str(x)
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = text_color ))
@@ -367,6 +367,9 @@ def findvideos(item):
         elif 'ok' in srv: srv = 'okru'
         elif 'mixdropco' in srv: srv = 'mixdrop'
 
+        elif 'cloud' in srv: srv = 'directo'
+        elif 'gg/' in srv: srv = 'directo'
+
         srv = srv.replace('com/', '')
 
         if servertools.is_server_available(srv):
@@ -381,13 +384,11 @@ def findvideos(item):
 
             if servidor == 'various': srv = servertools.corregir_other(url)
 
-            if not servidor == 'directo':
-                if srv == servidor: srv = ''
+            if srv == servidor: srv = ''
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = srv.capitalize() ))
 
     # Enlaces descarga
-
     if '<th>DESCARGAR</th>' in data:
         bloque = scrapertools.find_single_match(data, '<th>DESCARGAR</th>(.*?)</table>')
 
@@ -404,6 +405,9 @@ def findvideos(item):
 
             elif srv == 'ok': srv = 'mega'
 
+            elif 'cloud' in srv: srv = 'directo'
+            elif 'gg/' in srv: srv = 'directo'
+
             if servertools.is_server_available(srv):
                 if not servertools.is_server_enabled(srv): continue
             else:
@@ -411,8 +415,7 @@ def findvideos(item):
 
             servidor = servertools.corregir_servidor(srv)
 
-            if not servidor == 'directo':
-                if srv == servidor: srv = ''
+            if srv == servidor: srv = ''
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = srv.capitalize() + ' (D)' ))
 
@@ -432,16 +435,12 @@ def play(item):
 
     if 'monoschinos' in item.url:
         data = httptools.downloadpage(item.url).data
+
         url = scrapertools.find_single_match(data, "file: '([^']+)'")
-
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
     elif '?url=' in item.url:
         url = item.url.replace(host + 'reproductor?url=', '')
-        if '//videa.' in url:
+        if '/videa.' in url:
             return 'Servidor [COLOR tan]Videa[/COLOR] NO Soportado'
 
     if url:
@@ -449,6 +448,10 @@ def play(item):
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(server = servidor, url = url))
 

@@ -389,7 +389,6 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other ))
 
     # ~ Descargas
-
     bloque = scrapertools.find_single_match(data, '<div class="downloads-(.*?)</div> </div>')
     if not bloque: bloque = scrapertools.find_single_match(data, '<div class="downloads-(.*?)</div></div>')
 
@@ -424,7 +423,7 @@ def findvideos(item):
         if servidor == 'various': link_other = servertools.corregir_other(url)
 
         if '/megaup' in match: link_other = 'Megaup'
-        elif '/undefined' in match: link_other = 'Indeterminado'
+        elif '/undefined' in match: link_other = 'Indefinido'
         elif '/torrent' in match: link_other = 'Torrent'
         elif '/mega' in match: link_other = 'Mega'
         elif '/google' in match: link_other = 'Gvideo'
@@ -470,6 +469,10 @@ def play(item):
     if url:
         if '/acortalink.' in url:
            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
+
+        if item.server == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): item.server = new_server
 
         itemlist.append(item.clone(url = url, server = item.server))
 
