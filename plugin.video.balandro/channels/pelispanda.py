@@ -394,15 +394,20 @@ def findvideos(item):
     itemlist = []
 
     if item.contentType == 'episode':
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent', language = item.language, quality = item.quality ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent',
+                              language = item.language, quality = item.quality ))
 
         return itemlist
 
     data = do_downloadpage(item.url)
 
-    links = scrapertools.find_multiple_matches(data, '<td>Torrent</td>.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
-    if not links: links = scrapertools.find_multiple_matches(data, '<td>Utorrent</td>.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
-    if not links: links = scrapertools.find_multiple_matches(data, '<td>T</td>.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+    bloque = scrapertools.find_single_match(data, '>Utorrent<(.*?)</table>')
+
+    links = scrapertools.find_multiple_matches(bloque, '<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+
+    if not links: links = scrapertools.find_multiple_matches(data, '>Torrent<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+    if not links: links = scrapertools.find_multiple_matches(data, '>Utorrent<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+    if not links: links = scrapertools.find_multiple_matches(data, '>T<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
 
     for qlty, lang, size, link in links:
         if 'Castellano' in lang: lang = 'Esp'
@@ -410,7 +415,10 @@ def findvideos(item):
         elif 'Subitulado' in lang: lang = 'Vose'
         elif 'Version Original' in lang: lang = 'VO'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent', language = lang, quality = qlty, other = size ))
+        lang = lang.replace('>', '').strip()
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent',
+                              language = lang, quality = qlty, other = size ))
 
     return itemlist
 

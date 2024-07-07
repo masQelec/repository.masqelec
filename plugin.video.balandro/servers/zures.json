@@ -3,7 +3,7 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohh,  Oneupload,  Pandafiles,  Rovideo,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  Tusfiles,  Uploadbaz,  Uploadflix,  Uploady,  Veev,  Veoh,  Vidbob,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vipss,  Vkprime,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohh,  Oneupload,  Pandafiles,  Rovideo,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  Tusfiles,  Uploadbaz,  Uploadflix,  Uploady,  Veev,  Veoh,  Vidbob,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vipss,  Vkprime,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -46,6 +46,10 @@
       },
       {
         "pattern": "https://fastplay.(?:sx|cc|to)/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://filegram.to/([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {

@@ -272,6 +272,9 @@ def test_channel(channel_name):
     if 'tales' in clusters: clusters = clusters.replace('tales,', '').strip()
     if 'tales' in clusters: clusters = clusters.replace('tales', '').strip()
 
+    if 'bibles' in clusters: clusters = clusters.replace('bibles,', '').strip()
+    if 'bibles' in clusters: clusters = clusters.replace('bibles', '').strip()
+
     if 'docs' in clusters: clusters = clusters.replace('docs,', '').strip()
     if 'docs' in clusters: clusters = clusters.replace('docs', '').strip()
 
@@ -324,7 +327,7 @@ def test_channel(channel_name):
 
     if 'producers' in str(params['clusters']):
         if txt_temas: txt_temas += ', '
-        txt_temas += '[COLOR teal][B]Productoras[/B][/COLOR]'
+        txt_temas += '[COLOR teal][B]Productoras/Plataformas[/B][/COLOR]'
 
     if 'years'  in str(params['clusters']):
         if txt_temas: txt_temas += ', '
@@ -381,6 +384,10 @@ def test_channel(channel_name):
     if '3d' in str(params['clusters']):
         if txt_temas: txt_temas += ', '
         txt_temas += '[COLOR powderblue][B]3D[/B][/COLOR]'
+
+    if 'bibles' in str(params['clusters']):
+         if txt_temas: txt_temas += ', '
+         txt_temas += '[COLOR tan][B]Bíblicos[/B][/COLOR]'
 
     if txt_temas: txt += 'temas: ' + txt_temas
 

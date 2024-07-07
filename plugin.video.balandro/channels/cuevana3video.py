@@ -867,6 +867,9 @@ def play(item):
         if '/clonamesta' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
+        if '/plustream.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

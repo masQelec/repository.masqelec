@@ -185,6 +185,10 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://strwish.com/(?:e/|f/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://embedwish.com/(?:e/|f/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },

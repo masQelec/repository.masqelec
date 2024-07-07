@@ -670,6 +670,8 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'tupelihd': domains.manto_domain_tupelihd(item)
 
+    elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
+
     elif item.from_channel == 'yestorrent': domains.manto_domain_yestorrent(item)
 
     else:
@@ -917,6 +919,13 @@ def _proxies(item):
 
         if config.get_setting('channel_dontorrentsin_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'doramasyt':
+        from channels import doramasyt
+        item.channel = 'doramasyt'
+        latanime.configurar_proxies(item)
+
+        if config.get_setting('channel_doramasyt_proxies') is None: refrescar = False
+
     elif item.from_channel == 'elifilms':
         from channels import elifilms
         item.channel = 'elifilms'
@@ -1070,6 +1079,13 @@ def _proxies(item):
         mejortorrentnz.configurar_proxies(item)
 
         if config.get_setting('channel_mejortorrentnz_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'mundodonghua':
+        from channels import mundodonghua
+        item.channel = 'mundodonghua'
+        mundodonghua.configurar_proxies(item)
+
+        if config.get_setting('channel_mundodonghua_proxies') is None: refrescar = False
 
     elif item.from_channel == 'nextdede':
         from channels import nextdede

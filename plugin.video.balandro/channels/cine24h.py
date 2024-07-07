@@ -270,10 +270,7 @@ def list_all(item):
 
     if buscar_next:
         if itemlist:
-            if 'class="page-numbers current">' in data:
-                 next_page = scrapertools.find_single_match(data, 'class="page-numbers current">.*?<a class="page-numbers".*?href="(.*?)"')
-            else:
-                 next_page = scrapertools.find_single_match(data, '<a class="page-numbers".*?href="(.*?)"')
+            next_page = scrapertools.find_single_match(data, 'class="page-numbers current">.*?<a class="page-numbers".*?href="(.*?)"')
 
             if '/page/' in next_page:
                itemlist.append(item.clone( title='Siguientes ...', url = next_page, action='list_all', page=0, text_color='coral' ))

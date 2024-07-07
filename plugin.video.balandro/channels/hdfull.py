@@ -520,7 +520,7 @@ def mainlist(item):
     if config.get_setting('hdfull_login', 'hdfull', default=False):
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'all' ))
 
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -540,7 +540,7 @@ def mainlist(item):
         itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
                                     plot = 'Debe indicarse el nombre y apellido/s del director (lo más exacto posible).'))
 
-        itemlist.append(item.clone( title = 'Búsqueda en listas populares:', action = '', folder=False, text_color='tan' ))
+        itemlist.append(item.clone( title = 'Búsqueda en listas populares:', action = '', folder=False, text_color='greenyellow' ))
         itemlist.append(item.clone( title = ' - Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all',
                                     plot = 'Debe indicarse el título de la lista (ó parte del mismo).'))
 
@@ -563,7 +563,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -597,13 +597,13 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
         itemlist.append(item.clone( action='list_all', title='Catálogo', url = dominio + 'series', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( action='list_all', title='Últimas', url = dominio + 'series/date', search_type='tvshow', text_color='cyan' ))
+        itemlist.append(item.clone( action='list_all', title='Últimas', url = dominio + 'series/date', search_type='tvshow', text_color='moccasin' ))
 
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url= dominio + 'series/imdb_rating', search_type = 'tvshow' ))
 
@@ -613,7 +613,7 @@ def mainlist_series(item):
         if not config.get_setting('descartar_anime', default=False):
             itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow', text_color='springgreen' ))
 
-        itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='tan' ))
+        itemlist.append(item.clone( title = '[B]Episodios:[/B]', action = '', folder=False, text_color='tan' ))
 
         itemlist.append(item.clone( action='list_episodes', title=' - [COLOR cyan]Estreno[/COLOR]', opcion = 'premiere', search_type = 'tvshow' ))
 

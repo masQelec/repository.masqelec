@@ -499,7 +499,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -522,7 +522,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -562,7 +562,7 @@ def mainlist_series(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -570,7 +570,10 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Nuevos episodios', action = 'list_last', url = host, _type = 'episodes', nro_pagina = 1, search_type = 'tvshow', text_color = 'cyan' ))
 
-        itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, _type = 'series', nro_pagina = 1, search_type = 'tvshow', text_color = 'moccasin' ))
+        itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, _type = 'series', nro_pagina = 1, search_type = 'tvshow', text_color = 'yellowgreen' ))
+
+        if not config.get_setting('descartar_anime', default=False):
+            itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
         itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'series?orderBy=last_update', slug = 'series',
                                     nro_pagina = 1, order = '?orderBy=last_update', search_type = 'tvshow' ))
@@ -584,10 +587,7 @@ def mainlist_series(item):
         itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series?orderBy=score', slug = 'series',
                                     nro_pagina = 1, order = '?orderBy=score', search_type = 'tvshow' ))
 
-        if not config.get_setting('descartar_anime', default=False):
-            itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
-
-        itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', slug = 'series', nro_pagina = 1, search_type='tvshow'))
+        itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', slug = 'series', nro_pagina = 1, search_type='tvshow', text_color = 'moccasin' ))
 
         itemlist.append(item.clone( title = 'Por género', action = 'generos', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por año', action = 'anios', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
@@ -609,7 +609,7 @@ def mainlist_animes(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('playdede_login', 'playdede', default=False):
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
@@ -624,7 +624,7 @@ def mainlist_animes(item):
         itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'animes?orderBy=score', slug = 'animes',
                                     nro_pagina = 1, order = '?orderBy=score', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', group = 'anime', slug = 'animes', nro_pagina = 1, search_type='tvshow'))
+        itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', group = 'anime', slug = 'animes', nro_pagina = 1, search_type='tvshow', text_color = 'moccasin' ))
 
         itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))

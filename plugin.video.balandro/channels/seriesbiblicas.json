@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["lasts", "classic", "vos"],
+  "clusters": ["rankings", "lasts", "classic", "vos", "bibles"],
 
   "notes": "Películas y Series."
 }

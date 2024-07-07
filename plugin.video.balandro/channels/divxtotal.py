@@ -15,7 +15,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www4.divxtotal.mov/'
+host = 'https://www5.divxtotal.mov/'
 
 
 # ~ por si viene de enlaces guardados
@@ -23,7 +23,7 @@ ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://
              'https://www.divxtotal.ms/', 'https://www.divxtotal.fi/', 'https://www.divxtotal.cat/',
              'https://www.divxtotal.pl/', 'https://www.divxtotal.wf/', 'https://www.divxtotal.win/',
              'https://www1.divxtotal.zip/', 'https://www2.divxtotal.zip/', 'https://www2.divxtotal.mov/',
-             'https://www3.divxtotal.mov/']
+             'https://www3.divxtotal.mov/', 'https://www4.divxtotal.mov/']
 
 
 domain = config.get_setting('dominio', 'divxtotal', default='')
@@ -278,7 +278,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, '<ul class="pagination">.*?</span></a></li><li>' + "<a href='(.*?)'")
+        next_url = scrapertools.find_single_match(data, '<ul class="pagination">.*?' + "<li class='active'>" + '.*?</span></a></li><li>' + "<a href='(.*?)'")
 
         if next_url:
             if '/page/' in next_url:

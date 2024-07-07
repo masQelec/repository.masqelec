@@ -10,11 +10,11 @@ from core import httptools, scrapertools, servertools, tmdb
 # ~ pelis No hay 24/12/2023
 
 
-host = 'https://e.ennovelas-tv.com/'
+host = 'https://f.ennovelas-tv.com/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://c.ennovelas-tv.com/', 'https://d.ennovelas-tv.com/']
+ant_hosts = ['https://c.ennovelas-tv.com/', 'https://d.ennovelas-tv.com/' ,'https://e.ennovelas-tv.com/']
 
 
 domain = config.get_setting('dominio', 'ennovelastv', default='')
@@ -84,6 +84,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_epis', url = host + 'episodes11/', search_type = 'tvshow', text_color = 'cyan' ))
+
+    itemlist.append(item.clone( title = 'Últimas series', action = 'list_last', url = host + 'ennovelas/', search_type = 'tvshow', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -207,6 +209,52 @@ def list_epis(item):
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, infoLabels={'year': '-'},
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+def list_last(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    bloque = scrapertools.find_single_match(data, '>Últimos Series<(.*?)>Últimos Peliculas<')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        title = scrapertools.find_single_match(match, 'title="(.*?)"')
+
+        if not url or not title: continue
+
+        if '/movies/' in url: continue
+
+        thumb = scrapertools.find_single_match(match, 'data-img="(.*?)"')
+
+        SerieName = title
+
+        if " (" in title: SerieName = title.split(" (")[0]
+        elif "(En Espanol)" in title: SerieName = title.split("(En Espanol)")[0]
+        elif "En Español" in title: SerieName = title.split("En Español")[0]
+        elif "[Español Subtitulado]" in title: SerieName = title.split("[Español Subtitulado]")[0]
+        elif "[SUB Espanol]" in title: SerieName = title.split("[SUB Espanol]")[0]
+
+        if " Temporada" in title: SerieName = title.split(" Temporada")[0]
+        elif " Capitulos" in title: SerieName = title.split(" Capitulos")[0]
+        elif " Capítulos" in title: SerieName = title.split(" Capítulos")[0]
+        elif " Capitulo" in title: SerieName = title.split(" Capitulo")[0]
+        elif " Capítulo" in title: SerieName = title.split(" Capítulo")[0]
+
+        SerieName = SerieName.strip()
+
+        title = title.replace('Temporada', '[COLOR tan]Temporada[/COLOR]')
+
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

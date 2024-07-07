@@ -1,0 +1,17 @@
+{
+  "id": "ennovelas1",
+  "name": "EnNovelas1",
+  "thumbnail": "ennovelas1.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["lasts", "countries", "vos", "tales"],
+
+  "notes": "Web dedicada principalmente en Novelas. Películas y Series."
+}

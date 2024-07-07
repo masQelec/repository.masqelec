@@ -14,9 +14,15 @@ perpage = 20
 
 
 def do_downloadpage(url, post=None, headers=None):
-    if not headers: headers = {'Referer': host}
-
     data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    if not data:
+        if '?s=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Novelas360', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     return data
 
@@ -29,15 +35,13 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
-
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Bíblicas', action = 'list_all', url = host + 'telenovelas/biblicas/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Bíblicas', action = 'list_all', url = host + 'telenovelas/biblicas/', search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'tvshow' ))
 
@@ -50,13 +54,13 @@ def paises(item):
 
     itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'telenovelas/estados-unidos/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'telenovelas/argentina/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'telenovelas-brasil/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'telenovelas-chile/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'telenovelas-colombia/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'telenovelas-mexico/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'telenovelas-peru/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Turquía', action = 'list_all', url = host + 'telenovelas-turquia/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'telenovelas-venezuela/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'telenovelas/brasil/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'telenovelas/chile/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'telenovelas/colombia/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'telenovelas/mexico/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'telenovelas/peru/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Turquía', action = 'list_all', url = host + 'telenovelas/turquia/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'telenovelas/venezuela/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Resto del Mundo', action = 'list_all', url = host + 'telenovelas/resto-del-mundo/', text_color='moccasin' ))
 
     return itemlist

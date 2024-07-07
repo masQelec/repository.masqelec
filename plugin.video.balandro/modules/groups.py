@@ -11,7 +11,7 @@ import os
 from platformcode import config, logger
 from core.item import Item
 
-from core import channeltools
+from core import channeltools, scrapertools
 
 
 color_list_prefe = config.get_setting('channels_list_prefe_color', default='gold')
@@ -27,6 +27,36 @@ color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 thumb_filmaffinity = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'filmaffinity.jpg')
 thumb_tmdb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'tmdb.jpg')
+
+
+con_incidencias = ''
+no_accesibles = ''
+
+try:
+    with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+except:
+    try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+    except: txt_status = ''
+
+if txt_status:
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
+
+if txt_status:
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
 
 
 context_buscar = []
@@ -587,6 +617,8 @@ def submnu_series(item):
 
     if config.get_setting('mnu_novelas', default=True):
         itemlist.append(item.clone( title = '   - Con Novelas', action = 'ch_groups', group = 'tales', extra = 'tvshows' ))
+
+    itemlist.append(item.clone( title = '   - Con Temas Bíblicos', action = 'ch_groups', group = 'bibles', extra = 'tvshows' ))
 
     itemlist.append(item.clone( title = '   - Con Años', action = 'ch_groups', group = 'years', extra = 'tvshows' ))
 
@@ -1204,6 +1236,12 @@ def ch_groups(item):
 
             titulo += '[I][B][COLOR darkgoldenrod] (problemático)[/COLOR][/I][/B]'
 
+        if con_incidencias:
+           if ch['name'] in str(con_incidencias): titulo += '[I][B][COLOR tan] (incidencia)[/COLOR][/I][/B]'
+
+        if no_accesibles:
+           if ch['name'] in str(no_accesibles): titulo += '[I][B][COLOR tan] (no accesible)[/COLOR][/I][/B]'
+
         if ch['searchable']:
             if not ch['status'] == -1:
                 cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
@@ -1241,7 +1279,7 @@ def ch_groups(item):
 
         i =+ 1
 
-        itemlist.append(Item( channel=ch['id'], action=accion, title=titulo, context=context, text_color=color, plot = plot, sort = 'D', thumbnail=ch['thumbnail'], category=ch['name'], search_type = search_type ))
+        itemlist.append(Item( channel=ch['id'], action=accion, title=titulo, context=context, text_color=color, plot=plot, extra=item.extra, sort='D', thumbnail=ch['thumbnail'], category=ch['name'], search_type=search_type ))
 
         canales.append(ch['id'])
 

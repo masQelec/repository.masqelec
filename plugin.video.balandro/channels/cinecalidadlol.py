@@ -267,13 +267,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/?ref=es', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - [COLOR cyan]Últimas[/COLOR]', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = ' - [COLOR greenyellow]Últimas[/COLOR]', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow', group = '?ref=es' ))
 
     itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - [COLOR cyan]Últimas[/COLOR]', action = 'destacadas', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = ' - [COLOR greenyellow]Últimas[/COLOR]', action = 'destacadas', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow' ))
 

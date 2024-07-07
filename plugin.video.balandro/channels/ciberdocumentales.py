@@ -64,7 +64,7 @@ def list_all(item):
 
         if next_page:
             if '/page/' in next_page:
-                itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = host + next_page, text_color='coral' ))
+                itemlist.append(item.clone( title='Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 

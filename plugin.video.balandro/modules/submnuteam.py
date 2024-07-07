@@ -1802,6 +1802,7 @@ def resumen_canales(item):
     documentarys = 0
     infantiles = 0
     tales = 0
+    bibles = 0
     torrents = 0
     doramas = 0
     animes = 0
@@ -1886,6 +1887,8 @@ def resumen_canales(item):
 
         if 'tales' in ch['clusters']: tales += 1
 
+        if 'bibles' in ch['clusters']: bibles += 1
+
         if 'torrent' in tipos:
             torrents += 1
             bus_torrents += 1
@@ -1931,7 +1934,7 @@ def resumen_canales(item):
 
     txt += '       ' + str(inestables) + ' [COLOR plum]Inestables[/COLOR][CR]'
     txt += '       ' + str(problematics) + ' [COLOR darkgoldenrod]Problemáticos[/COLOR][CR]'
-    txt += '     ' + str(notices) + ' [COLOR olivedrab]CloudFlare Protection[/COLOR][CR]'
+    txt += '     ' + str(notices) + ' [COLOR olivedrab]Con Probable CloudFlare Protection[/COLOR][CR]'
     txt += '     ' + str(proxies) + ' [COLOR red]Pueden Usar Proxies[/COLOR][CR]'
     txt += '       ' + str(registers) + ' [COLOR teal]Requieren Cuenta[/COLOR][CR]'
     txt += '       ' + str(dominios) + ' [COLOR green]Varios Dominios[/COLOR][CR]'
@@ -1995,38 +1998,41 @@ def resumen_canales(item):
 
     txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN CANALES DISPONIBLES:[/B][/COLOR][CR]'
 
-    txt += '  ' + str(suggesteds) + ' [COLOR moccasin]Sugeridos[/COLOR][CR]'
+    txt += '    ' + str(suggesteds) + ' [COLOR moccasin]Sugeridos[/COLOR][CR]'
 
     txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
 
     txt += '  ' + str(series) + ' [COLOR hotpink]Series[/COLOR][CR]'
 
-    txt += '  ' + str(pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
+    txt += '    ' + str(pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
 
-    txt += '[CR]  ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
-    txt += '  ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
-    txt += '    ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
-    txt += '  ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
-    txt += '  ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
-    txt += '  ' + str(doramas) + '  [COLOR firebrick]Doramas[/COLOR][CR]'
-    txt += '  ' + str(animes) + '  [COLOR springgreen]Animes[/COLOR][CR]'
-    txt += '  ' + str(adults) + '  [COLOR orange]Adultos[/COLOR][CR]'
+    txt += '[CR]    ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
+    txt += '    ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
+    txt += '      ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
+    txt += '    ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
+    txt += '      ' + str(bibles) + '  [COLOR tan]Bíblicos[/COLOR][CR]'
+    txt += '    ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
+    txt += '    ' + str(doramas) + '  [COLOR firebrick]Doramas[/COLOR][CR]'
+    txt += '    ' + str(animes) + '  [COLOR springgreen]Animes[/COLOR][CR]'
+    txt += '    ' + str(adults) + '  [COLOR orange]Adultos[/COLOR][CR]'
 
     txt += '[CR][COLOR powderblue][B]DISTRIBUCIÓN CANALES DISPONIBLES PARA BÚSQUEDAS:[/B][/COLOR][CR]'
 
-    txt += '   ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+    txt += '     ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
     txt += '   ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
-    txt += '   ' + str(bus_pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
-    txt += ' ' + str(bus_documentales) + ' [COLOR cyan]Temática Documental[/COLOR][CR]'
-    txt += '   ' + str(bus_torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
-    txt += '   ' + str(bus_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
-    txt += '   ' + str(bus_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
+    txt += '     ' + str(bus_pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
+    txt += '   ' + str(bus_documentales) + ' [COLOR cyan]Temática Documental[/COLOR][CR]'
+    txt += '     ' + str(bus_torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
+    txt += '     ' + str(bus_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
+    txt += '     ' + str(bus_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
 
     platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución', txt)
 
 
 def resumen_incidencias(item):
     logger.info()
+
+    txt_status = ''
 
     txt = ''
 
@@ -2055,6 +2061,8 @@ def resumen_incidencias(item):
 
 def resumen_no_accesibles(item):
     logger.info()
+
+    txt_status = ''
 
     txt = ''
 

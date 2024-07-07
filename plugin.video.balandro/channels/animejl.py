@@ -24,19 +24,19 @@ def mainlist_animes(item):
         from modules import actions
         if actions.adults_password(item) == False: return
 
-    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'all', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes?page=1', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'animes?estado%5B%5D=2&order=created', search_type = 'tvshow', text_color = 'moccasin' ))
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animes?estado%5B%5D=0&order=created', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'animes?estado%5B%5D=1&order=created', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'animes?estado%5B%5D=2&order=created&page=1', search_type = 'tvshow', text_color = 'greenyellow' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animes?estado%5B%5D=0&order=created&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'animes?estado%5B%5D=1&order=created&page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'animes?genre[]=46&order=created', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'animes?genre[]=46&order=created&page=1', search_type = 'tvshow', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'animes?tipo%5B%5D=3&order=created', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'animes?tipo[]=3&order=created&page=1', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
@@ -51,10 +51,10 @@ def categorias(item):
 
     text_color = 'moccasin'
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes?tipo%5B%5D=1&order=created', search_type = 'tvshow', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Donghuas', action = 'list_all', url = host + 'animes?tipo%5B%5D=7&order=created', search_type = 'tvshow', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'animes?tipo%5B%5D=2&order=created', search_type = 'tvshow', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'animes?tipo%5B%5D=3&order=created', search_type = 'movie', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'animes?tipo%5B%5D=1&order=created&page=1', search_type = 'tvshow', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Donghuas', action = 'list_all', url = host + 'animes?tipo%5B%5D=7&order=created&page=1', search_type = 'tvshow', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'animes?tipo%5B%5D=2&order=created&page=1', search_type = 'tvshow', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'animes?tipo%5B%5D=3&order=created&page=1', search_type = 'movie', text_color=text_color ))
 
     return itemlist
 
@@ -73,7 +73,7 @@ def generos(item):
     for value, title in matches:
         if title == 'Latino/Español': continue
 
-        url = host + 'animes?genre%5B%5D=' + value + '&order=created'
+        url = host + 'animes?genre%5B%5D=' + value + '&order=created&page=1'
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
 
@@ -88,7 +88,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1989, -1):
-        url = host + 'animes?year%5B%5D=' + str(x) + '&order=created'
+        url = host + 'animes?year%5B%5D=' + str(x) + '&order=created&page=1'
 
         itemlist.append(item.clone( title = str(x), url = url, action='list_all', text_color='springgreen' ))
 
@@ -102,23 +102,39 @@ def list_all(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = "<article class='Anime alt B'><a href='([^']+)'>.*?class=.*?<img src='([^']+)' alt='([^']+)'>"
-    patron += "</figure><span class='Type' .*?>([^']+)</span>.*?star.*?<p>([^<]+)</p>"
+    matches = re.compile('<article(.*?)</article>').findall(data)
 
-    matches = scrapertools.find_multiple_matches(data, patron)
+    for match in matches:
+        url = scrapertools.find_single_match(match, "<a href='(.*?)'")
+        title = scrapertools.find_single_match(match, "<h3 class='Title'>(.*?)</h3>")
 
-    for url, thumb, title, type, plot in matches:
+        if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+
+        plot = scrapertools.find_single_match(match, '<p>(.*?)</p>')
+
         thumb = host + thumb
 
-        type = type.strip().lower()
+        title = title.replace('&#039;', "'").replace('&quot;', '').strip()
 
         titulo = title
         titulo = titulo.replace('Español Latino', '').replace('Español latino', '').replace('español Latino', '').replace('español latino', '').replace('Español', '').replace('español', '').strip()
 
-        if type == 'pelicula':
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
+        tipo = 'movie' if '>Pelicula<' in match else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
+            if item.search_type != 'all':
+                if item.search_type == 'tvshow': continue
+
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = titulo, infoLabels={'year': '-', 'plot': plot} ))
-        else:
+
+        if tipo == 'tvshow':
+            if item.search_type != 'all':
+                if item.search_type == 'movie': continue
+
             SerieName = titulo
 
             if 'Temporada' in SerieName: SerieName = SerieName.split("Temporada")[0]
@@ -129,19 +145,20 @@ def list_all(item):
 
             SerieName = SerieName.strip()
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-', 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)" rel="next">')
+        if '<ul class="pagination">' in data:
+            next_page = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)" rel="next">')
 
-        if next_page:
-            actual_page = scrapertools.find_single_match(item.url, '([^\?]+)?')
+            if next_page:
+                next_page = next_page.replace('&amp;', '&')
 
-            itemlist.append(item.clone( title = 'Siguientes ...', url = '%s%s' % (host, next_page) if not host in next_page else next_page,
-                                        action = 'list_all', text_color = 'coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', url = '%s%s' % (host, next_page) if not host in next_page else next_page,
+                                            action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 

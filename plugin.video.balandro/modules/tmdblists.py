@@ -79,7 +79,21 @@ def mainlist(item):
 
 
 def show_help(item):
-    txt = 'En este apartado se pueden hacer consultas a la web [COLOR gold][B]The Movie Database[/B][/COLOR] (TMDB), un proyecto comunitario que ofrece información de películas, series y personas.'
+    # ~ config [0-'es', 1-'es-MX', 2-'en', 3-'it', 4-'pt', 5-'fr', 6-'de']
+
+    tmdb_lang = config.get_setting('tmdb_lang', default=0)
+
+    if tmdb_lang == 0: idioma = 'Español'
+    elif tmdb_lang == 1: idioma = 'Latino'
+    elif tmdb_lang == 2: idioma = 'Inglés'
+    elif tmdb_lang == 3: idioma = 'Italiano'
+    elif tmdb_lang == 4: idioma = 'Portugués'
+    elif tmdb_lang == 5: idioma = 'Francés'
+    else: idioma = 'Alemán'
+
+    txt = '[COLOR cyan]Idioma de Búsqueda en TMDB: [/COLOR][COLOR red][B]' + idioma + '[/B][/COLOR][CR][CR]'
+
+    txt += 'En este apartado se pueden hacer consultas a la web [COLOR gold][B]The Movie Database[/B][/COLOR] (TMDB), un proyecto comunitario que ofrece información de películas, series y personas.'
 
     txt += '[CR]'
     txt += '[CR]Se puede buscar la [COLOR moccasin][B]filmografía[/B][/COLOR] de una persona y ver las películas/series dónde ha participado.'

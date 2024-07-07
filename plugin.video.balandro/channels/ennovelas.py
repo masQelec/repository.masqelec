@@ -252,7 +252,9 @@ def generos(item):
        ('crimen', 'Crimen'),
        ('drama', 'Drama'),
        ('misterio', 'Misterio'),
+       ('musica', 'Música'),
        ('romance', 'Romance'),
+       ('srnovelas', 'SrNovelas'),
        ('thriller', 'Thriller'),
        ('terror', 'Terror'),
        ('western', 'Western')
@@ -405,11 +407,12 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?a href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?a href="(.*?)"')
+        if not next_page: next_page = scrapertools.find_single_match(data, "<div class='pagination'>.*?<span class='current'>.*?a href='(.*?)'")
 
-        if next_url:
-            if '/page/' in next_url:
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
+        if next_page:
+            if '/page/' in next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 
@@ -469,11 +472,12 @@ def last_epis(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?a href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?a href="(.*?)"')
+        if not next_page: next_page = scrapertools.find_single_match(data, "<div class='pagination'>.*?<span class='current'>.*?a href='(.*?)'")
 
-        if next_url:
-            if '/page/' in next_url:
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'last_epis', text_color = 'coral' ))
+        if next_page:
+            if '/page/' in next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'last_epis', text_color = 'coral' ))
 
     return itemlist
 

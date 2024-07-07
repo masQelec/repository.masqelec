@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.07[/COLOR] [COLOR chartreuse] 10 de Junio de 2024[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.08[/COLOR] [COLOR chartreuse] 2 de Julio de 2024[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
@@ -46,7 +46,7 @@
 
  [COLOR cyan][B]CANALES INESTABLES:[/B][/COLOR]
     [COLOR springgreen][B]Son los pendientes de su evolucion, para decidir su Situacion Definitiva[/B][/COLOR]
-    MegaSerie,  PPeliculas
+    Cuevana3Pro,  Novelas360
 
  [COLOR darkcyan][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR]
     [COLOR springgreen][B]Son los pendientes de su situacion, para decidir su Re-activacion o Anulacion[/B][/COLOR]
