@@ -191,7 +191,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'novelas-completas/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo episodios', action = 'list_all', url = host + 'novelas-completas/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
@@ -268,10 +268,8 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    if item.group == 'onair': bloque = scrapertools.find_single_match(data, '>Novelas en Emisión<(.*?)<footer>')
-    else:
-       if '>Novelas Completas Gratis<' in data: bloque = scrapertools.find_single_match(data, '>Novelas Completas Gratis<(.*?)<footer>')
-       else: bloque = scrapertools.find_single_match(data, '<h1>(.*?)$')
+    if '>Novelas Completas Gratis<' in data: bloque = scrapertools.find_single_match(data, '>Novelas Completas Gratis<(.*?)</main>')
+    else: bloque = scrapertools.find_single_match(data, '<h1>(.*?)$')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 

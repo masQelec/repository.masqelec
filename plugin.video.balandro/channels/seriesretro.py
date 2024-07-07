@@ -170,7 +170,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/', search_type = 'tvshow', text_color='cyan' ))
 
-    itemlist.append(item.clone( title = 'Animación', action = 'list_all', url = host + 'category/animacion/', search_type = 'tvshow', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Animación', action = 'list_all', url = host + 'category/animacion/', search_type = 'tvshow', text_color='greenyellow' ))
 
     itemlist.append(item.clone( title = 'Live action', action = 'list_all', url = host + 'category/liveaction/', search_type = 'tvshow', text_color='moccasin' ))
 
@@ -273,8 +273,8 @@ def list_all(item):
                 buscar_next = False
 
         if buscar_next:
-            if '<div class=wp-pagenavi>' in data:
-                next_page = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
+            if '<div class="wp-pagenavi">' in data:
+                next_page = scrapertools.find_single_match(data, '<div class="wp-pagenavi">.*?class="page-numbers current".*?href="(.*?)"')
 
                 if next_page:
                     if '/page/' in next_page:
@@ -343,8 +343,8 @@ def list_epis(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        if '<div class="wp-pagenavi"' in data:
-            next_page = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
+        if '<div class="wp-pagenavi">' in data:
+            next_page = scrapertools.find_single_match(data, '<div class="wp-pagenavi">.*?class="page-numbers current".*?href="(.*?)"')
 
             if next_page:
                 if '/page/' in next_page:

@@ -134,7 +134,7 @@ def list_all(item):
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<li class="page-current"><span class="item">.*?href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, '<div class="page page-current".*?<a class="page-link".*?href="(.*?)"')
 
         if next_page:
             next_page = host[:-1] + next_page

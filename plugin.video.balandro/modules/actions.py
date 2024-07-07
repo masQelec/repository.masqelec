@@ -423,6 +423,8 @@ def manto_params(item):
         config.set_setting('channel_todotorrents_dominio', '')
         config.set_setting('channel_tupelihd_dominio', '')
 
+        config.set_setting('channel_veronline_dominio', '')
+
         config.set_setting('channel_yestorrent_dominio', '')
 
         config.set_setting('autoplay_max_links', '10')
@@ -489,7 +491,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '126.0.6478.36')
+        config.set_setting('chrome_last_version', '126.0.6478.127')
 
         config.set_setting('debug', '0')
 
@@ -1151,7 +1153,8 @@ def manto_folder_downloads(item):
               path = filetools.join(config.get_data_path(), 'downloads')
               filetools.rmdirtree(path)
            except:
-              pass
+              platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Contenido Descargas NO Localizado[/COLOR][/B]' % color_alert)
+              return
 
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Contenido Descargas eliminado[/B][/COLOR]' % color_infor)
 
@@ -1561,6 +1564,10 @@ def opciones_tupelihd(item):
     item.from_channel = 'tupelihd'
     opciones_domains_common(item)
 
+def opciones_veronline(item):
+    item.from_channel = 'veronline'
+    opciones_domains_common(item)
+
 def opciones_yestorrent(item):
     item.from_channel = 'yestorrent'
     opciones_domains_common(item)
@@ -1725,6 +1732,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'tupelihd': domains.manto_domain_tupelihd(item)
 
+            elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
+
             elif item.from_channel == 'yestorrent': domains.manto_domain_yestorrent(item)
 
             else:
@@ -1839,6 +1848,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'tupelihd': domains.test_domain_tupelihd(item)
 
+            elif item.from_channel == 'veronline': domains.test_domain_veronline(item)
+
             elif item.from_channel == 'yestorrent': domains.test_domain_yestorrent(item)
 
             else:
@@ -1880,3 +1891,15 @@ def opciones_domains_common(item):
             elif item.from_channel == 'srnovelas': helper.show_help_srnovelas(item)
 
             elif item.from_channel == 'subtorrents': helper.show_help_subtorrents(item)
+
+def quitar_autoplay(item):
+    logger.info()
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Quitar el Auto Play ?[/B][/COLOR]'):
+        config.set_setting('autoplay', False)
+
+def quitar_autoplay_one_link(item):
+    logger.info()
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Quitar el Auto Play [/B][/COLOR]Si solo hay [COLOR gold][B]Un enlace[/B][/COLOR] para reproducir ?'):
+        config.set_setting('autoplay_one_link', False)

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www17.mejortorrent.zip'
+host = 'https://www18.mejortorrent.zip'
 
 
 # ~ por si viene de enlaces guardados
@@ -16,7 +16,8 @@ ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://ww
              'https://www5.mejortorrent.rip', 'https://www6.mejortorrent.rip', 'https://www7.mejortorrent.rip',
              'https://www8.mejortorrent.rip', 'https://www9.mejortorrent.rip', 'https://www10.mejortorrent.rip',
              'https://www11.mejortorrent.rip', 'https://www12.mejortorrent.rip', 'https://www13.mejortorrent.rip',
-             'https://www14.mejortorrent.rip', 'https://www15.mejortorrent.rip', 'https://www16.mejortorrent.rip']
+             'https://www14.mejortorrent.rip', 'https://www15.mejortorrent.rip', 'https://www16.mejortorrent.rip',
+             'https://www17.mejortorrent.zip']
 
 
 domain = config.get_setting('dominio', 'mejortorrentapp', default='')

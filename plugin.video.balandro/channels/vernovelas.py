@@ -31,13 +31,15 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ver-novela/', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Temporadas', action = 'list_all', url = host + 'temporada/', group = 'temp', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Series con temporadas', action = 'list_all', url = host + 'temporada/', group = 'temp', search_type = 'tvshow', text_color = 'yellowgreen' ))
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'tendencias/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow', text_color='moccasin' ))
 
     return itemlist
 
@@ -59,6 +61,7 @@ def generos(item):
        ('fantasia', 'Fantasía'),
        ('historia', 'Historia'),
        ('misterio', 'Misterio'),
+       ('musica', 'Música'),
        ('narcotrafico', 'Narcotráfico'),
        ('novelas', 'Novelas'),
        ('reality', 'Reality'),
@@ -85,6 +88,56 @@ def anios(item):
         url = host + 'release/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color ='hotpink' ))
+
+    return itemlist
+
+
+def plataformas(item):
+    logger.info()
+    itemlist = []
+
+    productoras = [
+        ('amazon', 'Amazon'),
+        ('antena-3', 'Antena 3'),
+        ('apple-tv', 'Apple TV'),
+        ('atresplayer-premium', 'Atresplayer Premium'),
+        ('canal', 'Canal+'),
+        ('cbc-television', 'CBC Television'),
+        ('cbs', 'Cbs'),
+        ('caracol-tv', 'Caracol TV'),
+        ('disney', 'Disney+'),
+        ('elisa-viihde-viaplay', 'Elisa Viihde Viaplay'),
+        ('fox', 'FOX'),
+        ('globoplay', 'Globoplay'),
+        ('hbo', 'HBO'),
+        ('hulu', 'Hulu'),
+        ('itv', 'ITV'),
+        ('jtbc', 'Jtbc'),
+        ('kanal-d', 'Kanal D'),
+        ('las-estrellas', 'Las Estrellas'),
+        ('nbc', 'NBC'),
+        ('netflix', 'Netflix'),
+        ('novelastv', 'Novelas TV'),
+        ('peacock', 'Peacock'),
+        ('rcn', 'Rcn'),
+        ('rede-globo', 'Rede Globo'),
+        ('rtbf-be', 'Rtbf BE'),
+        ('showtime', 'Showtime'),
+        ('star-tv', 'Star Tv'),
+        ('starz', 'Starz'),
+        ('telemundo', 'Telemundo'),
+        ('tf1', 'TF1'),
+        ('the-roku-channel', 'The Roku Channel'),
+        ('the-wb', 'The WB'),
+        ('tv-globo', 'TV Globo'),
+        ('tv8', 'TV8'),
+        ('upn', 'UPN')
+        ]
+
+    for opc, tit in productoras:
+        url = host + 'network/' + opc + '/'
+
+        itemlist.append(item.clone( title = tit, action = 'list_all', url = url, text_color = 'moccasin' ))
 
     return itemlist
 
@@ -132,9 +185,9 @@ def list_all(item):
         titulo = title
 
         if item.group == 'temp':
-            tempo = scrapertools.find_single_match(match, '<h3>.*?class="local-link">(.*?)</a>')
+            tempo = scrapertools.find_single_match(match, '<span class="b">(.*?)</span>')
 
-            titulo = titulo + ' ' + tempo.replace('Temporada', '[COLOR goldenrod]Temporada[/COLOR]')
+            titulo = titulo + ' ' + '[COLOR goldenrod]Temporada [/COLOR]' + str(tempo)
 
         itemlist.append(item.clone( action='temporadas', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
@@ -242,9 +295,8 @@ def temporadas(item):
         title = 'Temporada ' + numtempo
 
         if len(matches) == 1:
-            if not item.group == 'temp':
-                if config.get_setting('channels_seasons', default=True):
-                    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
             item.page = 0
             item.contentType = 'season'

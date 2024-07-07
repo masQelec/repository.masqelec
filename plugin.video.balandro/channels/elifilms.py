@@ -12,9 +12,6 @@ from lib import decrypters
 host = 'https://allcalidad.re/'
 
 
-players = 'https://allcalidad.re'
-
-
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://elifilms.net/', 'https://elifilms.org/', 'https://allcalidad.si/',
              'https://allcalidad.ms/']
@@ -258,6 +255,7 @@ def list_all(item):
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, "<div id='pagination'.*?<li class='active'>.*?href='(.*?)'")
+        if not next_url: next_url = scrapertools.find_single_match(data, '<div id="pagination".*?<li class="active">.*?href="(.*?)"')
 
         if next_url:
             if '/page/' in next_url:

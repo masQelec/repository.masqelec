@@ -211,7 +211,7 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por plataforma', action = 'plataformas', search_type = 'tvshow', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Por estudio', action = 'estudios', search_type = 'tvshow', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Por estudio', action = 'estudios', search_type = 'tvshow', text_color='greenyellow' ))
 
     return itemlist
 

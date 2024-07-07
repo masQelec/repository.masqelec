@@ -308,11 +308,13 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination">.*?' + "class='current'.*?" + 'href="(.*?)"')
+        if '<nav class="navigation pagination">' in data:
+            next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination">.*?' + "class='current'.*?" + 'href="(.*?)"')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination">.*?class="current".*?href="(.*?)"')
 
-        if next_page:
-            if '/page/' in next_page:
-                itemlist.append(item.clone( title = 'Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title = 'Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 

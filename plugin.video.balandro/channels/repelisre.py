@@ -52,7 +52,8 @@ def configurar_proxies(item):
 def do_downloadpage(url, ref, post=None, headers=None):
     if not host in url:
         if ref.startswith('/'): ref = host[:-1] + ref
-        else: ref = host + ref
+        else: 
+           if not host in ref: ref = host + ref
 
         url = host + api + url
 

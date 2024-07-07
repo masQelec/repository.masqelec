@@ -62,6 +62,10 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_ser', url = host, search_type = 'tvshow', group = 'lasts', text_color = 'moccasin' ))
+
+    itemlist.append(item.clone( title = 'Recomendadas', action = 'list_ser', url = host, search_type = 'tvshow', group = 'recom' ))
+
     itemlist.append(item.clone( title = 'Más series', action = 'otras', search_type = 'tvshow' ))
 
     return itemlist
@@ -138,7 +142,12 @@ def list_ser(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>SERIES<(.*?)>MÁS SERIES<')
+    if item.group == 'recom':
+        bloque = scrapertools.find_single_match(data, '>SERIES RECOMENDADAS<(.*?)</script>')
+    elif item.group == 'lasts':
+        bloque = scrapertools.find_single_match(data, '>SERIES DISPONIBLES<(.*?)</script>')
+    else:
+        bloque = scrapertools.find_single_match(data, '>SERIES<(.*?)>MÁS SERIES<')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
 
@@ -146,6 +155,13 @@ def list_ser(item):
 
     for match in matches[item.page * perpage:]:
         if match == '#': continue
+
+        if '#spu-' in match:
+            match = match.replace('#spu-', '#spu-bg-')
+
+            match = scrapertools.find_single_match(str(data), match + '.*?<center>.*?<a href="(.*?)"')
+
+            if match == '#': continue
 
         title = match.replace(host, '').replace('http://seriesbiblicas.net/', '').replace('/', '').strip()
 
@@ -155,7 +171,7 @@ def list_ser(item):
 
         titulo = titulo.replace('-recordtv-subtitulada', ' ').replace('-recordtv', ' ').strip()
         titulo = titulo.replace('-en-espanol-2', ' ').replace('-en-espanol', ' ').replace('-portugues', ' ').replace('-audio-latino', ' ').replace('-latino', ' ').strip()
-        titulo = titulo.replace('-sub', ' ').replace('-imagentv', ' ').replace('-unife', ' ').strip()
+        titulo = titulo.replace('-sub', ' ').replace('-imagentv', ' ').replace('-unife', ' ').replace(' sub', ' ').replace(' subtitulada', ' ').strip()
 
         SerieName = titulo.replace('-', ' ').strip()
 
@@ -395,6 +411,7 @@ def findvideos(item):
     lang = 'Lat'
     if 'PT' in item.title: lang = 'Pt'
     elif ' Sub ' in item.title: lang = 'Vose'
+    elif '- Sub' in item.title: lang = 'Vose'
 
     if item.link:
         if item.link.startswith("//"): item.link = 'https:' + item.link

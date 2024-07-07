@@ -129,16 +129,18 @@
 
         <setting id="pchv_opc" type="bool" label="Opciones" default="false"/>
         <setting id="resumen_canales1" type="action" label="Resumen y distribución Canales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=resumen_canales)"/>
-        <setting id="show_channels_list" type="action" label="Qué canales están [COLOR gold][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list)"/>
-        <setting id="channels_suggesteds" type="action" label="Qué canales están [COLOR aquamarine][B]Sugeridos[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_suggesteds)"/>
-        <setting id="show_help_resto1" type="action" label="¿ Qué significa el Aviso [COLOR red][B]CloudFlare[/COLOR][COLOR orangered] Protection[/B][/COLOR] ?" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_resto)"/>
-        <setting id="show_help_notices" type="action" label="Qué canales tienen [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_notice)"/>
-        <setting id="channels_with_proxies" type="action" label="Qué [COLOR gold][B]canales[/B][/COLOR] pueden usar [COLOR red][B]Proxies[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
-        <setting id="channels_with_proxies_memorized" type="action" label="Qué canales tiene con [COLOR red][B]Proxies Memorizados[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies_memorized)"/>
-        <setting id="show_help_hdfull" type="action" label="Aviso canal [COLOR yellow]HdFull[/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_hdfull)"/>
-        <setting id="show_help_nextdede" type="action" label="Aviso canal [COLOR yellow]NextDede[/COLOR]" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_nextdede)"/>
-        <setting id="show_help_playdede" type="action" label="Aviso canal [COLOR yellow]PlayDede[/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede)"/>
-        <setting id="show_help_resto2" type="action" label="Posible Aviso en el resto de [COLOR darkorange][B]Canales[/B][/COLOR]" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_resto)"/>
+        <setting id="resumen_incidencias" type="action" label="Canales con [COLOR tan][B]Incidencias[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=resumen_incidencias)"/>
+        <setting id="resumen_no_accesibles" type="action" label="Canales [COLOR indianred][B]No Accesibles[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=resumen_no_accesibles)"/>
+        <setting id="show_channels_list" type="action" label="Qué canales están [COLOR gold][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list)"/>
+        <setting id="channels_suggesteds" type="action" label="Qué canales están [COLOR aquamarine][B]Sugeridos[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_suggesteds)"/>
+        <setting id="show_help_resto1" type="action" label="¿ Qué significa el Aviso [COLOR red][B]CloudFlare[/COLOR][COLOR orangered] Protection[/B][/COLOR] ?" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_resto)"/>
+        <setting id="show_help_notices" type="action" label="Qué canales tienen [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_notice)"/>
+        <setting id="channels_with_proxies" type="action" label="Qué [COLOR gold][B]canales[/B][/COLOR] pueden usar [COLOR red][B]Proxies[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
+        <setting id="channels_with_proxies_memorized" type="action" label="Qué canales tiene con [COLOR red][B]Proxies Memorizados[/B][/COLOR]" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies_memorized)"/>
+        <setting id="show_help_hdfull" type="action" label="Aviso canal [COLOR yellow]HdFull[/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_hdfull)"/>
+        <setting id="show_help_nextdede" type="action" label="Aviso canal [COLOR yellow]NextDede[/COLOR]" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_nextdede)"/>
+        <setting id="show_help_playdede" type="action" label="Aviso canal [COLOR yellow]PlayDede[/COLOR]" visible="eq(-12,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede)"/>
+        <setting id="show_help_resto2" type="action" label="Posible Aviso en el resto de [COLOR darkorange][B]Canales[/B][/COLOR]" visible="eq(-13,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_resto)"/>
 
         <setting label="Presentación Canales:" type="lsep"/>
 
@@ -304,6 +306,8 @@
 
         <setting id="opc_todotorrents" type="action" label="[COLOR gold]TodoTorrents[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_todotorrents)"/>
         <setting id="opc_tupelihd" type="action" label="[COLOR gold]TuPeliHd[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_tupelihd)"/>
+
+        <setting id="opc_veronline" type="action" label="[COLOR gold]VerOnline[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_veronline)"/>
 
         <setting id="opc_yestorrent" type="action" label="[COLOR gold]YesTorrent[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_yestorrent)"/>
     </category>
@@ -811,14 +815,19 @@
         <setting id="tmdb_clean_db_cache" type="action" label="Pulsar para [COLOR gold][B]Limpiar[/B][/COLOR] la Caché TMDB actual" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=clean_db_cache)"/>
         <setting id="tmdb_drop_db_cache" type="action" label="Pulsar para [COLOR red][B]Eliminar[/B][/COLOR] la Caché TMDB actual" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=drop_db_cache)"/>
 
+        <setting label="Uso Caché de Tmdb" type="lsep"/>
+
+        <setting id="tmdbm_uso" type="bool" label="Opciones" default="false"/>
+        <setting id="tmdb_cache" type="bool" label="Usar la Caché TMDB (Mejora las búsquedas Recurrentes)" default="true" visible="eq(-1,true)"/>
+        <setting id="tmdb_cache_expire" type="enum" label="Cuando Renovar la Caché de TMDB" values="cada 1 día|cada 7 días|cada 15 días|cada 30 días|No" default="4" visible="eq(-2,true)"/>
+
         <setting label="Obtención Datos de Películas/Series en TheMovieDB" type="lsep"/>
 
         <setting id="tmdb_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="tmdb_disabled" type="bool" label="Desactivar Accesos a TMDB en las Listas" default="false" visible="eq(-1,true)"/>
-        <setting id="tmdb_threads" type="labelenum" label="Número de Búsquedas Simultáneas (puede causar Inestabilidad)" values="5|10|15|20|25|30" default="20" visible="eq(-2,true)"/>
-        <setting id="tmdb_plus_info" type="bool" label="Localizar información Extendida (Duración, Actores, etc.)" default="false" visible="eq(-3,true)"/>
-        <setting id="tmdb_cache" type="bool" label="Usar la Caché TMDB (incide/mejora en las búsquedas Recurrentes)" default="true" visible="eq(-4,true)"/>
-        <setting id="tmdb_cache_expire" type="enum" label="Preferencias para Renovar la Caché TMDB" values="cada 1 día|cada 7 días|cada 15 días|cada 30 días|No" default="4" visible="eq(-5,true)"/>
+        <setting id="tmdb_disabled" type="bool" label="Desactivar Accesos en las Listas a TMDB" default="false" visible="eq(-1,true)"/>
+        <setting id="tmdb_langs" type="enum" label="Idioma de búsqueda en TMDB" values="Español|Latino|Inglés|Italiano|Portugués|Francés|Alemán" default="0" visible="eq(-2,true)"/>
+        <setting id="tmdb_threads" type="labelenum" label="Número de Búsquedas Simultáneas (puede causar Inestabilidad)" values="5|10|15|20|25|30" default="20" visible="eq(-3,true)"/>
+        <setting id="tmdb_plus_info" type="bool" label="Localizar información Extendida (Duración, Actores, etc.) Aumenta el tiempo de búsqueda" default="false" visible="eq(-4,true)"/>
     </category>
 
     <category label="Sistema">

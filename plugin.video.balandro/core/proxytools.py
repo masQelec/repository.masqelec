@@ -2129,7 +2129,7 @@ def testear_lista_proxies(canal, provider, url, proxies=[]):
             perc = int(hechos / num_proxies * 100)
             validos = sum([1 for proxy in proxies if proxies_info[proxy]['ok']])
 
-            progreso.update(perc, 'Comprobando el %d de %d proxies. [COLOR gold]Posibles Válidos[/COLOR] %d. [COLOR yellowgreen][B]Cancelar si tarda demasiado[/B][/COLOR] ó [COLOR cyan][B]si ya hay más de uno válido[/B][/COLOR].' % (hechos, num_proxies, validos))
+            progreso.update(perc, 'Comprobando el %d de %d proxies. [COLOR gold]Posibles Válidos[/COLOR] %d. [COLOR yellowgreen][B]Cancelar si tarda demasiado[/B][/COLOR] ó [COLOR cyan][B]si ya hay suficientes válidos[/B][/COLOR].' % (hechos, num_proxies, validos))
 
             if proxies_limit:
                 if validos >= 10: break # ~ si todos los 10 más rápidos

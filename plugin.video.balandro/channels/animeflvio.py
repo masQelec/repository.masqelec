@@ -95,9 +95,7 @@ def generos(item):
     matches = re.compile('<a href="(.*?)".*? title="(.*?)"').findall(bloque)
 
     for url, title in matches:
-        url = host[:-1] + url
-
-        url = url + '?page=1'
+        url = host[:-1] + url + '?page=1'
 
         itemlist.append(item.clone( title = title.capitalize(), action = 'list_all', url = url, text_color = 'deepskyblue' ))
 

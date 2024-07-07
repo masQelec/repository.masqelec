@@ -462,12 +462,13 @@ def corregir_servidor(servidor):
     elif servidor in ['pixel']: return 'pixeldrain'
     elif servidor in ['clickndownload']: return 'clicknupload'
     elif servidor in ['mixdrop', 'mixdroop', 'mixdrp', 'mdy48tn97', 'md3b0j6hj', 'mdbekjwqa', 'mdfx9dc8n', 'mdzsmutpcvykb']: return 'mixdrop'
+    elif servidor in ['vidoza', 'videzz']: return 'vidoza'
 
     elif servidor == 'uptostream': return 'uptobox'
 
     elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'hexload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'swhoi', 'listeamed', 'fsdcmo', 'fdewsdc', 'qiwi', 'swdyu']: return 'various'
 
-    elif servidor in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'fastplay', 'gostream', 'letsupload', 'liivideo', 'myupload', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'tusfiles', 'uploadba', 'uploadflix', 'uploady', 'veev', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vid', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub']: return 'zures'
+    elif servidor in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'fastplay', 'filegram', 'gostream', 'letsupload', 'liivideo', 'myupload', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'tusfiles', 'uploadba', 'uploadflix', 'uploady', 'veev', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vid', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub']: return 'zures'
 
     else: return servidor
 
@@ -543,7 +544,7 @@ def corregir_other(srv):
 
     elif 'streamruby' in srv or 'sruby' in srv or 'rubystream' in srv or 'stmruby' in srv or 'rubystm' in srv: srv = 'Streamruby'
 
-    elif 'allviid' in srv or 'cloudfile' in srv or 'cloudmail' in srv or 'dailyuploads' in srv or 'darkibox' in srv or 'dembed' in srv or 'downace' in srv or 'fastdrive' in srv or 'fastplay' in srv or 'gostream' in srv or 'letsupload' in srv or 'liivideo' in srv or 'myupload' in srv or 'oneupload' in srv or 'pandafiles' in srv or 'rovideo' in srv or 'send' in srv or 'streamable' in srv or 'streamdav' in srv or 'streamgzzz' in srv or 'streamoupload' in srv or 'tusfiles' in srv or 'uploadba' in srv or 'uploadflix' in srv or 'uploady' in srv or 'veev' in srv or 'veoh' in srv or 'vidbob' in srv or 'vidlook' in srv or 'vidmx' in srv or 'vid' in srv or 'vidpro' in srv or 'vipss' in srv or 'vkprime' in srv or 'worlduploads' in srv or 'ztreamhub' in srv: srv = 'Zures'
+    elif 'allviid' in srv or 'cloudfile' in srv or 'cloudmail' in srv or 'dailyuploads' in srv or 'darkibox' in srv or 'dembed' in srv or 'downace' in srv or 'fastdrive' in srv or 'fastplay' in srv or 'filegram' in srv or 'gostream' in srv or 'letsupload' in srv or 'liivideo' in srv or 'myupload' in srv or 'oneupload' in srv or 'pandafiles' in srv or 'rovideo' in srv or 'send' in srv or 'streamable' in srv or 'streamdav' in srv or 'streamgzzz' in srv or 'streamoupload' in srv or 'tusfiles' in srv or 'uploadba' in srv or 'uploadflix' in srv or 'uploady' in srv or 'veev' in srv or 'veoh' in srv or 'vidbob' in srv or 'vidlook' in srv or 'vidmx' in srv or 'vid' in srv or 'vidpro' in srv or 'vipss' in srv or 'vkprime' in srv or 'worlduploads' in srv or 'ztreamhub' in srv: srv = 'Zures'
 
     return srv
 

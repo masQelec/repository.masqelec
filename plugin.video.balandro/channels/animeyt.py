@@ -36,25 +36,34 @@ def mainlist_animes(item):
         from modules import actions
         if actions.adults_password(item) == False: return
 
-    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'all', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/?status=&type=&order=', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/?status=&type=&order=update&page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host + 'ver/?status=&type=&order=update', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host + 'ver/?status=&type=&order=update&page=1', search_type = 'tvshow', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Actualizados', action = 'list_all', url = host + 'ver/?status=&type=&order=latest', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Actualizados', action = 'list_all', url = host + 'ver/?status=&type=&order=latest&page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'ver/?sub=&order=popular', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'ver/?sub=&order=popular&page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + '?s=castellano', search_type = 'tvshow', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + '?s=latino', search_type = 'tvshow', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Series', action = 'list_all', url = host + 'ver/?status=&type=tv&order=update&page=1', search_type = 'tvshow', text_color = 'hotpink' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'ver/?status=&type=movie&order=update&page=1', search_type = 'movie', text_color='deepskyblue' ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'ver/?type=ova&sub=&order=update&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Onas', action = 'list_all', url = host + 'ver/?status=&type=ona&order=update&page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Series', action = 'list_all', url = host + 'ver/?status=&type=tv&order=', search_type = 'tvshow', text_color = 'hotpink' ))
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'ver/?status=&type=movie&order=', search_type = 'tvshow', text_color='deepskyblue' ))
-    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'ver/?type=ova&sub=', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Onas', action = 'list_all', url = host + 'ver/?status=&type=ona&order=', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def idiomas(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + '?s=castellano&order=update&page=1', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + '?s=latino&order=update&page=1', text_color='moccasin' ))
 
     return itemlist
 
@@ -103,7 +112,13 @@ def list_all(item):
 
         title = title.replace('&#8217;', "'").replace('&#8211;', '').replace('&#215;', 'x')
 
-        if '>Movie<' in match:
+        tipo = 'movie' if '>Movie<' in match else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
+            if item.search_type != 'all':
+                if item.search_type == 'tvshow': continue
+
             PeliName = title
 
             if '[Película' in PeliName: PeliName = PeliName.split("[Película")[0]
@@ -112,9 +127,13 @@ def list_all(item):
 
             PeliName = PeliName.strip()
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType = 'movie', contentTitle = PeliName, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        contentType = 'movie', contentTitle = PeliName, infoLabels={'year': year} ))
 
-        else:
+        if tipo == 'tvshow':
+            if item.search_type != 'all':
+                if item.search_type == 'movie': continue
+
             SerieName = title
 
             if '[Temporada' in SerieName: SerieName = SerieName.split("[Temporada")[0]
@@ -125,7 +144,8 @@ def list_all(item):
 
             SerieName = SerieName.strip()
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

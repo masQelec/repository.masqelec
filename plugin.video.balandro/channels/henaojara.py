@@ -96,6 +96,8 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    if not url: return ''
+
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -199,25 +201,32 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'all', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'veronline/category/categorias/', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'veronline/category/categorias/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'all', text_color = 'olivedrab' ))
+    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'veronline/category/emision/', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'veronline/category/emision/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'veronline/category/estrenos/', search_type = 'all', text_color = 'greenyellow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'veronline/category/estrenos/', search_type = 'tvshow', text_color = 'greenyellow' ))
 
-    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'veronline/category/categorias/espanol-castellano/', search_type = 'all', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'veronline/category/pelicula/', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'veronline/category/categorias/latino/', search_type = 'all', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'veronline/category/categorias/subtitulos/', search_type = 'all', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'veronline/category/pelicula/', search_type = 'all', text_color = 'deepskyblue' ))
+    return itemlist
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos',  search_type = 'all' ))
+
+def idiomas(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'veronline/category/categorias/espanol-castellano/', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'veronline/category/categorias/latino/', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'veronline/category/categorias/subtitulos/', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -290,7 +299,7 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         tipo = 'movie' if '>Pelicula' in match or '-movie-' in url else 'tvshow'
-        sufijo = '' if item.search_type == 'movie' else tipo
+        sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'tvshow':
             if not item.search_type == "all":
@@ -298,11 +307,12 @@ def list_all(item):
 
             titulo = title + nro_season
 
-            itemlist.append(item.clone( action = 'temporadas', url= url, title=titulo, thumbnail=thumb,
+            itemlist.append(item.clone( action = 'temporadas', url= url, title=titulo, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
-        else:
-            if not item.search_type == "all":
-                if item.search_type == "tvshow": continue
+
+        if tipo == 'movie':
+            if item.search_type != 'all':
+                if item.search_type == 'tvshow': continue
 
             PeliName = re.sub(r"Sub |Español|Latino|Castellano|HD|Temporada \d+|\(\d{4}\)", "", title).strip()
 
@@ -375,7 +385,10 @@ def list_last(item):
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
-        else:
+
+        if tipo == 'movie':
+            if item.search_type != 'all':
+                if item.search_type == 'tvshow': continue
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=PeliName, infoLabels={'year': year} ))
 

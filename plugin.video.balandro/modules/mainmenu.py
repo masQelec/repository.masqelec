@@ -13,7 +13,7 @@ from datetime import datetime
 from platformcode import config, logger, platformtools, updater
 from core.item import Item
 
-from core import channeltools
+from core import channeltools, scrapertools
 
 
 color_list_prefe = config.get_setting('channels_list_prefe_color', default='gold')
@@ -28,6 +28,36 @@ color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 current_year = int(datetime.today().year)
 current_month = int(datetime.today().month)
+
+
+con_incidencias = ''
+no_accesibles = ''
+
+try:
+    with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+except:
+    try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+    except: txt_status = ''
+
+if txt_status:
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
+
+if txt_status:
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
 
 
 context_desarrollo = []
@@ -1397,6 +1427,12 @@ def channels(item):
 
             if not item.extra == 'problematics': titulo += '[I][B][COLOR darkgoldenrod] (problemático)[/COLOR][/I][/B]'
 
+        if con_incidencias:
+           if ch['name'] in str(con_incidencias): titulo += '[I][B][COLOR tan] (incidencia)[/COLOR][/I][/B]'
+
+        if no_accesibles:
+           if ch['name'] in str(no_accesibles): titulo += '[I][B][COLOR tan] (no accesible)[/COLOR][/I][/B]'
+
         if ch['searchable']:
             if not ch['status'] == -1:
                 cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
@@ -1425,7 +1461,7 @@ def channels(item):
 
         i =+ 1
 
-        itemlist.append(Item( channel=ch['id'], action=accion, title=titulo, context=context, text_color=color, plot = plot, thumbnail=ch['thumbnail'], category=ch['name'] ))
+        itemlist.append(Item( channel=ch['id'], action=accion, title=titulo, context=context, text_color=color, plot=plot, extra=item.extra, thumbnail=ch['thumbnail'], category=ch['name'] ))
 
     if len(ch_list) == 0 or i == 0:
         if item.extra == 'Proxies' or item.extra == 'disableds':

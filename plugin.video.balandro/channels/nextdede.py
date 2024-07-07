@@ -560,7 +560,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='acciones', title=titulo, text_color='goldenrod' ))
 
     if config.get_setting('nextdede_login', 'nextdede', default=False):
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas colecciones[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas colecciones[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -584,7 +584,7 @@ def mainlist_pelis(item):
 
         if not config.get_setting('dominio', 'nextdede'): config.set_setting('dominio', dominio, 'nextdede')
 
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas colecciones[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas colecciones[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -624,7 +624,7 @@ def mainlist_series(item):
 
         if not config.get_setting('dominio', 'nextdede'): config.set_setting('dominio', dominio, 'nextdede')
 
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas colecciones[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas colecciones[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 

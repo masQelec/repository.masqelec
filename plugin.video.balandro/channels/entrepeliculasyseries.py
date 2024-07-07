@@ -494,6 +494,7 @@ def findvideos(item):
 
         elif '/1fichier.' in url: continue
         elif '/short.' in url: continue
+        elif '/plustream.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

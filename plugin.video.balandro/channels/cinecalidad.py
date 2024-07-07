@@ -241,7 +241,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host, search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'destacadas', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series-populares/', search_type = 'tvshow' ))
 
@@ -691,7 +691,7 @@ def findvideos(item):
 
                 url = item.url + _url
 
-                itemlist.append(Item (channel = item.channel, action = 'play', server = 'directo', title = '', url = url, other = servidor ))
+                itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = 'd' ))
 
     if not itemlist:
         if not ses == 0:
@@ -710,7 +710,7 @@ def play(item):
     if domain_memo: host_player = domain_memo
     else: host_player = host
 
-    if item.server == 'directo':
+    if item.server == 'directo' or item.other == 'd':
         url = ''
 
         if item.url:

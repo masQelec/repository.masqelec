@@ -44,12 +44,15 @@ except:
    except: pass
 
 
-host = 'https://wn3.cuevana3.vip'
+host = 'https://wiw3.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://cuevana3.vip', 'https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip',
-             'https://wlv.cuevana3.vip', 'https://wli3.cuevana3.vip', 'https://wnv3.cuevana3.vip']
+ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://wlv.cuevana3.vip',
+             'https://wli3.cuevana3.vip', 'https://wnv3.cuevana3.vip', 'https://wn3.cuevana3.vip',
+             'https://wv3i.cuevana3.vip', 'https://wmi.cuevana3.vip', 'https://wi3v.cuevana3.vip',
+             'https://wev3.cuevana3.vip', 'https://wv3n.cuevana3.vip', 'https://wl3n.cuevana3.vip',
+             'https://cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')
@@ -115,7 +118,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout, raise_weberror=raise_weberror).data
 
         if not data:
-            if not '/?s=' in url:
+            if not '?s=' in url:
                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Cuevana3Pro', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
@@ -214,6 +217,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/movies/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/category/page-peliculas-de-estrenos/', search_type = 'movie', text_color = 'cyan' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
@@ -243,7 +248,7 @@ def generos(item):
     if item.search_type == 'movie': text_color = 'deepskyblue'
     else: text_color = 'hotpink'
 
-    data = do_downloadpage(host)
+    data = do_downloadpage(host + '/movies/')
 
     bloque = scrapertools.find_single_match(data,'>Genres<(.*?)</ul>')
     if not bloque: bloque = scrapertools.find_single_match(data,'>Categorias<(.*?)</ul>')
@@ -666,6 +671,8 @@ def findvideos(item):
     matches = matches1 + matches1
 
     for url in matches:
+        if not url: continue
+
         ses += 1
 
         url = url.replace('&#038;', '&').replace('&amp;', '&').replace('#038;', '')
@@ -738,12 +745,15 @@ def play(item):
         url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
         if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
-        if not url: return itemlist
+        if not url:
+            if '.terabox.' in data or '.terabox.' in data or '/hydrax.' in data:
+                return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+            return itemlist
 
         if '/pelisplay.' in url: url = ''
 
         if url:
-            if '/terabox.' in url or '/hydrax.' in url:
+            if '/terabox.' in url or '.terabox.' in url or '/hydrax.' in url:
                 return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
             servidor = servertools.get_server_from_url(url)
@@ -836,10 +846,25 @@ def list_search(item):
 
 def search(item, texto):
     logger.info()
+    itemlist1 = []
+    itemlist2 = []
 
     try:
-        item.url = host + '/?s=' + texto.replace(" ", "+")
-        return list_search(item)
+        if item.search_type == 'movie':
+            item.url = host + '/movies?s=' + texto.replace(" ", "+")
+            return list_search(item)
+        elif item.search_type == 'tvshow':
+            item.url = host + '/series?s=' + texto.replace(" ", "+")
+            return list_search(item)
+        else:
+            item.url = host + '/movies?s=' + texto.replace(" ", "+")
+            itemlist1 = list_search(item)
+
+            item.url = host + '/series?s=' + texto.replace(" ", "+")
+            itemlist2 = list_search(item)
+
+            itemlist = itemlist1 + itemlist2
+            return itemlist
     except:
         import sys
         for line in sys.exc_info():

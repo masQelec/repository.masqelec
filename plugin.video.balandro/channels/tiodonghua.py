@@ -30,11 +30,11 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'donghua/', group = 'donghua', search_type = 'tvshow' )) 
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'donghua/', search_type = 'tvshow' )) 
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'episodios/', group = 'last_epis', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', group = 'animes', search_type = 'tvshow', text_color = 'springgreen' ))
+    itemlist.append(item.clone( title = 'Episodios Animes', action = 'list_all', url = host + 'anime/', group = 'animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Donghuas', action = 'list_all', url = host + 'genero/donghua/', search_type = 'tvshow', text_color = 'moccasin' ))
 
@@ -68,17 +68,7 @@ def generos(item):
     ]
 
     for opc, tit in opciones:
-        group = ''
-
-        if opc == 'action-adventure': group = 'donghua'
-        elif opc == 'animacion': group = 'donghua'
-        elif opc == 'comedia': group = 'donghua'
-        elif opc == 'drama': group = 'donghua'
-        elif opc == 'sci-fi-fantasy': group = 'donghua'
-
-        elif opc == 'anime-japones': group = 'generos'
-
-        itemlist.append(item.clone( title=tit, url = host + 'genero/' + opc + '/', action = 'list_all', group = group, text_color = 'springgreen' ))
+        itemlist.append(item.clone( title=tit, url = host + 'genero/' + opc + '/', action = 'list_all', text_color = 'springgreen' ))
 
     return itemlist
 
@@ -143,11 +133,7 @@ def list_all(item):
             itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epi ))
         else:
-            if item.group == 'donghua': url = url.replace('/donghua/', '/anime/anime/')
-
-            elif item.group == 'generos': url = url.replace('/donghua/', '/anime/anime/')
-
-            elif item.group == 'animes':
+            if item.group == 'animes':
                 epi = scrapertools.find_single_match(match, '<span class="epx">Ep(.*?)</span>').strip()
 
                 if not epi: epi = 1
@@ -197,25 +183,24 @@ def episodios(item):
     if not epis: epis = scrapertools.find_multiple_matches(data, '<li class="mark-.*?src="(.*?)".*?<div class="numerando">(.*?)</div>.*?<a href="(.*?)">(.*?)</a>')
 
     if not epis:
-        if item.group == 'donghua' or item.group == 'generos':
-            bloque = scrapertools.find_single_match(data, '</a></div><div class="inepcx">(.*?)</a></li></ul>')
+        bloque = scrapertools.find_single_match(data, '</a></div><div class="inepcx">(.*?)</a></li></ul>')
 
-            if '<div class="eplister">': bloque = scrapertools.find_single_match(bloque, '<div class="eplister">(.*?)$')
+        if '<div class="eplister">': bloque = scrapertools.find_single_match(bloque, '<div class="eplister">(.*?)$')
 
-            links = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
+        links = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
 
-            for url in links:
-                epi = scrapertools.find_single_match(bloque, '<a href="' + url + '".*?<div class="epl-num">(.*?)</div>').strip()
+        for url in links:
+            epi = scrapertools.find_single_match(bloque, '<a href="' + url + '".*?<div class="epl-num">(.*?)</div>').strip()
 
-                if not epi: epi = 1
-                item.contentSeason = 1
+            if not epi: epi = 1
+            item.contentSeason = 1
 
-                titulo = '%sx%s - %s' % (str(item.contentSeason), epi, item.contentSerieName)
+            titulo = '%sx%s - %s' % (str(item.contentSeason), epi, item.contentSerieName)
 
-                itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
-                                            contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
+            itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
+                                        contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
 
-            return itemlist
+        return itemlist
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(epis)
@@ -328,6 +313,7 @@ def findvideos(item):
         elif 'videopress.com' in url: continue
         elif 'tioplayer.com' in url: continue
         elif 'likessb.com' in url: continue
+        elif '.animefenix.' in url: continue
 
         if 'http:' in url: url = url.replace('http:', 'https:')
 

@@ -41,8 +41,7 @@ def mainlist_pelis(item):
     if not config.get_setting('descartar_anime', default=False):
        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'movie', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'audio-espanol/', search_type = 'movie', text_color = 'moccasin' ))
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'audio-latino/', search_type = 'movie', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
 
@@ -65,12 +64,21 @@ def mainlist_series(item):
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'audio-espanol/', search_type = 'tvshow', text_color = 'moccasin' ))
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'audio-latino/', search_type = 'tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def idiomas(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'audio-espanol/', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'audio-latino/', text_color = 'moccasin' ))
 
     return itemlist
 

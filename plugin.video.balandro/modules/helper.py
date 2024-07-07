@@ -963,6 +963,12 @@ def submnu_play(item):
 
     itemlist.append(item.clone( action='show_play_parameters', title=' - Qué [COLOR chocolate][B]Ajustes[/B][/COLOR] tiene en preferencias [COLOR fuchsia][B]Play[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
+    if config.get_setting('autoplay', default=False):
+        itemlist.append(item.clone( channel='actions', action='quitar_autoplay', title= ' - Quitar [COLOR fuchsia][B]Auto Play[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+
+    if config.get_setting('autoplay_one_link', default=True):
+        itemlist.append(item.clone( channel='actions', action='quitar_autoplay_one_link', title= ' - Quitar [COLOR fuchsia][B]Auto Play[/B][/COLOR] Si solo hay [COLOR gold][B]Un enlace[/B][/COLOR] para reproducir', thumbnail=config.get_thumb('news') ))
+
     itemlist.append(item.clone( action='show_server_report', title= ' - Reportar [COLOR gold][B]Reproducción de lista abortada[/B][/COLOR]', thumbnail=config.get_thumb('megaphone') ))
 
     itemlist.append(item.clone( action='show_not_play', title= ' - ¿ Qué [COLOR goldenrod][B]NO[/B][/COLOR] está contemplado en Balandro ?', thumbnail=config.get_thumb('roadblock') ))
@@ -1767,6 +1773,10 @@ def show_help_cuevana3video(item):
     item.notice = 'cuevana3video'
     show_help_canales(item)
 
+def show_help_doramasyt(item):
+    item.notice = 'doramasyt'
+    show_help_canales(item)
+
 def show_help_ennovelas(item):
     item.notice = 'ennovelas'
     show_help_canales(item)
@@ -1805,6 +1815,10 @@ def show_help_latanime(item):
 
 def show_help_megaserie(item):
     item.notice = 'megaserie'
+    show_help_canales(item)
+
+def show_help_mundodonghua(item):
+    item.notice = 'mundodonghua'
     show_help_canales(item)
 
 def show_help_nextdede(item):
@@ -2707,7 +2721,7 @@ def show_play_parameters(item):
     if config.get_setting('autoplay', default=False): txt += '[CR]    - [COLOR yellow][B] Activado[/B][/COLOR]'
     else: txt += '[CR]    - [COLOR yellow][B] Des-Activado[/B][/COLOR]'
 
-    if config.get_setting('autoplay_one_link', default=False): txt += '[CR]    -  Si solo hay [COLOR gold][B]Un enlace[/B][/COLOR] reproducirlo automáticamente[COLOR yellow][B]  Activado[/B][/COLOR]'
+    if config.get_setting('autoplay_one_link', default=True): txt += '[CR]    -  Si solo hay [COLOR gold][B]Un enlace[/B][/COLOR] reproducirlo automáticamente[COLOR yellow][B]  Activado[/B][/COLOR]'
     else: txt += '[CR]    -  Si solo hay [COLOR gold][B]Un enlace[/B][/COLOR] reproducirlo automáticamente[COLOR yellow][B]  Des-Activado[/B][/COLOR]'
 
     if config.get_setting('autoplay_channels_discarded', default=''):
@@ -4796,6 +4810,13 @@ def show_test(item):
         if tupelihd_dominio:
            if tex_dom: tex_dom = tex_dom + '   TupeliHd: ' + tupelihd_dominio + '[CR]'
            else: tex_dom = '[CR]   TupeliHd: ' + tupelihd_dominio + '[CR]'
+
+    datos = channeltools.get_channel_parameters('veronline')
+    if datos['active']:
+        veronline_dominio = config.get_setting('channel_veronline_dominio', default='')
+        if veronline_dominio:
+           if tex_dom: tex_dom = tex_dom + '   VerOnline: ' + veronline_dominio + '[CR]'
+           else: tex_dom = '[CR]   VerOnline: ' + veronline_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('yestorrent')
     if datos['active']:

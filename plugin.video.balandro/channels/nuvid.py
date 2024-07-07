@@ -31,11 +31,11 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'search/videos/_empty_/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'search/videos/videos/' ))
 
-    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'search/videos/_empty_/', tipo = 'rt' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'search/videos/videos/', tipo = 'rt' ))
 
-    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'search/videos/hd', qlty = '1' ))
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'search/videos/hd/', qlty = '1' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
@@ -126,6 +126,8 @@ def findvideos(item):
 
     videos = get_video_url(item.url)
 
+    if str(videos) == '': return itemlist
+
     if not videos:
         platformtools.dialog_notification('Nuvid', '[COLOR red]El archivo no existe o ha sido borrado[/COLOR]')
         return
@@ -147,9 +149,11 @@ def get_video_url(page_url):
 
     if "File was deleted" in data or "not Found" in data: return video_urls
 
-    url= "https://www.%s.com/player_config_json/?vid=%s&aid=0&domain_id=0&embed=0&ref=null&check_speed=0" % (srv, vid)
+    url = "https://www.%s.com/player_config_json/?vid=%s&aid=0&domain_id=0&embed=0&ref=null&check_speed=0" % (srv, vid)
 
     data = httptools.downloadpage(url).data
+
+    if str(data) == '[]': return ''
 
     data = scrapertools.find_single_match(data, '"files":(.*?)"quality"')
 

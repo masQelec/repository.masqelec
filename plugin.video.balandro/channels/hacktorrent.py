@@ -154,6 +154,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title = title.replace('&#8217;', "'")
+
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         qlty = scrapertools.find_single_match(match, '<ul class="card__list">.*?<li>(.*?)</li>')
@@ -313,15 +315,23 @@ def findvideos(item):
     itemlist = []
 
     if item.contentType == 'episode':
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent', language = item.language, quality = item.quality ))
+        lang = '?'
+        size = item.language
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent',
+                              language = lang, quality = item.quality, other = size ))
 
         return itemlist
 
     data = do_downloadpage(item.url)
 
-    links = scrapertools.find_multiple_matches(data, '>Torrents<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
-    if not links: links = scrapertools.find_multiple_matches(data, '>Utorrents<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
-    if not links: links = scrapertools.find_multiple_matches(data, '<td>T</td>.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+    bloque = scrapertools.find_single_match(data, '>Torrents<(.*?)</table>')
+
+    links = scrapertools.find_multiple_matches(bloque, '<td>(.*?)</td>.*?<td(.*?)</td>.*?</td>.*?<td class="hide-on-mobile">(.*?)</td>.*?href="(.*?)"')
+
+    if not links: links = scrapertools.find_multiple_matches(data, '>Torrents<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?</td>.*?<td class="hide-on-mobile">(.*?)</td>.*?href="(.*?)"')
+    if not links: links = scrapertools.find_multiple_matches(data, '>Utorrents<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?</td>.*?<td class="hide-on-mobile">(.*?)</td>.*?href="(.*?)"')
+    if not links: links = scrapertools.find_multiple_matches(data, '<td>T</td>.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?</td>.*?<td class="hide-on-mobile">(.*?)</td>.*?href="(.*?)"')
 
     for qlty, lang, size, link in links:
         if 'Castellano' in lang: lang = 'Esp'
@@ -329,7 +339,10 @@ def findvideos(item):
         elif 'Subitulado' in lang: lang = 'Vose'
         elif 'Version Original' in lang: lang = 'VO'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent', language = lang, quality = qlty ))
+        lang = lang.replace('>', '').strip()
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent',
+                              language = lang, quality = qlty, other = size ))
 
     return itemlist
 

@@ -59,9 +59,6 @@ if domain:
     else: host = domain
 
 
-perpage = 30
-
-
 def item_configurar_proxies(item):
     color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
 
@@ -196,7 +193,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
-    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'all', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes?page=1', search_type = 'tvshow' ))
 
@@ -204,13 +201,13 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animes?estado[]=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animes?estado[]=1?page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'animes?type%5B%5D=ova&order=default', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'animes?type%5B%5D=ova&order=default?page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'animes?type%5B%5D=movie&order=default', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'animes?type%5B%5D=movie&order=default?page=1', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'animes?type%5B%5D=special&order=default',  search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'animes?type%5B%5D=special&order=default?page=1',  search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por categorías', action = 'categorias', search_type = 'tvshow' ))
 
@@ -291,19 +288,23 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    if not item.page: item.page = 0
-
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<article class="serie-card"><div class="serie-card__information"><p>([^<]+)<\/p>'
-    patron += '<\/div><figure class="image"><a href="([^"]+)" title="([^"]+)">'
-    patron += '<img src="([^"]+)".*?<span class="tag year is-dark">(\d+)'
+    matches = re.compile('<article(.*?)</article>').findall(data)
 
-    matches = re.compile(patron).findall(data)
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        title = scrapertools.find_single_match(match, 'title="(.*?)"')
 
-    for info, url, title, thumb, year in matches[item.page * perpage:]:
         if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+
+        year = scrapertools.find_single_match(match, '<span class="tag year is-dark">(.*?)</span>')
+        if not year: year = '-'
+
+        plot = scrapertools.find_single_match(match, 'div class="serie-card__information"><p>(.*?)</p>')
 
         SerieName = title
 
@@ -314,25 +315,34 @@ def list_all(item):
 
         SerieName = SerieName.strip()
 
-        if item.search_type == 'tvshow':
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, 
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year, 'plot': info} ))
-        else:
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                        contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': info} ))
+        tipo = 'movie' if '>Película<' in match else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
 
-        if len(itemlist) >= perpage: break
+        if tipo == 'tvshow':
+            if item.search_type != 'all':
+                if item.search_type == 'movie': continue
+
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo = sufijo, 
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year, 'plot': plot} ))
+
+        if tipo == 'movie':
+            if item.search_type != 'all':
+                if item.search_type == 'tvshow': continue
+
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo = sufijo,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        if '<a class="pagination-link" href="' in data:
+        if '<a class="pagination-link"' in data:
             next_page = scrapertools.find_single_match(data, '<a class="pagination-link" href="([^"]+)">Siguiente')
 
             if next_page:
-                next_page = item.url.split("?")[0] + next_page
+                if 'page=' in next_page:
+                    next_page = item.url.split("?")[0] + next_page
 
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', page = 0, text_color = 'coral' ))
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 
@@ -416,6 +426,11 @@ def episodios(item):
     data = do_downloadpage(item.url)
 
     matches = re.compile('<a class="fa-play-circle d-inline-flex align-items-center is-rounded " href="([^"]+)".*?<span>([^<]+)', re.DOTALL).findall(data)
+
+    if not matches:
+        if '>Próximamente<' in data:
+             platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#039;', "'").replace('&#8217;', "'"), '[COLOR cyan]Proximamente[/COLOR]')
+             return
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)

@@ -103,7 +103,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'episodios', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'series/estrenos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'series/estrenos', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'series/tendencias/semana', search_type = 'tvshow' ))
 
@@ -530,6 +530,9 @@ def play(item):
         url = url_final
 
     if url:
+        if '/plustream.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+		
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

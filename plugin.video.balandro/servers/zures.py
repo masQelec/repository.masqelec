@@ -51,6 +51,7 @@ def get_video_url(page_url, url_referer=''):
         elif 'downace' in page_url: txt_server = 'Downace'
         elif 'fastdrive' in page_url: txt_server = 'Fastdrive'
         elif 'fastplay' in page_url: txt_server = 'Fastplay'
+        elif 'filegram' in page_url: txt_server = 'Filegram'
         elif 'gostream' in page_url: txt_server = ''
         elif 'letsupload' in page_url: txt_server = 'Gostream'
         elif 'liivideo' in page_url: txt_server = 'Liivideo'

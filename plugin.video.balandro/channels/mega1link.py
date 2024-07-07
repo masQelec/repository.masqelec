@@ -130,6 +130,7 @@ def list_all(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<span class="current">.*?' + "<a href='(.*?)'")
+        if not next_page: next_page = scrapertools.find_single_match(data, '<span class="current">.*?<a href="(.*?)"')
 
         if next_page:
             if '/page/' in next_page:
@@ -268,10 +269,12 @@ def list_search(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, ' href="([^"]+)"[^>]*><span class="icon-chevron-right">')
+        next_page = scrapertools.find_single_match(data, '<span class="current">.*?' + "<a href='(.*?)'")
+        if not next_page: next_page = scrapertools.find_single_match(data, '<span class="current">.*?<a href="(.*?)"')
 
         if next_page:
-            itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_search', text_color='coral' ))
+            if '/page/' in next_page:
+                itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_search', text_color='coral' ))
 
     return itemlist
 
