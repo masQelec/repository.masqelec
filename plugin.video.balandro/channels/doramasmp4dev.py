@@ -28,7 +28,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_all', url = host, search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_all', url = host, group = 'last', search_type = 'tvshow', text_color = 'cyan' ))
+
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'doramas-en-curso-ubau/', search_type = 'tvshow', text_color = 'moccasin' ))
+
+    itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'series/?type=Anime', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'tvshow' ))
@@ -94,9 +98,19 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
-    bloque = scrapertools.find_single_match(data, '<div class="listupd">(.*?)<div class="hpage">')
+    bloque = data
 
+    if '>Latest Release<' in data: pass
+    elif '>Última publicación<' in data: pass
+    elif '>Doramas en Curso<' in data: pass
+    else:
+       bloque = scrapertools.find_single_match(data, '<div class="listupd">(.*?)<div class="hpage">')
+
+    if not bloque: bloque = scrapertools.find_single_match(data, '>Latest Release<(.*?)<div class="hpage">')
     if not bloque: bloque = scrapertools.find_single_match(data, '>Última publicación<(.*?)<div class="hpage">')
+
+    if not bloque: bloque = scrapertools.find_single_match(data, '>Doramas en Curso<(.*?)<div class="pagination">')
+
     if not bloque: bloque = scrapertools.find_single_match(data, '<div class="listupd">(.*?)<div class="pagination">')
 
     matches = re.compile('<article(.*?)</article>').findall(bloque)
@@ -147,13 +161,23 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
+    if item.group == 'last': return itemlist
+
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<div class="hpage">.*?<a href="(.*?)"')
+        if '</i> Previous</a>' in data:
+           next_page = scrapertools.find_single_match(data, '<div class="hpage">.*?</i> Previous</a>.*?<a href="(.*?)"')
+           if not next_page: next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?</i> Previous</a>.*?class="page-numbers current">.*?href="(.*?)"')
+        else:
+           next_page = scrapertools.find_single_match(data, '<div class="hpage">.*?<a href="(.*?)"')
+           if not next_page: next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?class="page-numbers current">.*?href="(.*?)"')
 
         if next_page:
             if '?page=' in next_page or '/page/' in next_page:
                 if not '</i> Anterior</a>' in data:
-                    if not '/page/' in next_page: next_page = host[:-1] + next_page
+                    if not '/page/' in next_page:
+                        if '/series/' in item.url: next_page = host[:-1] + '/series/' + next_page
+                        elif 'doramas-en-curso-ubau' in item.url: next_page = host[:-1] + 'doramas-en-curso-ubau' + next_page
+                        else: next_page = host[:-1] + next_page
 
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
 
@@ -320,6 +344,35 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url.replace('&amp;', '&')
+
+    if item.server == 'directo':
+        if '.mundodrama.' in url:
+            data = do_downloadpage(url)
+
+            url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
+            if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
+        else: url = ''
+
+    if url:
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

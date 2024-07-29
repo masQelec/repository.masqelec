@@ -49,21 +49,22 @@ except:
 
 
 dominios = [
+         'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
-         'https://hd-full.co/',
-         'https://hd-full.biz/',
          'https://hd-full.in/',
-         'https://hd-full.im/',
          'https://hd-full.one/',
+         'https://hd-full.co/',
+         'https://hdfull.icu/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
+         'https://hd-full.biz/',
+         'https://hd-full.im/',
          'https://hdfull.quest/',
-         'https://hdfull.icu/',
          'https://new.hdfull.one/'
          ]
 
@@ -471,22 +472,22 @@ def acciones(item):
 
     if username:
         itemlist.append(Item( channel='domains', action='operative_domains_hdfull', title='[B]Dominios Operativos Vigentes[/B]',
-                              desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='mediumaquamarine' ))
+                              desde_el_canal = True, thumbnail=config.get_thumb('hdfull'), text_color='mediumaquamarine' ))
 
         itemlist.append(Item( channel='domains', action='last_domain_hdfull', title='[B]Comprobar último dominio vigente[/B]',
-                              desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
+                              desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('hdfull'), text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
-    itemlist.append(item.clone( channel='domains', action='manto_domain_hdfull', title=title, desde_el_canal = True, folder=False, thumbnail=config.get_thumb('keyboard'), text_color='darkorange' ))
+    itemlist.append(item.clone( channel='domains', action='manto_domain_hdfull', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     if not config.get_setting('hdfull_login', 'hdfull', default=False):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login', start_ses = True ))
 
-            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = '', thumbnail=config.get_thumb('pencil') ))
-            itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
+            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales' ))
+            itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('hdfull'), text_color='crimson' ))
         else:
             itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
@@ -495,13 +496,13 @@ def acciones(item):
     if config.get_setting('hdfull_login', 'hdfull', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
 
-        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales', thumbnail=config.get_thumb('pencil') ))
-        itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
+        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales' ))
+        itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('hdfull'), text_color='crimson' ))
 
     itemlist.append(item_configurar_dominio(item))
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_hdfull', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(Item( channel='helper', action='show_help_hdfull', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('hdfull') ))
 
     platformtools.itemlist_refresh()
 

@@ -37,12 +37,12 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Lista doramas', action = 'list_cats', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Lista doramas', action = 'list_lst', url = host, search_type = 'tvshow' ))
 
     return itemlist
 
 
-def list_cats(item):
+def list_lst(item):
     logger.info()
     itemlist = []
 
@@ -78,7 +78,7 @@ def list_cats(item):
         if num_matches > perpage:
             hasta = (item.page * perpage) + perpage
             if hasta < num_matches:
-                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_cats', text_color='coral' ))
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_lst', text_color='coral' ))
 
     return itemlist
 
@@ -276,7 +276,7 @@ def findvideos(item):
     ses = 0
 
     matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
-
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<IFRAME.*?SRC="(.*?)"')
     for url in matches:
         ses += 1
 

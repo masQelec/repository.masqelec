@@ -171,7 +171,7 @@ def submnu_special(item):
         itemlist.append(item.clone( channel='cinedeantes', action='list_sel', title='[COLOR moccasin] - Seleccion cinema[/COLOR]', url = 'https://pastebin.com/raw/QW0A0mzx', thumbnail=thumb_cinedeantes, search_type = 'movie' ))
 
         thumb_cinequinqui = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'cinequinqui.jpg')
-        itemlist.append(item.clone( channel='cinequinqui', action='list_all', title=' - Cine Quinqui', url = 'https://cinekinkitv.freesite.host/movies/', thumbnail=thumb_cinequinqui, search_type = 'movie' ))
+        itemlist.append(item.clone( channel='cinequinqui', action='list_all', title='[COLOR yellowgreen] - Cine Quinqui[/COLOR]', url = 'https://cinekinkitv.freesite.host/movies/', thumbnail=thumb_cinequinqui, search_type = 'movie' ))
 
         thumb_zoowomaniacos = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'zoowomaniacos.jpg')
         itemlist.append(item.clone( channel='zoowomaniacos', action='_las1001', title='[COLOR cyan] - Las 1001 que hay que ver[/COLOR]', thumbnail=thumb_zoowomaniacos, search_type = 'movie' ))
@@ -672,8 +672,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
 
-    elif item.from_channel == 'yestorrent': domains.manto_domain_yestorrent(item)
-
     else:
         platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Ajuste No Permitido[/B][/COLOR]' % color_alert)
 
@@ -1059,6 +1057,13 @@ def _proxies(item):
 
         if config.get_setting('channel_lilatorrent_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'mastorrents':
+        from channels import mastorrents
+        item.channel = 'mastorrents'
+        mastorrents.configurar_proxies(item)
+
+        if config.get_setting('channel_mastorrents_proxies') is None: refrescar = False
+
     elif item.from_channel == 'megaserie':
         from channels import megaserie
         item.channel = 'megaserie'
@@ -1311,6 +1316,13 @@ def _proxies(item):
 
         if config.get_setting('channel_subtorrents_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'tiodonghua':
+        from channels import tiodonghua
+        item.channel = 'tiodonghua'
+        tiodonghua.configurar_proxies(item)
+
+        if config.get_setting('channel_tiodonghua_proxies') is None: refrescar = False
+
     elif item.from_channel == 'todotorrents':
         from channels import todotorrents
         item.channel = 'todotorrents'
@@ -1339,6 +1351,13 @@ def _proxies(item):
 
         if config.get_setting('channel_ultrapelis_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'uphd':
+        from channels import uphd
+        item.channel = 'uphd'
+        uphd.configurar_proxies(item)
+
+        if config.get_setting('channel_uphd_proxies') is None: refrescar = False
+
     elif item.from_channel == 'verdetorrent':
         from channels import verdetorrent
         item.channel = 'verdetorrent'
@@ -1352,13 +1371,6 @@ def _proxies(item):
         veronline.configurar_proxies(item)
 
         if config.get_setting('channel_veronline_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'yestorrent':
-        from channels import yestorrent
-        item.channel = 'yestorrent'
-        yestorrent.configurar_proxies(item)
-
-        if config.get_setting('channel_yestorrent_proxies') is None: refrescar = False
 
     elif item.from_channel == 'zonaleros':
         from channels import zonaleros

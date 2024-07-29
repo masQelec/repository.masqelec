@@ -445,6 +445,10 @@
         "url": "https://lulustream.com/e/\\1"
       },
       {
+        "pattern": "https://ponmi.sbs/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://lulustream.com/e/\\1"
+      },
+      {
         "pattern": "https://turboviplay.com/t/([0-9a-zA-Z]+)",
         "url": "https://emturbovid.com/t/\\1"
       },

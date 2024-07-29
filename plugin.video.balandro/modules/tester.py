@@ -54,6 +54,45 @@ channels_unsatisfactory = config.get_setting('developer_test_channels', default=
 servers_unsatisfactory = config.get_setting('developer_test_servers', default='')
 
 
+srv_pending = ''
+con_incidencias = ''
+no_accesibles = ''
+
+try:
+    with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+except:
+    try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+    except: txt_status = ''
+
+if txt_status:
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION SERVIDORES(.*?)SITUACION CANALES')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR orchid]' in match: srv_pending += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+
 txt_provs = '[COLOR plum][B]Obtenga Nuevos Proxies desde[/B][/COLOR] [COLOR yellow][B]All-providers[/B][/COLOR], [COLOR yellow][B]Proxyscrape.com[/B][/COLOR], [COLOR yellow][B]Us-proxy.com[/B][/COLOR] ó los [COLOR magenta][B]Recomendados[/B][/COLOR][CR]'
 txt_proxs = '[COLOR red][B]Configure Proxies a Usar ...[/B][/COLOR][CR]'
 txt_pnews = '[COLOR red][B]Configure Nuevos Proxies a Usar ...[/B][/COLOR][CR]'
@@ -62,8 +101,8 @@ txt_blocs = '[COLOR darkorange][B]Parece estar Bloqueado por su Operadora de Int
 txt_checs = '[COLOR tomato][B]Compruebe su Internet y/ó el Canal, a través de un Navegador Web[/B][/COLOR][CR]'
 txt_coffs = '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][CR]'
 
-txt_erase = '[COLOR orangered][B]Podrían Eliminarse los Proxies del Canal, pueden No necesitarse, salvo bloqueo en Play.[/B][/COLOR]'
-txt_quita = '[COLOR orange][B]Se pueden Eliminar los Proxies del Canal, al parecer No se necesitan, excepto bloqueo[/COLOR] [COLOR fuchsia][B]Play[/B][/COLOR]'
+txt_erase = '[COLOR orangered][B]Podrían Eliminarse los Proxies del Canal, pueden No necesitarse, salvo bloqueo en Play, u Otros.[/B][/COLOR]'
+txt_quita = '[COLOR orange][B]podrían Eliminarse los Proxies del Canal, al parecer No se necesitan, excepto bloqueo[/COLOR] [COLOR fuchsia][B]Play[/B][/COLOR] [COLOR orange][B]u Otros[/B][/COLOR]'
 txt_suspe = '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR][CR]'
 txt_sorry = '[CR]sorry: [COLOR springgreen][B]Contact your hosting Provider[/B][/COLOR]'
 txt_false = '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR]'
@@ -74,21 +113,23 @@ timeout = config.get_setting('httptools_timeout', default=15)
 espera = config.get_setting('servers_waiting', default=6)
 
 dominioshdfull = [
+         'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
-         'https://hd-full.co/',
-         'https://hd-full.biz/',
          'https://hd-full.in/',
-         'https://hd-full.im/',
          'https://hd-full.one/',
+         'https://hd-full.co/',
+         'https://hdfull.icu/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
+         'https://hd-full.biz/',
+         'https://hd-full.im/',
          'https://hdfull.quest/',
-         'https://hdfull.icu/'
+         'https://new.hdfull.one/'
          ]
 
 
@@ -99,7 +140,7 @@ dominiosnextdede = [
          ]
 
 dominiosplaydede = [
-         'https://playdede.us/'
+         'https://playdede.eu/'
          ]
 
 
@@ -745,6 +786,34 @@ def test_channel(channel_name):
 
     if channel_id in str(channels_poe): pass
 
+    elif 'Incidencia:' in txt:
+        avis_causas = '[COLOR moccasin][B]Hay Una Incidencia en el canal.[/B]'
+        if '[B]Incidencia:[/B][/COLOR]' in str(txt):
+            incidencia = str(txt).split("[B]Incidencia:[/B][/COLOR]")[1]
+            incidencia = incidencia.strip()
+            incidencia = str(incidencia).split("[/B][/COLOR]")[0]
+
+            if incidencia:
+                if len(incidencia) < 50:
+                    avis_causas = avis_causas + ' ' + incidencia
+
+        platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+        avisado = True
+
+    elif 'No Accesible:' in txt:
+        avis_causas = '[COLOR moccasin][B]El canal No es Accesible.[/B]'
+        if '[B]No Accesible:[/B][/COLOR]' in str(txt):
+            incidencia = str(txt).split("[B]No Accesible:[/B][/COLOR]")[1]
+            incidencia = incidencia.strip()
+            incidencia = str(incidencia).split("[/B][/COLOR]")[0]
+
+            if incidencia:
+                if len(incidencia) < 50:
+                    avis_causas = avis_causas + ' ' + incidencia
+
+        platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+        avisado = True
+
     elif channel_id in str(channels_despised):
         invalid = True
 
@@ -813,8 +882,8 @@ def test_channel(channel_name):
 
                elif 'Falso Positivo.' in txt:
                    avis_causas = txt_false
-                   if txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
 
+                   if txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
@@ -822,10 +891,22 @@ def test_channel(channel_name):
                    avis_causas = txt_false
 
                    avis_causas = '[COLOR goldenrod][B]El Dominio de la Web está Expirado.[/B][/COLOR]'
-
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
+               elif 'Inaccesible' in txt:
+                   avis_causas = txt_false
+
+                   avis_causas = '[COLOR goldenrod][B]No se puede acceder a este sitio web.[/B][/COLOR]'
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                   avisado = True
+
+               elif 'Sin Información de Datos' in txt:
+                   avis_causas = txt_false
+
+                   avis_causas = '[COLOR goldenrod][B]Sin Información de Datos.[/B][/COLOR]'
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                   avisado = True
 
     txt = txt.replace('[CR][CR][CR]', '[CR][CR]')
 
@@ -839,6 +920,9 @@ def test_channel(channel_name):
         else:
             if 'Se pueden Eliminar los Proxies' in txt: return txt
             elif 'invalid:' in txt: return txt
+            elif 'Incidencia:' in txt: return txt
+            elif 'No Accesible:' in txt: return txt
+
             elif 'Podría estar Correcto' in txt: return ''
             else:
                 platformtools.dialog_textviewer(channel_name.upper(), txt)
@@ -913,7 +997,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
             response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, timeout=timeout, raise_weberror=False, bypass_cloudflare=False)
 
-        if '<title>You are being redirected...</title>' in response.data or '<title>Just a moment...</title>' in response.data:
+        if '<title>You are being redirected...</title>' in response.data or '<title>Just a moment...</title>' in response.data or '<title>Just a moment please...</title>' in response.data:
             if BR or BR2:
                 try:
                     ck_name, ck_value = balandroresolver.get_sucuri_cookie(response.data)
@@ -962,7 +1046,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
             response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, timeout=timeout, raise_weberror=False, bypass_cloudflare=False)
 
-        if '<title>You are being redirected...</title>' in response.data or '<title>Just a moment...</title>' in response.data:
+        if '<title>You are being redirected...</title>' in response.data or '<title>Just a moment...</title>' in response.data or '<title>Just a moment please...</title>' in response.data:
             if BR or BR2:
                 try:
                     ck_name, ck_value = balandroresolver.get_sucuri_cookie(response.data)
@@ -998,6 +1082,48 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             txt += 'actuales: [COLOR cyan][B]Sin proxies[/B][/COLOR]'
 	
     if dominio: dominio = '[COLOR coral]' + dominio + '[/COLOR]'
+
+    if txt_status:
+        if con_incidencias:
+            host_incid = host.replace('https://', '').replace('http://', '').replace('/', '')
+
+            if host_incid in str(con_incidencias):
+                incidencia = ''
+
+                txt += '[CR][CR][COLOR darkcyan][B]Incidencia:[/B][/COLOR] '
+                incids = scrapertools.find_multiple_matches(str(con_incidencias), '[COLOR moccasin](.*?)[/B][/COLOR]')
+
+                for incid in incids:
+                    if not host_incid in incid: continue
+
+                    incidencia = scrapertools.find_single_match(str(incid), '[COLOR lime].*?' + host_incid + '(.*?)$').strip()
+                    incidencia = incidencia.replace('[I][COLOR olivedrab]', '').replace('[I]', '').replace('[/I][/B][', '').strip()
+                    break
+
+                if not incidencia: incidencia = 'vea Últimos Cambios de Dominios en la Ayuda'
+
+                txt += '[COLOR tan][B]' + incidencia + '[/B][/COLOR][CR]'
+
+        if no_accesibles:
+            host_incid = host.replace('https://', '').replace('http://', '').replace('/', '')
+
+            if host_incid in str(no_accesibles):
+                incidencia = ''
+
+                txt += '[CR][CR][COLOR darkcyan][B]No Accesible:[/B][/COLOR] '
+                incids = scrapertools.find_multiple_matches(str(no_accesibles), '[COLOR moccasin](.*?)[/B][/COLOR]')
+
+                for incid in incids:
+                    if not host_incid in incid: continue
+
+                    incidencia = scrapertools.find_single_match(str(incid), '[COLOR lime].*?' + host_incid + '(.*?)$').strip()
+                    incidencia = incidencia.replace('[I][COLOR olivedrab]', '').replace('[I]', '').replace('[/I][/B][', '').strip()
+                    break
+
+                if not incidencia: incidencia = 'vea Últimos Cambios de Dominios en la Ayuda'
+                else: incidencia = incidencia + '[/COLOR]'
+
+                txt += '[COLOR tan][B]' + incidencia + '[/B][/COLOR][CR]'
 
     if follow_redirects == False: txt += '[CR][CR][COLOR moccasin][B]Acceso: ' + txt_dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
     else: txt += '[CR][CR][COLOR moccasin][B]Redirect: ' + txt_dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
@@ -1059,7 +1185,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
         else:
             if '| 502: Bad gateway</title>' in response.data or '| 522: Connection timed out</title>' in response.data: txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
             elif '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
-            elif '<title>Just a moment...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR][COLOR red][B] Protection[/B][/COLOR]'
+            elif '<title>Just a moment...</title>' in response.data or '<title>Just a moment please...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR][COLOR red][B] Protection[/B][/COLOR]'
             elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
             elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
             elif 'se encuentra en mantenimiento' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
@@ -1276,32 +1402,39 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     txt += '[CR][CR][COLOR moccasin][B]Headers:[/B][/COLOR][CR]'
                     txt += str(response.headers) + '[CR]'
 
-            if len(response.data) > 0:
-                if len(response.data) < 1000:
-                    if not 'Sugerencias:' in txt:
-                        if '<title>Account Suspended</title>' in response.data or '>Hello world!<' in response.data: txt += '[CR]'
+            if str(len(response.data)) == '0':
+                if not 'Datos:' in txt: txt += '[CR][CR][COLOR moccasin][B]Datos:[/B][/COLOR][CR]'
+                elif not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
-                        txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+                if 'No se puede acceder a este sitio web' in txt or 'Inaccesible no se puede acceder a este sitio web' in txt: txt += '[COLOR olive][B]Inaccesible[/B][/COLOR][CR]'
 
-                        if channel_id == 'playdo':
-                            if '{"status":' in str(response.data): txt += txt_verif 
+                txt += '[COLOR springgreen][B]Sin Información de Datos.[/B][/COLOR][CR]'
 
-                        if 'actuales:' in txt:
-                            if 'Sin proxies' in txt: txt += txt_proxs
-                            else:
-                               if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
-                               txt += txt_provs
+            elif len(response.data) < 1000:
+                 if not 'Sugerencias:' in txt:
+                     if '<title>Account Suspended</title>' in response.data or '>Hello world!<' in response.data: txt += '[CR]'
 
-                        txt += txt_routs
+                     txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
-                    if channel_id == 'playdo':
-                        if not '{"status":' in str(response.data): txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
-                    else:
-                        txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
+                     if channel_id == 'playdo':
+                         if '{"status":' in str(response.data): txt += txt_verif 
 
-                if not '/cgi-sys/suspendedpage.cgi' or not '/wp-admin/install.php' in new_web:
-                    txt += '[CR][CR][COLOR moccasin][B]Datos:[/B][/COLOR][CR]'
-                    txt += str(response.data).strip() + '[CR]'
+                     if 'actuales:' in txt:
+                         if 'Sin proxies' in txt: txt += txt_proxs
+                         else:
+                            if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                            txt += txt_provs
+
+                     txt += txt_routs
+
+                 if channel_id == 'playdo':
+                     if not '{"status":' in str(response.data): txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
+                 else:
+                     txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
+
+                 if not '/cgi-sys/suspendedpage.cgi' or not '/wp-admin/install.php' in new_web:
+                     txt += '[CR][CR][COLOR moccasin][B]Datos:[/B][/COLOR][CR]'
+                     txt += str(response.data).strip() + '[CR]'
 
     if 'active: True' in txt:
         if 'Invisible Captcha' in txt or 'Obtenga nuevos proxies' in txt or 'Host error' in txt or 'No se puede establecer una' in txt or 'Cloudflare' in txt or 'Protection' in txt or 'Unknow' in txt or 'invalid:' in txt:
@@ -1448,11 +1581,12 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                             txt += '[COLOR springgreen][B]Nuevo Dominio[/B][/COLOR][CR]'
 
                     if not 'nuevo:' in txt:
-                        if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+                        if not 'Inaccesible' in txt and not 'Sin Información de Datos.' in txt:
+                            if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
-                        if 'No se puede acceder a este sitio web' in txt or 'Inaccesible no se puede acceder a este sitio web' in txt: txt += '[COLOR olive][B]Inaccesible[/B][/COLOR][CR]'
+                            if 'No se puede acceder a este sitio web' in txt or 'Inaccesible no se puede acceder a este sitio web' in txt: txt += '[COLOR olive][B]Inaccesible[/B][/COLOR][CR]'
 
-                        txt += '[COLOR springgreen][B]Sin Información de Datos.[/B][/COLOR][CR]'
+                            txt += '[COLOR springgreen][B]Sin Información de Datos.[/B][/COLOR][CR]'
                 else:
                     if '<p>Por causas ajenas a' in response.data or '>Por causas ajenas a' in response.data:
                        if not txt_blocs in txt:
@@ -1600,7 +1734,7 @@ def test_server(server_name):
 
            if not tab_pat or not url_pat: continue
 
-           txt += 'patron: ' + str(tab_pat) + '[CR]'
+           txt += 'patrón: ' + str(tab_pat) + '[CR]'
            txt += 'urlpat: ' + str(url_pat) + '[CR][CR]'
     except:
        txt += 'patrones: ' + str(bloc) + '[CR][CR]'
@@ -1614,8 +1748,10 @@ def test_server(server_name):
 
     if 'Alternative' in notes:
         notes = notes.replace('Alternative vía:', '').strip()
+        notes = notes.replace('Out of Service', '[COLOR red]Fuera de Servicio[/COLOR]')
         txt_diag  += 'alternativas: ' + '[COLOR plum][B]' + str(notes) + '[/B][/COLOR][CR]'
     else:
+        notes = notes.replace('Out of Service', '[COLOR red]Fuera de Servicio[/COLOR]')
         if notes: txt_diag  += 'notes: ' + '[COLOR plum][B]' + str(notes) + '[/B][/COLOR][CR]'
 
     try:
@@ -1755,7 +1891,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
         else:
             if '| 502: Bad gateway</title>' in response.data or '| 522: Connection timed out</title>' in response.data: txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
             elif '<title>Attention Required! | Cloudflare</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR]'
-            elif '<title>Just a moment...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR][COLOR red][B] Protection[/B][/COLOR]'
+            elif '<title>Just a moment...</title>' in response.data or '<title>Just a moment please...</title>' in response.data: txt += '[CR]blocked: [COLOR orangered][B]Cloudflare[/B][/COLOR][COLOR red][B] Protection[/B][/COLOR]'
             elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
             elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
             else:

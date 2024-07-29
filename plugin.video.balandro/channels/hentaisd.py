@@ -52,6 +52,10 @@ def categorias(item):
 
     for url, title in matches:
         if title == 'audio latino': continue
+        elif title == 'Audio Castellano': continue
+        elif title == 'Calida Full HD': continue
+
+        title = title.replace('&ntilde;', 'ñ')
 
         itemlist.append(item.clone( action = 'list_list', url = url, title = title, text_color='orange' ))
 

@@ -141,7 +141,7 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_ppeliculas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(Item( channel='helper', action='show_help_ppeliculas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('ppeliculas') ))
 
     platformtools.itemlist_refresh()
 
@@ -507,7 +507,7 @@ def corregir_servidor(servidor):
      servidor = servidor.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '').replace('.sx', '')
      servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.xx', '').replace('.click', '')
      servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').replace('.uno', '').replace('.io', '')
-     servidor = servidor.replace('.link', '').strip()
+     servidor = servidor.replace('.link', '').replace('.club', '').replace('.red', '').replace('.download', '').replace('.vip', '').replace('.space', '').strip()
 
      return servidor
 
@@ -534,6 +534,8 @@ def findvideos(item):
 
             elif 'earn4files' in _server: continue
             elif 'uploadbuzz' in _server: continue
+            elif 'powvibeo' in _server: continue
+            elif 'slreamplay' in _server: continue
 
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
@@ -584,6 +586,8 @@ def findvideos(item):
 
             elif 'earn4files' in _server: continue
             elif 'uploadbuzz' in _server: continue
+            elif 'powvibeo' in _server: continue
+            elif 'slreamplay' in _server: continue
 
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
@@ -636,6 +640,8 @@ def findvideos(item):
 
             if 'earn4files' in servidor: continue
             elif 'uploadbuzz' in servidor: continue
+            elif 'powvibeo' in servidor: continue
+            elif 'slreamplay' in servidor: continue
 
             if 'gofile' in servidor: servidor = 'gofile'
 	
@@ -677,10 +683,14 @@ def findvideos(item):
             if 'earn4files' in servidor: continue
             elif 'uploadbuzz' in servidor: continue
             elif 'multiup' in servidor: continue
+            elif 'ddownload' in servidor: continue
+            elif 'fikper' in servidor: continue
+            elif 'powvibeo' in servidor: continue
+            elif 'slreamplay' in servidor: continue
 
-            elif 'nitro.' in servidor: continue
-            elif '1fichier.' in servidor: continue
-            elif 'turbobit.' in servidor: continue
+            elif 'nitro' in servidor: continue
+            elif '1fichier' in servidor: continue
+            elif 'turbobit' in servidor: continue
 
             elif 'gofile' in servidor: servidor = 'gofile'
 
@@ -737,6 +747,11 @@ def play(item):
         url = url.replace('\\/', '/')
 
         if url.startswith('//'): url = 'https:' + url
+
+        if '/?source=' in url:
+            data = do_downloadpage(url)
+
+            url = scrapertools.find_single_match(data, 'id="player".*?<source src="(.*?)"')
 
         if url.startswith('https://player.pepeliculas.org/'): url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
         elif url.startswith('https://hqq.tv/player/embed_player.php?'): url = url.replace('https://hqq.tv/player/embed_player.php?', 'https://waaw.to/watch_video.php?v=')

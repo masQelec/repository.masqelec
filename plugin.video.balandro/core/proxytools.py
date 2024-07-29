@@ -161,7 +161,7 @@ def get_settings_proxytools(canal):
 
     if provider == all_providers:
         if proxies_maximo: valor = 50
-        else: valor = 20
+        else: valor = 25
     else:
         valor = proxies_totales_limit
         config.set_setting('proxytools_max', valor, canal)
@@ -1126,22 +1126,26 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     for proxy, info in proxies_info:
         if not info['ok']: break
+
         selected.append(proxy)
 
         proxies_validos = config.get_setting('proxies_validos', default=True)
-        if proxies_validos:
-           if not search_provider:
-              if len(selected) >= 3: break # ~ los 3 más rápidos
+
+        if proxies_totales: pass 
+        else:
+           if proxies_validos:
+              if not search_provider:
+                  if len(selected) >= 3: break # ~ los 3 más rápidos
+              else:
+                 if proxies_limit:
+                     if len(selected) >= 10: break # ~ si todos los 10 más rápidos
+                 else:
+                     if len(selected) >= 3: break # ~ los 3 más rápidos
            else:
               if proxies_limit:
-                 if len(selected) >= 10: break # ~ si todos los 10 más rápidos
+                  if len(selected) >= 10: break # ~ si todos los 10 más rápidos
               else:
-                 if len(selected) >= 3: break # ~ los 3 más rápidos
-        else:
-           if proxies_limit:
-               if len(selected) >= 10: break # ~ si todos los 10 más rápidos
-           else:
-               if len(selected) >= 3: break # ~ los 3 más rápidos
+                  if len(selected) >= 3: break # ~ los 3 más rápidos
 
     if len(selected) > 0:
         config.set_setting('proxies', ', '.join(selected), canal)
@@ -1508,7 +1512,7 @@ def _spys_one(url, tipo_proxy, pais_proxy, max_proxies):
 
     resp = httptools.downloadpage(url_provider, post=url_post, raise_weberror=False, follow_redirects=False)
 
-    if '<title>Just a moment...</title>' in resp.data:
+    if '<title>Just a moment...</title>' in resp.data or '<title>Just a moment please...</title>' in resp.data:
         el_provider = '[B][COLOR %s] Freeproxy[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Spys.one', 'Vía' + el_provider)
 
@@ -1570,7 +1574,7 @@ def _hidemy_name(url, tipo_proxy, pais_proxy, max_proxies):
 
     resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
 
-    if '<title>Just a moment...</title>' in resp.data:
+    if '<title>Just a moment...</title>' in resp.data or '<title>Just a moment please...</title>' in resp.data:
         el_provider = '[B][COLOR %s] Freeproxy[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Spys.one', 'Vía' + el_provider)
 

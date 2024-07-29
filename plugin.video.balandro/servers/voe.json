@@ -123,6 +123,10 @@
       {
         "pattern": "https://graceaddresscommunity.com/(?:e/|)([A-z0-9]+)",
         "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://roberteachfinal.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
       }
     ]
   }

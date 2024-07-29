@@ -464,6 +464,7 @@ def findvideos(item):
             ses += 1
 
             if '/clonamesta.' in url: continue
+            elif '/hydrax.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -641,6 +642,9 @@ def play(item):
             url = scrapertools.find_single_match(data, '<div id="load-iframe">.*?</iframe>.*?<iframe id="embedvideo" src="(.*?)"')
 
             if url:
+                if '/hydrax.' in url:
+                    return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 
@@ -658,6 +662,9 @@ def play(item):
             if not 'error' in url:
                 if '/pelisloadtop.com/' in url: continue
 
+                if '/hydrax.' in url:
+                    return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 
@@ -673,6 +680,9 @@ def play(item):
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
             if not new_server.startswith("http"): servidor = new_server
+
+        if '/hydrax.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

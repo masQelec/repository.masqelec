@@ -88,7 +88,7 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_doramasyt', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(Item( channel='helper', action='show_help_doramasyt', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('doramasyt') ))
 
     platformtools.itemlist_refresh()
 
@@ -483,6 +483,7 @@ def findvideos(item):
         elif srv == 'drive': srv = 'gvideo'
         elif srv == 'pixel': srv = 'pixeldrain'
         elif srv == 'senvid2': srv = 'sendvid'
+        elif srv == 'mixdropco': srv = 'mixdrop'
         else:
              if srv == 'vgembedcom': srv = 'vembed'
 

@@ -34,26 +34,27 @@ channels_currents = [
         'poseidonhd2',
         'series24', 'seriesantiguas', 'serieskao', 'seriesmetro', 'srnovelas', 'subtorrents',
         'todotorrents', 'tupelihd',
-        'veronline',
-        'yestorrent'
+        'veronline'
         ]
 
 dominioshdfull = [
+         'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
-         'https://hd-full.co/',
-         'https://hd-full.biz/',
          'https://hd-full.in/',
-         'https://hd-full.im/',
          'https://hd-full.one/',
+         'https://hd-full.co/',
+         'https://hdfull.icu/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
+         'https://hd-full.biz/',
+         'https://hd-full.im/',
          'https://hdfull.quest/',
-         'https://hdfull.icu/'
+         'https://new.hdfull.one/'
          ]
 
 dominiosnextdede = [
@@ -63,7 +64,7 @@ dominiosnextdede = [
          ]
 
 dominiosplaydede = [
-         'https://playdede.us/'
+         'https://playdede.eu/'
          ]
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -3210,12 +3211,26 @@ def last_domain_playdede(item):
         last_domain = ''
 
     if not last_domain:
-        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
+        try:
+           data = httptools.downloadpage('https://t.me/playdedeinformacion').data
 
-        xbmc.sleep(1000)
-        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://dominiosplaydede.com[/B][/COLOR] ó [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B]')
-        return
+           dominios = scrapertools.find_multiple_matches(data, '>Web:(.*?)<')
 
+           if dominios:
+               for dominio in dominios:
+                   dominio = dominio.lower().strip()
+                   if dominio:
+                      dominio = dominio + '/'
+                      last_domain = dominio
+        except:
+           pass
+
+        if not last_domain:
+            platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
+
+            xbmc.sleep(1000)
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://dominiosplaydede.com[/B][/COLOR] ó [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B]')
+            return
 
     host_channel = ''
     config.set_setting('user_test_channel', 'host_channel')
@@ -3886,52 +3901,6 @@ def test_domain_veronline(item):
         platformtools.dialog_notification(config.__addon_name + ' - VerOnline', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def manto_domain_yestorrent(item):
-    logger.info()
-
-    channel_json = 'yestorrent.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando YesTorrent[/B][/COLOR]' % color_exec)
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_yestorrent(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('yestorrent')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('YesTorrent')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - YesTorrent', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
 def manto_domain_tupelihd(item):
     logger.info()
 
@@ -3976,22 +3945,6 @@ def test_domain_tupelihd(item):
         tester.test_channel('TuPeliHd')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - TuPeliHd', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
-def test_domain_yestorrent(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('yestorrent')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('YesTorrent')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - YesTorrent', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_common(item, id, name):
@@ -4606,16 +4559,6 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://www.veronline.': return
-
-    elif id == 'yestorrent':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://yestorrent.'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio YesTorrent  -->  [COLOR %s]https://yestorrent.???/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://yestorrent.': return
 
     else:
         return

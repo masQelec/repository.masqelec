@@ -89,7 +89,9 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     timeout = None
     if host in url:
-        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies:
+            timeout = config.get_setting('channels_repeat', default=30)
+            if '/series/': timeout = 60
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
@@ -149,7 +151,7 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_megaserie', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(Item( channel='helper', action='show_help_megaserie', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('megaserie') ))
 
     platformtools.itemlist_refresh()
 
@@ -345,6 +347,8 @@ def temporadas(item):
     matches = re.compile('data-season="(.*?)"', re.DOTALL).findall(data)
 
     for numtempo in matches:
+        if not numtempo: continue
+		
         title = 'Temporada ' + numtempo
 
         if len(matches) == 1:

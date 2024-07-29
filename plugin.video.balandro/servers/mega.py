@@ -55,6 +55,8 @@ def get_video_url(page_url, url_referer=''):
 
     page_url = page_url.replace('/embed#', '/#!')
 
+    page_url = page_url.replace('/#!!', '/#!')
+
     try:
        c = Client(url=page_url, is_playing_fnc=platformtools.is_playing)
        files = c.get_files()

@@ -1143,6 +1143,7 @@ def show_servers_list(item):
                 info = info + '[COLOR indianred][B] Descartado [/B][/COLOR]'
 
         if notes:
+            notes = notes.replace('Out of Service', '[COLOR red][B]Fuera de Servicio[/B][/COLOR]')
             if info: info = info + '  '
             info = info + '[COLOR mediumaquamarine]' + notes + '[/COLOR]'
 

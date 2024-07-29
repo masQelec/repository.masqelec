@@ -25,22 +25,53 @@ config.set_setting('proxysearch_process', '')
 config.set_setting('proxysearch_process_proxies', '')
 
 
+con_incidencias = ''
+no_accesibles = ''
+
+try:
+    with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+except:
+    try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+    except: txt_status = ''
+
+if txt_status:
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+
 dominioshdfull = [
+         'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
-         'https://hd-full.co/',
-         'https://hd-full.biz/',
          'https://hd-full.in/',
-         'https://hd-full.im/',
          'https://hd-full.one/',
+         'https://hd-full.co/',
+         'https://hdfull.icu/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
+         'https://hd-full.biz/',
+         'https://hd-full.im/',
          'https://hdfull.quest/',
-         'https://hdfull.icu/'
+         'https://new.hdfull.one/'
          ]
 
 dominiosnextdede = [
@@ -50,7 +81,7 @@ dominiosnextdede = [
          ]
 
 dominiosplaydede = [
-         'https://playdede.us/'
+         'https://playdede.eu/'
          ]
 
 
@@ -498,6 +529,13 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
     logger.info()
 
     global procesados
+
+    if txt_status:
+        if con_incidencias:
+           if channel_name in str(con_incidencias): return
+
+        if no_accesibles:
+           if channel_name in str(no_accesibles): return
 
     channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
 
