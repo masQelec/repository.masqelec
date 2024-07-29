@@ -15,7 +15,7 @@ from core import httptools, scrapertools, tmdb
 
 host = 'https://4144-don.mirror.pm/'
 
-# ~ 28/6/24 last domain  'https://dontorrent.city/'
+# ~ 28/7/24 last domain  'https://dontorrent.dance/'
 
 
 try:
@@ -73,7 +73,8 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.skin/', 'https://dontorrent.directory/', 'https://dontorrent.boutique/',
              'https://dontorrent.miami/', 'https://dontorrent.business/', 'https://dontorrent.clothing/',
              'https://dontorrent.icu/', 'https://dontorrent.fyi/', 'https://dontorrent.sbs/',
-             'https://dontorrent.cc/', 'https://dontorrent.esq/']
+             'https://dontorrent.cc/', 'https://dontorrent.esq/', 'https://dontorrent.city/',
+             'https://dontorrent.cologne/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -152,7 +153,7 @@ def acciones(item):
                                 from_channel='dontorrents', folder=False, text_color='chartreuse' ))
 
     itemlist.append(Item( channel='domains', action='last_domain_dontorrents', title='[B]Comprobar último dominio vigente[/B]',
-                          desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
+                          desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('dontorrents'), text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'

@@ -13,6 +13,8 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('/uqload.org/', '/uqload.com/embed-')
         page_url = page_url.replace('/uqload.co/', '/uqload.com/embed-')
         page_url = page_url.replace('/uqload.io/', '/uqload.com/embed-')
+        page_url = page_url.replace('/uqload.to/', '/uqload.com/embed-')
+        page_url = page_url.replace('/uqload.ws/', '/uqload.com/embed-')
 
     if not page_url.endswith('.html'): page_url += '.html'
 

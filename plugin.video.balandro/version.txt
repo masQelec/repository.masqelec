@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.08[/COLOR] [COLOR chartreuse] 2 de Julio de 2024[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.09[/COLOR] [COLOR chartreuse] 25 de Julio de 2024[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
@@ -46,12 +46,17 @@
 
  [COLOR cyan][B]CANALES INESTABLES:[/B][/COLOR]
     [COLOR springgreen][B]Son los pendientes de su evolucion, para decidir su Situacion Definitiva[/B][/COLOR]
-    Cuevana3Pro,  Novelas360
+    Cuevana3Pro,  Novelas360,  NuVid 
 
  [COLOR darkcyan][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR]
     [COLOR springgreen][B]Son los pendientes de su situacion, para decidir su Re-activacion o Anulacion[/B][/COLOR]
-    DocumaniaTv [COLOR moccasin][B] www.documaniatv.com [/COLOR][COLOR olivedrab][I] No Player [/I][/B][/COLOR]
-    NextDede [COLOR moccasin][B] nextdede.us [/COLOR][COLOR greenyellow][I] No Login [/I][/B][/COLOR]
+    CineKinki [COLOR moccasin][B] cinekinki.es [/COLOR][COLOR salmon][I] Kodi Not Play [/I][/B][/COLOR]
+    DocumaniaTv [COLOR moccasin][B] www.documaniatv.com [/COLOR][COLOR salmon][I] Kodi Not Play [/I][/B][/COLOR]
+    NextDede [COLOR moccasin][B] nextdede.us [/COLOR][COLOR greenyellow][I] Not Login [/I][/B][/COLOR]
+
+ [COLOR sienna][B]SITUACION SERVIDORES:[/B][/COLOR]
+    [COLOR orchid][B] Cinemaupload [/COLOR][I][COLOR salmon] Not Play [/I][/B][/COLOR]
+    [COLOR orchid][B] Fastream [/COLOR][I][COLOR salmon] Not Play [/I][/B][/COLOR]
 
  [COLOR gold][B]SERVIDORES VIAS ALTERNATIVAS/ADICIONALES QUE PUEDEN NECESITARSE:[/B][/COLOR]
     plugin.video.youtube

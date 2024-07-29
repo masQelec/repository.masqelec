@@ -49,6 +49,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_epis', url = host + 'episodes.php', search_type = 'tvshow', text_color = 'cyan' ))
 
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'topvideos.php', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por país', action='paises', search_type = 'tvshow' ))
 
     return itemlist
@@ -59,16 +61,20 @@ def paises(item):
     itemlist = []
 
     opciones = [
+       ('novelas-alemanas', 'Alemania'),
        ('novelas-americanas', 'América'),
        ('novelas-arabicas', 'Arabia'),
-       ('novelas-britanica', 'Britania'),
+       ('Novelas-brasilenas', 'Brasil'),
        ('novelas-chilenas', 'Chile'),
        ('novelas-colombianas', 'Colombia'),
        ('novelas-coreanas', 'Corea'),
        ('novelas-espanolas', 'España'),
        ('novelas-frances', 'Francia'),
+       ('novelas-holandesas', 'Holanda'),
        ('novelas-mexicanas', 'México'),
        ('novelas-noruegas', 'Noruega'),
+       ('NovelasNorvege', 'Norvege'),
+       ('novelas-peruanas', 'Perú'),
        ('Novelas-de-Reino-Unido', 'Reino Unido'),
        ('novelas-suecas', 'Suecia'),
        ('series-y-novelas-turcas', 'Turquía')
@@ -88,6 +94,7 @@ def list_all(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, '<li class="col-xs-6 col-sm-4 col-md-3">(.*?)</div></div></li>')
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<li class="col-xs-6 col-sm-6 col-md-3">(.*?)</div></div></li>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
@@ -131,7 +138,7 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
-            if 'search.php?keywords=' in item.url:
+            if 'search.php?keywords=' in item.url or 'topvideos.php' in item.url:
                 cap = False
                 if 'Capitulos' in title or 'Capítulos' in title: pass
                 elif 'Capitulo' in title or 'Capítulo' in title: cap = True
@@ -330,10 +337,10 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    lang = 'Lat'
-
-    if 'película en español' in data or 'pelicula en español' in data: lang = 'Esp'
-    elif item.lang == 'Esp': lang = 'Esp'
+    if item.lang == 'Esp': lang = 'Esp'
+    elif 'película en español' in data or 'pelicula en español' in data: lang = 'Esp'
+    elif 'en Espanol' in item.title: lang = 'Esp'
+    else: lang = 'Lat'
 
     ses = 0
 
@@ -374,7 +381,19 @@ def play(item):
        if not '/uploads/' in vid: url = vid
 
     if url:
-        if url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+        if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
+
+        elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
+
+        elif 'api.mycdn.moe/dl/?uptobox=' in url: url = url.replace('api.mycdn.moe/dl/?uptobox=', 'uptobox.com/')
+
+        elif url.startswith('http://vidmoly/'): url = url.replace('http://vidmoly/w/', 'https://vidmoly/embed-').replace('http://vidmoly/', 'https://vidmoly/')
+
+        elif url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+        elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
+        elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
+        elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
+        elif url.startswith('https://novelas360.cyou/'): url = url.replace('/novelas360.cyou/', '/waaw.to/')
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

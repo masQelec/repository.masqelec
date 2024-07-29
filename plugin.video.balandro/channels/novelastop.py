@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.srnovelas.top/'
+host = 'https://imu.srnovelas.top/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.srnovelas.top/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/release/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -38,6 +44,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por productora', action='plataformas', search_type = 'tvshow', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -85,6 +93,42 @@ def anios(item):
         url = host + 'release/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color ='hotpink' ))
+
+    return itemlist
+
+
+def plataformas(item):
+    logger.info()
+    itemlist = []
+
+    productoras = [
+        ('antena-3', 'Antena 3'),
+        ('atresplayer-premium', 'Atresplayer Premium'),
+        ('atv', 'Atv'),
+        ('canal', 'Canal+'),
+        ('cbs', 'Cbs'),
+        ('caracol-tv', 'Caracol TV'),
+        ('fox', 'FOX'),
+        ('kanal7', 'Kanal 7'),
+        ('kanal-d', 'Kanal D'),
+        ('las-estrellas', 'Las Estrellas'),
+        ('mega', 'Mega'),
+        ('novelastv', 'Novelas TV'),
+        ('mtv-latin-america', 'MTV Latin América'),
+        ('netflix', 'Netflix'),
+        ('rcn', 'Rcn'),
+        ('star-tv', 'Star Tv'),
+        ('telemundo', 'Telemundo'),
+        ('tf1', 'TF1'),
+        ('trt1', 'TRT 1'),
+        ('tv-globo', 'TV Globo'),
+        ('vix', 'Vix+')
+        ]
+
+    for opc, tit in productoras:
+        url = host + 'network/' + opc + '/'
+
+        itemlist.append(item.clone( title = tit, action = 'list_all', url = url, text_color = 'hotpink' ))
 
     return itemlist
 

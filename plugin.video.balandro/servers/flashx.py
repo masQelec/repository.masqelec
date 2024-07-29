@@ -3,7 +3,7 @@
 import xbmc, time, base64
 
 from core import httptools, scrapertools
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 
 from lib import jsunpack
 

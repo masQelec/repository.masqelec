@@ -8,12 +8,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://kissasians.vin/'
+host = 'https://kissasian.com.mx/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://kiriasian.com/', 'https://kissasians.bar/']
+    ant_hosts = ['https://kiriasian.com/', 'https://kissasians.bar/', 'https://kissasians.vin/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -41,7 +41,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos',  search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por alfabético (A - Z)', action = 'list_all', url = host + '/series/?status=&type=&order=title', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por alfabético (A - Z)', action = 'list_all', url = host + 'series/?status=&type=&order=title', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -53,10 +53,13 @@ def generos(item):
     data = do_downloadpage(host)
 
     bloque = scrapertools.find_single_match(data, '<ul class="genre">(.*?)</ul>')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<!-- genres -->(.*?)</ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title=".*?">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, 'value="(.*?)".*?<label.*?">(.*?)</label>')
 
-    for url, title in matches:
+    for id, title in matches:
+        url = host + 'series/?genre[]=' + id
+
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='firebrick' ))
 
     return itemlist
@@ -94,7 +97,7 @@ def list_all(item):
         elif ' 3rd ' in match: season = 3
         elif ' 4th ' in match: season = 4
         elif ' 5th ' in match: season = 5
-        elif ' 6th ' in match: season = 5
+        elif ' 6th ' in match: season = 6
         else: season = 1
 
         itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, infoLabels={'year': '-'},
@@ -212,7 +215,7 @@ def findvideos(item):
 
         if not video: continue
 
-        url = scrapertools.find_single_match(video,'<iframe src="(.*?)"')
+        url = scrapertools.find_single_match(video,'<iframe.*?src="(.*?)"')
 
         if url:
             if '/play.php?' in url:
@@ -238,6 +241,8 @@ def findvideos(item):
 
                 continue
 
+            if url.startswith("//"): url = 'https:' + url
+
             if not 'http' in url: ses = ses - 1
             else:
                 servidor = servertools.get_server_from_url(url)
@@ -246,10 +251,17 @@ def findvideos(item):
                 other = ''
                 if servidor == 'various': other = servertools.corregir_other(url)
 
+                if '/asianload.' in url:
+                   data3 = do_downloadpage(url)
+
+                   url = scrapertools.find_single_match(data3, 'file:"(.*?)"')
+
                 if servidor == 'directo':
-                    if not config.get_setting('developer_mode', default=False): continue
-                    other = url.split("/")[2]
-                    other = other.replace('https:', '').strip()
+                    if url.endswith('.m3u8'): other = 'Asianload'
+                    else:
+                        if not config.get_setting('developer_mode', default=False): continue
+                        other = url.split("/")[2]
+                        other = other.replace('https:', '').strip()
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = other ))
 

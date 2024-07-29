@@ -275,7 +275,9 @@ def findvideos(item):
             if not url.startswith("http"):
                 b64_decode = base64.b64decode(url)
 
-                if b64_decode: url = scrapertools.find_single_match(str(b64_decode), '<iframe src="(.*?)"')
+                if b64_decode:
+                    url = scrapertools.find_single_match(str(b64_decode), '<iframe src="(.*?)"')
+                    if not url: url = scrapertools.find_single_match(str(b64_decode), '<IFRAME SRC="(.*?)"')
 
             if url.startswith('//'): url = 'https:' + url
 
@@ -285,9 +287,13 @@ def findvideos(item):
             elif 'jetload.' in url: continue
             elif '.tioanime.' in url: continue
             elif '.fembed.' in url: continue
+            elif 'petardas.online' in url: continue
 
             url = url.replace('/altamina.online/', '/filemoon.sx/')
+            url = url.replace('/conlafuerzademilsalchipapas.site/', '/filemoon.sx/')
+
             url = url.replace('/elbailedeltroleo.site/', '/vgembed.com/')
+            url = url.replace('/yosisubogordas.site/', '/vgembed.com/')
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)

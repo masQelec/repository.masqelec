@@ -60,10 +60,11 @@ def generos(item):
     url_genre = host + '/animes'
 
     data = httptools.downloadpage(url_genre).data
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<div id="genero"(.*?)</select>')
+    bloque = scrapertools.find_single_match(data, '<div id="genero"(.*?)</div></div>')
 
-    matches = re.compile('<option value="(.*?)">(.*?)</option>').findall(bloque)
+    matches = re.compile('<input id=".*?value="(.*?)".*?">(.*?)</label>').findall(bloque)
 
     for gen, title in matches:
         title = title.strip()

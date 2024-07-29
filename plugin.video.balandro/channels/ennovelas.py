@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://ennovelas.site/'
+host = 'https://ennovelas.com.de/'
 
 
 # ~ por si viene de enlaces guardados
@@ -54,7 +54,7 @@ ant_hosts = ['https://w.ennovelas.net/', 'https://ww.ennovelas.net/', 'https://e
              'https://t.ennovelas.net/', 'https://n.ennovelas.net/', 'https://v.ennovelas.net/',
              'https://o.ennovelas.net/', 'https://u.ennovelas.net/', 'https://m.ennovelas.net/',
              'https://k.ennovelas.net/', 'https://ennovelas.io/', 'https://a.ennovelas.io/',
-             'https://ennovelas.net/']
+             'https://ennovelas.net/', 'https://ennovelas.site/']
 
 
 domain = config.get_setting('dominio', 'ennovelas', default='')
@@ -177,7 +177,7 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_ennovelas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(Item( channel='helper', action='show_help_ennovelas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('ennovelas') ))
 
     platformtools.itemlist_refresh()
 

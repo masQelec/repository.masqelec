@@ -98,7 +98,7 @@ def categorias(item):
 
     headers = {'referer': host + 'tags?hl=es'}
 
-    data = do_downloadpage(item.url, headers = headers)
+    data = do_downloadpage(url, headers = headers)
 
     data = jsontools.load(data).get('tags', {}).get('_embedded', {}).get('items', [])
 

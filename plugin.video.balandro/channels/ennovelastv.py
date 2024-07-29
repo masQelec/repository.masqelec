@@ -10,11 +10,12 @@ from core import httptools, scrapertools, servertools, tmdb
 # ~ pelis No hay 24/12/2023
 
 
-host = 'https://f.ennovelas-tv.com/'
+host = 'https://g.ennovelas-tv.com/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://c.ennovelas-tv.com/', 'https://d.ennovelas-tv.com/' ,'https://e.ennovelas-tv.com/']
+ant_hosts = ['https://c.ennovelas-tv.com/', 'https://d.ennovelas-tv.com/', 'https://e.ennovelas-tv.com/',
+             'https://f.ennovelas-tv.com/']
 
 
 domain = config.get_setting('dominio', 'ennovelastv', default='')
@@ -29,7 +30,10 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    raise_weberror = True
+    if '/years/' in url: raise_weberror = False
+
+    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if not data:
         if not '/search/' in url:
@@ -38,7 +42,7 @@ def do_downloadpage(url, post=None, headers=None):
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
-                data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -87,6 +91,65 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimas series', action = 'list_last', url = host + 'ennovelas/', search_type = 'tvshow', text_color = 'moccasin' ))
 
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por país', action='paises', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def generos(item):
+    logger.info()
+    itemlist = []
+
+    opciones = [
+       ('action', 'Acción'),
+       ('aventura', 'Aventura'),
+       ('comedy', 'Comedia'),
+       ('crime', 'Crimen'),
+       ('drama', 'Drama'),
+       ('mistery', 'Misterio'),
+       ('music', 'Música'),
+       ('romance', 'Romance'),
+       ('thriller', 'Thriller'),
+       ('terror', 'Terror'),
+       ('western', 'Western')
+    ]
+
+    for opc, tit in opciones:
+        itemlist.append(item.clone( title=tit, url = host + 'genre/' + opc + '/', action = 'list_all', text_color = 'hotpink' ))
+
+    return itemlist
+
+
+def paises(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'country/argentina/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'country/brasil/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'country/chile/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'country/colombia/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'country/mexico/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'country/peru/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Reino unido', action = 'list_all', url = host + 'country/reino-unido/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'country/venezuela/', text_color='moccasin' ))
+
+    return itemlist
+
+
+def anios(item):
+    logger.info()
+    itemlist = []
+
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 1989, -1):
+        url = host + 'years/' + str(x) + '/'
+
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'deepskyblue' ))
+
     return itemlist
 
 
@@ -105,6 +168,9 @@ def list_all(item):
         if not url or not title: continue
 
         if '/movies/' in url: continue
+
+        year = '-'
+        if '/years/' in item.url: year = scrapertools.find_single_match(item.url, "/years/(.*?)/")
 
         thumb = scrapertools.find_single_match(match, 'data-img="(.*?)"')
 
@@ -141,7 +207,7 @@ def list_all(item):
 
                 title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
 
-                itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, infoLabels={'year': '-'},
+                itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, infoLabels={'year': year},
                                             contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
                 continue
 
@@ -149,7 +215,7 @@ def list_all(item):
                 title = title.replace('Temporada', '[COLOR tan]Temporada[/COLOR]')
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
-                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

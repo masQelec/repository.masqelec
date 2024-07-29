@@ -110,7 +110,7 @@ def pornstars(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
 
@@ -132,7 +132,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         time = scrapertools.find_single_match(match, '<p>(.*?)</p>')
 
@@ -159,13 +159,16 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    matches0 = re.compile('<iframe.*?data-litespeed-src="(.*?)"', re.DOTALL).findall(data)
     matches1 = re.compile('<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
     matches2 = re.compile('<source type="video/mp4".*?src="(.*?)"', re.DOTALL).findall(data)
 
-    matches = matches1 + matches2
+    matches = matches0 + matches1 + matches2
 
     for link in matches:
         if '//a.' in link: continue
+
+        elif link == 'about:blank': continue
 
         if host in link:
             data2 = do_downloadpage(link)
@@ -177,13 +180,21 @@ def findvideos(item):
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'Vo' ))
 
-        if 'player-x.php?' in link:
-            url = scrapertools.find_single_match(data, 'mp4="(.*?)"')
+                return itemlist
 
+        elif 'player-x.php?' in link:
+            data2 = do_downloadpage(link)
+
+            url = scrapertools.find_single_match(data2, '<source type="video/mp4".*?src="(.*?)"')
+
+            url = scrapertools.find_single_match(data, 'mp4="(.*?)"')
+ 
             if url:
                 url += '|Referer=%s' % item.url
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'Vo' ))
+
+                return itemlist
 
         servidor = servertools.get_server_from_url(link)
         servidor = servertools.corregir_servidor(servidor)

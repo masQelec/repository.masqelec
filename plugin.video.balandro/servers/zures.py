@@ -42,7 +42,8 @@ def get_video_url(page_url, url_referer=''):
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         txt_server = 'Unknow'
 
-        if 'allviid' in page_url: txt_server = 'Allviid'
+        if 'amdahost' in page_url: txt_server = 'Amdahost'
+        elif 'allviid' in page_url: txt_server = 'Allviid'
         elif 'cloudfile' in page_url: txt_server = 'Cloudfile'
         elif 'cloudmail' in page_url: txt_server = 'Cloudmail'
         elif 'dailyuploads' in page_url: txt_server = 'Dailyuploads'

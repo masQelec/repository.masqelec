@@ -109,7 +109,7 @@ def plus_proxies(proxies, max_proxies):
                  proxies_plus.append(prox)
 
     elif tplus == 3:
-        if '<title>Just a moment...</title>' in resp.data:
+        if '<title>Just a moment...</title>' in resp.data or '<title>Just a moment please...</title>' in resp.data:
             el_provider = '[B][COLOR %s] Privacyaffairs[/B][/COLOR]' % color_exec
             platformtools.dialog_notification('Hidester', 'Vía' + el_provider)
 

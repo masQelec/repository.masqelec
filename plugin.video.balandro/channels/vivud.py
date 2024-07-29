@@ -40,7 +40,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Long Play', action = 'list_all', url = url_api + 'long&page=1' ))
 
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
     return itemlist
 
@@ -49,16 +49,15 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(item.url)
+    data = do_downloadpage(host)
+    data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
     data = scrapertools.find_single_match(data, '<ul class="sidebar-nav">(.*?)</ul>')
-    data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
     matches = re.compile('<a class="category-item" href="([^"]+)">([^"]+)</a>', re.DOTALL).findall(data)
 
     for url, title in matches:
-        url = host[:-1] + url
-        url = url + '?ajax=1&type=most-recent&page=1'
+        url = host[:-1] + url + '?ajax=1&type=most-recent&page=1'
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'orange' ))
 
@@ -82,16 +81,15 @@ def list_all(item):
         title = video["videoTitle"]
 
         src = video["src"]
+
         thumb = src.get('domain', domain) + src.get('pathMedium', domain) + "1.jpg"
 
         url = video["urls_CDN"]
-        url = url.get('480', domain)
-
-        url = url.replace("/\n/", "/")
-
+ 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (duration, title)
 
-        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
+        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, domain=domain, thumbnail=thumb,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
         actual = int(scrapertools.find_single_match(item.url, '&page=([0-9]+)'))
@@ -108,7 +106,15 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(Item( channel = item.channel, action='play', title='', url=item.url, server = 'directo', language = 'Vo') )
+    if '480' in str(item.url):
+        url = item.url.get('480', item.domain)
+
+        itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server = 'directo', language = 'Vo', other = '480') )
+
+    if '360' in str(item.url):
+        url = item.url.get('360', item.domain)
+
+        itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server = 'directo', language = 'Vo', other = '360') )
 
     return itemlist
 
@@ -116,7 +122,7 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
-        item.url =  host + texto.replace(" ", "+")
+        item.url = host + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

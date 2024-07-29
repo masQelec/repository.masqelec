@@ -425,8 +425,6 @@ def manto_params(item):
 
         config.set_setting('channel_veronline_dominio', '')
 
-        config.set_setting('channel_yestorrent_dominio', '')
-
         config.set_setting('autoplay_max_links', '10')
 
         config.set_setting('proxies_totales_limit', '500')
@@ -491,7 +489,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '126.0.6478.127')
+        config.set_setting('chrome_last_version', '127.0.6533.57')
 
         config.set_setting('debug', '0')
 
@@ -1568,10 +1566,6 @@ def opciones_veronline(item):
     item.from_channel = 'veronline'
     opciones_domains_common(item)
 
-def opciones_yestorrent(item):
-    item.from_channel = 'yestorrent'
-    opciones_domains_common(item)
-
 
 def opciones_domains_common(item):
     logger.info()
@@ -1734,8 +1728,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
 
-            elif item.from_channel == 'yestorrent': domains.manto_domain_yestorrent(item)
-
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)
 
@@ -1849,8 +1841,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'tupelihd': domains.test_domain_tupelihd(item)
 
             elif item.from_channel == 'veronline': domains.test_domain_veronline(item)
-
-            elif item.from_channel == 'yestorrent': domains.test_domain_yestorrent(item)
 
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)

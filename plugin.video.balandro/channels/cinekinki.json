@@ -1,0 +1,17 @@
+{
+  "id": "cinekinki",
+  "name": "CineKinki",
+  "thumbnail": "cinekinki.jpg",
+
+  "active": false,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast"],
+
+  "clusters": ["temporary", "classic"],
+
+  "notes": "Películas clásicas del género Kinki."
+}

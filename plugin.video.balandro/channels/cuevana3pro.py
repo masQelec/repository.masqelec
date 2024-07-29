@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://wiw3.cuevana3.vip'
+host = 'https://ww23.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
@@ -52,7 +52,10 @@ ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://w
              'https://wli3.cuevana3.vip', 'https://wnv3.cuevana3.vip', 'https://wn3.cuevana3.vip',
              'https://wv3i.cuevana3.vip', 'https://wmi.cuevana3.vip', 'https://wi3v.cuevana3.vip',
              'https://wev3.cuevana3.vip', 'https://wv3n.cuevana3.vip', 'https://wl3n.cuevana3.vip',
-             'https://cuevana3.vip']
+             'https://cuevana3.vip', 'https://wiw3.cuevana3.vip', 'https://wmi3.cuevana3.vip',
+             'https://wn3l.cuevana3.vip', 'https://imu.cuevana3.vip', 'https://wni3.cuevana3.vip',
+             'https://mvi.cuevana3.vip', 'https://wi3n.cuevana3.vip', 'https://wi3m.cuevana3.vip',
+             'https://im3.cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')
@@ -186,7 +189,7 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_cuevana3pro', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(Item( channel='helper', action='show_help_cuevana3pro', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('cuevana3pro') ))
 
     platformtools.itemlist_refresh()
 
@@ -218,6 +221,8 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/movies/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/category/page-peliculas-de-estrenos/', search_type = 'movie', text_color = 'cyan' ))
+
+    itemlist.append(item.clone( title = 'Sagas', action = 'list_all', url = host + '/genre/sagas/', search_type = 'movie', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -746,7 +751,7 @@ def play(item):
         if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
         if not url:
-            if '.terabox.' in data or '.terabox.' in data or '/hydrax.' in data:
+            if '/terabox.' in data or '.terabox.' in data or '/hydrax.' in data:
                 return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
             return itemlist
 

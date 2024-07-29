@@ -52,6 +52,45 @@ _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 _team = "[COLOR hotpink][B][I] t.me/Balandro_team [/I][/B][/COLOR]"
 
 
+srv_pending = ''
+con_incidencias = ''
+no_accesibles = ''
+
+try:
+    with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+except:
+    try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+    except: txt_status = ''
+
+if txt_status:
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION SERVIDORES(.*?)SITUACION CANALES')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR orchid]' in match: srv_pending += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+
 context_temas = []
 
 try: last_ver = updater.check_addon_version()
@@ -447,32 +486,23 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='', title= title, context=context_temas, text_color='lightyellow', folder=False ))
 
-    itemlist.append(item.clone( action='', title= ' - [B]Fecha [COLOR powderblue][I]' + str(datetime.today()) + '[/I][/B]', text_color='aquamarine' ))
+    itemlist.append(item.clone( action='', title= '[B]Fecha [COLOR powderblue][I]' + str(datetime.today()) + '[/I][/B]', text_color='aquamarine' ))
 
-    itemlist.append(item.clone( action='submnu_contacto', title= ' - [B]Contacto[/B]', text_color='limegreen', thumbnail=config.get_thumb('news') ))
-    itemlist.append(item.clone( action='submnu_fuente', title= ' - [B]Fuentes [COLOR powderblue][I]Add-Ons[/I][/B]', text_color='coral', thumbnail=config.get_thumb('pencil') ))
-    itemlist.append(item.clone( action='show_help_miscelanea', title= ' - [B]Miscelánea[/B]', text_color='goldenrod', thumbnail=config.get_thumb('booklet') ))
+    itemlist.append(item.clone( action='submnu_contacto', title= '[B]Contacto[/B]', text_color='limegreen', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='submnu_fuente', title= '[B]Fuentes [COLOR powderblue][I]Add-Ons[/I][/B]', text_color='coral', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( action='show_help_miscelanea', title= '[B]Miscelánea[/B]', text_color='goldenrod', thumbnail=config.get_thumb('booklet') ))
 
-    path = os.path.join(config.get_runtime_path(), 'dominios.txt')
+    if txt_status:
+        itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[B]Últimos Cambios Dominios[/B]', text_color='tomato', thumbnail=config.get_thumb('stack') ))
 
-    existe = filetools.exists(path)
+        if con_incidencias:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_incidencias', title='[COLOR gold][B]Canales [COLOR tan]Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
-    if existe:
-        txt_status = ''
+        if no_accesibles:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title='[COLOR gold][B]Canales [COLOR indianred]No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
-        try:
-           with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
-        except:
-           try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
-           except: pass
-
-        if txt_status:
-            bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
-
-            matches = bloque.count('[COLOR lime]')
-
-            if matches:
-                itemlist.append(item.clone( channel='actions', action='show_latest_domains', title=' - [B]Últimos Cambios Dominios[/B]', text_color='tomato', thumbnail=config.get_thumb('stack') ))
+        if srv_pending:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_pending', title='[COLOR fuchsia][B]Servidores [COLOR tan]Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
     if not config.get_setting('mnu_simple', default=False): tit_mnu = '[B][I]Menú Ayuda:[/I][/B]'
     else: tit_mnu = '[B][I]Menú Ayuda Simplificado:[/I][/B]'
@@ -729,31 +759,11 @@ def submnu_canales(item):
 
     itemlist.append(item.clone( action='', title= '[B][I]CANALES SITUACIÓN:[/I][/B]', text_color='goldenrod', folder=False ))
 
-    txt_status = ''
-
-    try:
-       with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
-    except:
-       try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
-       except: pass
-
     if txt_status:
-        bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
-
-        matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
-
-        if not '[COLOR moccasin]' in str(matches): matches = ''
-
-        if matches:
+        if con_incidencias:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_incidencias', title= '    - Canales[COLOR tan][B] Con Incidencias[/B][/COLOR]' ))
 
-        bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
-
-        matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
-
-        if not '[COLOR moccasin]' in str(matches): matches = ''
-
-        if matches:
+        if no_accesibles:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= '    - Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]' ))
 
     itemlist.append(item.clone( action='submnu_avisinfo_channels', title= '    - [COLOR aquamarine][B]Avisos[/COLOR] [COLOR green]Información[/B][/COLOR] canales' ))
@@ -786,17 +796,9 @@ def submnu_avisinfo_channels(item):
 
     itemlist.append(item.clone( action='', title= '[B]AVISOS INFORMACIÓN CANALES:[/B]', text_color='gold', folder=False ))
 
-    datos = channeltools.get_channel_parameters('entrepeliculasyseries')
-    if datos['active']:
-        itemlist.append(item.clone( action='show_help_entrepeliculasyseries', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]EntrePeliculasySeries[/B][/COLOR]', thumbnail=config.get_thumb('entrepeliculasyseries', 'thumb', 'channels') ))
-
     datos = channeltools.get_channel_parameters('hdfull')
     if datos['active']:
         itemlist.append(item.clone( action='show_help_hdfull', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HdFull[/B][/COLOR]', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
-
-    datos = channeltools.get_channel_parameters('hdfullse')
-    if datos['active']:
-        itemlist.append(item.clone( action='show_help_hdfullse', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]HdFullSe[/B][/COLOR]', thumbnail=config.get_thumb('hdfullse', 'thumb', 'channels') ))
 
     datos = channeltools.get_channel_parameters('nextdede')
     if datos['active']:
@@ -805,10 +807,6 @@ def submnu_avisinfo_channels(item):
     datos = channeltools.get_channel_parameters('playdede')
     if datos['active']:
         itemlist.append(item.clone( action='show_help_playdede', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]PlayDede[/B][/COLOR]', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
-
-    datos = channeltools.get_channel_parameters('zonaleros')
-    if datos['active']:
-        itemlist.append(item.clone( action='show_help_zonaleros', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal [COLOR yellow][B]ZonaLeros[/B][/COLOR]', thumbnail=config.get_thumb('zonaleros', 'thumb', 'channels') ))
 
     itemlist.append(item.clone( action='show_help_resto', title= ' - Posible [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] en el resto de los [COLOR gold][B]Canales[/B][/COLOR]' ))
 
@@ -1016,6 +1014,10 @@ def submnu_play(item):
 
     itemlist.append(item.clone( action='', title= '[B][I]PLAY SERVIDORES SITUACIÓN:[/I][/B]', folder=False, text_color='orchid' ))
 
+    if txt_status:
+        if srv_pending:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_pending', title=' - Servidores [COLOR tan][B]Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
+
     itemlist.append(item.clone( action='show_server_report', title= ' - Como [COLOR deepskyblue][B]Reportar[/B][/COLOR] posible Fallo en la Reproducción de Servidores', thumbnail=config.get_thumb('telegram') ))
 
     itemlist.append(item.clone( action='submnu_avisinfo_servers', title= '    - [COLOR aquamarine][B]Avisos[/COLOR] [COLOR green]Información[/B][/COLOR] servidores', thumbnail=config.get_thumb('bolt') ))
@@ -1143,6 +1145,13 @@ def submnu_buscar(item):
     itemlist.append(item.clone( action='', title='[B]BUSCAR:[/B]', folder=False, text_color='yellow' ))
 
     itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= ' - Resumen y Distribución Canales', thumbnail=config.get_thumb('stack') ))
+
+    if txt_status:
+        if con_incidencias:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_incidencias', title= '    - Canales[COLOR tan][B] Con Incidencias[/B][/COLOR]' ))
+
+        if no_accesibles:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= '    - Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]' ))
 
     itemlist.append(item.clone( action='show_help_bucle', title = ' - Las Búsquedas hacen [COLOR yellow][B]Bucle [COLOR goldenrod](piden de nuevo el texto a buscar)[/COLOR][/B]', thumbnail=config.get_thumb('news') ))
 
@@ -1424,9 +1433,17 @@ def submnu_version(item):
     itemlist.append(item.clone( action='show_version', title= ' - [COLOR green][B]Información[/B][/COLOR] Versión', thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='show_changelog', title= ' - [COLOR goldenrod][B]Historial[/B][/COLOR] de Versiones', thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( action='', title='[B]RESUMENES:[/B]', folder=False, text_color='violet', thumbnail=config.get_thumb('addon') ))
+    itemlist.append(item.clone( action='', title='[B]RESÚMENES:[/B]', folder=False, text_color='violet', thumbnail=config.get_thumb('addon') ))
 
     itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= ' -  Resumen y Distribución [COLOR gold][B]Canales[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+    if txt_status:
+        if con_incidencias:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_incidencias', title= ' -  Canales[COLOR tan][B] Con Incidencias[/B][/COLOR]' ))
+
+        if no_accesibles:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= ' -  Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]' ))
+
     itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= ' -  Resumen y Distribución [COLOR fuchsia][B]Servidores[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
     return itemlist
@@ -1785,6 +1802,10 @@ def show_help_entrepeliculasyseries(item):
     item.notice = 'entrepeliculasyseries'
     show_help_canales(item)
 
+def show_help_gnula(item):
+    item.notice = 'gnula'
+    show_help_canales(item)
+
 def show_help_gnula24h(item):
     item.notice = 'gnula24h'
     show_help_canales(item)
@@ -1881,6 +1902,14 @@ def show_help_subtorrents(item):
     item.notice = 'subtorrents'
     show_help_canales(item)
 
+def show_help_tiodonghua(item):
+    item.notice = 'tiodonghua'
+    show_help_canales(item)
+
+def show_help_uphd(item):
+    item.notice = 'uphd'
+    show_help_canales(item)
+
 def show_help_zonaleros(item):
     item.notice = 'zonaleros'
     show_help_canales(item)
@@ -1902,12 +1931,10 @@ def show_help_canales(item):
     if item.notice: txt = '[B][COLOR cyan]El webmaster de [COLOR yellow]' + item.notice.capitalize() + '[/COLOR] ha activado un nivel más de protección con [COLOR orangered]CloudFlare[/COLOR][/B][CR]'
     else: txt = '[B][COLOR cyan]El webmaster del [COLOR yellow]Canal[/COLOR] ha activado un nivel más de protección con [COLOR orangered]CloudFlare[/COLOR][/B][CR]'
 
-    if item.notice == 'hdfull' or item.notice == 'hdfullse' or item.notice == 'playdede' or item.notice == 'nextdede' or item.notice == 'entrepeliculasyseries' or item.notice == 'cine24h' or item.notice == 'animeonline' or item.notice == 'zonaleros':
+    if item.notice == 'hdfull' or item.notice == 'nextdede' or item.notice == 'playdede':
        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
 
        if item.notice == 'hdfull': txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominioshdfull.com[/COLOR][/B][CR]'
-
-       elif item.notice == 'hdfullse': txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://hdfull.pm[/COLOR][/B] [COLOR yellow]ó bien a [/COLOR][B][COLOR greenyellow]https://www.hdfull.it[/COLOR][/B][CR]'
 
        elif item.notice == 'NextDede':
           txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominiosnextdede.com[/COLOR][/B][CR]'
@@ -2483,6 +2510,11 @@ def show_help_proxies(item):
     txt += 'También, desde el listado de canales de películas y/ó series, en el [COLOR yellow][B]Menú Contextual[/B][/COLOR] se pueden desactivar los canales deseados.'
     txt += ' De esta manera quedarán descartados para las búsquedas globales, se evitarán sus mensajes relacionados con los proxies'
     txt += ' y se acelerará la búsqueda.'
+
+    txt += '[CR][CR][COLOR gold][B]¿ Como obtener los proxies en un canal determinado ó Globalmente ?[/B][/COLOR][CR]'
+    txt += 'Para un canal determinado, acceder a el canal, y en [COLOR goldenrod][B]Acciones[/COLOR] [COLOR plum](si no hay resultados)[/B][/COLOR],[CR]' 
+    txt += 'ejecutar [COLOR red][B]Configurar proxies a usar ...[/B][/COLOR][CR][CR]'
+    txt += 'Para Globalmente, use la opción Configurar Proxies a usar [COLOR plum][B](en los canales que los Necesiten)[/B][/COLOR]'
 
     txt += '[CR][CR][COLOR gold][B]¿ Cómo se usan los Ajustes de proxies ?[/B][/COLOR][CR]'
     txt += 'Por defecto en los Ajustes de Balandro esta activada la opción [COLOR red][B]Buscar proxies automáticamente[/B][/COLOR] ello efectua un barrido de búsqueda de acuerdo con el proveedor informado.'
@@ -4817,13 +4849,6 @@ def show_test(item):
         if veronline_dominio:
            if tex_dom: tex_dom = tex_dom + '   VerOnline: ' + veronline_dominio + '[CR]'
            else: tex_dom = '[CR]   VerOnline: ' + veronline_dominio + '[CR]'
-
-    datos = channeltools.get_channel_parameters('yestorrent')
-    if datos['active']:
-        yestorrent_dominio = config.get_setting('channel_yestorrent_dominio', default='')
-        if yestorrent_dominio:
-           if tex_dom: tex_dom = tex_dom + '   YesTorrent: ' + yestorrent_dominio + '[CR]'
-           else: tex_dom = '[CR]   YesTorrent: ' + yestorrent_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('zonaleros')
     if datos['active']:
