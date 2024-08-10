@@ -6,7 +6,7 @@
         <!-- startup delay 0 to 5 min -->
         <setting id="startup_delay" type="integer" label="30008" help="30074">
           <level>1</level>
-          <default>0</default>
+          <default>1</default>
           <constraints>
             <options>
               <option label="30062">0</option>
@@ -31,7 +31,7 @@
         </setting>
     		<setting id="run_on_idle" type="boolean" label="30014" help="30076">
           <level>1</level>
-          <default>false</default>
+          <default>true</default>
           <control type="toggle" />
         </setting>
     		<setting id="check_sources" type="boolean" label="30017" help="">
@@ -73,7 +73,7 @@
         <!-- timer options 1 hr, 2 hr, 4 hr, 6 hr, 12 hr, 24 hr -->
     		<setting id="video_timer" type="integer" label="30010" help="30079">
           <level>0</level>
-          <default>2</default>
+          <default>24</default>
           <constraints>
             <options>
               <option label="30068">1</option>
@@ -130,7 +130,7 @@
       <group id="1" label="">
         <setting id="update_music" type="boolean" label="30005" help="">
           <level>0</level>
-          <default>false</default>
+          <default>true</default>
           <control type="toggle" />
         </setting>
         <setting id="music_advanced_timer" type="boolean" label="30009" help="30078">
@@ -144,7 +144,7 @@
         <!-- timer options 1 hr, 2 hr, 4 hr, 6 hr, 12 hr, 24 hr -->
         <setting id="music_timer" type="integer" label="30010" help="30079">
           <level>0</level>
-          <default>2</default>
+          <default>24</default>
           <constraints>
             <options>
               <option label="30068">1</option>
@@ -201,12 +201,12 @@
       <group id="1" label="">
         <setting id="clean_libraries" type="boolean" label="30041" help="30082">
           <level>1</level>
-          <default>false</default>
+          <default>true</default>
           <control type="toggle" />
         </setting>
         <!-- options are both, video and music -->
         <setting id="library_to_clean" type="integer" label="30054" help="">
-          <level>1</level>
+          <level>0</level>
           <default>30055</default>
           <constraints>
             <options>

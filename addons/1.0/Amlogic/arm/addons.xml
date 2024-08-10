@@ -541,7 +541,7 @@ Tvheadend (eb59284): is a TV streaming server for Linux supporting DVB-S/S2, DVB
 </addon>
 
 <addon id="service.libraryautoupdate"
-    name="Library Auto Update" version="1.2.5" provider-name="robweber">
+    name="Library Auto Update" version="3.2.5" provider-name="robweber">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.dateutil" version="2.7.3" />
