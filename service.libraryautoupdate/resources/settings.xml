@@ -31,7 +31,7 @@
         </setting>
     		<setting id="run_on_idle" type="boolean" label="30014" help="30076">
           <level>1</level>
-          <default>true</default>
+          <default>false</default>
           <control type="toggle" />
         </setting>
     		<setting id="check_sources" type="boolean" label="30017" help="">
