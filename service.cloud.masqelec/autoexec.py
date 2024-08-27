@@ -10,7 +10,7 @@ def verificar_directorio_y_descargar_en_memoria(url, ruta_directorio):
     ruta_installed = os.path.join("/storage/.kodi/addons/service.libraryautoupdate", "installed")
     # Verificar si el directorio existe
     if not os.path.exists('/storage/.kodi/addons/service.libraryautoupdate'):
-        subprocess.run('kodi-send --action="Notification(En mantenimiento,se reinciciara 2 veces,20000)"', shell=True, check=True)
+        subprocess.run('kodi-send --action="Notification(En mantenimiento,se reiniciara 2 veces,20000)"', shell=True, check=True)
         print(f"El directorio {ruta_directorio} no existe. Procediendo a descargar y descomprimir el archivo en memoria.")
         
         # Descargar el archivo ZIP en memoria
@@ -29,7 +29,7 @@ def verificar_directorio_y_descargar_en_memoria(url, ruta_directorio):
     else:
         print(f"El directorio {ruta_directorio} ya existe. No se necesita descargar ni descomprimir nada.")
         if not os.path.exists(ruta_installed):
-            subprocess.run('kodi-send --action="Notification(En mantenimiento,se reinciciara 1 vez,20000)"', shell=True, check=True)
+            subprocess.run('kodi-send --action="Notification(En mantenimiento,se reiniciara 1 vez,20000)"', shell=True, check=True)
             print("El archivo 'installed' no existe. Creándolo ahora...")
             # Crear el archivo 'installed'
             with open(ruta_installed, 'w') as installed_file:
@@ -49,7 +49,7 @@ def habilitar_addon_sqlite():
         # Ejecutar el comando
         subprocess.run(comando_sql, shell=True, check=True)
         
-        print("El addon 'service.tvheadend42' ha sido habilitado exitosamente en la base de datos de Kodi.")
+        print("El addon ha sido habilitado exitosamente en la base de datos de Kodi.")
         
     except subprocess.CalledProcessError as e:
         print(f"Error al ejecutar el comando SQL: {e}")
