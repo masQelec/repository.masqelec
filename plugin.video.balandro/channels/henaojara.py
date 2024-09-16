@@ -316,6 +316,10 @@ def list_all(item):
 
             PeliName = re.sub(r"Sub |Español|Latino|Castellano|HD|Temporada \d+|\(\d{4}\)", "", title).strip()
 
+            if 'Movie' in PeliName: PeliName = PeliName.split("Movie")[0]
+
+            PeliName = PeliName.replace('Peliculas', '').replace('Pelicula', '').strip()
+
             PeliName = PeliName.strip()
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
@@ -387,8 +391,10 @@ def list_last(item):
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
         if tipo == 'movie':
-            if item.search_type != 'all':
-                if item.search_type == 'tvshow': continue
+            if 'Movie' in PeliName: PeliName = PeliName.split("Movie")[0]
+
+            PeliName = PeliName.replace('Peliculas', '').replace('Pelicula', '').strip()
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=PeliName, infoLabels={'year': year} ))
 

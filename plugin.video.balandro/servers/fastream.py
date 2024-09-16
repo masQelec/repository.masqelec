@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import re
+
 from platformcode import logger
 from core import httptools, scrapertools, servertools
 from lib import jsunpack
@@ -20,6 +22,7 @@ def get_video_url(page_url, url_referer=''):
             page_url = _embed
 
     data = httptools.downloadpage(page_url).data
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     if 'File is no longer available as it expired or has been deleted' in data:
         return 'Archivo inexistente ó eliminado'
@@ -30,18 +33,13 @@ def get_video_url(page_url, url_referer=''):
 
         h ['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/115.0'
 
-        h['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'
-        h['Accept-Encoding'] = 'gzip, deflate, br, zstd'
+        h['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
 
-        # ~ h['Accept-Language'] = 'es-ES,es;q=0.9,en;q=0.8,gl;q=0.7,ca;q=0.6,ru;q=0.5'
-
-        h['Cache-Control'] = 'max-age=0'
-        h['Priority'] = 'u=0, i'
         h['Sec-Fetch-User'] = '?1'
-        h['Upgrade-Insecure-Requests'] = '1'
         h['Cookie'] = 'aff=2; file_id=%s' % file_id
 
         data = httptools.downloadpage(page_url, headers=h).data
+        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     try:
         packed = scrapertools.find_single_match(data, "text/javascript'>(eval.*?)\s*</script>")
@@ -69,7 +67,7 @@ def get_video_url(page_url, url_referer=''):
 
     if video_urls:
         if not (len(video_urls)) == 1:
-            return 'Archivo Múltiple No soportado.'
+            return 'Archivo Múltiple No Soportado'
 
         video_urls = servertools.get_parse_hls(video_urls)
 

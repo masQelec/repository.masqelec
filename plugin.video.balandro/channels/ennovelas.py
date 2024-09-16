@@ -12,38 +12,6 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
-
 host = 'https://ennovelas.com.de/'
 
 
@@ -54,7 +22,7 @@ ant_hosts = ['https://w.ennovelas.net/', 'https://ww.ennovelas.net/', 'https://e
              'https://t.ennovelas.net/', 'https://n.ennovelas.net/', 'https://v.ennovelas.net/',
              'https://o.ennovelas.net/', 'https://u.ennovelas.net/', 'https://m.ennovelas.net/',
              'https://k.ennovelas.net/', 'https://ennovelas.io/', 'https://a.ennovelas.io/',
-             'https://ennovelas.net/', 'https://ennovelas.site/']
+             'https://ennovelas.net/', 'https://ennovelas.site/', 'https://tv.ennovelas.net/']
 
 
 domain = config.get_setting('dominio', 'ennovelas', default='')
@@ -130,21 +98,13 @@ def do_downloadpage(url, post=None, headers=None):
                         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('ennovelas', url, post=post, headers=headers, raise_weberror=raise_weberror).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-            except:
-                pass
+        if not url.startswith(host):
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('ennovelas', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
     if '<title>Just a moment...</title>' in data:
         if not '/search/' in url:
@@ -207,12 +167,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
     return itemlist
 
@@ -225,14 +183,14 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'novelas-completas/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/novelas-completas/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Nuevos episodios', action = 'last_epis', url = host + 'episodes/', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por país', action='paises', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Por país', action='paises', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'tvshow' ))
 
     return itemlist
@@ -266,27 +224,6 @@ def generos(item):
     return itemlist
 
 
-def paises(item):
-    logger.info()
-    itemlist = []
-
-    itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'genre/novelas-americanas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'genre/novelas-argentinas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'genre/novelas-brasilenas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'genre/telenovelas-chilenas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'genre/novelas-colombianas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'genre/novelas-espanolas/', lang = 'Esp', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Filipinas', action = 'list_all', url = host + 'genre/novelas-filipinas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'India', action = 'list_all', url = host + 'genre/novelas-indias/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'genre/novelas-mexicanas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'genre/novelas-peruanas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Reino unido', action = 'list_all', url = host + 'genre/novelas-reino-unido/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'genre/series-y-novelas-turcas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'genre/novelas-venezolanas/', text_color='moccasin' ))
-
-    return itemlist
-
-
 def anios(item):
     logger.info()
     itemlist = []
@@ -304,6 +241,27 @@ def anios(item):
         url = host + 'years/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = text_color ))
+
+    return itemlist
+
+
+def paises(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'genre/novelas-americanas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'genre/novelas-argentinas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'genre/novelas-brasilenas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'genre/telenovelas-chilenas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'genre/novelas-colombianas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'genre/novelas-espanolas/', lang = 'Esp', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Filipinas', action = 'list_all', url = host + 'genre/novelas-filipinas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'India', action = 'list_all', url = host + 'genre/novelas-indias/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'genre/novelas-mexicanas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'genre/novelas-peruanas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Reino unido', action = 'list_all', url = host + 'genre/novelas-reino-unido/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'genre/series-y-novelas-turcas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'genre/novelas-venezolanas/', text_color='moccasin' ))
 
     return itemlist
 
@@ -341,6 +299,13 @@ def list_all(item):
         title = title.replace('&#8216;', "").replace('&#8217;', "").replace('&#8230;', "").strip()
         title = title.replace('&#038;', '&').replace('&amp;', '&')
 
+        year = scrapertools.find_single_match(match, '(\d{4})')
+        if not year: year = '-'
+        else:
+           title = title.replace(year, '').strip()
+
+        if '/years/' in item.url: year = scrapertools.find_single_match(item.url, "/years/(.*?)/")
+
         SerieName = title
 
         if " (" in SerieName: SerieName = SerieName.split(" (")[0]
@@ -364,9 +329,6 @@ def list_all(item):
 
         tipo = 'movie' if '/movies/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
-
-        year = '-'
-        if '/years/' in item.url: year = scrapertools.find_single_match(item.url, "/years/(.*?)/")
 
         if tipo == 'movie':
             if not item.search_type == "all":
@@ -398,8 +360,9 @@ def list_all(item):
                                                 contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': year} ))
                     continue
 
-                else:
-                    title = title.replace('Temporada', '[COLOR tan]Temporada[/COLOR]')
+            title = title.replace('Temporada', '[COLOR tan]Temporada[/COLOR]')
+
+            title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]').replace('capitulo', '[COLOR goldenrod]Capítulo[/COLOR]')
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
@@ -550,6 +513,8 @@ def episodios(item):
     if item.d_season:
         data = do_downloadpage(host + 'wp-content/themes/vo2022/temp/ajax/seasons.php?seriesID=' + item.d_season, headers = {'Referer': item.url, 'X-Requested-With': 'XMLHttpRequest'})
 
+        if not data: return itemlist
+
         epis = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
         if not epis: data = do_downloadpage(item.url)
     else:
@@ -654,6 +619,8 @@ def findvideos(item):
 
         if '/likessb.' in url: continue
 
+        if url.startswith('//'): url = 'https:' + url
+
         if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 
         elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
@@ -689,6 +656,8 @@ def findvideos(item):
     if not iframes: iframes = scrapertools.find_multiple_matches(data, '<IFRAME.*?SRC="(.*?)"')
 
     for iframe in iframes:
+        if iframe.startswith('//'): iframe = 'https:' + iframe
+
         servidor = servertools.get_server_from_url(iframe)
         servidor = servertools.corregir_servidor(servidor)
 
@@ -848,6 +817,8 @@ def findvideos(item):
         ses += 1
 
         if '/wp-admin/' in url: continue
+
+        if url.startswith('//'): url = 'https:' + url
 
         if url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
         elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')

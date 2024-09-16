@@ -83,9 +83,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'DC Comics', action = 'list_all', url = host + 'genre/d-c/', search_type = 'movie', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'genre/netflix/', search_type = 'movie', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'genre/marvel/', search_type = 'movie', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'D.C.', action = 'list_all', url = host + 'genre/d-c/', search_type = 'movie', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Star wars', action = 'list_all', url = host + 'genre/starwars/', search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))

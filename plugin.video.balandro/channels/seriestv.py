@@ -177,6 +177,9 @@ def list_all(item):
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline</span>(.*?)>mas vistas<')
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>Veronline</span>(.*?)>mas vistas<')
 
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.*?</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>Veronline.*?</span>(.*?)>mas vistas<')
+
     matches = scrapertools.find_multiple_matches(bloque, '<div class="shortstory-in">(.*?)</div></div></div>')
 
     for match in matches:

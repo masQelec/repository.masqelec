@@ -252,7 +252,7 @@ def pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Catálogo (Películas)', action = 'list_all', url = host + 'pelicula/', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Catálogo [COLOR deepskyblue]Películas[/COLOR]', action = 'list_all', url = host + 'pelicula/' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/?get=movies' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings/?get=movies' ))
@@ -332,7 +332,7 @@ def list_all(item):
             if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
             else: year = '-'
 
-        title = title.replace('&#8217;', '').replace('&#8211;', '')
+        title = title.replace('&#8217;', '').replace('&#8211;', '').replace('&#8220;', '').replace('&#8221;', '')
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo

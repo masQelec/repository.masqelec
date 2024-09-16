@@ -82,6 +82,7 @@ def get_video_url(page_url, url_referer=''):
         elif 'vkprime' in page_url: txt_server = 'Vkprime'
         elif 'worlduploads' in page_url: txt_server = 'Worlduploads'
         elif 'ztreamhub' in page_url: txt_server = 'Ztreamhub'
+        elif 'updown' in page_url: txt_server = 'Updown'
 
         if txt_server == 'Unknow': return 'Servidor desconocido'
 

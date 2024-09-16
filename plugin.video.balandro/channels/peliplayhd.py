@@ -484,6 +484,9 @@ def findvideos(item):
             elif 'strwish' in srv:
                 servidor = 'directo'
                 other = 'strwish'
+            elif 'vidhidepre' in srv:
+                servidor = 'directo'
+                other = 'vidhidepre'
 
             if servidor == srv: other = ''
             elif not servidor == 'directo':
@@ -510,7 +513,7 @@ def play(item):
     url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
-    if item.other == 'Peliplaywish' or item.other == 'Mivideoplay' or item.other == 'Peliplaymoon' or item.other == 'Fmoonembed' or item.other == 'Embedmoon' or item.other == 'Jodwish' or item.other == 'Swhoi' or item.other == 'Swdyu' or item.other == 'strwish':
+    if item.other == 'Peliplaywish' or item.other == 'Mivideoplay' or item.other == 'Peliplaymoon' or item.other == 'Fmoonembed' or item.other == 'Embedmoon' or item.other == 'Jodwish' or item.other == 'Swhoi' or item.other == 'Swdyu' or item.other == 'strwish' or item.other == 'vidhidepre':
         if '/?trembed' in url:
             data = do_downloadpage(url)
 

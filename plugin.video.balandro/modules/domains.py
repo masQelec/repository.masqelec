@@ -38,6 +38,7 @@ channels_currents = [
         ]
 
 dominioshdfull = [
+         'https://hd-full.sbs/',
          'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
@@ -47,13 +48,14 @@ dominioshdfull = [
          'https://hd-full.one/',
          'https://hd-full.co/',
          'https://hdfull.icu/',
+         'https://hdfull.quest/',
+         'https://hdfull.link/'
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://hd-full.biz/',
          'https://hd-full.im/',
-         'https://hdfull.quest/',
          'https://new.hdfull.one/'
          ]
 
@@ -1351,16 +1353,14 @@ def latest_domains_hdfull(item):
     latest_domain = ''
 
     try:
-       host_domain = 'https://dominioshdfull.com/'
+       data = httptools.downloadpage('https://dominioshdfull.com/').data
 
-       data = httptools.downloadpage(host_domain).data
+       bloque = scrapertools.find_single_match(data, 'dominios operativos actualizados(.*?)<script>')
 
-       latest_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
+       latest_domain = scrapertools.find_single_match(bloque, 'href="(.*?)"')
 
        if not latest_domain: latest_domain = dominioshdfull[0]
-
-       if latest_domain:
-           latest_domain = latest_domain.replace('login', '')
+       else:
            if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
     except:
        latest_domain = ''
@@ -1371,7 +1371,7 @@ def latest_domains_hdfull(item):
         platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
         xbmc.sleep(1000)
-        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://twitter.com/hdfulloficial[/B][/COLOR]')
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]dominioshdfull.com//B][/COLOR]')
         return
 
     platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio es ', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
@@ -1421,29 +1421,14 @@ def last_domain_hdfull(item):
     latest_domain = ''
 
     try:
-       host_domain = 'https://dominioshdfull.com/'
+       data = httptools.downloadpage('https://dominioshdfull.com/').data
 
-       data = httptools.downloadpage(host_domain).data
+       bloque = scrapertools.find_single_match(data, 'dominios operativos actualizados(.*?)<script>')
 
-       latest_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
-
-       if not latest_domain:
-           operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
-
-           if not operative_domains:
-               operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
-
-               if operative_domains_unescape:
-                   operative_domains_unescape = unquote(str(operative_domains_unescape))
-
-                   operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
-
-               if operative_domains: latest_domain = operative_domains[0]
+       latest_domain = scrapertools.find_single_match(bloque, 'href="(.*?)"')
 
        if not latest_domain: latest_domain = dominioshdfull[0]
-
-       if latest_domain:
-           latest_domain = latest_domain.replace('login', '')
+       else:
            if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
     except:
        latest_domain = ''
@@ -1453,29 +1438,15 @@ def last_domain_hdfull(item):
 
     if not last_domain:
         try:
-           host_domain = 'https://dominioshdfull.com/'
+           data = httptools.downloadpage('https://dominioshdfull.com/').data
 
-           data = httptools.downloadpage(host_domain).data
+           bloque = scrapertools.find_single_match(data, 'dominios operativos actualizados(.*?)<script>')
 
-           last_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
-
-           if not last_domain:
-               operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
-
-               if not operative_domains:
-                   operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
-
-                   if operative_domains_unescape:
-                       operative_domains_unescape = unquote(str(operative_domains_unescape))
-
-                       operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
-
-                   last_domain = operative_domains[0]
+           last_domain = scrapertools.find_single_match(bloque, 'href="(.*?)"')
 
            if not last_domain: last_domain = dominioshdfull[0]
 
            if last_domain:
-               last_domain = last_domain.replace('login', '')
                if not last_domain.endswith('/'): last_domain = last_domain + '/'
         except:
            last_domain = ''
@@ -1502,7 +1473,6 @@ def last_domain_hdfull(item):
            if not last_domain: last_domain = dominioshdfull[0]
 
            if last_domain:
-               last_domain = last_domain.replace('login', '')
                if not last_domain.endswith('/'): last_domain = last_domain + '/'
         except:
            last_domain = ''
@@ -1513,7 +1483,7 @@ def last_domain_hdfull(item):
             platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
             xbmc.sleep(1000)
-            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://twitter.com/hdfulloficial[/B][/COLOR]')
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]dominioshdfull.com[/B][/COLOR]')
             return
 
 
@@ -1593,25 +1563,17 @@ def operative_domains_hdfull(item):
 
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
-    # ~ web para comprobar tods los dominios operativos
+    # ~ web para comprobar todos los dominios operativos
     # ~ web  0)-'https://dominioshdfull.com/'
 
     last_domain = ''
 
     try:
-       host_domain = 'https://dominioshdfull.com/'
+       data = httptools.downloadpage('https://dominioshdfull.com/').data
 
-       data = httptools.downloadpage(host_domain).data
+       bloque = scrapertools.find_single_match(data, 'dominios operativos actualizados(.*?)<script>')
 
-       operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
-
-       if not operative_domains:
-           operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
-
-           if operative_domains_unescape:
-               operative_domains_unescape = unquote(str(operative_domains_unescape))
-
-               operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
+       operative_domains = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
 
        if not operative_domains: operative_domains = dominioshdfull
 
@@ -2789,25 +2751,39 @@ def latest_domains_nextdede(item):
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando dominios[/B][/COLOR]' % color_exec)
 
     # ~ web para saber el ultimo dominio vigente en actions
-    # ~ web  'https://dominiosnextdede.com/'
+    # ~ web  'https://dominiosnextdede.com/'  ó  'https://t.me/s/NextdedeInformacion'
 
     last_domain = ''
     latest_domain = ''
 
     try:
-       host_domain = 'https://dominiosnextdede.com/'
-
-       data = httptools.downloadpage(host_domain).data
+       data = httptools.downloadpage('https://dominiosnextdede.com/').data
 
        latest_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
 
        if not latest_domain: latest_domain = dominiosnextdede[0]
 
        if latest_domain:
-           latest_domain = latest_domain.replace('login', '')
            if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
     except:
-       latest_domain = ''
+       pass
+
+    if not latest_domain:
+        try:
+           data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
+
+           bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
+
+           dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
+
+           for dominio in dominios:
+               dominio = dominio.lower().strip()
+               if dominio:
+                   dominio = dominio.replace('http:', 'https:')
+                   if not dominio.endswith('/'): dominio = dominio + '/'
+                   latest_domain = dominio
+        except:
+           pass
 
     if latest_domain: last_domain = latest_domain
 
@@ -2815,7 +2791,7 @@ def latest_domains_nextdede(item):
         platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
         xbmc.sleep(1000)
-        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://dominiosnextdede.com[/B][/COLOR]')
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]dominiosnextdede.com[/B][/COLOR]')
         return
 
     platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio es ', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
@@ -2855,77 +2831,79 @@ def last_domain_nextdede(item):
     platformtools.dialog_notification(config.__addon_name + ' - Nextdede', '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ webs  0)-'https://dominiosnextdede.com/'
+    # ~ webs  0)-'https://dominiosnextdede.com/'  ó  'https://t.me/s/NextdedeInformacion'
 
     last_domain = ''
     latest_domain = ''
 
     try:
-       host_domain = 'https://dominiosnextdede.com/'
-
-       data = httptools.downloadpage(host_domain).data
+       data = httptools.downloadpage('https://dominiosnextdede.com/').data
 
        latest_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
-
-       if not latest_domain:
-           operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
-
-           if not operative_domains:
-               operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
-
-               if operative_domains_unescape:
-                   operative_domains_unescape = unquote(str(operative_domains_unescape))
-
-                   operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
-
-               if operative_domains: latest_domain = operative_domains[0]
 
        if not latest_domain: latest_domain = dominiosnextdede[0]
 
        if latest_domain:
-           latest_domain = latest_domain.replace('login', '')
            if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
     except:
-       latest_domain = ''
+       pass
+
+    if not latest_domain:
+        try:
+           data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
+
+           bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
+
+           dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
+
+           for dominio in dominios:
+               dominio = dominio.lower().strip()
+               if dominio:
+                   dominio = dominio.replace('http:', 'https:')
+                   if not dominio.endswith('/'): dominio = dominio + '/'
+                   latest_domain = dominio
+        except:
+           pass
 
     if latest_domain:
         if latest_domain == domain: last_domain = latest_domain
 
     if not last_domain:
         try:
-           host_domain = 'https://dominiosnextdede.com/'
-
-           data = httptools.downloadpage(host_domain).data
+           data = httptools.downloadpage('https://dominiosnextdede.com/').data
 
            last_domain = scrapertools.find_single_match(data, 'onclick="location.href.*?' + "'(.*?)'")
-
-           if not last_domain:
-               operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
-
-               if not operative_domains:
-                   operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
-
-                   if operative_domains_unescape:
-                       operative_domains_unescape = unquote(str(operative_domains_unescape))
-
-                       operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
-
-                   last_domain = operative_domains[0]
 
            if not last_domain: last_domain = dominiosnextdede[0]
 
            if last_domain:
-               last_domain = last_domain.replace('login', '')
                if not last_domain.endswith('/'): last_domain = last_domain + '/'
         except:
-           last_domain = ''
+           pass
+
+    if not last_domain:
+        try:
+           data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
+
+           bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
+
+           dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
+
+           for dominio in dominios:
+               dominio = dominio.lower().strip()
+               if dominio:
+                   dominio = dominio.replace('http:', 'https:')
+                   if not dominio.endswith('/'): dominio = dominio + '/'
+                   last_domain = dominio
+        except:
+           pass
 
     if not last_domain:
         if not domain in str(dominiosnextdede):
             platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
             xbmc.sleep(1000)
-            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://dominiosnextdede.com[/B][/COLOR]')
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]dominiosnextdede.com[/B][/COLOR]')
             return
 
 
@@ -3005,29 +2983,38 @@ def operative_domains_nextdede(item):
 
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
-    # ~ web para comprobar tods los dominios operativos
-    # ~ web  0)-'https://dominiosnextdede.com/'
+    # ~ web para comprobar todos los dominios operativos
+    # ~ web  0)-'https://dominiosnextdede.com/'  ó  'https://t.me/s/NextdedeInformacion'
 
     last_domain = ''
 
     try:
-       host_domain = 'https://dominiosnextdede.com/'
-
-       data = httptools.downloadpage(host_domain).data
+       data = httptools.downloadpage('https://dominiosnextdede.com/').data
 
        operative_domains = scrapertools.find_multiple_matches(data, 'onclick="location.href.*?' + "'(.*?)'")
 
-       if not operative_domains:
-           operative_domains_unescape = scrapertools.find_multiple_matches(data, "document.write.*?'(.*?)'")
-
-           if operative_domains_unescape:
-               operative_domains_unescape = unquote(str(operative_domains_unescape))
-
-               operative_domains = scrapertools.find_multiple_matches(operative_domains_unescape, 'onclick="location.href.*?' + "'(.*?)'")
-
        if not operative_domains: operative_domains = dominiosnextdede
-
     except:
+       pass
+
+    if not last_domain:
+        try:
+           data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
+
+           bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
+
+           dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
+
+           for dominio in dominios:
+               dominio = dominio.lower().strip()
+               if dominio:
+                   dominio = dominio.replace('http:', 'https:')
+                   if not dominio.endswith('/'): dominio = dominio + '/'
+                   last_domain = dominio
+        except:
+           pass
+
+    if not last_domain:
        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Acceso Dominios Operativos[/B][/COLOR]' % color_alert)
        return
 
@@ -3196,19 +3183,20 @@ def last_domain_playdede(item):
     platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ webs  0)-'https://dominiosplaydede.com/' ó Telegram t.me/NextdedeOficial
+    # ~ webs  0)-'https://dominiosplaydede.com/'  1)-'https://t.me/playdedeinformacion'
 
     last_domain = ''
     latest_domain = ''
 
     try:
-        host_domain = 'https://dominiosplaydede.com/'
-
-        data = httptools.downloadpage(host_domain).data
+        data = httptools.downloadpage('https://dominiosplaydede.com/').data
 
         last_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
+
+        if last_domain:
+            if not last_domain.endswith('/'): last_domain = last_domain + '/'
     except:
-        last_domain = ''
+        pass
 
     if not last_domain:
         try:
@@ -3220,8 +3208,8 @@ def last_domain_playdede(item):
                for dominio in dominios:
                    dominio = dominio.lower().strip()
                    if dominio:
-                      dominio = dominio + '/'
-                      last_domain = dominio
+                       if not dominio.endswith('/'): dominio = dominio + '/'
+                       last_domain = dominio
         except:
            pass
 
@@ -3229,7 +3217,7 @@ def last_domain_playdede(item):
             platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
             xbmc.sleep(1000)
-            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://dominiosplaydede.com[/B][/COLOR] ó [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B]')
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]dominiosplaydede.com[/B][/COLOR] ó [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B]')
             return
 
     host_channel = ''
@@ -3321,20 +3309,40 @@ def operative_domains_playdede(item):
 
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
-    # ~ web para comprobar tods los dominios operativos
-    # ~ web  0)-'https://dominiosplaydede.com/'
+    # ~ web para comprobar todos los dominios operativos
+    # ~ web  0)-'https://dominiosplaydede.com/'  1)-'https://t.me/playdedeinformacion'
 
     sel_domain = ''
 
     try:
-       host_domain = 'https://dominiosplaydede.com/'
-
-       data = httptools.downloadpage(host_domain).data
+       data = httptools.downloadpage('https://dominiosplaydede.com/').data
 
        sel_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
+
+       if sel_domain:
+           if not sel_domain.endswith('/'): sel_domain = sel_domain + '/'
     except:
-       platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Acceso Dominios Operativos[/B][/COLOR]' % color_alert)
-       return
+       pass
+
+    if not sel_domain:
+       try:
+          data = httptools.downloadpage('https://t.me/playdedeinformacion').data
+
+          dominios = scrapertools.find_multiple_matches(data, '>Web:(.*?)<')
+
+          if dominios:
+              for dominio in dominios:
+                  dominio = dominio.lower().strip()
+                  if dominio:
+                      if not dominio.endswith('/'): dominio = dominio + '/'
+                      sel_domain = dominio
+       except:
+          pass
+
+    if not sel_domain:
+        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Acceso Dominios Operativos[/B][/COLOR]' % color_alert)
+        return
+
 
     host_channel = ''
     config.set_setting('user_test_channel', 'host_channel')

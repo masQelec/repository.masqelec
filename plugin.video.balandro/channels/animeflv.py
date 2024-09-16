@@ -246,9 +246,8 @@ def last_epis(item):
 
         title = title.replace('Epis.', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        if url:
-            itemlist.append(item.clone( action='findvideos', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail=thumb,
-                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis))
+        itemlist.append(item.clone( action='findvideos', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail=thumb,
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis))
 
     tmdb.set_infoLabels(itemlist)
 

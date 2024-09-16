@@ -171,14 +171,14 @@ def submnu_special(item):
         itemlist.append(item.clone( channel='cinedeantes', action='list_sel', title='[COLOR moccasin] - Seleccion cinema[/COLOR]', url = 'https://pastebin.com/raw/QW0A0mzx', thumbnail=thumb_cinedeantes, search_type = 'movie' ))
 
         thumb_cinequinqui = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'cinequinqui.jpg')
-        itemlist.append(item.clone( channel='cinequinqui', action='list_all', title='[COLOR yellowgreen] - Cine Quinqui[/COLOR]', url = 'https://cinekinkitv.freesite.host/movies/', thumbnail=thumb_cinequinqui, search_type = 'movie' ))
+        itemlist.append(item.clone( channel='cinequinqui', action='list_all', title='[COLOR greenyellow] - Cine QuinQui[/COLOR]', url = 'https://cinekinkitv.freesite.host/?post_type=movies', thumbnail=thumb_cinequinqui, search_type = 'movie' ))
 
         thumb_zoowomaniacos = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'zoowomaniacos.jpg')
-        itemlist.append(item.clone( channel='zoowomaniacos', action='_las1001', title='[COLOR cyan] - Las 1001 que hay que ver[/COLOR]', thumbnail=thumb_zoowomaniacos, search_type = 'movie' ))
-        itemlist.append(item.clone( channel='zoowomaniacos', action='_culto', title='[COLOR moccasin] - Cine de culto[/COLOR]', thumbnail=thumb_zoowomaniacos, search_type = 'movie' ))
+        itemlist.append(item.clone( channel='zoowomaniacos', action='_las1001', title='[COLOR darkcyan] - Las 1001 que hay que ver[/COLOR]', thumbnail=thumb_zoowomaniacos, search_type = 'movie' ))
+        itemlist.append(item.clone( channel='zoowomaniacos', action='_culto', title='[COLOR yellowgreen] - Cine de culto[/COLOR]', thumbnail=thumb_zoowomaniacos, search_type = 'movie' ))
 
         thumb_sigloxx = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'sigloxx.jpg')
-        itemlist.append(item.clone( channel='sigloxx', action='youtubes', title=' - Seleccion YouTube', thumbnail=thumb_sigloxx, search_type = 'movie' ))
+        itemlist.append(item.clone( channel='sigloxx', action='youtubes', title='[COLOR olivedrab] - Seleccion YouTube[/COLOR]', thumbnail=thumb_sigloxx, search_type = 'movie' ))
 
     if config.get_setting('search_extra_main', default=False):
         if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'movies' or item.extra == 'tvshows':
@@ -903,6 +903,13 @@ def _proxies(item):
 
         if config.get_setting('channel_divxtotal_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'documaniatv':
+        from channels import documaniatv
+        item.channel = 'documaniatv'
+        documaniatv.configurar_proxies(item)
+
+        if config.get_setting('channel_documaniatv_proxies') is None: refrescar = False
+
     elif item.from_channel == 'dontorrents':
         from channels import dontorrents
         item.channel = 'dontorrents'
@@ -920,7 +927,7 @@ def _proxies(item):
     elif item.from_channel == 'doramasyt':
         from channels import doramasyt
         item.channel = 'doramasyt'
-        latanime.configurar_proxies(item)
+        doramasyt.configurar_proxies(item)
 
         if config.get_setting('channel_doramasyt_proxies') is None: refrescar = False
 
@@ -1084,6 +1091,13 @@ def _proxies(item):
         mejortorrentnz.configurar_proxies(item)
 
         if config.get_setting('channel_mejortorrentnz_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'monoschinos':
+        from channels import monoschinos
+        item.channel = 'monoschinos'
+        monoschinos.configurar_proxies(item)
+
+        if config.get_setting('channel_monoschinos_proxies') is None: refrescar = False
 
     elif item.from_channel == 'mundodonghua':
         from channels import mundodonghua

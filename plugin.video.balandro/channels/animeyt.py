@@ -40,11 +40,14 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/?status=&type=&order=update&page=1', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'ver/?sub=&order=latest&page=1' , search_type = 'tvshow', text_color = 'cyan' ))
+
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host + 'ver/?status=&type=&order=update&page=1', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Actualizados', action = 'list_all', url = host + 'ver/?status=&type=&order=latest&page=1', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'ver/?sub=&order=popular&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'ver/?status=&type=&order=rating&page=1', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Series', action = 'list_all', url = host + 'ver/?status=&type=tv&order=update&page=1', search_type = 'tvshow', text_color = 'hotpink' ))
     itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'ver/?status=&type=movie&order=update&page=1', search_type = 'movie', text_color='deepskyblue' ))
@@ -115,6 +118,8 @@ def list_all(item):
         tipo = 'movie' if '>Movie<' in match else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
+        lang = ''
+
         if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
@@ -122,12 +127,20 @@ def list_all(item):
             PeliName = title
 
             if '[Película' in PeliName: PeliName = PeliName.split("[Película")[0]
-            elif '[Latino' in PeliName: PeliName = PeliName.split("[Latino")[0]
+
+            if '[Latino' in PeliName: PeliName = PeliName.split("[Latino")[0]
+            elif 'Latino]' in PeliName: PeliName = PeliName.split("Latino]")[0]
             elif '[Castellano' in PeliName: PeliName = PeliName.split("[Castellano")[0]
+            elif 'Castellano]' in PeliName: PeliName = PeliName.split("[Castellano")[0]
+            elif '[Subtitulado' in PeliName: PeliName = PeliName.split("[Subtitulado")[0]
+            elif 'Subtitulado]' in PeliName: PeliName = PeliName.split("Subtitulado]")[0]
 
             PeliName = PeliName.strip()
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+            if '[Latino' in title or 'Latino]' in title: lang = 'Lat'
+            elif '[Castellano' in title or 'Castellano]' in title: lang = 'Esp'
+
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, lang=lang, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = PeliName, infoLabels={'year': year} ))
 
         if tipo == 'tvshow':
@@ -139,12 +152,18 @@ def list_all(item):
             if '[Temporada' in SerieName: SerieName = SerieName.split("[Temporada")[0]
 
             if '[Latino' in SerieName: SerieName = SerieName.split("[Latino")[0]
+            elif 'Latino]' in SerieName: SerieName = SerieName.split("Latino]")[0]
             elif '[Castellano' in SerieName: SerieName = SerieName.split("[Castellano")[0]
+            elif 'Castellano]' in SerieName: SerieName = SerieName.split("Castellano]")[0]
             elif '[Subtitulado' in SerieName: SerieName = SerieName.split("[Subtitulado")[0]
+            elif 'Subtitulado]' in SerieName: SerieName = SerieName.split("Subtitulado]")[0]
 
             SerieName = SerieName.strip()
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+            if '[Latino' in title or 'Latino]' in title: lang = 'Lat'
+            elif '[Castellano' in title or 'Castellano]' in title: lang = 'Esp'
+
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, lang=lang, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -253,6 +272,8 @@ def findvideos(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     lang = 'Vose'
+
+    if item.lang: lang = item.lang
 
     ses = 0
 

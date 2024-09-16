@@ -7,6 +7,8 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
+# ~ 14/8/24 Peliculas solo hay 26
+
 host = 'https://w-ww.gnula2h.cc/'
 
 
@@ -215,6 +217,8 @@ def list_all(item):
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
+
+        if '/movies/' in url: continue
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -558,6 +562,8 @@ def list_search(item):
 
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="(.*?)"')
+
+        if '/movies/' in url: continue
 
         title = scrapertools.find_single_match(article, ' alt="(.*?)"')
 

@@ -119,16 +119,22 @@ def list_all(item):
         title = title.replace('&#039;', "'").replace('&quot;', '').strip()
 
         titulo = title
-        titulo = titulo.replace('Español Latino', '').replace('Español latino', '').replace('español Latino', '').replace('español latino', '').replace('Español', '').replace('español', '').strip()
+
+        titulo = titulo.replace('Español Latino', '').replace('Español latino', '').replace('español Latino', '').replace('español latino', '').replace('Español', '').replace('español', '').replace('Castellano', '').replace('castellano', '').strip()
 
         tipo = 'movie' if '>Pelicula<' in match else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
+
+        lang = ''
 
         if tipo == 'movie':
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+            if 'Español Latino' in title or 'Español Latino' in title or 'español Latino' in title or 'español latino' in title: lang = 'Lat'
+            elif 'Español' in title or 'español' in title or 'Castellano' in title or 'castellano' in title: lang = 'Esp'
+
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, lang=lang, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = titulo, infoLabels={'year': '-', 'plot': plot} ))
 
         if tipo == 'tvshow':
@@ -141,11 +147,21 @@ def list_all(item):
             if 'Audio' in SerieName: SerieName = SerieName.split("Audio")[0]
 
             if 'Español Latino' in SerieName: SerieName = SerieName.split("Español Latino")[0]
+            elif 'Español Latino' in SerieName: SerieName = SerieName.split("español Latino")[0]
+            elif 'español Latino' in SerieName: SerieName = SerieName.split("español Latino")[0]
+            elif 'español latino' in SerieName: SerieName = SerieName.split("español latino")[0]
+
             elif 'Español' in SerieName: SerieName = SerieName.split("Español")[0]
+            elif 'español' in SerieName: SerieName = SerieName.split("español")[0]
+            elif 'Castellano' in SerieName: SerieName = SerieName.split("Castellano")[0]
+            elif 'castellano' in SerieName: SerieName = SerieName.split("castellano")[0]
 
             SerieName = SerieName.strip()
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+            if 'Español Latino' in title or 'Español Latino' in title or 'español Latino' in title or 'español latino' in title: lang = 'Lat'
+            elif 'Español' in title or 'español' in title or 'Castellano' in title or 'castellano' in title: lang = 'Esp'
+
+            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, lang=lang, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-', 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -188,7 +204,14 @@ def last_epis(item):
         elif 'Audio' in SerieName: SerieName = SerieName.split("Audio")[0]
 
         if 'Español Latino' in SerieName: SerieName = SerieName.split("Español Latino")[0]
+        elif 'Español Latino' in SerieName: SerieName = SerieName.split("español Latino")[0]
+        elif 'español Latino' in SerieName: SerieName = SerieName.split("español Latino")[0]
+        elif 'español latino' in SerieName: SerieName = SerieName.split("español latino")[0]
+
         elif 'Español' in SerieName: SerieName = SerieName.split("Español")[0]
+        elif 'español' in SerieName: SerieName = SerieName.split("español")[0]
+        elif 'Castellano' in SerieName: SerieName = SerieName.split("Castellano")[0]
+        elif 'castellano' in SerieName: SerieName = SerieName.split("castellano")[0]
 
         SerieName = SerieName.strip()
 
@@ -202,7 +225,12 @@ def last_epis(item):
 
         titulo = titulo.replace('episodio', '[COLOR goldenrod]episodio[/COLOR]')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
+        lang = ''
+
+        if 'Español Latino' in title or 'Español Latino' in title or 'español Latino' in title or 'español latino' in title: lang = 'Lat'
+        elif 'Español' in title or 'español' in title or 'Castellano' in title or 'castellano' in title: lang = 'Esp'
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, lang=lang,
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis))
 
     tmdb.set_infoLabels(itemlist)
@@ -292,6 +320,9 @@ def findvideos(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    lang = item.lang
+    if not lang: lang = 'Vose'
+
     ses = 0
 
     matches = scrapertools.find_multiple_matches(data, 'video\[\d+\]\s*=\s*\'<iframe.*?src="([^"]+)"')
@@ -315,7 +346,7 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language='Vose', other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
 
     # ~ descargas  no se tratan por anomizador
 

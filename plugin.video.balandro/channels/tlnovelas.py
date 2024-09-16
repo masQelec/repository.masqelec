@@ -37,8 +37,9 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host + 'ultimos-capitulos/', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por país', action='paises', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por país', action='paises', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -67,22 +68,6 @@ def generos(item):
     return itemlist
 
 
-def paises(item):
-    logger.info()
-    itemlist = []
-
-    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'country/argentina/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'country/brasil/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'country/chile/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'country/colombia/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'country/mexico/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'country/peru/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Reino unido', action = 'list_all', url = host + 'country/reino-unido/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'country/venezuela/', text_color='moccasin' ))
-
-    return itemlist
-
-
 def anios(item):
     logger.info()
     itemlist = []
@@ -94,6 +79,19 @@ def anios(item):
         url = host + 'years/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'deepskyblue' ))
+
+    return itemlist
+
+
+def paises(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'country/united-states/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'country/chile/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'country/colombia/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'country/mexico/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'country/peru/', text_color='moccasin' ))
 
     return itemlist
 
@@ -185,6 +183,8 @@ def last_epis(item):
 
         epis = scrapertools.find_single_match(match, '<div class="episodeNum">.*?</span>.*?<span>(.*?)</span>')
         if not epis: epis = 1
+
+        title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
 
         titulo = str(temp) + 'x' + str(epis) + ' ' + title
 
@@ -325,6 +325,8 @@ def findvideos(item):
 
         if '/likessb.' in url: continue
 
+        if url.startswith('//'): url = 'https:' + url
+
         if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 
         elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
@@ -360,6 +362,8 @@ def findvideos(item):
     if not iframes: iframes = scrapertools.find_multiple_matches(data, '<IFRAME.*?SRC="(.*?)"')
 
     for iframe in iframes:
+        if iframe.startswith('//'): iframe = 'https:' + iframe
+
         servidor = servertools.get_server_from_url(iframe)
         servidor = servertools.corregir_servidor(servidor)
 
@@ -519,6 +523,8 @@ def findvideos(item):
         ses += 1
 
         if '/wp-admin/' in url: continue
+
+        if url.startswith('//'): url = 'https:' + url
 
         if url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
         elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')

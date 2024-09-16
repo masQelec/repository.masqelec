@@ -104,7 +104,7 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+    itemlist.append(item.clone( title = 'Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
 
     return itemlist
 
@@ -245,7 +245,7 @@ def list_all(item):
 
     bloque = scrapertools.find_single_match(data, '</h2>(.*?)>DoramasYT')
 
-    matches = re.compile('<li class="col mb-3 ficha_efecto">(.*?)</li>').findall(bloque)
+    matches = re.compile('ficha_efecto">(.*?)</li>').findall(bloque)
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
@@ -432,7 +432,8 @@ def episodios(item):
 
         title = 'Capítulo ' + match
 
-        titulo = title + ' ' + item.contentSerieName
+        if item.search_type == 'movie': titulo = item.contentTitle + ' ' + title
+        else: titulo = title + ' ' + item.contentSerieName
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
                                     contentType = 'episode', contentSeason = 1, contentEpisodeNumber=match ))
@@ -484,6 +485,7 @@ def findvideos(item):
         elif srv == 'pixel': srv = 'pixeldrain'
         elif srv == 'senvid2': srv = 'sendvid'
         elif srv == 'mixdropco': srv = 'mixdrop'
+        elif srv == 'mdy48tn97com': srv = 'mixdrop'
         else:
              if srv == 'vgembedcom': srv = 'vembed'
 

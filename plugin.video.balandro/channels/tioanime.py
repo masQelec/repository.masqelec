@@ -109,6 +109,8 @@ def list_all(item):
 
         thumb = host + thumb
 
+        title = title.replace('&amp;', '').replace('#039;s', "'s").replace('#039;', '').strip()
+
         SerieName = title
 
         if 'Season' in title: SerieName = title.split("Season")[0]
@@ -121,14 +123,30 @@ def list_all(item):
         sufijo = '' if item.search_type != 'all' else tipo
 
         if item.group == 'last_epis':
+            if ':' in SerieName: SerieName = title.split(":")[0]
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, infoLabels={'year': '-'},
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = 1))
 
         else:
-            itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+            if tipo == 'tvshow':
+                if item.search_type != 'all':
+                    if item.search_type == 'movie': continue
+
+                itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
+                                             contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+
+            if tipo == 'movie':
+                if item.search_type != 'all':
+                    if item.search_type == 'tvshow': continue
+
+                itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
+                                            contentType = 'movie', contentTitle = SerieName, infoLabels={'year': '-'} ))
+
 
     tmdb.set_infoLabels(itemlist)
+
+    if item.group == 'last_epis': return itemlist
 
     if itemlist:
         next_page = scrapertools.find_single_match(data,'<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')

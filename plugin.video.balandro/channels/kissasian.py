@@ -44,7 +44,7 @@ def generos(item):
 
     bloque = scrapertools.find_single_match(data, '>Genres<(.*?)</ul>')
 
-    matches = re.compile('<a href="(.*?)".*?">(.*?)</a>').findall(bloque)
+    matches = re.compile('<a href="(.*?)".*?>(.*?)</a>').findall(bloque)
 
     for url, gen in matches:
         itemlist.append(item.clone( title = gen, action = 'list_all', url = url, text_color = 'firebrick' ))
@@ -185,7 +185,7 @@ def episodios(item):
                 else: item.perpage = 50
 
     for url, epis in matches[item.page * item.perpage:]:
-        title = str(item.contentSeason) + 'x' + str(epis)
+        title = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
@@ -237,6 +237,28 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
+
+        if '/asianbxkiun.' in url:
+            data = do_downloadpage(url)
+
+            links = re.compile('data-video="(.*?)"', re.DOTALL).findall(data)
+
+            for link in links:
+                if not link: continue
+
+                elif '/asianbxkiun.' in link: continue
+
+                servidor = servertools.get_server_from_url(link)
+                servidor = servertools.corregir_servidor(servidor)
+
+                link = servertools.normalize_url(servidor, link)
+
+                other = ''
+                if servidor == 'various': other = servertools.corregir_other(link)
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Vos', other = other ))
+
+            continue
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(url)

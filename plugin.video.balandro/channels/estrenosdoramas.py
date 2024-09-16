@@ -67,7 +67,7 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+    itemlist.append(item.clone( title = 'Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
 
     return itemlist
 
@@ -238,7 +238,8 @@ def last_pelis(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                    contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -285,7 +286,7 @@ def last_epis(item):
 
         titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
                                     contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -342,7 +343,7 @@ def last_news(item):
 
         titulo = str(season) + 'x' + str(epis) + ' ' + title_serie
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, 
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
                                     contentType = 'episode', contentSerieName = title_serie, contentSeason = season, contentEpisodeNumber = epis, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -376,7 +377,8 @@ def last_series(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -458,14 +460,27 @@ def episodios(item):
     for url, title in matches[item.page * item.perpage:]:
         if not 'Capitulo' in title and not 'Capítulo' in title: continue
 
-        epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
-        if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
+        if ':' in title:
+            epis = scrapertools.find_single_match(title, 'Capitulo(.*?):').strip()
+            if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?):').strip()
+        else:
+            epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
+            if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
 
         if not epis: continue
 
-        title = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName
+        if ':' in title:
+            title = scrapertools.find_single_match(title, ':(.*?)$').strip()
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
+            if title: titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+            else: titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName
+        else:
+            titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName
+
+        epis = epis.replace('Final', '').strip()
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode',
+                                    contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -558,6 +573,9 @@ def play(item):
 
                     if _result:
                         if '"error":"empty link"' in _result: return itemlist
+                        elif '"error":"error."' in _result: return itemlist
+
+                        elif _result.strip() == '': return itemlist
 
                         _json = jsontools.load(_result)
 
@@ -597,6 +615,9 @@ def play(item):
 
                         if _result:
                             if '"error":"empty link"' in _result: return itemlist
+                            elif '"error":"error."' in _result: return itemlist
+
+                            elif _result.strip() == '': return itemlist
 
                             _json = jsontools.load(_result)
 
@@ -627,6 +648,9 @@ def play(item):
 
                     if _result:
                         if '"error":"empty link"' in _result: return itemlist
+                        elif '"error":"error."' in _result: return itemlist
+
+                        elif _result.strip() == '': return itemlist
 
                         _json = jsontools.load(_result)
 
@@ -662,6 +686,9 @@ def play(item):
 
                     if _result:
                         if '"error":"empty link"' in _result: return itemlist
+                        elif '"error":"error."' in _result: return itemlist
+
+                        elif _result.strip() == '': return itemlist
 
                         _json = jsontools.load(_result)
 

@@ -3,15 +3,15 @@
   "name": "CineKinki",
   "thumbnail": "cinekinki.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["movie"],
 
-  "categories": ["movie"],
+  "categories": ["movie", "torrent"],
   "language": ["cast"],
 
-  "clusters": ["temporary", "classic"],
+  "clusters": ["classic", "torrents"],
 
-  "notes": "Películas clásicas del género Kinki."
+  "notes": "Canal con enlaces Streaming y Torrent. Películas clásicas del género Kinki."
 }

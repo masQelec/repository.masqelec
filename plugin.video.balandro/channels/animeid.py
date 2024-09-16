@@ -77,7 +77,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '?page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Nuevas temporadas', action = 'list_all', url = host + 'new-season?page=1', _tipo = 'new-season', search_type = 'tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Nuevas temporadas/episodios', action = 'list_all', url = host + 'new-season?page=1', _tipo = 'new-season', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'ongoing-series?page=1', _tipo = 'ongoing-series', search_type = 'tvshow' ))
 
@@ -109,7 +109,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
-        tipo = 'movie' if 'Movie' in match else 'tvshow'
+        tipo = 'movie' if '-movie-' in url or 'Movie' in match else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
@@ -135,7 +135,15 @@ def list_all(item):
 
             SerieName = SerieName.strip()
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo = sufijo,
+            titulo = title
+
+            if item._tipo == 'new-season':
+                epis = scrapertools.find_single_match(match, '<div class="name">.*?Episodio(.*?)</div>').strip()
+
+                if epis:
+                    titulo = titulo + ' [COLOR goldenrod]Episodio[/COLOR] ' + epis
+
+            itemlist.append(item.clone( action='episodios', url=url, title=titulo, thumbnail=thumb, fmt_sufijo = sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)

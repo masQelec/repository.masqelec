@@ -78,9 +78,12 @@ def findvideos(item):
     for url in matches:
         url = host + url.replace(" ", "%20")
 
-        url = url + '|Referer=' + url
-
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = 'directo', title = '', language = 'Esp' ))
+
+        url = url.replace('.mkv', '.torrent').replace('.mp4', '.torrent')
+
+        if '.torrent' in url:
+            itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = 'torrent', title = '', language = 'Esp' ))
 
     return itemlist
 

@@ -79,6 +79,10 @@
       {
         "pattern": "https://oyohd.one/(?:f/|e/)([A-z0-9]+)",
         "url": "https://waaw.to/watch_video.php?v=\\1"
+      },
+      {
+        "pattern": "https://player.sorozatok.me/(?:f/|e/)([A-z0-9]+)",
+        "url": "https://waaw.to/watch_video.php?v=\\1"
       }
     ]
   }

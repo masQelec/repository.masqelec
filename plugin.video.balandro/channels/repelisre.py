@@ -89,7 +89,7 @@ def do_downloadpage(url, ref, post=None, headers=None):
             data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
-            if not 'recherche?q=' in url:
+            if not 'search?q=' in url:
                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('RePelisRe', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
@@ -98,6 +98,21 @@ def do_downloadpage(url, ref, post=None, headers=None):
                     data = httptools.downloadpage_proxy('repelisre', url, post=post, headers=headers, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        if not url.startswith(host):
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('repelisre', url, post=post, headers=headers, timeout=timeout).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+	
+    if '<title>Just a moment...</title>' in data:
+        if not '?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
 
     return data
 
@@ -110,6 +125,8 @@ def acciones(item):
                                 from_channel='repelisre', folder=False, text_color='chartreuse' ))
 
     itemlist.append(item_configurar_proxies(item))
+    itemlist.append(Item( channel='helper', action='show_help_repelisre', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('repelisre') ))
+
 
     platformtools.itemlist_refresh()
 

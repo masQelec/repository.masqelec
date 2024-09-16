@@ -15,7 +15,7 @@ from core import httptools, scrapertools, tmdb
 
 host = 'https://4144-don.mirror.pm/'
 
-# ~ 28/7/24 last domain  'https://dontorrent.dance/'
+# ~ 9/8/24 last domain  'https://dontorrent.date/'
 
 
 try:
@@ -74,7 +74,8 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.miami/', 'https://dontorrent.business/', 'https://dontorrent.clothing/',
              'https://dontorrent.icu/', 'https://dontorrent.fyi/', 'https://dontorrent.sbs/',
              'https://dontorrent.cc/', 'https://dontorrent.esq/', 'https://dontorrent.city/',
-             'https://dontorrent.cologne/']
+             'https://dontorrent.cologne/', 'https://dontorrent.dance/', 'https://dontorrent.cricket/',
+             'https://dontorrent.earth/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
