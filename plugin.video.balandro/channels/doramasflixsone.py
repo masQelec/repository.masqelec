@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re
+import os, re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -35,9 +35,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar dorama ...', action = 'search', search_type = 'tvshow', text_color = 'firebrick' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_lst', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Lista doramas', action = 'list_lst', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Episodios', action = 'list_all', url = host, search_type = 'tvshow' ))
 
     return itemlist
 
@@ -65,10 +65,13 @@ def list_lst(item):
         if 'Temporada' in SerieName: SerieName = SerieName.split("Temporada")[0]
         if 'temporada' in SerieName: SerieName = SerieName.split("temporada")[0]
 
+        if 'Season' in SerieName: SerieName = SerieName.split("Season")[0]
+        if '(TV)' in SerieName: SerieName = SerieName.split("(TV)")[0]
+
         SerieName = SerieName.strip()
 
         itemlist.append(item.clone( action='list_all', url = url, title = title, cat = True,
-                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'}, text_color = 'moccasin' ))
+                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -90,6 +93,10 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
+    title_ser = item.contentSerieName.replace("’s", 's').replace("'t", 't').replace(':', '').replace('.', '-').replace("'t", 't').replace('ñ', 'n').replace(' ', '-').lower()
+
+    title_ser = title_ser.replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&amp;', '').replace('amp;', '').replace('quot;', '').strip()
+
     matches = re.compile('<div class="recent-item tie_video">(.*?)</p>').findall(data)
 
     if not matches:
@@ -104,6 +111,8 @@ def list_all(item):
         if not title: title = scrapertools.find_single_match(match, '<h2 class="post-box-title">.*?">(.*?)</a>').strip()
 
         if not url or not title: continue
+
+        if not title_ser in url: continue
 
         title = title.replace('&#8211;', '').replace('&amp;', ' & ').replace('&#8217;', "'").replace('&#038;', '&').strip()
 
@@ -123,6 +132,8 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
+        title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]')
+
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -132,7 +143,10 @@ def list_all(item):
 
         if next_page:
             if '/page/' in next_page:
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
+                thumb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'doramasflixsone.jpg')
+
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all',
+                                            thumbnail=thumb, infoLabels={'year': '-'}, text_color = 'coral' ))
 
     return itemlist
 
@@ -153,7 +167,22 @@ def temporadas(item):
     if '-temporada-' in item.url: season = scrapertools.find_single_match(item.url, '-temporada-(.*?)/')
 
     item.contentSeason = season
-    itemlist = episodios(item)
+    item.page = 0
+
+    title_ser = item.contentSerieName.replace("’s", 's').replace("'t", 't').replace(':', '').replace("'t", 't').replace('ñ', 'n').replace(' ', '-').lower()
+
+    title_ser = title_ser.replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&amp;', '').replace('amp;', '').replace('quot;', '').strip()
+
+    url = host + 'category/' + title_ser + '/'
+
+    itemlist.append(item.clone( action='episodios', url=url, title='[COLOR hotpink]Serie[/COLOR] ' + title_ser.replace('-', ' ').capitalize(),
+                                        serie = True, cat = False, page = 0,
+                                        contentType = 'tvshow', contentSerieName = title_ser, contentSeason = season ))
+
+    itemlist2 = episodios(item)
+
+    itemlist = itemlist + itemlist2
+
     return itemlist
 
 
@@ -161,25 +190,45 @@ def episodios(item):
     logger.info()
     itemlist = []
 
+    matches = []
+
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
+    hay_match = False
+
     match = scrapertools.find_single_match(data, '<link rel="canonical" href="(.*?)"')
 
+    if item.serie:
+        match = ''
+
+        matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
+
     if match:
+        hay_match = True
+
         url = item.url
 
         epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
+        if not epis: epis = 1
 
-        itemlist.append(item.clone( action='findvideos', url = match, title = item.title, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
+        itemlist.append(item.clone( action='findvideos', url = match, title = item.title,
+                                    contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
     if item.cat:
         matches = []
+
+        if not hay_match:
+            epis = scrapertools.find_single_match(item.url, '-capitulo-(.*?)-')
+            if not epis: epis = 1
+
+            itemlist.append(item.clone( action='findvideos', url = item.url, title = item.title,
+                                        contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
     else:
-        matches = re.compile('<div class="related-item tie_video">(.*?)</p>', re.DOTALL).findall(data)
+        if not matches: matches = re.compile('<div class="related-item tie_video">(.*?)</p>', re.DOTALL).findall(data)
 
         if not matches:
             season = item.contentSeason
@@ -190,7 +239,8 @@ def episodios(item):
 
             if not epis: epis = 1
 
-            itemlist.append(item.clone( action='findvideos', url=item.url, title=item.title, contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
+            itemlist.append(item.clone( action='findvideos', url=item.url, title=item.title,
+                                        contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
 
             return itemlist
 
@@ -234,22 +284,41 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
+    title_ser = item.contentSerieName.replace("’s", 's').replace("'t", 't').replace(':', '').replace('.', '-').replace("'t", 't').replace('ñ', 'n').replace(' ', '-').lower()
+
+    title_ser = title_ser.replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&amp;', '').replace('amp;', '').replace('quot;', '').strip()
+
     for match in matches[item.page * item.perpage:]:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
         title = scrapertools.find_single_match(match, '<h3 class="post-box-title">.*?rel="bookmark">(.*?)</a>').strip()
         if not title: title = scrapertools.find_single_match(match, '<h3><a href=".*?">(.*?)</a>').strip()
+
+        if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+
+        if not title: title = item.contentSerieName.replace('-', ' ').capitalize()
 
         title = title.replace('&#8211;', '').replace('&amp;', ' & ').replace('&#8217;', "'").replace('&#038;', '&').strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
+        if not epis: epis = 1
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
+        titulo = title
 
-        if len(itemlist) >= item.perpage:
-            break
+        if not 'Capitulo' in titulo:
+            titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + titulo
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
+
+        if not hay_match:
+            if len(itemlist) >= item.perpage:
+                break
+        else:
+            if len(itemlist) >= (item.perpage + 1):
+                break
 
     tmdb.set_infoLabels(itemlist)
 
@@ -275,14 +344,22 @@ def findvideos(item):
 
     ses = 0
 
-    matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
-    if not matches: matches = scrapertools.find_multiple_matches(data, '<IFRAME.*?SRC="(.*?)"')
+    matches1 = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
+    matches2 = scrapertools.find_multiple_matches(data, '<IFRAME.*?SRC="(.*?)"')
+    matches3 = scrapertools.find_multiple_matches(data, 'videoIframe.src = "(.*?)"')
+
+    matches = matches1 + matches2 + matches3
+
     for url in matches:
+        if not url: continue
+
         ses += 1
 
         if url.startswith("//"): url = 'https:' + url
 
-        url = url.replace('/7/', '/e/')
+        url = url.replace('/7/', '/e/').replace('&#038;', '&')
+
+        if '/boosterx.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

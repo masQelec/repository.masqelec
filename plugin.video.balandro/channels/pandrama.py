@@ -26,7 +26,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar dorama ...', action = 'search', search_type = 'tvshow', text_color = 'firebrick' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo episodios', action = 'list_all', url = host, search_type = 'tvshow' ))
 
     return itemlist
 
@@ -54,11 +54,15 @@ def list_all(item):
         SerieName = title
 
         if 'Capítulo' in SerieName: SerieName = SerieName.split("Capítulo")[0]
+        if 'Capitulo' in SerieName: SerieName = SerieName.split("Capitulo")[0]
+        if 'capítulo' in SerieName: SerieName = SerieName.split("capítulo")[0]
+        if 'capitulo' in SerieName: SerieName = SerieName.split("capitulo")[0]
+
         if 'Sub Español' in SerieName: SerieName = SerieName.split("Sub Español")[0]
 
         SerieName = SerieName.strip()
 
-        titulo = title.replace('Capítulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('capítulo', '[COLOR goldenrod]Capitulo[/COLOR]')
+        titulo = title.replace('Capítulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('capítulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('capítulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('capitulo', '[COLOR goldenrod]Capitulo[/COLOR]')
 
         epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
 

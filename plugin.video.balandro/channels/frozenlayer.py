@@ -29,7 +29,17 @@ def mainlist_series(item):
         from modules import actions
         if actions.adults_password(item) == False: return
 
-    itemlist.append(item.clone( title = 'Buscar anime, ova, dorama, manga ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+    title = 'Buscar anime, ova, dorama, manga ...'
+    text_color = 'hotpink'
+
+    if item.extra == 'anime':
+        title = 'Buscar anime, ova, manga ...'
+        text_color = 'springgreen'
+    elif item.extra == 'dorama':
+        title = 'Buscar dorama ...'
+        text_color = 'firebrick'
+
+    itemlist.append(item.clone( title = title, action = 'search', search_type = 'tvshow', text_color = text_color ))
 
     itemlist.append(item.clone( title = 'Catálogo general', action = 'list_all', url = host + '/descargas/detallada/bittorrent', search_type = 'tvshow' ))
 
@@ -143,9 +153,9 @@ def list_all(item):
 
         title = title.replace('Episodio', '[COLOR goldenrod]Episodio[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace(' Cap', '[COLOR goldenrod] Cap[/COLOR]')
 
-        if '(Pelicula)' in title_ser:
-            PeliName = title_ser.replace('(Pelicula)', '').strip()
-            title = title.replace('(Pelicula)', '[COLOR deepskyblue]Película[/COLOR]')
+        if '(Pelicula)' in title_ser or '(pelicula)' in title_ser:
+            PeliName = title_ser.replace('(Pelicula)', '').replace('(pelicula)', '').strip()
+            title = title.replace('(Pelicula)', '[COLOR deepskyblue]Película[/COLOR]').replace('(pelicula)', '[COLOR deepskyblue]Película[/COLOR]')
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType = 'movie', contentTitle = PeliName, infoLabels={'year': '-'} ))
         else:

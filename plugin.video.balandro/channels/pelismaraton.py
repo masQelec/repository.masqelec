@@ -449,7 +449,9 @@ def findvideos(item):
 
         servidor = servidor.strip().lower()
 
-        if servidor == 'filemooon':
+        if servidor == 'powvideo': continue
+
+        elif servidor == 'filemooon':
             servidor = 'filemoon'
             url = url.replace('filemooon', 'filemoon')
 

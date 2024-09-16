@@ -266,6 +266,7 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
         title = scrapertools.find_single_match(match, 'class="my-1">(.*?)</h3')
 
         if not url or not title: continue
@@ -277,7 +278,7 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        title = title.replace('&#039;s', "'s").replace('&quot;', '').strip()
+        title = title.replace('&#039;s', "'s").replace('&quot;', '').replace('&amp;', '').strip()
 
         SerieName = title
 
@@ -299,7 +300,7 @@ def list_all(item):
 
         SerieName = SerieName.strip()
 
-        tipo = 'movie' if '-pelicula-' in url else 'tvshow'
+        tipo = 'movie' if '-pelicula' in url or '-movie' in url or '>Película<' in match or '>Pelicula' in match else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
@@ -343,7 +344,7 @@ def list_last(item):
     matches = scrapertools.find_multiple_matches(bloque, '<div class="col-6 col-md-6 col-lg-3 mb-3">.*?<a href="(.*?)".*?data-src="(.*?)".*?alt="(.*?)"')
 
     for url, thumb, title in matches:
-        title = title.replace('&#039;s', "'s")
+        title = title.replace('&#039;s', "'s").replace('&quot;', '').replace('&amp;', '').strip()
 
         SerieName = title
 
@@ -388,6 +389,7 @@ def episodios(item):
     bloque = scrapertools.find_single_match(data, '>Capítulos<(.*?)</script>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?</svg>(.*?)</div>')
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?alt="(.*?)"')
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -434,6 +436,8 @@ def episodios(item):
     for url, title in matches[item.page * item.perpage:]:
         if not url or not title: continue
 
+        title = title.replace('&#039;s', "'s").replace('&quot;', '').replace('&amp;', '').strip()
+
         epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
         if not epis: epis = 1
 
@@ -471,13 +475,22 @@ def findvideos(item):
 
         if '/lvturbo.' in url: continue
 
+        elif 'fembed' in url: continue
+        elif 'streamsb' in url: continue
+        elif 'playersb' in url: continue
+        elif 'sbembed' in url: continue
+
+        elif '.monoschinos2.' in url: continue
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
         other = ''
-        if servidor == 'directo': other = url
+        if servidor == 'directo':
+            other = url
+            if '/lulu' in url: servidor = 'various'
 
         if servidor == 'various': other = servertools.corregir_other(url)
 

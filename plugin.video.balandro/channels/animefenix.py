@@ -387,6 +387,8 @@ def last_epis(item):
     matches = re.compile('<a href="(.*?)".*?<img src="(.*?)".*?alt="(.*?)".*?<div class="overepisode.*?">(.*?)</div>', re.DOTALL).findall(bloque)
 
     for url, thumb, title, episode in matches:
+        title = title.replace('&quot;', '').strip()
+
         SerieName = title
 
         if 'Peliculas' in SerieName: SerieName = SerieName.split("Peliculas")[0]

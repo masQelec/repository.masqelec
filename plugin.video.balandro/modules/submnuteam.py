@@ -1099,6 +1099,8 @@ def test_tplus(item):
 
     tplus_actual = config.get_setting('proxies_tplus', default='32')
 
+    if config.get_setting('proxies_tplus_proces'): tplus_actual = config.get_setting('proxies_tplus_proces', default='32')
+
     opciones_tplus = [
             'openproxy.space http',
             'openproxy.space socks4',
@@ -1137,10 +1139,20 @@ def test_tplus(item):
             'hookzof',
             'manuGMG',
             'rdavydov socks5',
-            'lamt3012'
+            'lamt3012',
+            'proxyfly http',
+            'proxyfly socks4',
+            'proxyfly socks5',
+            'ErcinDedeoglu http',
+            'ErcinDedeoglu https',
+            'ErcinDedeoglu socks4',
+            'ErcinDedeoglu socks5'
             ]
 
     preselect = tplus_actual
+
+    opciones_tplus = sorted(opciones_tplus, key=lambda x: x[0])
+
     ret = platformtools.dialog_select('[COLOR cyan][B]Proveedores Proxies Tplus[/B][/COLOR]', opciones_tplus, preselect=preselect)
     if ret == -1: return -1
 
@@ -1182,10 +1194,20 @@ def test_tplus(item):
     elif opciones_tplus[ret] == 'manuGMG': proxies_tplus = '35'
     elif opciones_tplus[ret] == 'rdavydov socks5': proxies_tplus = '36'
     elif opciones_tplus[ret] == 'lamt3012': proxies_tplus = '37'
+    elif opciones_tplus[ret] == 'proxyfly http': proxies_tplus = '38'
+    elif opciones_tplus[ret] == 'proxyfly socks4': proxies_tplus = '39'
+    elif opciones_tplus[ret] == 'proxyfly socks5': proxies_tplus = '40'
+    elif opciones_tplus[ret] == 'ErcinDedeoglu http': proxies_tplus = '41'
+    elif opciones_tplus[ret] == 'ErcinDedeoglu https': proxies_tplus = '42'
+    elif opciones_tplus[ret] == 'ErcinDedeoglu socks4': proxies_tplus = '43'
+    elif opciones_tplus[ret] == 'ErcinDedeoglu socks5': proxies_tplus = '44'
 
     else: proxies_tplus = '32'
 
     config.set_setting('proxies_tplus', proxies_tplus)
+    config.set_setting('proxies_tplus_proces', '')
+
+    return proxies_tplus
 
 
 def test_alfabetico(item):
@@ -2117,14 +2139,6 @@ def resumen_canales(item):
     txt += '     ' + str(searchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
 
     if txt_status:
-        if con_incidencias:
-            matches = con_incidencias.count('[COLOR lime]')
-
-            if matches:
-                status_incid = matches
-
-                txt += '       ' + str(status_incid) + ' [COLOR tan]Con Incidencias[/COLOR][CR]'
-
         if no_accesibles:
             matches = no_accesibles.count('[COLOR lime]')
 
@@ -2133,13 +2147,21 @@ def resumen_canales(item):
 
     txt += '[CR]  ' + str(disponibles) + ' [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
 
-    if not status_access == 0:
-        txt += '       ' + str(status_access) + ' [COLOR indianred]No Accesibles[/COLOR][CR]'
+    if not status_access == 0: txt += '          [COLOR indianred]No Accesibles[/COLOR][B] '  + str(status_access) + '[/B][CR]'
 
-        accesibles = (disponibles - status_access)
-        txt += '  ' + str(accesibles) + ' [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
+    accesibles = (disponibles - status_access)
+    txt += '  ' + str(accesibles) + ' [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
 
-    if not no_actives == 0: txt += '  ' + str(no_actives) + ' [COLOR gray][B]Desactivados[/B][/COLOR][CR]'
+    if txt_status:
+        if con_incidencias:
+            matches = con_incidencias.count('[COLOR lime]')
+
+            if matches:
+                status_incid = matches
+
+                txt += '          [COLOR tan]Con Incidencias[/COLOR][B] ' + str(status_incid) + '[/B][CR]'
+
+    if not no_actives == 0: txt += '          [COLOR gray][B]Desactivados[/B][/COLOR][B] ' + str(no_actives) + '[/B][CR]'
 
     filtros = {}
 
@@ -2153,7 +2175,7 @@ def resumen_canales(item):
 
             con_proxies += 1
 
-        if con_proxies > 0: txt += '          [COLOR red]Con Proxies Informados[/COLOR] ' +  str(con_proxies) + '[CR]'
+        if con_proxies > 0: txt += '          [COLOR red]Con Proxies Informados[/COLOR][B] ' +  str(con_proxies) + '[/B][CR]'
 
     txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN CANALES DISPONIBLES:[/B][/COLOR][CR]'
 
@@ -2177,8 +2199,8 @@ def resumen_canales(item):
 
     txt += '[CR][COLOR powderblue][B]DISTRIBUCIÓN CANALES DISPONIBLES PARA BÚSQUEDAS:[/B][/COLOR][CR]'
 
-    txt += '     ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
-    txt += '     ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+    txt += '   ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+    txt += '   ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
     txt += '     ' + str(bus_pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
     txt += '   ' + str(bus_documentales) + ' [COLOR cyan]Temática Documental[/COLOR][CR]'
     txt += '     ' + str(bus_torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
@@ -2271,7 +2293,7 @@ def resumen_servidores(item):
         if "requiere" in notes.lower(): notsuported += 1
         elif "out of service" in notes.lower(): outservice += 1
 
-        if not dict_server['name'] == 'various':
+        if not dict_server['name'] == 'Youtube':
             if "alternative" in notes.lower(): alternatives += 1
 
     txt = '[COLOR yellow][B]RESÚMENES SERVIDORES:[/B][/COLOR][CR]'
@@ -2297,6 +2319,13 @@ def resumen_servidores(item):
         txt += '    ' + str(alternatives) + '  [COLOR green]Vías alternativas[/COLOR][CR]'
         txt += '    ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
 
+    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+        txt += '[CR][COLOR goldenrod][B]YOUTUBE:[/B][/COLOR][CR]'
+
+        txt += '      1' + '   [COLOR green]Vía alternativa[/COLOR][CR]'
+
+    txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN SERVIDORES DISPONIBLES:[/B][/COLOR]'
+
     accesibles = (operativos + aditionals)
     txt += '[CR]  ' + str(accesibles) + '  [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
 
@@ -2307,7 +2336,7 @@ def resumen_servidores(item):
             if matches:
                 status = matches
 
-                txt += '       ' + str(status) + '  [COLOR tan]Con Incidencias[/COLOR][CR]'
+                txt += '           [COLOR tan]Con Incidencias[/COLOR][B] ' + str(status) + '[/B][CR]'
 
     platformtools.dialog_textviewer('Resúmenes Servidores y su Distribución', txt)
 
@@ -2349,6 +2378,7 @@ def show_help_alternativas(item):
 
     txt += '   [COLOR yellow]Clicknupload[/COLOR][CR]'
     txt += '   [COLOR yellow]Cloudvideo[/COLOR][CR]'
+    txt += '   [COLOR yellow]Dailymotion[/COLOR][CR]'
     txt += '   [COLOR yellow]Doodstream[/COLOR][CR]'
     txt += '   [COLOR yellow]Flashx[/COLOR][CR]'
     txt += '   [COLOR yellow]Gofile[/COLOR][CR]'

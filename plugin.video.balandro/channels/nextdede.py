@@ -61,7 +61,7 @@ custom_headers["Sec-Fetch-Site"] = "same-origin"
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-# ~ webs  0)-'https://dominiosnextdede.com/'
+# ~ webs  0)-'https://dominiosnextdede.com/' ó Telegram 'https://t.me/s/NextdedeInformacion'
 
 dominios = [
          'https://nextdede.us',
@@ -283,6 +283,20 @@ def login(item):
     email = config.get_setting('nextdede_email', 'nextdede', default='')
     password = config.get_setting('nextdede_password', 'nextdede', default='')
     username = config.get_setting('nextdede_username', 'nextdede', default='')
+
+    try:
+       if username:
+           userint = int(username)
+
+           if userint:
+               platformtools.dialog_ok(config.__addon_name + ' NextDede', '[COLOR red][B]El Usuario NO puede ser sólo números.[/B][/COLOR]', '[COLOR cyan][B]Credenciales[/B] [/COLOR][COLOR chartreuse][B]Anuladas[/B][/COLOR]')
+               config.set_setting('channel_nextdede_nextdede_email', '')
+               config.set_setting('channel_nextdede_nextdede_password', '')
+               config.set_setting('channel_nextdede_nextdede_username', '')
+               config.set_setting('channel_nextdede_nextdede_login', False)
+               return False
+    except:
+       pass
 
     token = ''
     data = ''

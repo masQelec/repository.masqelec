@@ -12,7 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www12.dontorrent.link/'
+host = 'https://www13.dontorrent.link/'
 
 
 # ~ por si viene de enlaces guardados
@@ -20,7 +20,7 @@ ant_hosts = ['https://dontorrent.in/', 'https://dontorrent.tv/', 'https://www1.d
              'https://www2.dontorrent.fr/', 'https://www3.dontorrent.fr/', 'https://www4.dontorrent.fr/',
              'https://www5.dontorrent.fr/', 'https://www6.dontorrent.fr/', 'https://www7.dontorrent.fr/',
              'https://www8.dontorrent.fr/', 'https://www9.dontorrent.link/', 'https://www10.dontorrent.link/',
-             'https://www11.dontorrent.link/']
+             'https://www11.dontorrent.link/', 'https://www12.dontorrent.link/']
 
 
 domain = config.get_setting('dominio', 'dontorrentsin', default='')

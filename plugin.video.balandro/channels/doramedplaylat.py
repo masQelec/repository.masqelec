@@ -26,7 +26,7 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+    itemlist.append(item.clone( title = 'Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
 
     return itemlist
 
@@ -41,8 +41,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Subtituladas', action = 'list_all', url = sub_host + 'movies/', sub_host = True, search_type = 'movie', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Màs vistas', action = 'list_all', url = host + 'tendencias-2/?get=movies', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Mejor valoradas', action = 'list_all', url = host + 'ratings-2/?get=movies', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias-2/?get=movies', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings-2/?get=movies', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -61,7 +61,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Destacadas', action = 'list_all', url = sub_host + 'ratings/', sub_host = True, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Màs vistas', action = 'list_all', url = host + 'tendencias-2/?get=tv', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias-2/?get=tv', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings-2/?get=tv', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))

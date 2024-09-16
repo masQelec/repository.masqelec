@@ -1645,7 +1645,7 @@ def show_help_miscelanea(item):
 
     txt = '[COLOR gold][B]KODI MEDIA CENTER:[/B][/COLOR][CR]'
     txt += '  [B][COLOR tan]Kodi Versiones Oficiales Soportadas:[/COLOR][/B][CR]'
-    txt += '  [COLOR darkorange][B]22.x (P...),  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia  y  17.x Krypton[/B][/COLOR][CR][CR]'
+    txt += '  [COLOR darkorange][B]22.x Piers,  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia  y  17.x Krypton[/B][/COLOR][CR][CR]'
 
     txt += '  Kodi [COLOR yellow]Oficial[/COLOR]:  [COLOR plum][B]kodi.tv/download/[/B][/COLOR][CR]'
     txt += '  para obtener la [COLOR yellowgreen]Última versión[/COLOR] de este Media Center[CR][CR]'
@@ -1745,11 +1745,19 @@ def show_help_register(item):
 
     txt += '[CR][CR]  Si desconoceis el dominio actual de esa web, mediante un navegador localizar su [B][COLOR gold]telegram ó twitter[/COLOR][/B]'
 
-    txt += '[CR][CR]  Por ejemplo [B][COLOR yellow]HdFull[/COLOR][/B] twitter oficial ó [B][COLOR yellow]NextDede[/COLOR][/B] twitter oficial ó [B][COLOR yellow]PlayDede[/COLOR][/B] twitter oficial'
+    txt += '[CR][CR]  Acceder a:[CR]'
 
-    txt += '[CR][CR]  acceder para [COLOR yellow][B]HdFull[/B][/COLOR] a [B][COLOR cyan]https://dominioshdfull.com[/COLOR][/B][CR]'
-    txt += '  ó bien para [COLOR yellow][B]NextDede[/B][/COLOR] acceder a [B][COLOR cyan]https://dominiosnextdede.com[/COLOR][/B][CR]'
-    txt += '  y para [COLOR yellow][B]PlayDede[/B][/COLOR] acceder a [B][COLOR cyan]https://dominiosplaydede.com[/COLOR][/B] ó su[COLOR yellow][B] Telegram[/B] [B][COLOR cyan] t.me/playdedeinformacion[/COLOR][/B]'
+    datos = channeltools.get_channel_parameters('hdfull')
+    if datos['active']:
+        txt += '  [COLOR yellow][B]HdFull  [COLOR cyan]https://dominioshdfull.com[/COLOR][/B][/COLOR][CR]'
+
+    datos = channeltools.get_channel_parameters('nextdede')
+    if datos['active']:
+        txt += '  [COLOR yellow][B]NextDede  [COLOR cyan]https://dominiosnextdede.com[/COLOR][/B][/COLOR] ó [COLOR yellow][B] Telegram[/COLOR] [COLOR cyan] t.me/s/NextdedeInformacion[/B][/COLOR][CR]'
+
+    datos = channeltools.get_channel_parameters('playdede')
+    if datos['active']:
+        txt += '  [COLOR yellow][B]PlayDede  [COLOR cyan]https://dominiosplaydede.com[/COLOR][/B][/COLOR] ó [COLOR yellow][B] Telegram[/COLOR] [COLOR cyan] t.me/playdedeinformacion[/COLOR][/B]'
 
     txt += '[CR][CR]*) Imprescindible tomar buena nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para cada web.'
 
@@ -1838,6 +1846,10 @@ def show_help_megaserie(item):
     item.notice = 'megaserie'
     show_help_canales(item)
 
+def show_help_monoschinos(item):
+    item.notice = 'monoschinos'
+    show_help_canales(item)
+
 def show_help_mundodonghua(item):
     item.notice = 'mundodonghua'
     show_help_canales(item)
@@ -1880,6 +1892,10 @@ def show_help_playdo(item):
 
 def show_help_ppeliculas(item):
     item.notice = 'ppeliculas'
+    show_help_canales(item)
+
+def show_help_repelisre(item):
+    item.notice = 'repelisre'
     show_help_canales(item)
 
 def show_help_rojotorrent(item):
@@ -1938,7 +1954,7 @@ def show_help_canales(item):
 
        elif item.notice == 'NextDede':
           txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominiosnextdede.com[/COLOR][/B][CR]'
-          txt += '[COLOR yellow]  ó su[COLOR yellow][B] Telegram[/B] [/COLOR] [B][COLOR greenyellow]t.me/NextdedeOficial[/COLOR][/B][CR][CR]'
+          txt += '[COLOR yellow]  ó su[COLOR yellow][B] Telegram[/B] [/COLOR] [B][COLOR greenyellow] t.me/s/NextdedeInformacion[/COLOR][/B][CR][CR]'
 
        elif item.notice == 'playdede':
           txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominiosplaydede.com[/COLOR][/B][CR]'
@@ -5241,7 +5257,7 @@ def get_plataforma(txt):
     elif kver.startswith('19.'): ver = '19 - Matrix'
     elif kver.startswith('20.'): ver = '20 - Nexus'
     elif kver.startswith('21.'): ver = '21 - Omega'
-    elif kver.startswith('22.'): ver = '21 - (P...)'
+    elif kver.startswith('22.'): ver = '22 - Piers'
 
     else: ver = 'Desconocido'
 

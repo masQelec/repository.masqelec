@@ -3,7 +3,7 @@
 import os
 
 from core import httptools, scrapertools, filetools, jsontools
-from platformcode import config, logger, platformtools, recaptchav2
+from platformcode import config, logger, recaptchav2
 
 
 def get_video_url(page_url, url_referer=''):

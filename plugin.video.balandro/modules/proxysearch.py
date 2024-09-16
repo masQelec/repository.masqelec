@@ -55,6 +55,7 @@ if txt_status:
 
 
 dominioshdfull = [
+         'https://hd-full.sbs/',
          'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
@@ -64,13 +65,14 @@ dominioshdfull = [
          'https://hd-full.one/',
          'https://hd-full.co/',
          'https://hdfull.icu/',
+         'https://hdfull.quest/',
+         'https://hdfull.link/'
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://hd-full.biz/',
          'https://hd-full.im/',
-         'https://hdfull.quest/',
          'https://new.hdfull.one/'
          ]
 
@@ -611,11 +613,87 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
              return
 
           if not host:
-              if channel_id == 'hdfull': host = dominioshdfull[0] 
+              if channel_id == 'hdfull':
+                  try:
+                     data = httptools.downloadpage('https://dominioshdfull.com/').data
 
-              elif channel_id == 'nextdede': host = dominiosnextdede[0] 
+                     bloque = scrapertools.find_single_match(data, 'dominios operativos actualizados(.*?)<script>')
 
-              elif channel_id == 'playdede': host = dominiosplaydede[0]
+                     operative_domains = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
+
+                     if not operative_domains: host = dominioshdfull[0]
+                     else:
+                        host = operative_domains[0]
+                        if not host.endswith('/'): host = host + '/'
+                  except:
+                     host = dominioshdfull[0]
+
+              elif channel_id == 'nextdede':
+                  sel_domain = ''
+
+                  try:
+                     data = httptools.downloadpage('https://dominiosnextdede.com/').data
+
+                     sel_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
+
+                     if sel_domain:
+                         if not sel_domain.endswith('/'): host = sel_domain + '/'
+                  except:
+                     pass
+
+                  if not sel_domain:
+                     try:
+                        data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
+
+                        bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
+
+                        dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
+
+                        if not dominios: host = dominiosnextdede[0]
+                        else:
+                            for dominio in dominios:
+                                dominio = dominio.lower().strip()
+                                if dominio:
+                                    dominio = dominio.replace('http:', 'https:')
+                                    if not dominio.endswith('/'): dominio = dominio + '/'
+                                    sel_domain = dominio
+
+                            if sel_domain: host = sel_domain
+                            else: host = dominiosnextdede[0]
+                     except:
+                        host = dominiosnextdede[0]
+
+              elif channel_id == 'playdede':
+                  sel_domain = ''
+
+                  try:
+                     data = httptools.downloadpage('https://dominiosplaydede.com/').data
+
+                     sel_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
+
+                     if sel_domain:
+                         if not sel_domain.endswith('/'): host = sel_domain + '/'
+                  except:
+                     pass
+
+                  if not sel_domain:
+                     try:
+                        data = httptools.downloadpage('https://t.me/playdedeinformacion').data
+
+                        dominios = scrapertools.find_multiple_matches(data, '>Web:(.*?)<')
+
+                        if not dominios: host = dominiosplaydede[0]
+                        else:
+                            for dominio in dominios:
+                                dominio = dominio.lower().strip()
+                                if dominio:
+                                    if not dominio.endswith('/'): dominio = dominio + '/'
+                                    sel_domain = dominio
+
+                            if sel_domain: host = sel_domain
+                            else: host = dominiosplaydede[0]
+                     except:
+                        host = dominiosplaydede[0]
 
           if not host:
               part_py = 'def mainlist'

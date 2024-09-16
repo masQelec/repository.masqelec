@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://ww23.cuevana3.vip'
+host = 'https://ww3u.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
@@ -55,7 +55,8 @@ ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://w
              'https://cuevana3.vip', 'https://wiw3.cuevana3.vip', 'https://wmi3.cuevana3.vip',
              'https://wn3l.cuevana3.vip', 'https://imu.cuevana3.vip', 'https://wni3.cuevana3.vip',
              'https://mvi.cuevana3.vip', 'https://wi3n.cuevana3.vip', 'https://wi3m.cuevana3.vip',
-             'https://im3.cuevana3.vip']
+             'https://im3.cuevana3.vip', 'https://ww23.cuevana3.vip', 'https://iv3.cuevana3.vip',
+             'https://lm3.cuevana3.vip', 'https://ww3v.cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')
@@ -222,7 +223,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + '/category/page-peliculas-de-estrenos/', search_type = 'movie', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Sagas', action = 'list_all', url = host + '/genre/sagas/', search_type = 'movie', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Sagas', action = 'list_all', url = host + '/genre/sagas/', search_type = 'movie', text_color = 'greenyellow' ))
+
+    itemlist.append(item.clone( title = 'DC Comics', action = 'list_all', url = host + '/genre/dc-comics/', search_type = 'movie', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + '/genre/marvel/', search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -494,6 +498,7 @@ def findvideos(item):
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     matches = scrapertools.find_multiple_matches(data, 'id="player-option-(.*?)</li>')
+    if not matches: matches = scrapertools.find_multiple_matches(data, "id='player-option-(.*?)</li>")
 
     ses = 0
 
@@ -502,8 +507,13 @@ def findvideos(item):
 
         # ~ dtype, dpost, dnume
         dtype = scrapertools.find_single_match(match, ' data-type="(.*?)"')
+        if not dtype: dtype = scrapertools.find_single_match(match, " data-type='(.*?)'")
+
         dpost = scrapertools.find_single_match(match, ' data-post="(.*?)"')
+        if not dpost: dpost = scrapertools.find_single_match(match, " data-post='(.*?)'")
+
         dnume = scrapertools.find_single_match(match, ' data-nume="(.*?)"')
+        if not dnume: dnume = scrapertools.find_single_match(match, " data-nume='(.*?)'")
 
         if dtype and dpost and dnume:
             data1 = do_downloadpage(host + '/wp-json/dooplayer/v2/' + dpost + '/' + dtype + '/' + dnume +'/')
@@ -526,7 +536,8 @@ def findvideos(item):
 
                         embed = servertools.normalize_url(servidor, embed)
 
-                        lang = scrapertools.find_single_match(match, '.*?<span class="title">(.*?)</span>')
+                        lang = scrapertools.find_single_match(match, '<span class="title">(.*?)</span>')
+                        if not lang: lang = scrapertools.find_single_match(match, "<span class='title'>(.*?)</span>")
 
                         if 'Latino' in lang: lang = 'Lat'
                         elif 'Castellano' in lang or 'Español' in lang: lang = 'Esp'
@@ -542,6 +553,7 @@ def findvideos(item):
                         data2 = do_downloadpage(embed)
 
                         links = scrapertools.find_multiple_matches(data2, '<li class="linkserver".*?data-video="(.*?)"')
+                        if not links: links = scrapertools.find_multiple_matches(data2,"'<li class='linkserver'.*?data-video='(.*?)'")
 
                         if links:
                             for url in links:
@@ -555,7 +567,8 @@ def findvideos(item):
 
                                 url = servertools.normalize_url(servidor, url)
 
-                                lang = scrapertools.find_single_match(match, '.*?<span class="title">(.*?)</span>')
+                                lang = scrapertools.find_single_match(match, '<span class="title">(.*?)</span>')
+                                if not lang: lang = scrapertools.find_single_match(match, "<span class='title'>(.*?)</span>")
 
                                 if 'Latino' in lang: lang = 'Lat'
                                 elif 'Castellano' in lang or 'Español' in lang: lang = 'Esp'

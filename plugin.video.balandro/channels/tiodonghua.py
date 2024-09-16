@@ -214,10 +214,15 @@ def list_all(item):
             if item.group == 'animes':
                 epi = scrapertools.find_single_match(match, '<span class="epx">Ep(.*?)</span>').strip()
 
+                titulo = title
+
+                if epi:
+                    titulo = '[COLOR goldenrod]Episodio [/COLOR]' + titulo
+
                 if not epi: epi = 1
                 season = 1
 
-                itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                             contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epi ))
 
                 continue
@@ -370,6 +375,13 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(data, '"embed_url":.*?"(.*?)"')
 
+        if not 'http' in url:
+            if '<iframe' in data or '<IFRAME' in data:
+                 data = str(data).replace('=\\', '=').replace('\\"', '/"')
+
+                 url = scrapertools.find_single_match(str(data), '<iframe.*?src="(.*?)"')
+                 if not url: url = scrapertools.find_single_match(str(data), '<IFRAME.*?SRC="(.*?)"')
+
         if '<iframe' in url or '<IFRAME' in url:
              data = str(data).replace('=\\', '=').replace('\\"', '/"')
 
@@ -377,6 +389,50 @@ def findvideos(item):
              if not url: url = scrapertools.find_single_match(str(data), '<IFRAME.*?SRC="(.*?)"')
 
         url = url.replace('\\/', '/')
+
+        # ~ Multiserver
+        if '//player.tiodonghua.' in url:
+            data2 = do_downloadpage(url)
+            matches2 = scrapertools.find_multiple_matches(data2, "go_to_player.*?'(.*?)'")
+
+            for url in matches2:
+                ses += 1
+
+                if '/terabox.' in url: continue
+                elif '.tiodonghua.' in url: continue
+
+                if 'http:' in url: url = url.replace('http:', 'https:')
+
+                if not 'https:' in url: url = 'https:' + url
+
+                lang = '?'
+
+                servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
+
+                if servertools.is_server_available(servidor):
+                    if not servertools.is_server_enabled(servidor): continue
+                else:
+                    if not config.get_setting('developer_mode', default=False): continue
+
+                other = servidor
+
+                if servidor == 'various': other = servertools.corregir_other(url)
+
+                if servidor == other: other = ''
+
+                elif not servidor == 'directo':
+                   if not servidor == 'various': other = ''
+
+                if servidor == 'directo':
+                   if config.get_setting('developer_mode', default=False):
+                       other = url.split("/")[2]
+                       other = other.replace('https:', '').strip()
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
+
+            continue
+
 
         if not url: continue
 
@@ -391,6 +447,7 @@ def findvideos(item):
         elif 'videopress.com' in url: continue
         elif 'tioplayer.com' in url: continue
         elif 'likessb.com' in url: continue
+        elif '.animefenix.' in url: continue
         elif '.animefenix.' in url: continue
 
         if 'http:' in url: url = url.replace('http:', 'https:')

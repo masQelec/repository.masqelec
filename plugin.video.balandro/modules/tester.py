@@ -104,6 +104,7 @@ txt_coffs = '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][C
 txt_erase = '[COLOR orangered][B]Podrían Eliminarse los Proxies del Canal, pueden No necesitarse, salvo bloqueo en Play, u Otros.[/B][/COLOR]'
 txt_quita = '[COLOR orange][B]podrían Eliminarse los Proxies del Canal, al parecer No se necesitan, excepto bloqueo[/COLOR] [COLOR fuchsia][B]Play[/B][/COLOR] [COLOR orange][B]u Otros[/B][/COLOR]'
 txt_suspe = '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR][CR]'
+txt_reach = '[CR]status: [COLOR red[B]Suspendida[/B][/COLOR][CR]'
 txt_sorry = '[CR]sorry: [COLOR springgreen][B]Contact your hosting Provider[/B][/COLOR]'
 txt_false = '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR]'
 txt_verif = '[COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]'
@@ -113,6 +114,7 @@ timeout = config.get_setting('httptools_timeout', default=15)
 espera = config.get_setting('servers_waiting', default=6)
 
 dominioshdfull = [
+         'https://hd-full.sbs/',
          'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
@@ -122,13 +124,14 @@ dominioshdfull = [
          'https://hd-full.one/',
          'https://hd-full.co/',
          'https://hdfull.icu/',
+         'https://hdfull.quest/',
+         'https://hdfull.link/'
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://hd-full.biz/',
          'https://hd-full.im/',
-         'https://hdfull.quest/',
          'https://new.hdfull.one/'
          ]
 
@@ -702,11 +705,87 @@ def test_channel(channel_name):
              return
 
           if not host:
-              if channel_id == 'hdfull': host = dominioshdfull[0] 
+              if channel_id == 'hdfull':
+                  try:
+                     data = httptools.downloadpage('https://dominioshdfull.com/').data
 
-              elif channel_id == 'nextdede': host = dominiosnextdede[0] 
+                     bloque = scrapertools.find_single_match(data, 'dominios operativos actualizados(.*?)<script>')
 
-              elif channel_id == 'playdede': host = dominiosplaydede[0]
+                     operative_domains = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
+
+                     if not operative_domains: host = dominioshdfull[0]
+                     else:
+                        host = operative_domains[0]
+                        if not host.endswith('/'): host = host + '/'
+                  except:
+                     host = dominioshdfull[0]
+
+              elif channel_id == 'nextdede':
+                  sel_domain = ''
+
+                  try:
+                     data = httptools.downloadpage('https://dominiosnextdede.com/').data
+
+                     sel_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
+
+                     if sel_domain:
+                         if not sel_domain.endswith('/'): host = sel_domain + '/'
+                  except:
+                     pass
+
+                  if not sel_domain:
+                     try:
+                        data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
+
+                        bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
+
+                        dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
+
+                        if not dominios: host = dominiosnextdede[0]
+                        else:
+                            for dominio in dominios:
+                                dominio = dominio.lower().strip()
+                                if dominio:
+                                    dominio = dominio.replace('http:', 'https:')
+                                    if not dominio.endswith('/'): dominio = dominio + '/'
+                                    sel_domain = dominio
+
+                            if sel_domain: host = sel_domain
+                            else: host = dominiosnextdede[0]
+                     except:
+                        host = dominiosnextdede[0]
+
+              elif channel_id == 'playdede':
+                  sel_domain = ''
+
+                  try:
+                     data = httptools.downloadpage('https://dominiosplaydede.com/').data
+
+                     sel_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
+
+                     if sel_domain:
+                         if not sel_domain.endswith('/'): host = sel_domain + '/'
+                  except:
+                     pass
+
+                  if not sel_domain:
+                     try:
+                        data = httptools.downloadpage('https://t.me/playdedeinformacion').data
+
+                        dominios = scrapertools.find_multiple_matches(data, '>Web:(.*?)<')
+
+                        if not dominios: host = dominiosplaydede[0]
+                        else:
+                            for dominio in dominios:
+                                dominio = dominio.lower().strip()
+                                if dominio:
+                                    if not dominio.endswith('/'): dominio = dominio + '/'
+                                    sel_domain = dominio
+
+                            if sel_domain: host = sel_domain
+                            else: host = dominiosplaydede[0]
+                     except:
+                        host = dominiosplaydede[0]
 
           if not host:
               part_py = 'def mainlist'
@@ -794,7 +873,7 @@ def test_channel(channel_name):
             incidencia = str(incidencia).split("[/B][/COLOR]")[0]
 
             if incidencia:
-                if len(incidencia) < 50:
+                if len(incidencia) < 99:
                     avis_causas = avis_causas + ' ' + incidencia
 
         platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
@@ -808,7 +887,7 @@ def test_channel(channel_name):
             incidencia = str(incidencia).split("[/B][/COLOR]")[0]
 
             if incidencia:
-                if len(incidencia) < 50:
+                if len(incidencia) < 99:
                     avis_causas = avis_causas + ' ' + incidencia
 
         platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
@@ -840,6 +919,8 @@ def test_channel(channel_name):
             else:
                 if not channels_unsatisfactory == 'unsatisfactory':
                     if 'invalid:' in txt:
+                        if txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
+
                         platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                         avisado = True
 
@@ -872,6 +953,8 @@ def test_channel(channel_name):
        else:
            if not channels_unsatisfactory == 'unsatisfactory':
                if 'invalid:' in txt:
+                   if txt_sorry in txt or txt_suspe in txt or txt_reach in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
+
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
@@ -883,7 +966,7 @@ def test_channel(channel_name):
                elif 'Falso Positivo.' in txt:
                    avis_causas = txt_false
 
-                   if txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
+                   if txt_sorry in txt or txt_suspe in txt or txt_reach in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
@@ -1211,6 +1294,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             if 'Estamos en mantenimiento, por favor inténtelo más tarde' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
             elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
 
+            elif '/cgi-sys/defaultwebpage.cgi' in str(response.data): txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
+
             if new_web:
                 if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
                     if str(response.code) == '301' or str(response.code) == '308': txt += "[CR][CR][COLOR orangered][B]Nuevo Dominio Permanente[/B][/COLOR]"
@@ -1219,7 +1304,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web:
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1313,6 +1398,12 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                 elif '/www.alliance4creativity.com/' in new_web: txt += '[CR]legal: [COLOR springgreen][B]Copyright infringement[/B][/COLOR]'
                 elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
 
+                elif '"/lander"' in str(response.data):
+                    txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
+
+                    if 'Diagnosis:' in txt:
+                        if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
+
                 if new_web == '/login':
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
@@ -1325,7 +1416,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web:
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 

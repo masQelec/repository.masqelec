@@ -608,7 +608,8 @@ def findvideos(item):
         ses += 1
 
         if embed == 'd':
-            if not 'uptobox' in url: continue
+            if 'clicknupload' in url: pass
+            elif not 'uptobox' in url: continue
 
         elif '/powvideo.' in url: continue
         elif '/streamplay.' in url: continue

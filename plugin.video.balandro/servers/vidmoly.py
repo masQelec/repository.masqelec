@@ -50,8 +50,10 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url, headers=headers).data
 
-    if 'https://cdn.staticmoly.me/notice.php?' in data:
+    if '/notice.php' in data:
         return 'Archivo inexistente ó eliminado'
+    elif '<title>Please wait</title>' in data:
+        return 'Archivo No accesible temporalmente'
 
     packed = scrapertools.find_single_match(data, "<script type=[\"']text/javascript[\"']>(eval.*?)</script>")
 

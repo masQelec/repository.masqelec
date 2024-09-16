@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://pelisplushd.nz/'
+host = 'https://pelisplushd.bz/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://pelisplushd.cx/', 'https://ww3.pelisplushd.nz/', 'https://pelisplushd.top/',
-             'https://pelisplushd.rip/', 'https://pelisplushd.run/']
+             'https://pelisplushd.rip/', 'https://pelisplushd.run/', 'https://pelisplushd.nz/']
 
 
 domain = config.get_setting('dominio', 'pelisplushdnz', default='')

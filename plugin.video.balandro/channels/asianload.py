@@ -32,15 +32,17 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar dorama ...', action = 'search', search_type = 'tvshow', text_color='firebrick' ))
 
-    itemlist.append(item.clone( title = 'Catálogo episodios', action = 'list_all', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Episodios:', folder=False, text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = 'Episodios recientes', action = 'list_all', url = host + 'recently-added-raw', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'ongoing-series', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = ' - [COLOR cyan]Recientes[/COLOR]', action = 'list_all', url = host + 'recently-added-raw', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'popular', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = ' - En emisión', action = 'list_all', url = host + 'ongoing-series', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'kshow', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = ' - Más populares', action = 'list_all', url = host + 'popular', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = ' - Más valorados', action = 'list_all', url = host + 'kshow', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'movies', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -84,7 +86,7 @@ def list_all(item):
 
             PeliName = PeliName.strip()
 
-            title = title.replace('Episode', '[COLOR goldenrod]Episode[/COLOR]')
+            title = title.replace('Episode', '[COLOR deepskyblue]Episode[/COLOR]')
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                         contentType='movie', contentTitle=PeliName, infoLabels={'year': year} ))

@@ -73,23 +73,26 @@ def list_all(item):
 
     jdata = jsontools.load(data)
 
-    for video in jdata["data"]:
-        domain = ''
+    try:
+        for video in jdata["data"]:
+            domain = ''
 
-        duration = video["duration"]
+            duration = video["duration"]
 
-        title = video["videoTitle"]
+            title = video["videoTitle"]
 
-        src = video["src"]
+            src = video["src"]
 
-        thumb = src.get('domain', domain) + src.get('pathMedium', domain) + "1.jpg"
+            thumb = src.get('domain', domain) + src.get('pathMedium', domain) + "1.jpg"
 
-        url = video["urls_CDN"]
+            url = video["urls_CDN"]
  
-        titulo = "[COLOR tan]%s[/COLOR] %s" % (duration, title)
+            titulo = "[COLOR tan]%s[/COLOR] %s" % (duration, title)
 
-        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, domain=domain, thumbnail=thumb,
-                                    contentType = 'movie', contentTitle = title, contentExtra='adults') )
+            itemlist.append(item.clone (action='findvideos', title=titulo, url=url, domain=domain, thumbnail=thumb,
+                                        contentType = 'movie', contentTitle = title, contentExtra='adults') )
+    except:
+        pass
 
     if itemlist:
         actual = int(scrapertools.find_single_match(item.url, '&page=([0-9]+)'))

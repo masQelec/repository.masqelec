@@ -197,6 +197,10 @@ def configurar_proxies_canal(canal, url):
 
             if procesar:
                 provider_auto = all_providers
+
+                if not proxies_iniciales:
+                    if proxies_list: provider_auto = private_list
+
                 proxies_nuevos = ''
 
                 _buscar_proxies(canal, url, provider_auto, procesar)
@@ -460,6 +464,12 @@ def _buscar_proxies(canal, url, provider, procesar):
     if not procesar:
         if not provider == all_providers: search_provider = False
 
+    if proxies_list:
+        proxies_iniciales = config.get_setting('proxies', canal, default='').strip()
+        if not proxies_iniciales:
+            proxies = obtener_private_list()
+            search_provider = False
+
     msg_txt = '[B][COLOR %s]Obteniendo proxies ...[/COLOR][/B]'
 
     # ~ Providers que nunca intervienen en All-Providers salvo extended
@@ -480,7 +490,9 @@ def _buscar_proxies(canal, url, provider, procesar):
 
             if _tplus == -1: return False
 
-            config.set_setting('proxies_tplus', _tplus)
+            if _tplus is None: return False
+
+            config.set_setting('proxies_tplus_proces', _tplus)
 
             tplus = True
 
@@ -502,7 +514,6 @@ def _buscar_proxies(canal, url, provider, procesar):
            search_provider = False
            extended = False
            provider = ''
-
 
     if extended:
         if tplus == True:

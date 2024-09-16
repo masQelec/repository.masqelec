@@ -172,6 +172,9 @@ def findvideos(item):
         if not url or not servidor: continue
 
         if servidor == 'soon': continue
+        elif servidor == 'uii': continue
+        elif servidor == 'pastedvdrip': continue
+        elif servidor == 'rinku': continue
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
@@ -213,6 +216,9 @@ def play(item):
             url = url.replace('&amp;', '&')
 
             if url:
+                if '/uii.' in url:
+                    return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 

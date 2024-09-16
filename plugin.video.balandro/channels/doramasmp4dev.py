@@ -30,7 +30,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_all', url = host, group = 'last', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'doramas-en-curso-ubau/', search_type = 'tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'doramas-en-curso-ubau/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'series/?type=Anime', search_type = 'tvshow', text_color = 'springgreen' ))
 

@@ -46,7 +46,7 @@ except:
    except: pass
 
 
-host = 'https://megaxserie.me/'
+host = 'https://seriesmega.org/'
 
 
 def item_configurar_proxies(item):
@@ -82,6 +82,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://megaxserie.me/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/release/' in url: raise_weberror = False
 
     hay_proxies = False

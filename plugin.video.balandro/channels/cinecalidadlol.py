@@ -336,6 +336,8 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    _promos = 0
+
     matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
 
     if not matches:
@@ -349,7 +351,13 @@ def list_all(item):
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
         if url.startswith('/?post_id='): continue
-        elif '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url: continue
+
+        elif '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url:
+              _promos += 1
+              continue
+        elif 'Netflix Premium' in match or 'Suscripción Disney Plus' in match or 'Suscripción HBO' in match:
+              _promos += 1
+              continue
 
         if not url or not title: continue
 
@@ -406,6 +414,14 @@ def list_all(item):
         if next_page:
             if '/page/' in next_page:
                 itemlist.append(item.clone( title='Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
+    else:
+        if not _promos == 0:
+            next_page = scrapertools.find_single_match(data, "<span class='pages'>.*?class='current'>.*?" + 'href="(.*?)"')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<span class="pages">.*?class="current">.*?' + 'href="(.*?)"')
+
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title='Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 

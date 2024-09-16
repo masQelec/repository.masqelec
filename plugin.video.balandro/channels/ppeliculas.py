@@ -107,7 +107,7 @@ def do_downloadpage(url, post=None, headers=None):
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
-    if '<title>You are being redirected...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         if BR or BR2:
             try:
                 ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
@@ -508,6 +508,7 @@ def corregir_servidor(servidor):
      servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.xx', '').replace('.click', '')
      servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').replace('.uno', '').replace('.io', '')
      servidor = servidor.replace('.link', '').replace('.club', '').replace('.red', '').replace('.download', '').replace('.vip', '').replace('.space', '').strip()
+     servidor = servidor.replace('.xyz', '').replace('.me', '')
 
      return servidor
 
@@ -536,6 +537,14 @@ def findvideos(item):
             elif 'uploadbuzz' in _server: continue
             elif 'powvibeo' in _server: continue
             elif 'slreamplay' in _server: continue
+            elif 'fastclick' in _server: continue
+            elif 'streamix' in _server: continue
+            elif 'streamcloud' in _server: continue
+            elif 'kingvid' in _server: continue
+            elif 'stormo' in _server: continue
+            elif 'uploadz' in _server: continue
+            elif 'rockfile' in _server: continue
+            elif 'openload' in _server: continue
 
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
@@ -553,6 +562,8 @@ def findvideos(item):
                 lang = '?'
 
             if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
+            elif 'dood' in _server: _server = 'doodstream'
+            elif 'google' in _server or 'Google' in _server: _server = 'gvideo'
 
             other = corregir_servidor(_server)
 
@@ -588,6 +599,14 @@ def findvideos(item):
             elif 'uploadbuzz' in _server: continue
             elif 'powvibeo' in _server: continue
             elif 'slreamplay' in _server: continue
+            elif 'fastclick' in _server: continue
+            elif 'streamix' in _server: continue
+            elif 'streamcloud' in _server: continue
+            elif 'kingvid' in _server: continue
+            elif 'stormo' in _server: continue
+            elif 'uploadz' in _server: continue
+            elif 'rockfile' in _server: continue
+            elif 'openload' in _server: continue
 
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
@@ -605,6 +624,8 @@ def findvideos(item):
                 lang = '?'
 
             if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
+            elif 'dood' in _server: _server = 'doodstream'
+            elif 'google' in _server or 'Google' in _server: _server = 'gvideo'
 
             other = corregir_servidor(_server)
 
@@ -642,9 +663,19 @@ def findvideos(item):
             elif 'uploadbuzz' in servidor: continue
             elif 'powvibeo' in servidor: continue
             elif 'slreamplay' in servidor: continue
+            elif 'fastclick' in servidor: continue
+            elif 'streamix' in servidor: continue
+            elif 'streamcloud' in servidor: continue
+            elif 'kingvid' in servidor: continue
+            elif 'stormo' in servidor: continue
+            elif 'uploadz' in servidor: continue
+            elif 'rockfile' in servidor: continue
+            elif 'openload' in servidor: continue
 
             if 'gofile' in servidor: servidor = 'gofile'
-	
+            elif 'dood' in servidor: servidor = 'doodstream'
+            elif 'google' in servidor or 'Google' in servidor: servidor = 'gvideo'
+
             if url.startswith('https://player.pepeliculas.org/'): url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
 
             if lang == 'Latino': lang = 'Lat'
@@ -687,12 +718,23 @@ def findvideos(item):
             elif 'fikper' in servidor: continue
             elif 'powvibeo' in servidor: continue
             elif 'slreamplay' in servidor: continue
+            elif 'buzzheavier' in servidor: continue
+            elif 'fastclick' in servidor: continue
+            elif 'streamix' in servidor: continue
+            elif 'streamcloud' in servidor: continue
+            elif 'kingvid' in servidor: continue
+            elif 'stormo' in servidor: continue
+            elif 'uploadz' in servidor: continue
+            elif 'rockfile' in servidor: continue
+            elif 'openload' in servidor: continue
 
             elif 'nitro' in servidor: continue
             elif '1fichier' in servidor: continue
             elif 'turbobit' in servidor: continue
 
-            elif 'gofile' in servidor: servidor = 'gofile'
+            if 'gofile' in servidor: servidor = 'gofile'
+            elif 'dood' in servidor: servidor = 'doodstream'
+            elif 'google' in servidor or 'Google' in servidor: servidor = 'gvideo'
 
             elif servidor == 'filemoon': servidor = 'various'
             elif servidor == 'utorrent': servidor = 'torrent'
@@ -757,6 +799,17 @@ def play(item):
         elif url.startswith('https://hqq.tv/player/embed_player.php?'): url = url.replace('https://hqq.tv/player/embed_player.php?', 'https://waaw.to/watch_video.php?v=')
 
     if url:
+        if item.other.startswith("Sb"):
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif 'fembed' in url or  'streamsb' in url or 'playersb' in url or 'fcom' in url:
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif '.pepeliculas.' in url: url = ''
+
+    if url:
+        if 'http://' in url: url = url.replace('http://', 'https://')
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
