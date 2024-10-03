@@ -26,6 +26,35 @@ color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 
+con_incidencias = ''
+no_accesibles = ''
+
+try:
+    with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+except:
+    try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+    except: txt_status = ''
+
+if txt_status:
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+
 no_results_proxies = config.get_setting('search_no_results_proxies', default=True)
 no_results = config.get_setting('search_no_results', default=False)
 
@@ -53,6 +82,11 @@ def mainlist(item):
     itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información [COLOR yellow]Búsquedas[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_audios', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= '[COLOR green][B]Información[/B][/COLOR] Resumen y Distribución Canales', thumbnail=config.get_thumb('stack') ))
+
+    if no_accesibles:
+        itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= '[COLOR green][B]Información[/B][/COLOR] Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
     if config.get_setting('search_extra_main', default=False):
         itemlist.append(item.clone( action='', title= '[B]Búsquedas por Título en TMDB:[/B]', folder=False, text_color='violet', thumbnail=thumb_tmdb ))
@@ -144,9 +178,9 @@ def mainlist(item):
     if config.get_setting('search_show_last', default=True):
         itemlist.append(item.clone( channel='actions', action = 'manto_textos', title= ' - Quitar los [COLOR coral][B]Textos[/B][/COLOR] Memorizados de las búsquedas', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(item.clone( channel='filters', action = 'mainlist2', title = ' - [COLOR greenyellow][B]Efectuar búsquedas [COLOR gold](solo en determinados canales)[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='filters', action = 'mainlist2', title = ' - Efectuar búsquedas [COLOR gold][B](solo en determinados canales)[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( channel='filters', action = 'mainlist', title = ' - [COLOR cyan][B]Excluir canales de las búsquedas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='filters', action = 'mainlist', title = ' - [COLOR cyan][B]Excluir[/B][/COLOR] canales de las búsquedas', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='', title= '[B]Ajustes:[/B]', thumbnail=config.get_thumb('help'), folder=False, text_color='goldenrod' ))
 
@@ -171,6 +205,8 @@ def show_help_parameters(item):
 
     txt += '[CR][CR] - Qué canales Nunca intervendrán en las busquedas de [COLOR gold][B]Peliculas, Series y/ó Documentales[/B][/COLOR]:'
 
+    if no_accesibles: txt += '[CR]   - Los canales [B][COLOR tan]No Accesibles[/COLOR][/B]'
+
     if config.get_setting('mnu_doramas', default=True): txt += '[CR]   - Los canales de [B][COLOR firebrick]Doramas[/COLOR][/B]'
 
     if config.get_setting('mnu_animes', default=True): txt += '[CR]   - Los canales de [B][COLOR springgreen]Animes[/COLOR][/B]'
@@ -179,7 +215,7 @@ def show_help_parameters(item):
 
     txt += '[CR][CR] - [COLOR goldenrod][B]Procesos[/COLOR][/B]:'
 
-    txt += '[CR]   - Cuantos Resultados se previsualizarán por canal: [COLOR coral][B]' + str(config.get_setting('search_limit_by_channel', default=2)) + '[/COLOR][/B]'
+    txt += '[CR]   - Cuantos Resultados se previsualizarán por canal (por defecto 2): [COLOR coral][B]' + str(config.get_setting('search_limit_by_channel', default=2)) + '[/COLOR][/B]'
 
     if config.get_setting('search_only_prefered', default=False): txt += '[CR]   - Tiene Activado efectuar búsquedas solo en los canales [B][COLOR gold]Preferidos[/COLOR][/B]'
 
@@ -692,6 +728,9 @@ def do_search(item, tecleado):
 
                     if 'problematic' in ch['clusters']: name += '[I][COLOR darkgoldenrod] (problemático) [/COLOR][/I]'
 
+                    if no_accesibles:
+                        if ch['name'] in str(no_accesibles): name += '[I][COLOR tan] (no accesible)[/COLOR][/I]'
+
                     it.title = '[B][COLOR ' + color + ']' + name + '[/B][/COLOR] ' + it.title
 
                     itemlist.append(it)
@@ -772,6 +811,9 @@ def do_search(item, tecleado):
                     if 'inestable' in ch['clusters']: texto += '[I][COLOR plum] (inestable)[/COLOR][/I]'
 
                     if 'problematic' in ch['clusters']: texto += '[I][COLOR darkgoldenrod] (problemático)[/COLOR][/I]'
+
+                    if no_accesibles:
+                        if ch['name'] in str(no_accesibles): name += '[I][COLOR tan] (no accesible)[/COLOR][/I]'
 
                     titulo = '%s [COLOR %s]- %d %s' % (name, color, len(ch['itemlist_search']), texto)
             else:

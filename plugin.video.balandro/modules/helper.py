@@ -749,9 +749,9 @@ def submnu_canales(item):
 
     itemlist.append(item.clone( action='', title= '[B][I]CANALES PERSONALIZACIÓN:[/I][/B]', text_color='goldenrod', folder=False ))
     itemlist.append(item.clone( action='channels_prefered', title= '    - Qué canales tiene marcados como [COLOR gold][B]Preferidos[/B][/COLOR]' ))
-    itemlist.append(item.clone( action='channels_status', title= '    - Personalizar canales [COLOR gold][B]Preferidos[/B][/COLOR] (Marcar ó Des-marcar)', des_rea = False ))
+    itemlist.append(item.clone( action='channels_status', title= '    - Personalizar canales [COLOR gold][B]Preferidos[/B][/COLOR] (Marcar ó Des-marcar)', des_rea = False, _helper = True ))
     itemlist.append(item.clone( action='channels_no_actives', title= '    - Qué canales tiene marcados como [COLOR gray][B]Desactivados[/B][/COLOR]' ))
-    itemlist.append(item.clone( action='channels_status', title= '    - Personalizar [COLOR gold][B]Canales[/B][/COLOR] (Desactivar ó Re-activar)', des_rea = True ))
+    itemlist.append(item.clone( action='channels_status', title= '    - Personalizar canales [COLOR gray][B]Desactivados[/B][/COLOR] (Desactivar ó Re-activar)', des_rea = True, _helper = True ))
 
     itemlist.append(item.clone( action='', title= '[B][I]CANALES CUENTAS:[/I][/B]', text_color='goldenrod', folder=False ))
     itemlist.append(item.clone( action='show_help_register', title= '    - [COLOR green][B]Información[/B][/COLOR] webs que requieren [COLOR gold][B]Registrarse[/B][/COLOR] (Cuenta)', thumbnail=config.get_thumb('news') ))
@@ -1200,7 +1200,7 @@ def submnu_preferidos(item):
 
     itemlist.append(item.clone( action='', title='[B]PREFERIDOS:[/B]', folder=False, text_color='wheat' ))
 
-    itemlist.append(item.clone( action='show_menu_parameters', title= ' - [COLOR green][B]Información[/B][/COLOR] sobre sus [COLOR chocolate][B]Preferencias[/B][/COLOR] Actuales', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='show_preferidos_parameters', title= ' - [COLOR green][B]Información[/B][/COLOR] sobre sus [COLOR chocolate][B]Preferencias[/B][/COLOR] Actuales', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='show_help_tracking', title= ' - [COLOR green][B]Información[/B][/COLOR] ¿ Cómo funciona ?', thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='show_help_tracking_update', title= ' - [COLOR green][B]Información[/B][/COLOR] Búsqueda automática de [COLOR cyan][B]Nuevos Episodios[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
@@ -2389,6 +2389,45 @@ def show_not_download(item):
     platformtools.dialog_textviewer('¿ Qué NO está contemplado en las Descargas ?', txt)
 
 
+def show_preferidos_parameters(item):
+    logger.info()
+
+    txt = '[COLOR goldenrod][B]AJUSTES PREFERIDOS:[/B][/COLOR][CR]'
+
+    txt += ' - [COLOR cyan]Nuevos Episodios: Valores para Ejecutar el Servicio (Intervalo de horas, por defecto 12): [/COLOR][COLOR red][B]' + str(config.get_setting('addon_tracking_interval', default=12)) + '[/B][/COLOR][CR]'
+
+    tracking_order_movies = config.get_setting('tracking_order_movies', default=0)
+
+    if tracking_order_movies == 0: order_movies = 'Actualización'
+    elif tracking_order_movies == 1: order_movies = 'Título'
+    else: order_movies = 'Fecha de Estreno'
+
+    txt += '[CR] - [COLOR cyan]Ordenar Películas por (por defecto Actualización): [/COLOR][COLOR red][B]' + order_movies + '[/B][/COLOR][CR]'
+
+    txt += ' - [COLOR cyan]Lista de Películas: Cuantas Películas por página (por defecto 10): [/COLOR][COLOR red][B]' + str(config.get_setting('tracking_perpage_movies', default=10)) + '[/B][/COLOR][CR]'
+
+    tracking_order_tvshows = config.get_setting('tracking_order_tvshows', default=0)
+
+    if tracking_order_tvshows == 0: order_tvshows = 'Actualización'
+    elif tracking_order_tvshows == 1: order_tvshows = 'Título'
+    else: order_tvshows = 'Fecha de Estreno'
+
+    txt += '[CR] - [COLOR cyan]Ordenar Series por (por defecto Actualización): [/COLOR][COLOR red][B]' + order_tvshows + '[/B][/COLOR][CR]'
+
+    txt += ' - [COLOR cyan]Lista de Series: Cuantas Series por página (por defecto 10): [/COLOR][COLOR red][B]' + str(config.get_setting('tracking_perpage_tvshows', default=10)) + '[/B][/COLOR][CR]'
+
+    tracking_order_episodes = config.get_setting('tracking_order_episodes', default=0)
+
+    if tracking_order_episodes == 0: order_episodes = 'Actualización'
+    else: order_episodes = 'Fecha de Emisión'
+
+    txt += '[CR] - [COLOR cyan]Ordenar Series por (por defecto Fecha de Emisión): [/COLOR][COLOR red][B]' + order_episodes + '[/B][/COLOR][CR]'
+
+    txt += ' - [COLOR cyan]Lista de Episodios: Cuantos Episodios por página (por defecto Fecha de Emisión): [/COLOR][COLOR red][B]' + str(config.get_setting('tracking_perpage_episodes', default=10)) + '[/B][/COLOR][CR]'
+
+    platformtools.dialog_textviewer('Información Ajustes Preferidos', txt)
+
+
 def show_help_tracking(item):
     logger.info()
 
@@ -2625,6 +2664,9 @@ def show_channels_parameters(item):
  
     if config.get_setting('channels_list_order', default=True): txt += '[CR] - Se Presentan los canales [B][COLOR gold]Preferidos[/COLOR][/B] al principio de las Listas[CR]'
 
+    if not config.get_setting('mnu_desactivados', default=False):
+        txt += '[CR] - Se Presentan los canales [B][COLOR gray]Desactivados[/COLOR][/B] al final de las Listas[CR]'
+
     if config.get_setting('channels_list_no_inestables', default=False): txt += '[CR] - No se presentan los canales [COLOR plum][B]Inestables[/B][/COLOR][CR]'
 
     if config.get_setting('channels_list_no_problematicos', default=False): txt += '[CR] - No se presentan los canales [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR][CR]'
@@ -2766,7 +2808,9 @@ def show_play_parameters(item):
 
     txt += '[CR][CR][COLOR fuchsia][B] - AUTO PLAY:[/B][/COLOR]'
 
-    if config.get_setting('autoplay', default=False): txt += '[CR]    - [COLOR yellow][B] Activado[/B][/COLOR]'
+    if config.get_setting('autoplay', default=False):
+        txt += '[CR]    - [COLOR yellow][B] Activado[/B][/COLOR]'
+        txt += '[CR]    -  Número máximo de enlaces para intentar el auto play (por defecto 10): [COLOR coral][B]' + str(config.get_setting('autoplay_max_links', default=10)) + '[/COLOR][/B]'
     else: txt += '[CR]    - [COLOR yellow][B] Des-Activado[/B][/COLOR]'
 
     if config.get_setting('autoplay_one_link', default=True): txt += '[CR]    -  Si solo hay [COLOR gold][B]Un enlace[/B][/COLOR] reproducirlo automáticamente[COLOR yellow][B]  Activado[/B][/COLOR]'
@@ -2888,7 +2932,7 @@ def show_prx_parameters(item):
     provider = config.get_setting('proxies_provider')
     provider = opciones_provider[provider]
 
-    txt += '[CR][COLOR gold] - Proveedor Habitual:[/COLOR]' + ' [COLOR cyan][B]' + provider + '[/B][/COLOR][CR]'
+    txt += '[CR][COLOR gold] - Proveedor Habitual (por defecto Todos):[/COLOR]' + ' [COLOR cyan][B]' + provider + '[/B][/COLOR][CR]'
 
     if config.get_setting('proxies_list', default=False):
         path = os.path.join(config.get_data_path(), 'Lista-proxies.txt')
@@ -2929,7 +2973,7 @@ def show_prx_parameters(item):
     if config.get_setting('proxies_auto', default=True): txt += '[CR]    - [COLOR cyan][B] Activado[/B][/COLOR][CR]'
     else: txt += '[CR]    - [COLOR cyan][B] Des-Activado[/B][/COLOR][CR]'
 
-    txt += '[CR][COLOR gold] - Límite Máximo Total de proxies para Analizar:[/COLOR]' + ' [COLOR cyan][B]' + str(config.get_setting('proxies_totales_limit')) + '[/B][/COLOR]'
+    txt += '[CR][COLOR gold] - Límite Máximo Total de proxies para Analizar (por defecto 500):[/COLOR]' + ' [COLOR cyan][B]' + str(config.get_setting('proxies_totales_limit')) + '[/B][/COLOR]'
 
     txt += '[CR][COLOR gold] - Si se encontraron Suficientes proxies válidos dejar de buscar más:[/COLOR]'
 
@@ -2941,7 +2985,7 @@ def show_prx_parameters(item):
     if config.get_setting('proxies_validos', default=True): txt += ' [COLOR cyan][B] Activado[/B][/COLOR]'
     else: txt += ' [COLOR cyan][B] Des-Activado[/B][/COLOR]'
 
-    txt += '[CR][COLOR gold] - Cantidad Máxima de proxies válidos:[/COLOR]' + ' [COLOR cyan][B]' + str(config.get_setting('proxies_memory')) + '[/B][/COLOR]'
+    txt += '[CR][COLOR gold] - Cantidad Máxima de proxies válidos (por defecto 5):[/COLOR]' + ' [COLOR cyan][B]' + str(config.get_setting('proxies_memory')) + '[/B][/COLOR]'
 
     txt += '[CR][COLOR gold] - Al gestionar los proxies Auto-Eliminar los NO válidos:[/COLOR]'
 
@@ -2957,7 +3001,7 @@ def show_prx_parameters(item):
 
     txt += '[CR][COLOR gold] - Gestionar Vías alternativas si no se obtubieron suficientes proxies a analizar:[/COLOR]'
 
-    if config.get_setting('proxies_vias', default=False): txt += ' [COLOR cyan][B] Activado  '  + str(config.get_setting('proxies_tplus')) + '[/B][/COLOR][CR]'
+    if config.get_setting('proxies_vias', default=False): txt += ' [COLOR cyan][B] Activado (por defecto 32)  '  + str(config.get_setting('proxies_tplus')) + '[/B][/COLOR][CR]'
     else: txt += ' [COLOR cyan][B] Des-Activado[/B][/COLOR][CR]'
 
     txt += '[CR][COLOR yellow][B]SOLICITUDES:[/B][/COLOR]'
@@ -3469,6 +3513,13 @@ def proxies_show_vias(item):
     txt += ' [COLOR cyan][B] 35 [COLOR yellow][B]MmanuGMG[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 36 [COLOR yellow][B]Rdavydov socks5[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 37 [COLOR yellow][B]Lamt3012[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 38 [COLOR yellow][B]Proxyfly http[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 39 [COLOR yellow][B]Proxyfly socks4[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 40 [COLOR yellow][B]Proxyfly socks5[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 41 [COLOR yellow][B]ErcinDedeoglu http[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 42 [COLOR yellow][B]ErcinDedeoglu https[COLOR lime]  recomendado[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 43 [COLOR yellow][B]ErcinDedeoglu socks4[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 44 [COLOR yellow][B]ErcinDedeoglu socks5[/B][/COLOR][CR]'
 
     platformtools.dialog_textviewer('Proveedores Vías Alternativas de proxies', txt)
 
@@ -4131,7 +4182,7 @@ def show_torrents_parameters(item):
            cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
            tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
 
-    txt += ' - Cliente/Motor Torrent ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR][CR]'
+    txt += ' - Cliente/Motor Torrent (por defecto Seleccionar)' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("script.elementum.burst")'):
         cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()

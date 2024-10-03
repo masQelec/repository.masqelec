@@ -365,7 +365,7 @@ def list_all(item):
                 epis = scrapertools.find_single_match(title, 'Cap(.*?)$').strip()
                 if not epis: epis = 1
 
-                title = title.replace('Cap ', '[COLOR goldenrod]Cap [/COLOR]')
+                title = title.replace('Cap ', '[COLOR goldenrod]Cap [/COLOR]').replace('Episode ', '[COLOR goldenrod]Episode [/COLOR]')
 
                 itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, qualities=qlty, languages=lang, fmt_sufijo=sufijo,
                                             contentType = 'episode', contentSerieName = SerieName, contentSeason = 1, contentEpisodeNumber=epis, infoLabels={'year': year} ))
@@ -538,7 +538,7 @@ def findvideos(item):
     for datos in players:
         ses += 1
 
-        _server = scrapertools.find_single_match(datos, "<span class='server'>(.*?)</span>")
+        _server = scrapertools.find_single_match(datos, "<<span class='server'>(.*?)</span>")
         if not _server: _server = scrapertools.find_single_match(datos, '<span class="server">(.*?)</span>')
 
         if not 'saidochesto' in _server: continue
@@ -608,7 +608,7 @@ def findvideos(item):
 
                 link_other = link_other.replace('www.', '').replace('.com', '').replace('.net', '').replace('.org', '').replace('.top', '').replace('.do', '')
                 link_other = link_other.replace('.co', '').replace('.cc', '').replace('.sh', '').replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '')
-                link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.ag', '').replace('.sx', '').replace('.online', '').replace('.lat', '')
+                link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.ag', '').replace('.sx', '').replace('.online', '').replace('.lat', '').replace('.link', '')
 
                 if servidor == 'various': other = servertools.corregir_other(link_other)
                 else:

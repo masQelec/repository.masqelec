@@ -352,10 +352,18 @@ def temporadas(item):
 
     matches = re.compile('data-season="(.*?)"', re.DOTALL).findall(data)
 
+    tot_seasons = len(matches)
+
     for numtempo in matches:
         if not numtempo: continue
-		
-        title = 'Temporada ' + numtempo
+
+        nro_tempo = numtempo
+
+        if tot_seasons >= 10:
+            if len(nro_tempo) == 1:
+                nro_tempo = '0' + nro_tempo
+
+        title = 'Temporada ' + nro_tempo
 
         if len(matches) == 1:
             if config.get_setting('channels_seasons', default=True):
@@ -372,8 +380,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return sorted(itemlist,key=lambda x: x.title)
-
-    return itemlist
 
 
 def episodios(item):

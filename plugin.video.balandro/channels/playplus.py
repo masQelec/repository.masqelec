@@ -456,6 +456,18 @@ def list_last(item):
 
             SerieName = SerieName.replace('  ', ' ')
 
+            SerieName = SerieName.replace('Https:playdede.ws/episode/', '')
+
+            if "/" in SerieName: SerieName = SerieName.split("/")[0]
+
+            if str(epis).startswith("0"):
+                episodio = str(epis).replace('0', '')
+                SerieName = SerieName.replace(str(season) + 'x' + str(episodio), '')
+            else:
+                SerieName = SerieName.replace(str(season) + 'x' + str(epis), '')
+
+            SerieName = SerieName.strip()
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
@@ -643,6 +655,9 @@ def findvideos(item):
 
         if server == 'powvideo': continue
         elif server == 'streamplay': continue
+        elif server == 'fsapi': continue
+        elif server == '2embed': continue
+        elif server == 'tomatomatela': continue
 
         elif 'premiun' in server: continue
 
@@ -742,6 +757,9 @@ def findvideos(item):
 
         if server == 'powvideo': continue
         elif server == 'streamplay': continue
+        elif server == 'fsapi': continue
+        elif server == '2embed': continue
+        elif server == 'tomatomatela': continue
 
         if lang.lower() == 'espsub': lang = 'Vose'
 

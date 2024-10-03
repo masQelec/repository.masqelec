@@ -49,24 +49,23 @@ except:
 
 
 dominios = [
+         'https://hdfull.blog/',
+         'https://hd-full.info/',
          'https://hd-full.sbs/',
          'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
-         'https://hd-full.in/',
          'https://hd-full.one/',
          'https://hd-full.co/',
-         'https://hdfull.icu/',
          'https://hdfull.quest/',
-         'https://hdfull.link/'
+         'https://hdfull.link/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://hd-full.biz/',
-         'https://hd-full.im/',
          'https://new.hdfull.one/'
          ]
 
@@ -81,7 +80,8 @@ ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
              'https://hdfull.top/', 'https://hdfull.vip/', 'https://hdfull.wtf/',
              'https://hdfull.gdn/', 'https://hdfull.cloud/', 'https://hdfull.video/',
              'https://hdfull.work/', 'https://hdfull.life/', 'https://hdfull.digital/',
-             'https://hdfull.store/']
+             'https://hdfull.store/', 'https://hd-full.in/', 'https://hdfull.icu/',
+             'https://hd-full.im/']
 
 
 if host in str(ant_hosts): config.set_setting('dominio', dominios[0], 'hdfull')

@@ -56,7 +56,7 @@ def canales(item):
     for thumb, url, title in matches:
          url = host[:-1] + url
 
-         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'orange' ))
+         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'violet' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)" class="btn-pagination">Siguiente')
@@ -85,7 +85,7 @@ def categorias(item):
 
          url = host[:-1] + url
 
-         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='tan' ))
+         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -101,16 +101,13 @@ def pornstars(item):
     patron += '<a href="([^"]+)".*?'
     patron += 'data-src="(.*?)".*?'
     patron += '<h4><a href="[^"]+">([^<]+)</a></h4>.*?'
-    patron += '<a class="total-videos".*?>([^<]+)</a>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    for url, thumb, title, videos in matches:
+    for url, thumb, title in matches:
          url = host[:-1] + url
 
-         titulo = '[COLOR moccasin]%s[/COLOR] (%s)' % (title, videos.replace('vídeos', '').strip())
-
-         itemlist.append(item.clone (action='list_all', title=titulo, url=url, thumbnail=thumb ))
+         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='orange' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)" class="btn-pagination">Siguiente')

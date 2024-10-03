@@ -68,7 +68,7 @@ def categorias(item):
 
         title = title.capitalize()
 
-        itemlist.append(item.clone (action='list_list', title=title, url=url, text_color='tan' ))
+        itemlist.append(item.clone (action='list_list', title=title, url=url, text_color='moccasin' ))
     
     return sorted(itemlist,key=lambda x: x.title)
 

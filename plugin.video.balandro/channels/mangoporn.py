@@ -63,6 +63,9 @@ def categorias(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
+    if item.group == 'canales': text_color = 'violet'
+    else: text_color = 'moccasin'
+
     if item.group == 'canales': data = scrapertools.find_single_match(data, '>Studios<(.*?)</ul>')
     else: data = scrapertools.find_single_match(data, '>Genres<(.*?)</ul>')
 
@@ -71,7 +74,9 @@ def categorias(item):
     for url, title in matches:
         title = title.replace('&#038;', '&').strip()
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'orange' ))
+        if 'http:' in url: url = url.replace('http:', 'https:')
+
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color=text_color ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -83,7 +88,7 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1973, -1):
+    for x in range(current_year, 1999, -1):
         url = host + 'year/' + str(x)
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color='orange' ))
@@ -105,7 +110,11 @@ def list_all(item):
 
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
+        if '?php' in title: title = scrapertools.find_single_match(match, '<h3>.*?">(.*?)</a>')
+
         if not url or not title: continue
+
+        title = title.replace('Porn Online Free', '').strip()
 
         title = title.replace('&#8211;', '').replace('&#038;', '&').replace('&#8217;', "'").replace('&#8230;', '').strip()
 

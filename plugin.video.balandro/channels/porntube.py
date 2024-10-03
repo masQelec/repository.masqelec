@@ -85,7 +85,7 @@ def canales(item):
 
         url = host + 'channels/%s?hl=es' % can['slug']
 
-        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all', text_color = 'orange' ))
+        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all', text_color = 'violet' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -110,7 +110,7 @@ def categorias(item):
 
         url = host + 'tags/%s?hl=es' % cat['slug']
 
-        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all', text_color='tan' ))
+        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all', text_color='moccasin' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -132,7 +132,7 @@ def pornstars(item):
 
         url = host + 'pornstars/%s?hl=es' % pns['slug']
 
-        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all', text_color='moccasin' ))
+        itemlist.append(item.clone( title = title, thumbnail = thumb, url = url, action ='list_all', text_color='orange' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -204,7 +204,9 @@ def get_embed(item, itemlist):
         link = '+'.join([str(e['height']) for e in result['video']['encodings']])
 
         thumb = result['video']['masterThumb']
-        title = (item.title + ' [HD]') if result['video']['isHD'] else item.title
+
+        title = item.title
+
         url = 'https://tkn.porntube.com/%s/desktop/%s' % (result['video']['mediaId'], link)
 
         itemlist.append(item.clone( url = url, title = title, thumbnail = thumb ))

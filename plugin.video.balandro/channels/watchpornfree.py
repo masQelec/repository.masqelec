@@ -54,9 +54,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'category/featured/', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host, text_color = 'deepskyblue' ))
-
     itemlist.append(item.clone( title = 'Parodias', action = 'list_all', url = host + 'category/parodies/' ))
+
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host, text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Por estudio', action = 'categorias', url = host, group = 'estudios' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host, group = 'categorias'))
@@ -73,19 +73,18 @@ def categorias(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
+    if item.group == 'estudios': text_color = 'violet'
+    else: text_color = 'moccasin'
+
     if item.group == 'estudios':
         data = scrapertools.find_single_match(data, 'Studios</a>(.*?)</ul>')
     else:
         data = scrapertools.find_single_match(data, '>Categories</div>(.*?)</ul>')
-
+        
     matches = re.compile('href="([^"]+)".*?>([^"]+)</a></li>', re.DOTALL).findall(data)
 
     for url, title in matches:
-        if item.group == 'categorias':
-            if title == 'Parodies': continue
-            elif title == 'Porn Movies': continue
-
-        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'orange' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color=text_color ))
 
     if item.group == 'estudios':
         return sorted(itemlist, key=lambda x: x.title)
@@ -100,7 +99,7 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1971, -1):
+    for x in range(current_year, 1999, -1):
         url = host + 'release-year/' + str(x)
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color='orange' ))

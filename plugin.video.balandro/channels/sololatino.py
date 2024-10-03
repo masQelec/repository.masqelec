@@ -190,7 +190,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8230;', '').replace('&#8217;', "'").strip()
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;', "'").strip()
 
         thumb = scrapertools.find_single_match(match, '<data-srcset="(.*?)"')
 
@@ -381,6 +381,7 @@ def findvideos(item):
 
         for link in links:
             url = scrapertools.find_single_match(str(link), "'(.*?)'")
+            if not url: url = scrapertools.find_single_match(str(link), '"(.*?)"')
 
             if not url: continue
 

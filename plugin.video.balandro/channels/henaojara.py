@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://wvw.henaojara.com/'
+host = 'https://www.henaojara.com/'
 
 
 _players = ['.henaojara.']
@@ -52,7 +52,7 @@ _players = ['.henaojara.']
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://henaojara.com/', 'https://henaojara2.com/', 'https://www1.henaojara.com/',
-             'https://www.henaojara.com/']
+             'https://wvw.henaojara.com/']
 
 
 domain = config.get_setting('dominio', 'henaojara', default='')

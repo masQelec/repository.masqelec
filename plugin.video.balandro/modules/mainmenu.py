@@ -560,8 +560,6 @@ def mainlist(item):
     try: last_ver = updater.check_addon_version()
     except: last_ver = None
 
-    logger.info("check-00-last_ver: %s" % last_ver)
-
     if last_ver is None: last_ver = '[B][I][COLOR gray](fixes off)[/COLOR][/I][/B]'
     elif not last_ver:
         last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver

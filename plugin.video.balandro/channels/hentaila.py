@@ -56,7 +56,7 @@ def categorias(item):
     for genre, title in matches:
         url = host[:-1] + genre
 
-        itemlist.append(item.clone( action = 'list_all', url = url, title = title, text_color='orange' ))
+        itemlist.append(item.clone( action = 'list_all', url = url, title = title, text_color='moccasin' ))
 
     return sorted(itemlist, key=lambda i: i.title)
 

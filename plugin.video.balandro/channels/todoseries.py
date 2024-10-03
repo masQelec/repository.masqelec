@@ -138,7 +138,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(article, 'data-lazy-src="(.*?)"')
 
-        title = title.replace('&#8217;s', "'s").replace('&#8211;', '').strip()
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         year = '-'
 
@@ -432,7 +432,7 @@ def list_search(item):
         if year: title = title.replace('(' + year + ')' , '').strip()
         else: year ='-'
 
-        title = title.replace('&#8217;s', "'s").replace('&#8211;', '').strip()
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         tipo = 'tvshow' if '/series/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo

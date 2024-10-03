@@ -3,7 +3,7 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Amdahost,  Allviid,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohh,  Oneupload,  Pandafiles,  Rovideo,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  Tusfiles,  Updown,  Uploadbaz,  Uploadflix,  Uploady,  Veev,  Veoh,  Vidbob,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vipss,  Vkprime,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Amdahost,  Allviid,  Asian,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohh,  Oneupload,  Pandafiles,  Rovideo,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  SwiftLoad,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploady,  Veev,  Veoh,  Videa,  Vidbob,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vipss,  Vkprime,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -34,6 +34,10 @@
       },
       {
         "pattern": "https://dembed2.(?:com|net|pro)/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://asianplay.(?:net|pro)/([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
@@ -186,6 +190,22 @@
       },
       {
         "pattern": "https://updown.(?:sbs|icu|cam)/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://videa.hu/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://videakid.hu/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://swiftload.io/(?:d|e|v)/([0-9a-zA-Z]+)",
+        "url": "https://swiftload.io/v/\\1"
+      },
+      {
+        "pattern": "https://udrop.com/([0-9a-zA-Z]+)",
         "url": "\\1"
       }
     ]

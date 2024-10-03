@@ -207,7 +207,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/series', search_type = 'tvshow', tipo = 'index', pagina = 1 ))
 
-    itemlist.append(item.clone( title = 'Series con nuevos capítulos', action = 'list_all', url = host + '/series/tendencias', search_type = 'tvshow', pagina = 1, text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Series con nuevos capítulos', action = 'list_all', url = host + '/series/tendencias', search_type = 'tvshow', pagina = 1, text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Más Vistas', action = 'list_all', url = host + '/series/mas-vistas', search_type = 'tvshow', page = 0, pagina = 1 ))
 

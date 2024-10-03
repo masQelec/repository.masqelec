@@ -549,7 +549,7 @@ def findvideos(item):
                     servidor = 'directo'
                     other = 'plusvip'
 
-                if 'plustream' in link: other = 'plustream'
+                if 'plustream' in link: continue
 
                 if servidor == 'various': other = servertools.corregir_other(link)
 
@@ -578,7 +578,7 @@ def findvideos(item):
 
             if link_other == '1fichier': continue
 
-            if 'plustream' in url: link_other = 'plustream'
+            elif 'plustream' in url: continue
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
 	                          language = IDIOMAS.get(lang, lang), other = link_other.capitalize() ))
@@ -612,6 +612,9 @@ def play(item):
     if servidor == 'directo':
         new_server = servertools.corregir_other(url).lower()
         if not new_server.startswith("http"): servidor = new_server
+
+        if '/plustream.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
     itemlist.append(item.clone( url = url, server = servidor ))
 

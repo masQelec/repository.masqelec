@@ -344,6 +344,8 @@ def findvideos(item):
 
         if not embed: continue
 
+        if '<script' in embed: continue
+
         embed = embed.replace('\\/', '/')
 
         url = embed

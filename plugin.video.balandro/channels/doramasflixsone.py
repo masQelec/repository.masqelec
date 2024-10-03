@@ -20,7 +20,10 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    resp = httptools.downloadpage(url, post=post, headers=headers)
+
+    if resp.sucess: data = resp.data
+    else: data = ''
 
     return data
 
@@ -156,15 +159,15 @@ def temporadas(item):
     itemlist = []
 
     if not item.cat:
-        title = 'Sin temporadas'
-
         if config.get_setting('channels_seasons', default=True):
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]' + title + '[/COLOR]')
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
 
     item.contentType = 'season'
 
     season = 1
-    if '-temporada-' in item.url: season = scrapertools.find_single_match(item.url, '-temporada-(.*?)/')
+    if '-temporada-' in item.url:
+        season = scrapertools.find_single_match(item.url, '-temporada-(.*?)-')
+        if not season: season = scrapertools.find_single_match(item.url, '-temporada-(.*?)/')
 
     item.contentSeason = season
     item.page = 0
@@ -172,6 +175,11 @@ def temporadas(item):
     title_ser = item.contentSerieName.replace("’s", 's').replace("'t", 't').replace(':', '').replace("'t", 't').replace('ñ', 'n').replace(' ', '-').lower()
 
     title_ser = title_ser.replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&amp;', '').replace('amp;', '').replace('quot;', '').strip()
+
+    if '-temporada-' in item.url: 
+        temporada = scrapertools.find_single_match(item.url, '-temporada-(.*?)-')
+        if temporada:
+            title_ser = title_ser + '-temporada-' + temporada
 
     url = host + 'category/' + title_ser + '/'
 
@@ -197,6 +205,8 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
+
+    if not data: return itemlist
 
     hay_match = False
 
@@ -303,11 +313,13 @@ def episodios(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
+        if not epis: epis = scrapertools.find_single_match(url, '-capitulo-(.*?)/')
+
         if not epis: epis = 1
 
         titulo = title
 
-        if not 'Capitulo' in titulo:
+        if not 'capitulo' in titulo.lower():
             titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + titulo
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
@@ -323,14 +335,18 @@ def episodios(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
+        thumb = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'doramasflixsone.jpg')
+
         if len(matches) > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page= item.page + 1, perpage = item.perpage, text_color='coral' ))
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page= item.page + 1, perpage = item.perpage,
+                                        thumbnail=thumb, infoLabels={'year': '-'}, text_color = 'coral' ))
         else:
             next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
 
             if next_page:
                 if '/page/'in next_page:
-                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'episodios', page = 0, text_color = 'coral' ))
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'episodios', page = 0,
+                                                thumbnail=thumb, infoLabels={'year': '-'}, text_color = 'coral' ))
 
     return itemlist
 
@@ -360,6 +376,7 @@ def findvideos(item):
         url = url.replace('/7/', '/e/').replace('&#038;', '&')
 
         if '/boosterx.' in url: continue
+        elif '.mundodrama.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -383,7 +400,6 @@ def search(item, texto):
     logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
-        item.text = texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

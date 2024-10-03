@@ -167,7 +167,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_dir', url = host + 'directorio/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
 

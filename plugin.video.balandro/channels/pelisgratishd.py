@@ -179,8 +179,16 @@ def temporadas(item):
 
     matches = scrapertools.find_multiple_matches(data, '@click="tab = ' + "'season(.*?)'")
 
+    tot_seasons = len(matches)
+
     for nro_season in matches:
-        title = 'Temporada ' + nro_season
+        nro_tempo = nro_season
+
+        if tot_seasons >= 10:
+            if len(nro_season) == 1:
+                nro_tempo = '0' + nro_tempo
+
+        title = 'Temporada ' + nro_tempo
 
         if len(matches) == 1:
             if config.get_setting('channels_seasons', default=True):
@@ -196,7 +204,7 @@ def temporadas(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    return sorted(itemlist, key=lambda it: it.contentSeason)
+    return sorted(itemlist, key=lambda it: it.title)
 
 
 def episodios(item):

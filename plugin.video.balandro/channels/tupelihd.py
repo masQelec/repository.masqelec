@@ -13,6 +13,9 @@ host = 'https://www.pelitorrent.com/'
 _players = ['.pelitorrent.']
 
 
+perpage = 24
+
+
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.tupelihd.com/', 'https://senininternetin.com/', 'https://pelitorrent.xyz/',
              'https://pelitorrent.com/']
@@ -149,6 +152,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'estrenos', search_type = 'movie', text_color='cyan' ))
 
+    itemlist.append(item.clone( title = 'Cine clásico', action = 'list_all', url = host + 'peliculas/cine-clasico/', search_type = 'movie', text_color = 'moccasin' ))
+
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_mvi', url = host + 'wp-admin/admin-ajax.php', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
@@ -170,6 +177,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'torrents-series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'estrenos', search_type = 'tvshow', text_color='cyan' ))
+
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_mvi', url = host + 'wp-admin/admin-ajax.php', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -308,7 +317,8 @@ def list_all(item):
             if not item.search_type == 'all':
                if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages=IDIOMAS.get(lang, lang),
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        qualities=qlty, languages=IDIOMAS.get(lang, lang),
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
         if tipo == 'tvshow':
@@ -326,6 +336,71 @@ def list_all(item):
 
             if next_page:
                itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
+
+    return itemlist
+
+
+def list_mvi(item):
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+
+    if item.search_type == 'movie':
+        post = {'action': 'action_tr_movie_category', 'limit': '48', 'post': 'movies', 'cate': 'all', 'mode': '2'}
+    else:
+        post = {'action': 'action_tr_movie_category', 'limit': '48', 'post': 'series', 'cate': 'all', 'mode': '2'}
+
+    data = do_downloadpage(item.url, post = post)
+
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
+
+    num_matches = len(matches)
+
+    for article in matches[item.page * perpage:]:
+        url = scrapertools.find_single_match(article, ' href="(.*?)"')
+
+        title = scrapertools.find_single_match(article, '<div class="Title">(.*?)</div>')
+        if not title: title = scrapertools.find_single_match(article, '<h2 class=.*?>(.*?)</h2>')
+
+        if not url or not title: continue
+
+        title = title.replace('&#038;', '&')
+
+        tipo = 'tvshow' if '/series/' in url else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
+
+        year = scrapertools.find_single_match(article, '<span class="year">(\d+)</span>')
+        if not year: year = '-'
+
+        qlty_lang = scrapertools.find_single_match(article, '<span class="calidad">(.*?)</span')
+        if '|' in qlty_lang:
+            qlty = qlty_lang.split('|')[0].strip()
+            lang = qlty_lang.split('|')[1].strip()
+        else:
+            qlty = qlty_lang
+            lang = ''
+
+        if tipo == 'movie':
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                        qualities=qlty, languages=IDIOMAS.get(lang, lang),
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+
+        if tipo == 'tvshow':
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
+
+        if len(itemlist) >= perpage: break
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_mvi', text_color='coral' ))
 
     return itemlist
 
@@ -464,7 +539,8 @@ def puntuar_calidad(txt):
           '4kwebrip',
           '4kuhdmicro',
           '4kuhdrip',
-          '4kuhdremux'
+          '4kuhdremux',
+          'webdl'
           ]
 
     if txt not in orden: return 0

@@ -69,15 +69,16 @@ def categorias(item):
 
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|\\", "", data)
 
-    data = scrapertools.find_single_match(data, '<div class="menu-categories-tab"(.*?)<div class="menu-categories-tab"')
+    bloque = scrapertools.find_single_match(data, '<div class="menu-categories-tab"(.*?)<div class="menu-categories-tab"')
 
-    matches = re.compile('<a href="([^"]+)" class="[^"]+">([^<]+)<', re.DOTALL).findall(data)
+    matches = re.compile('<a href="([^"]+)" class="[^"]+">([^<]+)<', re.DOTALL).findall(bloque)
 
     for url, title in matches:
         title = title.strip()
+
         url = urlparse.urljoin(item.url, url)
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'tan' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

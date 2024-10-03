@@ -44,25 +44,6 @@ def mainlist_pelis(item):
     return itemlist
 
 
-def categorias(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(item.url)
-    data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
-
-    bloque = scrapertools.find_single_match(data, '</h1>(.*?)</main>')
-
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?">(.*?)</a>')
-
-    for url, title in matches:
-        title = title.capitalize()
-
-        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color='tan' ))
-
-    return itemlist
-
-
 def canales(item):
     logger.info()
     itemlist = []
@@ -83,7 +64,7 @@ def canales(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='orange' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='violet' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<li><a class="current">.*?<a href="(.*?)"')
@@ -91,6 +72,25 @@ def canales(item):
         if next_page:
             if '/page/' in next_page:
                 itemlist.append(item.clone (action='canales', title='Siguientes ...', url=next_page, text_color = 'coral') )
+
+    return itemlist
+
+
+def categorias(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
+
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)</main>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?">(.*?)</a>')
+
+    for url, title in matches:
+        title = title.capitalize()
+
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color='moccasin' ))
 
     return itemlist
 
@@ -115,7 +115,7 @@ def pornstars(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='orange' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<li><a class="current">.*?<a href="(.*?)"')

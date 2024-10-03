@@ -14,7 +14,10 @@ perpage = 30
 
 
 def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    resp = httptools.downloadpage(url, post=post, headers=headers)
+
+    if resp.sucess: data = resp.data
+    else: data = ''
 
     return data
 
@@ -91,7 +94,12 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
-    title_ser = item.contentSerieName.replace("’s", 's').replace("'t", 't').replace(':', '').replace("'t", 't').replace('ñ', 'n').replace(' ', '-').lower()
+    title_ser = item.contentSerieName.replace("’s", 's').replace("'t", 't').replace(':', '').replace("'t", 't').replace('ñ', 'n')
+
+    title_ser = title_ser.replace('Á', 'A').replace('É', 'E').replace('Í', 'I').replace('Ó', 'O').replace('Ú', 'U')
+    title_ser = title_ser.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace(' ', '-').lower()
+
+    title_ser = title_ser.replace('(', '').replace(')', '').strip()
 
     title_ser = title_ser.replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&amp;', '').replace('amp;', '').replace('quot;', '').strip()
 
@@ -170,22 +178,32 @@ def temporadas(item):
     itemlist = []
 
     if not item.cat:
-        title = 'Sin temporadas'
-
         if config.get_setting('channels_seasons', default=True):
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]' + title + '[/COLOR]')
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
 
     item.contentType = 'season'
 
     season = 1
-    if '-temporada-' in item.url: season = scrapertools.find_single_match(item.url, '-temporada-(.*?)/')
+    if '-temporada-' in item.url:
+        season = scrapertools.find_single_match(item.url, '-temporada-(.*?)-')
+        if not season: season = scrapertools.find_single_match(item.url, '-temporada-(.*?)/')
 
     item.contentSeason = season
     item.page = 0
 
-    title_ser = item.contentSerieName.replace("’s", 's').replace("'t", 't').replace(':', '').replace("'t", 't').replace('ñ', 'n').replace(' ', '-').lower()
+    title_ser = item.contentSerieName.replace("’s", 's').replace("'t", 't').replace(':', '').replace("'t", 't').replace('ñ', 'n')
+
+    title_ser = title_ser.replace('Á', 'A').replace('É', 'E').replace('Í', 'I').replace('Ó', 'O').replace('Ú', 'U')
+    title_ser = title_ser.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace(' ', '-').lower()
+
+    title_ser = title_ser.replace('(', '').replace(')', '').strip()
 
     title_ser = title_ser.replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&amp;', '').replace('amp;', '').replace('quot;', '').strip()
+
+    if '-temporada-' in item.url: 
+        temporada = scrapertools.find_single_match(item.url, '-temporada-(.*?)-')
+        if temporada:
+            title_ser = title_ser + '-temporada-' + temporada
 
     url = host + 'category/' + title_ser + '/'
 
@@ -212,6 +230,8 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
+    if not data: return itemlist
+
     hay_match = False
 
     match = scrapertools.find_single_match(data, '<link rel="canonical" href="(.*?)"')
@@ -231,7 +251,7 @@ def episodios(item):
             itemlist.append(item.clone( action='findvideos', url = match, title = item.title,
                                         contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
-        if '-episodul-' in match:
+        elif '-episodul-' in match:
             hay_match = True
 
             epis = scrapertools.find_single_match(match, '-episodul-(.*?)-')
@@ -254,7 +274,7 @@ def episodios(item):
                 if not matches:
                     return itemlist
 
-            if '-episodul-' in item.url:
+            elif '-episodul-' in item.url:
                 epis = scrapertools.find_single_match(item.url, '-episodul-(.*?)-')
                 if not epis: epis = 1
 
@@ -324,7 +344,12 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
-    title_ser = item.contentSerieName.replace("’s", 's').replace("'t", 't').replace(':', '').replace("'t", 't').replace('ñ', 'n').replace(' ', '-').lower()
+    title_ser = item.contentSerieName.replace("’s", 's').replace("'t", 't').replace(':', '').replace("'t", 't').replace('ñ', 'n')
+
+    title_ser = title_ser.replace('Á', 'A').replace('É', 'E').replace('Í', 'I').replace('Ó', 'O').replace('Ú', 'U')
+    title_ser = title_ser.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace(' ', '-').lower()
+
+    title_ser = title_ser.replace('(', '').replace(')', '').strip()
 
     title_ser = title_ser.replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&amp;', '').replace('amp;', '').replace('quot;', '').strip()
 
@@ -337,18 +362,23 @@ def episodios(item):
 
         if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
+        if not title: continue
+
         title = title.replace('&#8211;', '').strip()
 
         thumb = scrapertools.find_single_match(match, 'data-lazy-srcset="(.*?)"')
 
         epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
+        if not epis: epis = scrapertools.find_single_match(url, '-capitulo-(.*?)/')
+
         if not epis: epis = scrapertools.find_single_match(url, '-episodul-(.*?)-')
+        if not epis: epis = scrapertools.find_single_match(url, '-episodul-(.*?)/')
 
         if not epis: epis = 1
 
         titulo = title
 
-        if not 'Capitulo' in titulo:
+        if not 'capitulo' in titulo.lower():
             titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + titulo
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
@@ -430,6 +460,8 @@ def findvideos(item):
 
         if url.startswith("//"): url = 'https:' + url
 
+        if '/videoembed//' in url: url = url.replace('/videoembed//', '/videoembed/')
+
         url = url.replace('/7/', '/e/').replace('&#038;', '&')
 
         servidor = servertools.get_server_from_url(url)
@@ -454,7 +486,6 @@ def search(item, texto):
     logger.info()
     try:
         item.url = host + '?s=' + texto.replace(" ", "+")
-        item.text = texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

@@ -114,7 +114,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista-donghuas', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Nuevos capítulos', action = 'list_all', url = host + 'lista-episodios', group = 'last_epis', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'lista-episodios', group = 'last_epis', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'En emision', action = 'list_all', url = host + 'lista-donghuas-emision', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'lista-donghuas-finalizados', search_type = 'tvshow' ))

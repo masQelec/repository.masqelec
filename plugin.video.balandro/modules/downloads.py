@@ -262,8 +262,10 @@ def save_download(item):
 
                         elif isinstance(itemlist_play, basestring):
                             ok_play = False
-                            dialog_ok(config.__addon_name, itemlist_play)
-
+                            if notification_d_ok:
+                                platformtools.dialog_ok(config.__addon_name, itemlist_play)
+                            else:
+                                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No se pudo descargar[/COLOR][/B]' % color_exec)
                         else:
                             ok_play = False
                             if notification_d_ok:

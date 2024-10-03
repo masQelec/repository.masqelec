@@ -524,6 +524,8 @@ def findvideos(item):
         elif srv == 'ok':
           if '.fireload.com/' in url: continue
 
+          elif '/1cloudfile.' in url: srv = ''
+
           elif '/mega.nz/' in url: srv = 'mega'
 
         if not srv: srv = servertools.get_server_from_url(url)

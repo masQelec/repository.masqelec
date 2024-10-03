@@ -220,6 +220,8 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)" title="(.*?)">.*?</a>')
 
     for url, tit in matches:
+        if not tit: continue
+
         url = host[:-1] + url + '?page='
 
         itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = 'deepskyblue' ))
@@ -465,6 +467,7 @@ def findvideos(item):
 
             if '/clonamesta.' in url: continue
             elif '/hydrax.' in url: continue
+            elif '/epicdev.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)

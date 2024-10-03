@@ -9,6 +9,8 @@ from core import httptools, scrapertools, servertools, tmdb
 from lib import decrypters
 
 
+# ~ series proximamente  29/8/24
+
 host = 'https://allcalidad.re/'
 
 

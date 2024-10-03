@@ -162,8 +162,6 @@ def list_all(item):
         if item.group == 'last':
             if "Capitulo" in SerieName: SerieName = SerieName.split("Capitulo")[0]
 
-            SerieName = title.strip()
-
             season = scrapertools.find_single_match(url, '-temporada-(.*?)$')
             if not season: season = 1
 

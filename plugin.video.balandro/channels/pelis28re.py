@@ -186,6 +186,8 @@ def list_all(item):
 
         title = title.replace('&#8217;', "'").replace('&#8211;', '').strip()
 
+        title = title.replace('Animeonline', '').replace('Veranimeonline', '').strip()
+
         title = title.replace('Ver ', '').replace('ver ', '').replace(' Online', '').replace(' online', '').replace(' Serie', '').replace(' serie', '').strip()
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
@@ -385,8 +387,65 @@ def findvideos(item):
                 if '.novercine.' in lnk: continue
                 elif '.cuevana3.' in lnk: continue
                 elif '-ukr-' in lnk: continue
+                elif '/plustream.' in lnk: continue
 
                 other = ''
+
+                if '/saidochesto.' in lnk:
+                    data4 = do_downloadpage(lnk)
+
+                    options = scrapertools.find_multiple_matches(data4, '<li onclick="go_to_player(.*?)</li>')
+
+                    for option in options:
+                        ses += 1
+
+                        if 'data-lang="2"' in option: lang = 'Vose'
+                        elif 'data-lang="0"' in option: lang = 'Lat'
+                        elif 'data-lang="1"' in option: lang = 'Esp'
+                        else: lang = '?'
+
+                        url = scrapertools.find_single_match(str(option), "'(.*?)'")
+
+                        if not url: continue
+
+                        if '.novercine.' in url: continue
+                        elif '.cuevana3.' in url: continue
+                        elif '-ukr-' in url: continue
+                        elif '/plustream.' in url: continue
+
+                        elif '/1fichier.' in url: continue
+                        elif '/short.' in url: continue
+
+                        elif '/filemooon.' in url: continue
+
+                        other = ''
+
+                        if 'netu' in url or 'waaw' in url or 'hqq' in url:
+                            video = scrapertools.find_single_match(url, '/e/(.*?)$').strip()
+                            if video: url = 'https://waaw.to/watch_video.php?v=' + video
+
+                        servidor = servertools.get_server_from_url(url)
+                        servidor = servertools.corregir_servidor(servidor)
+
+                        if servertools.is_server_available(servidor):
+                            if not servertools.is_server_enabled(servidor): continue
+                        else:
+                            if not config.get_setting('developer_mode', default=False): continue
+
+                        if servidor == 'directo':
+                            try:
+                               if '//' in url: other = url.split('//')[1]
+                               else: other = url.split('/')[1]
+
+                               other = other.split('/')[0]
+                            except:
+                               other = url
+
+                        if servidor == 'various': other = servertools.corregir_other(url)
+
+                        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
+
+                    continue
 
                 servidor = servertools.get_server_from_url(lnk)
                 servidor = servertools.corregir_servidor(servidor)
@@ -416,8 +475,15 @@ def findvideos(item):
                 if '.novercine.' in lnk: continue
                 elif '.cuevana3.' in lnk: continue
                 elif '-ukr-' in lnk: continue
+                elif '/plustream.' in lnk: continue
+
+                elif '/filemooon.' in lnk: continue
 
                 other = ''
+
+                if 'netu' in lnk or 'waaw' in lnk or 'hqq' in lnk:
+                    video = scrapertools.find_single_match(lnk, '/e/(.*?)$').strip()
+                    if video: lnk = 'https://waaw.to/watch_video.php?v=' + video
 
                 servidor = servertools.get_server_from_url(lnk)
                 servidor = servertools.corregir_servidor(servidor)
@@ -462,15 +528,23 @@ def findvideos(item):
 
                url = scrapertools.find_single_match(data1, '<a href="(.*?)"')
 
+            if not url: continue
+
             if '.novercine.' in url: continue
             elif '.cuevana3.' in url: continue
             elif '-ukr-' in url: continue
+            elif '/plustream.' in url: continue
 
-            if not url: continue
             elif '/1fichier.' in url: continue
             elif '/short.' in url: continue
 
+            if '/filemooon.' in url: continue
+
             other = ''
+
+            if 'netu' in url or 'waaw' in url or 'hqq' in url:
+                video = scrapertools.find_single_match(url, '/e/(.*?)$').strip()
+                if video: url = 'https://waaw.to/watch_video.php?v=' + video
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)

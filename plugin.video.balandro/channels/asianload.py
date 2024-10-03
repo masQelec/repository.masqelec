@@ -32,7 +32,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar dorama ...', action = 'search', search_type = 'tvshow', text_color='firebrick' ))
 
-    itemlist.append(item.clone( title = 'Episodios:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = '[B]Episodios:[/B]', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
 

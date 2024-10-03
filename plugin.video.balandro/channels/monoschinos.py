@@ -263,6 +263,7 @@ def list_all(item):
         if 'Season' in title: SerieName = title.split("Season")[0]
         if 'Castellano' in title: SerieName = title.split("Castellano")[0]
         if 'Latino' in title: SerieName = title.split("Latino")[0]
+        if 'Japonés' in title: SerieName = title.split("Japonés")[0]
 
         SerieName = SerieName.strip()
 
@@ -335,6 +336,7 @@ def last_epis(item):
         if 'Season' in title: SerieName = title.split("Season")[0]
         if 'Castellano' in title: SerieName = title.split("Castellano")[0]
         if 'Latino' in title: SerieName = title.split("Latino")[0]
+        if 'Japonés' in title: SerieName = title.split("Japonés")[0]
 
         SerieName = SerieName.strip()
 

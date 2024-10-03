@@ -281,7 +281,7 @@ def findvideos(item):
 
              other = srv
 
-             if other == 'plustream': servidor = 'directo'
+             if other == 'plustream': continue
 
              if servidor == srv: other = ''
              elif not servidor == 'directo':

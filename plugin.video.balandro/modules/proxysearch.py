@@ -55,24 +55,23 @@ if txt_status:
 
 
 dominioshdfull = [
+         'https://hdfull.blog/',
+         'https://hd-full.info/',
          'https://hd-full.sbs/',
          'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
-         'https://hd-full.in/',
          'https://hd-full.one/',
          'https://hd-full.co/',
-         'https://hdfull.icu/',
          'https://hdfull.quest/',
-         'https://hdfull.link/'
+         'https://hdfull.link/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://hd-full.biz/',
-         'https://hd-full.im/',
          'https://new.hdfull.one/'
          ]
 

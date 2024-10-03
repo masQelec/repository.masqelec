@@ -268,7 +268,7 @@ def list_all(item):
 
         if not title or not url: continue
 
-        title = title.replace('Ver', '').replace('ver', '').replace('Descargar', '').replace('descargar', '').replace('&#039;', "'").strip()
+        title = title.replace('Ver', '').replace('ver', '').replace('Descargar', '').replace('descargar', '').replace('&#039;', "'").replace('&amp;', '').strip()
 
         thumb = scrapertools.find_single_match(match, 'src="([^"]+)"')
 
@@ -429,6 +429,11 @@ def findvideos(item):
             if link:
                 title = title.lower().strip()
 
+                if title == 'dropapk': continue
+                elif title == '1fichier': continue
+                elif title == 'onedrive': continue
+                elif title == 'free': continue
+
                 servidor = servertools.corregir_servidor(title)
 
                 if title == 'googledrive': servidor = 'gvideo'
@@ -464,6 +469,8 @@ def findvideos(item):
 
             if srv == 'dropapk': continue
             elif srv == '1fichier': continue
+            elif srv == 'onedrive': continue
+            elif srv == 'free': continue
 
             if srv == 'googledrive': srv = 'gvideo'
 
@@ -510,6 +517,11 @@ def findvideos(item):
 
                 if url:
                     srv = srv.lower().strip()
+
+                    if srv == 'dropapk': continue
+                    elif srv == '1fichier': continue
+                    elif srv == 'onedrive': continue
+                    elif srv == 'free': continue
 
                     servidor = servertools.corregir_servidor(srv)
 

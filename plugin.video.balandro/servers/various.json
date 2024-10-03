@@ -265,6 +265,14 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://playerwish.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://(?:wish.com/)(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://krakenfiles.com/(?:view/|embed-video/)([0-9a-zA-Z]+)",
         "url": "https://krakenfiles.com/embed-video/\\1"
       },
@@ -554,6 +562,14 @@
       },
       {
         "pattern": "https://vidhidepre.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://vidhidepro.com/s/\\1"
+      },
+      {
+        "pattern": "https://stblion.xyz/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://vidhidepro.com/s/\\1"
+      },
+      {
+        "pattern": "https://vidhideplus.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://vidhidepro.com/s/\\1"
       },
       {

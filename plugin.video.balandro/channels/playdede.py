@@ -1036,6 +1036,8 @@ def list_all(item):
         if url.startswith('/'): url = host[:-1] + url
         elif not url.startswith('http'): url = host + url
 
+        if '/extraiptv.' in url: continue
+
         title = clean_title(title, url)
 
         if 'Tu directorio de' in title: continue
@@ -1133,6 +1135,8 @@ def list_last(item):
 
         if url.startswith('/'): url = host[:-1] + url
         elif not url.startswith('http'): url = host + url
+
+        if '/extraiptv.' in url: continue
 
         title = clean_title(title, url)
 

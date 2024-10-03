@@ -655,8 +655,9 @@ def normalize_other(url):
     elif 'streamwish' in url: link_other = 'Streamwish'
     elif 'filemoon' in url: link_other = 'Filemoon'
     elif 'filelions' in url: link_other = 'Filelions'
-    elif 'plustream' in url: link_other = 'Plustream'
-    elif 'vidhidepro' in url: link_other = 'Vidhidepro'
+    elif 'vidhide' in url: link_other = 'Vidhidepro'
+
+    elif 'plustream' in url: link_other = ''
 
     else:
        if config.get_setting('developer_mode', default=False):
@@ -866,9 +867,6 @@ def play(item):
     if url:
         if '/clonamesta' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
-
-        if '/plustream.' in url:
-            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
