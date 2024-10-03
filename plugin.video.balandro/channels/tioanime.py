@@ -92,7 +92,7 @@ def list_all(item):
 
     data = httptools.downloadpage(item.url).data
 
-    if item.group == 'last_epis': bloque = scrapertools.find_single_match(data, '(.*?)>Últimas Peliculas<')
+    if item.group == 'last_epis': bloque = scrapertools.find_single_match(data, '>Últimos Episodios<(.*?)>Últimas Peliculas<')
     else: bloque = data
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')

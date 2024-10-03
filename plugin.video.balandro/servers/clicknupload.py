@@ -52,6 +52,8 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
+    page_url = page_url.replace('.site', '.org')
+
     ini_page_url = page_url
 
     data = httptools.downloadpage(page_url).data

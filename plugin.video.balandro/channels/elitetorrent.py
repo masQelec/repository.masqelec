@@ -86,7 +86,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas-16-1/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host + 'estrenos/', search_type = 'movie', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host + 'estrenos-23/', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
@@ -106,10 +106,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-20-1/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host + 'estrenos/', search_type = 'tvshow', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host + 'estrenos-23/', search_type = 'tvshow', text_color='cyan' ))
 
     return itemlist
-
 
 
 def idiomas(item):

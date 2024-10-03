@@ -489,7 +489,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '128.0.6613.85')
+        config.set_setting('chrome_last_version', '129.0.6668.71')  # ~ 25/9/24
 
         config.set_setting('debug', '0')
 
@@ -500,6 +500,8 @@ def manto_params(item):
         config.set_setting('user_test_channel', '')
 
         config.set_setting('sin_resp', '')
+
+        config.set_setting('proxies_tplus_proces', '')
 
         manto_proxies(item)
 
@@ -1279,14 +1281,70 @@ def show_ubicacion(item):
         ficheros = glob.glob(path)
         ficheros.sort(key=os.path.getmtime, reverse=False)
 
-    txt = 'Carpeta de descargas (por defecto [COLOR chocolate][B].../addon_data.../downloads[/B][/COLOR])'
+    txt = '[COLOR goldenrod][B]UBICACIÓN DESCARGAS:[/B][/COLOR][CR]'
+
+    txt += 'Carpeta de descargas (por defecto [COLOR chocolate][B].../addon_data.../downloads[/B][/COLOR])'
 
     if not ficheros: txt += '[CR][CR][COLOR yellow][B]Aún no tiene[/B][/COLOR][CR]'
     else: txt += '[CR][CR][COLOR cyan][B]Hay descargas[/B][/COLOR][CR]'
 
     txt += '[CR]' + path.replace('*.json', '').replace('.json', '')
 
-    platformtools.dialog_textviewer('Ubicación de las Descargas', txt)
+    txt += '[CR][CR][COLOR goldenrod][B]AJUSTES DESCARGAS:[/B][/COLOR][CR]'
+
+    down_block = config.get_setting('block_size', default=1)
+
+    if down_block == 0: block = '128 KB'
+    elif down_block == 1: block = '256 KB'
+    elif down_block == 2: block = '512 KB'
+    elif down_block == 3: block = '1024 KB'
+    else: cache = '2048 KB'
+
+    txt += ' - [COLOR cyan]Tamaño por Bloque (por defecto 256 KB): [/COLOR][COLOR red][B]' + block + '[/B][/COLOR][CR]'
+
+    down_part = config.get_setting('part_size', default=1)
+
+    if down_part == 0: part = '1 MB'
+    elif down_part == 1: part = '2 MB'
+    elif down_part == 2: part = '4 MB'
+    elif down_part == 3: part = '8 MB'
+    elif down_part == 4: part = '16 MB'
+    else: part  = '32 MB'
+
+    txt += ' - [COLOR cyan]Tamaño por Parte (por defecto 2 MB): [/COLOR][COLOR red][B]' + part + '[/B][/COLOR][CR]'
+
+    down_connections = config.get_setting('max_connections', default=4)
+
+    if down_connections == 0: connections = '1'
+    elif down_connections == 1: connections = '2'
+    elif down_connections == 2: connections = '3'
+    elif down_connections == 3: connections = '4'
+    elif down_connections == 4: connections = '5'
+    elif down_connections == 5: connections = '6'
+    elif down_connections == 6: connections = '7'
+    elif down_connections == 7: connections = '8'
+    elif down_connections == 8: connections = '9'
+    else: connections  = '10'
+
+    txt += ' - [COLOR cyan]Número máximo de Conexiones Simultáneas (por defecto 5): [/COLOR][COLOR red][B]' + connections + '[/B][/COLOR][CR]'
+
+    down_buffer = config.get_setting('max_buffer', default=4)
+
+    if down_buffer == 0: buffer = '0'
+    elif down_buffer == 1: buffer = '2'
+    elif down_buffer == 2: buffer = '4'
+    elif down_buffer == 3: buffer = '6'
+    elif down_buffer == 4: buffer = '8'
+    elif down_buffer == 5: buffer = '10'
+    elif down_buffer == 6: buffer = '12'
+    elif down_buffer == 7: buffer = '14'
+    elif down_buffer == 8: buffer = '16'
+    elif down_buffer == 9: buffer = '18'
+    else: buffer = '20'
+
+    txt += ' - [COLOR cyan]Número máximo de Partes en Memoria (por defecto 10): [/COLOR][COLOR red][B]' + buffer + '[/B][/COLOR][CR]'
+
+    platformtools.dialog_textviewer('Ajustes de las Descargas', txt)
 
 
 def show_servers_alternatives(item):

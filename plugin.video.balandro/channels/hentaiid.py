@@ -38,7 +38,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Alta definición', action = 'list_all', url = host + 'archivos/high-definition/' ))
     itemlist.append(item.clone( title = 'Los mejores', action = 'list_all', url = host + 'archivos/ranking-hentai/' ))
 
-    itemlist.append(item.clone( title = 'Mangas H', action = 'list_all', url = host + 'archivos/m2/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Mangas H', action = 'list_all', url = host + 'archivos/m2/', text_color='pink' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
@@ -57,7 +57,7 @@ def categorias(item):
     matches = re.compile('href="([^"]+)"[^>]+>(.*?)</a>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
-        itemlist.append(item.clone( action = 'list_all', url = url, title = title, text_color='orange' ))
+        itemlist.append(item.clone( action = 'list_all', url = url, title = title, text_color='moccasin' ))
 
     return itemlist
 

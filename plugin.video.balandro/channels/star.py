@@ -353,6 +353,8 @@ def episodios(item):
         epis = scrapertools.find_single_match(title, 'Episodio(.*?)$').strip()
         if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
         if not epis: epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
+        if not epis: epis = scrapertools.find_single_match(title, 'capítulo(.*?)$').strip()
+        if not epis: epis = scrapertools.find_single_match(title, 'capitulo(.*?)$').strip()
 
         if not epis: epis = 1
 

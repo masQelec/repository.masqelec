@@ -114,24 +114,23 @@ timeout = config.get_setting('httptools_timeout', default=15)
 espera = config.get_setting('servers_waiting', default=6)
 
 dominioshdfull = [
+         'https://hdfull.blog/',
+         'https://hd-full.info/',
          'https://hd-full.sbs/',
          'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
-         'https://hd-full.in/',
          'https://hd-full.one/',
          'https://hd-full.co/',
-         'https://hdfull.icu/',
          'https://hdfull.quest/',
-         'https://hdfull.link/'
+         'https://hdfull.link/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://hd-full.biz/',
-         'https://hd-full.im/',
          'https://new.hdfull.one/'
          ]
 
@@ -1295,6 +1294,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
 
             elif '/cgi-sys/defaultwebpage.cgi' in str(response.data): txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
+            elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
 
             if new_web:
                 if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
@@ -1304,7 +1304,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web:
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web or host + 'es/inicio' in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1392,6 +1392,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                 if not 'Diagnosis:' in txt: txt += '[CR][CR][COLOR moccasin][B]Diagnosis:[/B][/COLOR]'
 
                 if '<title>Account Suspended</title>' in response.data: txt += '[CR]status: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
+                elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
                 elif 'The website is under maintenance' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
                 elif 'The server is temporarily busy' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
                 elif '/cgi-sys/defaultwebpage.cgi' in response.data: txt += txt_sorry
@@ -1416,7 +1417,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web:
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web or host + 'es/inicio' in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1479,14 +1480,16 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                 if '/cgi-sys/suspendedpage.cgi' in new_web: txt += txt_suspe
                 else:
                    if not '<title>Account Suspended</title>' in response.data:
-                       if not '>Hello world!<' in response.data: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
+                       if not '>This site is currently suspended<' in response.data:
+                           if not '>Hello world!<' in response.data: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
 
             if 'sorry:' in txt:
                 if not 'account:' in txt:
                     if '/cgi-sys/defaultwebpage.cgi' in response.data: txt += txt_suspe
                     else:
                        if not '<title>Account Suspended</title>' in response.data:
-                           if not '>Hello world!<' in response.data: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
+                           if not '>This site is currently suspended<' in response.data:
+                               if not '>Hello world!<' in response.data: txt += '[CR]account: [COLOR goldenrod][B]Podría estar en Mantenimiento[/B][/COLOR]'
 
             if not "'location': '/login'" in str(response.headers):
                 if not 'status:'in txt:
@@ -1503,7 +1506,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
             elif len(response.data) < 1000:
                  if not 'Sugerencias:' in txt:
-                     if '<title>Account Suspended</title>' in response.data or '>Hello world!<' in response.data: txt += '[CR]'
+                     if '<title>Account Suspended</title>' in response.data or '>This site is currently suspended<' in response.data or '>Hello world!<' in response.data: txt += '[CR]'
 
                      txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 

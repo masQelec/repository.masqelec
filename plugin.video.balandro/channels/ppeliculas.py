@@ -402,6 +402,7 @@ def temporadas(item):
 
     for numtempo in matches:
         nro_tempo = numtempo
+
         if tot_tempo >= 10:
             if int(numtempo) < 10: nro_tempo = '0' + numtempo
 
@@ -421,7 +422,7 @@ def temporadas(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    return itemlist
+    return sorted(itemlist,key=lambda x: x.title)
 
 
 def episodios(item):
@@ -626,6 +627,7 @@ def findvideos(item):
             if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
             elif 'dood' in _server: _server = 'doodstream'
             elif 'google' in _server or 'Google' in _server: _server = 'gvideo'
+            elif 'rutube' in _server: _server = 'various'
 
             other = corregir_servidor(_server)
 
@@ -738,7 +740,7 @@ def findvideos(item):
 
             elif servidor == 'filemoon': servidor = 'various'
             elif servidor == 'utorrent': servidor = 'torrent'
-
+	
             if url.startswith('https://player.pepeliculas.org/'): url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
 
             if lang == 'Latino': lang = 'Lat'

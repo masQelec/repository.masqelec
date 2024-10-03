@@ -48,7 +48,7 @@
         <setting id="show_prx_parameters" type="action" label="Preferencias [COLOR red][B]Proxies[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_prx_parameters)"/>
         <setting id="show_mnu_torrents" type="action" label="Preferencias [COLOR blue][B]Torrents[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_torrents_parameters)"/>
         <setting id="show_help_parameters" type="action" label="Preferencias [COLOR yellow][B]Buscar[/B][/COLOR]" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=search&action=show_help_parameters)"/>
-        <setting id="show_mnu_preferidos" type="action" label="Preferencias [COLOR wheat][B]Preferidos[/B][/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_menu_parameters)"/>
+        <setting id="show_mnu_preferidos" type="action" label="Preferencias [COLOR wheat][B]Preferidos[/B][/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_preferidos_parameters)"/>
         <setting id="show_mnu_descargas" type="action" label="Preferencias [COLOR seagreen][B]Descargas[/B][/COLOR]" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=show_ubicacion)"/>
         <setting id="show_sistema" type="action" label="Preferencias [COLOR teal][B]Sistema[/B][/COLOR]" visible="eq(-12,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=show_sistema)"/>
 
@@ -499,7 +499,7 @@
         <setting label="Información Torrents:" type="lsep"/>
 
         <setting id="sht_inf" type="bool" label="Opciones" default="false"/>
-        <setting id="show_mnu_torrents1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_menu_parameters)"/>
+        <setting id="show_mnu_torrents1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_torrents_parameters)"/>
         <setting id="show_help_torrents" type="action" label="[COLOR yellow][B]¿ Dónde Obtener los Add-Ons para Torrents ?[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_torrents)"/>
         <setting id="show_clients_torrent" type="action" label="Qué Clientes/Motores externos torrent están [COLOR goldenrod][B]Soportados[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_clients_torrent)"/>
 
@@ -607,7 +607,7 @@
         <setting label="Información Preferidos:" type="lsep"/>
 
         <setting id="pri_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="show_mnu_preferidos1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_menu_parameters)"/>
+        <setting id="show_mnu_preferidos1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_preferidos_parameters)"/>
         <setting id="show_help_tracking" type="action" label="[COLOR yellow][B]¿ Cómo Funciona ?[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_tracking)"/>
         <setting id="manto_preferidos" type="action" label="Pulsar para [COLOR red][B]Eliminar[/B][/COLOR] Todo el contenido de sus [COLOR wheat][B]Preferidos[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_tracking_dbs)"/>
 
@@ -658,7 +658,7 @@
         <setting label="Información Descargas:" type="lsep"/>
 
         <setting id="dei_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="show_mnu_descargas1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_menu_parameters)"/>
+        <setting id="show_mnu_descargas1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=show_ubicacion)"/>
         <setting id="show_help_descargas" type="action" label="[COLOR yellow][B]¿ Cómo Funcionan ?[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_descargas)"/>
         <setting id="show_help_usb" type="action" label="¿ Se puede Descargar directamente en una [COLOR goldenrod][B]Unidad USB[/B][/COLOR] ?" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_usb)"/>
         <setting id="show_not_download" type="action" label="[COLOR yellowgreen][B]¿ Qué NO está contemplado en las Descargas ?[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_not_download)"/>

@@ -106,10 +106,13 @@ def get_video_url(page_url, url_referer=''):
 
     matches = scrapertools.find_multiple_matches(data_m3u8, 'NAME="([^"]+)",PROGRESSIVE-URI="([^"]+)"')
 
-    for calidad, url in sorted(matches, key=lambda x: int(x[0])):
-        calidad = calidad.replace('@60','')
-        url = httptools.get_url_headers(url)
-        video_urls.append(["%sp  mp4" % calidad, url, 0, subtitle])
+    try:
+        for calidad, url in sorted(matches, key=lambda x: int(x[0])):
+            calidad = calidad.replace('@60','')
+            url = httptools.get_url_headers(url)
+            video_urls.append(["%sp  mp4" % calidad, url, 0, subtitle])
+    except:
+        pass
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):

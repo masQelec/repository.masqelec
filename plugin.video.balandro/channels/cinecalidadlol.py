@@ -232,7 +232,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = '[B]En castellano:[/B]', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'espana/?ref=es', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host + 'espana/?ref=es', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/?ref=es', search_type = 'movie' ))
@@ -243,7 +243,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie', group = '?ref=es' ))
     itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie', group = '?ref=es' ))
 
-    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = '[B]En latino:[/B]', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
@@ -265,15 +265,15 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = '[B]En castellano:[/B]', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/?ref=es', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - [COLOR greenyellow]Últimas[/COLOR]', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = ' - [COLOR moccasin]Últimas[/COLOR]', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow', group = '?ref=es' ))
 
-    itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = '[B]En latino:[/B]', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - [COLOR greenyellow]Últimas[/COLOR]', action = 'destacadas', url = host, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = ' - [COLOR moccasin]Últimas[/COLOR]', action = 'destacadas', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow' ))
 

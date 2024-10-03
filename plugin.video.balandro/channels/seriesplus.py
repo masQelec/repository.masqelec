@@ -230,7 +230,7 @@ def list_all(item):
 
         if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s")
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         titulo = title
 
@@ -566,6 +566,8 @@ def list_search(item):
         if '/movies/' in url: continue
 
         title = scrapertools.find_single_match(article, ' alt="(.*?)"')
+
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 

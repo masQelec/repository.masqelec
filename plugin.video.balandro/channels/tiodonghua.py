@@ -41,6 +41,7 @@ def configurar_proxies(item):
     from core import proxytools
     return proxytools.configurar_proxies_canal(item.channel, host)
 
+
 def do_downloadpage(url, post=None, headers=None):
     if not headers: headers = {'Referer': host}
 
@@ -182,6 +183,8 @@ def list_all(item):
         if not year: year = '-'
 
         SerieName = title
+
+        SerieName = SerieName.replace('Novela', '').strip()
 
         if 'Sub Español' in SerieName: SerieName = SerieName.split("Sub Español")[0]
         if 'Traducida al Español' in SerieName: SerieName = SerieName.split("Traducida al Español")[0]
@@ -395,17 +398,35 @@ def findvideos(item):
             data2 = do_downloadpage(url)
             matches2 = scrapertools.find_multiple_matches(data2, "go_to_player.*?'(.*?)'")
 
+            url_post = url
+
             for url in matches2:
                 ses += 1
 
+                new_url = ''
+
+                headers = {'Referer': url_post, 'Connection': 'keep-alive'}
+
+                if config.get_setting('channel_tiodonghua_proxies', default=''):
+                    resp = httptools.downloadpage_proxy('tiodonghua', url, headers = headers, follow_redirects=False, raise_weberror=False)
+                else:
+                    resp = httptools.downloadpage(url, headers = headers, follow_redirects=False, raise_weberror=False)
+
+                if 'location' in resp.headers:
+                    new_url = resp.headers['location']
+
+                if new_url: url = new_url
+
                 if '/terabox.' in url: continue
+                elif '/tioplayer.' in url: continue
                 elif '.tiodonghua.' in url: continue
 
                 if 'http:' in url: url = url.replace('http:', 'https:')
 
                 if not 'https:' in url: url = 'https:' + url
 
-                lang = '?'
+                if url.startswith("https://sb"): continue
+                elif 'fembed' in url or  'streamsb' in url or 'playersb' in url or 'fcom' in url: continue
 
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
@@ -419,17 +440,24 @@ def findvideos(item):
 
                 if servidor == 'various': other = servertools.corregir_other(url)
 
-                if servidor == other: other = ''
+                if servidor == other:
+                    if servidor == 'zures':
+                        other = url.split("/")[2]
+                        other = other.replace('https:', '').strip()
+
+                    else: other = ''
 
                 elif not servidor == 'directo':
-                   if not servidor == 'various': other = ''
+                    if not servidor == 'various': other = ''
 
                 if servidor == 'directo':
-                   if config.get_setting('developer_mode', default=False):
-                       other = url.split("/")[2]
-                       other = other.replace('https:', '').strip()
+                    if '/ok.ru' in url: servidor = 'okru'
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
+                    elif config.get_setting('developer_mode', default=False):
+                        other = url.split("/")[2]
+                        other = other.replace('https:', '').strip()
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vos', other = other ))
 
             continue
 
@@ -448,11 +476,15 @@ def findvideos(item):
         elif 'tioplayer.com' in url: continue
         elif 'likessb.com' in url: continue
         elif '.animefenix.' in url: continue
-        elif '.animefenix.' in url: continue
+        elif '.tiodonghua.' in url: continue
+        elif '/odysee.' in url: continue
 
         if 'http:' in url: url = url.replace('http:', 'https:')
 
         if not 'https:' in url: url = 'https:' + url
+
+        if url.startswith("https://sb"): continue
+        elif 'fembed' in url or  'streamsb' in url or 'playersb' in url or 'fcom' in url: continue
 
         if 'es.png' in match: lang = 'Esp'
         elif 'mx.png' in match: lang = 'Lat'
@@ -472,7 +504,11 @@ def findvideos(item):
 
         if servidor == 'various': other = servertools.corregir_other(url)
 
-        if servidor == other: other = ''
+        if servidor == other:
+            if servidor == 'zures':
+                other = url.split("/")[2]
+                other = other.replace('https:', '').strip()
+            else: other = ''
 
         elif not servidor == 'directo':
            if not servidor == 'various': other = ''
@@ -486,6 +522,9 @@ def findvideos(item):
 
     if '<strong>DL</strong>' in data:
         url = scrapertools.find_single_match(data, '<strong>DL</strong>.*?<a href="(.*?)"')
+
+        if url.startswith("https://sb"): url = ''
+        elif 'fembed' in url or  'streamsb' in url or 'playersb' in url or 'fcom' in url: url = ''
 
         if url:
             servidor = servertools.get_server_from_url(url)

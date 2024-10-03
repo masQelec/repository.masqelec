@@ -284,12 +284,15 @@ def findvideos(item):
     IDIOMAS = {'Latino': 'Lat', 'Castellano': 'Esp', 'Subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
-
+    
     matches = re.compile('<li data-video="(.*?)".*?<span>(.*?)</span>', re.DOTALL).findall(data)
+    if not matches: matches = re.compile('data-tr="(.*?)".*?<span>(.*?)</span>', re.DOTALL).findall(data)
 
     ses = 0
 
     for url, lang_srv in matches:
+        if not url: continue
+
         ses += 1
 
         lang = ''
@@ -346,6 +349,8 @@ def findvideos(item):
         if servidor == 'various':
             if new_server: other = servertools.corregir_other(new_server)
             else: other = servertools.corregir_other(url)
+
+        if lang == other.lower() or lang == servidor: lang = ''
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url,
                               server = servidor, language = IDIOMAS.get(lang, lang), other = other ))

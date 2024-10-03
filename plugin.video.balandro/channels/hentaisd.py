@@ -34,7 +34,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'hentai/sin-censura/' ))
 
-    itemlist.append(item.clone( title = 'Latino', action = 'list_list', url = host + 'hentai/generos/latino/' ))
+    itemlist.append(item.clone( title = 'Latino', action = 'list_list', url = host + 'hentai/generos/latino/', text_color = 'pink' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
@@ -57,7 +57,9 @@ def categorias(item):
 
         title = title.replace('&ntilde;', 'ñ')
 
-        itemlist.append(item.clone( action = 'list_list', url = url, title = title, text_color='orange' ))
+        title = title.capitalize()
+
+        itemlist.append(item.clone( action = 'list_list', url = url, title = title, text_color='moccasin' ))
 
     return sorted(itemlist, key=lambda i: i.title)
 
@@ -155,8 +157,11 @@ def findvideos(item):
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(url)
+
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vo' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vo', other = other ))
 
     return itemlist
 

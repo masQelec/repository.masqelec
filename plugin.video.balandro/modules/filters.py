@@ -494,8 +494,17 @@ def only_prefered(item):
         i =+ 1
 
     if i == 0:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales preferidos[/B][/COLOR]' % color_adver)
-        return
+        filtros = {'status': 1}
+        ch_list = channeltools.get_channels_list(filtros=filtros)
+
+        for ch in ch_list:
+            if not ch['status'] == 1: continue
+
+            i =+ 1
+
+        if i == 0:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales preferidos[/B][/COLOR]' % color_adver)
+            return
 
     for ch in ch_list:
         if not ch['status'] == 1: continue
@@ -695,6 +704,12 @@ def channels_status(item):
     if not str(seleccionados) == '[]':
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Canales Re-ajustados[/B][/COLOR]' % color_exec)
 
+        if not item._helper:
+            if item.des_rea:
+               platformtools.dialog_ok(config.__addon_name + ' - Canales Desactivados', '[COLOR yellow][B]Si efectuó alguna variación en sus Ajustes de Canales.[/COLOR][/B]', '[COLOR cyan][B]Recuerde, que para que los [COLOR gold]Cambios Surtan Efecto[/COLOR][COLOR cyan], deberá Abandonar el proceso de Ajustes e ingresar de nuevo en el.[/B][/COLOR]')
+            else:
+               platformtools.dialog_ok(config.__addon_name + ' - Canales Preferidos', '[COLOR yellow][B]Si efectuó alguna variación en sus Ajustes de Canales.[/COLOR][/B]', '[COLOR cyan][B]Recuerde, que para que los [COLOR gold]Cambios Surtan Efecto[/COLOR][COLOR cyan], deberá Abandonar el proceso de Ajustes e ingresar de nuevo en el.[/B][/COLOR]')
+
         platformtools.itemlist_refresh()
 
 
@@ -709,7 +724,8 @@ def channels_des_rea_make(ret, channels_ids):
 
         status = config.get_setting('status', channel_id)
 
-        if status is None: config.set_setting('status', -1, channel_id)
+        if str(status) == 'None':
+            config.set_setting('status', -1, channel_id)
         else:
             if status == -1: config.set_setting('status', 0, channel_id)
             elif str(status) == '0': config.set_setting('status', -1, channel_id)
@@ -729,7 +745,8 @@ def channels_preferidos_make(ret, channels_ids):
 
         status = config.get_setting('status', channel_id)
 
-        if status is None: config.set_setting('status', 1, channel_id)
+        if str(status) == 'None':
+            config.set_setting('status', 1, channel_id)
         else:
             if status == -1: config.set_setting('status', 1, channel_id)
             elif str(status) == '0': config.set_setting('status', 1, channel_id)

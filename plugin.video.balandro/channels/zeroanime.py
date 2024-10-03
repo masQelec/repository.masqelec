@@ -131,6 +131,9 @@ def list_all(item):
 
         if url.startswith("./"): url = host + url.replace('./', '/')
 
+        if '/ver-anime-en-animeflv-' in url: continue
+        elif '/anime-movil-' in url: continue
+
         lang = 'Vose'
         if 'q=Latino' in item.url: lang = 'Lat'
 
@@ -144,7 +147,7 @@ def list_all(item):
             if not '&p=' in item.url:
                 next_page = scrapertools.find_single_match(data, '<ul class="pagination d-inline-flex">.*?</a>.*?href="(.*?)"')
             else:
-                next_page = scrapertools.find_single_match(data, '<ul class="pagination d-inline-flex">.*?<li class="page-item active">.*?</a>*?ref="(.*?)"')
+                next_page = scrapertools.find_single_match(data, '<ul class="pagination d-inline-flex">.*?<li class="page-item active">.*?</a>.*?ref="(.*?)"')
 
             if next_page:
                 if '&p=' in next_page:
@@ -262,7 +265,7 @@ def episodios(item):
 
         if not epis: epis = 1
 
-        titulo = str(item.contentSeason) + 'x' + str(epis)
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epis ))
@@ -316,6 +319,19 @@ def play(item):
     resp = httptools.downloadpage(item.url, headers={'Referer': item.ref})
 
     url = scrapertools.find_single_match(str(resp.headers), "'refresh': '0; URL=(.*?)'")
+
+    if url.startswith("/drop.php?"):
+        url = host + url
+
+        data = do_downloadpage(url)
+
+        url = scrapertools.find_single_match(str(data), '"file":"(.*?)"')
+
+        if url:
+            if '/dropden.' in url:
+                itemlist.append(item.clone(url = url, server = 'directo'))
+
+                return itemlist
 
     if not 'http' in url: url = ''
 

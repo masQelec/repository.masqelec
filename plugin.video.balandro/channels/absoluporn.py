@@ -48,20 +48,16 @@ def categorias(item):
 
     data = do_downloadpage(item.url)
 
-    patron  = '&nbsp;<a href="([^"]+)" class="link1b">([^"]+)</a>&nbsp;<span class="text23">([^<]+)</span>'
+    matches = re.compile('&nbsp;<a href="([^"]+)" class="link1b">([^"]+)</a>', re.DOTALL).findall(data)
 
-    matches = re.compile(patron,re.DOTALL).findall(data)
-
-    for url, title, cantidad in matches:
-        titulo = '[COLOR orange]%s[/COLOR] %s' % (title, cantidad)
-
+    for url, title in matches:
         url = url.replace('..', '')
 
         url = url.replace('.html', '_date.html')
 
         url = host + url
 
-        itemlist.append(item.clone (action='list_all', title=titulo, url=url, text_color = 'tan' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

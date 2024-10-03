@@ -429,6 +429,8 @@ def episodios(item):
 
         title = title.replace('\\u00c9', 'E')
 
+        title = title.replace('\/', '').strip()
+
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
@@ -483,6 +485,8 @@ def findvideos(item):
         if url.startswith('/'): url = host[:-1] + url
 
         if not 'http' in url: continue
+
+        if '/pelisplus.upns.pro' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

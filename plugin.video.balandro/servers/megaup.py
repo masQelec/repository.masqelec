@@ -48,6 +48,9 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
+    if "File not found" in data:
+        return "Archivo inexistente ó eliminado"
+
     msg_error = scrapertools.find_single_match(data, "<li class='no-side-margin'>([^<]+)</li>")
 
     if "no longer available!" in msg_error:

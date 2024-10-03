@@ -684,7 +684,7 @@ def findvideos(item):
             elif enlace.startswith('https://video.ennovelas.net/'): enlace = enlace.replace('/video.ennovelas.net/', '/waaw.to/')
             elif enlace.startswith('https://reproductor.telenovelas-turcas.com.es/'): enlace = enlace.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
             elif enlace.startswith('https://novelas360.cyou/player/'): enlace = enlace.replace('/novelas360.cyou/player/', '/waaw.to/')
-            elif url.startswith('https://novelas360.cyou/'): url = url.replace('/novelas360.cyou/', '/waaw.to/')
+            elif enlace.startswith('https://novelas360.cyou/'): enlace = enlace.replace('/novelas360.cyou/', '/waaw.to/')
 
             enlace = enlace.replace('&amp;', '&')
 

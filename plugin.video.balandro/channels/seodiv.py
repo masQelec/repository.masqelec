@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://areliux.com/'
+host = 'https://seodiv.com/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://areliux.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     if '<title>Bot Verification</title>' in data:
@@ -29,11 +35,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'serie/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'anime/', search_type = 'tvshow', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Dibujos animados', action = 'list_all', url = host + 'dibujo/', search_type = 'tvshow', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Dibujos animados', action = 'list_all', url = host + 'animadas/', search_type = 'tvshow', text_color='moccasin' ))
 
     return itemlist
 

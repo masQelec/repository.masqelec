@@ -1340,17 +1340,18 @@ def test_all_webs(item):
                             rememorize = True
 
                 if 'invalid:' in str(txt):
-                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '¿ Desea comprobar el Canal de nuevo, [COLOR red][B]por Acceso sin Host Válido en los datos. [/B][/COLOR]?'):
-                        try: txt = tester.test_channel(ch['name'])
-                        except:
-                             platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                             tests_all_webs.append(ch['name'])
-                             continue
+                    if not 'Suspendida' in str(txt):
+                        if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '¿ Desea comprobar el Canal de nuevo, [COLOR red][B]por Acceso sin Host Válido en los datos. [/B][/COLOR]?'):
+                            try: txt = tester.test_channel(ch['name'])
+                            except:
+                                 platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
+                                 tests_all_webs.append(ch['name'])
+                                 continue
 
-                        if 'code: [COLOR springgreen][B]200' in str(txt):
-                            if 'invalid:' in str(txt):
-                                platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado el Acceso sin Host Válido en los datos.[/B][/COLOR]')
-                                tests_all_webs.append(ch['name'])
+                            if 'code: [COLOR springgreen][B]200' in str(txt):
+                                if 'invalid:' in str(txt):
+                                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado el Acceso sin Host Válido en los datos.[/B][/COLOR]')
+                                    tests_all_webs.append(ch['name'])
 
             elif 'Falso Positivo.' in str(txt):
                 platformtools.dialog_textviewer(ch['name'], txt)
@@ -1842,7 +1843,7 @@ def show_sistema(item):
 
     if config.get_setting('chrome_last_version', default=''): txt += '[CR][COLOR yellow][B] - Versión Chrome/Chromium: [/COLOR][COLOR cyan]' + config.get_setting('chrome_last_version') + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B] - Timeout [/B](tiempo máximo de espera en los Accesos)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B] - Timeout [/B](tiempo máximo de espera en los Accesos, por defecto 15)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
 
     txt += '[CR] - Confirmar con el Botón pulsar [OK] en ciertas Notificaciones: '
 
@@ -1854,9 +1855,9 @@ def show_sistema(item):
     if config.get_setting('notification_beep', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
     else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B] - Tiempo de espera en los Reintentos [/B](en el acceso a ciertos Canales)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B] - Tiempo de espera en los Reintentos [/B](en el acceso a ciertos Canales, por defecto 30)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B] - Tiempo de espera [/B](en el acceso a ciertos Servidores)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B] - Tiempo de espera [/B](en el acceso a ciertos Servidores, por defecto 6)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
 
     txt += '[CR][COLOR goldenrod][B]PREFERENCIAS NOTIFICACIONES CANALES:[/B][/COLOR][CR]'
 
@@ -1879,6 +1880,15 @@ def show_sistema(item):
 
     if config.get_setting('channels_charges', default=True): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
     else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR goldenrod][B]DEPURACIÓN:[/B][/COLOR][CR]'
+
+    loglevel = config.get_setting('debug', 0)
+    if loglevel == 0: tex_niv = 'Solo Errores'
+    elif loglevel == 1: tex_niv = 'Errores e Información'
+    else: tex_niv = 'Máxima Información'
+
+    txt += '[COLOR yellow][B] - Nivel de información del fichero [COLOR aqua][B]LOG[/B][/COLOR] (por defecto Error): [COLOR cyan][B]' + tex_niv + ' [/B][/COLOR][CR]'
 
     platformtools.dialog_textviewer('Información Ajustes del Sistema', txt)
 
@@ -2262,7 +2272,7 @@ def resumen_servidores(item):
     notsuported = 0
     outservice = 0
     alternatives = 0
-    aditionals = 39
+    aditionals = 40
     disponibles = 0
     pending = 0
 
@@ -2303,7 +2313,7 @@ def resumen_servidores(item):
     txt += '    ' + str(inactives) + '  [COLOR coral]Inactivos[/COLOR][CR]'
     txt += '    ' + str(notsuported) + '  [COLOR fuchsia]Sin Soporte[/COLOR][CR]'
 
-    if outservice > 0: txt += '      ' + str(outservice) + '  [COLOR red]Sin Servicio[/COLOR][CR]'
+    if outservice > 0: txt += '    ' + str(outservice) + '  [COLOR red]Sin Servicio[/COLOR][CR]'
 
     txt += '[CR]  ' + str(disponibles) + '  [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
 
@@ -2387,6 +2397,7 @@ def show_help_alternativas(item):
     txt += '   [COLOR yellow]Playtube[/COLOR][CR]'
     txt += '   [COLOR yellow]Racaty[/COLOR][CR]'
     txt += '   [COLOR yellow]Streamlare[/COLOR][CR]'
+    txt += '   [COLOR yellow]Streamvid[/COLOR][CR]'
     txt += '   [COLOR yellow]Uptobox[/COLOR][CR]'
     txt += '   [COLOR yellow]Userscloud[/COLOR][CR]'
     txt += '   [COLOR yellow]Various[/COLOR][CR]'

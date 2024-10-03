@@ -9,13 +9,13 @@ from core import httptools, scrapertools, servertools, tmdb
 
 # ~ 14/8/24 Peliculas solo hay 26
 
-host = 'https://wv5h.gnula.cc/'
+host = 'https://w-v5n.gnula.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/', 'https://w-ww.gnula.cc/',
              'https://ww-w.gnula.cc/', 'https://www1.gnula.cc/', 'https://w-w-w.gnula.cc/',
-             'https://wv5n.gnula.cc/']
+             'https://wv5n.gnula.cc/', 'https://wv5h.gnula.cc/', 'https://wv5l.gnula.cc/' ]
 
 
 domain = config.get_setting('dominio', 'gnula2h', default='')
@@ -270,7 +270,7 @@ def list_all(item):
 
         if '/ver-pelicula/' in url: continue
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s")
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -604,7 +604,7 @@ def list_search(item):
 
         title = scrapertools.find_single_match(article, ' alt="(.*?)"')
 
-        title = title.replace('&#8217;', '')
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 

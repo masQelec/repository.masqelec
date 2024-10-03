@@ -7,11 +7,11 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.veronline.in/'
+host = 'https://www.veronline.mov/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.veronline.sh/', 'https://www.veronline.cc/']
+ant_hosts = ['https://www.veronline.sh/', 'https://www.veronline.cc/', 'https://www.veronline.in/']
 
 domain = config.get_setting('dominio', 'veronline', default='')
 
@@ -193,9 +193,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<span>Veronline.in</span>(.*?)>mas vistas<')
+    bloque = scrapertools.find_single_match(data, '<span>Veronline.mov</span>(.*?)>mas vistas<')
 
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.in</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.mov</span>(.*?)>mas vistas<')
 
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline</span>(.*?)>mas vistas<')
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>Veronline</span>(.*?)>mas vistas<')

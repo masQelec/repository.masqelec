@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://doramasmp4.dev/'
+host = 'https://doramasmp4.se/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://doramasmp4.dev/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -122,7 +128,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8217;', "'")
+        title = title.replace('&#8217;', "'").replace('&#8220;', '').replace('&#8221;', '').strip()
 
         SerieName = title
 
@@ -355,11 +361,15 @@ def play(item):
     url = item.url.replace('&amp;', '&')
 
     if item.server == 'directo':
-        if '.mundodrama.' in url:
+        if '/fkplayer.xyz' in url:
+            return 'Servidor [COLOR plum]NO Soportado[/COLOR]'
+
+        elif '.mundodrama.' in url:
             data = do_downloadpage(url)
 
             url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
             if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
+
         else: url = ''
 
     if url:

@@ -219,8 +219,13 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
+            titulo = title
+
+            if "La Película" in titulo: titulo = titulo.split("La Película")[0]
+            if "La película" in title: titulo = titulo.split("La película")[0]
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
 
         if tipo == 'tvshow':
             if item.search_type != 'all':

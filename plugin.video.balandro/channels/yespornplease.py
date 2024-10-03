@@ -64,12 +64,12 @@ def canales(item):
     matches = re.compile('<a href="(.*?)">(.*?)</a>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
-        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'orange' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'violet' ))
 
     if itemlist:
-        itemlist.append(item.clone (action='list_all', title= 'BangBros', url = host + '/bangbros/', text_color = 'orange' ))
-        itemlist.append(item.clone (action='list_all', title= 'Brazzers', url = host + '/brazzers/', text_color = 'orange' ))
-        itemlist.append(item.clone (action='list_all', title= 'Reality Kings', url = host + '/reality-kings/', text_color = 'orange' ))
+        itemlist.append(item.clone (action='list_all', title= 'BangBros', url = host + '/bangbros/', text_color = 'violet' ))
+        itemlist.append(item.clone (action='list_all', title= 'Brazzers', url = host + '/brazzers/', text_color = 'violet' ))
+        itemlist.append(item.clone (action='list_all', title= 'RealityKings', url = host + '/reality-kings/', text_color = 'violet' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -87,7 +87,7 @@ def categorias(item):
     for url, thumb, title in matches:
         if title == 'All Videos': continue
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'tan' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'moccasin' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -110,9 +110,9 @@ def pornstars(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='orange' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -132,7 +132,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         time = scrapertools.find_single_match(match, '<p>(.*?)</p>')
 
@@ -169,6 +169,8 @@ def findvideos(item):
         if '//a.' in link: continue
 
         elif link == 'about:blank': continue
+
+        elif '/www.googletagmanager.' in link: continue
 
         if host in link:
             data2 = do_downloadpage(link)

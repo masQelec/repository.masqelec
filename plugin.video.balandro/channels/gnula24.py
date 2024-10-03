@@ -256,7 +256,7 @@ def list_all(item):
 
         if '/movies/' in url: continue
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s")
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         title = re.sub(r" \(.*?\)| \| .*", "", title)
 
@@ -599,7 +599,7 @@ def list_search(item):
 
         title = scrapertools.find_single_match(article, ' alt="(.*?)"')
 
-        title = title.replace('&#8217;', '')
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 

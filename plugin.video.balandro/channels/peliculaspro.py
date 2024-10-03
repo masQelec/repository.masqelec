@@ -307,8 +307,16 @@ def temporadas(item):
 
     temporadas = re.compile('<a data-post="(.*?)".*?data-season="(.*?)"', re.DOTALL).findall(data)
 
+    tot_seasons = len(temporadas)
+
     for dpost, tempo in temporadas:
-        title = 'Temporada ' + tempo
+        nro_tempo = tempo
+
+        if tot_seasons >= 10:
+            if len(nro_tempo) == 1:
+                nro_tempo = '0' + nro_tempo
+
+        title = 'Temporada ' + nro_tempo
 
         if len(temporadas) == 1:
             if config.get_setting('channels_seasons', default=True):
@@ -325,7 +333,7 @@ def temporadas(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    return sorted(itemlist, key=lambda x: x.contentSeason)
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def episodios(item):
@@ -402,15 +410,19 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Castellano': 'Esp', 'Latino': 'Lat', 'Sub Español': 'Vose'}
+    IDIOMAS = {'Castellano': 'Esp', 'Latino': 'Lat', 'Sub Español': 'Vose', 'Subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, 'id="options-(.*?)".*?<iframe .*?src="(.*?)"')
 
+    ses = 0
+
     i = 0
 
     for opt, url in matches:
+        ses += 1
+
         i += 1
 
         srv, lang = scrapertools.find_single_match(data, 'href="#options-' + str(opt)+ '">.*?<span class="server">(.*?)-(.*?)</span>')
@@ -428,11 +440,15 @@ def findvideos(item):
         other = ''
 
         if servidor:
+            if srv.startswith("sb"): continue
+            elif srv == 'vanfem': continue
+
             if srv == 'streamz': servidor = srv
             elif srv == 'doods': servidor = 'doodstream'
-            elif srv == 'streamtape': servidor = 'streamtape'
+            elif srv == 'streamtape' or srv == 'stapadblockuser': servidor = 'streamtape'
             elif srv == 'netu' or srv == 'hqq': servidor = 'waaw'
-            elif srv == 'd0o0d' or srv == 'do0od' or srv == 'd0000d' or srv == 'd000d': servidor = 'doodstream'
+            elif srv == 'd0o0d' or srv == 'do0od' or srv == 'd0000d' or srv == 'd000d' or srv == 'dood': servidor = 'doodstream'
+            elif srv == 'vidoza': servidor = 'vidoza'
 
             elif srv == 'streamcrypt':  other = srv + ' ' + str(i)
 
@@ -452,13 +468,14 @@ def findvideos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<span class="num">.*?</span>(.*?)</td>.*?<td>(.*?)</td>.*?<span>(.*?)</span>.*?href="(.*?)"')
 
     for srv, lang, qlty, url in matches:
-        i += 1
+        ses += 1
 
         srv = srv.lower().strip()
 
         if srv == '1fichier': continue
         elif srv == 'ver en': continue
         elif srv == 'drop': continue
+        elif srv == 'bit': continue
 
         idioma = IDIOMAS.get(lang, lang)
 
@@ -471,7 +488,7 @@ def findvideos(item):
            if not servidor == 'various': other = ''
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url,
-                              language = idioma, quality = qlty, other = other.capitalize() ))
+                              language = idioma, quality = qlty, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -524,7 +541,13 @@ def play(item):
             data = do_downloadpage(url)
             url = scrapertools.find_single_match(data, "window.open.*?'(.*?)'")
 
+    if '/peliculaspro.' in url: url = ''
+
+    elif url == '/blank.html': url = ''
+
     if url:
+        if url.startswith('https://pelisfree.site/'): url = url.replace('/pelisfree.site/', '/waaw.to/')
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

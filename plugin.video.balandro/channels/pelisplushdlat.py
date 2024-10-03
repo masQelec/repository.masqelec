@@ -507,6 +507,7 @@ def findvideos(item):
             link_other = scrapertools.find_single_match(data, '<a href="#option' + opt + '">(.*?)</a>')
 
             link_other = normalize_other(link_other)
+            if not link_other: continue
 
         if servidor == 'various': link_other = servertools.corregir_other(url)
 
@@ -534,7 +535,9 @@ def findvideos(item):
 
         link_other = ''
 
-        if servidor == 'directo': link_other = normalize_other(url)
+        if servidor == 'directo':
+            link_other = normalize_other(url)
+            if not link_other: continue
 
         if servidor == 'various': link_other = servertools.corregir_other(url)
 
@@ -552,7 +555,9 @@ def normalize_other(url):
     if 'pelisplus' in url: link_other = 'plus'
     elif 'damedamehoy' in url: link_other = 'dame'
     elif 'tomatomatela' in url: link_other = 'dame'
-    elif 'plustream' in url: link_other = 'plustream'
+
+    elif 'plustream' in url: link_other = ''
+
     else:
        if config.get_setting('developer_mode', default=False): link_other = url
        else: link_other = ''

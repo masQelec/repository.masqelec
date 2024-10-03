@@ -1,16 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True
-
-if PY3:
-    import urllib.parse as urlparse
-else:
-    import urlparse
-
-
 import re
 
 from platformcode import config, logger, platformtools
@@ -73,9 +62,9 @@ def canales(item):
 
         title = title.replace('&nbsp', '').replace('&ntilde;', 'ñ').strip()
 
-        url += '/videos/new/0'
+        url = host + 'channels' + url + '/videos/new/0'
 
-        itemlist.append(item.clone( action = 'list_canales', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail = thumb, text_color = 'orange' ))
+        itemlist.append(item.clone( action = 'list_canales', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail = thumb, text_color = 'violet' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a class="active".*?</a>.*?<a href="(.*?)"')
@@ -99,13 +88,16 @@ def list_canales(item):
         time = vid["d"]
         thumbnail =  vid["i"]
 
+        title = title.replace('&ntilde;', 'ñ')
+
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
         thumb = thumbnail.replace("\/", "/")
 
-        url = scrapertools.find_single_match(url, '/(\d+/[A-z0-9_-]+)')
-        url = "/video%s" % url
-        url = urlparse.urljoin(item.url,url)
+        id = url.split("/")
+        url = "/video.%s/a" % id[-2].replace('video.', '')
+
+        url = host[:-1] + url
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb ))
 
@@ -146,7 +138,7 @@ def categorias(item):
     for url, title in matches[desde:hasta]:
         titulo = title.capitalize()
 
-        itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url, title = titulo, text_color = 'tan' ))
+        itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url, title = titulo, text_color = 'moccasin' ))
 
     if itemlist:
         if num_matches > hasta:
@@ -167,9 +159,9 @@ def pornstars(item):
     for thumb, url, title in matches:
         title = title.replace('&ntilde;', 'ñ')
 
-        url += '/videos/new/0'
+        url = host[:-1] + url + '/videos/new/0'
 
-        itemlist.append(item.clone( action = 'list_stars', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail = thumb, text_color = 'moccasin' ))
+        itemlist.append(item.clone( action = 'list_stars', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail = thumb, text_color = 'orange' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a class="active".*?</a>.*?<a href="(.*?)"')
@@ -202,9 +194,10 @@ def list_stars(item):
 
         thumb = thumb.replace("\/", "/")
 
-        url = scrapertools.find_single_match(url, '/(\d+/[A-z0-9_-]+)')
-        url = "/video%s" % url
-        url = urlparse.urljoin(item.url,url)
+        id = url.split("/")
+        url = "/video.%s/a" % id[-2].replace('video.', '')
+
+        url = host[:-1] + url
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb ))
 
@@ -237,9 +230,9 @@ def modelos(item):
     for thumb, url, title in matches:
         title = title.replace('&ntilde;', 'ñ')
 
-        url += '/videos/new/0'
+        url = host[:-1] + url + '/videos/new/0'
 
-        itemlist.append(item.clone( action = 'list_models', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail = thumb, text_color = 'moccasin' ))
+        itemlist.append(item.clone( action = 'list_models', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail = thumb, text_color = 'pink' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a class="active".*?</a>.*?<a href="(.*?)"')
@@ -272,9 +265,10 @@ def list_models(item):
 
         thumb = thumb.replace("\/", "/")
 
-        url = scrapertools.find_single_match(url, '/(\d+/[A-z0-9_-]+)')
-        url = "/video%s" % url
-        url = urlparse.urljoin(item.url,url)
+        id = url.split("/")
+        url = "/video.%s/a" % id[-2].replace('video.', '')
+
+        url = host[:-1] + url
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb ))
 
@@ -307,9 +301,9 @@ def webcams(item):
     for thumb, url, title in matches:
         title = title.replace('&ntilde;', 'ñ')
 
-        url += '/videos/new/0'
+        url = host[:-1] + url + '/videos/new/0'
 
-        itemlist.append(item.clone( action = 'list_webcams', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail = thumb, text_color = 'moccasin' ))
+        itemlist.append(item.clone( action = 'list_webcams', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail = thumb, text_color = 'tan' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a class="active".*?</a>.*?<a href="(.*?)"')
@@ -342,9 +336,10 @@ def list_webcams(item):
 
         thumb = thumb.replace("\/", "/")
 
-        url = scrapertools.find_single_match(url, '/(\d+/[A-z0-9_-]+)')
-        url = "/video%s" % url
-        url = urlparse.urljoin(item.url,url)
+        id = url.split("/")
+        url = "/video.%s/a" % id[-2].replace('video.', '')
+
+        url = host[:-1] + url
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb ))
 
@@ -386,11 +381,13 @@ def list_all(item):
             title = title.replace('_', ' ').strip()
             title = title.capitalize()
 
-        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'e').replace('&oacute;', 'o').replace('&uacute;', 'u')
+        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'e').replace('&oacute;', 'o').replace('&uacute;', 'u').strip()
+        title = title.replace('Aaacute;', 'a').replace('&Eacute;', 'e').replace('&Iacute;', 'e').replace('&Oacute;', 'o').replace('&Uacute;', 'u').strip()
 
-        title = title.replace('&aacuate;', 'a').replace('&eacuate;', 'e').replace('&iacuate;', 'e').replace('&oacuate;', 'o').replace('&uacuate;', 'u')
+        title = title.replace('&aacuate;', 'a').replace('&eacuate;', 'e').replace('&iacuate;', 'e').replace('&oacuate;', 'o').replace('&uacuate;', 'u').strip()
+        title = title.replace('&Aacuate;', 'a').replace('&Eacuate;', 'e').replace('&Iacuate;', 'e').replace('&Oacuate;', 'o').replace('&Uacuate;', 'u').strip()
 
-        title = title.replace("&#039;", "'").replace('&quot;', '').replace('&iexcl;', '').replace('&ndash;', '').replace('&ntilde;', 'ñ').replace("&rsquo;", "'")
+        title = title.replace("&#039;", "'").replace('&quot;', '').replace('&iexcl;', '').replace('&ndash;', '').replace('&ntilde;', 'ñ').replace("&rsquo;", "'").replace("&iquest;", '').strip()
 
         itemlist.append(item.clone( action = 'findvideos', url = url if url.startswith('http') else host[:-1] + url,
                                     title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
@@ -425,7 +422,16 @@ def list_best(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
         title = scrapertools.find_single_match(match, '">(.*?)</a>')
+
+        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'e').replace('&oacute;', 'o').replace('&uacute;', 'u').strip()
+        title = title.replace('Aaacute;', 'a').replace('&Eacute;', 'e').replace('&Iacute;', 'e').replace('&Oacute;', 'o').replace('&Uacute;', 'u').strip()
+
+        title = title.replace('&aacuate;', 'a').replace('&eacuate;', 'e').replace('&iacuate;', 'e').replace('&oacuate;', 'o').replace('&uacuate;', 'u').strip()
+        title = title.replace('&Aacuate;', 'a').replace('&Eacuate;', 'e').replace('&Iacuate;', 'e').replace('&Oacuate;', 'o').replace('&Uacuate;', 'u').strip()
+
+        title = title.replace("&#039;", "'").replace('&quot;', '').replace('&iexcl;', '').replace('&ndash;', '').replace('&ntilde;', 'ñ').replace("&rsquo;", "'").replace("&iquest;", '').strip()
 
         itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url, title = title ))
 

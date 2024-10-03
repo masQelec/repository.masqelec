@@ -248,8 +248,16 @@ def temporadas(item):
 
     matches = scrapertools.find_multiple_matches(data, '<li class="sel-temp"><a data-post="([^"]+)" data-season="([^"]+)')
 
+    tot_seasons = len(matches)
+
     for dpost, tempo in matches:
-        title = 'Temporada ' + '0' + tempo
+        nro_tempo = tempo
+
+        if tot_seasons >= 10:
+            if len(nro_tempo) == 1:
+                nro_tempo = '0' + nro_tempo
+
+        title = 'Temporada ' + nro_tempo
 
         if len(matches) == 1:
             if config.get_setting('channels_seasons', default=True):

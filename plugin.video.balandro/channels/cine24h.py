@@ -368,7 +368,7 @@ def episodios(item):
     for epis, url, thumb, title in matches[item.page * item.perpage:]:
         if not 'http' in thumb: thumb = 'https:' + thumb
 
-        title = epis + 'x' + str(item.contentSeason) + ' ' + title
+        title = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))

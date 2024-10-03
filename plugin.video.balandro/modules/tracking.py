@@ -8,7 +8,7 @@ from core.item import Item
 
 from platformcode import config, logger, platformtools
 
-from core import trackingtools, filetools
+from core import trackingtools, filetools, scrapertools
 
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -16,6 +16,35 @@ color_infor = config.get_setting('notification_infor_color', default='pink')
 color_adver = config.get_setting('notification_adver_color', default='violet')
 color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+
+con_incidencias = ''
+no_accesibles = ''
+
+try:
+    with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+except:
+    try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+    except: txt_status = ''
+
+if txt_status:
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
 
 
 # ~ Infos
@@ -167,6 +196,9 @@ def mainlist(item):
         itemlist.append(item.clone( title = '[B]INFORMACIÓN:[/B]', action = '', thumbnail=config.get_thumb('help'), text_color='wheat' ))
 
         itemlist.append(item.clone( channel='actions', title = '[COLOR red][B]Eliminar Todos los Preferidos[/B][/COLOR]', action = 'manto_tracking_dbs', thumbnail=config.get_thumb('videolibrary') ))
+
+        if no_accesibles:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= 'Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] ¿ Cómo funciona ?', action = 'show_help_tracking', thumbnail=config.get_thumb('news') ))
 
