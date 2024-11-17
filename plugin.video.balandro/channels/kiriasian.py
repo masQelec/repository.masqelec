@@ -98,7 +98,12 @@ def list_all(item):
         elif ' 4th ' in match: season = 4
         elif ' 5th ' in match: season = 5
         elif ' 6th ' in match: season = 6
+        elif ' 7th ' in match: season = 7
+        elif ' 8th ' in match: season = 8
+        elif ' 9th ' in match: season = 9
         else: season = 1
+
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, infoLabels={'year': '-'},
                                     contentSerieName = SerieName, contentType = 'tvshow', contentSeason = season  ))
@@ -140,7 +145,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('KiriAsian', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('KiriAsian', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -218,7 +226,16 @@ def findvideos(item):
         url = scrapertools.find_single_match(video,'<iframe.*?src="(.*?)"')
 
         if url:
-            if '/play.php?' in url:
+            if '/streaming.php' in url:
+                if not 'http' in url: url = 'https:' + url
+
+                data1 = do_downloadpage(url)
+
+                url = scrapertools.find_single_match(data1,'file: "(.*?)"')
+
+                if not url: continue
+
+            elif '/play.php?' in url:
                 if not 'http' in url: url = 'https:' + url
 
                 data2 = do_downloadpage(url)

@@ -36,17 +36,18 @@ def import_libs(module):
         for lib in list(filter(lambda x: not '.py' in x, lib_path)):
             sys.path.append(os.path.join(path, lib))
 
+
 def get_video_url(page_url, url_referer=''):
     logger.info("url=" + page_url)
     video_urls = []
 
     ini_page_url = page_url
 
-    headers = [['User-Agent', 'Mozilla/5.0']]
+    headers = {}
 
     if '|' in page_url:
         page_url, referer = page_url.split('|', 1)
-        headers.append(['Referer', referer])
+        headers["Referer"] = referer
 
     if not page_url.endswith('/config'): page_url = scrapertools.find_single_match(page_url, '.*?video/[0-9]+')
 

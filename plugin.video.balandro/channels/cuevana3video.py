@@ -188,6 +188,8 @@ def acciones(item):
 
     itemlist.append(Item( channel='helper', action='show_help_cuevana3video', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('cuevana3video') ))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'cuevana3video', thumbnail=config.get_thumb('cuevana3video') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -286,12 +288,17 @@ def list_all(item):
         url = scrapertools.find_single_match(article, '\s*href=(?:"|)([^ >"]+)')
         if '/pagina-ejemplo' in url: continue
 
+        title = scrapertools.find_single_match(article, '<h2 class="Title">([^<]+)</h2>').strip()
+
+        if not url or not title: continue
+
+        title = title.replace('&#039;s', "'s").strip()
+
         thumb = scrapertools.find_single_match(article, 'data-src="([^ >]+)"')
         if not thumb: thumb = scrapertools.find_single_match(article, ' src=(?:"|)([^ >"]+)')
 
         thumb = host + url
 
-        title = scrapertools.find_single_match(article, '<h2 class="Title">([^<]+)</h2>').strip()
         qlty = scrapertools.find_single_match(article, '<span\s*class=(?:"|)Qlty(?:"|)>([^<]+)</span>')
         plot = scrapertools.find_single_match(article, '<p>(.*?)</p>')
 
@@ -361,13 +368,19 @@ def last_epis(item):
     matches = scrapertools.find_multiple_matches(bloque, patron)
 
     for url, thumb, title, date in matches:
+        if not url or not title: continue
+
         season, episode = scrapertools.get_season_and_episode(title).split("x")
 
         contentSerieName = scrapertools.find_single_match(title, '(.*?) \d')
 
+        title = title.replace('&#039;s', "'s").strip()
+
         url = host + url
+
         thumb = 'https://' + thumb
-        titulo = title + ' (%s)' % date
+
+        titulo = str(season) + 'x' + str(episode) + ' ' + title.replace(str(season) + 'x' + str(episode), '') + ' (%s)' % date
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail=thumb, url = url,
                                     contentType = 'episode', contentSerieName=contentSerieName, contentSeason = season, contentEpisodeNumber = episode ))
@@ -429,7 +442,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('Cuevana3Video', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -480,7 +496,10 @@ def episodios(item):
 
         url = host + url
 
-        itemlist.append(item.clone( action='findvideos', title = title, thumbnail=thumb, url = url, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+        titulo = str(season) + 'x' + str(epis) + ' ' + title.replace(str(season) + 'x' + str(epis), '').strip()
+
+        itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail=thumb, url = url,
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break

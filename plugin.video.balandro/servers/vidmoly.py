@@ -48,12 +48,20 @@ def get_video_url(page_url, url_referer=''):
     headers = {}
     if url_referer: headers['Referer'] = url_referer
 
-    data = httptools.downloadpage(page_url, headers=headers).data
+    resp = httptools.downloadpage(page_url, headers=headers)
 
-    if '/notice.php' in data:
+    if resp.code == 404:
         return 'Archivo inexistente ó eliminado'
-    elif '<title>Please wait</title>' in data:
-        return 'Archivo No accesible temporalmente'
+    elif '/notice.php' in resp.data:
+        return 'Archivo inexistente ó eliminado'
+
+    data = resp.data
+
+    url = scrapertools.find_single_match(str(data), 'file:".*?)"')
+    if url:
+        url += '|Referer=%s' + url_referer
+        video_urls.append(['m3u8', url])
+        return video_urls
 
     packed = scrapertools.find_single_match(data, "<script type=[\"']text/javascript[\"']>(eval.*?)</script>")
 

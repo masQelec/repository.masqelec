@@ -25,6 +25,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'YouTube', action = 'youtubes', thumbnail=config.get_thumb('youtube'), search_type = 'movie', text_color = 'moccasin' ))
 
+    itemlist.append(item.clone ( title = 'Con acento español', action = 'list_films', url = host + 'especial-peliculas-con-acento-espanol/', search_type = 'movie' ))
+
     itemlist.append(item.clone ( title = 'Sagas', action = 'sagas', url = host + 'sagas/sagas-pag1/', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -224,7 +226,10 @@ def findvideos(item):
     data = httptools.downloadpage(item.url).data
 
     url = scrapertools.find_single_match(data, '<source src="(.*?)"')
+    if not url: url = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
+
     if not url: url = scrapertools.find_single_match(data, '<source type="video/mp4".*?src="(.*?)"')
+    if not url: url = scrapertools.find_single_match(data, '<iframe type="video/mp4".*?src="(.*?)"')
 
     url = url.replace('https://www.adf.ly/6680622/banner/', '').replace('&amp;', '&')
 

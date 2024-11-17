@@ -55,6 +55,7 @@ if txt_status:
 
 
 dominioshdfull = [
+         'https://hdfull.buzz/',
          'https://hdfull.blog/',
          'https://hd-full.info/',
          'https://hd-full.sbs/',
@@ -796,6 +797,9 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
            if not el_memorizado in str(channels_proxies_memorized):
                if not channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized + el_memorizado
                else: channels_proxies_memorized = channels_proxies_memorized + ', ' + el_memorizado
+
+               if "'''" in channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized.replace("'''", "'")
+               if "''" in channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized.replace("''", "'")
 
                config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 

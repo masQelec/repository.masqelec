@@ -39,13 +39,16 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + "language/spanish", text_color = 'pink' ))
 
-    itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + "video?o=cm" ))
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + "video?o=mv" ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + "video?o=cm", text_color = 'cyan' ))
+
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + "video?o=mv" ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + "video?o=tr" ))
+
     itemlist.append(item.clone( title = 'Más candentes', action = 'list_all', url = host + "video?o=ht" ))
 
+    itemlist.append(item.clone( title = 'Caseros', action = 'list_all', url = host + "video?p=homemade&o=tr", text_color = 'tan' ))
+
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host + "video?o=lg" ))
-    itemlist.append(item.clone( title = 'Caseros', action = 'list_all', url = host + "video?p=homemade&o=tr" ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host + 'channels?o=rk' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'categories/' ))

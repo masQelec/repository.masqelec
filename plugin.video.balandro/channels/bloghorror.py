@@ -219,7 +219,7 @@ def findvideos(item):
 
         if idioma:
             if not other == 'Magnet' and not other == 'mega':
-                lng = idioma
+                lng = idioma.replace('<em>', '').strip()
                 other = ''
 
         if servidor == 'directo':

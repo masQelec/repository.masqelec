@@ -33,8 +33,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host  + '/en/wall-date-1.html' ))
 
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host  + '/en/wall-main-1.html' ))
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host  + '/en/wall-main-1.html' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host  + '/en/wall-note-1.html' ))
+
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host  + '/en/wall-time-1.html' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + '/en' ))

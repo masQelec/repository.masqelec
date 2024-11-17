@@ -468,7 +468,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('SeriesRetro', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('SeriesRetro', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -619,7 +622,7 @@ def play(item):
     url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
     if url.startswith(host):
-        if item.other == 'D' or 'D ' in item.other :
+        if item.other == 'D' or 'D ' in item.other:
             if config.get_setting('channel_seriesretro_proxies', default=''):
                 url = httptools.downloadpage_proxy('seriesretro', url, follow_redirects=False, only_headers=True).headers.get('location', '')
             else:
@@ -677,6 +680,9 @@ def play(item):
 
                 itemlist.append(item.clone( url = url, server = 'mega' ))
                 return itemlist
+
+        if '/acortalink.' in url:
+            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

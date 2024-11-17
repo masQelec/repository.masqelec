@@ -625,6 +625,8 @@ def list_premios_anyo(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    if not item.anyo: item.anyo = '-'
+
     bloque = scrapertools.find_single_match(data, '<h1(.*?)</div></li></ul></div></div>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title="(.*?)".*?src="(.*?)"')

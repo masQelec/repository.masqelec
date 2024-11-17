@@ -56,6 +56,8 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_pelispediaws', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'pelispediaws', thumbnail=config.get_thumb('pelispediaws') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist

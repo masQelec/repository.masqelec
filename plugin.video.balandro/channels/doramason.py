@@ -166,7 +166,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('DoramasOn', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('DoramasOn', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -208,7 +211,9 @@ def episodios(item):
         epis = title.replace('Episodio', '').strip()
         if not epis: epis = 1
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:

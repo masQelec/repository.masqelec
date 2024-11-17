@@ -51,8 +51,9 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Series', action = 'list_all', url = host + 'ver/?status=&type=tv&order=update&page=1', search_type = 'tvshow', text_color = 'hotpink' ))
     itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'ver/?status=&type=movie&order=update&page=1', search_type = 'movie', text_color='deepskyblue' ))
-    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'ver/?type=ova&sub=&order=update&page=1', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Onas', action = 'list_all', url = host + 'ver/?status=&type=ona&order=update&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'ver/?type=ova&sub=&order=update&page=1', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
@@ -75,7 +76,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(host + 'generos//').data
+    data = httptools.downloadpage(host + 'generos/').data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = scrapertools.find_single_match(data, '</h1>(.*?)</ul>')
@@ -124,18 +125,7 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
-            PeliName = title
-
-            if '[Película' in PeliName: PeliName = PeliName.split("[Película")[0]
-
-            if '[Latino' in PeliName: PeliName = PeliName.split("[Latino")[0]
-            elif 'Latino]' in PeliName: PeliName = PeliName.split("Latino]")[0]
-            elif '[Castellano' in PeliName: PeliName = PeliName.split("[Castellano")[0]
-            elif 'Castellano]' in PeliName: PeliName = PeliName.split("[Castellano")[0]
-            elif '[Subtitulado' in PeliName: PeliName = PeliName.split("[Subtitulado")[0]
-            elif 'Subtitulado]' in PeliName: PeliName = PeliName.split("Subtitulado]")[0]
-
-            PeliName = PeliName.strip()
+            PeliName = corregir_SerieName(title)
 
             if '[Latino' in title or 'Latino]' in title: lang = 'Lat'
             elif '[Castellano' in title or 'Castellano]' in title: lang = 'Esp'
@@ -147,18 +137,7 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
-            SerieName = title
-
-            if '[Temporada' in SerieName: SerieName = SerieName.split("[Temporada")[0]
-
-            if '[Latino' in SerieName: SerieName = SerieName.split("[Latino")[0]
-            elif 'Latino]' in SerieName: SerieName = SerieName.split("Latino]")[0]
-            elif '[Castellano' in SerieName: SerieName = SerieName.split("[Castellano")[0]
-            elif 'Castellano]' in SerieName: SerieName = SerieName.split("Castellano]")[0]
-            elif '[Subtitulado' in SerieName: SerieName = SerieName.split("[Subtitulado")[0]
-            elif 'Subtitulado]' in SerieName: SerieName = SerieName.split("Subtitulado]")[0]
-
-            SerieName = SerieName.strip()
+            SerieName = corregir_SerieName(title)
 
             if '[Latino' in title or 'Latino]' in title: lang = 'Lat'
             elif '[Castellano' in title or 'Castellano]' in title: lang = 'Esp'
@@ -208,7 +187,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('AnimeYt', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('AnimeYt', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -245,12 +227,10 @@ def episodios(item):
     for url, epis, title in matches[item.page * item.perpage:]:
         title = title.replace('&#8217;', "'").replace('&#8211;', '').replace('&#215;', 'x')
 
-        titulo = title + ' ' + item.contentSerieName
+        if item.contentSerieName: titulo = '1x' + str(epis) + ' ' + title + ' ' + item.contentSerieName
+        else: titulo = item.title
 
-        if item.contentSerieName:
-            itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
-        else:
-            itemlist.append(item.clone( action='findvideos', url = url, title = titulo ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -374,6 +354,25 @@ def play(item):
         itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
+
+
+def corregir_SerieName(SerieName):
+    logger.info()
+
+    if '[Película' in SerieName: SerieName = SerieName.split("[Película")[0]
+
+    if '[Temporada' in SerieName: SerieName = SerieName.split("[Temporada")[0]
+
+    if '[Latino' in SerieName: SerieName = SerieName.split("[Latino")[0]
+    elif 'Latino]' in SerieName: SerieName = SerieName.split("Latino]")[0]
+    elif '[Castellano' in SerieName: SerieName = SerieName.split("[Castellano")[0]
+    elif 'Castellano]' in SerieName: SerieName = SerieName.split("Castellano]")[0]
+    elif '[Subtitulado' in SerieName: SerieName = SerieName.split("[Subtitulado")[0]
+    elif 'Subtitulado]' in SerieName: SerieName = SerieName.split("Subtitulado]")[0]
+
+    SerieName = SerieName.strip()
+
+    return SerieName
 
 
 def search(item, texto):

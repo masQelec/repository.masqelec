@@ -40,13 +40,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Novelas:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = '[B]Novelas:[/B]', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_nov', url = host + 'video_tag/novelas-online/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = ' - [COLOR limegreen]Últimos capítulos[/COLOR]', action = 'list_nov', url = host + 'video_tag/telenovelas-online-gratis/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = ' - [COLOR cyan]Últimos capítulos[/COLOR]', action = 'list_nov', url = host + 'video_tag/telenovelas-online-gratis/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Series:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = '[B]Series:[/B]', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
@@ -282,7 +282,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('Novelas360', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('Novelas360', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')

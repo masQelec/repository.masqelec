@@ -6,11 +6,11 @@ if sys.version_info[0] >= 3:
     PY3 = True
     unicode = str
 
-    from urllib.parse import urlparse
+    from urllib.parse import parse_qs, urlparse
 else:
     PY3 = False
 
-    from urlparse import urlparse    
+    from urlparse import parse_qs, urlparse    
 
 
 import os, re, time, datetime
@@ -466,9 +466,9 @@ def corregir_servidor(servidor):
 
     elif servidor == 'uptostream': return 'uptobox'
 
-    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'hexload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lulu', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'qiwi', 'swdyu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'wish', 'stblion']: return 'various'
+    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'hexload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lulu', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'qiwi', 'swdyu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'wish', 'stblion', 'terabox']: return 'various'
 
-    elif servidor in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'fastplay', 'filegram', 'gostream', 'letsupload', 'liivideo', 'myupload', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'tusfiles', 'uploadba', 'uploadflix', 'uploady', 'veev', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vid', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub', 'amdahost', 'updown', 'videa', 'asianplay', 'swiftload', 'udrop']: return 'zures'
+    elif servidor in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'fastplay', 'filegram', 'gostream', 'letsupload', 'liivideo', 'myupload', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'turbovid', 'tusfiles', 'uploadba', 'uploadflix', 'uploady', 'veev', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vid', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub', 'amdahost', 'updown', 'videa', 'asianplay', 'swiftload', 'udrop']: return 'zures'
 
     else: return servidor
 
@@ -500,7 +500,7 @@ def corregir_other(srv):
     elif 'moonplayer' in srv: srv = 'Moonplayer'
     elif 'yadi' in srv: srv = 'Yandex'
 
-    elif 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv or 'wishfast' in srv or 'doodporn' in srv or 'sfastwish' in srv or 'flaswish' in srv or 'obeywish' in srv or 'cdnwish' in srv or 'asnwish' in srv or 'flastwish' in srv or 'jodwish' in srv or 'swhoi' in srv or 'fsdcmo' in srv or 'swdyu' in srv or 'wishonly' in srv or 'playerwish' in srv or 'wish' in srv: srv = 'Streamwish'
+    elif 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv or 'wishfast' in srv or 'doodporn' in srv or 'sfastwish' in srv or 'flaswish' in srv or 'obeywish' in srv or 'cdnwish' in srv or 'asnwish' in srv or 'flastwish' in srv or 'jodwish' in srv or 'swhoi' in srv or 'fsdcmo' in srv or 'swdyu' in srv or 'wishonly' in srv or 'playerwish' in srv or 'hlswish' in srv or 'wish' in srv: srv = 'Streamwish'
 
     elif 'desiupload' in srv: srv = 'Desiupload'
 
@@ -542,9 +542,11 @@ def corregir_other(srv):
 
     elif 'qiwi' in srv: srv = 'Qiwi'
 
+    elif 'terabox' in srv: srv = 'Terabox'
+
     elif 'streamruby' in srv or 'sruby' in srv or 'rubystream' in srv or 'stmruby' in srv or 'rubystm' in srv: srv = 'Streamruby'
 
-    elif 'allviid' in srv or 'cloudfile' in srv or 'cloudmail' in srv or 'dailyuploads' in srv or 'darkibox' in srv or 'dembed' in srv or 'downace' in srv or 'fastdrive' in srv or 'fastplay' in srv or 'filegram' in srv or 'gostream' in srv or 'letsupload' in srv or 'liivideo' in srv or 'myupload' in srv or 'oneupload' in srv or 'pandafiles' in srv or 'rovideo' in srv or 'send' in srv or 'streamable' in srv or 'streamdav' in srv or 'streamgzzz' in srv or 'streamoupload' in srv or 'tusfiles' in srv or 'uploadba' in srv or 'uploadflix' in srv or 'uploady' in srv or 'veev' in srv or 'veoh' in srv or 'vidbob' in srv or 'vidlook' in srv or 'vidmx' in srv or 'vid' in srv or 'vidpro' in srv or 'vipss' in srv or 'vkprime' in srv or 'worlduploads' in srv or 'ztreamhub' in srv or 'amdahost' in srv or 'updown' in srv or 'videa' in srv or 'asianplay' in srv or 'swiftload' in srv or 'udrop' in srv: srv = 'Zures'
+    elif 'allviid' in srv or 'cloudfile' in srv or 'cloudmail' in srv or 'dailyuploads' in srv or 'darkibox' in srv or 'dembed' in srv or 'downace' in srv or 'fastdrive' in srv or 'fastplay' in srv or 'filegram' in srv or 'gostream' in srv or 'letsupload' in srv or 'liivideo' in srv or 'myupload' in srv or 'oneupload' in srv or 'pandafiles' in srv or 'rovideo' in srv or 'send' in srv or 'streamable' in srv or 'streamdav' in srv or 'streamgzzz' in srv or 'streamoupload' in srv or 'turbovid' in srv or 'tusfiles' in srv or 'uploadba' in srv or 'uploadflix' in srv or 'uploady' in srv or 'veev' in srv or 'veoh' in srv or 'vidbob' in srv or 'vidlook' in srv or 'vidmx' in srv or 'vid' in srv or 'vidpro' in srv or 'vipss' in srv or 'vkprime' in srv or 'worlduploads' in srv or 'ztreamhub' in srv or 'amdahost' in srv or 'updown' in srv or 'videa' in srv or 'asianplay' in srv or 'swiftload' in srv or 'udrop' in srv: srv = 'Zures'
 
     return srv
 
@@ -622,76 +624,50 @@ def get_parse_hls(video_urls):
 
     import codecs
 
+    server = 'fastream'
+
     hs = ''
+
     new_video_urls = list()
+
     headers = dict()
 
-    if not video_urls:
-        return 'Falta el Archivo'
+    if (len(video_urls)) == 1:
+        url = video_urls[0][1]
 
-    if not (len(video_urls)) == 1:
-        return 'Archivo Múltiple No Soportado'
+        if '|' in url:
+            part = url.split('|')
+            url = part[0]
 
-    url = video_urls[0][1]
-    if '|' in url:
-        part = url.split('|')
-        url = part[0]
+            if not '.m3u8' in str(url): return video_urls
 
-        if not url.endswith('blenditall.m3u8'):
-            if not 'master.m3u8' in url:
-                return 'Tipo de Archivo Desconocido'
+            khs = part[1]
 
-        khs = part[1]
-        hs = '|' + khs
+            hs = '|' + khs
 
-        matches = scrapertools.find_multiple_matches(khs, r'(\w+)=([^&]+)')
+            for key, val in parse_qs(khs).items():
+                headers[key] = val[0]
 
-        for key, val in matches:
-            headers[key] = val
+        if not '.m3u8' in str(url):
+            return video_urls
 
-    if not url.endswith('blenditall.m3u8'):
-        if not 'master.m3u8' in url:
-            return 'Tipo de Archivo Desconocido'
+        data = httptools.downloadpage(url, headers=headers).data
 
-    headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/115.0'
+        patron = r'#EXT-X-STREAM-INF.*?RESOLUTION=(\d+x\d+).*?\s(http.*?)\s'
 
-    headers['Accept'] = '/'
+        if not isinstance(data, str):
+            data = codecs.decode(data, "utf-8")
 
-    headers['Origin'] = 'https://fastream.to'
-    headers['Referer'] = 'https://fastream.to/'
+        matches = scrapertools.find_multiple_matches(data, patron)
 
-    data = httptools.downloadpage(url, headers=headers).data
+        if len(matches) > 1:
+            for res, video_url in matches:
+                info = '.m3u8 (%s)' % res
 
-    if not isinstance(data, str):
-        datos = data
-        try: data = codecs.decode(data, 'utf-8', 'strict')
-        except: data = datos
+                video_url += hs
 
-    if '<h1>403 Forbidden</h1>' in data:
-        return 'Acceso Denegado al Archivo'
+                new_video_urls.append([info, video_url])
 
-    matches = scrapertools.find_multiple_matches(data, r'#EXT-X-STREAM-INF.*?RESOLUTION=(\d+x\d+).*?\s(http.*?)\s')
-
-    if not matches:
-        patron = 'RESOLUTION=\d+x(\d+),.*?'
-        patron += 'URI="([^"]+)"'
-
-        matches = re.compile(patron, re.DOTALL).findall(data)
-
-    sub_server = ''
-    if 'master.m3u8' in url:
-        sub_server = scrapertools.find_single_match(url, "(.*?)master.m3u8")
-
-    if len(matches) > 1:
-        for res, video_url in matches:
-            if sub_server: video_url = sub_server + video_url
-
-            video_url += hs
-            video_url = video_url.replace('iframes', 'index')
-
-            info = '.m3u8 (%s)' % res
-            new_video_urls.append([info, video_url])
-
-        return new_video_urls
+            return new_video_urls
 
     return video_urls

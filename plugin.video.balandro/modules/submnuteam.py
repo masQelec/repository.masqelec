@@ -97,25 +97,25 @@ context_config = []
 tit = '[COLOR tan][B]Preferencias Canales[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
 
-tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
+tit = '[COLOR darkorange]Información Dominios[/COLOR]'
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
 tit = '[COLOR %s][B]Últimos Cambios Dominios[/B][/COLOR]' % color_exec
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
-tit = '[COLOR %s][B]Quitar Dominios Memorizados[/B][/COLOR]' % color_alert
+tit = '[COLOR darkorange][B]Quitar Dominios Memorizados[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_domains'})
 
 tit = '[COLOR green][B]Información Plataforma[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_plataforma'})
 
-tit = '[COLOR %s][B]Quitar Proxies Memorizados[/B][/COLOR]' % color_alert
+tit = '[COLOR %s][B]Quitar Todos los Proxies[/B][/COLOR]' % color_alert
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR olive][B]Limpiezas[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_limpiezas'})
 
-tit = '[COLOR darkorange][B]Borrar Carpeta Caché[/B][/COLOR]'
+tit = '[COLOR orange][B]Borrar Carpeta Caché[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_folder_cache'})
 
 tit = '[COLOR %s][B]Sus Ajustes Personalizados[/B][/COLOR]' % color_avis
@@ -124,13 +124,13 @@ context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_sets'}
 tit = '[COLOR %s][B]Cookies Actuales[/B][/COLOR]' % color_infor
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_cook'})
 
-tit = '[COLOR %s][B]Eliminar Cookies[/B][/COLOR]' % color_alert
+tit = '[COLOR %s][B]Eliminar Cookies[/B][/COLOR]' % color_infor
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_cookies'})
 
 tit = '[COLOR %s]Sus Advanced Settings[/COLOR]' % color_adver
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_advs'})
 
-tit = '[COLOR %s][B]Eliminar Advanced Settings[/B][/COLOR]' % color_alert
+tit = '[COLOR fuchsia][B]Eliminar Advanced Settings[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_advs'})
 
 tit = '[COLOR mediumaquamarine][B]Restablecer Parámetros Internos[/B][/COLOR]'
@@ -157,7 +157,7 @@ if config.get_setting('proxysearch_excludes', default=''):
 tit = '[COLOR %s]Información Proxies[/COLOR]' % color_avis
 context_proxy_channels.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-tit = '[COLOR %s][B]Quitar Proxies Actuales[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR %s][B]Quitar los Proxies Actuales[/B][/COLOR]' % color_list_proxies
 context_proxy_channels.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR %s]Ajustes categorías Menú, Canales, Dominios y Proxies[/COLOR]' % color_exec
@@ -181,7 +181,7 @@ if config.get_setting('proxysearch_excludes', default=''):
 tit = '[COLOR %s]Información Proxies[/COLOR]' % color_avis
 context_usual.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-tit = '[COLOR %s][B]Quitar Proxies Actuales[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR %s][B]Quitar los Proxies Actuales[/B][/COLOR]' % color_list_proxies
 context_usual.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR %s]Ajustes categorías Canales, Dominios y Proxies[/COLOR]' % color_exec
@@ -192,7 +192,7 @@ context_ayuda = []
 tit = '[COLOR tan][B]Preferencias Menús[/B][/COLOR]'
 context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
-tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
+tit = '[COLOR darkorange]Información Dominios[/COLOR]'
 context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
 tit = '[COLOR %s][B]Últimos Cambios Dominios[/B][/COLOR]' % color_exec
@@ -216,7 +216,7 @@ context_ayuda.append({'title': tit, 'channel': 'actions', 'action': 'check_addon
 tit = '[COLOR green][B]Preguntas Frecuentes[/B][/COLOR]'
 context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_help_faq'})
 
-tit = '[COLOR red][B]Temas No Contemplados[/B][/COLOR]'
+tit = '[COLOR fuchsia][B]Temas No Contemplados[/B][/COLOR]'
 context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_not_contemplated'})
 
 tit = '[COLOR goldenrod][B]Miscelánea[/B][/COLOR]'
@@ -624,6 +624,15 @@ def submnu_sistema(item):
         itemlist.append(item.clone( channel='actions', action='manto_folder_cache', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
 
     if not item.helper:
+        path = filetools.join(config.get_data_path(), 'tracking_dbs')
+
+        existe = filetools.exists(path)
+
+        if existe:
+            itemlist.append(item.clone( action='', title='[I]CONTENIDO PREFERIDOS:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+
+            itemlist.append(item.clone( channel='actions', action='manto_tracking_dbs', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
+
         downloadpath = config.get_setting('downloadpath', default='')
 
         if downloadpath: path = downloadpath
@@ -635,15 +644,6 @@ def submnu_sistema(item):
             itemlist.append(item.clone( action='', title='[I]CONTENIDO DESCARGAS:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
             itemlist.append(item.clone( channel='actions', action='manto_folder_downloads', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
-
-        path = filetools.join(config.get_data_path(), 'tracking_dbs')
-
-        existe = filetools.exists(path)
-
-        if existe:
-            itemlist.append(item.clone( action='', title='[I]CONTENIDO PREFERIDOS:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
-
-            itemlist.append(item.clone( channel='actions', action='manto_tracking_dbs', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
 
     path = filetools.join(config.get_data_path(), 'tmdb.sqlite-journal')
 
@@ -740,7 +740,7 @@ def submnu_logs(item):
 
             itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'proxies.log', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_temporales', title='Eliminar', _logs = True, thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+        itemlist.append(item.clone( channel='actions', action='manto_temporales', title='Eliminar Todos los LOGS', _logs = True, thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     if item.helper: platformtools.itemlist_refresh()
 
@@ -939,20 +939,20 @@ def submnu_developers(item):
 
     itemlist.append(item.clone( action='copy_dev', title= 'Obtener una Copia del fichero dev-notes.txt', thumbnail=config.get_thumb('folder'), text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( channel='helper', action='', title= '[COLOR firebrick][B][I]Developers Fuentes:[/I][/B][/COLOR]', folder=False ))
+    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]DEVELOPERS FUENTES:[/I][/B][/COLOR]', folder=False ))
 
-    itemlist.append(item.clone( channel='helper', action='', title= ' - Fuentes [COLOR darkorange][B]https://github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Fuentes [COLOR darkorange][B]https://github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
 
-    itemlist.append(item.clone( channel='helper', action='', title= '[COLOR firebrick][B][I]Developers Telegram:[/I][/B][/COLOR]', folder=False ))
+    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]Developers Telegram:[/I][/B][/COLOR]', folder=False ))
 
-    itemlist.append(item.clone( channel='helper', action='', title= ' - Team ' + _team + ' Equipo de Desarrollo', folder=False, thumbnail=config.get_thumb('telegram') ))
+    itemlist.append(item.clone( action='', title= ' - Team ' + _team + ' Equipo de Desarrollo', folder=False, thumbnail=config.get_thumb('telegram') ))
 
-    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]Developers Incorporaciones:[/B][/I][/COLOR]', folder=False ))
+    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]DEVELOPERS INCORPORACIONES:[/B][/I][/COLOR]', folder=False ))
 
-    itemlist.append(item.clone( channel='helper', action='', title='[COLOR yellow][B][I]  Solicitudes solo con Enlace de Invitación[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( action='', title='[COLOR yellow][B][I]  Solicitudes solo con Enlace de Invitación[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(item.clone( channel='helper', action='', title= '  Foro ' + _foro, thumbnail=config.get_thumb('foro'), folder=False ))
-    itemlist.append(item.clone( channel='helper', action='', title= '  Telegram ' + _telegram, thumbnail=config.get_thumb('telegram'), folder=False ))
+    itemlist.append(item.clone( action='', title= '  Foro ' + _foro, thumbnail=config.get_thumb('foro'), folder=False ))
+    itemlist.append(item.clone( action='', title= '  Telegram ' + _telegram, thumbnail=config.get_thumb('telegram'), folder=False ))
 
     return itemlist
 
@@ -1102,51 +1102,59 @@ def test_tplus(item):
     if config.get_setting('proxies_tplus_proces'): tplus_actual = config.get_setting('proxies_tplus_proces', default='32')
 
     opciones_tplus = [
-            'openproxy.space http',
-            'openproxy.space socks4',
-            'openproxy.space socks5',
-            'vpnoverview.com',
-            'proxydb.net http',
-            'proxydb.net https',
-            'proxydb.net socks4',
-            'proxydb.net socks5',
-            'netzwelt.de',
-            'proxy-list.download http',
-            'proxy-list.download https',
-            'proxy-list.download socks4',
-            'proxy-list.download socks5',
-            'freeproxy.world',
-            'freeproxy.world anonymity',
-            'hidemyna.me.en',
-            'list.proxylistplus.com',
-            'proxyservers.pro',
+            'Openproxy.space http',
+            'Openproxy.space socks4',
+            'Openproxy.space socks5',
+            'Vpnoverview.com',
+            'Proxydb.net http',
+            'Proxydb.net https',
+            'Proxydb.net socks4',
+            'Proxydb.net socks5',
+            'Netzwelt.de',
+            'Proxy-list.download http',
+            'Proxy-list.download https',
+            'Proxy-list.download socks4',
+            'Proxy-list.download socks5',
+            'Freeproxy.world',
+            'Freeproxy.world anonymity',
+            'Hidemyna.me.en',
+            'List.proxylistplus.com',
+            'Proxyservers.pro',
             'TheSpeedX',
-            'proxyscan.io http',
-            'proxyscan.io https',
-            'openproxylist.xyz http',
-            'openproxylist.xyz socks4',
-            'openproxylist.xyz socks5',
-            'proxy-list.download v1 socks4',
-            'proxy-list.download v1 socks5',
-            'monosans',
-            'jetkai',
-            'sunny9577',
-            'proxy4parsing',
-            'hendrikbgr',
-            'rdavydov http',
-            'aslisk',
-            'rdavydov socks4',
-            'hookzof',
-            'manuGMG',
-            'rdavydov socks5',
-            'lamt3012',
-            'proxyfly http',
-            'proxyfly socks4',
-            'proxyfly socks5',
+            'Proxyscan.io http',
+            'Proxyscan.io https',
+            'Openproxylist.xyz http',
+            'Openproxylist.xyz socks4',
+            'Openproxylist.xyz socks5',
+            'Proxy-list.download v1 socks4',
+            'Proxy-list.download v1 socks5',
+            'Monosans',
+            'Jetkai',
+            'Sunny9577',
+            'Proxy4parsing',
+            'Hendrikbgr',
+            'Rdavydov http',
+            'Aslisk',
+            'Rdavydov socks4',
+            'Hookzof',
+            'ManuGMG',
+            'Rdavydov socks5',
+            'Lamt3012',
+            'Proxifly http',
+            'Proxifly https',
+            'Proxifly socks4',
+            'Proxifly socks5',
             'ErcinDedeoglu http',
             'ErcinDedeoglu https',
             'ErcinDedeoglu socks4',
-            'ErcinDedeoglu socks5'
+            'ErcinDedeoglu socks5',
+            'Proxycompass',
+            'Proxybros',
+            'Proxyscrape all',
+            'Proxyscrape anonymous',
+            'Proxyscrape elite',
+            'Proxyscrape transparent',
+            'Proxyscrape https'
             ]
 
     preselect = tplus_actual
@@ -1156,51 +1164,59 @@ def test_tplus(item):
     ret = platformtools.dialog_select('[COLOR cyan][B]Proveedores Proxies Tplus[/B][/COLOR]', opciones_tplus, preselect=preselect)
     if ret == -1: return -1
 
-    if opciones_tplus[ret] == 'openproxy.space http': proxies_tplus = '0'
-    elif opciones_tplus[ret] == 'openproxy.space socks4': proxies_tplus = '1'
-    elif opciones_tplus[ret] == 'openproxy.space socks5': proxies_tplus = '2'
-    elif opciones_tplus[ret] == 'vpnoverview.com': proxies_tplus = '3'
-    elif opciones_tplus[ret] == 'proxydb.net http': proxies_tplus = '4'
-    elif opciones_tplus[ret] == 'proxydb.net https': proxies_tplus = '5'
-    elif opciones_tplus[ret] == 'proxydb.net socks4': proxies_tplus = '6'
-    elif opciones_tplus[ret] == 'proxydb.net socks5': proxies_tplus = '7'
-    elif opciones_tplus[ret] == 'netzwelt.de': proxies_tplus = '8'
-    elif opciones_tplus[ret] == 'proxy-list.download http': proxies_tplus = '9'
-    elif opciones_tplus[ret] == 'proxy-list.download https': proxies_tplus = '10'
-    elif opciones_tplus[ret] == 'proxy-list.download socks4': proxies_tplus = '11'
-    elif opciones_tplus[ret] == 'proxy-list.download socks5': proxies_tplus = '12'
-    elif opciones_tplus[ret] == 'freeproxy.world': proxies_tplus = '13'
-    elif opciones_tplus[ret] == 'freeproxy.world anonymity': proxies_tplus = '14'
-    elif opciones_tplus[ret] == 'hidemyna.me.en': proxies_tplus = '15'
-    elif opciones_tplus[ret] == 'list.proxylistplus.com': proxies_tplus = '16'
-    elif opciones_tplus[ret] == 'proxyservers.pro': proxies_tplus = '17'
+    if opciones_tplus[ret] == 'Openproxy.space http': proxies_tplus = '0'
+    elif opciones_tplus[ret] == 'Openproxy.space socks4': proxies_tplus = '1'
+    elif opciones_tplus[ret] == 'Openproxy.space socks5': proxies_tplus = '2'
+    elif opciones_tplus[ret] == 'Vpnoverview.com': proxies_tplus = '3'
+    elif opciones_tplus[ret] == 'Proxydb.net http': proxies_tplus = '4'
+    elif opciones_tplus[ret] == 'Proxydb.net https': proxies_tplus = '5'
+    elif opciones_tplus[ret] == 'Proxydb.net socks4': proxies_tplus = '6'
+    elif opciones_tplus[ret] == 'Proxydb.net socks5': proxies_tplus = '7'
+    elif opciones_tplus[ret] == 'Netzwelt.de': proxies_tplus = '8'
+    elif opciones_tplus[ret] == 'Proxy-list.download http': proxies_tplus = '9'
+    elif opciones_tplus[ret] == 'Proxy-list.download https': proxies_tplus = '10'
+    elif opciones_tplus[ret] == 'Proxy-list.download socks4': proxies_tplus = '11'
+    elif opciones_tplus[ret] == 'Proxy-list.download socks5': proxies_tplus = '12'
+    elif opciones_tplus[ret] == 'Freeproxy.world': proxies_tplus = '13'
+    elif opciones_tplus[ret] == 'Freeproxy.world anonymity': proxies_tplus = '14'
+    elif opciones_tplus[ret] == 'Hidemyna.me.en': proxies_tplus = '15'
+    elif opciones_tplus[ret] == 'List.proxylistplus.com': proxies_tplus = '16'
+    elif opciones_tplus[ret] == 'Proxyservers.pro': proxies_tplus = '17'
     elif opciones_tplus[ret] == 'TheSpeedX': proxies_tplus = '18'
-    elif opciones_tplus[ret] == 'proxyscan.io http': proxies_tplus = '19'
-    elif opciones_tplus[ret] == 'proxyscan.io https': proxies_tplus = '20'
-    elif opciones_tplus[ret] == 'openproxylist.xyz http': proxies_tplus = '21'
-    elif opciones_tplus[ret] == 'openproxylist.xyz socks4': proxies_tplus = '22'
-    elif opciones_tplus[ret] == 'openproxylist.xyz socks5': proxies_tplus = '23'
-    elif opciones_tplus[ret] == 'proxy-list.download v1 socks4': proxies_tplus = '24'
-    elif opciones_tplus[ret] == 'proxy-list.download v1 socks5': proxies_tplus = '25'
-    elif opciones_tplus[ret] == 'monosans': proxies_tplus = '26'
-    elif opciones_tplus[ret] == 'jetkai': proxies_tplus = '27'
-    elif opciones_tplus[ret] == 'sunny9577': proxies_tplus = '28'
-    elif opciones_tplus[ret] == 'proxy4parsing': proxies_tplus = '29'
-    elif opciones_tplus[ret] == 'hendrikbgr': proxies_tplus = '30'
-    elif opciones_tplus[ret] == 'rdavydov http': proxies_tplus = '31'
-    elif opciones_tplus[ret] == 'aslisk': proxies_tplus = '32'
-    elif opciones_tplus[ret] == 'rdavydov socks4': proxies_tplus = '33'
-    elif opciones_tplus[ret] == 'hookzof': proxies_tplus = '34'
-    elif opciones_tplus[ret] == 'manuGMG': proxies_tplus = '35'
-    elif opciones_tplus[ret] == 'rdavydov socks5': proxies_tplus = '36'
-    elif opciones_tplus[ret] == 'lamt3012': proxies_tplus = '37'
-    elif opciones_tplus[ret] == 'proxyfly http': proxies_tplus = '38'
-    elif opciones_tplus[ret] == 'proxyfly socks4': proxies_tplus = '39'
-    elif opciones_tplus[ret] == 'proxyfly socks5': proxies_tplus = '40'
+    elif opciones_tplus[ret] == 'Proxyscan.io http': proxies_tplus = '19'
+    elif opciones_tplus[ret] == 'Proxyscan.io https': proxies_tplus = '20'
+    elif opciones_tplus[ret] == 'Openproxylist.xyz http': proxies_tplus = '21'
+    elif opciones_tplus[ret] == 'Openproxylist.xyz socks4': proxies_tplus = '22'
+    elif opciones_tplus[ret] == 'Openproxylist.xyz socks5': proxies_tplus = '23'
+    elif opciones_tplus[ret] == 'Proxy-list.download v1 socks4': proxies_tplus = '24'
+    elif opciones_tplus[ret] == 'Proxy-list.download v1 socks5': proxies_tplus = '25'
+    elif opciones_tplus[ret] == 'Monosans': proxies_tplus = '26'
+    elif opciones_tplus[ret] == 'Jetkai': proxies_tplus = '27'
+    elif opciones_tplus[ret] == 'Sunny9577': proxies_tplus = '28'
+    elif opciones_tplus[ret] == 'Proxy4parsing': proxies_tplus = '29'
+    elif opciones_tplus[ret] == 'Hendrikbgr': proxies_tplus = '30'
+    elif opciones_tplus[ret] == 'Rdavydov http': proxies_tplus = '31'
+    elif opciones_tplus[ret] == 'Aslisk': proxies_tplus = '32'
+    elif opciones_tplus[ret] == 'Rdavydov socks4': proxies_tplus = '33'
+    elif opciones_tplus[ret] == 'Hookzof': proxies_tplus = '34'
+    elif opciones_tplus[ret] == 'ManuGMG': proxies_tplus = '35'
+    elif opciones_tplus[ret] == 'Rdavydov socks5': proxies_tplus = '36'
+    elif opciones_tplus[ret] == 'Lamt3012': proxies_tplus = '37'
+    elif opciones_tplus[ret] == 'Proxifly http': proxies_tplus = '38'
+    elif opciones_tplus[ret] == 'Proxifly https': proxies_tplus = '45'
+    elif opciones_tplus[ret] == 'Proxifly socks4': proxies_tplus = '39'
+    elif opciones_tplus[ret] == 'Proxifly socks5': proxies_tplus = '40'
     elif opciones_tplus[ret] == 'ErcinDedeoglu http': proxies_tplus = '41'
     elif opciones_tplus[ret] == 'ErcinDedeoglu https': proxies_tplus = '42'
     elif opciones_tplus[ret] == 'ErcinDedeoglu socks4': proxies_tplus = '43'
     elif opciones_tplus[ret] == 'ErcinDedeoglu socks5': proxies_tplus = '44'
+    elif opciones_tplus[ret] == 'Proxycompass': proxies_tplus = '46'
+    elif opciones_tplus[ret] == 'Proxybros': proxies_tplus = '47'
+    elif opciones_tplus[ret] == 'Proxyscrape all': proxies_tplus = '48'
+    elif opciones_tplus[ret] == 'Proxyscrape anonymous': proxies_tplus = '49'
+    elif opciones_tplus[ret] == 'Proxyscrape elite': proxies_tplus = '50'
+    elif opciones_tplus[ret] == 'Proxyscrape transparent': proxies_tplus = '51'
+    elif opciones_tplus[ret] == 'Proxyscrape https': proxies_tplus = '52'
 
     else: proxies_tplus = '32'
 
@@ -2272,7 +2288,7 @@ def resumen_servidores(item):
     notsuported = 0
     outservice = 0
     alternatives = 0
-    aditionals = 40
+    aditionals = 41
     disponibles = 0
     pending = 0
 
@@ -2366,7 +2382,7 @@ def resumen_pending(item):
                 if '[COLOR orchid]' in match: txt += '[B' + match + '/I][/B][/COLOR][CR]'
 
     if not txt:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No Hay No con Incidencias[/COLOR][/B]' % color_exec)
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No Hay con Incidencias[/COLOR][/B]' % color_exec)
         return
 
     platformtools.dialog_textviewer('Servidores con Incidencias', txt)
@@ -2459,6 +2475,7 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Streamruby[/COLOR][CR]'
     txt += '   [COLOR yellow]Streamvid[/COLOR][CR]'
     txt += '   [COLOR yellow]Streamwish[/COLOR][CR]'
+    txt += '   [COLOR yellow]Terabox[/COLOR][CR]'
     txt += '   [COLOR yellow]Tubeload[/COLOR][CR]'
     txt += '   [COLOR yellow]Turboviplay[/COLOR][CR]'
     txt += '   [COLOR yellow]Twitch[/COLOR][CR]'

@@ -174,6 +174,8 @@ def acciones(item):
 
     itemlist.append(Item( channel='helper', action='show_help_hdfullse', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('hdfullse') ))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'hdfullse', thumbnail=config.get_thumb('hdfullse') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -481,7 +483,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('HdFullSe', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('HdFullSe', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -613,6 +618,7 @@ def findvideos(item):
 
         elif '/powvideo.' in url: continue
         elif '/streamplay.' in url: continue
+        elif '/vidtodo.' in url: continue
 
         elif 'onlystream.tv' in url: url = url.replace('onlystream.tv', 'upstream.to')
         elif 'vev.io' in url: url = url.replace('vev.io', 'streamtape.com/e')

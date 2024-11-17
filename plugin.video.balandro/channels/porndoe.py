@@ -35,14 +35,14 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'videos' ))
 
-    itemlist.append(item.clone( title = 'Exclusivos', action = 'list_all', url = host + 'category/74/premium-hd' ))
+    itemlist.append(item.clone( title = 'Exclusivos', action = 'list_all', url = host + 'category/74/premium-hd', text_color = 'pink' ))
 
-    itemlist.append(item.clone( title = 'Escenas', action = 'list_all', url = host + 'movies' ))
-
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'videos/top-porn-germany' ))
+    itemlist.append(item.clone( title = 'Escenas', action = 'list_all', url = host + 'movies', text_color = 'tan' ))
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'videos?sort=views' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'videos?sort=likes' ))
+
+    itemlist.append(item.clone( title = 'Más candentes', action = 'list_all', url = host + 'videos/top-porn-germany' ))
 
     itemlist.append(item.clone( title = 'Long Play', action = 'list_all', url = host + 'videos?sort=length' ))
 

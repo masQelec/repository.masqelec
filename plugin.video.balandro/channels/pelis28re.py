@@ -269,7 +269,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('Pelis28Re', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('Pelis28Re', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -353,7 +356,9 @@ def findvideos(item):
 
         if not d_type or not d_post or not d_nume: continue
 
-        if d_nume == 'trailer': continue
+        if d_nume == 'trailer':
+            ses = ses - 1
+            continue
 
         data1 = do_downloadpage(host + 'wp-json/dooplayer/v2/' + d_post + '/' + d_type + '/' + d_nume)
 
@@ -388,6 +393,7 @@ def findvideos(item):
                 elif '.cuevana3.' in lnk: continue
                 elif '-ukr-' in lnk: continue
                 elif '/plustream.' in lnk: continue
+                elif '/xupalace.' in lnk: continue
 
                 other = ''
 
@@ -412,6 +418,7 @@ def findvideos(item):
                         elif '.cuevana3.' in url: continue
                         elif '-ukr-' in url: continue
                         elif '/plustream.' in url: continue
+                        elif '/xupalace.' in url: continue
 
                         elif '/1fichier.' in url: continue
                         elif '/short.' in url: continue
@@ -476,6 +483,7 @@ def findvideos(item):
                 elif '.cuevana3.' in lnk: continue
                 elif '-ukr-' in lnk: continue
                 elif '/plustream.' in lnk: continue
+                elif '/xupalace.' in lnk: continue
 
                 elif '/filemooon.' in lnk: continue
 
@@ -534,6 +542,7 @@ def findvideos(item):
             elif '.cuevana3.' in url: continue
             elif '-ukr-' in url: continue
             elif '/plustream.' in url: continue
+            elif '/xupalace.' in url: continue
 
             elif '/1fichier.' in url: continue
             elif '/short.' in url: continue

@@ -35,7 +35,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'videos/' ))
 
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'most-popular/' ))
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'most-popular/' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'top-rated/' ))
 
     itemlist.append(item.clone( title = 'Long Play', action = 'list_all', url = host + 'search/?sort_by=duration&from_videos=1' ))

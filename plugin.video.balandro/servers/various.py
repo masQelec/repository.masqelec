@@ -37,6 +37,8 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
+    ini_page_url = page_url
+
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         txt_server = 'Unknow'
 
@@ -60,12 +62,24 @@ def get_video_url(page_url, url_referer=''):
         elif 'rumble' in page_url: txt_server = 'Rumble'
         elif 'qiwi' in page_url: txt_server = 'Qiwi'
 
+        elif 'terabox' in page_url:
+              txt_server = 'Terabox'
+
+              page_url = page_url.replace('/terabox.app/', '/terabox.com/')
+
         elif 'streamruby' in page_url or 'sruby' in page_url or 'rubystream' in page_url or 'stmruby' in page_url or 'rubystm' in page_url: txt_server = 'Streamruby'
 
         elif 'goodstream' in page_url:
               txt_server = 'Goodstream'
 
-              if not '/video/embed/' in page_url: page_url = page_url.replace('/goodstream.uno/', '/goodstream.uno/video/embed/')
+              if '/embed-' in page_url:
+                  page_url = page_url.replace('/goodstream.uno/embed-', '/goodstream.uno/video/embed/')
+                  page_url = page_url.replace('/goodstream.one/embed-', '/goodstream.uno/video/embed/')
+                  page_url = page_url.replace('.html', '')
+ 
+              if not '/video/embed/' in page_url:
+                  page_url = page_url.replace('/goodstream.uno/', '/goodstream.uno/video/embed/')
+                  page_url = page_url.replace('/goodstream.one/', '/goodstream.uno/video/embed/')
 
         elif 'filemoon' in page_url or 'fmoonembed' in page_url or 'embedmoon' in page_url or 'moonjscdn' in page_url:
               txt_server = 'Filemoon'
@@ -94,12 +108,13 @@ def get_video_url(page_url, url_referer=''):
               txt_server = 'Yandex'
               page_url = page_url.replace('/yadi.sk/', '/disk.yandex.ru/')
 
-        elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'wish' in page_url:
+        elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url:
               txt_server = 'Streamwish'
               page_url = page_url.replace('/streamwish.com/', '/streamwish.to/').replace('/streamwish.top/', '/streamwish.to/').replace('/streamwish.site/', '/streamwish.to/').replace('/strwish.xyz/', '/streamwish.to/').replace('/strwish.com/', '/streamwish.to/').replace('/embedwish.com/', '/streamwish.to/').replace('/wishembed.pro/', '/streamwish.to/')
               page_url = page_url.replace('/awish.pro/', '/streamwish.to/').replace('/dwish.pro/', '/streamwish.to/').replace('/mwish.pro/', '/streamwish.to/').replace('/wishfast.top/', '/streamwish.to/').replace('/sfastwish.com/', '/streamwish.to/').replace('/doodporn.xyz/', '/streamwish.to/')
               page_url = page_url.replace('/flaswish.com/', '/streamwish.to/').replace('/obeywish.com/', '/streamwish.to/').replace('/cdnwish.com/', '/streamwish.to/').replace('/asnwish.com/', '/streamwish.to/').replace('/flastwish.com/', '/streamwish.to/').replace('/jodwish.com/', '/streamwish.to/')
               page_url = page_url.replace('/swhoi.com/', '/streamwish.to/').replace('/fsdcmo.sbs/', '/streamwish.to/').replace('/swdyu.com/', '/streamwish.to/').replace('/wishonly.site/', '/streamwish.to/').replace('/playerwish.com/', '/streamwish.to/')
+              page_url = page_url.replace('/hlswish.com/', '/streamwish.to/').replace('/streamwish.fun/', '/streamwish.to/')
 
         elif 'desiupload' in page_url:
               txt_server = 'Desiupload'
@@ -168,6 +183,8 @@ def get_video_url(page_url, url_referer=''):
 
               page_url = page_url.replace('/vidhidepre.com/v/', '/vidhidepro.com/s/').replace('/vidhidepre.com/f/', '/vidhidepro.com/s/')
               page_url = page_url.replace('/vidhideplus.com/v/', '/vidhidepro.com/s/').replace('/vidhideplus.com/f/', '/vidhidepro.com/s/')
+              page_url = page_url.replace('/vidhide.fun/v/', '/vidhidepro.com/s/').replace('/vidhide.fun/f/', '/vidhidepro.com/s/')
+              page_url = page_url.replace('/vidhidehub.com/v/', '/vidhidepro.com/s/').replace('/vidhidehub.com/f/', '/vidhidepro.com/s/')
 
               page_url = page_url.replace('/stblion.xyz/v/', '/vidhidepro.com/s/').replace('/stblion.xyz/f/', '/vidhidepro.com/s/')
 
@@ -196,6 +213,8 @@ def get_video_url(page_url, url_referer=''):
             el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
             el_srv += ('ResolveUrl[/B][/COLOR]')
             platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
+            page_url = ini_page_url
 
             return 'Vídeo no encontrado con ResolveUrl'
 

@@ -67,6 +67,7 @@ def get_video_url(page_url, url_referer=''):
         elif 'streamcool' in page_url: txt_server = 'Streamcool'
         elif 'streamgzzz' in page_url: txt_server = 'Streamgzzz'
         elif 'streamoupload' in page_url: txt_server = 'Streamoupload'
+        elif 'turbovid' in page_url: txt_server = 'Turbovid'
         elif 'tusfiles' in page_url: txt_server = 'Tusfiles'
         elif 'uploadbaz' in page_url: txt_server = 'Uploadbaz'
         elif 'uploadflix' in page_url: txt_server = 'Uploadflix'

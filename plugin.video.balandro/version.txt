@@ -1,7 +1,7 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.11[/COLOR] [COLOR chartreuse] 26 de Septiembre de 2024[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.12 [/COLOR] [COLOR chartreuse] 4 de Noviembre de 2024[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
-    Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
+    Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Tutoriales, Sugerencias, etc.
     Telegram  [COLOR aquamarine][B][I]t.me/balandro_asesor[/I][/B][/COLOR]  Asesoramiento, Dudas, Consultas, etc.
 
  [COLOR yellow][B]FUENTE:[/B][/COLOR]
@@ -14,7 +14,12 @@
 
  [COLOR gold][B]MEDIA CENTERS:[/B][/COLOR]
     [B][COLOR tan]Kodi Versiones Oficiales Soportadas:[/COLOR][/B]
+       [COLOR violet][B]https://kodi.tv/download/[/B][/COLOR]  y  [COLOR violet][B]https://mirrors.kodi.tv/releases/[/B][/COLOR]
        [COLOR darkorange][B]22.x Piers,  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia  y  17.x Krypton[/B][/COLOR]
+
+    [B][COLOR tan]Kodi Consultas:[/COLOR][/B]
+       [COLOR violet][B]https://mundokodi.com[/B][/COLOR]
+       [COLOR goldenrod][B]Tutoriales, Instalaciones, Funciones, Add-Ons, Noticias, etc.[/B][/COLOR]
 
  [COLOR gold][B]ADD-ONS EXTERNOS:[/B][/COLOR]
     [B][COLOR mediumaquamarine]Motores Torrents Soportados:[/COLOR][/B]
@@ -53,9 +58,7 @@
     DocumaniaTv [COLOR moccasin][B] www.documaniatv.com [/COLOR][COLOR salmon][I] Kodi Not Play [/I][/B][/COLOR]
     NextDede [COLOR moccasin][B] nextdede.us [/COLOR][COLOR greenyellow][I] Not Login [/I][/B][/COLOR]
 
- [COLOR sienna][B]SITUACION SERVIDORES:[/B][/COLOR]
-    [COLOR orchid][B] Cinemaupload [/COLOR][I][COLOR salmon] Not Play [/I][/B][/COLOR]
-    [COLOR orchid][B] Fastream [/COLOR][I][COLOR salmon] Not Play [/I][/B][/COLOR]
+ [COLOR sienna][B]SITUACION SERVIDORES:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
  [COLOR gold][B]SERVIDORES VIAS ALTERNATIVAS/ADICIONALES QUE PUEDEN NECESITARSE:[/B][/COLOR]
     plugin.video.youtube

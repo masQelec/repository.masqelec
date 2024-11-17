@@ -86,7 +86,7 @@ def list_lst(item):
 
         SerieName = SerieName.strip()
 
-        title = title.replace('Temporada', '[COLOR goldenrod]Temporada[/COLOR]')
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='list_all', url = url, title = title, cat = True,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
@@ -179,7 +179,9 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
-        title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+
+        title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
@@ -233,9 +235,11 @@ def temporadas(item):
 
     url = host + 'category/' + title_ser + '/'
 
-    itemlist.append(item.clone( action='episodios', url=url, title='[COLOR hotpink]Serie[/COLOR] ' + title_ser.replace('-', ' ').capitalize(),
+    SerieName = title_ser.replace('-', ' ').capitalize()
+
+    itemlist.append(item.clone( action='episodios', url=url, title='[COLOR hotpink]Serie[/COLOR] ' + SerieName,
                                         serie = True, cat = False, page = 0,
-                                        contentType = 'tvshow', contentSerieName = title_ser, contentSeason = season ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season ))
 
     itemlist2 = episodios(item)
 
@@ -291,6 +295,8 @@ def episodios(item):
                 matches = re.compile('<div class="related-item tie_video">(.*?)</p>', re.DOTALL).findall(bloque)
 
                 if not matches:
+                    tmdb.set_infoLabels(itemlist)
+
                     return itemlist
 
     else:
@@ -311,6 +317,8 @@ def episodios(item):
             itemlist.append(item.clone( action='findvideos', url=item.url, title=item.title,
                                         contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
 
+            tmdb.set_infoLabels(itemlist)
+
             return itemlist
 
     if item.page == 0 and item.perpage == 50:
@@ -321,7 +329,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('EnNovelasPl', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('EnNovelasPl', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -387,7 +398,7 @@ def episodios(item):
 
         titulo = title
 
-        if not 'capitulo' in titulo.lower() and not 'episod' in titulo.lower():
+        if not 'capitulo' in titulo.lower():
             titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + titulo
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,

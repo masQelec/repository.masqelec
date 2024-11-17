@@ -174,6 +174,8 @@ def acciones(item):
 
     itemlist.append(Item( channel='helper', action='show_help_srnovelas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('srnovelas') ))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'srnovelas', thumbnail=config.get_thumb('srnovelas') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -221,11 +223,12 @@ def last_epis(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
-    matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
+    matches = scrapertools.find_multiple_matches(data, '<div class="grid-item item-(.*?)/div></a></div>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
-        title = scrapertools.find_single_match(match, '<p class="entry-title">(.*?)</p>')
+
+        title = scrapertools.find_single_match(match, '<h2>(.*?)</h2>')
 
         if not url or not title: continue
 
@@ -233,12 +236,12 @@ def last_epis(item):
 
         SerieName = scrapertools.find_single_match(match, 'alt="(.*?)"')
         if not SerieName:
-            SerieName = scrapertools.find_single_match(match, '<p class="entry-title">(.*?)Capitulo')
+            SerieName = scrapertools.find_single_match(match, '<h2>(.*?)Capitulo')
             SerieName = SerieName.replace('Final', '').strip()
 
         season = 1
 
-        epis = scrapertools.find_single_match(match, '<p class="entry-title">.*?Capitulo(.*?)</p>')
+        epis = scrapertools.find_single_match(match, '<h2>.*?Capitulo(.*?)</h2>')
         epis = epis.replace('Final', '').strip()
 
         if not epis: epis = 1
@@ -286,6 +289,8 @@ def list_all(item):
         title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "").strip()
         title = title.replace('&#8216;', "").replace('&#8217;', "").strip()
         title = title.replace('&amp;', '&')
+
+        if title.startswith("Serie "): title = title.replace('Serie ', '').strip()
 
         year = '-'
 
@@ -397,7 +402,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('SrNovelas', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('SrNovelas', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -481,6 +489,8 @@ def findvideos(item):
         url = url.strip()
 
         if '/likessb.' in url: continue
+
+        if url.startswith('//'): url = 'https:' + url
 
         if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 
@@ -624,6 +634,8 @@ def findvideos(item):
         ses += 1
 
         if '/wp-admin/' in url: continue
+
+        if url.startswith('//'): url = 'https:' + url
 
         if url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
         elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')

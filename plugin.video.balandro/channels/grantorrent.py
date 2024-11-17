@@ -187,6 +187,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'grantorrent', thumbnail=config.get_thumb('grantorrent') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist

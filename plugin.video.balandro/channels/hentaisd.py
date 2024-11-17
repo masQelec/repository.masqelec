@@ -32,9 +32,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_list', url = host + 'hentai/estrenos/', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'hentai/sin-censura/' ))
+    itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'hentai/sin-censura/', text_color = 'tan' ))
 
-    itemlist.append(item.clone( title = 'Latino', action = 'list_list', url = host + 'hentai/generos/latino/', text_color = 'pink' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_list', url = host + 'hentai/generos/latino/', text_color = 'pink' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 

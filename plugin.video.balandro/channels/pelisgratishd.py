@@ -39,8 +39,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'peliculas-populares/', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
@@ -122,6 +120,7 @@ def list_all(item):
     bloque = data
 
     if '>Destacadas<' in data: bloque = scrapertools.find_single_match(data, '(.*?)>Destacadas<')
+
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
@@ -229,7 +228,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('PelisGratisHd', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('PelisGratisHd', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -348,6 +350,7 @@ def findvideos(item):
         elif '/disable2.' in url: continue
         elif '/disable.' in url: continue
         elif '/embedsito.' in url: continue
+        elif '/xupalace.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -380,6 +383,7 @@ def findvideos(item):
             elif '/disable2.' in url: continue
             elif '/disable.' in url: continue
             elif '/embedsito.' in url: continue
+            elif '/xupalace.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
