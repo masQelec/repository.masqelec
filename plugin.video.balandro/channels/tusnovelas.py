@@ -7,13 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww1.tusnovelashd.co/'
+host = 'https://tusnovelashd.live/'
 
 
 perpage = 30
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://ww1.tusnovelashd.co/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     resp = httptools.downloadpage(url, post=post, headers=headers)
 
     if resp.sucess: data = resp.data
@@ -69,7 +75,7 @@ def list_lst(item):
         if 'Temporada' in SerieName: SerieName = SerieName.split("Temporada")[0]
         if 'temporada' in SerieName: SerieName = SerieName.split("temporada")[0]
 
-        title = title.replace('Temporada', '[COLOR goldenrod]Temporada[/COLOR]')
+        title = title.replace('Temporada', '[COLOR goldenrod]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='list_all', url = url, title = title, cat = True,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
@@ -153,7 +159,11 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'data-lazy-src"(.*?)"')
 
-        title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+
+        title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        title = title.replace('Completo HD', '').replace('completo HD', '').replace('Online', '').strip()
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
@@ -207,9 +217,11 @@ def temporadas(item):
 
     url = host + 'category/' + title_ser + '/'
 
+    SerieName = title_ser.replace('-', ' ').capitalize()
+
     itemlist.append(item.clone( action='episodios', url=url, title='[COLOR hotpink]Serie[/COLOR] ' + title_ser.replace('-', ' ').capitalize(),
                                         serie = True, cat = False, page = 0,
-                                        contentType = 'tvshow', contentSerieName = title_ser, contentSeason = season ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season ))
 
     itemlist2 = episodios(item)
 
@@ -272,6 +284,8 @@ def episodios(item):
                 matches = re.compile('<li class="post-item(.*?)</li>', re.DOTALL).findall(data)
 
                 if not matches:
+                    tmdb.set_infoLabels(itemlist)
+
                     return itemlist
 
             elif '-episodul-' in item.url:
@@ -284,6 +298,8 @@ def episodios(item):
                 matches = re.compile('<li class="post-item(.*?)</li>', re.DOTALL).findall(data)
 
                 if not matches:
+                    tmdb.set_infoLabels(itemlist)
+
                     return itemlist
 
     else:
@@ -302,6 +318,8 @@ def episodios(item):
             itemlist.append(item.clone( action='findvideos', url=item.url, title=item.title,
                                         contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
 
+            tmdb.set_infoLabels(itemlist)
+
             return itemlist
 
     if item.page == 0 and item.perpage == 50:
@@ -312,7 +330,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('TusNovelas', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('TusNovelas', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -363,6 +384,8 @@ def episodios(item):
         if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not title: continue
+
+        title = title.replace('Completo HD', '').replace('completo HD', '').replace('Online', '').strip()
 
         title = title.replace('&#8211;', '').strip()
 

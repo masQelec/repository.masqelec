@@ -98,13 +98,13 @@ context_buscar.append({'title': tit, 'channel': 'search', 'action': 'show_help_p
 tit = '[COLOR darkcyan][B]Preferencias Proxies[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_prx_parameters'})
 
-tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
+tit = '[COLOR darkorange]Información Dominios[/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
 tit = '[COLOR mediumaquamarine][B]Últimos Cambios Dominios[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
-tit = '[COLOR %s][B]Quitar Dominios Memorizados[/B][/COLOR]' % color_alert
+tit = '[COLOR darkorange][B]Quitar Dominios Memorizados[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'manto_domains'})
 
 tit = '[COLOR gold][B]Qué Canales No Intervienen[/B][/COLOR]'
@@ -157,7 +157,7 @@ if config.get_setting('proxysearch_excludes', default=''):
 tit = '[COLOR %s]Información Proxies[/COLOR]' % color_infor
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-tit = '[COLOR %s][B]Quitar Proxies Actuales[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR %s][B]Quitar Todos los Proxies[/B][/COLOR]' % color_list_proxies
 context_buscar.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR %s][B]Información Búsquedas[/B][/COLOR]' % color_infor
@@ -184,7 +184,7 @@ if config.get_setting('proxysearch_excludes', default=''):
 tit = '[COLOR %s]Información Proxies[/COLOR]' % color_infor
 context_generos.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-tit = '[COLOR %s][B]Quitar Proxies Actuales[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR %s][B]Quitar Todos los Proxies[/B][/COLOR]' % color_list_proxies
 context_generos.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR %s]Ajustes categorías Menú, Canales, Dominios y Proxies[/COLOR]' % color_exec
@@ -208,7 +208,7 @@ if config.get_setting('proxysearch_excludes', default=''):
 tit = '[COLOR %s]Información Proxies[/COLOR]' % color_avis
 context_proxy_channels.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-tit = '[COLOR %s][B]Quitar Proxies Actuales[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR %s][B]Quitar Todos los Proxies[/B][/COLOR]' % color_list_proxies
 context_proxy_channels.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR %s]Ajustes categorías Menú, Canales, Dominios y Proxies[/COLOR]' % color_exec
@@ -247,7 +247,7 @@ if config.get_setting('proxysearch_excludes', default=''):
 tit = '[COLOR %s]Información Proxies[/COLOR]' % color_avis
 context_torrents.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-tit = '[COLOR %s][B]Quitar Proxies Actuales[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR %s][B]Quitar Todos los Proxies[/B][/COLOR]' % color_list_proxies
 context_torrents.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR %s]Ajustes categorías Canales, Dominios, Proxies y Torrents[/COLOR]' % color_exec
@@ -281,7 +281,7 @@ if config.get_setting('proxysearch_excludes', default=''):
 tit = '[COLOR %s]Información Proxies[/COLOR]' % color_avis
 context_parental.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-tit = '[COLOR %s][B]Quitar Proxies Actuales[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR %s][B]Quitar Todos los Proxies[/B][/COLOR]' % color_list_proxies
 context_parental.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR %s]Ajustes categorías Canales, Parental, Dominios y Proxies[/COLOR]' % color_exec
@@ -343,40 +343,40 @@ context_config = []
 tit = '[COLOR tan][B]Preferencias Canales[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
 
-tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
+tit = '[COLOR darkorange]Información Dominios[/COLOR]'
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
 tit = '[COLOR %s][B]Últimos Cambios Dominios[/B][/COLOR]' % color_exec
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'show_latest_domains'})
 
-tit = '[COLOR %s][B]Quitar Dominios Memorizados[/B][/COLOR]' % color_alert
+tit = '[COLOR darkorange][B]Quitar Dominios Memorizados[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_domains'})
 
 tit = '[COLOR green][B]Información Plataforma[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_plataforma'})
 
-tit = '[COLOR %s][B]Quitar Proxies Memorizados[/B][/COLOR]' % color_alert
+tit = '[COLOR %s][B]Quitar Todos los Proxies[/B][/COLOR]' % color_alert
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR olive][B]Limpiezas[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_limpiezas'})
 
-tit = '[COLOR darkorange][B]Borrar Carpeta Caché[/B][/COLOR]'
+tit = '[COLOR orange][B]Borrar Carpeta Caché[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_folder_cache'})
 
 tit = '[COLOR %s][B]Sus Ajustes Personalizados[/B][/COLOR]' % color_avis
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_sets'})
 
-tit = '[COLOR %s][B]Cookies Actuales[/B][/COLOR]' % color_infor
+tit = '[COLOR %s]Cookies Actuales[/COLOR]' % color_infor
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_cook'})
 
-tit = '[COLOR %s][B]Eliminar Cookies[/B][/COLOR]' % color_alert
+tit = '[COLOR %s][B]Eliminar Cookies[/B][/COLOR]' % color_infor
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_cookies'})
 
 tit = '[COLOR %s]Sus Advanced Settings[/COLOR]' % color_adver
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_advs'})
 
-tit = '[COLOR %s][B]Eliminar Advanced Settings[/B][/COLOR]' % color_alert
+tit = '[COLOR fuchsia][B]Eliminar Advanced Settings[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'actions', 'action': 'manto_advs'})
 
 tit = '[COLOR mediumaquamarine][B]Restablecer Parámetros Internos[/B][/COLOR]'
@@ -400,7 +400,7 @@ if config.get_setting('proxysearch_excludes', default=''):
 tit = '[COLOR %s]Información Proxies[/COLOR]' % color_avis
 context_usual.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-tit = '[COLOR %s][B]Quitar Proxies Actuales[/B][/COLOR]' % color_list_proxies
+tit = '[COLOR %s][B]Quitar Todos los Proxies[/B][/COLOR]' % color_list_proxies
 context_usual.append({'title': tit, 'channel': 'actions', 'action': 'manto_proxies'})
 
 tit = '[COLOR %s]Ajustes categorías Canales, Dominios y Proxies[/COLOR]' % color_exec
@@ -572,7 +572,7 @@ def mainlist(item):
     tit = '[COLOR tan][B]Preferencias Menús[/B][/COLOR]'
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
-    tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
+    tit = '[COLOR darkorange]Información Dominios[/COLOR]'
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
     tit = '[COLOR %s][B]Últimos Cambios Dominios[/B][/COLOR]' % color_exec
@@ -597,7 +597,7 @@ def mainlist(item):
     tit = '[COLOR green][B]Preguntas Frecuentes[/B][/COLOR]'
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_help_faq'})
 
-    tit = '[COLOR red][B]Temas No Contemplados[/B][/COLOR]'
+    tit = '[COLOR fuchsia][B]Temas No Contemplados[/B][/COLOR]'
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_not_contemplated'})
 
     tit = '[COLOR goldenrod][B]Miscelánea[/B][/COLOR]'
@@ -1205,7 +1205,7 @@ def channels(item):
 
         if 'proxies' in ch['notes'].lower():
             if config.get_setting(cfg_proxies_channel, default=''):
-                tit = '[COLOR %s][B]Quitar Proxies del Canal[/B][/COLOR]' % color_list_proxies
+                tit = '[COLOR %s]Quitar Proxies del Canal[/COLOR]' % color_list_proxies
                 context.append({'title': tit, 'channel': item.channel, 'action': '_quitar_proxies'})
 
         if ch['searchable']:
@@ -1301,7 +1301,7 @@ def channels(item):
         if 'current' in ch['clusters']:
             cfg_domains = True
 
-            tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
+            tit = '[COLOR darkorange]Información Dominios[/COLOR]'
             context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
         tit = '[COLOR %s][B]Últimos Cambios Dominios[/B][/COLOR]' % color_exec

@@ -205,6 +205,8 @@ def acciones(item):
 
     itemlist.append(Item( channel='helper', action='show_help_cinecalidadlol', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('cinecalidadlol') ))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'cinecalidadlol', thumbnail=config.get_thumb('cinecalidadlol') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -234,7 +236,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = '[B]En castellano:[/B]', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'espana/?ref=es', search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host + 'espana/?ref=es', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Más vistas', action = 'destacadas', url = host + 'espana/?ref=es', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/?ref=es', search_type = 'movie' ))
 
     if not config.get_setting('descartar_anime', default=False):
@@ -245,7 +247,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = '[B]En latino:[/B]', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Más vistas', action = 'destacadas', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
 
     if not config.get_setting('descartar_anime', default=False):
@@ -267,13 +269,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = '[B]En castellano:[/B]', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/?ref=es', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - [COLOR moccasin]Últimas[/COLOR]', action = 'destacadas', url = host + '?ref=es', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow', group = '?ref=es' ))
 
     itemlist.append(item.clone( title = '[B]En latino:[/B]', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'ver-serie/', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = ' - [COLOR moccasin]Últimas[/COLOR]', action = 'destacadas', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'tvshow' ))
 
@@ -522,7 +522,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('CineCalidadLol', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -762,6 +765,9 @@ def findvideos(item):
 def play(item):
     logger.info()
     itemlist = []
+
+    if '/acortalink.' in item.url:
+        return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
     domain_memo = config.get_setting('dominio', 'cinecalidadlol', default='')
 

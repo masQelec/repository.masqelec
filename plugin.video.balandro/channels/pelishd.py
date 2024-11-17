@@ -173,7 +173,6 @@ def findvideos(item):
 
                 elif '/1fichier.' in url: continue
                 elif '/www.fireload.' in url: continue
-                elif '/terabox.' in url: continue
                 elif '/t.me' in url: continue
                 elif '/zb4vh-' in url: continue
 

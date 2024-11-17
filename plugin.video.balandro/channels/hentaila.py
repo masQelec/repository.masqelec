@@ -35,7 +35,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'directorio?status[1]=on' ))
     itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'directorio?status[2]=on' ))
 
-    itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'directorio?uncensored=on' ))
+    itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'directorio?uncensored=on', text_color = 'tan' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 

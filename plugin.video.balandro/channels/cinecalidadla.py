@@ -82,6 +82,8 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_cinecalidadla', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'cinecalidadla', thumbnail=config.get_thumb('cinecalidadla') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -115,7 +117,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = '[B]En latino:[/B]', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Más vistas', action = 'destacadas', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'calidad/4k-ultra-hd-hdr/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie' ))
@@ -370,7 +372,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('CineCalidadLa', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -529,6 +534,9 @@ def findvideos(item):
 def play(item):
     logger.info()
     itemlist = []
+
+    if '/acortalink.' in item.url:
+        return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
     domain_memo = config.get_setting('dominio', 'cinecalidadla', default='')
 

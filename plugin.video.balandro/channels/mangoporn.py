@@ -35,13 +35,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
-    itemlist.append(item.clone( title = 'Películas:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = '[B]Películas:[/B]', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'genres/porn-movies/page/1/' ))
 
     itemlist.append(item.clone( title = ' - Tendencias', action = 'list_all', url = host + 'adult/trending/page/1/' ))
 
-    itemlist.append(item.clone( title = 'Vídeos:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = '[B]Vídeos:[/B]', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'xxxporn/' ))
 
@@ -114,7 +114,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('Porn Online Free', '').strip()
+        title = title.replace('Porn Online Free', '').replace('Watch', '').strip()
 
         title = title.replace('&#8211;', '').replace('&#038;', '&').replace('&#8217;', "'").replace('&#8230;', '').strip()
 
@@ -176,7 +176,8 @@ def findvideos(item):
 
             if servidor == 'various': other = servertools.corregir_other(url)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
+            if not servidor == 'directo':
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
 
     # ~  Download
     if '>Download Sources' in data:
@@ -208,7 +209,8 @@ def findvideos(item):
 
                 if servidor == 'various': other = servertools.corregir_other(url) + ' ' + other
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
+                if not servidor == 'directo':
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
 
     if not itemlist:
         if not ses == 0:

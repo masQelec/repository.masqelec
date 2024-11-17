@@ -525,6 +525,8 @@ def list_all(item):
 
         if '/release-year/' in item.url: year = scrapertools.find_single_match(item.url, "/release-year/(.*?)/")
 
+        if not year == '-': title = title.replace('(' + year + ')', '').strip()
+
         qlty = scrapertools.find_single_match(info, '-quality">(.*?)</div>')
 
         tipo = 'tvshow' if '/series/' in url else 'movie'
@@ -575,12 +577,14 @@ def last_epis(item):
 
         url = host + url
 
-        titulo = title
+        titulo = str(season) + 'x' + str(episode) + ' ' + title
 
         fecha = scrapertools.find_single_match(info, '<span class="ep_airdate">(.*?)</span>').strip()
         if fecha: titulo = titulo + '  (' + fecha + ')'
 
-        titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
+        titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+
+        titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Cap.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Cap.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', title = titulo, url = url, thumbnail = thumb,
                                     contentType = 'episode', contentSerieName=serie_name, contentSeason = season, contentEpisodeNumber = episode, infoLabels = {'year': '-'} ))
@@ -643,6 +647,7 @@ def episodios(item):
     data = do_downloadpage(item.url)
 
     patron_season = '<strong>(?:Season|Temporada) %s</strong>.*?class="les-content"(.*?)</div>' % season
+
     data = scrapertools.find_single_match(data, patron_season)
 
     matches = re.compile('<a href="([^"]+)">(?:Episode|Capitulo) (\d+)', re.DOTALL).findall(data)
@@ -655,7 +660,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('HomeCine', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('HomeCine', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -692,10 +700,11 @@ def episodios(item):
     for url, epis in matches[item.page * item.perpage:]:
         url = host + url
 
-        try: titulo = '%sx%s - Capítulo %s' % (season, epis, epis)
+        try: titulo = '%sx%s Capítulo %s' % (season, epis, epis)
         except: titulo = 'Episodio ' + epis
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, contentType = 'episode',
+                                    contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break

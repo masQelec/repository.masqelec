@@ -63,22 +63,21 @@ def get_video_url(page_url, url_referer=''):
             if url.startswith('/e/'): url = 'https://mixdrop.ag' + url
             data = httptools.downloadpage(url).data
  
-    packed = scrapertools.find_multiple_matches(data, "(?s)eval(.*?)\s*</script>")
+    packed = scrapertools.find_multiple_matches(data, r'(eval.*?)</script>')
 
     for pack in packed:
         try: data = jsunpack.unpack(pack)
         except: data = ''
 
-        if 'MDCore.' in data: break
-
-    urls = scrapertools.find_multiple_matches(data, 'MDCore\.\w+="([^"]+)')
+    urls = scrapertools.find_multiple_matches(data, 'MDCore\.\w+\s*=\s*"([^"]+)"')
 
     for url in urls:
         if '/' not in url: continue
         elif url.endswith('.jpg'): continue
 
         if url.startswith('//'):
-            video_urls.append(["mp4", 'https:' + url])
+            url = 'https' + url
+            video_urls.append(["mp4", url])
             break
 
     if not video_urls:

@@ -343,7 +343,10 @@ def with_proxies(item):
                 dominio = dominio.replace('https://', '').replace('/', '')
                 info = info + '[B][COLOR cyan] %s [/B][/COLOR]' % dominio
 
-        if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+        if config.get_setting(cfg_proxies_channel, default=''):
+            info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+            if config.get_setting(cfg_proxytools_provider, default=''):
+                info = info + ' [COLOR goldenrod][B]' + config.get_setting(cfg_proxytools_provider).capitalize() + '[/B][/COLOR] '
         elif config.get_setting(cfg_proxytools_max_channel, default=''): info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
         elif config.get_setting(cfg_proxytools_provider, default=''): info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
         else: info = info + '[COLOR firebrick][B] Quizás use proxies [/B][/COLOR]'
@@ -1432,7 +1435,7 @@ def show_clients_torrent(item):
 
 
 def search_new_proxies(canal_0, canal_1, canal_2):
-    if platformtools.dialog_yesno(canal_0, canal_1, '[COLOR red][B]¿ Desea efectuar una nueva búsqueda de proxies en el canal ?[/B][/COLOR]'):
+    if platformtools.dialog_yesno(canal_0, canal_1, '¿ Efectuar una [COLOR cyan][B]Nueva Búsqueda[/B][/COLOR] de [COLOR red][B]Proxies[/B][/COLOR] en el Canal ?'):
         channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
         iniciales_channels_proxies_memorized = channels_proxies_memorized
 
@@ -1443,7 +1446,7 @@ def search_new_proxies(canal_0, canal_1, canal_2):
     return False
 
 def tests_channels(canal_0, canal_1, canal_2):
-    if platformtools.dialog_yesno(canal_0, '[COLOR goldenrod][B]¿ Efectuar Test Web del Canal ?[/B][/COLOR]', canal_1, canal_2):
+    if platformtools.dialog_yesno(canal_0, '[COLOR cyan][B]¿ Desea Efectuar el Test Web del Canal ?[/B][/COLOR]', canal_1, canal_2):
         from modules import tester
 
         config.set_setting('developer_test_channels', '')

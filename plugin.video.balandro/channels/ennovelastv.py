@@ -10,12 +10,12 @@ from core import httptools, scrapertools, servertools, tmdb
 # ~ pelis No hay 24/12/2023
 
 
-host = 'https://g.ennovelas-tv.com/'
+host = 'https://i.ennovelas-tv.com/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://c.ennovelas-tv.com/', 'https://d.ennovelas-tv.com/', 'https://e.ennovelas-tv.com/',
-             'https://f.ennovelas-tv.com/']
+             'https://f.ennovelas-tv.com/', 'https://g.ennovelas-tv.com/', 'https://h.ennovelas-tv.com/']
 
 
 domain = config.get_setting('dominio', 'ennovelastv', default='')
@@ -68,6 +68,8 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_ennovelastv', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'ennovelastv', thumbnail=config.get_thumb('ennovelastv') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -87,7 +89,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_epis', url = host + 'episodes11/', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'episodes11/', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Últimas series', action = 'list_last', url = host + 'ennovelass/', search_type = 'tvshow', text_color = 'moccasin' ))
 
@@ -212,7 +214,9 @@ def list_all(item):
                 epis = scrapertools.find_single_match(match, '<span>Cap.*?<span>(.*?)</span>')
                 if not epis: epis = 1
 
-                title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
+                title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+
+                title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
                 itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, infoLabels={'year': year},
                                             contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
@@ -280,7 +284,9 @@ def list_epis(item):
 
         SerieName = SerieName.strip()
 
-        title = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Capítulo[/COLOR]')
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+
+        title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, infoLabels={'year': '-'},
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
@@ -326,7 +332,7 @@ def list_last(item):
 
         SerieName = SerieName.strip()
 
-        title = title.replace('Temporada', '[COLOR tan]Temporada[/COLOR]')
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
@@ -406,7 +412,10 @@ def episodios(item):
         try: tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('EnNovelasTv', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('EnNovelasTv', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -448,6 +457,8 @@ def episodios(item):
 
         epis = scrapertools.find_single_match(match, '<span>(.*?)</span>')
         if not epis: epis = 1
+
+        title = title.replace('EP ', '[COLOR goldenrod]Epis. [/COLOR]').replace('Ep ','[COLOR goldenrod]Epis. [/COLOR]')
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 

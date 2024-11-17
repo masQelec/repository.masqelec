@@ -159,6 +159,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'pelisplus', thumbnail=config.get_thumb('pelisplus') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -269,6 +271,8 @@ def list_all(item):
 
         title = re.sub(r" \(.*?\)| \| .*", "", title)
 
+        title = title.replace('&#039;', "'")
+
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year text-center">(.*?)</span>')
@@ -364,7 +368,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('PelisPlus', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('PelisPlus', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -726,6 +733,8 @@ def list_search(item):
 
     for url, thumb, year, title in matches:
         if url.startswith('/'): url = host_player + url
+
+        title = title.replace('&#039;', "'")
 
         if not year: year = '-'
 

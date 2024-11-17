@@ -11,12 +11,6 @@ host = 'https://doramasmp4.se/'
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://doramasmp4.dev/']
-
-    for ant in ant_hosts:
-        url = url.replace(ant, host)
-
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -34,9 +28,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'list_all', url = host, group = 'last', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host, group = 'last', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'doramas-en-curso-ubau/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Completados', action = 'list_all', url = host + 'series/?status=Completed', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'series/?type=Anime', search_type = 'tvshow', text_color = 'springgreen' ))
 
@@ -139,17 +135,20 @@ def list_all(item):
 
         if 'Temporada' in SerieName: SerieName = SerieName.split("Temporada")[0]
         if 'temporada' in SerieName: SerieName = SerieName.split("temporada")[0]
+        if 'Season' in SerieName: SerieName = SerieName.split("Season")[0]
+        if 'season' in SerieName: SerieName = SerieName.split("season")[0]
 
         SerieName = SerieName.strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
-        titulo = title.replace('Capitulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('capitulo', '[COLOR goldenrod]Capitulo[/COLOR]')
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
-        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Capitulo[/COLOR]').replace('capítulo', '[COLOR goldenrod]Capitulo[/COLOR]')
-        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Episodio[/COLOR]').replace('episodio', '[COLOR goldenrod]Episodio[/COLOR]')
+        titulo = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        if '[COLOR goldenrod]Capitulo[/COLOR]' in titulo:
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodie', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if item.group == 'last':
             season = 1
 
             if '-temporada-' in url: season = scrapertools.find_single_match(url, '-temporada-(.*?)/')
@@ -159,6 +158,9 @@ def list_all(item):
             if not epis: epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
 
             if not epis: epis = 1
+
+            if '>Upcoming<' in match:
+                titulo = '[COLOR cyan][B]Proximamente[/B][/COLOR]' + ' ' + titulo
 
             itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentType = 'episode', contentSerieName = SerieName,
                                         contentSeason = season, contentEpisodeNumber=epis, infoLabels={'year': '-'} ))
@@ -193,6 +195,13 @@ def list_all(item):
 def temporadas(item):
     logger.info()
     itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    if not '<li data-index="' in data:
+        if '>Upcoming<' in data or '>Ongoing<' in data:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Proximamente[/B][/COLOR]')
+            return
 
     if config.get_setting('channels_seasons', default=True):
         title = 'Sin temporadas'
@@ -244,7 +253,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('DoramasMp4Dev', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('DoramasMp4Dev', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -277,11 +289,21 @@ def episodios(item):
                 else: item.perpage = 50
 
     for url, epis, title, in matches[item.page * item.perpage:]:
-        orden = epis.replace('Cap ', '').strip()
+        epis = epis.replace('Cap ', '').strip()
+
+        orden = epis
 
         if len(orden) == 1: orden = '0' + orden
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, orden = orden,
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+
+        titulo = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodie', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, orden = orden,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
@@ -330,7 +352,9 @@ def findvideos(item):
     matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
     for url in matches:
-        if '/googleads.' in url: continue
+        if url == 'about:blank': continue
+
+        elif '/googleads.' in url: continue
 
         ses += 1
 
@@ -347,6 +371,10 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other = other ))
 
     if not itemlist:
+        if '>Upcoming<' in data or '>Ongoing<' in data:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Proximamente[/B][/COLOR]')
+            return
+
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return

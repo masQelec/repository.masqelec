@@ -49,6 +49,7 @@ except:
 
 
 dominios = [
+         'https://hdfull.buzz/',
          'https://hdfull.blog/',
          'https://hd-full.info/',
          'https://hd-full.sbs/',
@@ -88,7 +89,7 @@ if host in str(ant_hosts): config.set_setting('dominio', dominios[0], 'hdfull')
 
 
 login_ok = '[COLOR chartreuse]HdFull Login correcto[/COLOR]'
-start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR], Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
+start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR], Por favor, si fuera necesario [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
 
 perpage = 20
 
@@ -486,8 +487,8 @@ def acciones(item):
     username = config.get_setting('hdfull_username', 'hdfull', default='')
 
     if username:
-        itemlist.append(Item( channel='domains', action='operative_domains_hdfull', title='[B]Dominios Operativos Vigentes[/B]',
-                              desde_el_canal = True, thumbnail=config.get_thumb('hdfull'), text_color='mediumaquamarine' ))
+        itemlist.append(Item( channel='domains', action='operative_domains_hdfull', title='[COLOR mediumaquamarine][B]Dominios Operativos Vigentes' + '[COLOR dodgerblue] https://dominioshdfull.com/[/B][/COLOR]',
+                              desde_el_canal = True, thumbnail=config.get_thumb('hdfull') ))
 
         itemlist.append(Item( channel='domains', action='last_domain_hdfull', title='[B]Comprobar último dominio vigente[/B]',
                               desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('hdfull'), text_color='chocolate' ))
@@ -517,7 +518,9 @@ def acciones(item):
     itemlist.append(item_configurar_dominio(item))
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_hdfull', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('hdfull') ))
+    itemlist.append(Item( channel='helper', action='show_help_hdfull', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', _mnu = True, thumbnail=config.get_thumb('hdfull') ))
+
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'hdfull', thumbnail=config.get_thumb('hdfull') ))
 
     platformtools.itemlist_refresh()
 
@@ -623,7 +626,7 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( action='list_all', title='Catálogo', url = dominio + 'series', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( action='list_all', title='Últimas', url = dominio + 'series/date', search_type='tvshow', text_color='moccasin' ))
+        itemlist.append(item.clone( action='list_all', title='Últimas', url = dominio + 'series/date', search_type='tvshow', text_color='yellowgreen' ))
 
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url= dominio + 'series/imdb_rating', search_type = 'tvshow' ))
 
@@ -640,7 +643,7 @@ def mainlist_series(item):
         if not config.get_setting('descartar_anime', default=False):
             itemlist.append(item.clone( action='list_episodes', title=' - [COLOR springgreen]Anime[/COLOR]', opcion = 'anime', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( action='list_episodes', title=' - [COLOR moccasin]Últimos[/COLOR]', opcion = 'latest', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_episodes', title=' - [COLOR yellowgreen]Últimos[/COLOR]', opcion = 'latest', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_episodes', title=' - Actualizados', opcion = 'updated', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( action='series_abc', title='Por letra (A - Z)', search_type = 'tvshow' ))
@@ -833,7 +836,7 @@ def list_episodes(item):
         show = epi['show']['title']['es'] if 'es' in epi['show']['title'] and epi['show']['title']['es'] != '' else epi['show']['title']['en'] if 'en' in epi['show']['title'] else ''
 
         tit = epi['title']['es'] if 'es' in epi['title'] and epi['title']['es'] != '' else epi['title']['en'] if 'en' in epi['title'] else ''
-        titulo = '%s %sx%s %s' % (show, epi['season'], epi['episode'], tit)
+        titulo = '%sx%s %s %s' % (epi['season'], epi['episode'], tit, '[COLOR violet]' + show + '[/COLOR]')
 
         langs = ['Vose' if idio == 'ESPSUB' else idio.capitalize() for idio in epi['languages']]
         if langs: titulo += ' [COLOR %s]%s[/COLOR]' % (color_lang, ', '.join(langs))
@@ -1032,7 +1035,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -1068,6 +1074,8 @@ def episodios(item):
 
     for epi in data[item.page * item.perpage:]:
         tit = epi['title']['es'] if 'es' in epi['title'] and epi['title']['es'] else epi['title']['en'] if 'en' in epi['title'] and epi['title']['en'] else ''
+        if not tit: tit = epi['show']['title']['es'] if 'es' in epi['show']['title'] and epi['show']['title']['es'] != '' else epi['show']['title']['en'] if 'en' in epi['show']['title'] else ''
+
         titulo = '%sx%s %s' % (epi['season'], epi['episode'], tit)
 
         langs = ['Vose' if idio == 'ESPSUB' else idio.capitalize() for idio in epi['languages']]

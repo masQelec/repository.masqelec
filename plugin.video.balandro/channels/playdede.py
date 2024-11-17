@@ -71,7 +71,7 @@ perpage = 21
 login_ok = '[COLOR chartreuse]PlayDede Login correcto[/COLOR]'
 login_ko = '[COLOR red][B]PlayDede Login incorrecto[/B][/COLOR]'
 no_login = '[COLOR orangered][B]PlayDede Sin acceso Login[/B][/COLOR]'
-start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR], Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
+start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR], Por favor, si fuera necesario [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
 
 datos_ko = '>Registrarme<'
 
@@ -497,6 +497,8 @@ def acciones(item):
 
     itemlist.append(Item( channel='helper', action='show_help_playdede', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('playdede') ))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'playdede', thumbnail=config.get_thumb('playdede') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -589,7 +591,7 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Nuevos episodios', action = 'list_last', url = host, _type = 'episodes', nro_pagina = 1, search_type = 'tvshow', text_color = 'cyan' ))
+        itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_last', url = host, _type = 'episodes', nro_pagina = 1, search_type = 'tvshow', text_color = 'cyan' ))
 
         itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, _type = 'series', nro_pagina = 1, search_type = 'tvshow', text_color = 'yellowgreen' ))
 
@@ -1036,11 +1038,10 @@ def list_all(item):
         if url.startswith('/'): url = host[:-1] + url
         elif not url.startswith('http'): url = host + url
 
-        if '/extraiptv.' in url: continue
-
         title = clean_title(title, url)
 
         if 'Tu directorio de' in title: continue
+        elif '/extraiptv.' in url: continue
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
@@ -1113,6 +1114,9 @@ def list_last(item):
                     login(item)
                     data = do_downloadpage(url)
 
+                    if data:
+                        data = do_downloadpage(url, post=post)
+
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = data.replace('\\/', '/')
@@ -1136,11 +1140,10 @@ def list_last(item):
         if url.startswith('/'): url = host[:-1] + url
         elif not url.startswith('http'): url = host + url
 
-        if '/extraiptv.' in url: continue
-
         title = clean_title(title, url)
 
         if 'Tu directorio de' in title: continue
+        elif '/extraiptv.' in url: continue
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
@@ -1231,7 +1234,10 @@ def list_last(item):
 
             titulo = titulo.replace('  ', ' ')
 
-            if not 'x' in titulo: titulo = titulo + ' ' + str(season) + 'x' + str(epis)
+            if len(epis) == 2:
+                if epis.startswith("0"): epis = epis.replace('0', '')
+
+            titulo: titulo = str(season) + 'x' + str(epis) + ' ' + titulo.replace(str(season) + 'x' + str(epis), '')
 
             SerieName = SerieName.replace('  ', ' ')
 
@@ -1334,12 +1340,13 @@ def list_network(item):
 
         if not url or not title: continue
 
-        if 'Tu directorio de' in title: continue
-
         if url.startswith('/'): url = host[:-1] + url
         elif not url.startswith('http'): url = host + url
 
         title = clean_title(title, url)
+
+        if 'Tu directorio de' in title: continue
+        elif '/extraiptv.' in url: continue
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
@@ -1380,6 +1387,23 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
+    url = item.url
+
+    # ~ si se perdio la sesion (utoken)
+    if data:
+        if datos_ko in str(data):
+            logout(item)
+            login(item)
+            data = do_downloadpage(url)
+
+            if data:
+                username = config.get_setting('playdede_username', 'playdede', default='')
+
+                if not username in data:
+                    logout(item)
+                    login(item)
+                    data = do_downloadpage(url)
+
     matches = re.compile('<div class="clickSeason.*?data-season="(.*?)"', re.DOTALL).findall(data)
     if not matches: matches = re.compile("<div class='clickSeason.*?data-season='(.*?)'", re.DOTALL).findall(data)
 
@@ -1415,6 +1439,22 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    url = item.url
+
+    if data:
+        if datos_ko in str(data):
+            logout(item)
+            login(item)
+            data = do_downloadpage(url)
+
+            if data:
+                username = config.get_setting('playdede_username', 'playdede', default='')
+
+                if not username in data:
+                    logout(item)
+                    login(item)
+                    data = do_downloadpage(url)
+
     bloque = scrapertools.find_single_match(data, '<div class="se-c".*?data-season="%d"(.*?)<\/div><\/div>' % (item.contentSeason))
     if not bloque: bloque = scrapertools.find_single_match(data, "<div class='se-c'.*?data-season='%d'(.*?)<\/div><\/div>" % (item.contentSeason))
 
@@ -1432,7 +1472,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('PlayDede', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('PlayDede', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -1548,6 +1591,7 @@ def findvideos(item):
         elif server == 'hexupload': other = 'Hexupload'
         elif server == 'userload': other = 'Userload'
         elif server == 'streamruby': other = 'Streamruby'
+        elif server == 'streamsilk': other = 'Turboviplay'
 
         elif server == 'luluvideo':
               server = 'various'
@@ -1588,6 +1632,7 @@ def findvideos(item):
         elif server == 'hexupload': other = 'Hexupload'
         elif server == 'userload': other = 'Userload'
         elif server == 'streamruby': other = 'Streamruby'
+        elif server == 'streamsilk': other = 'Turboviplay'
 
         elif server == 'luluvideo':
               server = 'various'
@@ -1738,6 +1783,11 @@ def list_search(item):
                 if '/serie/' in url: continue
             else:
                 if '/pelicula/' in url: continue
+
+        title = clean_title(title, url)
+
+        if 'Tu directorio de' in title: continue
+        elif '/extraiptv.' in url: continue
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 

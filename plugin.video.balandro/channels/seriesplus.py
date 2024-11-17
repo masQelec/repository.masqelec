@@ -9,7 +9,7 @@ from core import httptools, scrapertools, servertools, tmdb
 
 # ~ 14/8/24 Peliculas solo hay 26
 
-host = 'https://w-ww.gnula2h.cc/'
+host = 'https://wl3v.gnula2h.cc/'
 
 
 def item_configurar_proxies(item):
@@ -45,6 +45,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://w-ww.gnula2h.cc/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/release/' in url: raise_weberror = False
 
     if not headers: headers = {'Referer': host}
@@ -374,7 +380,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('SeriesPlus', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('SeriesPlus', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')

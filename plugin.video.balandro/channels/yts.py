@@ -81,8 +81,6 @@ def paises(item):
 
     return sorted(itemlist, key=lambda it: it.title)
 
-    return itemlist
-
 
 def calidades(item):
     logger.info()

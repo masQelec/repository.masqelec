@@ -36,7 +36,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'directorio-hentai?estado[]=0&order=created' ))
     itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'directorio-hentai?estado[]=1&order=created' ))
 
-    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'directorio-hentai?genre[]=71&order=updated', text_color = 'pink' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'directorio-hentai?genre[]=71&order=updated', text_color = 'pink' ))
 
     itemlist.append(item.clone( title = 'Hentai', action = 'list_all', url = host + 'directorio-hentai?tipo[]=1&tipo[]=7&order=updated' ))
     itemlist.append(item.clone( title = 'Jav', action = 'list_all', url = host + 'directorio-hentai?tipo[]=2&order=updated' ))

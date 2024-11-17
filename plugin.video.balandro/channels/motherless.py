@@ -50,9 +50,12 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host  + 'videos/recent' ))
 
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host  + 'videos/viewed' ))
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host  + 'videos/popular' ))
-    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host  + 'videos/commented' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host  + 'videos/viewed' ))
+
+    itemlist.append(item.clone( title = 'Favoritos', action = 'list_all', url = host  + 'videos/favorited', text_color = 'pink' ))
+
+    itemlist.append(item.clone( title = 'Comentados', action = 'list_all', url = host  + 'videos/commented', text_color = 'tan' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host ))
 

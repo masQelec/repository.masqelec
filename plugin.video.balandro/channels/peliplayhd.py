@@ -358,7 +358,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('PeliPlayHd', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('PeliPlayHd', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -402,7 +405,11 @@ def episodios(item):
 
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
-        titulo = str(item.contentSeason) + 'x' + epis + ' ' + title.replace(str(item.contentSeason) + 'x' + epis, '').strip()
+        titulo = str(item.contentSeason) + 'x' + epis + ' ' + title
+
+        titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
+
+        titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Epis..[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
@@ -508,7 +515,8 @@ def findvideos(item):
             elif not servidor == 'directo':
                if not servidor == 'various': other = ''
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other.capitalize() ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                  language = lang, other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

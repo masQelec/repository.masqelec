@@ -35,10 +35,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'inyourlanguage/es/', text_color = 'pink' ))
 
-    itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = host + 'hot/' ))
-
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'mostviewed/' ))
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'mostviewed/' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'top/' ))
+
+    itemlist.append(item.clone( title = 'Más candentes', action = 'list_all', url = host + 'hot/' ))
 
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'redtube/hd/', text_color = 'tan' ))
 

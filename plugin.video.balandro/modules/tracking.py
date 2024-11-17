@@ -47,7 +47,7 @@ if txt_status:
         if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
 
 
-# ~ Infos
+# ~ Infolabels
 def valor_infolabel(valor, infoLabels):
     if valor in infoLabels: return infoLabels[valor]
     return ''
@@ -77,7 +77,7 @@ def addFavourite(item):
     # ~ Si no está definido tmdb_id seleccionar
     if item.contentType in ['movie', 'tvshow'] and not item.infoLabels['tmdb_id']:
         tipo = 'película' if item.contentType == 'movie' else 'serie'
-        platformtools.dialog_ok(config.__addon_name, '[COLOR red][B]La %s no está identificada en TMDB.[/B][/COLOR]' % tipo, '[COLOR yellow][B]Si hay varias opciones posibles. Seleccionar una de ellas y sino cambiar el texto de búsqueda.[/B][/COLOR]')
+        platformtools.dialog_ok(config.__addon_name, '[COLOR red][B]La %s no está correctamente identificada para TMDB.[/B][/COLOR]' % tipo, '[COLOR yellow][B]Si se presentasen varias opciones posibles[/B][/COLOR], [COLOR cyan][B]Seleccione una de ellas[/B][/COLOR] y sino [COLOR yellowgreen][B]Modificar el Texto de búsqueda.[/B][/COLOR]')
 
         from core import tmdb
 
@@ -134,7 +134,8 @@ def addFavourite(item):
         msg = '[B][COLOR yellow]Comprobar modulos (.scrap_and_save_...)[/COLOR][/B]'
 
     if not done:
-        platformtools.dialog_ok(config.__addon_name, '[B][COLOR red]No se pudieron añadir los enlaces[/COLOR][/B]', msg)
+        if msg:
+            platformtools.dialog_ok(config.__addon_name, '[B][COLOR red]No se pudieron añadir los enlaces[/COLOR][/B]', msg)
         return False
 
     tit = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
@@ -152,6 +153,8 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = '[B]PREFERIDOS:[/B]', action = '', text_color='wheat' ))
 
+    itemlist.append(item.clone( action='show_infos', title='[COLOR fuchsia][B]Cuestiones Preliminares[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+
     elem = 0
 
     db = trackingtools.TrackingData()
@@ -163,11 +166,13 @@ def mainlist(item):
     if (count_movies + count_shows + count_episodes) == 0:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Preferidos[/COLOR][/B]' % color_exec)
 
+        # ~ Si existe Preferidos pero NO Hay contenido
         try:
             preferidos_path = filetools.join(config.get_data_path(), 'tracking_dbs')
             filetools.rmdirtree(preferidos_path)
         except:
             pass
+
     else:
         if not count_movies == 0:
             itemlist.append(item.clone( title = '[COLOR deepskyblue][B]Películas[/B][/COLOR] (%d)' % count_movies, action = 'mainlist_pelis', thumbnail=config.get_thumb('movie') ))
@@ -193,22 +198,30 @@ def mainlist(item):
         itemlist.append(item.clone( title='[B]Gestionar listas[/B]', action='mainlist_listas', text_color='goldenrod' )) 
 
     if not elem == 0:
-        itemlist.append(item.clone( title = '[B]INFORMACIÓN:[/B]', action = '', thumbnail=config.get_thumb('help'), text_color='wheat' ))
-
-        itemlist.append(item.clone( channel='actions', title = '[COLOR red][B]Eliminar Todos los Preferidos[/B][/COLOR]', action = 'manto_tracking_dbs', thumbnail=config.get_thumb('videolibrary') ))
-
-        if no_accesibles:
-            itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= 'Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
-
-    itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] ¿ Cómo funciona ?', action = 'show_help_tracking', thumbnail=config.get_thumb('news') ))
-
-    itemlist.append(item.clone( channel='helper', title = '[COLOR green][B]Información[/B][/COLOR] Búsqueda automática de [COLOR cyan][B]Nuevos Episodios[/B][/COLOR]', action = 'show_help_tracking_update', thumbnail=config.get_thumb('news') ))
+        itemlist.append(item.clone( channel='actions', title = '[COLOR red][B]Eliminar[/B][/COLOR] Todos los Preferidos', action = 'manto_tracking_dbs', thumbnail=config.get_thumb('videolibrary') ))
 
     itemlist.append(item.clone( channel='actions', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] categoría [COLOR wheat][B]Preferidos[/B][/COLOR]', action = 'open_settings', thumbnail=config.get_thumb('settings') ))
 
     platformtools.itemlist_refresh()
 
     return itemlist
+
+
+def show_infos(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( action='', title='[COLOR fuchsia][B]PREFERIDOS Cuestiones Preliminares:[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( channel='helper', title = ' - [COLOR green][B]Información[/B][/COLOR] ¿ Cómo funciona ?', action = 'show_help_tracking', thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( channel='helper', title = ' - [COLOR green][B]Información[/B][/COLOR] Búsqueda automática de [COLOR cyan][B]Nuevos Episodios[/B][/COLOR]', action = 'show_help_tracking_update', thumbnail=config.get_thumb('news') ))
+
+    if no_accesibles:
+        itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= ' - [COLOR green][B]Información[/B][/COLOR] Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+    return itemlist
+
 
 def mainlist_pelis(item):
     logger.info()
@@ -468,7 +481,7 @@ def findvideos(item):
 
     else:
         # ~ canal preferente preseleccionado u ordenar por updated o último usado ?
-        ret = platformtools.dialog_select('¿ De qué canal quieres los enlaces ?', opciones, useDetails=True)
+        ret = platformtools.dialog_select('¿ De qué canal desea obtener los enlaces ?', opciones, useDetails=True)
         if ret == -1: return None
 
     it_sel = Item().fromurl(opciones_row[ret][1])
@@ -555,7 +568,9 @@ def acciones_peli(item):
     elif len(rows) >= 1: acciones.append('Eliminar película')
 
     listas = []
+
     itemlist_listas = mainlist_listas(item)
+
     for it in itemlist_listas:
         # ~ descarta item crear y lista activa
         if it.lista != '' and '[lista activa]' not in it.title: listas.append(it.title)
@@ -617,7 +632,9 @@ def acciones_peli(item):
 
         # ~ Dialogo para escoger lista
         opciones = []
+
         itemlist_listas = mainlist_listas(item)
+
         for it in itemlist_listas:
             # ~ descarta item crear y lista activa
             if it.lista != '' and '[lista activa]' not in it.title: opciones.append(it.title)
@@ -627,7 +644,7 @@ def acciones_peli(item):
             platformtools.dialog_ok(config.__addon_name, 'No hay otras listas dónde mover el enlace.', '[COLOR yellow]Puedes crearlas desde la opción Gestionar listas.[/COLOR]')
             return False
 
-        ret2 = platformtools.dialog_select('Seleccionar lista destino', opciones)
+        ret2 = platformtools.dialog_select('Seleccionar Lista Destino', opciones)
         if ret2 == -1: 
             db.close()
             return False
@@ -696,7 +713,7 @@ def acciones_serie(item):
         el_canal = str(channel.encode('utf-8'))
         el_canal = el_canal.replace("b'", '').replace("'", '').strip()
 
-        acciones.append('Eliminar enlaces del canal [COLOR blue]%s[/COLOR]' % el_canal)
+        acciones.append('Eliminar enlaces del canal [COLOR hotpink]%s[/COLOR]' % el_canal)
 
     if len(canales) == 0: acciones.append('Eliminar serie')
     elif len(canales) >= 1: acciones.append('Eliminar serie')
@@ -732,7 +749,7 @@ def acciones_serie(item):
 
     elif acciones[ret].startswith('Eliminar enlaces del canal '):
         channel = config.quitar_colores(acciones[ret].replace('Eliminar enlaces del canal ', ''))
-        if not platformtools.dialog_yesno('Eliminar enlaces Serie', '¿Confirma Eliminar los enlaces del canal [COLOR blue][B]%s[/B][/COLOR] ?' % channel): return False
+        if not platformtools.dialog_yesno('Eliminar enlaces Serie', '¿Confirma Eliminar los enlaces del canal [COLOR hotpink][B]%s[/B][/COLOR] ?' % channel): return False
 
         el_canal = str(channel)
         el_canal = el_canal.replace("b'", '').replace("'", '').strip()
@@ -776,6 +793,7 @@ def acciones_serie(item):
         db.cur.execute('SELECT season FROM seasons WHERE tmdb_id=? ORDER BY season ASC', (tmdb_id,))
         seasons = db.cur.fetchall()
         txt += '[CR][CR]%d episodios en %d temporadas. ' % (num_epi, len(seasons))
+
         for (season,) in seasons:
             db.cur.execute('SELECT COUNT(*) FROM episodes WHERE tmdb_id=? AND season=?', (tmdb_id, season))
             num_epi = db.cur.fetchone()[0]
@@ -783,6 +801,7 @@ def acciones_serie(item):
 
         # ~ Mostrar info de enlaces
         txt += '[CR][CR]Enlaces a nivel de serie y temporadas:'
+
         for (channel,) in canales:
             guardados = []
             links_channels = ''
@@ -792,6 +811,7 @@ def acciones_serie(item):
 
             db.cur.execute('SELECT season FROM channels_seasons WHERE tmdb_id=? AND channel=? ORDER BY season ASC', (tmdb_id, channel.encode('utf-8')))
             enlaces = db.cur.fetchall()
+
             for (season,) in enlaces:
                 guardados.append('T%d' % season)
 
@@ -803,13 +823,13 @@ def acciones_serie(item):
                 el_canal = el_canal.replace("b'", '').replace("'", '').strip()
                 lo_guardado = str(guardados)
                 lo_guardado = lo_guardado.replace("['", '').replace("']", '').strip()
-                links_channels += ('[CR][CR] - Con enlace al canal [COLOR blue]%s[/COLOR] ' + lo_guardado + '.') % el_canal.capitalize()
+                links_channels += ('[CR][CR] - Con enlace al canal [COLOR hotpink]%s[/COLOR] ' + lo_guardado + '.') % el_canal.capitalize()
 
                 txt += links_channels 
             else:
                 el_canal = str(channel.encode('utf-8'))
                 el_canal = el_canal.replace("b'", '').replace("'", '').strip()
-                links_channels += ('[CR][CR]Con enlace al canal: [COLOR blue]%s[/COLOR] ' 'episodios sueltos.') % el_canal.capitalize()
+                links_channels += ('[CR][CR]Con enlace al canal: [COLOR hotpink]%s[/COLOR] ' 'episodios sueltos.') % el_canal.capitalize()
 
                 txt += links_channels 
 
@@ -818,7 +838,7 @@ def acciones_serie(item):
             # ~ db.cur.execute('SELECT season, episode FROM channels_episodes WHERE tmdb_id=? AND channel=? ORDER BY season ASC, episode ASC', (tmdb_id, channel.encode('utf-8')))
             # ~ enlaces = db.cur.fetchall()
             # ~ if len(enlaces) > 0:
-                # ~ txt += '[CR][COLOR blue]%s[/COLOR]:' % channel.encode('utf-8')
+                # ~ txt += '[CR][COLOR hotpink]%s[/COLOR]:' % channel.encode('utf-8')
                 # ~ for season, episode in enlaces:
                     # ~ txt += ' %dx%d' % (season, episode)
 
@@ -830,7 +850,7 @@ def acciones_serie(item):
                 for season, count in enlaces:
                     el_canal = str(channel.encode('utf-8'))
                     el_canal = el_canal.replace("b'", '').replace("'", '').strip()
-                    links_channels += '[CR][CR] - Con enlace al canal [COLOR blue]%s[/COLOR] T%d (%d)' % (el_canal.capitalize(), season, count)
+                    links_channels += '[CR][CR] - Con enlace al canal [COLOR hotpink]%s[/COLOR] T%d (%d)' % (el_canal.capitalize(), season, count)
 
                 txt += links_channels 
 
@@ -857,7 +877,7 @@ def acciones_serie(item):
 
         if cambiar_opciones:
             opciones = ['Cada vez que se ejecute el servicio', 'Una vez al día', 'Cada dos días', 'Cada tres días', 'Cada semana']
-            ret = platformtools.dialog_select('¿ Cada cuanto comprobar si hay nuevos episodios ?', opciones)
+            ret = platformtools.dialog_select('¿ Cada cuanto Tiempo desea Comprobar si existen Nuevos Episodios ?', opciones)
             if ret == -1:
                 db.close()
                 return False
@@ -882,7 +902,9 @@ def acciones_serie(item):
 
         # ~ Diálogo para escoger lista
         opciones = []
+
         itemlist_listas = mainlist_listas(item)
+
         for it in itemlist_listas:
             # ~ descarta item crear y lista activa
             if it.lista != '' and '[lista activa]' not in it.title: opciones.append(it.title)
@@ -892,7 +914,7 @@ def acciones_serie(item):
             platformtools.dialog_ok(config.__addon_name, 'No hay otras listas dónde mover el enlace.', '[COLOR yellow]Puedes crearlas desde la opción Gestionar listas.[/COLOR]')
             return False
 
-        ret2 = platformtools.dialog_select('Seleccionar lista destino', opciones)
+        ret2 = platformtools.dialog_select('Seleccionar Lista Destino', opciones)
         if ret2 == -1:
             db.close()
             return False
@@ -929,7 +951,7 @@ def acciones_serie(item):
         except:
             platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Database destino Locked[/B][/COLOR]')
 
-        platformtools.dialog_notification(acciones[ret], '[COLOR gold]%s[/COLOR] %s a lista [COLOR blue][B]%s[/B][/COLOR]' % (item.contentSerieName, operacion, dbname_destino) )
+        platformtools.dialog_notification(acciones[ret], '[COLOR gold]%s[/COLOR] %s a lista [COLOR hotpink][B]%s[/B][/COLOR]' % (item.contentSerieName, operacion, dbname_destino) )
         if operacion == 'copiada':
             # ~ No necesita itemlist_refresh posterior
             db.close(commit=True)
@@ -955,7 +977,7 @@ def acciones_temporada(item):
     acciones.append('Eliminar la Temporada %d' % season)
 
     # ~ Tratamiento de la acción escogida
-    ret = platformtools.dialog_select('Acción a ejecutar', acciones)
+    ret = platformtools.dialog_select('Acción a Ejecutar', acciones)
     if ret == -1: return False
 
     elif acciones[ret].startswith('Invertir el orden'):
@@ -1006,7 +1028,7 @@ def acciones_episodio(item):
     acciones.append('Eliminar el episodio %d x %d' % (season, episode))
 
     # ~ Tratamiento de la acción escogida
-    ret = platformtools.dialog_select('Acción a ejecutar', acciones)
+    ret = platformtools.dialog_select('Acción a Ejecutar', acciones)
     if ret == -1: return False
 
     elif acciones[ret].startswith('Actualizar desde TMDB'):

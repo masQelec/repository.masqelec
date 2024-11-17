@@ -45,6 +45,8 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_seriesmetro', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'seriesmetro', thumbnail=config.get_thumb('seriesmetro') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -307,7 +309,10 @@ def episodios(item):
                 if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
             except: tvdb_id = ''
 
-            if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('SeriesMetro', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
             elif tvdb_id:
                 if sum_parts > 50:
                     platformtools.dialog_notification('SeriesMetro', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -354,6 +359,8 @@ def episodios(item):
             elif len(str(ord_epis)) == 2: ord_epis = '000' + ord_epis
             elif len(str(ord_epis)) == 3: ord_epis = '00' + ord_epis
 
+            title = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+
             tab_epis.append([ord_epis, url, title, season, episode])
 
         if tab_epis:
@@ -362,8 +369,8 @@ def episodios(item):
             for orden, url, tit, ses, epi in tab_epis:
                  tit = tit + ' ' + item.contentSerieName
 
-                 itemlist.append(item.clone( action = 'findvideos', url = url, title = tit, contentType = 'episode',
-                                             contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
+                 itemlist.append(item.clone( action = 'findvideos', url = url, title = tit,
+                                             contentType='episode', ontentSeason=item.contentSeason, contentEpisodeNumber=epi ))
 
         tmdb.set_infoLabels(itemlist)
 
@@ -409,7 +416,9 @@ def episodios(item):
         for orden, url, tit, ses, epi in tab_epis:
             tit = tit.replace('"', '').strip()
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = tit, contentType = 'episode', contentSeason = ses, contentEpisodeNumber = epi ))
+            tit = tit.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = tit, contentType='episode', contentSeason=ses, contentEpisodeNumber=epi ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -436,7 +445,7 @@ def findvideos(item):
     dterm = scrapertools.find_single_match(data, ' data-term="([^"]+)')
     if not dterm: return itemlist
 
-    matches = scrapertools.find_multiple_matches(data, '<a data-opt="([^"]+)".*?<span class="option">(?:Cload|CinemaUpload) - ([^<]*)')
+    matches = scrapertools.find_multiple_matches(data, '<a data-opt="([^"]+)".*?<span class="option">(?:Cload|CinemaUpload|Fastream) - ([^<]*)')
 
     for dopt, lang in matches:
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', dterm = dterm, dopt = dopt, url = item.url, language = IDIOMAS.get(lang, lang) ))

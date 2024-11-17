@@ -42,7 +42,7 @@ def mainlist_series(item):
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'catalogo.php?t=anime', search_type = 'tvshow', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Dibujos animados', action = 'list_all', url = host + 'catalogo.php?t=series-animadas', search_type = 'tvshow', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Animación', action = 'list_all', url = host + 'catalogo.php?t=series-animadas', search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Live action', action ='list_all', url = host + 'catalogo.php?t=series-actores', search_type = 'tvshow', text_color='yellowgreen' ))
 
@@ -102,10 +102,20 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
+        year = scrapertools.find_single_match(title, '(\d{4})')
+        if year: title = title.replace('(' + str(year) + ')', '').strip()
+
+        c_title = title = title.replace('(Latino)', '').replace('Latino', '').replace('Subtitulada', '').strip()
+
+        if " (OVA" in c_title: c_title = c_title.split(" (OVA")[0]
+        elif " OVA" in c_title: c_title = c_title.split(" OVA")[0]
+
         if '/pelicula/' in url or '/especial/' in url:
-            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail = thumb,
+                                        contentType='movie', contentTitle=c_title, infoLabels={'year': '-'} ))
         else:
-            itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,  contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
+                                        contentType='tvshow', contentSerieName=c_title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -182,7 +192,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('DangoToons', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('DangoToons', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -235,7 +248,12 @@ def episodios(item):
             i += 1
             epis = i
 
-        itemlist.append(item.clone( action='findvideos', url= host + url, title = title, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+        title = scrapertools.find_single_match(title, ' - (.*?)$')
+
+        titulo = str(season) + 'x' + str(epis) + ' ' + title
+
+        itemlist.append(item.clone( action='findvideos', url= host + url, title = titulo,
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -267,8 +285,6 @@ def findvideos(item):
 
         url = url.replace('\/', '/')
 
-        if '/goo.' in url: continue
-
         if url.startswith('//'): url = 'https:' + url
 
         servidor = servertools.get_server_from_url(url)
@@ -279,6 +295,8 @@ def findvideos(item):
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
+        if '/goo.' in url: servidor = ''
+
         if not servidor == 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, language = 'Lat', title = '', url = url ))
 
@@ -286,6 +304,34 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if '/goo.' in url:
+        new_url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+
+        if new_url: url = new_url
+
+    if url:
+        if not url.startswith("http"): url = "https:" + url
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 
@@ -304,11 +350,21 @@ def sub_search(item):
         tipo = 'movie' if '/pelicula/' in url or '/especial/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
+        year = scrapertools.find_single_match(title, '(\d{4})')
+        if year: title = title.replace('(' + str(year) + ')', '').strip()
+
+        c_title = title = title.replace('(Latino)', '').replace('Latino', '').replace('Subtitulada', '').strip().strip()
+
+        if " (OVA" in c_title: c_title = c_title.split(" (OVA")[0]
+        elif " OVA" in c_title: c_title = c_title.split(" OVA")[0]
+
         if tipo == 'movie':
-            itemlist.append(item.clone( action='findvideos', url = url, title = title, fmt_sufijo=sufijo, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='findvideos', url = url, title = title, fmt_sufijo=sufijo,
+                                        contentType='movie', contentTitle=c_title, infoLabels={'year': '-'} ))
 
         if tipo == 'tvshow':
-            itemlist.append(item.clone( action='temporadas', url = url, title = title, fmt_sufijo=sufijo, contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action='temporadas', url = url, title = title, fmt_sufijo=sufijo,
+                                        contentType='tvshow', contentSerieName=c_title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

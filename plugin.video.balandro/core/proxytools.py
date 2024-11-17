@@ -94,7 +94,6 @@ if proxies_extended:
 
 
 opciones_recommended = [
-        'almroot',
         'mmpx12',
         default_provider,
         'us-proxy.org',
@@ -160,8 +159,8 @@ def get_settings_proxytools(canal):
     pais_proxy = config.get_setting('proxytools_pais', canal, default='')
 
     if provider == all_providers:
-        if proxies_maximo: valor = 50
-        else: valor = 25
+        if proxies_maximo: valor = proxies_totales_limit
+        else: valor = 500
     else:
         valor = proxies_totales_limit
         config.set_setting('proxytools_max', valor, canal)
@@ -199,7 +198,9 @@ def configurar_proxies_canal(canal, url):
                 provider_auto = all_providers
 
                 if not proxies_iniciales:
-                    if proxies_list: provider_auto = private_list
+                    provider = config.get_setting('proxytools_provider', canal, default=default_provider)
+                    if not provider == all_providers:
+                        if proxies_list: provider_auto = private_list
 
                 proxies_nuevos = ''
 
@@ -249,6 +250,9 @@ def configurar_proxies_canal(canal, url):
             if config.get_setting('memorize_channels_proxies', default=True):
                 channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
 
+                if "'''" in channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized.replace("'''", "'")
+                if "''" in channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized.replace("''", "'")
+
                 el_memorizado = "'" + canal.lower() + "'"
 
                 if not el_memorizado in str(channels_proxies_memorized):
@@ -289,27 +293,27 @@ def configurar_proxies_canal(canal, url):
         else: texto = '[COLOR plum]Modificar proxies manualmente[/COLOR]'
 
         acciones.append(platformtools.listitem_to_select(texto, lbl, ''))
-        acciones.append(platformtools.listitem_to_select('[COLOR yellow]Buscar nuevos proxies[/COLOR]', 'Buscar con parámetros actuales [COLOR darkcyan][B](Guardará los mejores)[/B][/COLOR]'))
-        acciones.append(platformtools.listitem_to_select('[COLOR cyan]Parámetros búsquedas[/COLOR] proveedor, tipo, país, ...', '[COLOR goldenrod][B]%s[/B][/COLOR], [COLOR darkorange]%s[/COLOR], [COLOR chocolate]%s[/COLOR], [COLOR darkgoldenrod]%d[/COLOR]' % (provider, tipo_proxy, pais_proxy, max_proxies), ''))
+        acciones.append(platformtools.listitem_to_select('[COLOR yellow]Buscar nuevos proxies[/COLOR]', 'Buscar con parámetros actuales [COLOR darkcyan][B]Guardará los mejores[/B][/COLOR]'))
+        acciones.append(platformtools.listitem_to_select('[COLOR cyan]Parámetros búsquedas[/COLOR] Proveedor, Tipo, País, ...', '[COLOR goldenrod][B]%s[/B][/COLOR], [COLOR darkorange]%s[/COLOR], [COLOR chocolate]%s[/COLOR], [COLOR darkgoldenrod]%d[/COLOR]' % (provider, tipo_proxy, pais_proxy, max_proxies), ''))
 
-        if proxies: acciones.append(platformtools.listitem_to_select('[COLOR red]Quitar proxies[/COLOR]', 'Suprimir proxies actuales para probar el canal sin ellos'))
+        if proxies: acciones.append(platformtools.listitem_to_select('[COLOR red]Quitar proxies[/COLOR]', 'Quitar los proxies actuales para probar el canal sin ellos'))
 
         hay_private = False
         if provider == private_list:
             hay_private = exist_yourlist()
             if hay_private:
-                acciones.append(platformtools.listitem_to_select('[COLOR red]Eliminar lista actual [COLOR cyan] ' + private_list + '[/COLOR]', '[COLOR goldenrod][B]Solo si obtuvo una Nueva Lista[/B][/COLOR]'))
+                acciones.append(platformtools.listitem_to_select('[COLOR red]Eliminar lista actual [COLOR cyan] ' + private_list + '[/COLOR]', '[COLOR chocolate][B]Solo si obtuvo una Nueva Lista[/B][/COLOR]'))
 
-        acciones.append(platformtools.listitem_to_select('[COLOR yellowgreen]Ajustes categoría proxies[/COLOR]', '[COLOR mediumaquamarine]Si los modifica deberá abandonar por cancelar[/COLOR]'))
+        acciones.append(platformtools.listitem_to_select('[COLOR yellowgreen]Ajustes categoría proxies[/COLOR]', '[COLOR mediumaquamarine]Si los modifica deberá abandonar por Cancelar[/COLOR]'))
 
-        if proxies_help: acciones.append(platformtools.listitem_to_select('[COLOR green]Ayuda[/COLOR]', 'Informacion sobre la gestión de proxies'))
+        if proxies_help: acciones.append(platformtools.listitem_to_select('[COLOR green]Ayuda[/COLOR]', 'Información sobre la Gestión de proxies'))
 
         ret = platformtools.dialog_select('Configuración proxies para [COLOR darkorange][B]%s[/B][/COLOR]' % canal.capitalize(), acciones, useDetails=True)
 
         if ret == -1: break
 
         elif ret == 0:
-            new_proxies = platformtools.dialog_input(default=proxies, heading='Indicar el proxy a utilizar ó varios separados por comas')
+            new_proxies = platformtools.dialog_input(default=proxies, heading='Indicar Uno ó varios Proxis a utilizar separados por comas')
             if new_proxies:
                 if '.' in new_proxies and ':' in new_proxies: pass
                 else:
@@ -398,8 +402,15 @@ def _settings_proxies_canal(canal, opciones_provider):
     provider = opciones_provider[ret]
     config.set_setting('proxytools_provider', provider, canal)
 
+    proxies_iniciales = config.get_setting('proxies', canal, default='').strip()
+
+    if not proxies_iniciales:
+        if provider == all_providers:
+            config.set_setting('proxytools_max', proxies_totales_limit, canal)
+            return True
+
     if provider == private_list:
-        config.set_setting('proxytools_max', 50, canal)
+        config.set_setting('proxytools_max', proxies_totales_limit, canal)
         return True
 
     if not proxies_tipos: ret = 0
@@ -423,20 +434,20 @@ def _settings_proxies_canal(canal, opciones_provider):
     config.set_setting('proxytools_pais', pais_proxy, canal)
 
     if proxies_maximo:
-        config.set_setting('proxytools_max', 50, canal)
+        config.set_setting('proxytools_max', proxies_totales_limit, canal)
         return True
 
     try:
-        max_proxies = int(platformtools.dialog_numeric(0, 'Valor máximo de proxies a analizar (tope 50)', '20'))
+        max_proxies = int(platformtools.dialog_numeric(0, 'Valor máximo de proxies a analizar (tope 500)', '50'))
         if ret == -1: return False
 
-        if max_proxies < 3 or max_proxies > 50:
-            platformtools.dialog_notification(canal, 'Valor incorrecto, mínimo 3, máximo 50')
-            max_proxies = 20
-            if proxies_maximo: max_proxies = 50
+        if max_proxies < 3 or max_proxies > 500:
+            platformtools.dialog_notification(canal, 'Valor incorrecto, mínimo 3, máximo 500')
+            max_proxies = 50
+            if proxies_maximo: max_proxies = proxies_totales_limit
     except:
-        max_proxies = 20
-        if proxies_maximo: max_proxies = 50
+        max_proxies = 50
+        if proxies_maximo: max_proxies = proxies_totales_limit
 
     config.set_setting('proxytools_max', max_proxies, canal)
 
@@ -467,8 +478,9 @@ def _buscar_proxies(canal, url, provider, procesar):
     if proxies_list:
         proxies_iniciales = config.get_setting('proxies', canal, default='').strip()
         if not proxies_iniciales:
-            proxies = obtener_private_list()
-            search_provider = False
+            if not provider == all_providers:
+                proxies = obtener_private_list()
+                search_provider = False
 
     msg_txt = '[B][COLOR %s]Obteniendo proxies ...[/COLOR][/B]'
 
@@ -738,21 +750,6 @@ def _buscar_proxies(canal, url, provider, procesar):
                 proxies = _mmpx12(url, tipo_proxy, pais_proxy, max_proxies)
                 if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
-    if search_provider or provider == 'almroot':
-        searching = True
-
-        if proxies_recommended:
-           if not 'almroot' in opciones_recommended: searching = False
-        elif providers_preferred:
-            if not 'almroot' in providers_preferred: searching = False
-
-        if searching:
-            if len(all_providers_proxies) < proxies_totales_limit:
-                if search_provider: platformtools.dialog_notification('Buscar en Almroot', msg_txt % color_infor)
-
-                proxies = _almroot(url, tipo_proxy, pais_proxy, max_proxies)
-                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
-
     if search_provider or provider == default_provider:
         searching = True
 
@@ -781,6 +778,20 @@ def _buscar_proxies(canal, url, provider, procesar):
                 if search_provider: platformtools.dialog_notification('Buscar en Us-proxy', msg_txt % color_infor)
 
                 proxies = _us_proxy_org(url, tipo_proxy, pais_proxy, max_proxies)
+                if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
+
+    if search_provider or provider == 'almroot':
+        searching = True
+
+        if proxies_recommended: searching = False
+        elif providers_preferred:
+            if not 'almroot' in providers_preferred: searching = False
+
+        if searching:
+            if len(all_providers_proxies) < proxies_totales_limit:
+                if search_provider: platformtools.dialog_notification('Buscar en Almroot', msg_txt % color_infor)
+
+                proxies = _almroot(url, tipo_proxy, pais_proxy, max_proxies)
                 if proxies: all_providers_proxies = acumulaciones(provider, proxies, all_providers_proxies, max_proxies)
 
     if search_provider or provider == 'free-proxy-list':
@@ -1178,7 +1189,6 @@ def _buscar_proxies(canal, url, provider, procesar):
             if provider == private_list: platformtools.dialog_notification('Buscar proxies', 'Sin proxies válidos [B][COLOR %s]en su lista[/COLOR][/B]' % color_alert)
             else:
                texto_mensaje = '[COLOR red][B]Proveedores recomendados: [/B][/COLOR]'
-               if not provider == 'almroot': texto_mensaje += '[COLOR lime][B] Almroot [/B][/COLOR]'
                if not provider == 'mmpx12': texto_mensaje += '[COLOR lime][B] Mmpx12 [/B][/COLOR]'
                if not provider == 'proxyscrape.com': texto_mensaje += '[COLOR lime][B] Proxyscrape.com [/B][/COLOR]'
                if not provider == 'us-proxy.org': texto_mensaje += '[COLOR lime][B] Us-proxy.org [/B][/COLOR]'
@@ -1307,7 +1317,7 @@ def _dailyproxylists_com(url, tipo_proxy, pais_proxy, max_proxies):
 
             if prox: proxies.append(prox + ':' + port)
 
-    if len(proxies) < 50: proxies = proxytoolsz.plus_proxies(proxies, max_proxies)
+    if len(proxies) < proxies_totales_limit: proxies = proxytoolsz.plus_proxies(proxies, max_proxies)
 
     return proxies
 

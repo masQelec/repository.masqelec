@@ -118,6 +118,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'elifilms', thumbnail=config.get_thumb('elifilms') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -160,9 +162,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
-    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', _avis = True, search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-4/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-4/', _avis = True, search_type = 'tvshow' ))
 
     return itemlist
 
@@ -255,6 +257,13 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
+    if not itemlist:
+        if item.search_type == 'tvshow':
+            if '?s=' in item.url:
+                if item._avis:
+                    platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Proximamente[/B][/COLOR]')
+                    return
+
     if itemlist:
         next_url = scrapertools.find_single_match(data, "<div id='pagination'.*?<li class='active'>.*?href='(.*?)'")
         if not next_url: next_url = scrapertools.find_single_match(data, '<div id="pagination".*?<li class="active">.*?href="(.*?)"')
@@ -319,7 +328,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('EliFilms', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('EliFilms', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -411,7 +423,7 @@ def findvideos(item):
         i += 1
 
     # ~ Descargas
-    matches = scrapertools.find_multiple_matches(data, 'id="dw-.*?name="url" value="(.*?)".*?name="domain" value="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, 'id="dw-.*?name="url" value="(.*?)".*?name="domain".*?value="(.*?)"')
 
     for dvid, srv in matches:
         ses += 1
@@ -422,6 +434,8 @@ def findvideos(item):
         elif '1fichier' in srv: continue
 
         if srv == 'utorrent': srv = 'torrent'
+
+        elif 'latino' in srv: srv = 'torrent'
 
         servidor = servertools.corregir_servidor(srv)
 

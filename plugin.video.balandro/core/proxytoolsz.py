@@ -9,7 +9,7 @@ from platformcode import config, logger, platformtools
 
 color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
-tipos_plus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
+tipos_plus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52]
 
 
 def plus_proxies(proxies, max_proxies):
@@ -38,6 +38,7 @@ def plus_proxies(proxies, max_proxies):
     elif tplus == 5: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/http/data.txt'
     elif tplus == 6: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/socks4/data.txt'
     elif tplus == 7: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/socks5/data.txt'
+    elif tplus == 45: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/https/data.txt'
 
     elif tplus == 8: url_provider = 'https://www.netzwelt.de/proxy/index.html'
 
@@ -101,6 +102,16 @@ def plus_proxies(proxies, max_proxies):
     elif tplus == 43: url_provider = 'https://raw.githubusercontent.com/ErcinDedeoglu/proxies/main/proxies/socks4.txt'
     elif tplus == 44: url_provider = 'https://raw.githubusercontent.com/ErcinDedeoglu/proxies/main/proxies/socks5.txt'
 
+    elif tplus == 46: url_provider = 'https://proxycompass.com/free-proxy/'
+
+    elif tplus == 47: url_provider = 'https://proxybros.com/free-proxy-list/'
+
+    elif tplus == 48: url_provider = 'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=https&anonymity=all'
+    elif tplus == 49: url_provider = 'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=https&anonymity=anonymous'
+    elif tplus == 50: url_provider = 'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=https&anonymity=elite'
+    elif tplus == 51: url_provider = 'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=https&anonymity=transparent'
+    elif tplus == 52: url_provider = 'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=https'
+
     if url_provider:
         resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
 
@@ -156,7 +167,7 @@ def plus_proxies(proxies, max_proxies):
 
                 proxies_plus.append(prox + ':' + port)
 
-    elif tplus == 4 or tplus == 5 or tplus == 6 or tplus == 7:
+    elif tplus == 4 or tplus == 5 or tplus == 6 or tplus == 7 or tplus == 45:
         el_provider = '[B][COLOR %s] Proxydb[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
 
@@ -236,8 +247,6 @@ def plus_proxies(proxies, max_proxies):
     elif tplus == 16:
         el_provider = '[B][COLOR %s] Proxylistplus[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
-
-        resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td><img src=".*?<td>(.*?)</td>.*?<td>(.*?)</td>')
 
@@ -362,6 +371,46 @@ def plus_proxies(proxies, max_proxies):
 
             if prox:
                 proxies_plus.append(prox)
+
+    elif tplus == 46:
+        el_provider = '[B][COLOR %s] Proxycompass[/B][/COLOR]' % color_exec
+        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+
+        enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td class="table-ip">(.*?)</td>.*?<td>(.*?)</td>')
+
+        for prox, puerto in enlaces:
+            prox = prox.strip()
+            puerto = puerto.strip()
+
+            if not prox or not puerto: continue
+
+            proxies_plus.append(prox + ':' + puerto)
+
+    elif tplus == 47:
+        el_provider = '[B][COLOR %s] Proxybros[/B][/COLOR]' % color_exec
+        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+
+        enlaces = scrapertools.find_multiple_matches(str(resp.data), '<span class="proxy-ip" data-ip>(.*?)</span>.*?<td data-port>(.*?)</td>')
+
+        for prox, puerto in enlaces:
+            prox = prox.strip()
+            puerto = puerto.strip()
+
+            if not prox or not puerto: continue
+
+            proxies_plus.append(prox + ':' + puerto)
+
+    elif tplus == 48 or tplus == 49 or tplus == 50 or tplus == 51 or tplus == 52:
+        if tplus == 48: el_provider = '[B][COLOR %s] Proxyscrape All[/B][/COLOR]' % color_exec
+        elif tplus == 49: el_provider = '[B][COLOR %s] Proxyscrape Anonymous[/B][/COLOR]' % color_exec
+        elif tplus == 50: el_provider = '[B][COLOR %s] Proxyscrape Elite[/B][/COLOR]' % color_exec
+        elif tplus == 51: el_provider = '[B][COLOR %s] Proxyscrape Transparent[/B][/COLOR]' % color_exec
+        elif tplus == 52: el_provider = '[B][COLOR %s] Proxyscrape Https[/B][/COLOR]' % color_exec
+
+        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+
+        if resp.data:
+           if not "<title>404" in str(resp.data): proxies_plus = resp.data.split()
 
     # ~ si no se obtuvo ninguno
     if not proxies_plus:
