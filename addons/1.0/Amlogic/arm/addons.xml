@@ -129,14 +129,14 @@ v0.5.9 (2022-03-22)
 
 <addon id="repository.coreelec"
 		name="CoreELEC Add-ons"
-		version="20.2"
+		version="20.5"
 		provider-name="CoreELEC">
 	<extension point="xbmc.addon.repository"
 		name="CoreELEC Add-ons">
 		<dir>
-			<info>https://addons.coreelec.org/Amlogic-ng/20.2/arm/addons.xml.gz</info>
-			<checksum verify="sha256">https://addons.coreelec.org/Amlogic-ng/20.2/arm/addons.xml.gz?sha256</checksum>
-			<datadir>https://addons.coreelec.org/Amlogic-ng/20.2/arm</datadir>
+			<info>https://addons.coreelec.org/Amlogic-ng/20.5/arm/addons.xml.gz</info>
+			<checksum verify="sha256">https://addons.coreelec.org/Amlogic-ng/20.5/arm/addons.xml.gz?sha256</checksum>
+			<datadir>https://addons.coreelec.org/Amlogic-ng/20.5/arm</datadir>
 		</dir>
 	</extension>
 	<extension point="xbmc.addon.metadata">
