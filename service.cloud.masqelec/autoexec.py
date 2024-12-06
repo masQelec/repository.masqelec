@@ -1,10 +1,80 @@
 #!/usr/bin/python
 import os
 import io
+import re
 import urllib.request
 import zipfile
 import subprocess
 
+def copy_file_with_rclone(remote, remote_path, local_path):
+    command = [
+        '/storage/.config/rclone/rclone', 'copy', f'{remote}:{remote_path}', local_path
+    ]
+    try:
+        subprocess.run(command, check=True)
+        print(f"Copy complete: {local_path}/{remote_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during copy: {e}")
+
+def copy(name_file):
+    remote = "update"  # Nombre del remote configurado en rclone
+    remote_path = name_file  # Ruta del archivo en Google Drive
+    local_path = "/storage/.update"  # Ruta local donde quieres guardar el archivo
+    print(f"Copying {remote}:{remote_path} to {local_path} using rclone")
+    copy_file_with_rclone(remote, remote_path, local_path)
+
+def get_ver_file(name_file):
+    # Abre el archivo
+    with open(name_file, 'r') as archivo:
+        # Lee el archivo linea por linea
+        for linea in archivo:
+            # Busca la palabra "VERSION" en la linea
+            if "VERSION" in linea:
+                # Si la encuentra, extrae el texto entre comillas
+                resultado = re.findall(r'"(.*?)"', linea)
+                return resultado
+
+    # Si no encuentra ninguna linea con "VERSION", devuelve None
+    return None
+
+def get_ver_txt(txt):
+    # Divide el texto en l neas
+    lineas = txt.split('\n')
+
+    for linea in lineas:
+        # Busca la palabra "VERSION" en la l nea
+        if "VERSION" in linea:
+            # Si la encuentra, extrae el texto entre comillas
+            resultado = re.findall(r'"(.*?)"', linea)
+            return resultado
+
+    # Si no encuentra ninguna linea con "VERSION", devuelve Nonee
+    return None
+    
+def get_txt_url(url):
+    # Abre la URL
+    with urllib.request.urlopen(url) as txt_url:
+        # Lee el contenido y lo decodifica a txt
+        txt = txt_url.read().decode()
+    return txt
+
+# Función para actualizar la verison de kodi
+def update_version():
+    try:
+        name_str_file = get_ver_file('/etc/os-release')
+        print(name_str_file[0])
+        
+        name_str_url = get_ver_txt(get_txt_url("https://docs.google.com/uc?export=download&id=1jYfAGe_peaZJvhhTgXhDWBrQIX8yeAPv"))
+        
+        if name_str_file[0] != name_str_url[0]:
+        	print("Nueva actualizacion " + name_str_url[0])
+        	copy("update/" + name_str_url[0] + ".tar")
+        	subprocess.call(["kodi-send", "-action='Notification(MANTENIMIENTO,'Kodi va a reiniciar para actualizar, espere..')'"])
+        	os.system('reboot')
+        	
+    except subprocess.CalledProcessError as e:
+        print(f"Error during copy: {e}")
+    
 # Función para verificar si un directorio existe y descomprimir en memoria
 def verificar_directorio_y_descargar_en_memoria(url, ruta_directorio):
     ruta_installed = os.path.join("/storage/.kodi/addons/service.libraryautoupdate", "installed")
@@ -71,33 +141,32 @@ def reload_rclone():
 
         urllib.request.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone_videos_2.service",
                                    filename="/storage/.config/system.d/rclone_videos_2.service")
-        urllib.request.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone_update.service",
-                                   filename="/storage/.config/system.d/rclone_update.service")
 
 
         subprocess.call(["systemctl", "daemon-reload"])
         
-        subprocess.call(["systemctl", "enable", "rclone_tvshows_1"])
-        subprocess.call(["systemctl", "enable", "rclone_tvshows_2"])
-        subprocess.call(["systemctl", "enable", "rclone_videos_1"])
-        subprocess.call(["systemctl", "enable", "rclone_videos_2"])
-        subprocess.call(["systemctl", "enable", "rclone_update"])
-        
         subprocess.call(["systemctl", "start", "rclone_tvshows_1"])
+        subprocess.call(["systemctl", "enable", "rclone_tvshows_1"])
+        
         subprocess.call(["systemctl", "start", "rclone_tvshows_2"])
+        subprocess.call(["systemctl", "enable", "rclone_tvshows_2"])
+        
         subprocess.call(["systemctl", "start", "rclone_videos_1"])
+        subprocess.call(["systemctl", "enable", "rclone_videos_1"])
+        
         subprocess.call(["systemctl", "start", "rclone_videos_2"])
-        subprocess.call(["systemctl", "start", "rclone_update"])
+        subprocess.call(["systemctl", "enable", "rclone_videos_2"])
+        
 
     except:
         reload_rclone()
 
 # Llamar a la función
+verificar_directorio_y_descargar_en_memoria('https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/service.libraryautoupdate.zip', '/storage/.kodi/addons/')
+
+# Llamar a la función
 reload_rclone()
 
 # Llamar a la función
-verificar_directorio_y_descargar_en_memoria('https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/service.libraryautoupdate.zip', '/storage/.kodi/addons/')
-
-
-
+update_version()
 
