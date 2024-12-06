@@ -71,21 +71,33 @@ def reload_rclone():
 
         urllib.request.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone_videos_2.service",
                                    filename="/storage/.config/system.d/rclone_videos_2.service")
+        urllib.request.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone_update.service",
+                                   filename="/storage/.config/system.d/rclone_update.service")
+
 
         subprocess.call(["systemctl", "daemon-reload"])
-        subprocess.call(["systemctl", "restart", "rclone_tvshows_1"])
-        subprocess.call(["systemctl", "restart", "rclone_tvshows_2"])
-        subprocess.call(["systemctl", "restart", "rclone_videos_1"])
-        subprocess.call(["systemctl", "restart", "rclone_videos_2"])
+        
+        subprocess.call(["systemctl", "enable", "rclone_tvshows_1"])
+        subprocess.call(["systemctl", "enable", "rclone_tvshows_2"])
+        subprocess.call(["systemctl", "enable", "rclone_videos_1"])
+        subprocess.call(["systemctl", "enable", "rclone_videos_2"])
+        subprocess.call(["systemctl", "enable", "rclone_update"])
+        
+        subprocess.call(["systemctl", "start", "rclone_tvshows_1"])
+        subprocess.call(["systemctl", "start", "rclone_tvshows_2"])
+        subprocess.call(["systemctl", "start", "rclone_videos_1"])
+        subprocess.call(["systemctl", "start", "rclone_videos_2"])
+        subprocess.call(["systemctl", "start", "rclone_update"])
 
     except:
         reload_rclone()
 
 # Llamar a la función
-verificar_directorio_y_descargar_en_memoria('https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/service.libraryautoupdate.zip', '/storage/.kodi/addons/')
+reload_rclone()
 
 # Llamar a la función
-reload_rclone()
+verificar_directorio_y_descargar_en_memoria('https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/service.libraryautoupdate.zip', '/storage/.kodi/addons/')
+
 
 
 
