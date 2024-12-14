@@ -86,7 +86,7 @@ def list_lst(item):
 
         SerieName = SerieName.strip()
 
-        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='list_all', url = url, title = title, cat = True,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
@@ -179,7 +179,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
-        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
         title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
@@ -237,7 +237,7 @@ def temporadas(item):
 
     SerieName = title_ser.replace('-', ' ').capitalize()
 
-    itemlist.append(item.clone( action='episodios', url=url, title='[COLOR hotpink]Serie[/COLOR] ' + SerieName,
+    itemlist.append(item.clone( action='episodios', url=url, title='[COLOR hotpink]Serie[/COLOR] ' + SerieName.replace('temporada', '[COLOR tan]Temp.[/COLOR]'),
                                         serie = True, cat = False, page = 0,
                                         contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season ))
 
@@ -314,7 +314,7 @@ def episodios(item):
 
             if not epis: epis = 1
 
-            itemlist.append(item.clone( action='findvideos', url=item.url, title=item.title,
+            itemlist.append(item.clone( action='findvideos', url=item.url, title=item.title.replace('temporada', '[COLOR tan]Temp.[/COLOR]'),
                                         contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
 
             tmdb.set_infoLabels(itemlist)
@@ -387,7 +387,7 @@ def episodios(item):
 
         if not title: continue
 
-        title = title.replace('&#8211;', '').strip()
+        title = title.replace('&#8211;', '').replace('temporada', '[COLOR tan]Temp.[/COLOR]').strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 

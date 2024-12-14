@@ -319,7 +319,10 @@ def mainlist_episodios(item):
     rows = db.get_all_episodes(orden=orden[tracking_order], desde=item.desde, numero=tracking_perpage)
 
     for tmdb_id, season, episode, infolabels in rows:
-        titulo = '%s %dx%02d' % (infolabels['tvshowtitle'], infolabels['season'], infolabels['episode'])
+        # ~ 11/11/24 TypeError: %d format: a real number is required, not str
+        # ~ titulo = '%s %dx%02d' % (infolabels['tvshowtitle'], infolabels['season'], infolabels['episode'])
+        titulo = infolabels['tvshowtitle'] + ' ' + str(infolabels['season']) + 'x' + str(infolabels['episode'])
+
         subtitulo = valor_infolabel('episodio_titulo', infolabels)
         if subtitulo != '': titulo += ' ' + subtitulo
 
@@ -473,7 +476,7 @@ def findvideos(item):
     db.close()
 
     if len(opciones) == 0:
-        platformtools.dialog_ok(config.__addon_name, '[B][COLOR %s]No hay enlaces guardados con ningún canal, ó, No hay guardado ningún canal activo con enlaces.[/B][/COLOR]' % color_adver)
+        platformtools.dialog_ok(config.__addon_name, '[B][COLOR %s]No hay enlaces Guardados en Ningún Canal ó [COLOR yellow]los Canales Guardados ya NO están Activos[/COLOR].[/B][/COLOR]' % color_exec)
         return None
 
     # ~ Sólo hay un canal, ir a él directamente

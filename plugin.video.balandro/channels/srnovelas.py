@@ -515,8 +515,7 @@ def findvideos(item):
 
         if servidor == 'various': other = servertools.corregir_other(url)
 
-        if not servidor == 'directo':
-            itemlist.append(Item( channel=item.channel, action = 'play', server = servidor, url = url, language = lang, other = other.capitalize() ))
+        itemlist.append(Item( channel=item.channel, action = 'play', server = servidor, url = url, language = lang, other = other.capitalize() ))
 
     # ~ links
 
@@ -576,8 +575,7 @@ def findvideos(item):
                 if other: other = other + ' D'
                 else: other = 'D'
 
-            if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
     t_link = scrapertools.find_single_match(data, 'var vo_theme_dir = "(.*?)"')
     id_link = scrapertools.find_single_match(data, 'vo_postID = "(.*?)"')
@@ -620,8 +618,7 @@ def findvideos(item):
                other = ''
                if servidor == 'various': other = servertools.corregir_other(u_link)
 
-               if not servidor == 'directo':
-                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
+               itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
 
            i += 1
 
@@ -656,13 +653,34 @@ def findvideos(item):
         if other: other = other + ' d'
         else: other = 'd'
 
-        if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if url:
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"): servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
+
+        itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
 

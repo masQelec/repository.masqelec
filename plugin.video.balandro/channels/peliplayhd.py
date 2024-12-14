@@ -1,47 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True
-
 import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
-
-
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
 
 
 host = 'https://peliplayhd.com/'
@@ -80,6 +43,8 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    if not headers: headers = {'Referer': url}
+
     hay_proxies = False
     if config.get_setting('channel_peliplayhd_proxies', default=''): hay_proxies = True
 
@@ -110,21 +75,13 @@ def do_downloadpage(url, post=None, headers=None):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('peliplayhd', url, post=post, headers=headers, timeout=timeout).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-            except:
-                pass
+        if not url.startswith(host):
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('peliplayhd', url, post=post, headers=headers, timeout=timeout).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if '<title>Just a moment...</title>' in data:
         if not '?s=' in url:
@@ -230,7 +187,7 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1971, -1):
+    for x in range(current_year, 1969, -1):
         url = host + 'release/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'deepskyblue' ))
@@ -499,6 +456,9 @@ def findvideos(item):
             elif 'playerwish' in srv:
                 servidor = 'directo'
                 other = 'playerwish'
+            elif 'fastream' in srv:
+                servidor = 'directo'
+                other = 'fastream'
 
             else:
                 if 'wish' in srv:
@@ -537,7 +497,7 @@ def play(item):
     url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
-    if item.other == 'Indeterminado' or item.other == 'Peliplaywish' or item.other == 'Mivideoplay' or item.other == 'Peliplaymoon' or item.other == 'Fmoonembed' or item.other == 'Embedmoon' or item.other == 'Jodwish' or item.other == 'Swhoi' or item.other == 'Swdyu' or item.other == 'Strwish' or item.other == 'Vidhidepre' or item.other == 'Playerwish' or item.other == 'Streamwish' or item.other == 'Vidhidepro':
+    if item.other == 'Indeterminado' or item.other == 'Peliplaywish' or item.other == 'Mivideoplay' or item.other == 'Peliplaymoon' or item.other == 'Fmoonembed' or item.other == 'Embedmoon' or item.other == 'Jodwish' or item.other == 'Swhoi' or item.other == 'Swdyu' or item.other == 'Strwish' or item.other == 'Vidhidepre' or item.other == 'Playerwish' or item.other == 'Streamwish' or item.other == 'Vidhidepro' or item.other == 'Fastream':
         if '/?trembed' in url:
             data = do_downloadpage(url)
 
@@ -551,14 +511,13 @@ def play(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        url = servertools.normalize_url(servidor, url)
-
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
-        if not servidor == 'directo':
-            itemlist.append(item.clone(server = servidor, url = url))
+        url = servertools.normalize_url(servidor, url)
+
+        itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
 

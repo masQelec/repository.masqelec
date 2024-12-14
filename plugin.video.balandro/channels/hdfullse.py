@@ -203,10 +203,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
     itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'star', search_type = 'person', 
-                                plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
-
+                                plot = 'Indicar el Nombre y Apellido/s del intérprete.'))
     itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
-                                plot = 'Debe indicarse el nombre y apellido/s del director.'))
+                                plot = 'Indicar el Nombre y Apellido/s del director.'))
 
     return itemlist
 
@@ -649,10 +648,10 @@ def search(item, texto):
     logger.info()
     try:
         if item.group:
-            item.url = host + '/search' + '/' + item.group + '/' + texto
+            item.url = host + '/search' + '/' + item.group + '/' + texto.replace(' ', '+')
         else:
             texto = texto.replace(' ', '+')
-            item.search_post = {'menu': 'search', 'query': texto}
+            item.search_post = {'menu': 'search', 'query': texto.replace(' ', '+')}
             item.url = host + '/search'
 			
         return list_all(item)

@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow", "torrent"],
   "language": ["lat"],
 
-  "clusters": ["notice", "classic", "infantil", "years", "lasts", "kids"],
+  "clusters": ["suggested", "notice", "classic", "infantil", "years", "lasts", "kids"],
 
   "notes": "Canal con enlaces Streaming y Torrent. Películas por géneros y años. Series clásicas, por Géneros, años en idioma orignal de emisión. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

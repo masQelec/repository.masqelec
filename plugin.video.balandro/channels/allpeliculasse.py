@@ -414,10 +414,8 @@ def findvideos(item):
 
         if '/1fichier.' in match: continue
         elif '/turbobit.' in match: continue
-        elif '/fembed.' in match: continue
 
-        if '/1fichier.' in url: continue
-        elif '/turbobit.' in url: continue
+        elif '/fembed.' in match: continue
 
         elif '/cloudemb.' in url or '.fembed.' in url or '/fembad.' in url or 'vanfem' in url: continue
         elif '/tubesb.' in url  or '/sbsonic.' in url or '/sbrapid.' in url or '/lvturbo.' in url or '/sbface.' in url or '/sbbrisk.' in url or '/sblona.' in url: continue
@@ -432,7 +430,7 @@ def findvideos(item):
 
         if '/megaup' in match: link_other = 'Megaup'
         elif '/undefined' in match: link_other = 'Indefinido'
-        elif '/torrent' in match: link_other = 'Torrent'
+        elif '/torrent' in match or 'Utorrent' in match: link_other = 'Torrent'
         elif '/mega' in match: link_other = 'Mega'
         elif '/google' in match: link_other = 'Gvideo'
         elif '/mediafire' in match: link_other = 'Mediafire'
@@ -480,7 +478,7 @@ def play(item):
 
         if item.server == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): item.server = new_server
+            if new_server.startswith("http"): item.server = new_server
 
         itemlist.append(item.clone(url = url, server = item.server))
 

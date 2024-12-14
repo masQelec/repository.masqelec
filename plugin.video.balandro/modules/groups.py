@@ -862,6 +862,9 @@ def ch_groups(item):
         if config.get_setting('mnu_problematicos', default=False):
             if 'problematic' in ch['clusters']: continue
 
+        if config.get_setting('mnu_clones', default=False):
+            if 'clone' in ch['clusters']: continue
+
         if 'trailers' in ch['clusters']: continue
 
         if item.group == 'classic':
@@ -1242,6 +1245,16 @@ def ch_groups(item):
             elif config.get_setting('channels_list_no_problematicos', default=False): continue
 
             titulo += '[I][B][COLOR darkgoldenrod] (problemático)[/COLOR][/I][/B]'
+
+        if 'clone' in ch['clusters']:
+            if config.get_setting('mnu_simple', default=False): continue
+
+            if not item.extra == 'all':
+                if not item.extra == 'clones': 
+                    if config.get_setting('mnu_clones', default=False): continue
+                    elif config.get_setting('channels_list_no_clones', default=False): continue
+
+            if not item.extra == 'clones': titulo += '[I][B][COLOR turquoise] (clon)[/COLOR][/I][/B]'
 
         if con_incidencias:
            if ch['name'] in str(con_incidencias): titulo += '[I][B][COLOR tan] (incidencia)[/COLOR][/I][/B]'

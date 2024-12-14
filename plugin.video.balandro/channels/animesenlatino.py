@@ -348,7 +348,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 
@@ -360,8 +360,12 @@ def corregir_SerieName(SerieName):
 
     if '(TV)' in SerieName: SerieName = SerieName.split("(TV)")[0]
 
+    if '(OVA)' in SerieName: SerieName = SerieName.split("(OVA)")[0]
+
     if 'Season' in SerieName: SerieName = SerieName.split("Season")[0]
     if 'season' in SerieName: SerieName = SerieName.split("season")[0]
+
+    if 'Specials ' in SerieName: SerieName = SerieName.split("Specials ")[0]
 
     if ' S1 ' in SerieName: SerieName = SerieName.split(" S1 ")[0]
     elif ' S2 ' in SerieName: SerieName = SerieName.split(" S2 ")[0]

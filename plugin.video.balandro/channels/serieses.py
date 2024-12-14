@@ -123,6 +123,7 @@ def list_all(item):
                if '/page-' in year: year = scrapertools.find_single_match(year, "(.*?)/page-")
 
         if not year: year = '-'
+
         itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
                                     contentType='tvshow', contentSerieName=title,  infoLabels = {'year': year} ))
 

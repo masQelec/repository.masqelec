@@ -179,8 +179,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'pelicula/', group = 'destacadas', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_top', url = host, search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     return itemlist
@@ -201,8 +199,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = host + 'tendencias/', group = 'tendencias', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'series/', group = 'destacadas', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_top', url = host, search_type = 'tvshow' ))
 
     return itemlist
 
@@ -269,11 +265,12 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#038;', '').replace("&#8217;", "'").replace("&#8211;", "")
+        title = title.replace('&#038;', '&').replace("&#8217;", "'").replace("&#8211;", "")
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         qlty = scrapertools.find_single_match(match, '<span class="quality">(.*?)</span>')
+        if 'Promo' in qlty or 'Proximamente' in qlty: qlty = ''
 
         year = scrapertools.find_single_match(match, '</h3>.*?<span>(.*?)</span>')
         if year:
@@ -300,58 +297,16 @@ def list_all(item):
 
     tmdb.set_infoLabels(itemlist)
 
+    if item.group == 'destacadas': return itemlist
+
     if itemlist:
         if '<div class="pagination">' in data:
-            if not item.group == 'destacadas':
-                next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
+            next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)".*?<i id="nextpagination"')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "<a href='(.*?)'.*?<i id='nextpagination'")
 
-                if next_page:
-                    if '/page/' in next_page:
-                        itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
-
-    return itemlist
-
-
-def list_top(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(item.url)
-
-    if item.search_type == 'movie':
-        blk = '<h3>TOP Movies(.*?)<h3>TOP Series'
-    else:
-        blk = '<h3>TOP Series(.*?)</div></div></div></div>'
-
-    bloque = scrapertools.find_single_match(data, blk)
-
-    matches = scrapertools.find_multiple_matches(bloque, 'id="top-(.*?)div class="puesto">')
-
-    for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-
-        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
-        if not title: title = scrapertools.find_single_match(match, '<a href=.*?">(.*?)</a>')
-
-        if not url or not title: continue
-
-        title = title.replace('&#038;', '').replace("&#8217;", "'").replace("&#8211;", "")
-
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
-
-        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
-
-        if tipo == 'movie':
-            if item.search_type == "tvshow": continue
-
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
-
-        if tipo == 'tvshow':
-            if item.search_type == "movie": continue
-
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
-
-    tmdb.set_infoLabels(itemlist)
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone(title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral'))
 
     return itemlist
 
@@ -384,16 +339,26 @@ def last_epis(item):
            epis = s_e.split("x")[1]
         except:
            i += 1
-           season = 0
+           season = 1
            epis = i
 
-        if season >= 3:
-            season = scrapertools.find_single_match(match, '<span>T(.*?)E').strip()
-            if not season: season = 1
+        if season >= 99:
+            try:
+               season = scrapertools.find_single_match(title, ' (' + '(.*?)X').strip()
+               epis = scrapertools.find_single_match(title, ' (' + '.*?X(.*?)$').strip()
+            except:
+               season = ''
+               epis = ''
+
+            if not season:
+                season = scrapertools.find_single_match(match, '<span>T(.*?)E').strip()
+                season = 1
+
+            if not epis: epis = 1
 
         title = title.replace('Online', '').replace('Sub Español', 'Vose').strip()
 
-        title = title.replace('&#038;', '').replace("&#8217;", "'").replace("&#8211;", "")
+        title = title.replace('&#038;', '&').replace("&#8217;", "'").replace("&#8211;", "")
 
         if ':' in title: SerieName = scrapertools.find_single_match(title, '(.*?):').strip()
         elif ' (' in title: SerieName = title.split(" (")[0]
@@ -409,6 +374,7 @@ def last_epis(item):
     if itemlist:
         if '<div class="pagination">' in data:
             next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "<a href='(.*?)'")
 
             if next_page:
                 if '/page/' in next_page:
@@ -542,7 +508,7 @@ def corregir_servidor(servidor):
     servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.xx', '').replace('.click', '')
     servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').replace('.uno', '').replace('.io', '')
     servidor = servidor.replace('.link', '').replace('.club', '').replace('.red', '').replace('.download', '').replace('.vip', '').replace('.space', '').replace('.name', '')
-    servidor = servidor.replace('.xyz', '').replace('.me', '').replace('.one', '').replace('.hu', '').replace('.fun', '').strip()
+    servidor = servidor.replace('.xyz', '').replace('.me', '').replace('.li', '').replace('.one', '').replace('.hu', '').replace('.fun', '').strip()
 
     return servidor
 
@@ -585,6 +551,12 @@ def findvideos(item):
 
             if 'youtube' in _server: continue
 
+            elif 'sbcom' in _server: continue
+            elif 'lvturbo' in _server: continue
+            elif 'vanfem' in _server: continue
+            elif 'fembed' in _server: continue
+            elif 'fcom' in _server: continue
+
             elif 'earn4files' in _server: continue
             elif 'uploadbuzz' in _server: continue
             elif 'powvibeo' in _server: continue
@@ -601,6 +573,8 @@ def findvideos(item):
             elif 'datafile' in _server: continue
             elif 'raptu' in _server: continue
             elif 'buzzheavier' in _server: continue
+            elif 'guccihide' in _server: continue
+            elif 'rapidgator' in _server: continue
 
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
@@ -619,7 +593,11 @@ def findvideos(item):
 
             if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
             elif 'dood' in _server: _server = 'doodstream'
+            elif 'gofile' in _server: _server = 'gofile'
             elif 'google' in _server or 'Google' in _server: _server = 'gvideo'
+            elif 'rutube' in _server: _server = 'various'
+            elif 'gamovideo' in _server: _server = 'gamovideo'
+            elif 'vidmoly' in _server: _server = 'vidmoly'
 
             other = corregir_servidor(_server)
 
@@ -671,6 +649,12 @@ def findvideos(item):
 
             if 'youtube' in _server: continue
 
+            elif 'sbcom' in _server: continue
+            elif 'lvturbo' in _server: continue
+            elif 'vanfem' in _server: continue
+            elif 'fembed' in _server: continue
+            elif 'fcom' in _server: continue
+
             elif 'earn4files' in _server: continue
             elif 'uploadbuzz' in _server: continue
             elif 'powvibeo' in _server: continue
@@ -687,6 +671,8 @@ def findvideos(item):
             elif 'datafile' in _server: continue
             elif 'raptu' in _server: continue
             elif 'buzzheavier' in _server: continue
+            elif 'guccihide' in _server: continue
+            elif 'rapidgator' in _server: continue
 
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
@@ -705,8 +691,11 @@ def findvideos(item):
 
             if 'hqq' in _server or 'netu' in _server or 'waaw' in _server: _server = 'waaw'
             elif 'dood' in _server: _server = 'doodstream'
+            elif 'gofile' in _server: _server = 'gofile'
             elif 'google' in _server or 'Google' in _server: _server = 'gvideo'
             elif 'rutube' in _server: _server = 'various'
+            elif 'gamovideo' in _server: _server = 'gamovideo'
+            elif 'vidmoly' in _server: _server = 'vidmoly'
 
             other = corregir_servidor(_server)
 
@@ -742,7 +731,13 @@ def findvideos(item):
 
             servidor = corregir_servidor(domain)
 
-            if 'earn4files' in servidor: continue
+            if 'sbcom' in servidor: continue
+            elif 'lvturbo' in servidor: continue
+            elif 'vanfem' in servidor: continue
+            elif 'fembed' in servidor: continue
+            elif 'fcom' in servidor: continue
+
+            elif 'earn4files' in servidor: continue
             elif 'uploadbuzz' in servidor: continue
             elif 'powvibeo' in servidor: continue
             elif 'slreamplay' in servidor: continue
@@ -758,10 +753,16 @@ def findvideos(item):
             elif 'datafile' in servidor: continue
             elif 'raptu' in servidor: continue
             elif 'buzzheavier' in servidor: continue
+            elif 'guccihide' in servidor: continue
+            elif 'rapidgator' in servidor: continue
 
-            if 'gofile' in servidor: servidor = 'gofile'
+            if 'hqq' in servidor or 'netu' in servidor or 'waaw' in servidor: servidor = 'waaw'
             elif 'dood' in servidor: servidor = 'doodstream'
+            elif 'gofile' in servidor: servidor = 'gofile'
             elif 'google' in servidor or 'Google' in servidor: servidor = 'gvideo'
+            elif 'rutube' in servidor: servidor = 'various'
+            elif 'gamovideo' in servidor: servidor = 'gamovideo'
+            elif 'vidmoly' in servidor: servidor = 'vidmoly'
 
             if url.startswith('https://player.pepeliculas.org/'):
                 url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
@@ -800,7 +801,13 @@ def findvideos(item):
 
             servidor = corregir_servidor(domain)
 
-            if 'earn4files' in servidor: continue
+            if 'sbcom' in servidor: continue
+            elif 'lvturbo' in servidor: continue
+            elif 'vanfem' in servidor: continue
+            elif 'fembed' in servidor: continue
+            elif 'fcom' in servidor: continue
+
+            elif 'earn4files' in servidor: continue
             elif 'uploadbuzz' in servidor: continue
             elif 'multiup' in servidor: continue
             elif 'ddownload' in servidor: continue
@@ -820,18 +827,24 @@ def findvideos(item):
             elif 'datafile' in servidor: continue
             elif 'raptu' in servidor: continue
             elif 'buzzheavier' in servidor: continue
+            elif 'guccihide' in servidor: continue
 
+            elif 'rapidgator' in servidor: continue
             elif 'nitro' in servidor: continue
             elif '1fichier' in servidor: continue
             elif 'turbobit' in servidor: continue
 
-            if 'gofile' in servidor: servidor = 'gofile'
+            if 'hqq' in servidor or 'netu' in servidor or 'waaw' in servidor: servidor = 'waaw'
             elif 'dood' in servidor: servidor = 'doodstream'
+            elif 'gofile' in servidor: servidor = 'gofile'
             elif 'google' in servidor or 'Google' in servidor: servidor = 'gvideo'
+            elif 'rutube' in servidor: servidor = 'various'
+            elif 'gamovideo' in servidor: servidor = 'gamovideo'
+            elif 'vidmoly' in servidor: servidor = 'vidmoly'
 
             elif servidor == 'filemoon': servidor = 'various'
             elif servidor == 'utorrent': servidor = 'torrent'
-	
+
             if url.startswith('https://player.pepeliculas.org/'):
                 url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
                 servidor == 'waaw'
@@ -865,7 +878,9 @@ def findvideos(item):
             if not url: continue
 
             if 'buzzheavier' in srv: continue
+            elif 'guccihide' in srv: continue
 
+            elif 'rapidgator' in srv: continue
             elif 'nitro' in srv: continue
             elif '1fichier' in srv: continue
             elif 'turbobit' in srv: continue
@@ -875,9 +890,9 @@ def findvideos(item):
             elif lang == 'Subtitulado' or lang == 'Subtitulada' or lang == 'VOSE': lang = 'Vose'
             else: lang = '?'
 
-            if 'utorrent' in srv: srv = 'Torrent'
-            elif 'mega' in srv: srv = 'Mega'
-            elif 'mediafire' in srv: srv = 'Mediafire'
+            if 'utorrent' in srv: srv = 'torrent'
+            elif 'mega' in srv: srv = 'mega'
+            elif 'mediafire' in srv: srv = 'mediafire'
 
             other = corregir_servidor(srv)
 
@@ -896,8 +911,16 @@ def findvideos(item):
 
         if url in blk_tor: continue
 
-        if 'buzzheavier' in srv: continue
+        if 'sbcom' in srv: continue
+        elif 'lvturbo' in srv: continue
+        elif 'vanfem' in srv: continue
+        elif 'fembed' in srv: continue
+        elif 'fcom' in srv: continue
 
+        elif 'buzzheavier' in srv: continue
+        elif 'guccihide' in srv: continue
+
+        elif 'rapidgator' in srv: continue
         elif 'nitro' in srv: continue
         elif '1fichier' in srv: continue
         elif 'turbobit' in srv: continue
@@ -907,9 +930,13 @@ def findvideos(item):
         elif lang == 'Subtitulado' or lang == 'Subtitulada' or lang == 'VOSE': lang = 'Vose'
         else: lang = '?'
 
-        if 'utorrent' in srv: srv = 'Torrent'
-        elif 'mega' in srv: srv = 'Mega'
-        elif 'mediafire' in srv: srv = 'Mediafire'
+        if 'utorrent' in srv: srv = 'torrent'
+        elif 'mega' in srv: srv = 'mega'
+        elif 'mediafire' in srv: srv = 'mediafire'
+        elif 'gofile' in srv: srv = 'gofile'
+        elif 'google' in srv or 'Google' in srv: srv = 'gvideo'
+        elif 'gamovideo' in srv: srv = 'gamovideo'
+        elif 'vidmoly' in srv: srv = 'vidmoly'
 
         other = corregir_servidor(srv)
 
@@ -954,7 +981,7 @@ def play(item):
 
         if 'location' in resp.headers: url = resp.headers['location']
 
-    elif item.other == 'Clickndownload' or item.other == 'Gofile':
+    elif item.other == 'Clickndownload' or item.other == 'Gofile' or item.other == 'Gvideo' or item.other == 'Uptobox' or item.other == 'Dood' or item.other == 'Gamovideo' or item.other == 'Vidmoly' or item.other == 'Zures' or item.other != '':
         if not item.url.startswith(host) and not _player in url:
             resp = httptools.downloadpage(item.url, follow_redirects=False)
         else:
@@ -964,6 +991,8 @@ def play(item):
                 resp = httptools.downloadpage(item.url, follow_redirects=False)
 
         if 'location' in resp.headers: url = resp.headers['location']
+        else:
+           url = scrapertools.find_single_match(resp.data, '<a id="link".*?href="(.*?)"')
 
     else:
         data = do_downloadpage(item.url, headers = {'Referer': item.ref})
@@ -986,13 +1015,18 @@ def play(item):
         if item.other.startswith("Sb"):
             return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
 
-        elif 'fembed' in url or  'streamsb' in url or 'playersb' in url or 'fcom' in url:
+        elif 'streamsb' in url or 'playersb' in url:
             return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
 
-        elif '.pepeliculas.' in url: url = ''
+        elif 'uptobox' in url:
+            return 'Servidor [COLOR goldenrod]Fuera de Servicio[/COLOR]'
+
+        elif '.pepeliculas.' in url or'-pepeliculas.' in url: url = ''
+
+        elif '.googleapis.' in url: url = ''
 
     if url:
-        if 'http://' in url: url = url.replace('http://', 'https://')
+        url = url.replace('http://', 'https://')
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -1001,7 +1035,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone( url=url, server=servidor))
 
@@ -1023,7 +1057,7 @@ def list_search(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#038;', '').replace("&#8217;", "'").replace("&#8211;", "")
+        title = title.replace('&#038;', '&').replace("&#8217;", "'").replace("&#8211;", "")
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
@@ -1054,6 +1088,7 @@ def list_search(item):
     if itemlist:
         if '<div class="pagination">' in data:
             next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
+            if not next_page: next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "<a href='(.*?)'")
 
             if next_page:
                 if '/page/' in next_page:

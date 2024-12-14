@@ -262,6 +262,7 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="([^"]+)"')
 
         year = scrapertools.find_single_match(match, '<span class="inf">(.*?)</span>').strip()
+
         if year: title = title.replace('(' + year + ')', '').strip()
         else:
             year = scrapertools.find_single_match(title, '(\d{4})')
@@ -271,7 +272,7 @@ def list_all(item):
 
         if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
 
-        title = title.replace('&#8211;', '').replace('&#039;', "'").replace('&#8230;', ' &').replace('&amp;', '&').replace('&#8217;s', "'").strip()
+        title = title.replace('&#8211;', '').replace('&#039;', "'").replace('&#8230;', ' &').replace('&amp;', '&').replace('&#8217;s', "'").replace('&#039;s', "'s").strip()
 
         tipo = 'movie' if '/movies/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -640,7 +641,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

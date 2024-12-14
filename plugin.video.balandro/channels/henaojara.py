@@ -150,6 +150,11 @@ def do_downloadpage(url, post=None, headers=None):
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
         return ''
 
+    if '>Sorry, you have been blocked<' in data:
+        if not '?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]Access[COLOR orangered] Blocked[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -686,7 +691,9 @@ def findvideos(item):
 
                 players = players.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
-                data3 = do_downloadpage(players)
+                headers = {'Referer': host, 'Priority': 'u=4', 'Sec-GPC': '1', 'Accept-Encoding': 'gzip, deflate, br, zstd' }
+
+                data3 = do_downloadpage(players, headers=headers)
 
                 matches3 = scrapertools.find_multiple_matches(data3, "loadVideo.*?'(.*?)'" + '.*?alt="(.*?)"')
 
@@ -922,7 +929,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone( url=url, server=servidor))
 

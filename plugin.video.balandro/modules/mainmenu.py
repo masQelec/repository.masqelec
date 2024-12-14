@@ -543,6 +543,9 @@ def mainlist(item):
         if config.get_setting('mnu_proxies', default=False):
             itemlist.append(item.clone( action='channels', extra='proxies', title=' - [B]Proxies[/B]', context=context_proxy_channels, thumbnail=config.get_thumb('stack'), text_color='red' ))
 
+        if config.get_setting('mnu_clones', default=False):
+            itemlist.append(item.clone( action='channels', extra='clones', title=' - [B]Clones[/B]', context=context_proxy_channels, thumbnail=config.get_thumb('stack'), text_color='turquoise' ))
+
         if config.get_setting('mnu_problematicos', default=False):
             itemlist.append(item.clone( action='channels', extra='problematics', title=' - [B]Problemáticos[/B]', context=context_desactivados, thumbnail=config.get_thumb('stack'), text_color='darkgoldenrod' ))
 
@@ -563,8 +566,12 @@ def mainlist(item):
     if last_ver is None: last_ver = '[B][I][COLOR gray](fixes off)[/COLOR][/I][/B]'
     elif not last_ver:
         last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
+
+        text_dev = ''
+        if config.get_setting('developer_mode', default=False): text_dev = ' [COLOR darkorange][B]Desarrollo[/B][/COLOR]'
+
         if not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')):
-            platformtools.dialog_notification(config.__addon_name, '[COLOR yellow][B]Versión Desfasada del Add-On[/COLOR][/B]')
+            platformtools.dialog_notification(config.__addon_name + text_dev, '[COLOR yellow][B]Versión Desfasada del Add-On[/COLOR][/B]')
     else: last_ver = ''
 
     context_ayuda = []
@@ -818,10 +825,11 @@ def channels(item):
         if config.get_setting('sub_mnu_cfg_search', default=True):
             itemlist.append(item.clone( channel='submnuctext', action='submnu_search', title='[B]Personalizar búsquedas[/B]', context=context_cfg_search, extra = 'torrents', thumbnail=config.get_thumb('help'), text_color='moccasin' ))
 
-        itemlist.append(Item( channel='search', action='search', search_type='all', title='[B][COLOR blue]Buscar Torrent[/COLOR] película y/ó Serie ...[/B]', context=context_search, extra = 'only_torrents', thumbnail=config.get_thumb('search'), text_color='yellow' ))
+        if not config.get_setting('search_no_exclusively_torrents', default=False):
+            itemlist.append(Item( channel='search', action='search', search_type='all', title='[B][COLOR blue]Buscar Torrent[/COLOR] película y/ó Serie ...[/B]', context=context_search, extra = 'only_torrents', thumbnail=config.get_thumb('search'), text_color='yellow' ))
 
-        if config.get_setting('mnu_documentales', default=True):
-            itemlist.append(Item( channel='search', action='search', search_type='documentary', title='[B][COLOR blue]Buscar Torrent[/COLOR] documental ...[/B]', context=context_search, extra = 'documentaries', thumbnail=config.get_thumb('documentary'), text_color='cyan' ))
+            if config.get_setting('mnu_documentales', default=True):
+                itemlist.append(Item( channel='search', action='search', search_type='documentary', title='[B][COLOR blue]Buscar Torrent[/COLOR] documental ...[/B]', context=context_search, extra = 'documentaries', thumbnail=config.get_thumb('documentary'), text_color='cyan' ))
 
         if config.get_setting('sub_mnu_favoritos', default=False):
             itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), text_color='plum' ))
@@ -858,6 +866,9 @@ def channels(item):
 
             if config.get_setting('mnu_proxies', default=False):
                 if item.extra == 'proxies': presentar = False
+
+            if config.get_setting('mnu_clones', default=False):
+                if item.extra == 'clones': presentar = False
 
             if config.get_setting('mnu_problematicos', default=False):
                 if item.extra == 'problematics': presentar = False
@@ -912,16 +923,15 @@ def channels(item):
            itemlist.append(item.clone( action='', title='[B]- [I]Sugeridos:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('suggested'), text_color='tan' ))
 
         elif item.extra == 'proxies': item.category = 'Solo los Canales con Proxies Memorizados'
+        elif item.extra == 'clones': item.category = 'Solo los Canales que sean Clones'
 
-        elif item.extra == 'disableds':
-           item.category = 'Solo los Canales que estén Desactivados'
-           itemlist.append(item.clone( action='', title='[B]- [I]Desactivados:[/I][/B]', context=context_desactivados, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='tan' ))
+        elif item.extra == 'disableds': item.category = 'Solo los Canales que estén Desactivados'
 
         elif item.extra == 'problematics': item.category = 'Solo los Canales que sean Problemáticos (Predominan Sin enlaces Disponibles/Válidos/Soportados)'
 
         elif not item.extra == 'groups':
            if item.extra == 'prefereds':
-               item.category = 'Solo los Canales Preferidps'
+               item.category = 'Solo los Canales Preferidos'
                itemlist.append(item.clone( action='', title='[B]- [I]Canales Preferidos:[/I][/B]', context=context_usual, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='tan' ))
            else:
                item.category = 'Todos los Canales'
@@ -1032,14 +1042,20 @@ def channels(item):
 
                 itemlist.append(item.clone( action='', title='[B]- [I]Animes:[/I][/B]', context=context_parental, plot=item.category, thumbnail=config.get_thumb('anime'), text_color='tan' ))
 
-        if item.extra == 'proxies' or item.extra == 'problematics':
+        if item.extra == 'proxies' or item.extra == 'clones' or item.extra == 'problematics' or item.extra == 'disableds':
             itemlist.append(item.clone( channel='actions', action='open_settings', title='[COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR tan][B]Menú)[/B][/COLOR]', context=context_config, folder=False, thumbnail=config.get_thumb('settings') ))
 
             if item.extra == 'proxies':
                 itemlist.append(item.clone( action='', title='[B]- [I]Proxies:[/I][/B]', context=context_proxy_channels, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='tan' ))
 
+            if item.extra == 'clones':
+                itemlist.append(item.clone( action='', title='[B]- [I]Clones:[/I][/B]', context=context_proxy_channels, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='turquoise' ))
+
             if item.extra == 'problematics':
                 itemlist.append(item.clone( action='', title='[B]- [I]Problemáticos:[/I][/B]', context=context_desactivados, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='tan' ))
+
+            if item.extra == 'disableds':
+                itemlist.append(item.clone( action='', title='[B]- [I]Desactivados:[/I][/B]', context=context_desactivados, plot=item.category, thumbnail=config.get_thumb('stack'), text_color='gray' ))
 
         accion = 'mainlist'
         filtros = {}
@@ -1081,12 +1097,21 @@ def channels(item):
 
             if not config.get_setting(cfg_proxies_channel, default=''): continue
 
+        if item.extra == 'clones':
+            if not 'clone' in ch['clusters']: continue
+
         else:
             if not item.extra == 'all':
-                if not item.extra == 'disableds':
+                if item.extra == 'proxies': pass
+                elif item.extra == 'clones': pass
+
+                elif not item.extra == 'disableds':
                     if config.get_setting('mnu_proxies', default=False):
                         if 'Puede requerir el uso de proxies' in ch['notes']:
                             if config.get_setting(cfg_proxies_channel, default=''): continue
+
+                    if config.get_setting('mnu_clones', default=False):
+                        if 'clone' in ch['clusters']: continue
 
         if item.extra == 'movies':
             if ch['searchable'] == False:
@@ -1424,6 +1449,16 @@ def channels(item):
 
             if not item.extra == 'problematics': titulo += '[I][B][COLOR darkgoldenrod] (problemático)[/COLOR][/I][/B]'
 
+        if 'clone' in ch['clusters']:
+            if config.get_setting('mnu_simple', default=False): continue
+
+            if not item.extra == 'all':
+                if not item.extra == 'clones': 
+                    if config.get_setting('mnu_clones', default=False): continue
+                    elif config.get_setting('channels_list_no_clones', default=False): continue
+
+            if not item.extra == 'clones': titulo += '[I][B][COLOR turquoise] (clon)[/COLOR][/I][/B]'
+
         if con_incidencias:
            if ch['name'] in str(con_incidencias): titulo += '[I][B][COLOR tan] (incidencia)[/COLOR][/I][/B]'
 
@@ -1464,10 +1499,12 @@ def channels(item):
         if item.extra == 'Proxies' or item.extra == 'disableds':
             itemlist.append(item.clone( channel='actions', action='open_settings', title='[COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR tan][B]Menú)[/B][/COLOR]', context=context_config, folder=False, thumbnail=config.get_thumb('settings') ))
 
-        if item.extra == 'Proxies':
+        if item.extra == 'proxies':
             itemlist.append(item.clone( channel='filters', action='with_proxies', title='[B]Sin canales con Proxies Memorizados[/B]', text_color=color_list_proxies, thumbnail=config.get_thumb('stack'), folder=False ))
-        elif item.extra == 'problematics':
+        elif item.extra == 'clones':
             itemlist.append(item.clone( channel='filters', action='show_channels_list', title='[B]Sin canales Problemáticos[/B]', text_color='darkgoldenrod', problematics=True, thumbnail=config.get_thumb('stack'), folder=False ))
+        elif item.extra == 'problematics':
+            itemlist.append(item.clone( channel='filters', action='show_channels_list', title='[B]Sin canales Problemáticos[/B]', text_color='darkgoldenrod', clones=True, thumbnail=config.get_thumb('stack'), folder=False ))
         elif item.extra == 'disableds':
             itemlist.append(item.clone( channel='filters', action='channels_status', title='[B]Sin canales Desactivados[/B]', text_color=color_list_inactive, des_rea=True, thumbnail=config.get_thumb('stack'), folder=False ))
         else:

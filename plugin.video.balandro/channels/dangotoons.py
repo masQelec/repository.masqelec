@@ -93,14 +93,17 @@ def list_all(item):
 
     for match in matches[desde:hasta]:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        if not url: url = scrapertools.find_single_match(match, "<a href='(.*?)'")
 
         title = scrapertools.find_single_match(match, 'class="titulo">(.*?)</p>')
+        if not title: title = scrapertools.find_single_match(match, "class='titulo'>(.*?)</p>")
 
         if not url or not title: continue
 
         if url.startswith('/'): url = host[:-1] + url
 
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(match, "data-src='(.*?)'")
 
         year = scrapertools.find_single_match(title, '(\d{4})')
         if year: title = title.replace('(' + str(year) + ')', '').strip()
@@ -233,8 +236,10 @@ def episodios(item):
 
     for match in matches[item.page * item.perpage:]:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        if not url: url = scrapertools.find_single_match(match, "<a href='(.*?)'")
 
         title = scrapertools.find_single_match(match, '<a href=".*?">(.*?)</a>')
+        if not title: title = scrapertools.find_single_match(match, "<a href='.*?'>(.*?)</a>")
 
         if not url or not title: continue
 
@@ -276,7 +281,7 @@ def findvideos(item):
 
     url_videos = scrapertools.find_single_match(data, 'var q = \[ \[(.+?)\] \]')
 
-    matches = scrapertools.find_multiple_matches(url_videos, '"(.+?)"')
+    matches = scrapertools.find_multiple_matches(url_videos, '"(.*?)"')
 
     ses = 0
 
@@ -329,7 +334,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

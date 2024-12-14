@@ -446,6 +446,7 @@ def findvideos(item):
         if 'trailer' in servidor: continue
 
         if 'hqq.' in servidor: servidor = 'waaw'
+        elif 'cloudvideo.' in servidor: servidor = 'cloudvideo'
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
@@ -485,6 +486,7 @@ def findvideos(item):
         if '/hqq.' in url: servidor = 'waaw'
 
         if servidor == 'directo': continue
+        elif 'cloudvideo.' in servidor: servidor = 'cloudvideo'
 
         url = servertools.normalize_url(servidor, url)
 
@@ -526,7 +528,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

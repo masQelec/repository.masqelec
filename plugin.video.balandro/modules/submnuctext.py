@@ -638,9 +638,7 @@ def _dominio_vigente(item):
 def _dominio_memorizado(item):
     from modules import domains
 
-    if item.from_channel == 'animefenix': domains.manto_domain_animefenix(item)
-
-    elif item.from_channel == 'animeflv': domains.manto_domain_animeflv(item)
+    if item.from_channel == 'animeflv': domains.manto_domain_animeflv(item)
 
     elif item.from_channel == 'animeid': domains.manto_domain_animeid(item)
 
@@ -653,8 +651,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'cinecalidadlol': domains.manto_domain_cinecalidadlol(item)
 
     elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
-
-    elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
 
     elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
 
@@ -678,8 +674,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
 
-    elif item.from_channel == 'estrenosdoramas': domains.manto_domain_estrenosdoramas(item)
-
     elif item.from_channel == 'gnula': domains.manto_domain_gnula(item)
 
     elif item.from_channel == 'gnula24': domains.manto_domain_gnula24(item)
@@ -694,6 +688,8 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'henaojara': domains.manto_domain_henaojara(item)
 
+    elif item.from_channel == 'homecine': domains.manto_domain_homecine(item)
+
     elif item.from_channel == 'mejortorrentapp': domains.manto_domain_mejortorrentapp(item)
 
     elif item.from_channel == 'mejortorrentnz': domains.manto_domain_mejortorrentnz(item)
@@ -707,8 +703,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'peliculaspro': domains.manto_domain_peliculaspro(item)
 
     elif item.from_channel == 'pelisforte': domains.manto_domain_pelisforte(item)
-
-    elif item.from_channel == 'pelismaraton': domains.manto_domain_pelismaraton(item)
 
     elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
 
@@ -745,8 +739,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'subtorrents': domains.manto_domain_subtorrents(item)
 
     elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
-
-    elif item.from_channel == 'tupelihd': domains.manto_domain_tupelihd(item)
 
     elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
 
@@ -897,12 +889,12 @@ def _proxies(item):
 
         if config.get_setting('channel_allpeliculasse_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'animefenix':
-        from channels import animefenix
-        item.channel = 'animefenix'
-        animefenix.configurar_proxies(item)
+    elif item.from_channel == 'animejl':
+        from channels import animejl
+        item.channel = 'animejl'
+        animejl.configurar_proxies(item)
 
-        if config.get_setting('channel_animefenix_proxies') is None: refrescar = False
+        if config.get_setting('channel_animejl_proxies') is None: refrescar = False
 
     elif item.from_channel == 'animeonline':
         from channels import animeonline
@@ -938,13 +930,6 @@ def _proxies(item):
         cliversite.configurar_proxies(item)
 
         if config.get_setting('channel_cliversite_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'cuevana2':
-        from channels import cuevana2
-        item.channel = 'cuevana2'
-        cuevana2.configurar_proxies(item)
-
-        if config.get_setting('channel_cuevana2_proxies') is None: refrescar = False
 
     elif item.from_channel == 'cuevana2esp':
         from channels import cuevana2esp
@@ -1050,6 +1035,13 @@ def _proxies(item):
         filmoves.configurar_proxies(item)
 
         if config.get_setting('channel_filmoves_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'flixcorn':
+        from channels import flixcorn
+        item.channel = 'flixcorn'
+        flixcorn.configurar_proxies(item)
+
+        if config.get_setting('channel_flixcorn_proxies') is None: refrescar = False
 
     elif item.from_channel == 'gnula':
         from channels import gnula
@@ -1232,13 +1224,6 @@ def _proxies(item):
         pelisforte.configurar_proxies(item)
 
         if config.get_setting('channel_pelisforte_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'pelismaraton':
-        from channels import pelismaraton
-        item.channel = 'pelismaraton'
-        pelismaraton.configurar_proxies(item)
-
-        if config.get_setting('channel_pelismaraton_proxies') is None: refrescar = False
 
     elif item.from_channel == 'pelispanda':
         from channels import pelispanda
@@ -1435,13 +1420,6 @@ def _proxies(item):
         tomadivx.configurar_proxies(item)
 
         if config.get_setting('channel_tomadivx_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'tupelihd':
-        from channels import tupelihd
-        item.channel = 'tupelihd'
-        tupelihd.configurar_proxies(item)
-
-        if config.get_setting('channel_tupelihd_proxies') is None: refrescar = False
 
     elif item.from_channel == 'tuseries':
         from channels import tuseries

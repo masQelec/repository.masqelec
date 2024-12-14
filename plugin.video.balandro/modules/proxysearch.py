@@ -55,6 +55,8 @@ if txt_status:
 
 
 dominioshdfull = [
+         'https://hdfull.cfd/',
+         'https://hdfull.tel/',
          'https://hdfull.buzz/',
          'https://hdfull.blog/',
          'https://hd-full.info/',
@@ -64,15 +66,13 @@ dominioshdfull = [
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
-         'https://hd-full.one/',
          'https://hd-full.co/',
          'https://hdfull.quest/',
-         'https://hdfull.link/',
          'https://hdfull.today/',
+         'https://hd-full.biz/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
-         'https://hd-full.biz/',
          'https://new.hdfull.one/'
          ]
 

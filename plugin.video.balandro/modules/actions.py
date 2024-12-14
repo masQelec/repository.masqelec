@@ -221,7 +221,7 @@ def search_trailers(item):
             ret = xbmcgui.Dialog().select('Tráilers para [B][COLOR yellow]%s[/B][/COLOR]' % nombre, opciones, useDetails=True)
             if ret == -1: break
 
-            platformtools.dialog_notification(resultados[ret]['name'], 'Cargando tráiler ...', time=3000, sound=False)
+            platformtools.dialog_notification(resultados[ret]['name'], '[COLOR cyan]Cargando Tráiler[/COLOR] ...', time=3000, sound=False)
 
             from core import servertools
 
@@ -414,7 +414,6 @@ def manto_params(item):
 
         config.set_setting('proxies', '', 'test_providers')
 
-        config.set_setting('channel_animefenix_dominio', '')
         config.set_setting('channel_animeflv_dominio', '')
         config.set_setting('channel_animeid_dominio', '')
         config.set_setting('channel_animeonline_dominio', '')
@@ -423,7 +422,6 @@ def manto_params(item):
         config.set_setting('channel_cinecalidadla_dominio', '')
         config.set_setting('channel_cinecalidadlol_dominio', '')
         config.set_setting('channel_cliversite_dominio', '')
-        config.set_setting('channel_cuevana2_dominio', '')
         config.set_setting('channel_cuevana2esp_dominio', '')
         config.set_setting('channel_cuevana3pro_dominio', '')
         config.set_setting('channel_cuevana3video_dominio', '')
@@ -437,7 +435,6 @@ def manto_params(item):
         config.set_setting('channel_elitetorrentnz_dominio', '')
         config.set_setting('channel_ennovelastv_dominio', '')
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
-        config.set_setting('channel_estrenosdoramas_dominio', '')
 
         config.set_setting('channel_gnula_dominio', '')
         config.set_setting('channel_gnula24_dominio', '')
@@ -451,6 +448,7 @@ def manto_params(item):
 
         config.set_setting('channel_hdfullse_dominio', '')
         config.set_setting('channel_henaojara_dominio', '')
+        config.set_setting('channel_homecine_dominio', '')
 
         config.set_setting('channel_mejortorrentapp_dominio', '')
         config.set_setting('channel_mejortorrentnz_dominio', '')
@@ -466,7 +464,6 @@ def manto_params(item):
 
         config.set_setting('channel_peliculaspro_dominio', '')
         config.set_setting('channel_pelisforte_dominio', '')
-        config.set_setting('channel_pelismaraton_dominio', '')
         config.set_setting('channel_pelismart_dominio', '')
         config.set_setting('channel_pelispanda_dominio', '')
         config.set_setting('channel_pelispedia2me_dominio', '')
@@ -492,7 +489,6 @@ def manto_params(item):
         config.set_setting('channel_subtorrents_dominio', '')
 
         config.set_setting('channel_todotorrents_dominio', '')
-        config.set_setting('channel_tupelihd_dominio', '')
 
         config.set_setting('channel_veronline_dominio', '')
 
@@ -560,7 +556,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '130.0.6723.92')  # ~ 30/10/24
+        config.set_setting('chrome_last_version', '131.0.6778.87')  # ~ 7/12/24
 
         config.set_setting('debug', '0')
 
@@ -1475,10 +1471,6 @@ def test_internet(item):
     return
 
 
-def opciones_animefenix(item):
-    item.from_channel = 'animefenix'
-    opciones_domains_common(item)
-
 def opciones_animeflv(item):
     item.from_channel = 'animeflv'
     opciones_domains_common(item)
@@ -1505,10 +1497,6 @@ def opciones_cinecalidadlol(item):
 
 def opciones_cliversite(item):
     item.from_channel = 'cliversite'
-    opciones_domains_common(item)
-
-def opciones_cuevana2(item):
-    item.from_channel = 'cuevana2'
     opciones_domains_common(item)
 
 def opciones_cuevana2esp(item):
@@ -1555,10 +1543,6 @@ def opciones_entrepeliculasyseries(item):
     item.from_channel = 'entrepeliculasyseries'
     opciones_domains_common(item)
 
-def opciones_estrenosdoramas(item):
-    item.from_channel = 'estrenosdoramas'
-    opciones_domains_common(item)
-
 def opciones_gnula(item):
     item.from_channel = 'gnula'
     opciones_domains_common(item)
@@ -1587,6 +1571,10 @@ def opciones_henaojara(item):
     item.from_channel = 'henaojara'
     opciones_domains_common(item)
 
+def opciones_homecine(item):
+    item.from_channel = 'homecine'
+    opciones_domains_common(item)
+
 def opciones_mejortorrentapp(item):
     item.from_channel = 'mejortorrentapp'
     opciones_domains_common(item)
@@ -1613,10 +1601,6 @@ def opciones_peliculaspro(item):
 
 def opciones_pelisforte(item):
     item.from_channel = 'pelisforte'
-    opciones_domains_common(item)
-
-def opciones_pelismaraton(item):
-    item.from_channel = 'pelismaraton'
     opciones_domains_common(item)
 
 def opciones_pelismart(item):
@@ -1691,10 +1675,6 @@ def opciones_todotorrents(item):
     item.from_channel = 'todotorrents'
     opciones_domains_common(item)
 
-def opciones_tupelihd(item):
-    item.from_channel = 'tupelihd'
-    opciones_domains_common(item)
-
 def opciones_veronline(item):
     item.from_channel = 'veronline'
     opciones_domains_common(item)
@@ -1751,9 +1731,7 @@ def opciones_domains_common(item):
         from modules import domains
 
         if ret == 0:
-            if item.from_channel == 'animefenix': domains.manto_domain_animefenix(item)
-
-            elif item.from_channel == 'animeflv': domains.manto_domain_animeflv(item)
+            if item.from_channel == 'animeflv': domains.manto_domain_animeflv(item)
 
             elif item.from_channel == 'animeid': domains.manto_domain_animeid(item)
 
@@ -1766,8 +1744,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'cinecalidadlol': domains.manto_domain_cinecalidadlol(item)
 
             elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
-
-            elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
 
             elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
 
@@ -1791,8 +1767,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
 
-            elif item.from_channel == 'estrenosdoramas': domains.manto_domain_estrenosdoramas(item)
-
             elif item.from_channel == 'gnula': domains.manto_domain_gnula(item)
 
             elif item.from_channel == 'gnula24': domains.manto_domain_gnula24(item)
@@ -1807,6 +1781,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'henaojara': domains.manto_domain_henaojara(item)
 
+            elif item.from_channel == 'homecine': domains.manto_domain_homecine(item)
+
             elif item.from_channel == 'mejortorrentapp': domains.manto_domain_mejortorrentapp(item)
 
             elif item.from_channel == 'mejortorrentnz': domains.manto_domain_mejortorrentnz(item)
@@ -1820,8 +1796,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'peliculaspro': domains.manto_domain_peliculaspro(item)
 
             elif item.from_channel == 'pelisforte': domains.manto_domain_pelisforte(item)
-
-            elif item.from_channel == 'pelismaraton': domains.manto_domain_pelismaraton(item)
 
             elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
 
@@ -1859,17 +1833,13 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
 
-            elif item.from_channel == 'tupelihd': domains.manto_domain_tupelihd(item)
-
             elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
 
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)
 
         elif ret == 1:
-            if item.from_channel == 'animefenix': domains.test_domain_animefenix(item)
-
-            elif item.from_channel == 'animeflv': domains.test_domain_animeflv(item)
+            if item.from_channel == 'animeflv': domains.test_domain_animeflv(item)
 
             elif item.from_channel == 'animeid': domains.test_domain_animeid(item)
 
@@ -1882,8 +1852,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'cinecalidadlol': domains.test_domain_cinecalidadlol(item)
 
             elif item.from_channel == 'cliversite': domains.test_domain_cliversite(item)
-
-            elif item.from_channel == 'cuevana2': domains.test_domain_cuevana2(item)
 
             elif item.from_channel == 'cuevana2esp': domains.test_domain_cuevana2esp(item)
 
@@ -1907,8 +1875,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'entrepeliculasyseries': domains.test_domain_entrepeliculasyseries(item)
 
-            elif item.from_channel == 'estrenosdoramas': domains.test_domain_estrenosdoramas(item)
-
             elif item.from_channel == 'gnula': domains.test_domain_gnula(item)
 
             elif item.from_channel == 'gnula24': domains.test_domain_gnula24(item)
@@ -1923,6 +1889,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'henaojara': domains.test_domain_henaojara(item)
 
+            elif item.from_channel == 'homecine': domains.test_domain_homecine(item)
+
             elif item.from_channel == 'mejortorrentapp': domains.test_domain_mejortorrentapp(item)
 
             elif item.from_channel == 'mejortorrentnz': domains.test_domain_mejortorrentnz(item)
@@ -1936,8 +1904,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'peliculaspro': domains.test_domain_peliculaspro(item)
 
             elif item.from_channel == 'pelisforte': domains.test_domain_pelisforte(item)
-
-            elif item.from_channel == 'pelismaraton': domains.test_domain_pelismaraton(item)
 
             elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
 
@@ -1975,8 +1941,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'todotorrents': domains.test_domain_todotorrents(item)
 
-            elif item.from_channel == 'tupelihd': domains.test_domain_tupelihd(item)
-
             elif item.from_channel == 'veronline': domains.test_domain_veronline(item)
 
             else:
@@ -1985,9 +1949,7 @@ def opciones_domains_common(item):
         elif ret == 2:
             from modules import helper
 
-            if item.from_channel == 'animefenix': helper.show_help_animefenix(item)
-
-            elif item.from_channel == 'animeonline': helper.show_help_animeonline(item)
+            if item.from_channel == 'animeonline': helper.show_help_animeonline(item)
 
             elif item.from_channel == 'cinecalidadlol': helper.show_help_cinecalidadlol(item)
 
@@ -2005,13 +1967,11 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'henaojara': helper.show_help_henaojara(item)
 
+            elif item.from_channel == 'homecine': helper.show_help_homecine(item)
+
             elif item.from_channel == 'peliculaspro': helper.show_help_peliculaspro(item)
 
-            elif item.from_channel == 'peliplayhd': helper.show_help_henaojara(item)
-
             elif item.from_channel == 'pelisforte': helper.show_help_pelisforte(item)
-
-            elif item.from_channel == 'pelismaraton': helper.show_help_pelismaraton(item)
 
             elif item.from_channel == 'playdede': helper.show_help_playdede(item)
 

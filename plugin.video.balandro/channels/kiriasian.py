@@ -224,6 +224,7 @@ def findvideos(item):
         if not video: continue
 
         url = scrapertools.find_single_match(video,'<iframe.*?src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(video,'<IFRAME.*?SRC="(.*?)"')
 
         if url:
             if '/streaming.php' in url:

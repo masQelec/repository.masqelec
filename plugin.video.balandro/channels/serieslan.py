@@ -423,12 +423,12 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
-        if servidor and (servidor != 'directo' or 'googleusercontent' in url):
-            url = servertools.normalize_url(servidor, url)
+        #if servidor and (servidor != 'directo' or 'googleusercontent' in url):
+        url = servertools.normalize_url(servidor, url)
 
-            itemlist.append(item.clone( url=url, server=servidor ))
+        itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
 

@@ -342,6 +342,9 @@ def play(item):
         url = scrapertools.find_single_match(str(data), '"file":"(.*?)"')
 
         if url:
+            if url.startswith("/dropden."):
+               url = host + url
+
             if '/dropden.' in url:
                 itemlist.append(item.clone(url = url, server = 'directo'))
 
@@ -360,7 +363,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

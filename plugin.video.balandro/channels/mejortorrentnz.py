@@ -13,11 +13,12 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www1.mejortorrent.si'
+host = 'https://mejortorrent.mov'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://mejortorrent.nz', 'https://mejortorrent.cc', 'https://mejortorrent.se']
+ant_hosts = ['https://mejortorrent.nz', 'https://mejortorrent.cc', 'https://mejortorrent.se',
+            'https://www1.mejortorrent.si']
 
 
 domain = config.get_setting('dominio', 'mejortorrentnz', default='')
@@ -149,6 +150,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/peliculas-13/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/ultimos/', search_type = 'movie', text_color='cyan' ))
+
     itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + '/peliculas-hd-3/', search_type = 'movie' ))
 
     return itemlist
@@ -163,6 +166,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/series-3/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/ultimos/', search_type = 'tvshow', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Episodios', action = 'list_all', url = host + '/series-3/capitulos/', search_type = 'tvshow' ))
 
@@ -180,6 +185,8 @@ def mainlist_documentales(item):
     itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/documentales-3/', search_type = 'documentary' ))
+
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/ultimos/', search_type = 'documentary', text_color='cyan' ))
 
     return itemlist
 
@@ -199,7 +206,8 @@ def list_all(item):
         if not url: continue
 
         title = url
-        title = title.replace(host, '').replace('-', ' ').replace('/', '').strip()
+        title = title.replace(host, '').replace('-', ' ').replace('/', '')
+        title = title.replace('https://', '').strip()
         title = title.capitalize()
 
         if title == 'Documentales': continue
@@ -226,14 +234,22 @@ def list_all(item):
                                         contentType='movie', contentTitle=titulo, infoLabels={'year': '-'} ))
 
         elif item.search_type == 'tvshow':
-            title = title.replace(' &#8211;', '').strip()
+            SerieName = title
 
-            SerieName = corregir_SerieName(title)
+            SerieName = SerieName.replace('[720p]', '').strip()
+
+            SerieName = SerieName.replace('&#8211;', '').replace('&#215;', '').strip()
+
+            SerieName = SerieName.replace("&#8217;", "'")
+
+            SerieName = corregir_SerieName(SerieName)
 
             if SerieName:
-                title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
+                titulo = title.replace('&#215;', 'x').replace('&#8211;', '').replace("&#8217;", "'")
 
-                itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
+                titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
+
+                itemlist.append(item.clone( action='episodios', url=url, title=titulo, thumbnail=thumb,
                                             contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
 
         else:
@@ -254,6 +270,77 @@ def list_all(item):
             if next_page:
                 if '/page/' in next_page:
                     itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page, text_color='coral' ))
+
+    return itemlist
+
+
+def list_list(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    if item.search_type == 'movie':
+        bloque = scrapertools.find_single_match(data, "<div class='h5 text-dark card-title top'.*?>Peliculas(.*?)>Series")
+    elif item.search_type == 'tvshow':
+        bloque = scrapertools.find_single_match(data, "<div class='h5 text-dark card-title top'.*?>Series(.*?)>Musica")
+    else:
+        bloque = scrapertools.find_single_match(data, "<div class='h5 text-dark card-title top'.*?>Documentales(.*?)>Variados")
+
+    matches = scrapertools.find_multiple_matches(bloque, "<span class='text-muted'>(.*?)<br>")
+
+    logger.info("check-00-mayches: %s" % matches)
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, "<a href='(.*?)'")
+        title = scrapertools.find_single_match(match, "class='text-primary'>(.*?)</a>")
+
+        if not url or not title: continue
+
+        if item.search_type == 'movie':
+            titulo = title
+
+            if '4K' in titulo: titulo = title.replace('[4K]', '').replace('4K', '').strip()
+            elif 'HD' in titulo: titulo = title.replace('[HD]', '').replace('HD', '').strip()
+            elif '3D' in titulo: titulo = title.replace('[3D]', '').replace('3D', '').strip()
+
+            titulo = titulo.strip()
+
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title,
+                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
+
+        elif item.search_type == 'tvshow':
+            SerieName = title
+
+            SerieName = SerieName.replace('[720p]', '').strip()
+
+            SerieName = SerieName.replace('&#8211;', '').replace('&#215;', '').strip()
+
+            SerieName = SerieName.replace("&#8217;", "'")
+
+            SerieName = corregir_SerieName(SerieName)
+
+            titulo = title.replace('&#215;', 'x').replace('&#8211;', '').replace("&#8217;", "'")
+
+            titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
+
+            itemlist.append(item.clone( action='episodios', url = url, title = titulo,
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': '-'} ))
+
+        else:
+            titulo = title
+
+            if '4K' in titulo: titulo = title.replace('[4K]', '').replace('4K', '').strip()
+            elif 'HD' in titulo: titulo = title.replace('[HD]', '').replace('HD', '').strip()
+            elif '3D' in titulo: titulo = title.replace('[3D]', '').replace('3D', '').strip()
+
+            titulo = titulo.strip()
+
+            itemlist.append(item.clone( action = 'episodios', url = url, title = title,
+                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 

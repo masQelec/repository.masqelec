@@ -245,7 +245,7 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        if '/asianbxkiun.' in url:
+        if '/asianbxkiun.' in url or '/embasic.pro' in url:
             data = do_downloadpage(url)
 
             links = re.compile('data-video="(.*?)"', re.DOTALL).findall(data)
@@ -254,6 +254,7 @@ def findvideos(item):
                 if not link: continue
 
                 elif '/asianbxkiun.' in link: continue
+                elif '/embasic.pro/' in link: continue
 
                 servidor = servertools.get_server_from_url(link)
                 servidor = servertools.corregir_servidor(servidor)

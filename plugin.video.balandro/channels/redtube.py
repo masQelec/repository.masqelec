@@ -203,20 +203,23 @@ def get_video_url(page_url):
 
     data = resp.data
 
-    url = scrapertools.find_single_match(data,'"format":"mp4","videoUrl":"([^"]+)"')
+    url = scrapertools.find_single_match(data,'"format":"mp4",.*?"videoUrl":"([^"]+)"')
 
-    url = url.replace("\\", "")
+    url = url.replace('\\/','/')
+
+    url = url.replace('\\', '')
 
     if url.startswith('/'): url = host[:-1] + url
 
-    data = httptools.downloadpage(url).data
+    if url:
+        data = httptools.downloadpage(url).data
 
-    matches = scrapertools.find_multiple_matches(data, '"defaultQuality":.*?,"quality":"([^"]+)","videoUrl"\:"([^"]+)"')
+        matches = scrapertools.find_multiple_matches(data, '"defaultQuality":.*?,"quality":"([^"]+)","videoUrl"\:"([^"]+)"')
 
-    for qlty, url in matches:
-        url =  url.replace('\\/', '/')
+        for qlty, url in matches:
+            url =  url.replace('\\/', '/')
 
-        video_urls.append([qlty, url])
+            video_urls.append([qlty, url])
  
     return video_urls
 

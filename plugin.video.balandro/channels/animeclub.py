@@ -38,7 +38,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host + 'lista/nuevos-animes/', group = 'news', search_type = 'tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host + 'lista/nuevos-animes/', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'lista/anime-mas-vistos/', search_type = 'tvshow' ))
 
@@ -71,8 +71,7 @@ def list_all(item):
 
         SerieName = corregir_SerieName(title)
 
-        if item.group == 'news':
-            title = title.replace('Season', '[COLOR tan]Season[/COLOR]')
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, page = 0,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
@@ -124,6 +123,8 @@ def last_epis(item):
         epis = scrapertools.find_single_match(match, '<div class="episodio">Episodio (.*?)</div>').strip()
 
         if not epis: epis = 1
+
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]')
 
         titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + title.replace('Capítulo ' + str(epis), '').replace('Capitulo ' + str(epis), '').strip()
 
