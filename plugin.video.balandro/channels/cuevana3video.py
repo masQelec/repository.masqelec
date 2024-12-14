@@ -675,6 +675,7 @@ def normalize_other(url):
     elif 'filemoon' in url: link_other = 'Filemoon'
     elif 'filelions' in url: link_other = 'Filelions'
     elif 'vidhide' in url: link_other = 'Vidhidepro'
+    elif 'goodstream' in url: link_other = 'Goodstream'
 
     elif 'plustream' in url: link_other = ''
 
@@ -883,6 +884,54 @@ def play(item):
                     itemlist.append(item.clone(url=url, server=servidor))
                     return itemlist
 
+    elif item.other == 'play':
+        if '/pelisplay.infoplay':
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        elif '/pelisplay.ccplay?' in item.url:
+            if not item.url.startswith(host):
+                resp = httptools.downloadpage(item.url)
+            else:
+                if config.get_setting('channel_cuevana3video_proxies', default=''):
+                    resp = httptools.downloadpage_proxy('cuevana3video', item.url)
+                else:
+                    resp = httptools.downloadpage(item.url)
+
+            if not resp.data: return itemlist
+        else:
+            data = do_downloadpage(item.url)
+
+        matches = scrapertools.find_multiple_matches(data, 'data-video="(.*?)"')
+
+        if not matches:
+            url = scrapertools.find_single_match(data, "sources.*?'(.*?)'")
+
+            if url:
+                servidor = servertools.get_server_from_url(url)
+                servidor = servertools.corregir_servidor(servidor)
+
+                url = servertools.normalize_url(servidor, url)
+
+                itemlist.append(item.clone(url=url, server=servidor))
+                return itemlist
+
+        for url in matches:
+            if '//damedamehoy.' in url or '//tomatomatela.' in url:
+                url = resuelve_dame_toma(url)
+
+            if url:
+                itemlist.append(item.clone(url = url, server = 'directo'))
+                return itemlist
+
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            url = servertools.normalize_url(servidor, url)
+
+            if servidor and servidor != 'directo':
+                itemlist.append(item.clone(url = url, server = servidor))
+                return itemlist
+
     if url:
         if '/clonamesta' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
@@ -894,7 +943,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

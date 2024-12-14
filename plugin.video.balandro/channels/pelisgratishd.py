@@ -6,6 +6,12 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
+try:
+    from Cryptodome.Cipher import AES
+    from lib import jscrypto
+except:
+    pass
+
 
 host = 'https://pelisgratishd.in/'
 
@@ -314,9 +320,69 @@ def findvideos(item):
     data = do_downloadpage(new_url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    options = scrapertools.find_multiple_matches(data, '<li onclick="go_to_playerVast(.*?)</li>')
-
     ses = 0
+
+    if '//embed69.' in new_url:
+        ses += 1
+
+        datae = data
+
+        e_links = scrapertools.find_single_match(datae, 'const dataLink =(.*?);')
+        e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
+
+        langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
+
+        for lang in langs:
+            ses += 1
+
+            lang = lang + '"type":"video"'
+
+            links = scrapertools.find_multiple_matches(str(lang), '"servername":"(.*?)","link":"(.*?)".*?"type":"video"')
+
+            if 'SUB' in lang: lang = 'Vose'
+            elif 'LAT' in lang: lang = 'Lat'
+            elif 'ESP' in lang: lang = 'Esp'
+            else: lang = '?'
+
+            for srv, link in links:
+                ses += 1
+
+                srv = srv.lower().strip()
+
+                if not srv: continue
+                elif host in link: continue
+
+                elif '1fichier.' in srv: continue
+                elif 'plustream' in srv: continue
+                elif 'embedsito' in srv: continue
+                elif 'disable2' in srv: continue
+                elif 'disable' in srv: continue
+                elif 'xupalace' in srv: continue
+                elif 'uploadfox' in srv: continue
+                elif 'streamsito' in srv: continue
+
+                servidor = servertools.corregir_servidor(srv)
+
+                if servertools.is_server_available(servidor):
+                    if not servertools.is_server_enabled(servidor): continue
+                else:
+                    if not config.get_setting('developer_mode', default=False): continue
+
+                other = ''
+
+                if servidor == 'various': other = servertools.corregir_other(srv)
+
+                if servidor == 'directo':
+                    if not config.get_setting('developer_mode', default=False): continue
+                    else:
+                       other = url.split("/")[2]
+                       other = other.replace('https:', '').strip()
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes,
+                                      language=lang, other=other ))
+
+    # ~ Otros
+    options = scrapertools.find_multiple_matches(data, '<li onclick="go_to_playerVast(.*?)</li>')
 
     for option in options:
         ses += 1
@@ -408,6 +474,41 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if item.crypto:
+        logger.info("check-1-crypto: %s" % item.crypto)
+        logger.info("check-2-crypto: %s" % item.bytes)
+        try:
+            ###############url =  AES.decrypt(item.crypto, item.bytes)
+            url = AES.new(item.crypto, AES.MODE_SIV==10)
+            logger.info("check-3-crypto: %s" % url)
+
+            url = jscrypto.new(item.crypto, 2, IV=item.bytes)
+            logger.info("check-4-crypto: %s" % url)
+        except:
+            return '[COLOR cyan]No se pudo [COLOR red]Desencriptar[/COLOR]'
+
+    if url:
+        if '/xupalace.' in url or '/uploadfox.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

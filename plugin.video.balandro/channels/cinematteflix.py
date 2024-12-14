@@ -31,7 +31,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/videoclub/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/videoclub-gratis-cinematteflix/' ))
 
     itemlist.append(item.clone( title = 'Magazine', action = 'list_all', url = host, group = 'magazine', page = 1))
 

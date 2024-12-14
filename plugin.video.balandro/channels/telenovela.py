@@ -161,6 +161,8 @@ def list_all(item):
         lang = ''
         if 'subtitulado' in title.lower(): lang = 'Vose'
 
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').strip()
+
         if '-capitulo-' in url:
             epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
 
@@ -343,7 +345,7 @@ def episodios(item):
         epis = scrapertools.find_single_match(match, '<div class="epl-num">.*?EP(.*?)</div>').strip()
         if not epis: epis = 1
 
-        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').strip()
 
         titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
@@ -384,6 +386,7 @@ def findvideos(item):
 
         if '/likessb.' in url: continue
         elif '/argtesa.' in url: continue
+        elif '/ennovelas.' in url: continue
 
         if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 

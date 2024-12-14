@@ -49,6 +49,8 @@ except:
 
 
 dominios = [
+         'https://hdfull.cfd/',
+         'https://hdfull.tel/',
          'https://hdfull.buzz/',
          'https://hdfull.blog/',
          'https://hd-full.info/',
@@ -58,15 +60,13 @@ dominios = [
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
-         'https://hd-full.one/',
          'https://hd-full.co/',
          'https://hdfull.quest/',
-         'https://hdfull.link/',
          'https://hdfull.today/',
+         'https://hd-full.biz/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
-         'https://hd-full.biz/',
          'https://new.hdfull.one/'
          ]
 
@@ -82,7 +82,7 @@ ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
              'https://hdfull.gdn/', 'https://hdfull.cloud/', 'https://hdfull.video/',
              'https://hdfull.work/', 'https://hdfull.life/', 'https://hdfull.digital/',
              'https://hdfull.store/', 'https://hd-full.in/', 'https://hdfull.icu/',
-             'https://hd-full.im/']
+             'https://hd-full.im/', 'https://hd-full.one/', 'https://hdfull.link/']
 
 
 if host in str(ant_hosts): config.set_setting('dominio', dominios[0], 'hdfull')
@@ -555,9 +555,9 @@ def mainlist(item):
         itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
         itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'actor', search_type = 'person',
-                                    plot = 'Debe indicarse el nombre y apellido/s del intérprete (lo más exacto posible).'))
+                                    plot = 'Indicar el Nombre y Apellido/s del intérprete (lo más exacto posible).'))
         itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
-                                    plot = 'Debe indicarse el nombre y apellido/s del director (lo más exacto posible).'))
+                                    plot = 'Indicar el Nombre y Apellido/s del director (lo más exacto posible).'))
 
         itemlist.append(item.clone( title = 'Búsqueda en listas populares:', action = '', folder=False, text_color='greenyellow' ))
         itemlist.append(item.clone( title = ' - Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all',
@@ -590,8 +590,8 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( action='list_all', title='Catálogo', url = dominio + 'peliculas', search_type = 'movie' ))
 
-        itemlist.append(item.clone( action='list_all', title='Últimos estrenos', url = dominio + 'peliculas-estreno', search_type = 'movie', text_color='cyan' ))
-        itemlist.append(item.clone( action='list_all', title='Últimas actualizadas', url = dominio + 'peliculas-actualizadas', search_type = 'movie' ))
+        itemlist.append(item.clone( action='list_all', title='Estrenos', url = dominio + 'peliculas-estreno', search_type = 'movie', text_color='cyan' ))
+        itemlist.append(item.clone( action='list_all', title='Actualizadas', url = dominio + 'peliculas-actualizadas', search_type = 'movie' ))
 
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url = dominio + 'peliculas/imdb_rating', search_type = 'movie' ))
 
@@ -1398,10 +1398,10 @@ def search(item, texto):
 
     try:
         if item.group:
-            item.url = dominio + 'buscar' + '/' + item.group + '/' + texto
+            item.url = dominio + 'buscar' + '/' + item.group + '/' + texto.replace(' ', '+')
 
         elif item.target_action:
-            item.post = 'target=lists&action=search&search=%s&start=0&limit=99' % texto.replace(' ','+')
+            item.post = 'target=lists&action=search&search=%s&start=0&limit=99' % texto.replace(' ', '+')
             return list_listas(item)
 
         else:
@@ -1410,7 +1410,7 @@ def search(item, texto):
             magic = scrapertools.find_single_match(data, "name='__csrf_magic'\s*value=\"([^\"]+)")
             if not magic: return []
 
-            item.search_post = '__csrf_magic=%s&menu=search&query=%s' % (magic, texto.replace(' ','+'))
+            item.search_post = '__csrf_magic=%s&menu=search&query=%s' % (magic, texto.replace(' ', '+'))
             item.url = dominio + 'buscar'
 
         return list_all(item)

@@ -276,8 +276,10 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, ' href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
         title = scrapertools.find_single_match(match, '<img alt="(.*?)"')
+        if not title: title = scrapertools.find_single_match(match, "<img alt='(.*?)'")
 
         if not url or not title: continue
 
@@ -457,6 +459,7 @@ def findvideos(item):
     else: lang = '?'
 
     bloque = scrapertools.find_single_match(data, '<div class="bg-tabs">(.*?)</div> </div> </div>')
+    if not bloque: bloque = scrapertools.find_single_match(data, "<div class='bg-tabs'>(.*?)</div> </div> </div>")
 
     matches = scrapertools.find_multiple_matches(bloque, 'data-server="(.*?)".*?<span>(.*?)</span>')
 

@@ -223,7 +223,7 @@ def list_all(item):
                 continue
 
             else:
-                title = title.replace('Temporada', '[COLOR tan]Temporada[/COLOR]')
+                title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
@@ -496,6 +496,8 @@ def findvideos(item):
         url = url.strip()
 
         if '/likessb.' in url: continue
+        elif '/lylxan.' in url: continue
+        elif '/live.demand.' in url: continue
 
         if url.startswith('//'): url = 'https:' + url
 
@@ -522,8 +524,7 @@ def findvideos(item):
 
         if servidor == 'various': other = servertools.corregir_other(url)
 
-        if not servidor == 'directo':
-            itemlist.append(Item( channel=item.channel, action = 'play', server = servidor, url = url, language = lang, other = other.capitalize() ))
+        itemlist.append(Item( channel=item.channel, action = 'play', server = servidor, url = url, language = lang, other = other.capitalize() ))
 
     # ~ links
     data = do_downloadpage(item.url + '?do=watch')
@@ -551,6 +552,9 @@ def findvideos(item):
 
         for url in matches:
             if '/wp-admin/' in url: continue
+
+            elif '/lylxan.' in url: continue
+            elif '/live.demand.' in url: continue
 
             if url.startswith('//'): url = 'https:' + url
 
@@ -582,8 +586,7 @@ def findvideos(item):
                 if other: other = other + ' D'
                 else: other = 'D'
 
-            if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
     t_link = scrapertools.find_single_match(data, 'var vo_theme_dir = "(.*?)"')
     id_link = scrapertools.find_single_match(data, 'vo_postID = "(.*?)"')
@@ -607,6 +610,9 @@ def findvideos(item):
 
            if '/wp-admin/' in u_link: u_link = ''
 
+           elif '/lylxan.' in u_link: u_link = ''
+           elif '/live.demand.' in u_link: u_link = ''
+
            if u_link:
                if u_link.startswith('https://sr.ennovelas.net/'): u_link = u_link.replace('/sr.ennovelas.net/', '/waaw.to/')
                elif u_link.startswith('https://video.ennovelas.net/'): u_link = u_link.replace('/video.ennovelas.net/', '/waaw.to/')
@@ -626,8 +632,7 @@ def findvideos(item):
                other = ''
                if servidor == 'various': other = servertools.corregir_other(u_link)
 
-               if not servidor == 'directo':
-                   itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
+               itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
 
            i += 1
 
@@ -640,6 +645,9 @@ def findvideos(item):
         ses += 1
 
         if '/wp-admin/' in url: continue
+
+        elif '/lylxan.' in url: continue
+        elif '/live.demand.' in url: continue
 
         if url.startswith('//'): url = 'https:' + url
 
@@ -662,8 +670,7 @@ def findvideos(item):
         if other: other = other + ' d'
         else: other = 'd'
 
-        if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other ))
 
     # ~ Otros
     link_srv = scrapertools.find_single_match(data, '<div id="btnServers">.*?href="(.*?)"')
@@ -683,6 +690,9 @@ def findvideos(item):
             ses += 1
 
             if '/wp-admin/' in enlace: continue
+
+            elif '/lylxan.' in enlace: continue
+            elif '/live.demand.' in enlace: continue
 
             if enlace.startswith('//'): enlace = 'https:' + enlace
 
@@ -707,13 +717,33 @@ def findvideos(item):
             other = ''
             if servidor == 'various': other = servertools.corregir_other(enlace)
 
-            if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = enlace, server = servidor, language = lang, other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = enlace, server = servidor, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if url:
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"): servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
+
+        itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
 

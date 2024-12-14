@@ -95,7 +95,7 @@ def list_list(item):
 
         titulo = name.replace('_', '').capitalize()
 
-        if country: titulo = titulo + ' [COLOR orange]' + str(country).lower() + '[/COLOR]'
+        if country: titulo = titulo + ' [COLOR violet]' + str(country).lower() + '[/COLOR]'
 
         if age:
            if not str(age) == '[None]':
@@ -147,7 +147,7 @@ def list_all(item):
 
         titulo = name.replace('_', '').capitalize()
 
-        if country: titulo = titulo + ' [COLOR orange]' + str(country).lower() + '[/COLOR]'
+        if country: titulo = titulo + ' [COLOR violet]' + str(country).lower() + '[/COLOR]'
 
         if age:
            if not str(age) == '[None]':

@@ -1,17 +1,22 @@
-[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod] Situacion Dominios [/COLOR][COLOR aqua]  4 de Noviembre de 2024 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 4.0.12[/B][/COLOR]
+[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod] Situacion Dominios [/COLOR][COLOR aqua]  10 de Diciembre de 2024 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 4.0.13[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
    Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Tutoriales, Sugerencias, etc.
    Telegram  [COLOR aquamarine][B][I]t.me/balandro_asesor[/I][/B][/COLOR]  Asesoramiento, Dudas, Consultas, etc.
+   [COLOR goldenrod][B]Los Usuarios de Telegram pueden Incorporar Nuevos Miembros[/B][/COLOR]
 
  [COLOR gold][B]MEDIA CENTERS:[/B][/COLOR]
     [B][COLOR tan]Kodi Versiones Oficiales Soportadas:[/COLOR][/B]
-       [COLOR violet][B]https://kodi.tv/download/[/B][/COLOR]  y  [COLOR violet][B]https://mirrors.kodi.tv/releases/[/B][/COLOR]
+       [COLOR violet][B][I]https://kodi.tv/download/[/I][/B][/COLOR]  y  [COLOR violet][B][I]https://mirrors.kodi.tv/releases/[/I][/B][/COLOR]
        [COLOR darkorange][B]22.x Piers,  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia  y  17.x Krypton[/B][/COLOR]
 
-    [B][COLOR tan]Kodi Consultas:[/COLOR][/B]
-       [COLOR violet][B]https://mundokodi.com[/B][/COLOR]
+    [B][COLOR limegreen]Kodi Consultas:[/COLOR][/B]
+       [COLOR violet][B][I]https://mundokodi.com[/I][/B][/COLOR]
        [COLOR goldenrod][B]Tutoriales, Instalaciones, Funciones, Add-Ons, Noticias, etc.[/B][/COLOR]
+
+ [COLOR gold][B]CONSULTAS ADD-ONS EXTERNOS:[/B][/COLOR]
+    [COLOR violet][B][I]https://www.pluginsxbmc.com[/I][/B][/COLOR]
+    [COLOR goldenrod][B]Tutoriales, Instalaciones, Funciones, Add-Ons, Noticias, etc.[/B][/COLOR]
 
  [COLOR fuchsia][B]CUESTIONES PRELIMINARES:[/B][/COLOR]
    Si algun canal no obtiene [COLOR coral][B]Resultados[/B][/COLOR] y tiene la opcion [COLOR red][B]Configurar proxies a usar ...[/B][/COLOR]:
@@ -21,7 +26,7 @@
         o menos saturados, o mas duraderos, ademas pueden ser gratuitos o de pago.[/B][/COLOR]
 
  [COLOR red][B]PROXIES[COLOR deepskyblue] GESTION LISTAS PERSONALIZADAS:[/B][/COLOR] 
-   [B][COLOR moccasin] Lista-proxies.zip [COLOR dodgerblue] Descarga desde el Foro [COLOR limegreen][I] Revision 22/8/2024 [/I][/B][/COLOR]
+   [B][COLOR moccasin] Lista-proxies.zip [COLOR dodgerblue] Descarga desde el Foro [COLOR limegreen][I] Revision 14/11/2024 [/I][/B][/COLOR]
 
  [COLOR sienna][B]SITUACION SERVIDORES:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
@@ -33,12 +38,13 @@
    [B][COLOR moccasin] NextDede [COLOR lime] nextdede.us [I][COLOR greenyellow] Not Login [/I][/B][/COLOR]
 
  [COLOR slateblue][B]CANALES PROBABLEMENTE NO ACCESIBLES:[/B][/COLOR]
-   [B][COLOR moccasin] DoramasOn [COLOR lime] doramason.com [I][COLOR red] Host Off [/I][/B][/COLOR]
-   [B][COLOR moccasin] EnNovelasWs [COLOR lime] ww.ennovelas.ws [I][COLOR red] Host Off [/I][/B][/COLOR]
+   [B][COLOR moccasin] MasNovelas [COLOR lime] ennovelas.pro [I][COLOR red] Host Error [/I][/B][/COLOR]
+   [B][COLOR moccasin] PanDrama [COLOR lime] pandramas.net [I][COLOR red] Host Off [/I][/B][/COLOR]
+   [B][COLOR moccasin] PeliPlayHd [COLOR lime] peliplayhd.com [I][COLOR red] CloudFlare ReCaptCha [/I][/B][/COLOR]
    [B][COLOR moccasin] RePelisRe [COLOR lime] wow.repelis.re [I][COLOR red] CloudFlare ReCaptCha [/I][/B][/COLOR]
-   [B][COLOR moccasin] TodoSeries [COLOR lime] todoserieshd.net [I][COLOR red] Host Off [/I][/B][/COLOR]
+   [B][COLOR moccasin] SeriesLan [COLOR lime] serieslan.com [I][COLOR red] Host Not Found [/I][/B][/COLOR]
    [B][COLOR moccasin] UpHd [COLOR lime] ultrapelishd.net [I][COLOR red] CloudFlare ReCaptCha [/I][/B][/COLOR]
-   [B][COLOR moccasin] ViVud [COLOR lime] vivud.com [I][COLOR red] Host Off [/I][/B][/COLOR]
+   [B][COLOR moccasin] VivUd [COLOR lime] vivud.com [I][COLOR red] Host Off [/I][/B][/COLOR]
    [B][COLOR moccasin] ZMovs [COLOR lime] zmovs.com [I][COLOR red] Host Off [/I][/B][/COLOR]
 
  [COLOR cyan][B]ULTIMOS CAMBIOS DE DOMINIOS:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]

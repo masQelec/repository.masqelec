@@ -672,6 +672,9 @@ def play(item):
 
                 break
     else:
+        if '/plustream.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
@@ -679,10 +682,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
-
-        if '/plustream.' in url:
-            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

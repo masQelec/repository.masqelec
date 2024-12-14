@@ -432,6 +432,7 @@ def findvideos(item):
 
         if 'trailer' in srv: continue
         elif '1fichier' in srv: continue
+        elif 'publicbt' in srv: continue
 
         if srv == 'utorrent': srv = 'torrent'
 
@@ -525,7 +526,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         if not servidor == 'directo':
             itemlist.append(item.clone(server = servidor, url = url))

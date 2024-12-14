@@ -161,6 +161,7 @@ def findvideos(item):
             data1 = httptools.downloadpage(down).data
 
             data1 = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data1)
+
             bloque1 = scrapertools.find_single_match(data1, '<div class="tab_container">(.*?)<li>')
 
             links = scrapertools.find_multiple_matches(bloque1, 'href="(.*?)"')
@@ -175,6 +176,7 @@ def findvideos(item):
                 elif '/www.fireload.' in url: continue
                 elif '/t.me' in url: continue
                 elif '/zb4vh-' in url: continue
+                elif '.whatsapp.' in url: continue
 
                 if url.startswith('https://mega.nz/folder/'): continue
 

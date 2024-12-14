@@ -9,7 +9,7 @@ from platformcode import config, logger, platformtools
 
 color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
-tipos_plus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52]
+tipos_plus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]
 
 
 def plus_proxies(proxies, max_proxies):
@@ -59,8 +59,9 @@ def plus_proxies(proxies, max_proxies):
     elif tplus == 18: url_provider = 'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt'
 
     elif tplus == 19: url_provider = 'https://raw.githubusercontent.com/prxchk/proxy-list/main/http.txt'
-
-    elif tplus == 20: url_provider = 'https://gist.github.com/markavale/c39036066b69fa7f9f346caf6d1fe58a'
+    elif tplus == 20: url_provider = 'https://raw.githubusercontent.com/prxchk/proxy-list/main/all.txt'
+    elif tplus == 54: url_provider = 'https://raw.githubusercontent.com/prxchk/proxy-list/main/socks4.txt'
+    elif tplus == 55: url_provider = 'https://raw.githubusercontent.com/prxchk/proxy-list/main/socks5.txt'
 
     elif tplus == 21: url_provider = 'https://api.openproxylist.xyz/http.txt'
     elif tplus == 22: url_provider = 'https://api.openproxylist.xyz/socks4.txt'
@@ -112,10 +113,13 @@ def plus_proxies(proxies, max_proxies):
     elif tplus == 51: url_provider = 'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=https&anonymity=transparent'
     elif tplus == 52: url_provider = 'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=https'
 
+    elif tplus == 53: url_provider = 'https://gist.github.com/markavale/c39036066b69fa7f9f346caf6d1fe58a'
+
     if url_provider:
         resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
 
-        if 'location:' in resp.data: resp.data = ''
+        if not tplus == 53:
+            if 'location:' in resp.data: resp.data = ''
 
     if tplus == 0 or tplus == 1 or tplus == 2:
         el_provider = '[B][COLOR %s] Openproxy[/B][/COLOR]' % color_exec
@@ -258,8 +262,12 @@ def plus_proxies(proxies, max_proxies):
 
             proxies_plus.append(prox + ':' + puerto)
 
-    elif tplus == 19:
-        el_provider = '[B][COLOR %s] Proxyscan[/B][/COLOR]' % color_exec
+    elif tplus == 19 or tplus == 20 or tplus == 54 or tplus == 55:
+        if tplus == 19: el_provider = '[B][COLOR %s] Proxyscan Http[/B][/COLOR]' % color_exec
+        elif tplus == 20: el_provider = '[B][COLOR %s] Proxyscan All[/B][/COLOR]' % color_exec
+        elif tplus == 54: el_provider = '[B][COLOR %s] Proxyscan Socks4[/B][/COLOR]' % color_exec
+        elif tplus == 55: el_provider = '[B][COLOR %s] Proxyscan Socks5[/B][/COLOR]' % color_exec
+
         platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
@@ -267,16 +275,7 @@ def plus_proxies(proxies, max_proxies):
         for prox in enlaces:
             prox = prox.strip()
 
-            if prox: proxies_plus.append(prox)
-
-    elif tplus == 20:
-        el_provider = '[B][COLOR %s] Markavale[/B][/COLOR]' % color_exec
-        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
-
-        enlaces = scrapertools.find_multiple_matches(str(resp.data), 'data-line-number=".*?<td id=".*?">(.*?)</td>')
-
-        for prox in enlaces:
-            prox = prox.strip()
+            prox = prox.replace('http://', '').replace('https://', '').replace('socks4://', '').replace('socks5://', '')
 
             if prox: proxies_plus.append(prox)
 
@@ -411,6 +410,19 @@ def plus_proxies(proxies, max_proxies):
 
         if resp.data:
            if not "<title>404" in str(resp.data): proxies_plus = resp.data.split()
+
+    elif tplus == 53:
+        el_provider = '[B][COLOR %s] Markavale[/B][/COLOR]' % color_exec
+        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+
+        block = scrapertools.find_single_match(str(resp.data), '"proxy-list.txt">(.*?)</table>')
+
+        enlaces = scrapertools.find_multiple_matches(str(block), '<td id="file-proxy-list-txt-.*?js-file-line">(.*?)</td>')
+                                                
+        for prox in enlaces:
+            prox = prox.strip()
+
+            if prox: proxies_plus.append(prox)
 
     # ~ si no se obtuvo ninguno
     if not proxies_plus:

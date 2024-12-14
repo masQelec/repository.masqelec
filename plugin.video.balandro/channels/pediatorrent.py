@@ -136,13 +136,13 @@ def list_all(item):
     if not matches: matches = scrapertools.find_multiple_matches(data, '<div class="relative flex flex-col gap-y-3 my-5 md:my-4">(.*?)</div></div>')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, ' href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, ' alt="(.*?)"').strip()
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         qlty = scrapertools.find_single_match(match, '<span>(.*?)</span>')
 

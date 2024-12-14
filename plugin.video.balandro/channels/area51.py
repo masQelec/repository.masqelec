@@ -120,9 +120,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
-    bloque = scrapertools.find_single_match(data, '<div class="list-videos">(.*?)</div></div></div></div>')
+    bloque = scrapertools.find_single_match(data, '<div class="list-videos">(.*?)<footer>')
 
-    matches = re.compile('<a href="(.*?)".*?title="(.*?)".*?src="(.*?)".*?<span class="is-hd">(.*?)</span>').findall(bloque)
+    matches = re.compile('<div class="item.*?<a href="(.*?)".*?title="(.*?)".*?src="(.*?)".*?<span class="is-hd">(.*?)</span>').findall(bloque)
 
     for url, title, thumb, time in matches:
         if '</i>' in time: time = scrapertools.find_single_match(time, '</i>(.*?)$')

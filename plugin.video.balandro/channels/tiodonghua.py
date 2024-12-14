@@ -220,7 +220,7 @@ def list_all(item):
                     SerieName = SerieName.replace(' ' + str(epi), '').strip()
                     titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epi) + ' ' + titulo.replace(' ' + str(epi), '').strip()
 
-                titulo = titulo.replace('Season', '[COLOR tan]Season[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+                titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
                 itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb, infoLabels={'year': year},
                                             contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epi ))
@@ -560,7 +560,7 @@ def play(item):
 
     if servidor == 'directo':
         new_server = servertools.corregir_other(url_play).lower()
-        if not new_server.startswith("http"): servidor = new_server
+        if new_server.startswith("http"): servidor = new_server
 
     itemlist.append(item.clone(url = url_play, server = servidor))
 

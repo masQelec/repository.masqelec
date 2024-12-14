@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import codecs
+import re, codecs
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -226,7 +226,7 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-        if not url: url = scrapertools.find_single_match(match, '<a href=(.*?) ').strip()
+        if not url: url = scrapertools.find_single_match(match, 'href=(.*?) ').strip()
 
         title = scrapertools.find_single_match(match, 'class="entry-title">(.*?)</')
 
@@ -246,8 +246,8 @@ def list_all(item):
 
     if itemlist:
         if '>SIGUIENTE' in data:
-            next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?<a class="page-link" .*?href="(.*?)"')
-            if not next_page: next_page = scrapertools.find_single_match(data, '<a class="page-link current".*?</a>.*?<a class=page-link.*?href=(.*?)>')
+            next_page = scrapertools.find_single_match(data, 'class="page-link current".*?class="page-link" .*?href="(.*?)"')
+            if not next_page: next_page = scrapertools.find_single_match(data, 'class="page-link current".*?</a>.*?class=page-link.*?href=(.*?)>')
 
             if next_page:
                 next_page = next_page.replace('&#038;', '&')
@@ -263,11 +263,12 @@ def findvideos(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '>OPCIONES<(.*?)</section>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'href="#options-(.*?)">.*?<span class="server">(.*?)-(.*?)</span>')
-    if not matches: matches = scrapertools.find_multiple_matches(bloque, 'href=#options-(.*?)>.*?<span class=server>(.*?)-(.*?)</span>')
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, 'href=#options-(.*?)>.*?<spanclass=server>(.*?)-(.*?)</span>')
 
     ses = 0
 
@@ -291,7 +292,7 @@ def findvideos(item):
         else: lang = idioma
 
         url = scrapertools.find_single_match(data, '<div id="options-' + opt + '".*?src="([^"]+)"')
-        if not url: url = scrapertools.find_single_match(data, '<div id=options-' + opt + '.*?<iframe data-src="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, '<divid=options-' + opt + '.*?data-src="(.*?)"')
 
         if url:
             servidor = servertools.corregir_servidor(srv)
@@ -416,14 +417,13 @@ def play(item):
 
         if item.ref:
             url += "|Referer=" + item.ref
-            logger.info("check-00-forte: %s" % url)
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(server = servidor, url = url))
 

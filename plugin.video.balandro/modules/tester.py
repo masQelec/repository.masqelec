@@ -114,6 +114,8 @@ timeout = config.get_setting('httptools_timeout', default=15)
 espera = config.get_setting('servers_waiting', default=6)
 
 dominioshdfull = [
+         'https://hdfull.cfd/',
+         'https://hdfull.tel/',
          'https://hdfull.buzz/',
          'https://hdfull.blog/',
          'https://hd-full.info/',
@@ -123,15 +125,13 @@ dominioshdfull = [
          'https://hd-full.me/',
          'https://hd-full.vip/',
          'https://hd-full.lol/',
-         'https://hd-full.one/',
          'https://hd-full.co/',
          'https://hdfull.quest/',
-         'https://hdfull.link/',
          'https://hdfull.today/',
+         'https://hd-full.biz/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
-         'https://hd-full.biz/',
          'https://new.hdfull.one/'
          ]
 
@@ -151,7 +151,7 @@ channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
-channels_despised = ['beeg', 'cuevana3in', 'hdfullse', 'pelisplushdlat', 'playdo', 'ytsmx']
+channels_despised = ['beeg', 'cam4', 'cuevana3in', 'hdfullse', 'pelisplushdlat', 'playdo', 'ytsmx']
 
 servers_poe = [ 'directo', 'm3u8hls', 'torrent' ]
 
@@ -189,7 +189,11 @@ def test_channel(channel_name):
     except: last_ver = None
 
     if last_ver is None: last_ver = '[B][I][COLOR %s](sin acceso)[/COLOR][/I][/B]' % color_alert
-    elif not last_ver: last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
+    elif not last_ver:
+          text_dev = ''
+          if config.get_setting('developer_mode', default=False): text_dev = '[COLOR darkorange][B]Desarrollo[/B][/COLOR] '
+          last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
+          last_ver = last_ver + '  '  + text_dev
     else: last_ver = ''
 
     last_fix = config.get_addon_version()
@@ -255,7 +259,10 @@ def test_channel(channel_name):
     if 'problematic' in clusters: clusters = clusters.replace('problematic,', '').strip()
     if 'temporary' in clusters: clusters = clusters.replace('temporary,', '').strip()
     if 'mismatched' in clusters: clusters = clusters.replace('mismatched,', '').strip()
+
     if 'clons' in clusters: clusters = clusters.replace('clons,', '').strip()
+    if 'clone' in clusters: clusters = clusters.replace('clone,', '').strip()
+
     if 'register' in clusters: clusters = clusters.replace('register,', '').strip()
     if 'current' in clusters: clusters = clusters.replace('current,', '').strip()
     if 'torrents' in clusters: clusters = clusters.replace('torrents,', '').strip()
@@ -496,7 +503,11 @@ def test_channel(channel_name):
 
         if 'clons' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
-            txt_diag  += 'clones: ' + '[COLOR lightyellow][B]Varios Clones[/B][/COLOR]'
+            txt_diag  += 'clones: ' + '[COLOR turquoise][B]Varios Clones del Canal Principal[/B][/COLOR]'
+
+        if 'clone' in str(params['clusters']):
+            if txt_diag: txt_diag += '[CR]'
+            txt_diag  += 'clone: ' + '[COLOR turquoise][B]Clon del Canal Principal[/B][/COLOR]'
 
         if 'onlyone' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
@@ -1296,6 +1307,10 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
             elif '/cgi-sys/defaultwebpage.cgi' in str(response.data): txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
             elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
+            elif 'Renew Now' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
+
+            if len(response.data) < 1100:
+                 if '.js"></script>' in str(response.data): txt += "[CR]web: [COLOR red][B]No Sponsors[/B][/COLOR]"
 
             if new_web:
                 if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
@@ -1305,7 +1320,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web or host + 'es/inicio' in new_web:
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web or host + 'es/inicio' in new_web or host + 'pro' in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1418,7 +1433,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web or host + 'es/inicio' in new_web:
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web or host + 'es/inicio' in new_web or host + 'pro' in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1771,7 +1786,11 @@ def test_server(server_name):
     except: last_ver = None
 
     if last_ver is None: last_ver = '[B][I][COLOR %s](sin acceso)[/COLOR][/I][/B]' % color_alert
-    elif not last_ver: last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
+    elif not last_ver:
+          text_dev = ''
+          if config.get_setting('developer_mode', default=False): text_dev = '[COLOR darkorange][B]Desarrollo[/B][/COLOR] '
+          last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
+          last_ver = last_ver + '  '  + text_dev
     else: last_ver = ''
 
     last_fix = config.get_addon_version()
@@ -2007,7 +2026,7 @@ def acces_server(server_name, url, txt, follow_redirects=None):
         elif ">The page you’re looking for could have been deleted or never have existed" in response.data: txt += '[CR]acces: [COLOR orangered][B]Web Sin Información [COLOR red]Borrada ó Inexistente[/B][/COLOR]'
 
         if len(response.data) >= 1000:
-            if new_web == '?op=login':
+            if new_web == '?op=login' or new_web == 'login' or new_web == 'inicio':
                 if 'Diagnosis:' in txt:
                     if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 

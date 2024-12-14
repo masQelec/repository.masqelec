@@ -1555,14 +1555,12 @@ def findvideos(item):
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    ses = 0
+
     # ~ Reproductor
     matches = re.compile('<div class="playerItem(.*?)</div></div>', re.DOTALL).findall(data)
 
-    ses = 0
-
     for match in matches:
-        ses += 1
-
         sid = scrapertools.find_single_match(match, 'data-loadPlayer="(.*?)"')
         if not sid: sid = scrapertools.find_single_match(match, "data-loadplayer='(.*?)'")
 
@@ -1570,9 +1568,12 @@ def findvideos(item):
 
         if not server or not sid: continue
 
+        if server == 'alternativo': continue
+
+        ses += 1
+
         if server == 'powvideo': continue
         elif server == 'streamplay': continue
-        elif server == 'alternativo': continue
 
         lang = scrapertools.find_single_match(match, 'data-lang="(.*?)"')
 
@@ -1591,7 +1592,7 @@ def findvideos(item):
         elif server == 'hexupload': other = 'Hexupload'
         elif server == 'userload': other = 'Userload'
         elif server == 'streamruby': other = 'Streamruby'
-        elif server == 'streamsilk': other = 'Turboviplay'
+        elif server == 'streamsilk': other = 'Streamsilk'
 
         elif server == 'luluvideo':
               server = 'various'
@@ -1609,15 +1610,16 @@ def findvideos(item):
     matches = re.compile('data-quality="(.*?)".*?data-lang="(.*?)".*?href="(.*?)".*?<span>.*?">(.*?)</b>', re.DOTALL).findall(bloque)
 
     for qlty, lang, url, server in matches:
-        ses += 1
-
         if not url or not server: continue
+
+        if server == 'alternativo': continue
+
+        ses += 1
 
         server = server.lower().strip()
 
         if server == 'powvideo': continue
         elif server == 'streamplay': continue
-        elif server == 'alternativo': continue
 
         if lang.lower() == 'espsub': lang = 'Vose'
 
@@ -1632,7 +1634,7 @@ def findvideos(item):
         elif server == 'hexupload': other = 'Hexupload'
         elif server == 'userload': other = 'Userload'
         elif server == 'streamruby': other = 'Streamruby'
-        elif server == 'streamsilk': other = 'Turboviplay'
+        elif server == 'streamsilk': other = 'Streamsilk'
 
         elif server == 'luluvideo':
               server = 'various'
@@ -1650,13 +1652,14 @@ def findvideos(item):
     matches = re.compile('data-quality="(.*?)".*?data-lang="(.*?)".*?href="(.*?)".*?<span>.*?">(.*?)</b>', re.DOTALL).findall(bloque)
 
     for qlty, lang, url, server in matches:
-        ses += 1
-
         if not url or not server: continue
 
-        server = server.lower().strip()
-
         if '>recomendado<' in server: continue
+        elif server == 'alternativo': continue
+
+        ses += 1
+
+        server = server.lower().strip()
 
         if '/ul.' in url: continue
         elif '/1fichier.' in url: continue
@@ -1727,7 +1730,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url_play).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = url_play, server = servidor))
 

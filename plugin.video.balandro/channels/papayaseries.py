@@ -231,7 +231,7 @@ def list_all(item):
         year = scrapertools.find_single_match(match, '<span class="Year">(.*?)</span>')
         if not year: year = '-'
 
-        title = title.replace('&#8217;s', "'s")
+        title = title.replace('&#8217;s', "'s").replace('&#038;', '&')
 
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
@@ -270,6 +270,13 @@ def temporadas(item):
             return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
+
+    if not seasons:
+        matches = scrapertools.find_multiple_matches(data, '<td><span class="Num">(.*?)</span>.*?>Descargar<.*?href="(.*?)"')
+
+        if matches:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]No es Una Serie[/B][/COLOR]')
+            return
 
     tmdb.set_infoLabels(itemlist)
 
@@ -370,6 +377,9 @@ def findvideos(item):
 
     IDIOMAS = {'Español Latino': 'Lat', 'Latino': 'Lat', 'Castellano': 'Esp', 'Subtitulado': 'Vose'}
 
+    if item.contentType == 'movie':
+        itemlist.append(Item(channel = item.channel, action = 'play', server = '', title = '', url = item.url ))
+
     data = do_downloadpage(item.url)
 
     options = scrapertools.find_multiple_matches(data, 'data-tplayernv="Opt(.*?)".*?(.*?)</li>')
@@ -427,7 +437,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(new_url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = new_url, server = servidor))
 

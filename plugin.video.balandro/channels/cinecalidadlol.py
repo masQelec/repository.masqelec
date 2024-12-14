@@ -352,7 +352,7 @@ def list_all(item):
 
         if url.startswith('/?post_id='): continue
 
-        elif '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url:
+        elif '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url or '.ggpickaff.' in url:
               _promos += 1
               continue
         elif 'Netflix Premium' in match or 'Suscripción Disney Plus' in match or 'Suscripción HBO' in match:
@@ -727,7 +727,8 @@ def findvideos(item):
                qlty = '4K'
                servidor = servidor.replace('4k', '').replace('4K', '').strip()
 
-            if 'subtítulo' in servidor: continue
+            if servidor == 'subtítulos' or 'subtitulo' in servidor: continue
+
             elif 'forzado' in servidor: continue
             elif 'cinecalidad' in servidor: continue
 
@@ -843,7 +844,7 @@ def play(item):
             if '/okru.' in url: servidor = 'okru'
 
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         if servidor == 'zplayer': url = url + '|' + host_player
 

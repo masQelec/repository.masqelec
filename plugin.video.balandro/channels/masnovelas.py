@@ -507,6 +507,11 @@ def episodios(item):
         title = title.replace('&#8216;', "").replace('&#8217;', "").replace('&#8230;', "").strip()
         title = title.replace('&#038;', '&').replace('&amp;', '&')
 
+        season = item.contentSeason
+        c_season = scrapertools.find_single_match(url, '-temporada-(.*?)-')
+        if c_season:
+            if not c_season == season: season = c_season
+	
         epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
         if not epis: epis = scrapertools.find_single_match(url, '-capitulo-(.*?)/')
 
@@ -521,10 +526,10 @@ def episodios(item):
 
         title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+        titulo = str(season) + 'x' + str(epis) + ' ' + title
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break

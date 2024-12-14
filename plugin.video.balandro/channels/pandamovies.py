@@ -198,9 +198,7 @@ def findvideos(item):
 
         if not url: continue
 
-        if '/streamsilk.' in url: continue
-        elif '/swiftload.' in url: continue
-        elif '/frdl.' in url: continue
+        if '/frdl.' in url: continue
         elif '/nitroflare.' in url: continue
         elif '/snowdayonline.' in url: continue
 
