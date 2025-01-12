@@ -294,7 +294,7 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'movie', contentTitle = SerieName, infoLabels={'year': year} ))
 
         if tipo == 'tvshow':
@@ -447,6 +447,9 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not item.search_type == 'tvshow':
+        if not '-episodio-' in item.url: item.url = item.url.replace('/anime/', '/ver/') + '-episodio-1'
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)

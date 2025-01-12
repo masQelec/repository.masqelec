@@ -9,9 +9,9 @@
   "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["torrent", "movie", "tvshow"],
-  "language": ["cast", "lat", "vo"],
+  "language": ["vo"],
 
   "clusters": ["onlyone", "torrents", "4k", "docs", "adults", "lists"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente."
+  "notes": "Canal con enlaces Torrent exclusivamente. Películas y Series en Versión Original."
 }

@@ -21,7 +21,7 @@ from modules import tester
 
 channels_currents = [
         'animeflv', 'animeid', 'animeonline',
-        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cliversite', 'cuevana2esp', 'cuevana3pro', 'cuevana3video',
+        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cliversite', 'cuevana2', 'cuevana2esp', 'cuevana3pro', 'cuevana3video',
         'divxtotal', 'dontorrents', 'dontorrentsin',
         'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelastv', 'entrepeliculasyseries',
         'gnula', 'gnula24', 'gnula24h', 'grantorrent',
@@ -66,7 +66,7 @@ dominiosnextdede = [
          ]
 
 dominiosplaydede = [
-         'https://playdede.eu/'
+         'https://playdede.me/'
          ]
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -398,6 +398,52 @@ def test_domain_cliversite(item):
         platformtools.dialog_notification(config.__addon_name + ' - CliverSite', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
+def manto_domain_cuevana2(item):
+    logger.info()
+
+    channel_json = 'cuevana2.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana2[/B][/COLOR]' % color_exec)
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_cuevana2(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('cuevana2')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('Cuevana2')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - Cuevana2', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
 def manto_domain_cuevana2esp(item):
     logger.info()
 
@@ -580,6 +626,79 @@ def test_domain_divxtotal(item):
         tester.test_channel('DivxTotal')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - DivxTotal', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
+def operative_domains_dontorrents(item):
+    logger.info()
+
+    domain = config.get_setting('dominio', 'dontorrents', default='')
+
+    channel_json = 'dontorrents.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
+
+    # ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
+    # ~ web 0)-'https://t.me/s/DonTorrent'
+
+    last_domain = ''
+
+    try:
+       data = httptools.downloadpage('https://t.me/s/DonTorrent').data
+
+       dominios = scrapertools.find_multiple_matches(data, '>Dominio Oficial.*?<a href="(.*?)"')
+
+       if dominios:
+           for dominio in dominios:
+               last_domain = dominio
+    except:
+       pass
+
+    if not last_domain:
+        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
+
+        xbmc.sleep(1000)
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://t.me/s/DonTorrent[/B][/COLOR]')
+        return
+
+    if domain == last_domain:
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+        return
+
+    nom_dom = domain
+    txt_dom = 'Dominio memorizado incorrecto.'
+    if not domain:
+        nom_dom = 'Sin información'
+        txt_dom = 'Aún No hay ningún Dominio memorizado.'
+
+    if not last_domain:
+        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Comprobación Dominio[/B][/COLOR]' % color_alert)
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Seleccionado:   [COLOR cyan][B]' + last_domain + '[/B][/COLOR]'): 
+        config.set_setting('dominio', last_domain, 'Dontorrents')
+
+        if not item.desde_el_canal:
+            if not item.from_action == 'mainlist':
+                platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Último dominio vigente memorizado, pero aún NO guardado.[/COLOR]', '[COLOR cyan][B]Recuerde, que para que el cambio surta efecto deberá abandonar los Ajustes de Balandro a través de su correspondiente botón --> OK[/B][/COLOR]')
 
 
 def last_domain_dontorrents(item):
@@ -1207,8 +1326,8 @@ def latest_domains_hdfull(item):
 
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando dominios[/B][/COLOR]' % color_exec)
 
-    # ~ web para saber el ultimo dominio vigente en actions
-    # ~ web  'https://dominioshdfull.com/'
+    # ~ web para saber el ultimo dominio vigente
+    # ~ web 0)-https://dominioshdfull.com/
 
     last_domain = ''
     latest_domain = ''
@@ -1276,7 +1395,7 @@ def last_domain_hdfull(item):
     platformtools.dialog_notification(config.__addon_name + ' - HdFull', '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ webs  0)-'https://dominioshdfull.com/'  1)-'https://new.hdfull.one/'
+    # ~ webs  0)-https://dominioshdfull.com/  1)-https://new.hdfull.one/
 
     last_domain = ''
     latest_domain = ''
@@ -1425,7 +1544,7 @@ def operative_domains_hdfull(item):
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar todos los dominios operativos
-    # ~ web  0)-'https://dominioshdfull.com/'
+    # ~ web  0)-https://dominioshdfull.com/
 
     last_domain = ''
 
@@ -1615,7 +1734,7 @@ def last_domain_hdfullse(item):
     platformtools.dialog_notification(config.__addon_name + ' - HdFullSe', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ web 0)-'https://hdfull.pm'
+    # ~ web 0)-https://hdfull.pm
 
     last_domain = ''
     latest_domain = ''
@@ -1742,7 +1861,7 @@ def operative_domains_hdfullse(item):
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ web 0)-'https://hdfull.pm'
+    # ~ web 0)-https://hdfull.pm
 
     try:
        host_domain = 'https://hdfull.pm'
@@ -1796,7 +1915,7 @@ def operative_domains_hdfullse(item):
         return
 
     if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Seleccionado:   [COLOR cyan][B]' + sel_domain + '[/B][/COLOR]'): 
-        config.set_setting('dominio', sel_domain, 'hdfullSe')
+        config.set_setting('dominio', sel_domain, 'hdfullse')
 
         if not item.desde_el_canal:
             if not item.from_action == 'mainlist':
@@ -2657,8 +2776,8 @@ def latest_domains_nextdede(item):
 
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando dominios[/B][/COLOR]' % color_exec)
 
-    # ~ web para saber el ultimo dominio vigente en actions
-    # ~ web  'https://dominiosnextdede.com/'  ó  'https://t.me/s/NextdedeInformacion'
+    # ~ webs para saber el ultimo dominio vigente
+    # ~ webs  0)-https://dominiosnextdede.com/  1)-https://t.me/s/NextdedeInformacion
 
     last_domain = ''
     latest_domain = ''
@@ -2674,23 +2793,6 @@ def latest_domains_nextdede(item):
            if not latest_domain.endswith('/'): latest_domain = latest_domain + '/'
     except:
        pass
-
-    if not latest_domain:
-        try:
-           data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
-
-           bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
-
-           dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
-
-           for dominio in dominios:
-               dominio = dominio.lower().strip()
-               if dominio:
-                   dominio = dominio.replace('http:', 'https:')
-                   if not dominio.endswith('/'): dominio = dominio + '/'
-                   latest_domain = dominio
-        except:
-           pass
 
     if latest_domain: last_domain = latest_domain
 
@@ -2738,7 +2840,7 @@ def last_domain_nextdede(item):
     platformtools.dialog_notification(config.__addon_name + ' - Nextdede', '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ webs  0)-'https://dominiosnextdede.com/'  ó  'https://t.me/s/NextdedeInformacion'
+    # ~ webs  0)-https://dominiosnextdede.com/  1)-https://t.me/s/NextdedeInformacion
 
     last_domain = ''
     latest_domain = ''
@@ -2755,23 +2857,6 @@ def last_domain_nextdede(item):
     except:
        pass
 
-    if not latest_domain:
-        try:
-           data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
-
-           bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
-
-           dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
-
-           for dominio in dominios:
-               dominio = dominio.lower().strip()
-               if dominio:
-                   dominio = dominio.replace('http:', 'https:')
-                   if not dominio.endswith('/'): dominio = dominio + '/'
-                   latest_domain = dominio
-        except:
-           pass
-
     if latest_domain:
         if latest_domain == domain: last_domain = latest_domain
 
@@ -2785,23 +2870,6 @@ def last_domain_nextdede(item):
 
            if last_domain:
                if not last_domain.endswith('/'): last_domain = last_domain + '/'
-        except:
-           pass
-
-    if not last_domain:
-        try:
-           data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
-
-           bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
-
-           dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
-
-           for dominio in dominios:
-               dominio = dominio.lower().strip()
-               if dominio:
-                   dominio = dominio.replace('http:', 'https:')
-                   if not dominio.endswith('/'): dominio = dominio + '/'
-                   last_domain = dominio
         except:
            pass
 
@@ -2891,7 +2959,7 @@ def operative_domains_nextdede(item):
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar todos los dominios operativos
-    # ~ web  0)-'https://dominiosnextdede.com/'  ó  'https://t.me/s/NextdedeInformacion'
+    # ~ web  0)-https://dominiosnextdede.com/  1)-https://t.me/s/NextdedeInformacion
 
     last_domain = ''
 
@@ -2903,23 +2971,6 @@ def operative_domains_nextdede(item):
        if not operative_domains: operative_domains = dominiosnextdede
     except:
        pass
-
-    if not last_domain:
-        try:
-           data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
-
-           bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
-
-           dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
-
-           for dominio in dominios:
-               dominio = dominio.lower().strip()
-               if dominio:
-                   dominio = dominio.replace('http:', 'https:')
-                   if not dominio.endswith('/'): dominio = dominio + '/'
-                   last_domain = dominio
-        except:
-           pass
 
     if not last_domain:
        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Acceso Dominios Operativos[/B][/COLOR]' % color_alert)
@@ -3090,41 +3141,28 @@ def last_domain_playdede(item):
     platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ webs  0)-'https://dominiosplaydede.com/'  1)-'https://t.me/playdedeinformacion'
+    # ~ webs  0)-https://privacidad.me/@playdede  1)-Twitter https://x.com/playdedesocial  2)-Telegram https://t.me/playdedeinformacion
 
     last_domain = ''
     latest_domain = ''
 
     try:
-        data = httptools.downloadpage('https://dominiosplaydede.com/').data
+        data = httptools.downloadpage('https://privacidad.me/@playdede/').data
 
-        last_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
+        last_domain = scrapertools.find_single_match(data, '>Web:(.*?)</a>').strip()
 
         if last_domain:
+            if not 'https' in last_domain: last_domain  = 'https://' + last_domain
             if not last_domain.endswith('/'): last_domain = last_domain + '/'
     except:
         pass
 
     if not last_domain:
-        try:
-           data = httptools.downloadpage('https://t.me/playdedeinformacion').data
-
-           dominios = scrapertools.find_multiple_matches(data, '>Web:(.*?)<')
-
-           if dominios:
-               for dominio in dominios:
-                   dominio = dominio.lower().strip()
-                   if dominio:
-                       if not dominio.endswith('/'): dominio = dominio + '/'
-                       last_domain = dominio
-        except:
-           pass
-
         if not last_domain:
             platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
             xbmc.sleep(1000)
-            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]dominiosplaydede.com[/B][/COLOR] ó [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B]')
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]privacidad.me/@playdede[/B][/COLOR] ó [B][COLOR greenyellow] x.com/playdedesocial[/COLOR][/B] ó [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B]')
             return
 
     host_channel = ''
@@ -3156,16 +3194,18 @@ def last_domain_playdede(item):
     if host_channel:
         if last_domain:
             if last_domain in host_channel:
-                 platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
-                 return
+                 if last_domain in str(dominiosplaydede):
+                     platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+                     return
 
     if domain == last_domain:
-        if item.host_canal:
-            if item.host_canal == last_domain:
-                platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
-        else:
-            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
-        return
+        if last_domain in str(dominiosplaydede):
+            if item.host_canal:
+                if item.host_canal == last_domain:
+                    platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+                else:
+                    platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+                return
 
     nom_dom = domain
     txt_dom = 'Último Dominio memorizado incorrecto.'
@@ -3217,39 +3257,24 @@ def operative_domains_playdede(item):
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar todos los dominios operativos
-    # ~ web  0)-'https://dominiosplaydede.com/'  1)-'https://t.me/playdedeinformacion'
+    # ~ webs  0)-https://privacidad.me/@playdede  1)-Twitter https://x.com/playdedesocial  2)-Telegram https://t.me/playdedeinformacion
 
     sel_domain = ''
 
     try:
-       data = httptools.downloadpage('https://dominiosplaydede.com/').data
+       data = httptools.downloadpage('https://privacidad.me/@playdede/').data
 
-       sel_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
+       sel_domain = scrapertools.find_single_match(data, '>Web:(.*?)</a>').strip()
 
        if sel_domain:
+           if not 'https' in sel_domain: sel_domain = 'https://' + sel_domain
            if not sel_domain.endswith('/'): sel_domain = sel_domain + '/'
     except:
        pass
 
     if not sel_domain:
-       try:
-          data = httptools.downloadpage('https://t.me/playdedeinformacion').data
-
-          dominios = scrapertools.find_multiple_matches(data, '>Web:(.*?)<')
-
-          if dominios:
-              for dominio in dominios:
-                  dominio = dominio.lower().strip()
-                  if dominio:
-                      if not dominio.endswith('/'): dominio = dominio + '/'
-                      sel_domain = dominio
-       except:
-          pass
-
-    if not sel_domain:
         platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Acceso Dominios Operativos[/B][/COLOR]' % color_alert)
         return
-
 
     host_channel = ''
     config.set_setting('user_test_channel', 'host_channel')
@@ -3944,6 +3969,16 @@ def manto_domain_common(item, id, name):
         if not domain: domain = 'https://'
 
         new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio CliverSite  -->  [COLOR %s]https://???.cliver..??[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://': return
+
+    elif id == 'cuevana2':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Cuevana2  -->  [COLOR %s]https://???.cuevana2.???/[/COLOR]' % color_avis)
 
         if new_domain is None: return
         elif new_domain == 'https://': return

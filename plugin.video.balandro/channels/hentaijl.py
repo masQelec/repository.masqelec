@@ -106,7 +106,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, "<img src='(.*?)'")
 
-        titulo = title.replace('episodio', '[COLOR goldenrod]episodio[/COLOR]')
+        titulo = title.replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         if item.group == 'find':
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))

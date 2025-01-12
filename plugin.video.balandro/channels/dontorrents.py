@@ -15,7 +15,7 @@ from core import httptools, scrapertools, tmdb
 
 host = 'https://4144-don.mirror.pm/'
 
-# ~ 5/12/24 last domain  'https://dontorrent.foundation/'
+# ~ 19/12/24 last domain  'https://dontorrent.auction/'
 
 
 try:
@@ -78,7 +78,8 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.earth/', 'https://dontorrent.date/', 'https://dontorrent.email/',
              'https://dontorrent.education/', 'https://dontorrent.exposed/', 'https://dontorrent.faith/',
              'https://dontorrent.gratis/', 'https://dontorrent.equipment/', 'https://dontorrent.fashion/',
-             'https://dontorrent.gallery/', 'https://dontorrent.yoga/']
+             'https://dontorrent.gallery/', 'https://dontorrent.yoga/', 'https://dontorrent.foundation/',
+             'https://dontorrent.co/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -155,6 +156,9 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='domains', action='test_domain_dontorrents', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='dontorrents', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(Item( channel='domains', action='operative_domains_dontorrents', title='Comprobar [B]Dominio Operativo Vigente' + '[COLOR dodgerblue] https://t.me/s/DonTorrent[/B][/COLOR]',
+                          desde_el_canal = True, thumbnail=config.get_thumb('dontorrents'), text_color='mediumaquamarine' ))
 
     itemlist.append(Item( channel='domains', action='last_domain_dontorrents', title='[B]Comprobar último dominio vigente[/B]',
                           desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('dontorrents'), text_color='chocolate' ))

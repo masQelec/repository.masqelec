@@ -43,29 +43,27 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Los 80', action = 'list_all', url = host + 'tag/cinematte-80/' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'movie' ))
 
     return itemlist
 
 
-def generos(item):
+def categorias(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Análisis y estudios', url = host + 'category/analisis-y-estudios/', action = 'list_all', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone( title = 'Artículos de cine', url = host + 'category/articulos-de-cine/', action = 'list_all', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Análisis y estudios', url = host + 'category/analisis-y-estudios/', action = 'list_all', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Artículos de cine', url = host + 'category/articulos-de-cine/', action = 'list_all', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Cinematte', url = host + 'category/cinematte-flix/', action = 'list_all', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone( title = 'Críticas', url = host + 'category/critica/', action = 'list_all', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone( title = 'Contemporáneo', url = host + 'category/actualidad/', action = 'list_all', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Críticas', url = host + 'category/critica/', action = 'list_all', text_color = 'moccasin' ))
 
     if not config.get_setting('descartar_xxx', default=False):
-        itemlist.append(item.clone( title = 'Erotismo', url = host + 'category/erotismo/', action = 'list_all', text_color = 'deepskyblue' ))
+        itemlist.append(item.clone( title = 'Erotismo', url = host + 'category/erotismo-y-cine/', action = 'list_all', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Imprescindibles', url = host + 'category/imprescindibles/', action = 'list_all', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone( title = 'Lecciones de cine', url = host + 'category/lecciones-de-cine/', action = 'list_all', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone( title = 'Operas primas', url = host + 'category/obras-maestras/', action = 'list_all', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone( title = 'Uncategorized', url = host + 'category/uncategorized/', action = 'list_all', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Imprescindibles', url = host + 'category/peliculas-imprescindibles/', action = 'list_all', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Lecciones de cine', url = host + 'category/lecciones-de-cine/', action = 'list_all', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Operas primas', url = host + 'category/obras-maestras/', action = 'list_all', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Uncategorized', url = host + 'category/uncategorized/', action = 'list_all', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -98,7 +96,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
         if not thumb: thumb = scrapertools.find_single_match(match, ' style="background-image.*?' + "'(.*?)'")
-		
+
         thumb = thumb.replace('&#038;', '&').replace('&amp;', '&')
 
         capitulos = False
@@ -117,6 +115,7 @@ def list_all(item):
         if not title: title = scrapertools.find_single_match(match, 'rel="bookmark">(.*?)</a>')
         if not title: title = scrapertools.find_single_match(match, '<a href=".*?">(.*?)</a>')
         if not title: title = scrapertools.find_single_match(match, ' alt="(.*?)"')
+        if not title: title = scrapertools.find_single_match(match, ' aria-label="(.*?)"')
 
         if not title: continue
 

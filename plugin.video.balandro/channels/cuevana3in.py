@@ -286,7 +286,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Latino': 'Lat', 'Castellano': 'Esp', 'Subtitulado': 'Vose'}
+    IDIOMAS = {'Latino': 'Lat', 'Español Latino': 'Lat', 'Español': 'Esp', 'Castellano': 'Esp', 'Subtitulado': 'Vose'}
 
     data = do_downloadpage(item.url)
     
@@ -302,7 +302,16 @@ def findvideos(item):
 
         lang = ''
 
-        if ' - ' in lang_srv: lang = scrapertools.find_single_match(lang_srv, '.*?-(.*?)-').strip()
+        if ' - ' in lang_srv:
+             lang = scrapertools.find_single_match(lang_srv, '.*?-(.*?)$').strip()
+
+             if lang:
+                 if not lang in str(IDIOMAS): lang = ''
+
+        if not lang:
+            if '/latino.png' in data: lang = 'Español Latino'
+            elif '/spanish.png' in data: lang = 'Español'
+            elif '/english.png' in data: lang = 'Subtitulado'
 
         if url.startswith('//'): url = 'https:' + url
 
@@ -330,10 +339,10 @@ def findvideos(item):
 
         other = ''
 
-        if 'HD' in lang:
+        if not lang: lang = '?'
+        elif 'HD' in lang:
             other = scrapertools.find_single_match(lang, 'HD.*?(.*?)$').strip()
             lang = '?'
-
         elif '. ' in lang:
             other = scrapertools.find_single_match(lang, '(.*?). ').strip()
             lang = '?'
@@ -417,9 +426,10 @@ def search(item, texto):
             item.url = host + 'search/' + texto.replace(" ", "+")
             itemlist1 = list_all(item)
 
-            item.search_type = 'tvshows'
-            item.url = host + 'search/' + texto.replace(" ", "+")
-            itemlist2 = list_all(item)
+            if not itemlist1:
+                item.search_type = 'tvshows'
+                item.url = host + 'search/' + texto.replace(" ", "+")
+                itemlist2 = list_all(item)
 
             itemlist = itemlist1 + itemlist2
             return itemlist

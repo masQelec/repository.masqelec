@@ -193,12 +193,11 @@ def findvideos(item):
                 itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server = servidor, language = 'Vo', other = other) )
 
     # ~ Embeds
-    matches = re.compile('<meta itemprop="embedURL".*?content="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<iframe src="(.*?)"', re.DOTALL).findall(data)
+    if not matches: matches = re.compile('<meta itemprop="embedUR.*?content="(.*?)"', re.DOTALL).findall(data)
 
     for url in matches:
         ses += 1
-
-        if url == '#content': continue
 
         if url:
             servidor = servertools.get_server_from_url(url)

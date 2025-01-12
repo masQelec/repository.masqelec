@@ -100,7 +100,7 @@ def pornstars(item):
 
     patron = '<div class="box-chica">.*?'
     patron += '<a href="([^"]+)".*?'
-    patron += 'data-src="(.*?)".*?'
+    patron += "data-src='(.*?)'.*?"
     patron += '<h4><a href="[^"]+">([^<]+)</a></h4>.*?'
 
     matches = re.compile(patron, re.DOTALL).findall(data)

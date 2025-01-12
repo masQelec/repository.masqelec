@@ -46,8 +46,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
-    itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'xnxx-tags/' ))
+    itemlist.append(item.clone( title = 'Por canal', action = 'canales'))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'xxx-categories/' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars/' ))
 
     return itemlist
@@ -57,21 +57,12 @@ def canales(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(item.url)
+    itemlist.append(item.clone (action='list_all', title= 'BangBros', url = host + 'bangbros/', text_color = 'violet' ))
+    itemlist.append(item.clone (action='list_all', title= 'Brazzers', url = host + 'brazzers/', text_color = 'violet' ))
+    itemlist.append(item.clone (action='list_all', title= 'RealityKings', url = host + 'reality-kings/', text_color = 'violet' ))
+    itemlist.append(item.clone (action='list_all', title= 'YouPorn', url = host + 'xnxx/youporn-2/', text_color = 'violet' ))
 
-    bloque = scrapertools.find_single_match(data, 'Categories<p>(.*?)Friends<p>')
-
-    matches = re.compile('<a href="(.*?)">(.*?)</a>', re.DOTALL).findall(bloque)
-
-    for url, title in matches:
-        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'violet' ))
-
-    if itemlist:
-        itemlist.append(item.clone (action='list_all', title= 'BangBros', url = host + '/bangbros/', text_color = 'violet' ))
-        itemlist.append(item.clone (action='list_all', title= 'Brazzers', url = host + '/brazzers/', text_color = 'violet' ))
-        itemlist.append(item.clone (action='list_all', title= 'RealityKings', url = host + '/reality-kings/', text_color = 'violet' ))
-
-    return sorted(itemlist, key=lambda x: x.title)
+    return itemlist
 
 
 def categorias(item):
@@ -80,12 +71,22 @@ def categorias(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Categories<(.*?)Categories<p>')
+    bloque = scrapertools.find_single_match(data, '>Categories</h1>(.*?)</center>')
 
-    matches = re.compile('<a href="(.*?)".*?src="(.*?)".*?<figcaption>(.*?)</figcaption>', re.DOTALL).findall(bloque)
+    matches = re.compile('<a(.*?)</a></div>', re.DOTALL).findall(bloque)
 
-    for url, thumb, title in matches:
+    for match in matches:
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, '<figcaption>(.*?)</figcaption>')
+        if not title: title = scrapertools.find_single_match(match, 'class="wp-caption-text gallery-caption">(.*?)</a>')
+
+        if not url or not title: continue
+
         if title == 'All Videos': continue
+
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'moccasin' ))
 
@@ -110,7 +111,7 @@ def pornstars(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='orange' ))
 
@@ -190,7 +191,7 @@ def findvideos(item):
             url = scrapertools.find_single_match(data2, '<source type="video/mp4".*?src="(.*?)"')
 
             url = scrapertools.find_single_match(data, 'mp4="(.*?)"')
- 
+
             if url:
                 url += '|Referer=%s' % item.url
 
@@ -206,6 +207,19 @@ def findvideos(item):
         if not 'http' in link: link = 'https:' + link
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Vo' ))
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if '/mediac.povaddict.' in url: return itemlist
+
+    itemlist.append(item.clone(server = item.server, url = url))
 
     return itemlist
 

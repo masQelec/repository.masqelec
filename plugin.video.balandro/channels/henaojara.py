@@ -298,7 +298,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
-        tipo = 'movie' if '>Pelicula' in match or '-movie-' in url else 'tvshow'
+        tipo = 'movie' if '>PELICULA<' in match or '>Pelicula' in match or '-movie-' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'tvshow':
@@ -474,7 +474,7 @@ def temporadas(item):
 
             return itemlist
 
-    if '>Pelicula' in data or '-movie-' in item.url:
+    if '>PELICULA<' in data or '>Pelicula' in data or '-movie-' in item.url:
         peli = scrapertools.find_single_match(data, '<span class="Num">.*?<a href="(.*?)"')
 
         itemlist.append(item.clone( action='findvideos', url = peli, title = '[COLOR yellow]Servidores[/COLOR] ' + item.title,
@@ -645,7 +645,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
-    if '>Pelicula' in data or '-movie-' in item.url:
+    if '>PELICULA<' in data or '>Pelicula' in data or '-movie-' in item.url:
         peli = scrapertools.find_single_match(data, '<span class="Num">.*?<a href="(.*?)"')
 
         peli = peli.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
@@ -691,9 +691,10 @@ def findvideos(item):
 
                 players = players.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
-                headers = {'Referer': host, 'Priority': 'u=4', 'Sec-GPC': '1', 'Accept-Encoding': 'gzip, deflate, br, zstd' }
+                headers = {'Referer': host, 'Priority': 'u=4', 'Sec-GPC': '1', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Connection': 'keep-alive' }
 
                 data3 = do_downloadpage(players, headers=headers)
+                # ~ logger.info("check-1-data3: %s" % str(data3))
 
                 matches3 = scrapertools.find_multiple_matches(data3, "loadVideo.*?'(.*?)'" + '.*?alt="(.*?)"')
 

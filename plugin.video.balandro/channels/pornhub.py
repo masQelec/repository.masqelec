@@ -10,9 +10,6 @@ from core import httptools, scrapertools, servertools
 host = 'https://es.pornhub.com/'
 
 
-perpage = 30
-
-
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
 

@@ -32,7 +32,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas-de-estreno/', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Recomendadas', action = 'list_all', url = host + 'peliculas-recomendadas/' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'peliculas-recomendadas/' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -79,7 +79,7 @@ def list_all(item):
         if not year: year = '-'
         else: title = title.replace('(' + year + ')', '').strip()
 
-        title = title.replace('&#038;', '').replace('&#215;', 'x')
+        title = title.replace('&#038;', '').replace('&#8211;', '').replace('&#215;', 'x')
 
         langs = []
         if '/cas.png' in article: langs.append('Esp')
@@ -169,6 +169,8 @@ def findvideos(item):
                     other = ''
                     if servidor == 'various': other = servertools.corregir_other(embed)
 
+                    if '/player/?id=' in embed: servidor = ''
+
                     itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = embed,
                                           language = lang, other = other ))
 
@@ -198,7 +200,7 @@ def findvideos(item):
                 if enlace:
                     data3 = do_downloadpage(enlace, headers = headers)
 
-                    new_url = scrapertools.find_single_match(data3, 'href="(.*?)"')
+                    new_url = scrapertools.find_single_match(data3, '<a id="link".*?href="(.*?)"')
 
                     if not new_url: continue
 
@@ -238,7 +240,7 @@ def findvideos(item):
                 if enlace:
                     data3 = do_downloadpage(enlace, headers = headers)
 
-                    new_url = scrapertools.find_single_match(data3, 'href="(.*?)"')
+                    new_url = scrapertools.find_single_match(data3, '<a id="link".*?href="(.*?)"')
 
                     if not new_url: continue
 
@@ -278,7 +280,7 @@ def findvideos(item):
                 if enlace:
                     data3 = do_downloadpage(enlace, headers = headers)
 
-                    new_url = scrapertools.find_single_match(data3, 'href="(.*?)"')
+                    new_url = scrapertools.find_single_match(data3, '<a id="link".*?href="(.*?)"')
 
                     if not new_url: continue
 
@@ -303,6 +305,30 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if not item.server:
+        data = do_downloadpage(item.url)
+
+        url = scrapertools.find_single_match(data, "var url = '(.*?)'")
+
+    if url:
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 
@@ -334,7 +360,7 @@ def list_search(item):
         if not year: year = '-'
         else: title = title.replace('(' + year + ')', '').strip()
 
-        title = title.replace('&#038;', '').replace('&#215;', 'x')
+        title = title.replace('&#038;', '').replace('&#8211;', '').replace('&#215;', 'x')
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                     contentType='movie', contentTitle=title, infoLabels={'year': year} ))

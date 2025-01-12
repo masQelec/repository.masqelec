@@ -146,7 +146,7 @@ def list_all(item):
 
             if lang == 'Español' or lang == 'es': lng = 'Esp'
             if lang == 'Latino' or lang == 'mx': lng = 'Lat'
-            if lang == 'Subtitulado': lng = 'Vose'
+            if lang == 'Subtitulado' or lang == 'jp': lng = 'Vose'
             if lang == 'Ingles' or lang == 'en': lng = 'Voi'
 
             if lng:

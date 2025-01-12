@@ -378,6 +378,8 @@ def findvideos(item):
                     servidor = 'directo'
                     other = 'vidhidepro'
                 else:
+                    if 'wastream' in srv: continue
+
                     servidor = 'directo'
                     other = 'indeterminado'
 

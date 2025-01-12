@@ -276,6 +276,7 @@ def list_all(item):
         if '/flags/es.png' in match: langs.append('Esp')
         if '/flags/mx.png' in match: langs.append('Lat')
         if '/flags/en.png' in match: langs.append('Vose')
+        if '/flags/jp.png' in match: langs.append('Vose')
 
         if 'ver-pelicula/' in url:
             if item.search_type == 'tvshow': continue
@@ -568,6 +569,7 @@ def list_search(item):
         if '/flags/es.png' in article: langs.append('Esp')
         if '/flags/mx.png' in article: langs.append('Lat')
         if '/flags/en.png' in article: langs.append('Vose')
+        if '/flags/jp.png' in article: langs.append('Vose')
 
         tipo = 'movie' if '/ver-pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo

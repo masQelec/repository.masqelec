@@ -13,7 +13,7 @@ except:
     pass
 
 
-host = 'https://www.pelisgratishd.xyz/'
+host = 'https://ver.pelisgratishd.life/'
 
 
 perpage = 35
@@ -21,7 +21,7 @@ perpage = 35
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.pelisgratishd.life/']
+    ant_hosts = ['https://www.pelisgratishd.life/', 'https://www.pelisgratishd.xyz/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -574,6 +574,8 @@ def episodios(item):
 
         if not epis: epis = 1
 
+        if not title: title = item.contentSerieName
+
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo,
@@ -624,6 +626,8 @@ def findvideos(item):
 
         e_links = scrapertools.find_single_match(datae, 'const dataLink =(.*?);')
         e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
+
+        e_links = e_links.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
 
         langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
 

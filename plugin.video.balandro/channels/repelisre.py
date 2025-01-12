@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import re
+
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
+
+# ~ 14/12/24  Los Episodios de las Series SIEMPRE dan Error Pagina NO Encomtrada
 
 host = 'https://wow.repelis.re/'
 
@@ -74,6 +78,13 @@ def do_downloadpage(url, ref, post=None, headers=None):
 
         headers["Referer"] = ref
 
+    else:
+        if '/series-online/' in url:
+            headers = dict()
+            headers["User-Agent"] = useragent
+
+            headers["Referer"] = ref
+
     hay_proxies = False
     if config.get_setting('channel_repelisre_proxies', default=''): hay_proxies = True
 
@@ -108,7 +119,7 @@ def do_downloadpage(url, ref, post=None, headers=None):
                 data = httptools.downloadpage_proxy('repelisre', url, post=post, headers=headers, timeout=timeout).data
             else:
                 data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-	
+
     if '<title>Just a moment...</title>' in data:
         if not '/search?' in url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
@@ -157,8 +168,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', ref = '/peliculas-online/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     return itemlist
@@ -173,22 +182,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', ref = '/series-online/', search_type = 'tvshow') )
-
-    return itemlist
-
-
-def idiomas(item):
-    logger.info()
-    itemlist = []
-
-    itemlist.append(item.clone( title = 'Castellano', action = 'list_all',
-                                url = 'taxonomy?tax-data={"name":"language","term":"mx"}', ref = '/peliculas/mx/', group = 'langs', text_color = 'moccasin' ))
-
-    itemlist.append(item.clone( title = 'Latino', action = 'list_all',
-                                url = 'taxonomy?tax-data={"name":"language","term":"en"}', ref = '/peliculas/en/', group = 'langs', text_color = 'moccasin' ))
-
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all',
-                                url = 'taxonomy?tax-data={"name":"language","term":"es"}', ref = '/peliculas/es/', group = 'langs', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -223,13 +216,12 @@ def list_all(item):
 
     if not item.page: item.page = 1
 
-    if item.group == 'langs': item.url = item.url + '&paged=' + str(item.page) + '&ptype=movies,series&limit=25&lang=any'
-
-    elif item.group == 'genres': item.url = item.url + '&paged=' + str(item.page) + '&ptype=movies,series&limit=25&lang=any'
+    if item.group == 'genres': item.url = item.url + 'chrome?paged=' + str(item.page) + '&ptype=movies,series&limit=25&lang=any'
 
     if not item.url:
-        item.url = 'moviespage?paged=' + str(item.page) + '&limit=25'
-        if item.search_type == 'tvshow': item.url = 'seriespage?paged=' + str(item.page) + '&limit=25'
+        item.url = 'chrome?type=movies&paged=' + str(item.page) + '&limit=25&lang=any'
+
+        if item.search_type == 'tvshow': item.url = 'chrome?type=series&paged=' + str(item.page) + '&limit=25&lang=any'
 
     data = do_downloadpage(item.url, item.ref)
 
@@ -510,8 +502,8 @@ def clean_title(title):
 def search(item, texto):
     logger.info()
     try:
-        item.url = 'search?q=' + texto.replace(" ", "+")
-        item.ref = 'search?s=' + texto.replace(" ", "+")
+        item.url = 'search-title?q=' + texto.replace(" ", "+")
+        item.ref = 'search-title?s=' + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

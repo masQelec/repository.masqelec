@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.13 [/COLOR] [COLOR chartreuse] 10 de Diciembre de 2024[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.14 [/COLOR] [COLOR chartreuse] 9 de Enero de 2025[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Tutoriales, Sugerencias, etc.
@@ -52,7 +52,7 @@
 
  [COLOR greenyellow][B]CANALES PROBLEMATICOS:[/B][/COLOR]
     [COLOR springgreen][B]Son en los que Predominan Sin enlaces Disponibles, Invalidos y/o Servidores No Soportados[/B][/COLOR]
-    Mega1Link,  RetroTv,  SeriesMovil
+    SeriesMovil
 
  [COLOR cyan][B]CANALES INESTABLES:[/B][/COLOR]
     [COLOR springgreen][B]Son los pendientes de su evolucion, para decidir su Situacion Definitiva[/B][/COLOR]
@@ -62,7 +62,6 @@
     [COLOR springgreen][B]Son los pendientes de su situacion, para decidir su Re-activacion o Anulacion[/B][/COLOR]
     DocumaniaTv [COLOR moccasin][B] www.documaniatv.com [/COLOR][COLOR salmon][I] Kodi Not Play [/I][/B][/COLOR]
     NextDede [COLOR moccasin][B] nextdede.us [/COLOR][COLOR greenyellow][I] Not Login [/I][/B][/COLOR]
-    PlayDo [COLOR moccasin][B] playdomapp.top [/COLOR][COLOR greenyellow][I] Domain Expired [/I][/B][/COLOR]
 
  [COLOR sienna][B]SITUACION SERVIDORES:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 

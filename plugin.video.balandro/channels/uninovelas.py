@@ -433,6 +433,7 @@ def findvideos(item):
         if url.startswith("https://sb"): continue
 
         elif '/argtesa.' in url: continue
+        elif '/peliculas8k.' in url: continue
 
         elif 'fembed' in url or  'streamsb' in url or 'playersb' in url or 'fcom' in url: continue
         elif '.lvturbo.' in url: continue

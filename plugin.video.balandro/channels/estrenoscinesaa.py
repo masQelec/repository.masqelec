@@ -212,11 +212,8 @@ def findvideos(item):
 
         if not url or not servidor: continue
 
-        quality = 'HD'
-        lang = 'Esp'
-
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                              language = lang, quality = quality , other = 'd' + ' ' + other ))
+                              language = 'Esp', quality = 'HD' , other = 'd' + ' ' + other ))
 
     if not itemlist:
         if not ses == 0:

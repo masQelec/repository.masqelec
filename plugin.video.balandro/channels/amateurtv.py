@@ -36,7 +36,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Mujeres', action = 'list_all', url = host  + '/v3/readmodel/cache/cams/w/0/50/es/' ))
     itemlist.append(item.clone( title = 'Hombres', action = 'list_all', url = host  + '/v3/readmodel/cache/cams/m/0/50/es/' ))
     itemlist.append(item.clone( title = 'Parejas', action = 'list_all', url = host  + '/v3/readmodel/cache/cams/c/0/50/es/' ))
-    itemlist.append(item.clone( title = 'Transexuales', action = 'list_all', url = host  + '/v3/readmodel/cache/cams/t/0/50/es/' ))
+    itemlist.append(item.clone( title = 'Transsexuales', action = 'list_all', url = host  + '/v3/readmodel/cache/cams/t/0/50/es/' ))
 
     itemlist.append(item.clone( title = 'Privados', action = 'list_all', url = host  + '/v3/readmodel/cache/cams/p/0/50/es/', text_color = 'tan' ))
 

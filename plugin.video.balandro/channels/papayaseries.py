@@ -45,6 +45,9 @@ except:
    except: pass
 
 
+# ~ 15/12/24 Peliculas No se Tratan solo tienen Downloads
+
+
 host = 'https://papayaseries.com/'
 
 
@@ -408,11 +411,13 @@ def findvideos(item):
 
             itemlist.append(Item(channel = item.channel, action = 'play', server = 'directo', title = '', url = url,
                                  language = IDIOMAS.get(lng,lng), quality = qty, quality_num = puntuar_calidad(qty), other = other.capitalize() ))
+
+    # ~ Downloads No se Tratan
+
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
-
 
     return itemlist
 

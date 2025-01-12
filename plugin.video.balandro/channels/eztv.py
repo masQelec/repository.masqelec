@@ -212,6 +212,7 @@ def episodios(item):
         bloque = re.compile('- Season ' + str(item.contentSeason) + '.*?Episodes</h3>(.*?)<h3>', re.DOTALL).findall(data)
 
     matches = re.compile('<br/>(.*?)--', re.DOTALL).findall(str(bloque))
+    if not matches:  matches = re.compile('<br />(.*?)--', re.DOTALL).findall(str(bloque))
 
     for match in matches:
         if '<div class="showinfo_header">' in match: continue

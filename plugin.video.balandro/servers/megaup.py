@@ -48,7 +48,7 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
-    if "File not found" in data:
+    if ">File not found<" in data:
         return "Archivo inexistente ó eliminado"
 
     msg_error = scrapertools.find_single_match(data, "<li class='no-side-margin'>([^<]+)</li>")
@@ -61,7 +61,8 @@ def get_video_url(page_url, url_referer=''):
     url = scrapertools.find_single_match(data, "href='([^']+)'>download now</a>")
 
     if url:
-        headers = { 'Referer': page_url }
+        headers = {'Referer': page_url}
+
         url = httptools.downloadpage(url, headers=headers, follow_redirects=False, only_headers=True).headers.get('location', '')
 
         if url:
@@ -104,13 +105,24 @@ def get_video_url(page_url, url_referer=''):
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
 
+                    elif 'File cannot be located or removed' in trace:
+                       return 'Acceso Denegado CloudFlare'
+
                 elif '<urlopen error' in traceback.format_exc():
                     return 'No se puede establecer la conexión'
 
                 return 'Sin Respuesta ResolveUrl'
 
-        else:
-            return 'Acceso Denegado, Falta ResolveUrl' # ~ Cloudflare recaptcha
+    new_url = scrapertools.find_single_match(data, '<a class="btn btn-default" href="(.*?)"')
+
+    if new_url:
+        data_new_url = httptools.downloadpage(new_url).data
+
+        url = scrapertools.find_single_match(data_new_url, "'href','([^']+)'")
+
+        if url:
+            video_urls.append(['mp4', url])
+            return video_urls
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
@@ -149,12 +161,12 @@ def get_video_url(page_url, url_referer=''):
                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                        return 'Fichero sin link al vídeo ó restringido'
 
+                   elif 'File cannot be located or removed' in trace:
+                      return 'Acceso Denegado CloudFlare'
+
                elif '<urlopen error' in traceback.format_exc():
                    return 'No se puede establecer la conexión'
 
                return 'Sin Respuesta ResolveUrl'
-
-        else:
-           return 'Acceso Denegado (2do.), Falta ResolveUrl' # ~ Cloudflare recaptcha
 
     return video_urls

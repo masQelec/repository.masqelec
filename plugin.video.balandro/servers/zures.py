@@ -3,7 +3,7 @@
 import xbmc, time
 
 from platformcode import config, logger, platformtools
-from core import scrapertools
+from core import httptools, scrapertools
 
 
 espera = config.get_setting('servers_waiting', default=6)
@@ -44,6 +44,7 @@ def get_video_url(page_url, url_referer=''):
 
         if 'amdahost' in page_url: txt_server = 'Amdahost'
         elif 'allviid' in page_url: txt_server = 'Allviid'
+        elif 'bigwarp' in page_url: txt_server = 'Bigwarp'
         elif 'cloudfile' in page_url: txt_server = 'Cloudfile'
         elif 'cloudmail' in page_url: txt_server = 'Cloudmail'
         elif 'dailyuploads' in page_url: txt_server = 'Dailyuploads'
@@ -73,7 +74,7 @@ def get_video_url(page_url, url_referer=''):
         elif 'uploadbaz' in page_url: txt_server = 'Uploadbaz'
         elif 'uploadflix' in page_url: txt_server = 'Uploadflix'
         elif 'uploady' in page_url: txt_server = 'Uploady'
-        elif 'veev' in page_url: txt_server = 'Veev'
+        elif 'veev' in page_url or 'doods' in page_url: txt_server = 'Veev'
         elif 'veoh' in page_url: txt_server = 'Veoh'
         elif 'vidbob' in page_url: txt_server = 'Vidbob'
         elif 'vidlook' in page_url: txt_server = 'Vidlook'
@@ -120,6 +121,15 @@ def get_video_url(page_url, url_referer=''):
         except:
             import traceback
             logger.error(traceback.format_exc())
+
+            if txt_server == 'Bigwarp':
+                data = httptools.downloadpage(page_url).data
+                url = scrapertools.find_single_match(str(data), 'file:"(.*?)"')
+
+                if url:
+                    # ~ 1/1/2025  Directo pq falla ResolveUrl
+                    video_urls = [[url[-4:], url]]
+                    return video_urls
 
             if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
                 trace = traceback.format_exc()

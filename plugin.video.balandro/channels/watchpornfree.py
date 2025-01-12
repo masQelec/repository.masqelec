@@ -80,7 +80,7 @@ def categorias(item):
         data = scrapertools.find_single_match(data, 'Studios</a>(.*?)</ul>')
     else:
         data = scrapertools.find_single_match(data, '>Categories</div>(.*?)</ul>')
-        
+
     matches = re.compile('href="([^"]+)".*?>([^"]+)</a></li>', re.DOTALL).findall(data)
 
     for url, title in matches:
@@ -123,9 +123,9 @@ def list_all(item):
     num_matches = len(matches)
 
     for url, thumb, title in matches[item.page * perpage:]:
-        if len(itemlist) >= perpage: break
-
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
+
+        if len(itemlist) >= perpage: break
 
     if itemlist:
         buscar_next = True
@@ -136,7 +136,7 @@ def list_all(item):
                 buscar_next = False
 
         if buscar_next:
-            next_page = scrapertools.find_single_match(data,'<a class="next page-numbers" href="([^"]+)">Next &raquo;</a>')
+            next_page = scrapertools.find_single_match(data,'<a class="next page-numbers" href="([^"]+)">Next')
 
             if next_page:
                 if '/page/' in next_page:
@@ -190,6 +190,8 @@ def findvideos(item):
             elif '/katfile.' in url: continue
             elif '/fikper.' in url: continue
             elif '/turbobit.' in url: continue
+
+            elif '/frdl.' in url: continue
             elif '/hitfile.' in url: continue
 
             if '/drivevideo.' in url:
@@ -206,7 +208,6 @@ def findvideos(item):
                 if servidor == 'various': other = servertools.corregir_other(url)
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
-
 
     if not itemlist:
         if not ses == 0:

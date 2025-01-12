@@ -12,6 +12,7 @@ host = 'https://zbporn.com/'
 
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
+
     return data
 
 
@@ -31,7 +32,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'latest-updates/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
+
+    itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'latest-updates/' ))
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'most-popular/' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'top-rated/' ))
@@ -137,7 +140,7 @@ def list_all(item):
         next_page = scrapertools.find_single_match(data, '<div class="page page-current".*?<a class="page-link".*?href="(.*?)"')
 
         if next_page:
-            next_page = host[:-1] + next_page
+            if not host in next_page: next_page = host[:-1] + next_page
 
             itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, text_color = 'coral') )
 

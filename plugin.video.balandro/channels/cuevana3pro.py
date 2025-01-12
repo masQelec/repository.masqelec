@@ -13,7 +13,7 @@ except:
     pass
 
 
-host = 'https://zx1.cuevana3.vip'
+host = 'https://zz.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
@@ -27,7 +27,7 @@ ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://w
              'https://iv3.cuevana3.vip', 'https://lm3.cuevana3.vip', 'https://ww3v.cuevana3.vip',
              'https://ww3u.cuevana3.vip', 'https://wl3v.cuevana3.vip', 'https://wv3n.cuevana3.vip',
              'https://wl3r.cuevana3.vip', 'https://me3.cuevana3.vip', 'https://me4.cuevana3.vip',
-             'https://mia.cuevana3.vip', 'https://max.cuevana3.vip']
+             'https://mia.cuevana3.vip', 'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')
@@ -795,7 +795,67 @@ def findvideos(item):
     for match in matches:
         lang = '?'
 
-        if '/xupalace.' in match:
+        if '//embed69.' in match:
+            ses += 1
+
+            datae = do_downloadpage(match)
+
+            e_links = scrapertools.find_single_match(datae, 'const dataLink =(.*?);')
+            e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
+
+            e_links = e_links.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
+
+            langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
+
+            for lang in langs:
+                ses += 1
+
+                lang = lang + '"type":"video"'
+
+                links = scrapertools.find_multiple_matches(str(lang), '"servername":"(.*?)","link":"(.*?)".*?"type":"video"')
+
+                if 'SUB' in lang: lang = 'Vose'
+                elif 'LAT' in lang: lang = 'Lat'
+                elif 'ESP' in lang: lang = 'Esp'
+                else: lang = '?'
+
+                for srv, link in links:
+                    ses += 1
+
+                    srv = srv.lower().strip()
+
+                    if not srv: continue
+                    elif host in link: continue
+
+                    elif '1fichier.' in srv: continue
+                    elif 'plustream' in srv: continue
+                    elif 'embedsito' in srv: continue
+                    elif 'disable2' in srv: continue
+                    elif 'disable' in srv: continue
+                    elif 'xupalace' in srv: continue
+                    elif 'uploadfox' in srv: continue
+
+                    servidor = servertools.corregir_servidor(srv)
+
+                    if servertools.is_server_available(servidor):
+                        if not servertools.is_server_enabled(servidor): continue
+                    else:
+                        if not config.get_setting('developer_mode', default=False): continue
+
+                    other = ''
+
+                    if servidor == 'various': other = servertools.corregir_other(srv)
+
+                    if servidor == 'directo':
+                        if not config.get_setting('developer_mode', default=False): continue
+                        else:
+                           other = url.split("/")[2]
+                           other = other.replace('https:', '').strip()
+
+                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes,
+                                          language=lang, other=other ))
+
+        elif '/xupalace.' in match:
             ses += 1
 
             if 'php?id=' in match:

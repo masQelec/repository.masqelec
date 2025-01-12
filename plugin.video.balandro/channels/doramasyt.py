@@ -275,7 +275,7 @@ def list_all(item):
             if not item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
         if tipo == 'tvshow':
@@ -457,6 +457,9 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie':
+        item.url = item.url.replace('/dorama/', '/ver/').replace('-sub-espanol', '-episodio-1')
+
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
@@ -487,7 +490,7 @@ def findvideos(item):
         elif srv == 'drive': srv = 'gvideo'
         elif srv == 'pixel': srv = 'pixeldrain'
         elif srv == 'senvid2': srv = 'sendvid'
-        elif srv == 'mixdropco': srv = 'mixdrop'
+        elif srv == 'mixdropco' or srv == 'mxdrop': srv = 'mixdrop'
         elif srv == 'mdy48tn97com': srv = 'mixdrop'
         else:
              if srv == 'vgembedcom': srv = 'vembed'

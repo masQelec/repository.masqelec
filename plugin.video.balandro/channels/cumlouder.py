@@ -58,7 +58,7 @@ def repertorios(item):
         itemlist.append(item.clone( action = 'list_all', url = url, thumbnail = thumb, title = title, page = 1, text_color = 'pink' ))
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
+        next_url = scrapertools.find_single_match(data, '<a class="btn-pagination".*?itemprop="name".*?href="(.*?)"')
 
         if next_url:
             next_url = host + next_url
@@ -92,7 +92,7 @@ def canales(item):
         itemlist.append(item.clone( action = 'list_all', url = url, title = title, thumbnail = thumb, page = 1, text_color = 'violet' ))
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
+        next_url = scrapertools.find_single_match(data, '<a class="btn-pagination".*?temprop="name".*?href="(.*?)"')
 
         if next_url:
             next_url = host + next_url
@@ -125,7 +125,7 @@ def categorias(item):
         itemlist.append(item.clone( action = 'list_all', url = url, title = title, thumbnail = thumb, page = 1, text_color='moccasin' ))
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
+        next_url = scrapertools.find_single_match(data, '<a class="btn-pagination".*?itemprop="name".*?href="(.*?)"')
 
         if next_url:
             next_url = host + next_url
@@ -157,7 +157,7 @@ def pornstars(item):
         itemlist.append(item.clone( action = 'list_all', url = url, thumbnail = thumb, title = title, page = 1, text_color='orange' ))
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
+        next_url = scrapertools.find_single_match(data, '<a class="btn-pagination".*?itemprop="name".*?href="(.*?)"')
 
         if next_url:
             next_url = host + next_url
@@ -198,7 +198,7 @@ def list_all(item):
                                     contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, '<a class="btn-pagination" itemprop="name" href="(.*?)"')
+        next_url = scrapertools.find_single_match(data, '<a class="btn-pagination".*?itemprop="name".*?href="(.*?)"')
 
         if next_url:
             next_url = host + next_url

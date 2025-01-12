@@ -96,6 +96,8 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    if not headers: headers = {'Referer': host}
+
     if '/release/' in url: raise_weberror = False
 
     hay_proxies = False

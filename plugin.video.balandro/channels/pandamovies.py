@@ -194,13 +194,18 @@ def findvideos(item):
     matches = matches1 + matches2
 
     for url in matches:
+        ses += 1
+
         if 'link=' in url: url = scrapertools.find_single_match(url, 'link=(.*?)$')
 
         if not url: continue
 
         if '/frdl.' in url: continue
-        elif '/nitroflare.' in url: continue
         elif '/snowdayonline.' in url: continue
+        elif '/freepopnews.' in url: continue
+
+        elif '/nitroflare.' in url: continue
+        elif 'rapidgator.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

@@ -13,10 +13,16 @@ except:
     pass
 
 
-host = 'https://wvw.henaojara.net/'
+host = 'https://vwv.henaojara.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://wvw.henaojara.net/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not headers: headers = {'Referer': host}
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
@@ -407,10 +413,17 @@ def findvideos(item):
                                   language=lang, other=srv ))
 
     # ~ download
-    bloque = scrapertools.find_single_match(data, 'data-dwn="(.*?)]')
-    bloque = bloque.replace('&quot;', '"')
+    bloque = scrapertools.find_single_match(data, 'data-dwn=(.*?)Descargar<')
 
-    matches = re.compile('"(.*?)"', re.DOTALL).findall(bloque)
+    if bloque:
+        if '><li' in bloque: bloque = bloque.split("><li")[0]
+        elif ']"><i' in bloque: bloque = bloque.split(']"><i')[0]
+
+        bloque = bloque.strip()
+        bloque = bloque.replace('&quot;', '"').replace(',', '","').replace('"",""', '","')
+        bloque = bloque + ','
+
+    matches = re.compile('"(.*?)",', re.DOTALL).findall(bloque)
 
     for option in matches:
         ses += 1
@@ -421,65 +434,42 @@ def findvideos(item):
 
         url = url.replace('\\/', '/')
 
-        url = url.replace('.henaojara2.', '.henaojara.')
+        if '1fichier' in url: continue
+        elif 'fembed' in url: continue
+        elif 'streamsb' in url: continue
+        elif 'nyuu' in url: continue
+        elif '4sync' in url: continue
 
-        other = scrapertools.find_single_match(data, 'data-tplayernv="Opt' + str(option) + '"><span>(.*?)</span>')
-        other = other.replace('<strong>', '').replace('</strong>', '')
+        if 'netuplayer' in url or 'netu' in url or 'hqq' in url: servidor = 'waaw'
 
-        other = other.strip().lower()
+        elif 'streamtape' in url: servidor = 'streamtape'
+        elif 'mega' in url: servidor = 'mega'
+        elif 'voe' in url: servidor = 'voe'
+        elif 'mixdrop' in url: servidor = 'mixdrop'
 
-        if other == 'multiplayer':
-            url2 = url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
+        elif 'streamwish' in url or 'wish' in url: servidor = 'various'
+        elif 'filelions' in url: servidor = 'various'
+        elif 'filemoon' in url: servidor = 'various'
+        elif 'streamvid' in url: servidor = 'various'
+        elif 'vidhide' in url: servidor = 'various'
+        elif 'lulustream' in url: servidor = 'various'
+        elif 'listeamed' in url or 'vidguard' in url: servidor = 'various'
 
-            data2 = do_downloadpage(url2)
+        elif 'ok' in url: servidor = 'okru'
+        elif 'dood' in url: servidor = 'doodstream'
 
-            players = scrapertools.find_single_match(data2, 'src="(.*?)"')
+        else:
+             if servertools.is_server_available(url):
+                 if not servertools.is_server_enabled(url): continue
+             else:
+                 if not config.get_setting('developer_mode', default=False): continue
+                 servidor = 'directo'
 
-            if players:
-                players = players.replace('.henaojara2.', '.henaojara.')
+        other = ''
+        if servidor == 'various': other = servertools.corregir_other(url)
+        elif not servidor == 'directo': other = ''
 
-                players = players.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
-
-                data3 = do_downloadpage(players)
-
-                matches3 = scrapertools.find_multiple_matches(data3, "loadVideo.*?'(.*?)'" + '.*?alt="(.*?)"')
-
-                for player, srv in matches3:
-                    srv = srv.strip().lower()
-
-                    servidor = srv
-
-                    player = player.replace('.henaojara2.', '.henaojara.')
-
-                    if srv == 'fembed': continue
-                    elif srv == 'streamsb': continue
-                    elif srv == 'nyuu': continue
-                    elif srv == '4sync': continue
-
-                    if srv == 'netuplayer' or srv == 'netu' or srv == 'hqq': servidor = 'waaw'
-
-                    elif srv == 'streamwish': servidor = 'various'
-                    elif srv == 'filelions': servidor = 'various'
-                    elif srv == 'filemoon': servidor = 'various'
-                    elif srv == 'streamvid': servidor = 'various'
-                    elif srv == 'vidhide': servidor = 'various'
-                    elif srv == 'lulustream': servidor = 'various'
-
-                    elif srv == 'ok': servidor = 'okru'
-                    elif srv == 'dood': servidor = 'doodstream'
-
-                    else:
-                       if servertools.is_server_available(servidor):
-                           if not servertools.is_server_enabled(servidor): continue
-                       else:
-                           if not config.get_setting('developer_mode', default=False): continue
-                           servidor = 'directo'
-
-                    other = ''
-                    if servidor == 'various': other = servertools.corregir_other(srv)
-                    elif not servidor == 'directo': other = ''
-
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = player, language = lang, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -531,38 +521,6 @@ def play(item):
 
     elif '/go.php?v=' in url:
           url = scrapertools.find_single_match(url, 'v=(.*?)$')
-
-    else:
-        data = do_downloadpage(url)
-
-        new_url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"').strip()
-
-        if new_url:
-            if new_url.startswith('//'): new_url = 'https:' + new_url
-
-            url = new_url
-
-            if '/nyuu.' in new_url:
-                new_url = new_url.replace('&amp;', '&').strip()
-
-                data = do_downloadpage(new_url)
-
-                url = scrapertools.find_single_match(data, 'url: "(.*?)"')
-
-                url = url.replace('&amp;', '&').strip()
-
-                if url:
-                    itemlist.append(item.clone( url=url, server='directo'))
-                    return itemlist
-
-            elif '/player/go.php?v=' in new_url:
-                new_url = new_url.replace('/player/go.php?v=', '/player/go-player.php?v=')
-
-                data = do_downloadpage(new_url)
-
-                url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
-
-                if url.startswith('//'): url = 'https:' + url
 
     if '/streamium.xyz/' in url: url = ''
     elif '/pelispng.' in url: url = ''

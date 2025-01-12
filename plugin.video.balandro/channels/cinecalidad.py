@@ -5,7 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import re, base64
+import re, os, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -741,9 +741,12 @@ def play(item):
 
             if url.endswith('.torrent'):
                 if config.get_setting('proxies', item.channel, default=''):
-                    import os
+                    if PY3:
+                        from core import requeststools
+                        data = requeststools.read(url, 'cinecalidad')
+                    else:
+                        data = do_downloadpage(url)
 
-                    data = do_downloadpage(url)
                     file_local = os.path.join(config.get_data_path(), "temp.torrent")
                     with open(file_local, 'wb') as f: f.write(data); f.close()
 
@@ -821,9 +824,12 @@ def play(item):
 
         if url.endswith('.torrent'):
             if config.get_setting('proxies', item.channel, default=''):
-                import os
+                if PY3:
+                    from core import requeststools
+                    data = requeststools.read(url, 'cinecalidad')
+                else:
+                    data = do_downloadpage(url)
 
-                data = do_downloadpage(url)
                 file_local = os.path.join(config.get_data_path(), "temp.torrent")
                 with open(file_local, 'wb') as f: f.write(data); f.close()
 

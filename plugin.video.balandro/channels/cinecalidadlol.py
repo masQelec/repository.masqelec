@@ -5,7 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import re
+import re, os
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -239,9 +239,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = ' - Más vistas', action = 'destacadas', url = host + 'espana/?ref=es', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/?ref=es', search_type = 'movie' ))
 
-    if not config.get_setting('descartar_anime', default=False):
-        itemlist.append(item.clone( title = ' - [COLOR springgreen]Animes[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/anime/?ref=es', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie', group = '?ref=es' ))
     itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie', group = '?ref=es' ))
 
@@ -249,9 +246,6 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Más vistas', action = 'destacadas', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/peliculas-en-calidad-4k/', search_type = 'movie' ))
-
-    if not config.get_setting('descartar_anime', default=False):
-        itemlist.append(item.clone( title = ' - [COLOR springgreen]Animes[/COLOR]', action = 'list_all', url = host + 'genero-de-la-pelicula/anime/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = ' - Por género', action='generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie' ))
@@ -291,9 +285,11 @@ def generos(item):
 
     bloque = scrapertools.find_single_match(data, '<ul id="menu-menu"(.*?)<a id="close_menu"')
 
-    matches = re.compile('<a href="(.*?)">(.*?)</a>').findall(bloque)
+    matches = re.compile('href="(.*?)">(.*?)</a>').findall(bloque)
 
     for url, title in matches:
+        title = title.strip()
+
         if title == '4K UHD': continue
         elif title == 'Estrenos': continue
         elif title == 'Destacadas': continue
@@ -831,7 +827,20 @@ def play(item):
             return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
         if url.endswith('.torrent'):
-            itemlist.append(item.clone( url = url, server = 'torrent' ))
+            if config.get_setting('proxies', item.channel, default=''):
+                if PY3:
+                    from core import requeststools
+                    data = requeststools.read(url, 'cinecalidadlol')
+                else:
+                    data = do_downloadpage(url)
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            else:
+                itemlist.append(item.clone( url = url, server = 'torrent' ))
+
             return itemlist
 
         elif 'magnet:?' in url:
