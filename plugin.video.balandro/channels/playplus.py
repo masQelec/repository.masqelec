@@ -711,6 +711,9 @@ def findvideos(item):
                 elif '/katfile' in link: continue
                 elif '/nitro' in link: continue
 
+                elif '/powvideo' in link: continue
+                elif '/streamplay' in link: continue
+
                 elif '/viewsb.' in link: continue
                 elif '/formatearwindows.' in link: continue
 
@@ -718,8 +721,6 @@ def findvideos(item):
 
                 servidor = servertools.get_server_from_url(link)
                 servidor = servertools.corregir_servidor(servidor)
-
-                link = servertools.normalize_url(servidor, link)
 
                 if not servidor == 'various': other = ''
                 else: other = servertools.corregir_other(link)
@@ -738,6 +739,11 @@ def findvideos(item):
             server = 'waaw'
             sid = sid.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
 
+        if 'powvideo' in sid: continue
+        elif 'streamplay' in sid: continue
+
+        if 'premiun' in server: continue
+
         elif server == 'filelions': other = 'Filelions'
         elif server == 'filemoon': other = 'Filemoon'
         elif server == 'streamwish': other = 'Streamwish'
@@ -747,8 +753,6 @@ def findvideos(item):
         elif server == 'hexupload': other = 'Hexupload'
         elif server == 'userload': other = 'Userload'
         elif server == 'streamruby': other = 'Streamruby'
-
-        elif 'premiun' in server: continue
 
         server = servertools.corregir_servidor(server)
 
@@ -801,6 +805,9 @@ def findvideos(item):
                 elif '/katfile' in link: continue
                 elif '/nitro' in link: continue
 
+                elif '/powvideo' in link: continue
+                elif '/streamplay' in link: continue
+
                 elif '/viewsb.' in link: continue
                 elif '/formatearwindows.' in link: continue
 
@@ -808,8 +815,6 @@ def findvideos(item):
 
                 servidor = servertools.get_server_from_url(link)
                 servidor = servertools.corregir_servidor(servidor)
-
-                link = servertools.normalize_url(servidor, link)
 
                 if not servidor == 'various': other = ''
                 else: other = servertools.corregir_other(link)
@@ -824,11 +829,13 @@ def findvideos(item):
 
             continue
 
+        if 'premiun' in server: continue
+
         if server == 'player':
             server = 'waaw'
             url = url.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
 
-        if server == 'filelions': other = 'Filelions'
+        elif server == 'filelions': other = 'Filelions'
         elif server == 'filemoon': other = 'Filemoon'
         elif server == 'streamwish': other = 'Streamwish'
         elif server == 'streamhub': other = 'Streamhub'
@@ -836,8 +843,6 @@ def findvideos(item):
         elif server == 'vembed': other = 'Vidguard'
         elif server == 'hexupload': other = 'Hexupload'
         elif server == 'userload': other = 'Userload'
-
-        elif 'premiun' in server: continue
 
         server = servertools.corregir_servidor(server)
 
@@ -889,6 +894,31 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if url:
+        if '/iplayerhls.' in url or '/powvideo.' in url or '/streamplay.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        elif '/ouo.' in url:
+            return 'CloudFlare [COLOR red]ReCaptcha[/COLOR]'
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

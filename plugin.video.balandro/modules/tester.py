@@ -143,7 +143,7 @@ dominiosnextdede = [
          ]
 
 dominiosplaydede = [
-         'https://playdede.eu/'
+         'https://playdede.me/'
          ]
 
 
@@ -151,7 +151,7 @@ channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
-channels_despised = ['beeg', 'cam4', 'cuevana3in', 'hdfullse', 'pelisplushdlat', 'playdo', 'ytsmx']
+channels_despised = ['beeg', 'cam4', 'cuevana3in', 'hdfullse', 'pelisplushdlat', 'ytsmx']
 
 servers_poe = [ 'directo', 'm3u8hls', 'torrent' ]
 
@@ -241,6 +241,9 @@ def test_channel(channel_name):
     if 'Puede requerir el uso de proxies' in notes: notes = scrapertools.find_single_match(str(notes), '(.*?)Puede requerir el uso de proxies').strip()
 
     txt += 'info: [COLOR yellow][B]' + str(notes) + '[/B][/COLOR][CR]'
+
+    if 'Puede requerir el uso de proxies' in str(params['notes']):
+        txt += 'manage: [COLOR red][B]Gestión de Proxies[/B][/COLOR][CR]'
 
     if 'temporary' in str(params['clusters']): txt += 'búsquedas: [COLOR red][B]False[/B][/COLOR][CR]'
     else: txt += 'búsquedas: [COLOR chartreuse][B]' + str(params['searchable']) + '[/B][/COLOR][CR]'
@@ -344,7 +347,17 @@ def test_channel(channel_name):
     if '3d' in clusters: clusters = clusters.replace('3d,', '').strip()
     if '3d' in clusters: clusters = clusters.replace('3d', '').strip()
 
-    if clusters: txt += 'grupos: ' + str(clusters) + '[CR]'
+    if not clusters:
+         if 'torrent' in str(params['categories']):
+             clusters = 'Torrents' + clusters
+             txt += 'grupos: ' + str(clusters) + '[CR]'
+    else:
+         if 'torrent' in str(params['categories']):
+             if not 'torrents' in clusters: clusters = 'Torrents, ' + clusters
+
+         clusters = clusters.replace('torrents', 'Torrents')
+
+         txt += 'grupos: ' + str(clusters) + '[CR]'
 
     txt_temas = ''
 
@@ -732,71 +745,33 @@ def test_channel(channel_name):
                      host = dominioshdfull[0]
 
               elif channel_id == 'nextdede':
-                  sel_domain = ''
-
                   try:
                      data = httptools.downloadpage('https://dominiosnextdede.com/').data
 
                      sel_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
 
                      if sel_domain:
-                         if not sel_domain.endswith('/'): host = sel_domain + '/'
+                         if not sel_domain.endswith('/'): sel_domain = sel_domain + '/'
+
+                         if sel_domain in str(dominiosnextdede):
+                             host = sel_domain
                   except:
-                     pass
-
-                  if not sel_domain:
-                     try:
-                        data = httptools.downloadpage('https://t.me/s/NextdedeInformacion').data
-
-                        bloque = scrapertools.find_single_match(data, 'bloqueos de operadoras(.*?)</div>')
-
-                        dominios = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
-
-                        if not dominios: host = dominiosnextdede[0]
-                        else:
-                            for dominio in dominios:
-                                dominio = dominio.lower().strip()
-                                if dominio:
-                                    dominio = dominio.replace('http:', 'https:')
-                                    if not dominio.endswith('/'): dominio = dominio + '/'
-                                    sel_domain = dominio
-
-                            if sel_domain: host = sel_domain
-                            else: host = dominiosnextdede[0]
-                     except:
-                        host = dominiosnextdede[0]
+                     host = dominiosnextdede[0]
 
               elif channel_id == 'playdede':
-                  sel_domain = ''
-
                   try:
-                     data = httptools.downloadpage('https://dominiosplaydede.com/').data
+                      data = httptools.downloadpage('https://privacidad.me/@playdede/').data
 
-                     sel_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
+                      sel_domain = scrapertools.find_single_match(data, '>Web:(.*?)</a>').strip()
 
-                     if sel_domain:
-                         if not sel_domain.endswith('/'): host = sel_domain + '/'
+                      if sel_domain:
+                          if not 'https' in sel_domain: sel_domain = 'https://' + sel_domain
+                          if not sel_domain.endswith('/'): sel_domain = sel_domain + '/'
+
+                          if sel_domain in str(dominiosplaydede):
+                              host = sel_domain
                   except:
-                     pass
-
-                  if not sel_domain:
-                     try:
-                        data = httptools.downloadpage('https://t.me/playdedeinformacion').data
-
-                        dominios = scrapertools.find_multiple_matches(data, '>Web:(.*?)<')
-
-                        if not dominios: host = dominiosplaydede[0]
-                        else:
-                            for dominio in dominios:
-                                dominio = dominio.lower().strip()
-                                if dominio:
-                                    if not dominio.endswith('/'): dominio = dominio + '/'
-                                    sel_domain = dominio
-
-                            if sel_domain: host = sel_domain
-                            else: host = dominiosplaydede[0]
-                     except:
-                        host = dominiosplaydede[0]
+                      host = dominiosplaydede[0]
 
           if not host:
               part_py = 'def mainlist'
@@ -836,7 +811,7 @@ def test_channel(channel_name):
         if dominio: host = dominio
 
     if not host or not '//' in host:
-        el_canal = ('Falta Dominio/Host/Clon/Metodo en [B][COLOR %s]' + channel_py) % color_alert
+        el_canal = ('Falta Dominio/Host/Clon/Método en [B][COLOR %s]' + channel_py) % color_alert
         platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
         return
 
@@ -1077,11 +1052,6 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
     # ~ 20/11/2023
     headers = {}
 
-    if channel_id == 'playdo':
-        host_acces = host_acces + 'api/search'
-        useragent = httptools.get_user_agent()
-        headers = {"User-Agent": useragent + " pddkit/2023"}
-
     if not config.get_setting(cfg_proxies_channel, default=''):
         response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
 
@@ -1307,6 +1277,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
             elif '/cgi-sys/defaultwebpage.cgi' in str(response.data): txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
             elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
+
+            elif '>The domain has expired and may be available at' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
             elif 'Renew Now' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
 
             if len(response.data) < 1100:
@@ -1526,9 +1498,6 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                      txt += '[CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
-                     if channel_id == 'playdo':
-                         if '{"status":' in str(response.data): txt += txt_verif 
-
                      if 'actuales:' in txt:
                          if 'Sin proxies' in txt: txt += txt_proxs
                          else:
@@ -1537,10 +1506,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                      txt += txt_routs
 
-                 if channel_id == 'playdo':
-                     if not '{"status":' in str(response.data): txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
-                 else:
-                     txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
+                 txt += '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR][CR]'
 
                  if not '/cgi-sys/suspendedpage.cgi' or not '/wp-admin/install.php' in new_web:
                      txt += '[CR][CR][COLOR moccasin][B]Datos:[/B][/COLOR][CR]'

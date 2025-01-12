@@ -5,7 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import re
+import re, os
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -391,8 +391,6 @@ def play(item):
 
                 elif 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
                     return 'Archivo [COLOR red]No encontrado[/COLOR]'
-
-                import os
 
                 file_local = os.path.join(config.get_data_path(), "temp.torrent")
                 with open(file_local, 'wb') as f: f.write(data); f.close()

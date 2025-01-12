@@ -262,6 +262,7 @@ def list_all(item):
 
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
                                         qualities=qlty, languages = ', '.join(lngs), fmt_sufijo=sufijo,
+                                        contentExtra='3',
                                         contentSerieName = SerieName, contentType = 'tvshow', infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -299,8 +300,9 @@ def episodios(item):
         season = 0
         episode = 0
 
-    itemlist.append(item.clone( action = 'findvideos', url = item.url, title = item.title, thumbnail = item.thumbnail, contentSerieName = SerieName,
-                                contentSeason = season, contentType = 'episode', contentEpisodeNumber = episode ))
+    itemlist.append(item.clone( action = 'findvideos', url = item.url, title = item.title, thumbnail = item.thumbnail,
+                                contentExtra='',
+                                contentSerieName = SerieName, contentSeason = season, contentType = 'episode', contentEpisodeNumber = episode ))
 
     tmdb.set_infoLabels(itemlist)
 

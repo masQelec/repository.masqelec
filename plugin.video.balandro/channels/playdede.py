@@ -44,16 +44,16 @@ except:
    except: pass
 
 
-host = 'https://playdede.eu/'
+host = 'https://playdede.me/'
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-# ~ webs  0)-'https://dominiosplaydede.com/' ó Telegram 'https://t.me/playdedeinformacion'
+# ~ webs  0)-https://privacidad.me/@playdede  1)-Twitter https://x.com/playdedesocial  2)-Telegram https://t.me/playdedeinformacion
 
 
 # ~ por si viene de enlaces guardados posteriores
 ant_hosts = ['https://playdede.com/', 'https://playdede.org/', 'https://playdede.nu/',
-             'https://playdede.to/', 'https://playdede.us/']
+             'https://playdede.to/', 'https://playdede.us/', 'https://playdede.eu/']
 
 
 domain = config.get_setting('dominio', 'playdede', default='')
@@ -465,7 +465,7 @@ def acciones(item):
     username = config.get_setting('playdede_username', 'playdede', default='')
 
     if username:
-        itemlist.append(Item( channel='domains', action='operative_domains_playdede', title='[B]Dominio Operativo Vigente[/B]',
+        itemlist.append(Item( channel='domains', action='operative_domains_playdede', title='[B]Dominio Operativo Vigente' + '[COLOR dodgerblue] https://privacidad.me/@playdede[/B][/COLOR]',
                               desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('playdede'), text_color='mediumaquamarine' ))
 
         itemlist.append(Item( channel='domains', action='last_domain_playdede', title='[B]Comprobar último dominio vigente[/B]',
@@ -494,6 +494,8 @@ def acciones(item):
         itemlist.append(Item( channel='domains', action='del_datos_playdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('playdede'), text_color='crimson' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( title = '[COLOR aquamarine][B]Aviso[/COLOR] [COLOR violet][B]Ubicacióm[/B][/COLOR] Media Center', action = 'show_media_center', thumbnail=config.get_thumb('mediacenter') ))
 
     itemlist.append(Item( channel='helper', action='show_help_playdede', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('playdede') ))
 
@@ -1644,6 +1646,8 @@ def findvideos(item):
 
         server = servertools.corregir_servidor(server)
 
+        if server == 'zures': other = servertools.corregir_zures(url)
+
         itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = lang, quality = qlty, other = other ))
 
     # ~ Descargas
@@ -1684,6 +1688,7 @@ def findvideos(item):
 
         if not server == 'directo':
             if server == 'various': other = servertools.corregir_other(server)
+            elif server == 'zures': other = servertools.corregir_zures(url).capitalize()
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = lang, quality = qlty, other = other ))
 
@@ -1867,6 +1872,20 @@ def show_credenciales(item):
     password = config.get_setting('playdede_password', 'playdede', default='')
 
     platformtools.dialog_ok(config.__addon_name + ' PlayDede - Credenciales', 'User..:  [COLOR yellow][B]' + username, '[/B][/COLOR]Pass.:  [COLOR yellow][B]' + password + '[/B][/COLOR]')
+
+
+def show_media_center(item):
+    logger.info()
+
+    txt = 'Si el Canal [COLOR plum][B] NO Obtiene Resultados[/B][/COLOR] y la Ubicación de su Media Center [COLOR violet][B]NO es España[/B][/COLOR]:[CR]'
+
+    txt += 'Necesitará Obligatoriamnete [COLOR red][B]Configurar Proxies a usar ...[/B][/COLOR] en este canal.[CR][CR]'
+
+    txt += '[COLOR cyan][B]Aviso del Web Master de este canal:[/B][/COLOR][CR]'
+
+    txt += '[COLOR yellow][B]Debido a la situación actual, hemos tenido que tomar medidas de seguridad adicionales. Por esta razón, el acceso a nuestra web está limitado a países hispanohablantes. Recomendamos utilizar una VPN de un país de habla hispana para continuar disfrutando de nuestro contenido. Entendemos que esto pueda causar inconvenientes, pero es necesario si queremos permanecer activos durante más tiempo.[/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Información Aviso Ubicacióm Media Center', txt)
 
 
 def search(item, texto):

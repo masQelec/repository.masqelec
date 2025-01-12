@@ -67,6 +67,8 @@ def categorias(item):
 
         title = title.replace('&#039;', "'")
 
+        title = title.capitalize()
+
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color=text_color ))
 
     if itemlist:

@@ -152,9 +152,6 @@ def generos(item):
        if item.group == 'animes': text_color = 'springgreen'
        else: text_color = 'hotpink'
 
-    logger.info()
-    itemlist=[]
-
     genres = [
        'accion',
        'animacion',
@@ -413,6 +410,8 @@ def findvideos(item):
 
         e_links = scrapertools.find_single_match(datae, 'const dataLink =(.*?);')
         e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
+
+        e_links = e_links.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
 
         langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
 

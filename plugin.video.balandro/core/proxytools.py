@@ -253,11 +253,22 @@ def configurar_proxies_canal(canal, url):
                 if "'''" in channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized.replace("'''", "'")
                 if "''" in channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized.replace("''", "'")
 
+                if ", ," in channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized.replace(", ,", ',')
+
                 el_memorizado = "'" + canal.lower() + "'"
 
                 if not el_memorizado in str(channels_proxies_memorized):
                     if not channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized + el_memorizado
-                    else: channels_proxies_memorized = channels_proxies_memorized + ', ' + el_memorizado
+                    else:
+                       if not str(channels_proxies_memorized.endswith(",")):
+                           channels_proxies_memorized = channels_proxies_memorized + ', ' + el_memorizado
+                       else:
+                           channels_proxies_memorized = channels_proxies_memorized + ' ' + el_memorizado
+
+                    if "'''" in channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized.replace("'''", "'")
+                    if "''" in channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized.replace("''", "'")
+
+                    if ", ," in channels_proxies_memorized: channels_proxies_memorized = channels_proxies_memorized.replace(", ,", ',')
 
                     config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 

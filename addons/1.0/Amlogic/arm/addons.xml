@@ -58,12 +58,12 @@ v0.5.9 (2022-03-22)
   </extension>
 </addon>
 
-<addon id="repository.slyguy" name="SlyGuy Repository (slyguy.uk)" provider-name="SlyGuy" version="0.0.8">
-  <extension point="xbmc.addon.repository" name="SlyGuy Repository (slyguy.uk)">
+<addon id="repository.slyguy" name="SlyGuy Repository" provider-name="SlyGuy" version="0.0.9">
+  <extension point="xbmc.addon.repository" name="SlyGuy Repository">
     <dir>
-      <info compressed="false">https://slyguy.uk/.repo/addons.xml</info>
-      <checksum>https://slyguy.uk/.repo/addons.xml.md5</checksum>
-      <datadir zip="true">https://slyguy.uk/.repo/</datadir>
+      <info compressed="false">https://slyguy.uk/.repo/repository.slyguy/addons.xml</info>
+      <checksum>https://slyguy.uk/.repo/repository.slyguy/addons.xml.md5</checksum>
+      <datadir zip="true">https://slyguy.uk/.repo/repository.slyguy/</datadir>
     </dir>
   </extension>
   <extension point="xbmc.addon.metadata">
@@ -331,7 +331,7 @@ v0.5.9 (2022-03-22)
   </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="4.0.13" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="Balandro" version="4.0.14" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -351,11 +351,11 @@ v0.5.9 (2022-03-22)
       <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.13[/COLOR][COLOR chartreuse]  Diciembre de 2024[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.14[/COLOR][COLOR chartreuse]  Enero de 2025[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]
-        [COLOR plum][B]]22.x Piers,  21.x Omega,  20.x Nexus,  19.x Matrix,[/B][/COLOR]
+        [COLOR plum][B]22.x Piers,  21.x Omega,  20.x Nexus,  19.x Matrix,[/B][/COLOR]
         [COLOR plum][B]18.x Leia  y  17.x Krypton[/B][/COLOR]
 
     [COLOR springgreen][B]Fuente[/COLOR]  [COLOR cyan]https://repobal.github.io/base/[/B][/COLOR]

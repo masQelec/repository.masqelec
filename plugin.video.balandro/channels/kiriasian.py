@@ -183,6 +183,11 @@ def episodios(item):
                 else: item.perpage = 50
 
     for url, epi, title in epis[item.page * item.perpage:]:
+        c_year = scrapertools.find_single_match(title, '(\d{4})')
+        if c_year: title = title.replace('(' + c_year + ')', '').strip()
+
+        title = title.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+
         titulo = '%sx%s - %s' % (str(item.contentSeason), epi, title)
 
         if len(epi) == 1: orden = '0' + epi

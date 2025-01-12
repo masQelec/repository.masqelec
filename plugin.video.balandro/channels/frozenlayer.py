@@ -57,7 +57,7 @@ def mainlist_series(item):
 
             itemlist.append(item.clone( title = ' - Más valorados', action = 'list_lst', url = host + '/animes/lista?sort=rating&direction=desc&detallada=true', search_type = 'tvshow' ))
 
-            itemlist.append(item.clone( title = ' - [COLOR deepskyblue]Películas[/COLOR]', action = 'list_lst', url = host + '/buscar/anime/pelicula?&categoria=pelicula&detallada=true', search_type = 'tvshow' ))
+            itemlist.append(item.clone( title = ' - [COLOR deepskyblue]Películas[/COLOR]', action = 'list_lst', url = host + '/buscar/anime/pelicula?&categoria=pelicula&detallada=true', search_type = 'movie' ))
 
             itemlist.append(item.clone( title = ' - [COLOR greenyellow]Episodios[/COLOR]', action = 'list_all', url = host + '/descargas/detallada/bittorrent/anime', search_type = 'tvshow' ))
 
@@ -70,7 +70,7 @@ def mainlist_series(item):
             itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/anime-OVA', search_type = 'tvshow' ))
 
             itemlist.append(item.clone( title = '[B]Mangas:[/B]', folder=False, text_color='moccasin' ))
-            itemlist.append(item.clone( title = ' - [COLOR deepskyblue]Películas[/COLOR]', action = 'list_all', url = host + '/descargas/detallada/bittorrent/manga', _group = 'mangas', search_type = 'tvshow' ))
+            itemlist.append(item.clone( title = ' - [COLOR deepskyblue]Películas[/COLOR]', action = 'list_all', url = host + '/descargas/detallada/bittorrent/manga', _group = 'mangas', search_type = 'movie' ))
 
     return itemlist
 
@@ -161,6 +161,7 @@ def list_all(item):
                                         contentType = 'movie', contentTitle = PeliName, infoLabels={'year': year} ))
         else:
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, url_tor = url_tor,
+                                        contentExtra='3',
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -219,6 +220,7 @@ def list_lst(item):
                                             contentType = 'movie', contentTitle = PeliName, infoLabels={'year': year} ))
             else:
                 itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
+                                            contentExtra='3',
                                             contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)

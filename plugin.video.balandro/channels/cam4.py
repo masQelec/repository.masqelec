@@ -36,7 +36,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Mujeres', action = 'list_all', url = host + 'directoryCams?directoryJson=true&online=true&url=true&gender=female&broadcastType=female_group&broadcastType=solo&broadcastType=male_female_group&page=1' ))
     itemlist.append(item.clone( title = 'Hombres', action = 'list_all', url = host + 'directoryCams?directoryJson=true&online=true&url=true&gender=male&broadcastType=male_group&broadcastType=solo&page=1' ))
     itemlist.append(item.clone( title = 'Parejas', action = 'list_all', url = host + 'directoryCams?directoryJson=true&online=true&url=true&broadcastType=female_group&broadcastType=male_female_group&page=1' ))
-    itemlist.append(item.clone( title = 'Transexuales', action = 'list_all', url = host + 'directoryCams?directoryJson=true&online=true&url=true&gender=shemale&page=1' ))
+    itemlist.append(item.clone( title = 'Transsexuales', action = 'list_all', url = host + 'directoryCams?directoryJson=true&online=true&url=true&gender=shemale&page=1' ))
 
     return itemlist
 

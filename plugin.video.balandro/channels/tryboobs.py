@@ -79,7 +79,7 @@ def pornstars(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
 
     for url, thumb, total, title in matches:
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='orange' ))
 
     if itemlist:
         next_url = scrapertools.find_single_match(data, '<li><a class="pag-next" href="([^"]+)"><ins>Next</ins></a>')

@@ -87,9 +87,9 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'series/novedades/', group = 'animes', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'animes/novedades/', group = 'animes', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'animes/mejor-valoradas/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'animes/mejor-valoradas/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'animes', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'animes', search_type = 'tvshow' ))
@@ -294,9 +294,11 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<div class="se-c".*?data-season="' + str(item.contentSeason) + '"(.*?)</li></ul></div></div>')
+    bloque = scrapertools.find_single_match(data, '<div class="se-c".*?data-season="' + str(item.contentSeason) + '"(.*?)</li></ul></div>')
+    if not bloque: bloque = scrapertools.find_single_match(data, "<div class='se-c'.*?data-season='" + str(item.contentSeason) + "'(.*?)</li></ul></div>")
 
     matches = re.compile('<li class="mark-.*?<a href="(.*?)".*?<img src="(.*?)".*?<div class="epst">(.*?)</div>.*?<div class="numerando">(.*?)</div>', re.DOTALL).findall(bloque)
+    if not matches: matches = re.compile("<li class='mark-.*?<a href='(.*?)'.*?<img src='(.*?)'.*?<div class='epst'>(.*?)</div>.*?<div class='numerando'>(.*?)</div>", re.DOTALL).findall(bloque)
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -393,6 +395,8 @@ def findvideos(item):
 
             e_links = scrapertools.find_single_match(datae, 'const dataLink =(.*?);')
             e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
+
+            e_links = e_links.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
 
             langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
 

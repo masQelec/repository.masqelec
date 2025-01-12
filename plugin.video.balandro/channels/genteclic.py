@@ -136,6 +136,9 @@ def list_all(item):
 
             if not title: continue
 
+            c_year = scrapertools.find_single_match(title, '(\d{4})')
+            if c_year: title = title.replace('(' + c_year + ')', '').strip()
+
             thumb = scrapertools.find_single_match(article, ' data-src="([^"]+)')
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang,

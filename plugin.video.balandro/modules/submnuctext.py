@@ -652,6 +652,8 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
 
+    elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
+
     elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
 
     elif item.from_channel == 'cuevana3pro': domains.manto_domain_cuevana3pro(item)
@@ -924,12 +926,26 @@ def _proxies(item):
 
         if config.get_setting('channel_cinecalidadlol_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'cineplay':
+        from channels import cineplay
+        item.channel = 'cineplay'
+        cineplay.configurar_proxies(item)
+
+        if config.get_setting('channel_cineplay_proxies') is None: refrescar = False
+
     elif item.from_channel == 'cliversite':
         from channels import cliversite
         item.channel = 'cliversite'
         cliversite.configurar_proxies(item)
 
         if config.get_setting('channel_cliversite_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'cuevana2':
+        from channels import cuevana2
+        item.channel = 'cuevana2'
+        cuevana2.configurar_proxies(item)
+
+        if config.get_setting('channel_cuevana2_proxies') is None: refrescar = False
 
     elif item.from_channel == 'cuevana2esp':
         from channels import cuevana2esp
@@ -944,6 +960,13 @@ def _proxies(item):
         cuevana3pro.configurar_proxies(item)
 
         if config.get_setting('channel_cuevana3pro_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'cuevana3run':
+        from channels import cuevana3run
+        item.channel = 'cuevana3pro'
+        cuevana3run.configurar_proxies(item)
+
+        if config.get_setting('channel_cuevana3run_proxies') is None: refrescar = False
 
     elif item.from_channel == 'cuevana3video':
         from channels import cuevana3video
@@ -1162,13 +1185,6 @@ def _proxies(item):
 
         if config.get_setting('channel_mejortorrentnz_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'monoschinos':
-        from channels import monoschinos
-        item.channel = 'monoschinos'
-        monoschinos.configurar_proxies(item)
-
-        if config.get_setting('channel_monoschinos_proxies') is None: refrescar = False
-
     elif item.from_channel == 'mundodonghua':
         from channels import mundodonghua
         item.channel = 'mundodonghua'
@@ -1225,6 +1241,13 @@ def _proxies(item):
 
         if config.get_setting('channel_pelisforte_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'pelisgratishd':
+        from channels import pelisgratishd
+        item.channel = 'pelisgratishd'
+        pelisgratishd.configurar_proxies(item)
+
+        if config.get_setting('channel_pelisgratishd_proxies') is None: refrescar = False
+
     elif item.from_channel == 'pelispanda':
         from channels import pelispanda
         item.channel = 'pelispanda'
@@ -1274,26 +1297,12 @@ def _proxies(item):
 
         if config.get_setting('channel_pelisxd_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'pepecinetop':
-        from channels import pepecinetop
-        item.channel = 'pepecinetop'
-        pepecinetop.configurar_proxies(item)
-
-        if config.get_setting('channel_pepecinetop_proxies') is None: refrescar = False
-
     elif item.from_channel == 'playdede':
         from channels import playdede
         item.channel = 'playdede'
         playdede.configurar_proxies(item)
 
         if config.get_setting('channel_playdede_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'playdo':
-        from channels import playdo
-        item.channel = 'playdo'
-        playdo.configurar_proxies(item)
-
-        if config.get_setting('channel_playdo_proxies') is None: refrescar = False
 
     elif item.from_channel == 'plushd':
         from channels import plushd
@@ -1308,6 +1317,13 @@ def _proxies(item):
         ppeliculas.configurar_proxies(item)
 
         if config.get_setting('channel_ppeliculas_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'rarbg':
+        from channels import rarbg
+        item.channel = 'rarbg'
+        rarbg.configurar_proxies(item)
+
+        if config.get_setting('channel_rarbg_proxies') is None: refrescar = False
 
     elif item.from_channel == 'reinventorrent':
         from channels import reinventorrent
@@ -1420,13 +1436,6 @@ def _proxies(item):
         tomadivx.configurar_proxies(item)
 
         if config.get_setting('channel_tomadivx_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'tuseries':
-        from channels import tuseries
-        item.channel = 'tuseries'
-        tuseries.configurar_proxies(item)
-
-        if config.get_setting('channel_tuseries_proxies') is None: refrescar = False
 
     elif item.from_channel == 'ultrapelis':
         from channels import ultrapelis

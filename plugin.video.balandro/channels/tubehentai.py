@@ -9,8 +9,6 @@ from core import httptools, scrapertools
 
 host = 'https://tubehentai.com/'
 
-perpage = 30
-
 
 def mainlist(item):
     return mainlist_pelis(item)

@@ -6,7 +6,7 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
 
-import re
+import re, os
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -572,22 +572,26 @@ def play(item):
 
         url = link
 
-        if PY3:
-            from core import requeststools
-            data = requeststools.read(url, 'mejortorrentnz')
+        if url.endswith('.torrent'):
+            if config.get_setting('proxies', item.channel, default=''):
+                if PY3:
+                    from core import requeststools
+                    data = requeststools.read(url, 'mejortorrentnz')
+                else:
+                    data = do_downloadpage(url)
+
+                if data:
+                    if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+                        return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                    file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                    with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                    itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            else:
+                itemlist.append(item.clone( url = url, server = 'torrent' ))
         else:
-            data = do_downloadpage(url)
-
-        if data:
-            if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
-                return 'Archivo [COLOR red]Inexistente[/COLOR]'
-
-            import os
-
-            file_local = os.path.join(config.get_data_path(), "temp.torrent")
-            with open(file_local, 'wb') as f: f.write(data); f.close()
-
-            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            itemlist.append(item.clone( url = url, server = 'torrent' ))
 
     return itemlist
 

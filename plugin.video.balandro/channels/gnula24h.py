@@ -9,19 +9,20 @@ from core import httptools, scrapertools, servertools, tmdb
 
 # ~ 14/8/24 Peliculas solo hay 26
 
-host = 'https://w-v5n.gnula.cc/'
+host = 'https://wv-5n.gnula.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/', 'https://w-ww.gnula.cc/',
              'https://ww-w.gnula.cc/', 'https://www1.gnula.cc/', 'https://w-w-w.gnula.cc/',
-             'https://wv5n.gnula.cc/', 'https://wv5h.gnula.cc/', 'https://wv5l.gnula.cc/' ]
+             'https://wv5n.gnula.cc/', 'https://wv5h.gnula.cc/', 'https://wv5l.gnula.cc/',
+             'https://w-v5n.gnula.cc/']
 
 
-domain = config.get_setting('dominio', 'gnula2h', default='')
+domain = config.get_setting('dominio', 'gnula24h', default='')
 
 if domain:
-    if domain == host: config.set_setting('dominio', '', 'gnula2h')
+    if domain == host: config.set_setting('dominio', '', 'gnula24h')
     elif domain in str(ant_hosts): config.set_setting('dominio', '', 'gnula2h')
     else: host = domain
 
@@ -110,7 +111,7 @@ def acciones(item):
     logger.info()
     itemlist = []
 
-    domain_memo = config.get_setting('dominio', 'gnula2h', default='')
+    domain_memo = config.get_setting('dominio', 'gnula24h', default='')
 
     if domain_memo: url = domain_memo
     else: url = host
@@ -119,8 +120,8 @@ def acciones(item):
 
     itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
-    itemlist.append(item.clone( channel='domains', action='test_domain_gnula2h', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
-                                from_channel='gnula2h', folder=False, text_color='chartreuse' ))
+    itemlist.append(item.clone( channel='domains', action='test_domain_gnula24h', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='gnula24h', folder=False, text_color='chartreuse' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'

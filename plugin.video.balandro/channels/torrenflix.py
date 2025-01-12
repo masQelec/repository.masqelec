@@ -593,7 +593,12 @@ def play(item):
         url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"')
 
     if url:
-        if url.startswith('https://drive.google.com/'): url = ''
+        if '.filekas.'in url:
+            data = do_downloadpage(url)
+
+            url = scrapertools.find_single_match(data, '<li id="download">.*?<a href="(.*?)"')
+
+        elif url.startswith('https://drive.google.com/'): url = ''
 
     if url:
        if item.server == 'torrent':

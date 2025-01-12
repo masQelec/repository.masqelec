@@ -490,6 +490,8 @@ def findvideos(item):
 
         if '/likessb.' in url: continue
 
+        elif '/peytonepre' in url: continue
+
         if url.startswith('//'): url = 'https:' + url
 
         if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
@@ -545,6 +547,8 @@ def findvideos(item):
         for url in matches:
             if '/wp-admin/' in url: continue
 
+            elif '/peytonepre' in url: continue
+
             if url.startswith('//'): url = 'https:' + url
 
             elif 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
@@ -599,6 +603,8 @@ def findvideos(item):
 
            if '/wp-admin/' in u_link: u_link = ''
 
+           elif '/peytonepre' in u_link: u_link = ''
+
            if u_link:
                if u_link.startswith('https://sr.ennovelas.net/'): u_link = u_link.replace('/sr.ennovelas.net/', '/waaw.to/')
                elif u_link.startswith('https://video.ennovelas.net/'): u_link = u_link.replace('/video.ennovelas.net/', '/waaw.to/')
@@ -631,6 +637,8 @@ def findvideos(item):
         ses += 1
 
         if '/wp-admin/' in url: continue
+
+        elif '/peytonepre' in url: continue
 
         if url.startswith('//'): url = 'https:' + url
 
@@ -697,6 +705,7 @@ def list_search(item):
         url = scrapertools.find_single_match(article, ' href="(.*?)"')
 
         title = scrapertools.find_single_match(article, ' title="(.*?)"')
+        if not title: title = scrapertools.find_single_match(article, '<p class="entry-title">(.*?)</p>')
 
         if not url or not title: continue
 
@@ -719,6 +728,9 @@ def list_search(item):
             epis = epis.replace('/', '')
 
             if not epis: epis = 1
+
+            title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+            title = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, infoLabels={'year': '-'},
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epis ))

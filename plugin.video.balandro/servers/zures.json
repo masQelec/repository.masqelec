@@ -3,7 +3,7 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Amdahost,  Allviid,  Asian,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohh,  Oneupload,  Pandafiles,  Rovideo,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploady,  Veev,  Veoh,  Videa,  Vidbob,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vidtube,  Vipss,  Vkprime,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asian,  Bigwarp,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohh,  Oneupload,  Pandafiles,  Rovideo,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploady,  Veev,  Veoh,  Videa,  Vidbob,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vidtube,  Vipss,  Vkprime,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -97,6 +97,10 @@
         "url": "\\1"
       },
       {
+        "pattern": "https://send.now/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
         "pattern": "https://sendit.cloud/([0-9a-zA-Z]+)",
         "url": "\\1"
       },
@@ -143,6 +147,10 @@
       {
         "pattern": "https://veev.to/([0-9a-zA-Z]+)",
         "url": "\\1"
+      },
+      {
+        "pattern": "https://doods.to/([0-9a-zA-Z]+)",
+        "url": "https://veev.to/\\1"
       },
       {
         "pattern": "https://veoh.com/([0-9a-zA-Z]+)",
@@ -210,6 +218,10 @@
       },
       {
         "pattern": "https://udrop.com/([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://bigwarp.io/([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {

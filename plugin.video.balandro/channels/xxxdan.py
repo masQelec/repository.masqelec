@@ -10,6 +10,9 @@ from core import httptools, scrapertools, servertools
 host = 'https://xxxdan.com/es/'
 
 
+perpage = 50
+
+
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
     return data
@@ -59,6 +62,8 @@ def categorias(item):
     for url, title, thumb in matches:
         title = title.replace('ánal', 'anal').replace('ánime', 'anime').replace('árabe', 'arabe')
 
+        title = title.capitalize()
+
         url = url.replace('channel', 'channel30')
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'moccasin' ))
@@ -70,6 +75,8 @@ def list_all(item):
     logger.info()
     itemlist = []
 
+    if not item.page: item.page = 0
+
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
@@ -79,7 +86,9 @@ def list_all(item):
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    for url, thumb, time in matches:
+    num_matches = len(matches)
+
+    for url, thumb, time in matches[item.page * perpage:]:
         title = scrapertools.find_single_match(url, host + '.*?/(.*?).html')
 
         title = title.replace('-', ' ')
@@ -88,13 +97,21 @@ def list_all(item):
 
         itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
+        if len(itemlist) >= perpage: break
+
     if itemlist:
-        next_page = scrapertools.find_single_match(data,'<link rel="next" href="([^"]+)"')
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
+                buscar_next = False
 
-        if next_page:
-            next_page = host + next_page
+        if buscar_next:
+            next_page = scrapertools.find_single_match(data,'<link rel="next".*?href="([^"]+)"')
 
-            itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, text_color = 'coral') )
+            if next_page:
+                itemlist.append(item.clone (action='list_all', title='Siguientes ...', url = next_page, page= 0, text_color = 'coral') )
 
     return itemlist
 
@@ -109,7 +126,7 @@ def findvideos(item):
     url = scrapertools.find_single_match(data, 'src:\'([^\']+)\'')
 
     if url:
-        url = url.replace("https","http")
+        url = url.replace("https", "http")
 
         itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server = 'directo', language = 'Vo') )
 

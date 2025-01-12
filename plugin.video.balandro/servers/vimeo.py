@@ -96,6 +96,9 @@ def get_video_url(page_url, url_referer=''):
                         return 'Fichero sin link al vídeo ó restringido'
 
                 elif '<urlopen error' in traceback.format_exc():
+                    if ' alert protocol version ' in traceback.format_exc():
+                         return 'Acceso Denegado CloudFlare'
+
                     return 'No se puede establecer la conexión'
 
                 return 'Sin Respuesta ResolveUrl'

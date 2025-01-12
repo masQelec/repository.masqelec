@@ -261,8 +261,9 @@ def show_help_parameters(item):
     else: txt = 'Los canales que tenga marcados como [B][COLOR cyan]Desactivados[/COLOR][/B] nunca intervendrán en las búsquedas[CR][CR]'
 
     txt += ' - [B][COLOR gold]Canales[/COLOR][/B] que Nunca intervienen en las busquedas:'
-    txt += '[CR][COLOR darkorange][B]    CineDeAntes,  CineLibreOnline,  CineMatteFlix,  Frozenlayer,'
-    txt += '[CR]    SeriesBiblicas,  SigloXX,  Trailers,  TvSeries,  YouTubeDocs[/B][/COLOR]'
+    txt += '[CR][COLOR darkorange][B]    DocumentaryHeaven,  CineDeAntes,  CineLibreOnline,  CineMatteFlix,'
+    txt += '[CR]    Frozenlayer,  SeriesBiblicas,  SigloXX,  Trailers,  TvSeries,'
+    txt += '[CR]    YouTubeDocs,  TopDocumentaryFilms[/B][/COLOR]'
 
     if not config.get_setting('mnu_documentales', default=True): txt += '[CR][CR] - Los canales de [B][COLOR cyan]Documentales[/COLOR][/B] jamás intervendrán en las busquedas'
 

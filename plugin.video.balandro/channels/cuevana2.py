@@ -44,14 +44,15 @@ except:
    except: pass
 
 
-host = 'https://www.cuevana2.run/'
+host = 'https://www.cuevana2.lat/'
 
 
 _player = '.cuevana2.'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.cuevana2.icu/', 'https://ww2.cuevana2.biz/', 'https://cuevana2.biz/']
+ant_hosts = ['https://www.cuevana2.icu/', 'https://ww2.cuevana2.biz/', 'https://cuevana2.biz/',
+             'https://www.cuevana2.run/']
 
 
 domain = config.get_setting('dominio', 'cuevana2', default='')
@@ -644,7 +645,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         if servidor == 'zplayer': url = url + '|' + host
 

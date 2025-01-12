@@ -168,6 +168,8 @@ def list_all(item):
             episode = scrapertools.find_single_match(url, '-capitulo-(.*?)/')
             if not episode: episode = 1
 
+            title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+
             title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentSerieName=SerieName,
@@ -286,6 +288,8 @@ def episodios(item):
         if not episode: episode = 1
 
         title = str(item.contentSeason) + 'x' + str(episode) + ' ' + item.contentSerieName
+
+        if '-' in episode: episode = episode.replace('-', '').strip()
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, orden = 1,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=episode ))

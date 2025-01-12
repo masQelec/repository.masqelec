@@ -10,7 +10,7 @@ from core import httptools, scrapertools, jsontools
 host = 'https://www.xvideos.com/'
 
 
-perpage = 30
+perpage = 250
 
 
 def do_downloadpage(url, post=None, headers=None):
@@ -123,8 +123,6 @@ def categorias(item):
     itemlist = []
 
     if not item.page: item.page = 0
-
-    perpage = 250
 
     data = do_downloadpage(host + 'tags')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)

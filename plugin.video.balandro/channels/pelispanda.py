@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import re
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+import re, os
 
 from platformcode import logger, config, platformtools
 from core.item import Item
@@ -453,11 +458,29 @@ def play(item):
     host_torrent = host[:-1]
     url_base64 = decrypters.decode_url_base64(url, host_torrent)
 
+    if not url_base64: return itemlist
+
     if url_base64.startswith('magnet:'):
         itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
     elif url_base64.endswith(".torrent"):
-        itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+        if config.get_setting('proxies', item.channel, default=''):
+            if PY3:
+                from core import requeststools
+                data = requeststools.read(url_base64, 'pelispanda')
+            else:
+                data = do_downloadpage(url_base64)
+
+            if data:
+                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+        else:
+            itemlist.append(item.clone( url = url_base64 , server = 'torrent' ))
 
     return itemlist
 

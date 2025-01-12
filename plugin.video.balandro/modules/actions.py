@@ -422,6 +422,7 @@ def manto_params(item):
         config.set_setting('channel_cinecalidadla_dominio', '')
         config.set_setting('channel_cinecalidadlol_dominio', '')
         config.set_setting('channel_cliversite_dominio', '')
+        config.set_setting('channel_cuevana2_dominio', '')
         config.set_setting('channel_cuevana2esp_dominio', '')
         config.set_setting('channel_cuevana3pro_dominio', '')
         config.set_setting('channel_cuevana3video_dominio', '')
@@ -556,7 +557,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '131.0.6778.87')  # ~ 7/12/24
+        config.set_setting('chrome_last_version', '131.0.6778.265')  # ~ 8/1/25
 
         config.set_setting('debug', '0')
 
@@ -1499,6 +1500,10 @@ def opciones_cliversite(item):
     item.from_channel = 'cliversite'
     opciones_domains_common(item)
 
+def opciones_cuevana2(item):
+    item.from_channel = 'cuevana2'
+    opciones_domains_common(item)
+
 def opciones_cuevana2esp(item):
     item.from_channel = 'cuevana2esp'
     opciones_domains_common(item)
@@ -1745,6 +1750,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cliversite': domains.manto_domain_cliversite(item)
 
+            elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
+
             elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
 
             elif item.from_channel == 'cuevana3pro': domains.manto_domain_cuevana3pro(item)
@@ -1852,6 +1859,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'cinecalidadlol': domains.test_domain_cinecalidadlol(item)
 
             elif item.from_channel == 'cliversite': domains.test_domain_cliversite(item)
+
+            elif item.from_channel == 'cuevana2': domains.test_domain_cuevana2(item)
 
             elif item.from_channel == 'cuevana2esp': domains.test_domain_cuevana2esp(item)
 

@@ -170,6 +170,9 @@ def generos(item):
         if config.get_setting('descartar_anime', default=False):
             if title == 'Anime': continue
 
+        if not host in url:
+            url = host[:-1] + url
+
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = text_color ))
 
     return sorted(itemlist, key=lambda x: x.title)

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools
 
 
-host = 'https://www4.hentaila.com/'
+host = 'https://www5.hentaila.com/'
 
 
 def mainlist(item):
@@ -51,7 +51,7 @@ def categorias(item):
 
     bloque = scrapertools.find_single_match(data, '>Generos<(.*?)</section>')
 
-    matches = re.compile('<li.*?<a href="(.*?)".*?class>(.*?)</a>', re.DOTALL).findall(bloque)
+    matches = re.compile('<a href="(.*?)".*?class.*?>(.*?)</a>', re.DOTALL).findall(bloque)
 
     for genre, title in matches:
         url = host[:-1] + genre
@@ -121,7 +121,9 @@ def episodios(item):
 
         thumb = host[:-1] + thumb
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
+        titulo = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     return itemlist
 

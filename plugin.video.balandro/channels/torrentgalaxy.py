@@ -28,6 +28,12 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
+    if not config.get_setting('descartar_anime', default=False):
+        if not no_porns:
+            itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime/', search_type = 'tvshow', text_color=' springgreen' ))
+        else:
+            itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
+
     if not no_porns:
         itemlist.append(item.clone( title = 'Adultos', action = 'mainlist_adults', text_color = 'orange' ))
 
@@ -47,7 +53,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = 'Bollywood', action = 'list_all', url = host + 'get-posts/keywords:Bollywood:category:Movies/', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'get-posts/keywords:4K UHD:category:Movies/', search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:4K UHD:category:Movies/', search_type = 'movie' ))
 
         itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'get-posts/keywords:HD:category:Movies/', search_type = 'movie' ))
 
@@ -61,7 +67,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = 'Bollywood', action = 'list_all', url = host + 'get-posts/keywords:Bollywood:category:Movies:ncategory:XXX/', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'get-posts/keywords:4K UHD:category:Movies/', search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:4K UHD:category:Movies/', search_type = 'movie' ))
 
         itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'get-posts/keywords:HD:category:Movies:ncategory:XXX/', search_type = 'movie' ))
 
@@ -83,11 +89,12 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Colecciones', action = 'list_all', url = host + 'get-posts/keywords:Packs:category:TV/', search_type = 'tvshow', text_color='greenyellow' ))
 
-        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime/', search_type = 'tvshow', text_color=' springgreen' ))
+        if not config.get_setting('descartar_anime', default=False):
+            itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime/', search_type = 'tvshow', text_color=' springgreen' ))
 
         itemlist.append(item.clone( title = '[B]Episodios:[/B]', action = '', search_type = 'tvshow', text_color='moccasin' ))
 
-        itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'get-posts/keywords:Eps 4k UHD:category:TV/', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:Eps 4k UHD:category:TV/', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = ' - En HD', action = 'list_all', url = host + 'get-posts/keywords:Episodes HD:category:TV/', search_type = 'tvshow' ))
 
@@ -97,11 +104,12 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Colecciones', action = 'list_all', url = host + 'get-posts/keywords:Packs:category:TV:ncategory:XXX/', search_type = 'tvshow', text_color='greenyellow' ))
 
-        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
+        if not config.get_setting('descartar_anime', default=False):
+            itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
 
         itemlist.append(item.clone( title = '[B]Episodios:[/B]', action = '', search_type = 'tvshow', text_color='moccasin' ))
 
-        itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'get-posts/keywords:Eps 4k UHD:category:TV:ncategory:XXX/', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:Eps 4k UHD:category:TV:ncategory:XXX/', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = ' - En HD', action = 'list_all', url = host + 'get-posts/keywords:Episodes HD:category:TV:ncategory:XXX/', search_type = 'tvshow' ))
 
@@ -118,7 +126,7 @@ def mainlist_adults(item):
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'get-posts/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + 'get-posts/keywords:4K UHD:category:XXX/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:4K UHD:category:XXX/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = ' - En HD', action = 'list_all', url = host + 'get-posts/keywords:HD:category:XXX/', search_type = 'movie' ))
 
@@ -157,13 +165,17 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, "src=.?'(.*?)'")
 
+        contentExtra = ''
         if '<small>XXX' in match:
+            contentExtra = 'adults'
             thumb = config.get_thumb('adults')
 
         lang = scrapertools.find_single_match(match, '<!-- <img class="dim txlight".*?title="(.*?)"')
 
-        if 'SPANISH' in lang or 'Spanish' in lang: lang = 'Esp'
-        elif 'ENGLISH' in lang or 'English' in lang: lang = 'Ing'
+        if not lang: lang = 'Vo'
+        else:
+           if 'SPANISH' in lang or 'Spanish' in lang: lang = 'Esp'
+           elif 'ENGLISH' in lang or 'English' in lang: lang = 'Ing'
 
         c_year = scrapertools.find_single_match(title, '(\d{4})')
         if c_year:
@@ -182,11 +194,12 @@ def list_all(item):
 
             SerieName = corregir_Name(title)
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = lang, fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
+                                        contentExtra='3',
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
         if tipo == 'movie':
-            if not item.search_type == "all":
+            if item.search_type != 'all':
                 if item.search_type == "tvshow": continue
 
             if '<small>TV: Sports' in match: pass
@@ -195,7 +208,8 @@ def list_all(item):
 
             PeliName = corregir_Name(title)
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, languages = lang, fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action = 'findvideos', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
+                                        contentExtra=contentExtra,
                                         contentType = 'movie', contentTitle = PeliName, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -298,7 +312,8 @@ def corregir_Name(Name):
     if "BDRip" in Name: Name = Name.split("BDRip")[0]
     if "DVDRip" in Name: Name = Name.split("DVDRip")[0]
     if "WEBRiP" in Name: Name = Name.split("WEBRiP")[0]
-    if "WEB-DL" in Name: Name = Name.split("WEB-Dl")[0]
+    if "WEB-DL" in Name: Name = Name.split("WEB-DL")[0]
+    if "WEB DL" in Name: Name = Name.split("WEB DL")[0]
     if "WEBDL" in Name: Name = Name.split("WEBDl")[0]
     if "HDR" in Name: Name = Name.split("HDR")[0]
     if "HDTS" in Name: Name = Name.split("HDTS")[0]

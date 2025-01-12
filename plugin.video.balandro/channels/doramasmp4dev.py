@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://doramasmp4.se/'
+host = 'https://doramasmp4.dev/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://doramasmp4.se/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -390,6 +396,8 @@ def play(item):
 
     if item.server == 'directo':
         if '/fkplayer.xyz' in url:
+            return 'Servidor [COLOR plum]NO Soportado[/COLOR]'
+        elif '/peytonepre.' in url:
             return 'Servidor [COLOR plum]NO Soportado[/COLOR]'
 
         elif '.mundodrama.' in url:

@@ -2106,6 +2106,8 @@ def resumen_canales(item):
     total = 0
 
     inactives = 0
+    cerrados = 0
+    anulados = 0
     temporarys = 0
     mismatcheds = 0
     inestables = 0
@@ -2147,6 +2149,7 @@ def resumen_canales(item):
     animes = 0
     adults = 0
     privates = 0
+    others = 0
     no_actives = 0
 
     filtros = {'active': False}
@@ -2156,13 +2159,19 @@ def resumen_canales(item):
         total += 1
 
         if ch['active'] == False:
-            if not 'temporary' in ch['clusters']: inactives += 1
+            if not 'temporary' in ch['clusters']:
+                inactives += 1
 
-        if 'temporary' in ch['clusters']: temporarys += 1
+                if 'Web CERRADA' in ch['notes']: cerrados += 1
+                elif 'Web ANULADA' in ch['notes']: anulados += 1
+                else: others += 1
 
-        if 'privates' in ch['clusters']:
-            el_canal = ch['id']
-            if os.path.exists(os.path.join(config.get_runtime_path(), 'channels', el_canal)): privates += 1
+        else:
+            if 'temporary' in ch['clusters']: temporarys += 1
+
+            if 'privates' in ch['clusters']:
+                el_canal = ch['id']
+                if os.path.exists(os.path.join(config.get_runtime_path(), 'channels', el_canal + '.py')): privates += 1
 
     filtros = {}
     ch_list = channeltools.get_channels_list(filtros=filtros)
@@ -2263,28 +2272,40 @@ def resumen_canales(item):
 
         if 'privates' in ch['clusters']:
             el_canal = ch['id']
-            if os.path.exists(os.path.join(config.get_runtime_path(), 'channels', el_canal)): privates += 1
+            if os.path.exists(os.path.join(config.get_runtime_path(), 'channels', el_canal + '.py')): privates += 1
 
     txt = '[COLOR yellow][B]RESÚMENES CANALES:[/B][/COLOR][CR]'
 
     txt += '  ' + str(total) + ' [COLOR darkorange][B]Canales[/B][/COLOR][CR][CR]'
 
     txt += '     ' + str(inactives) + ' [COLOR coral]Inactivos[/COLOR][CR]'
-    txt += '       ' + str(temporarys) + ' [COLOR cyan]Temporalmente Inactivos[/COLOR][CR]'
+    txt += '           ' + str(cerrados) + ' [COLOR coral]Cerrados[/COLOR][CR]'
+    txt += '           ' + str(anulados) + ' [COLOR coral]Anulados[/COLOR][CR]'
+
+    if not others == 0: txt += '             ' + str(others) + ' [COLOR coral]Otros[/COLOR][CR]'
+
+    if not temporarys == 0: txt += '       ' + str(temporarys) + ' [COLOR cyan]Temporalmente Inactivos[/COLOR][CR]'
 
     if not PY3:
         if not mismatcheds == 0: txt += '       ' + str(mismatcheds) + ' [COLOR violet]Posible Incompatibilidad[/COLOR][CR]'
 
-    txt += '       ' + str(inestables) + ' [COLOR plum]Inestables[/COLOR][CR]'
-    txt += '       ' + str(problematics) + ' [COLOR darkgoldenrod]Problemáticos[/COLOR][CR]'
+    if not inestables == 0: txt += '       ' + str(inestables) + ' [COLOR plum]Inestables[/COLOR][CR]'
+
+    if not problematics == 0: txt += '       ' + str(problematics) + ' [COLOR darkgoldenrod]Problemáticos[/COLOR][CR]'
+
     txt += '     ' + str(clones) + ' [COLOR turquoise]Clones[/COLOR][CR]'
     txt += '     ' + str(notices) + ' [COLOR olivedrab]Con Probable CloudFlare Protection[/COLOR][CR]'
     txt += '     ' + str(proxies) + ' [COLOR red]Pueden Usar Proxies[/COLOR][CR]'
-    txt += '       ' + str(registers) + ' [COLOR teal]Requieren Cuenta[/COLOR][CR]'
-    txt += '       ' + str(dominios) + ' [COLOR green]Varios Dominios[/COLOR][CR]'
+
+    if not registers == 0: txt += '       ' + str(registers) + ' [COLOR teal]Requieren Cuenta[/COLOR][CR]'
+
+    if not dominios == 0: txt += '       ' + str(dominios) + ' [COLOR green]Varios Dominios[/COLOR][CR]'
+
     txt += '     ' + str(currents) + ' [COLOR goldenrod]Gestión Dominio Vigente[/COLOR][CR]'
-    txt += '     ' + str(onlyones) + ' [COLOR fuchsia]Con un Único Servidor[/COLOR][CR]'
-    txt += '     ' + str(searchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
+
+    if not onlyones == 0: txt += '     ' + str(onlyones) + ' [COLOR fuchsia]Con un Único Servidor[/COLOR][CR]'
+
+    if not searchables == 0: txt += '     ' + str(searchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
 
     if txt_status:
         if no_accesibles:
@@ -2337,13 +2358,19 @@ def resumen_canales(item):
 
     txt += '[CR]    ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
     txt += '    ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
-    txt += '      ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
+
+    if not infantiles == 0: txt += '      ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
+
     txt += '    ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
-    txt += '      ' + str(bibles) + '  [COLOR tan]Bíblicos[/COLOR][CR]'
+
+    if not bibles == 0: txt += '      ' + str(bibles) + '  [COLOR tan]Bíblicos[/COLOR][CR]'
+
     txt += '    ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
     txt += '    ' + str(doramas) + '  [COLOR firebrick]Doramas[/COLOR][CR]'
     txt += '    ' + str(animes) + '  [COLOR springgreen]Animes[/COLOR][CR]'
     txt += '    ' + str(adults) + '  [COLOR orange]Adultos[/COLOR][CR]'
+
+    if not privates == 0: txt += '      ' + str(privates) + '  [COLOR grey]Privados[/COLOR][CR]'
 
     txt += '[CR][COLOR powderblue][B]DISTRIBUCIÓN CANALES DISPONIBLES PARA BÚSQUEDAS:[/B][/COLOR][CR]'
 
@@ -2423,7 +2450,7 @@ def resumen_servidores(item):
     notsuported = 0
     outservice = 0
     alternatives = 0
-    aditionals = 41
+    aditionals = 93  # ~ 44 Various  y  49  Zures
     disponibles = 0
     pending = 0
 
@@ -2484,6 +2511,8 @@ def resumen_servidores(item):
         txt += '[CR][COLOR goldenrod][B]YOUTUBE:[/B][/COLOR][CR]'
 
         txt += '      1' + '   [COLOR green]Vía alternativa[/COLOR][CR]'
+
+        aditionals += 1
 
     txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN SERVIDORES DISPONIBLES:[/B][/COLOR]'
 
@@ -2548,6 +2577,7 @@ def show_help_alternativas(item):
     txt += '   [COLOR yellow]Playtube[/COLOR][CR]'
     txt += '   [COLOR yellow]Racaty[/COLOR][CR]'
     txt += '   [COLOR yellow]Streamlare[/COLOR][CR]'
+    txt += '   [COLOR yellow]Streamtape[/COLOR][CR]'
     txt += '   [COLOR yellow]Streamvid[/COLOR][CR]'
     txt += '   [COLOR yellow]Uptobox[/COLOR][CR]'
     txt += '   [COLOR yellow]Userscloud[/COLOR][CR]'
@@ -2585,9 +2615,12 @@ def show_help_adicionales(item):
 
     txt += '[CR][COLOR gold]ResolveUrl Script:[/COLOR]  %s' % tex_mr
 
-    txt += '[CR][CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
+    txt += '[CR][CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR gold][B]Various[/B] [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
 
+    txt += '   [COLOR yellow]Azipcdn[/COLOR][CR]'
+    txt += '   [COLOR yellow]Bembed[/COLOR][CR]'
     txt += '   [COLOR yellow]Desiupload[/COLOR][CR]'
+    txt += '   [COLOR yellow]Doodporn[/COLOR][CR]'
     txt += '   [COLOR yellow]Drop[/COLOR][CR]'
     txt += '   [COLOR yellow]Dropload[/COLOR][CR]'
     txt += '   [COLOR yellow]Embedgram[/COLOR][CR]'
@@ -2628,5 +2661,57 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Vudeo[/COLOR][CR]'
     txt += '   [COLOR yellow]Yandex[/COLOR][CR]'
     txt += '   [COLOR yellow]Youdbox[/COLOR]'
+
+    txt += '[CR][CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR gold][B]Zures[/B] [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
+
+    txt += '   [COLOR yellow]Allviid[/COLOR][CR]'
+    txt += '   [COLOR yellow]Amdahost[/COLOR][CR]'
+    txt += '   [COLOR yellow]Asian[/COLOR][CR]'
+    txt += '   [COLOR yellow]Bigwarp[/COLOR][CR]'
+    txt += '   [COLOR yellow]Cloudfile[/COLOR][CR]'
+    txt += '   [COLOR yellow]Cloudmail[/COLOR][CR]'
+    txt += '   [COLOR yellow]Dailyuploads[/COLOR][CR]'
+    txt += '   [COLOR yellow]Darkibox[/COLOR][CR]'
+    txt += '   [COLOR yellow]Dembed[/COLOR][CR]'
+    txt += '   [COLOR yellow]Downace[/COLOR][CR]'
+    txt += '   [COLOR yellow]Fastdrive[/COLOR][CR]'
+    txt += '   [COLOR yellow]Fastplay[/COLOR][CR]'
+    txt += '   [COLOR yellow]Filegram[/COLOR][CR]'
+    txt += '   [COLOR yellow]Gostream[/COLOR][CR]'
+    txt += '   [COLOR yellow]Letsupload[/COLOR][CR]'
+    txt += '   [COLOR yellow]Liivideo[/COLOR][CR]'
+    txt += '   [COLOR yellow]Myupload[/COLOR][CR]'
+    txt += '   [COLOR yellow]Neohh[/COLOR][CR]'
+    txt += '   [COLOR yellow]Oneupload[/COLOR][CR]'
+    txt += '   [COLOR yellow]Pandafiles[/COLOR][CR]'
+    txt += '   [COLOR yellow]Rovideo[/COLOR][CR]'
+    txt += '   [COLOR yellow]Send[/COLOR][CR]'
+    txt += '   [COLOR yellow]Streamable[/COLOR][CR]'
+    txt += '   [COLOR yellow]Streamdav[/COLOR][CR]'
+    txt += '   [COLOR yellow]Streamcool[/COLOR][CR]'
+    txt += '   [COLOR yellow]Streamgzzz[/COLOR][CR]'
+    txt += '   [COLOR yellow]Streamoupload[/COLOR][CR]'
+    txt += '   [COLOR yellow]SwiftLoad[/COLOR][CR]'
+    txt += '   [COLOR yellow]Turbovid[/COLOR][CR]'
+    txt += '   [COLOR yellow]Tusfiles[/COLOR][CR]'
+    txt += '   [COLOR yellow]Udrop[/COLOR][CR]'
+    txt += '   [COLOR yellow]Updown[/COLOR][CR]'
+    txt += '   [COLOR yellow]Uploadbaz[/COLOR][CR]'
+    txt += '   [COLOR yellow]Uploadflix[/COLOR][CR]'
+    txt += '   [COLOR yellow]Uploady[/COLOR][CR]'
+    txt += '   [COLOR yellow]Veev[/COLOR][CR]'
+    txt += '   [COLOR yellow]Veoh[/COLOR][CR]'
+    txt += '   [COLOR yellow]Videa[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vidbob[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vidlook[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vidmx[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vido[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vidpro[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vidstore[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vidtube[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vipss[/COLOR][CR]'
+    txt += '   [COLOR yellow]Vkprime[/COLOR][CR]'
+    txt += '   [COLOR yellow]Worlduploads[/COLOR][CR]'
+    txt += '   [COLOR yellow]Ztreamhub[/COLOR][CR]'
 
     platformtools.dialog_textviewer('Servidores Vías Adicionales', txt)

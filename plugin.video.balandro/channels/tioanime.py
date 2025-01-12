@@ -62,7 +62,7 @@ def generos(item):
 
     bloque = scrapertools.find_single_match(data, '>Genero<(.*?)</select>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<option value="(.*?)">(.*?)</option>')
+    matches = scrapertools.find_multiple_matches(bloque, '<option value="(.*?)".*?>(.*?)</option>')
 
     for genre, title in matches:
         title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'í').replace('&oacute;', 'ó').replace('&uacute;', 'u')
@@ -147,9 +147,8 @@ def list_all(item):
                 if item.search_type != 'all':
                     if item.search_type == 'tvshow': continue
 
-                itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
+                itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
                                             contentType = 'movie', contentTitle = SerieName, infoLabels={'year': '-'} ))
-
 
     tmdb.set_infoLabels(itemlist)
 
@@ -247,6 +246,9 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not item.search_type == 'tvshow':
+        if not '-1' in item.url: item.url = item.url.replace('/anime/', '/ver/') + '-1'
 
     data = httptools.downloadpage(item.url).data
 

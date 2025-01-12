@@ -1134,7 +1134,7 @@ def show_infos_play(item):
         if srv_pending:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_pending', title='[COLOR fuchsia][B]Servidores [COLOR tan]Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
-    itemlist.append(item.clone( action='', title=' - [COLOR violet][B]Filtre[/B][/COLOR] Servidores en [COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR fuchsia][B]Play[/B][/COLOR])', thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( channel='actions', action = 'open_settings', title='- [COLOR violet][B]Filtre[/B][/COLOR] Servidores en [COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR fuchsia][B]Play[/B][/COLOR])', thumbnail=config.get_thumb('bolt') ))
 
     return itemlist
 
@@ -1156,7 +1156,13 @@ def show_infos_alternativas(item):
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
        itemlist.append(item.clone( action='show_servers_list', title= '    - Qué servidores tienen [COLOR yellow][B]Vías Alternativas[/B][/COLOR]', tipo = 'alternativos', thumbnail=config.get_thumb('bolt') ))
+
        itemlist.append(item.clone( channel='submnuteam', action='show_help_adicionales', title= '    - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR yellowgreen][B]ResolveUrl[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
+    else:
+       itemlist.append(item.clone( action='', title= '- [COLOR yellow][B]ResolveUrl[/B][/COLOR] [COLOR red][B]No Instalado[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
+
+    if not xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+       itemlist.append(item.clone( action='', title= '- [COLOR yellow][B]YouTube[/B][/COLOR] [COLOR red][B]No Instalado[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
 
     return itemlist
 
@@ -2007,7 +2013,8 @@ def show_help_bucle(item):
     txt = ''
 
     txt += '[CR][COLOR gold][B]¿ Porqué la opción [/COLOR][COLOR yellow]Buscar[/COLOR][COLOR gold] entra em modo bucle (vuelve a solicitar el texto a localizar) ?[/B][/COLOR][CR]'
-    txt += 'Add-Ons de limpieza que pueden afectar al funcionamiento, [COLOR gold][B]LimpiaTuKodi, Indigo y similares[/B][/COLOR].'
+    txt += 'Add-Ons de Programas que pueden afectar al funcionamiento de las búsquedas:[CR]'
+    txt += '  [COLOR yellowgreen][B]LimpiarKodi,  LimpiaTuKodi,  EzMaintenace,  Indigo  y  similares[/B][/COLOR].'
 
     txt += '[CR][CR]Cuando desde estos Add-Ons se ejecuta la función [COLOR gold][B]Limpiar Cache y Rom[/B][/COLOR],'
     txt += ' se elimina la carpeta interna de la caché de su Media Center Kodi [COLOR gold][B].../.kodi/temp/archive_cache/[/B][/COLOR]'
@@ -2034,7 +2041,7 @@ def show_help_register(item):
 
     txt += '[CR][CR]  Si desconoceis el dominio actual de esa web, mediante un navegador localizar su [B][COLOR gold]telegram ó twitter[/COLOR][/B]'
 
-    txt += '[CR][CR]  Acceder a:[CR]'
+    txt += '[CR][CR]  [COLOR goldenrod][B]Acceder a:[/B][/COLOR][CR]'
 
     datos = channeltools.get_channel_parameters('hdfull')
     if datos['active']:
@@ -2046,7 +2053,9 @@ def show_help_register(item):
 
     datos = channeltools.get_channel_parameters('playdede')
     if datos['active']:
-        txt += '  [COLOR yellow][B]PlayDede  [COLOR cyan]dominiosplaydede.com[/COLOR][/B][/COLOR] ó [COLOR yellow][B] Telegram[/COLOR] [COLOR cyan] t.me/playdedeinformacion[/COLOR][/B]'
+        txt += '  [COLOR yellow][B]PlayDede  [COLOR cyan]privacidad.me/@playdede[/COLOR][/B][/COLOR][CR]'
+        txt += '  [COLOR yellow][B]PlayDede  [COLOR gold][B]Twitter [/B][/COLOR] [B][COLOR cyan] x.com/playdedesocial[/COLOR][/B][CR]'
+        txt += '  [COLOR yellow][B]PlayDede  [COLOR gold][B]Telegram[/B][/COLOR] [B][COLOR cyan] t.me/playdedeinformacion[/COLOR][/B]'
 
     txt += '[CR][CR]*) Imprescindible tomar buena nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para cada web.'
 
@@ -2081,6 +2090,10 @@ def show_help_cinecalidadlol(item):
 
 def show_help_cuevana3pro(item):
     item.notice = 'cuevana3pro'
+    show_help_canales(item)
+
+def show_help_cuevana3run(item):
+    item.notice = 'cuevana3run'
     show_help_canales(item)
 
 def show_help_cuevana3video(item):
@@ -2171,20 +2184,16 @@ def show_help_pelisxd(item):
     item.notice = 'pelisxd'
     show_help_canales(item)
 
-def show_help_pepecinetop(item):
-    item.notice = 'pepecinetop'
-    show_help_canales(item)
-
 def show_help_playdede(item):
     item.notice = 'playdede'
     show_help_canales(item)
 
-def show_help_playdo(item):
-    item.notice = 'playdo'
-    show_help_canales(item)
-
 def show_help_ppeliculas(item):
     item.notice = 'ppeliculas'
+    show_help_canales(item)
+
+def show_help_rarbg(item):
+    item.notice = 'rarbg'
     show_help_canales(item)
 
 def show_help_repelisre(item):
@@ -2262,8 +2271,9 @@ def show_help_canales(item):
            txt += '[COLOR yellow]  ó su[COLOR yellow][B] Telegram[/B] [/COLOR] [B][COLOR greenyellow] t.me/s/NextdedeInformacion[/COLOR][/B][CR][CR]'
 
         elif item.notice == 'playdede':
-           txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominiosplaydede.com[/COLOR][/B][CR]'
-           txt += '[COLOR yellow]  ó su[COLOR yellow][B] Telegram[/B] [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B][CR]'
+           txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR goldenrod]privacidad.me/@playdede[/COLOR][/B][CR]'
+           txt += '[COLOR yellow]  También puede acceder a su [/COLOR][COLOR gold][B]Twitter [/COLOR] [B][COLOR greenyellow] x.com/playdedesocial[/COLOR][/B][CR]'
+           txt += '[COLOR yellow]  ó bien acceder a su[/COLOR][COLOR gold][B] Telegram[/B] [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B][CR]'
 
     elif item.notice == 'cuevana3pro':
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
@@ -2325,8 +2335,13 @@ def show_help_gamovideo(item):
 
     txt = '*) Si su Media Center opera bajo alguna de las siguientes opciones:[CR]'
 
-    txt += '  - Ejecución de Balandro bajo [COLOR gold]Builds, Wizards ó Widgets[/COLOR] puede fallar la Reproducción de este servidor[CR]'
-    txt += '  - Intervención del fichero [COLOR gold]AdvancedSettings[/COLOR] con sentencias relativas a la memoria de su Media Center[CR][CR]'
+    txt += '  - Ejecución de Balandro en [COLOR darkorange][B]Kodi NO oficiales[/B][/COLOR]. (Mods, Forks, Clons,  etc.)[CR]'
+    txt += '    ó bajo [COLOR gold]Builds, Wizards ó Widgets[/COLOR] puede fallar la Reproducción de este servidor[CR]'
+	
+    txt += '[CR]*) Add-Ons de Programas que pueden afectar también al funcionamiento de este Servidor:[CR]'
+    txt += '     [COLOR yellowgreen][B]LimpiarKodi,  LimpiaTuKodi,  EzMaintenace,  Indigo  y  similares[/B][/COLOR].[CR]'
+
+    txt += '     Si Alteran el fichero [COLOR gold]AdvancedSettings[/COLOR] con sentencias relativas a la memoria de su Media Center.'
 
     platformtools.dialog_textviewer('Información servidor Gamovideo', txt)
 
@@ -2591,7 +2606,8 @@ def show_help_faq(item):
     txt += ' Pero si se mantiene activado el borrado por ejemplo en Indigo, al reiniciar su Media Center Kodi dejará de funcionar de nuevo.'
 
     txt += '[CR][CR][COLOR gold][B]¿ Porqué la opción [/COLOR][COLOR yellow]Buscar[/COLOR][COLOR gold] entra em modo bucle (vuelve a solicitar el texto a localizar) ?[/B][/COLOR][CR]'
-    txt += 'Add-Ons de limpieza que pueden afectar al funcionamiento de Balandro, [COLOR gold]LimpiaTuKodi, Indigo y similares.[/COLOR]'
+    txt += 'Add-Ons de Programas que pueden afectar al funcionamiento de Balandro:[CR]' 
+    txt += '  [COLOR yellowgreen][B]LimpiarKodi,  LimpiaTuKodi,  EzMaintenace,  Indigo  y  similares.[B][/COLOR]'
 
     txt += '[CR][CR]Cuando desde estos Add-Ons se ejecuta la función [COLOR gold]Limpiar Cache y Rom[/COLOR],'
     txt += ' se elimina la carpeta interna de la caché de su Media Center Kodi [COLOR gold].../.kodi/temp/archive_cache/[/COLOR]'
@@ -2657,11 +2673,15 @@ def show_not_contemplated(item):
     txt ='[COLOR red][B]¿ Qué temas no están Implementados y/ó Garantizados dentro de Balandro ?[/B][/COLOR][CR]'
 
     txt += '[CR] - [COLOR pink][B]Media Centers[/COLOR] [COLOR yellow][B]No se pueden Garantizar resultados satisfactorios:[/B][/COLOR][CR]'
-    txt += '    - Si se opera con versiones del Media Center [COLOR darkorange][B]Kodi NO oficiales[/B][/COLOR]. (Mods, Forks, etc.)[CR]'
+    txt += '    - Si se opera con versiones del Media Center [COLOR darkorange][B]Kodi NO oficiales[/B][/COLOR]. (Mods, Forks, Clons,  etc.)[CR]'
     txt += '    - Si se usan Versiones anteriores a [COLOR darkorange][B]Kodi 17.x[/B][/COLOR] en su Media Center.[CR]'
     txt += '    - Ejecución en Media Centers que vengan Pre-instalados en su equipo tipos [COLOR gold][B]KdPlayer, KkPlayer ó similares[/B][/COLOR][CR]'
     txt += '    - Ejecución de Balandro bajo [COLOR goldenrod][B]Builds, Wizards ó Widgets[/B][/COLOR] en su Media Center.[CR]'
-    txt += '    - Intervención del fichero [COLOR gold][B]AdvancedSettings[/B][/COLOR] con sentencias relativas a la [COLOR darkorange][B]Memoria[/B][/COLOR] de su Media Center[CR]'
+
+    txt += '[CR] - [COLOR limegreen][B]Add-Ons Externos[/COLOR] de [COLOR moccasin][B]Programas[/B][/COLOR] que pueden afectar al funcionamiento de Balandro:[CR]'
+    txt += '     [COLOR yellowgreen][B]LimpiarKodi,  LimpiaTuKodi,  EzMaintenace,  Indigo  y  similares[/B][/COLOR].[CR]'
+
+    txt += '     Si Alteran el fichero [COLOR gold]AdvancedSettings[/COLOR] con sentencias relativas a la memoria de su Media Center.[CR]'
 
     txt += '[CR] - [COLOR limegreen][B]Add-Ons Externos[/COLOR] [COLOR yellow][B]No Contemplados:[/B][/COLOR][CR]'
     txt += '    - Motores [COLOR blue][B]Torrent[/B][/COLOR] [COLOR gold][B]Horus / AceStream[/B][/COLOR][CR]'
@@ -2677,6 +2697,7 @@ def show_not_contemplated(item):
             txt += '   - Descargar [COLOR gold][B]Todos[/B][/COLOR] los Capítulos de una Temporada alunísono[CR]'
             txt += '   - NO se admiten las descargas de ficheros en formatos [COLOR gold][B]m3u8,  mpd,  rtmp,  torrent[/B][/COLOR][CR]'
             txt += '   - NO están permitidas las descargas de ficheros en formato Comprimido [COLOR goldenrod][B]zip,  rar,  etc.[/B][/COLOR][CR]'
+            txt += '   - NO se pueden descargar los Vídeos de [COLOR fuchsia][B]YouTube[/B][/COLOR][CR]'
 
     txt += '[CR] - [COLOR fuchsia][B]Play[/COLOR] [COLOR yellow]Servidores:[/B][/COLOR][CR]'
     txt += '    - Cuentas Premium en el servidor [COLOR darkorange][B]Uptobox[/B][/COLOR][CR]'
@@ -3218,6 +3239,13 @@ def show_play_parameters(item):
             for server in servers:
                 server = server.lower().strip()
                 txt += '[CR]       [COLOR gray] ' + server + '[/COLOR]'
+
+            txt += '[CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+        txt += '[CR][CR][COLOR fuchsia][B] - TRAÍLERS:[/B][/COLOR] a través de [COLOR yellow][B]YouTube[/B][/COLOR]'
+    else:
+        txt += '[CR][CR][COLOR fuchsia][B] - TRAÍLERS:[/B][/COLOR] [COLOR yellow][B]YouTube[/B][/COLOR] [COLOR red][B]No Instalado[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Parámetros Actuales en Play', txt)
 
@@ -4481,8 +4509,9 @@ def show_help_domains(item):
         txt += '    y [B][COLOR yellow]Puede Asociar Cualquiera de Ellos[/COLOR][/B], [B][COLOR green]Independientemente del que usó para Registrar su Cuenta.[/COLOR][/B][CR][CR]'
 
     elif item.category == 'PlayDede':
-        txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominiosplaydede.com[/COLOR][/B][CR]'
-        txt += '[COLOR lime]ó bien acceder a su Telegram [/COLOR] [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B][CR][CR]'
+        txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR yellow]privacidad.me/@playdede[/COLOR][/B][CR]'
+        txt += '[COLOR lime]También puede acceder a su [/COLOR][COLOR goldenrod][B] Twitter [/B][/COLOR] [B][COLOR greenyellow] x.com/playdedesocial[/COLOR][/B][CR]'
+        txt += '[COLOR lime]ó bien acceder a su [/COLOR][COLOR goldenrod][B] Telegram [/B][/COLOR] [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B][CR][CR]'
 
     txt += '*) Determinadas webs Cambian constantemente de Dominio y es necesario modificarlo para permitir su acceso.'
 
@@ -4624,7 +4653,7 @@ def show_help_centers(item):
     txt += '  *) Localize tutoriales en [COLOR cyan][B]YouTube[/B][/COLOR] ó bien acceda a [COLOR yellow][B]kodi.tv[/B][/COLOR],[CR]'
     txt += '      para obtener Información y Soporte al respecto.[CR][CR]'
 
-    txt += '  *) Tambien puede acceder a la Web [COLOR violet][B]mundokodi.com[/B][/COLOR] para efectuar consultas.[CR]'
+    txt += '  *) También puede acceder a la Web [COLOR violet][B]mundokodi.com[/B][/COLOR] para efectuar consultas.[CR]'
     txt += '      para obtener [COLOR goldenrod]Tutoriales, Instalaciones, Funciones, Add-Ons, Noticias, etc.[/COLOR][CR][CR]'
 
     txt += '[COLOR limegreen][B]ADD-ONS EXTERNOS:[/B][/COLOR][CR]'
@@ -4974,6 +5003,13 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   CliverSite: ' + cliversite_dominio + '[CR]'
            else: tex_dom = '[CR]   CliverSite: ' + cliversite_dominio + '[CR]'
 
+    datos = channeltools.get_channel_parameters('cuevana2')
+    if datos['active']:
+        cuevana2_dominio = config.get_setting('channel_cuevana2_dominio', default='')
+        if cuevana2_dominio:
+           if tex_dom: tex_dom = tex_dom + '   Cuevana2: ' + cuevana2_dominio + '[CR]'
+           else: tex_dom = '[CR]   Cuevana2: ' + cuevana2_dominio + '[CR]'
+
     datos = channeltools.get_channel_parameters('cuevana2esp')
     if datos['active']:
         cuevana2esp_dominio = config.get_setting('channel_cuevana2esp_dominio', default='')
@@ -5246,13 +5282,6 @@ def show_test(item):
         if playdede_dominio:
            if tex_dom: tex_dom = tex_dom + '   PlayDede: ' + playdede_dominio + '[CR]'
            else: tex_dom = '[CR]   PlayDede: ' + playdede_dominio + '[CR]'
-
-    datos = channeltools.get_channel_parameters('playdo')
-    if datos['active']:
-        playdo_dominio = config.get_setting('channel_playdo_dominio', default='')
-        if playdo_dominio:
-           if tex_dom: tex_dom = tex_dom + '   PlayDo: ' + playdo_dominio + '[CR]'
-           else: tex_dom = '[CR]   PlayDo: ' + playdo_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('poseidonhd2')
     if datos['active']:

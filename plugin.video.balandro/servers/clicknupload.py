@@ -63,6 +63,7 @@ def get_video_url(page_url, url_referer=''):
     if 'File Not Found' in data:
         return 'Archivo inexistente ó eliminado'
 
+    url = ''
     post = ''
 
     block = scrapertools.find_single_match(data, '(?i)<Form method="POST"(.*?)</Form>')
@@ -71,13 +72,14 @@ def get_video_url(page_url, url_referer=''):
     for name, value in matches:
         post += name + '=' + value + '&'
 
-    post = post.replace("download1", "download2")
+    if post:
+        post = post.replace("download1", "download2")
 
-    headers = {'Referer': page_url}
+        headers = {'Referer': page_url}
 
-    data = httptools.downloadpage(page_url, post=post, headers=headers).data
+        data = httptools.downloadpage(page_url, post=post, headers=headers).data
 
-    url = scrapertools.find_single_match(data, "window.open\('([^']+)")
+        url = scrapertools.find_single_match(data, "window.open\('([^']+)")
 
     if url:
         url_strip = urllib.quote(url.rsplit('/', 1)[1])
@@ -122,6 +124,10 @@ def get_video_url(page_url, url_referer=''):
                     return 'Archivo inexistente ó eliminado'
                 elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                     return 'Fichero sin link al vídeo ó restringido'
+
+            elif ' Bad Request' in traceback.format_exc():
+               if '/recaptcha/' in traceback.format_exc():
+                   return 'Fichero de Vídeo con CaptCha'
 
             elif '<urlopen error' in traceback.format_exc():
                 return 'No se puede establecer la conexión'

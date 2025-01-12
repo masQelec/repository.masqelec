@@ -95,7 +95,7 @@ def list_list(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
-    matches = re.compile('<div class="col-sm-6 col-md-2 central">.*?<a href="([^"]+)".*?<img src="([^"]+)".*?<h5>([^<]+)</h5>', re.DOTALL).findall(data)
+    matches = re.compile('<div class="col-sm-6 col-md-2 central">.*?href="([^"]+)".*?src="([^"]+)".*?<h5>([^<]+)</h5>', re.DOTALL).findall(data)
 
     for url, thumb, title in matches:
         itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
@@ -131,6 +131,7 @@ def findvideos(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
+
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>||<br/>', "", data)
 
     data = scrapertools.find_single_match(data, 'var videos =(.*?)\}')
@@ -141,7 +142,10 @@ def findvideos(item):
         url = url.replace('cloud/index.php', 'cloud/query.php')
 
         if "/player.php" in url:
-            data = httptools.downloadpage(url).data
+            resp = httptools.downloadpage(url)
+            if not resp.sucess: continue
+
+            data = resp.data
 
             phantom = scrapertools.find_single_match(data, 'Phantom.Start\("(.*?)"\)')
             phantom = phantom.replace('"+"', '')

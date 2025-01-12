@@ -7,12 +7,15 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ennovelas.com.pl/'
+host = 'https://ennovelas.li/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://ennovelas.com.tr/']
+    ant_hosts = ['https://ennovelas.com.tr/', 'https://ennovelas.com.pl/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
 
     raise_weberror = True
     if '/years/' in url: raise_weberror = False
@@ -92,6 +95,7 @@ def paises(item):
     itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'country/colombia/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'country/mexico/', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'country/peru/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Turquía', action = 'list_all', url = host + 'country/turkey/', text_color='moccasin' ))
 
     return itemlist
 

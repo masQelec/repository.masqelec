@@ -107,7 +107,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'data-background="(.*?)"')
 
-        title = title.replace('&#038;', '&').replace('&#8211;', '')
+        title = title.replace('&#038;', '&').replace('&#8211;', '').replace('&#8217;s', "'s")
 
         year = '-'
 

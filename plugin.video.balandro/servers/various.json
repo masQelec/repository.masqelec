@@ -25,7 +25,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://filemoon.(?:sx|to|in|nl|wf|eu|art|link|top|lat|org)/(?:e/|d/|download/)[0-9a-zA-Z]+)",
+        "pattern": "(https://filemoon.(?:sx|to|in|nl|wf|eu|art|link|top|lat|org|online)/(?:e/|d/|download/)[0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {
