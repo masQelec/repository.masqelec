@@ -200,6 +200,7 @@ def modificar_agente_usuario(ruta_archivo):
         if cambio_realizado:
             # Mensaje de confirmación
             print(f"El archivo {ruta_archivo} ha sido modificado.")
+            subprocess.call(["systemctl", "restart", "service.tvheadend43"])
         else:
             print(f"No se realizaron cambios en el archivo {ruta_archivo}.")
     
