@@ -39,11 +39,11 @@ def reload_rclone():
     except:
         reload_rclone()
 
-# Función para modificar el agente de usuario en el archivo config
+# Funcion para modificar el agente de usuario en el archivo config
 def modificar_agente_usuario(ruta_archivo):
     # Verificar si el archivo existe
     if not os.path.isfile(ruta_archivo):
-        print(f"El archivo {ruta_archivo} no existe.")
+        print('El archivo {} no existe.'.format(ruta_archivo))
         return
     
     try:
@@ -56,37 +56,37 @@ def modificar_agente_usuario(ruta_archivo):
         # Abrir el archivo en modo escritura para hacer los cambios
         with open(ruta_archivo, 'w') as archivo:
             for linea in lineas:
-                # Buscar la línea que contiene "http_user_agent"
+                # Buscar la linea que contiene "http_user_agent"
                 if '"http_user_agent":' in linea:
                     partes = linea.split('"http_user_agent":')
-                    print(f'Partes: {partes}')  # Mensaje de depuración
                     
                     # Obtener el valor actual del agente de usuario
                     usuario_actual = partes[1].split('"')[1].strip()
-                    print(f'Agente de usuario actual: {usuario_actual}')  # Mensaje de depuración sin comilla adicional
+                    print('Agente de usuario actual: {}'.format(usuario_actual))  # Mensaje de depuracion sin comilla adicional
                     
                     # Si el valor no es "samsung-agent/1.1", actualizarlo
                     if usuario_actual != 'samsung-agent/1.1':
-                        nueva_linea = f'    "http_user_agent": "samsung-agent/1.1",\n'
+                        nueva_linea = '    "http_user_agent": "{}",\n'.format("samsung-agent/1.1")
                         archivo.write(nueva_linea)
                         cambio_realizado = True
-                        print("Se ha realizado un cambio.")  # Mensaje de depuración
+                        print("Se ha realizado un cambio.")  # Mensaje de depuracion
+
                     else:
                         archivo.write(linea)
                 else:
                     archivo.write(linea)
         
         if cambio_realizado:
-            # Mensaje de confirmación
-            print(f"El archivo {ruta_archivo} ha sido modificado.")
-            subprocess.call(["systemctl", "restart", "service.tvheadend42"])
+            # Mensaje de confirmacion
+            print("El archivo {} ha sido modificado.".format(ruta_archivo))
+            subprocess.call(["systemctl", "restart", "service.tvheadend43"])
         else:
-            print(f"No se realizaron cambios en el archivo {ruta_archivo}.")
+            print("No se realizaron cambios en el archivo {}.".format(ruta_archivo))
     
     except Exception as e:
-        print(f"Ocurrió un error al modificar el archivo: {e}")
+        print("Ocurrio un error al modificar el archivo: {}".format(e))
 
-# Llamada a la función con la ruta especificada
-modificar_agente_usuario('/storage/.kodi/userdata/addon_data/service.tvheadend42/config')
+# Llamada a la funcion con la ruta especificada
+modificar_agente_usuario('/storage/.kodi/userdata/addon_data/service.tvheadend43/config')
 
 reload_rclone()
