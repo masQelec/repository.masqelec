@@ -15,6 +15,7 @@ from resources.lib.common.exceptions import (LoginError, MissingCredentialsError
                                              ErrorMsg)
 from .api_paths import EPISODES_PARTIAL_PATHS, ART_PARTIAL_PATHS, build_paths
 from .logging import LOG, measure_exec_time_decorator
+from ..database.db_utils import TABLE_SESSION
 
 
 def logout():
@@ -25,24 +26,46 @@ def logout():
 def login(ask_credentials=True):
     """Perform a login"""
     try:
+        is_success = False
         credentials = None
-        is_login_with_credentials = True
+        is_login_with_credentials = False
+        # The database 'isAdsPlan' value is stored after the login, so the first time we have None value
+        # this avoids to show the notice message multiple times if more login attempts will be done over the time
+        show_ads_notice = G.LOCAL_DB.get_value('is_ads_plan', None, table=TABLE_SESSION) is None
         if ask_credentials:
             is_login_with_credentials = ui.show_yesno_dialog('Login', common.get_local_string(30340),
                                                              yeslabel=common.get_local_string(30341),
                                                              nolabel=common.get_local_string(30342))
-            if is_login_with_credentials:
-                credentials = {'credentials': ui.ask_credentials()}
+            # if is_login_with_credentials:
+            #     credentials = {'credentials': ui.ask_credentials()}
+        if is_login_with_credentials:
+            # The login page is changed now part of HTML seem protected by reCaptcha
+            # in the HTML page the reactContext data is added after the reCaptcha checks so at the moment
+            # it is not accessible by requesting the login page through python script,
+            # this prevents us to get the authURL code needed to perform the login request
+            ui.show_ok_dialog('Login',
+                              'Due to new website protections at moment the login with credentials is not available.')
+            is_login_with_credentials = False
+
         if is_login_with_credentials:
             if common.make_call('login', credentials):
-                return True
+                is_success = True
         else:
             data = common.run_nf_authentication_key()
             if not data:
                 raise MissingCredentialsError
             password = ui.ask_for_password()
             if password and common.make_call('login_auth_data', {'data': data, 'password': password}):
-                return True
+                is_success = True
+        if is_success:
+            if show_ads_notice and G.LOCAL_DB.get_value('is_ads_plan', False, table=TABLE_SESSION):
+                from resources.lib.kodi.ui import show_ok_dialog
+                show_ok_dialog('Netflix - ADS plan',
+                               'ADS PLAN support is EXPERIMENTAL! You may experience of '
+                               'malfunctions of add-on features (e.g. language selection).\n'
+                               'ADS will be displayed at the beginning of the videos to allow the add-on '
+                               'to work properly. Press OK to agree the terms.')
+            return True
     except MissingCredentialsError:
         # Aborted from user or leave an empty field
         ui.show_notification(common.get_local_string(30112))
@@ -218,27 +241,32 @@ def verify_profile_lock(guid, pin):
 
 def get_available_audio_languages():
     """Get the list of available audio languages of videos"""
+    # originalAudioLanguages genres: 81555714
     call_args = {
-        'paths': [['spokenAudioLanguages', {'from': 0, 'to': 25}, ['id', 'name']]]
+        'paths': [['genres', 81555714, 'subgenres', {'to': 50}, ['id', 'name', 'languageCode']]]
     }
     response = common.make_call('path_request', call_args)
     lang_list = {}
-    for lang_dict in response.get('spokenAudioLanguages', {}).values():
+    data_list = response.get('genres', {}).get('81555714', {}).get('subgenres', {})
+    for lang_dict in data_list.values():
         lang_id = lang_dict['id'].get('value')
         if lang_id is None:  # If none the list is ended
             break
         lang_list[lang_id] = lang_dict['name']['value']
     return lang_list
 
+# todo: dubbingLanguages genres: 81586478
 
 def get_available_subtitles_languages():
     """Get the list of available subtitles languages of videos"""
+    # subtitleLanguages genres: 81586477
     call_args = {
-        'paths': [['subtitleLanguages', {'from': 0, 'to': 25}, ['id', 'name']]]
+        'paths': [['genres', 81586477, 'subgenres', {'to': 50}, ['id', 'name', 'languageCode']]]
     }
     response = common.make_call('path_request', call_args)
     lang_list = {}
-    for lang_dict in response.get('subtitleLanguages', {}).values():
+    data_list = response.get('genres', {}).get('81586477', {}).get('subgenres', {})
+    for lang_dict in data_list.values():
         lang_id = lang_dict['id'].get('value')
         if lang_id is None:  # If none the list is ended
             break

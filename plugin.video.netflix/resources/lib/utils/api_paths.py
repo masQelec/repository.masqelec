@@ -30,6 +30,7 @@ LENGTH_ATTRIBUTES = {
     'stdlist': lambda r, context, key: jgrapgh_len(r[context][key]),
     'stdlist_wid': lambda r, context, uid, key: jgrapgh_len(r[context][uid][key]),
     'searchlist': lambda r, context, key: len(list(r[context][key].values())[0]),
+    'videoslist': lambda r, list_name: jgrapgh_len(r[list_name])
 }
 
 """Predefined lambda expressions that return the number of video results within a path response dict"""
@@ -50,7 +51,7 @@ VIDEO_LIST_PARTIAL_PATHS = [
     [['requestId', 'summary', 'title', 'synopsis', 'regularSynopsis', 'evidence', 'queue', 'inRemindMeList',
       'episodeCount', 'info', 'maturity', 'runtime', 'seasonCount', 'availability', 'trackIds',
       'releaseYear', 'userRating', 'numSeasonsLabel', 'bookmarkPosition', 'creditsOffset',
-      'dpSupplementalMessage', 'watched', 'delivery', 'sequiturEvidence', 'promoVideo', 'availability']],
+      'dpSupplementalMessage', 'watched', 'delivery', 'sequiturEvidence', 'promoVideo', 'availability', 'itemSummary']],
     [['genres', 'tags', 'creators', 'directors', 'cast'],
      {'from': 0, 'to': 10}, ['id', 'name']]
 ] + ART_PARTIAL_PATHS
@@ -323,7 +324,8 @@ def jgrapgh_len(data_dict):
     """
     count = 0
     for value in data_dict:
-        if data_dict[value].get('$type') == 'atom':
+        ref = _remove_nesting(data_dict[value])
+        if ref.get('$type') == 'atom':
             break
         count += 1
     return count

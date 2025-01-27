@@ -122,8 +122,8 @@ class SessionAccess(SessionCookie, SessionHTTPRequests):
                              'If you have just done "Sign out of all devices" from Netflix account settings '
                              'wait about 10 minutes before generating a new AuthKey.') from exc
         # Get the account e-mail
-        page_response = self.get('your_account').decode('utf-8')
-        email_match = re.search(r'account-email[^<]+>([^<]+@[^</]+)</', page_response)
+        page_response = self.get('account_security').decode('utf-8')
+        email_match = re.search(r'>([^<]+@[^</]+)<', page_response)
         email = email_match.group(1).strip() if email_match else None
         if not email:
             raise WebsiteParsingError('E-mail field not found')
@@ -228,7 +228,7 @@ class SessionAccess(SessionCookie, SessionHTTPRequests):
 
 
 def _login_payload(credentials, auth_url, react_context):
-    country_id = react_context['models']['loginContext']['data']['geo']['requestCountry']['id']
+    country_id = react_context['models']['signupContext']['data']['geo']['requestCountry']['id']
     country_codes = react_context['models']['countryCodes']['data']['codes']
     try:
         country_code = '+' + next(dict_item for dict_item in country_codes if dict_item["id"] == country_id)['code']
@@ -258,7 +258,7 @@ def _get_accept_language_string(react_context):
     # and also influence the reactContext data (locale data and messages strings).
     # Locale is usually automatically determined by the browser,
     # we try get the locale code by reading the locale set as default in the reactContext.
-    supported_locales = react_context['models']['loginContext']['data']['geo']['supportedLocales']
+    supported_locales = react_context['models']['signupContext']['data']['geo']['supportedLocales']
     try:
         locale = next(dict_item for dict_item in supported_locales if dict_item["default"] is True)['locale']
     except StopIteration:

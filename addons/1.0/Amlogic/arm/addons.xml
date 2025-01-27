@@ -191,7 +191,7 @@ v0.5.9 (2022-03-22)
     </extension>
 </addon>
 
-<addon id="plugin.video.netflix" name="Netflix" version="1.22.3+matrix.1" provider-name="libdev, jojo, asciidisco, caphm, castagnait">
+<addon id="plugin.video.netflix" name="Netflix" version="1.23.3+matrix.1" provider-name="libdev, jojo, asciidisco, caphm, castagnait">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.addon.signals" version="0.0.6+matrix.1"/>
@@ -264,7 +264,7 @@ v0.5.9 (2022-03-22)
     <disclaimer lang="zh_TW">在您居住的國家使用此套件可能並不合法 - 請在安裝前與您當地的法律核對</disclaimer>
 	  <assets>
       <icon>resources/media/icon.png</icon>
-      <fanart>resources/media/fanart.jpg</fanart>
+      <fanart>resources/media/fanart.png</fanart>
       <screenshot>resources/media/screenshot-01.jpg</screenshot>
       <screenshot>resources/media/screenshot-02.jpg</screenshot>
       <screenshot>resources/media/screenshot-03.jpg</screenshot>
@@ -278,10 +278,10 @@ v0.5.9 (2022-03-22)
     <email></email>
     <forum>https://forum.kodi.tv/showthread.php?tid=329767</forum>
     <source>https://github.com/CastagnaIT/plugin.video.netflix</source>
-    <news>v1.22.3 (2023-09-20)
-- Removed HTTPX module (http2) to fix compatibility with python >= 3.11
-- Restored Requests module (details https://github.com/CastagnaIT/plugin.video.netflix/pull/1622)
-- Fix cookies errors of 1.22.2
+    <news>v1.23.3 (2024-04-16)
+- Disabled login with e-mail/password (new website protections)
+- Add workaround for missing images to tvshow/movies
+- Fixed login with Auth key due to e-mail parsing problem
     </news>
   </extension>
 </addon>
