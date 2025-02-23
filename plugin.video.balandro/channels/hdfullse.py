@@ -5,12 +5,6 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import re, base64
-
-from platformcode import config, logger, platformtools
-from core.item import Item
-from core import httptools, scrapertools, jsontools, servertools, tmdb
-
 
 LINUX = False
 BR = False
@@ -44,11 +38,19 @@ except:
    except: pass
 
 
+import re, base64
+
+from platformcode import config, logger, platformtools
+from core.item import Item
+from core import httptools, scrapertools, jsontools, servertools, tmdb
+
+
 # ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
-# ~ web 0)-'https://hdfull.pm'
+# ~ web 0)-'https://hdfull.pm/' 1)-'https://www.hdfull.it'
 
 
 host = 'https://www.hdfull.it'
+
 
 refer = 'https://hdfull.pm/'
 
@@ -101,7 +103,7 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post = None, referer = None):
+def do_downloadpage(url, post=None, headers=None, referer=None):
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -461,7 +463,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = do_downloadpage(item.url)
+    data = do_downloadpage(item.url, referer = item.referer)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, 'id="season-episodes">(.*?)</div></div></div>')

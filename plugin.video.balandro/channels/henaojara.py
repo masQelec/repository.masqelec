@@ -47,7 +47,7 @@ except:
 host = 'https://www.henaojara.com/'
 
 
-_players = ['.henaojara.']
+_players = ['.henaojara.', '.henaojara2.']
 
 
 # ~ por si viene de enlaces guardados
@@ -106,10 +106,10 @@ def do_downloadpage(url, post=None, headers=None):
     if config.get_setting('channel_henaojara_proxies', default=''): hay_proxies = True
 
     timeout = None
-    if host in url or _players[0] in url:
+    if host in url or str(_players) in url:
         if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
-    if not url.startswith(host) and not _players[0] in url:
+    if not url.startswith(host) and not str(_players) in url:
         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
     else:
         if hay_proxies:
@@ -135,7 +135,7 @@ def do_downloadpage(url, post=None, headers=None):
                 if ck_name and ck_value:
                     httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
 
-                if not url.startswith(host) and not _players[0] in url:
+                if not url.startswith(host) and not str(_players) in url:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
                 else:
                     if hay_proxies:
@@ -430,7 +430,8 @@ def last_epis(item):
         epis = scrapertools.find_single_match(match, '<span class="ClB">.*?x(.*?)</span>')
         if not epis: epis = 1
 
-        title = 'Episodio ' + epis + ' ' + title
+        if not str(temp) == '1': title = 'Episodio ' + str(temp) + 'x' + epis + ' ' + title
+        else: title = 'Episodio ' + epis + ' ' + title
 
         title = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
@@ -672,8 +673,6 @@ def findvideos(item):
 
         if not url: continue
 
-        url = url.replace('.henaojara2.', '.henaojara.')
-
         other = scrapertools.find_single_match(data, 'data-tplayernv="Opt' + str(option) + '"><span>(.*?)</span>')
         other = other.replace('<strong>', '').replace('</strong>', '')
 
@@ -687,14 +686,11 @@ def findvideos(item):
             players = scrapertools.find_single_match(data2, 'src="(.*?)"')
 
             if players:
-                players = players.replace('.henaojara2.', '.henaojara.')
-
                 players = players.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
-                headers = {'Referer': host, 'Priority': 'u=4', 'Sec-GPC': '1', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Connection': 'keep-alive' }
+                headers = {'Referer': url2, 'Priority': 'u=4', 'Sec-GPC': '1', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Connection': 'keep-alive' }
 
                 data3 = do_downloadpage(players, headers=headers)
-                # ~ logger.info("check-1-data3: %s" % str(data3))
 
                 matches3 = scrapertools.find_multiple_matches(data3, "loadVideo.*?'(.*?)'" + '.*?alt="(.*?)"')
 
@@ -702,8 +698,6 @@ def findvideos(item):
                     srv = srv.strip().lower()
 
                     servidor = srv
-
-                    player = player.replace('.henaojara2.', '.henaojara.')
 
                     if srv == 'fembed': continue
                     elif srv == 'streamsb': continue
@@ -816,8 +810,6 @@ def findvideos(item):
            if servidor == 'directo':
                if not other: other = other + ' D' + str(nro)
 
-        url = url.replace('.henaojara2.', '.henaojara.')
-
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 
     if not itemlist:
@@ -844,10 +836,10 @@ def play(item):
     if '/?trdownload=' in url:
         try:
            timeout = None
-           if host_player in url or _players[0] in url:
+           if host_player in url or str(_players) in url:
                if config.get_setting('channel_henaojara_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
 
-           if not url.startswith(host_player) and not _players[0] in url:
+           if not url.startswith(host_player) and not str(_players) in url:
                url = httptools.downloadpage(url, follow_redirects=False, timeout=timeout).headers['location']
            else:
                if config.get_setting('channel_henaojara_proxies', default=''):
@@ -855,10 +847,16 @@ def play(item):
                else:
                    url = httptools.downloadpage(url, follow_redirects=False, timeout=timeout).headers['location']
 
+        except:
+           url = ''
+
+        if url:
            url = url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
            if '/multiplayer/' in url:
-               data = do_downloadpage(url, headers={'Referer': url})
+               headers = {'Referer': url, 'Content-Type': 'application/x-www-form-urlencoded', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Connection': 'keep-alive' }
+
+               data = do_downloadpage(url, headers=headers)
 
                srv = scrapertools.find_single_match(data, "value = '(.*?)'")
 
@@ -870,8 +868,6 @@ def play(item):
 
                if not url:
                    return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
-        except:
-           url = ''
 
     elif '/go.php?v=' in url:
           url = scrapertools.find_single_match(url, 'v=(.*?)$')

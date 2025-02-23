@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod] Situacion Dominios [/COLOR][COLOR aqua]  9 de Enero de 2025 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 4.0.14[/B][/COLOR]
+[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod] Situacion Dominios [/COLOR][COLOR aqua]  5 de Febrero de 2025 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 4.0.15[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
    Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Tutoriales, Sugerencias, etc.
@@ -36,15 +36,14 @@
 
  [COLOR yellowgreen][B]SITUACION CANALES:[/B][/COLOR]
    [B][COLOR moccasin] AmateurTv [COLOR lime] es.amateur.tv [I][COLOR olivedrab] Kodi Play Pixelation [/I][/B][/COLOR]
-   [B][COLOR moccasin] HenaOjara [COLOR lime] www.henaojara.com [I][COLOR olivedrab] Players Acces Denied [/I][/B][/COLOR]
+   [B][COLOR moccasin] HenaOjara [COLOR lime] www.henaojara.com [I][COLOR olivedrab] Players Access Denied [/I][/B][/COLOR]
 
  [COLOR darkcyan][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR] [COLOR powderblue][B][I] Pdtes. Re-Activar o Anular [/I][/B][/COLOR]
    [B][COLOR moccasin] DocumaniaTv [COLOR lime] www.documaniatv.com [I][COLOR salmon] Kodi Not Play [/I][/B][/COLOR]
-   [B][COLOR moccasin] NextDede [COLOR lime] nextdede.us [I][COLOR greenyellow] Not Login [/I][/B][/COLOR]
 
  [COLOR slateblue][B]CANALES PROBABLEMENTE NO ACCESIBLES:[/B][/COLOR]
-   [B][COLOR moccasin] PeliPlayHd [COLOR lime] peliplayhd.com [I][COLOR red] CloudFlare ReCaptCha [/I][/B][/COLOR]
-   [B][COLOR moccasin] RePelisRe [COLOR lime] wow.repelis.re [I][COLOR red] CloudFlare Identity [/I][/B][/COLOR]
-   [B][COLOR moccasin] UpHd [COLOR lime] ultrapelishd.net [I][COLOR red] Hide CloudFlare ReCaptCha [/I][/B][/COLOR]
+   [B][COLOR moccasin] CliverSite [COLOR lime] www2.cliver.me [I][COLOR red] Connection Refused [/I][/B][/COLOR]
+   [B][COLOR moccasin] Cuevana3Video [COLOR lime] cuevana3.ch [I][COLOR red] Connection Refused [/I][/B][/COLOR]
+   [B][COLOR moccasin] PelisPlus [COLOR lime] pelisplusgo.vip [I][COLOR red] Connection Refused [/I][/B][/COLOR]
 
  [COLOR cyan][B]ULTIMOS CAMBIOS DE DOMINIOS:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]

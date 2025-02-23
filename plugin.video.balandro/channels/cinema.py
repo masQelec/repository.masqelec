@@ -188,8 +188,6 @@ def findvideos(item):
             elif '/nitro' in url: continue
             elif '/filecrypt.' in url: continue
 
-            elif '/peytonepre.' in url: continue
-
             elif '/viewsb.' in url: continue
             elif '/www.fembed.' in url: continue
 

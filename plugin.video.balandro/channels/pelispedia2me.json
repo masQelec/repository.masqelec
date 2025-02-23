@@ -3,7 +3,7 @@
   "name": "PelisPedia2Me",
   "thumbnail": "pelispedia2me.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["current", "years", "kids", "docs", "anime", "vos"],
 
-  "notes": "Películas por géneros y año."
+  "notes": "Web CERRADA. Películas por géneros y año."
 }

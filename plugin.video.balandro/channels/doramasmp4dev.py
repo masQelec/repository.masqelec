@@ -362,6 +362,8 @@ def findvideos(item):
 
         elif '/googleads.' in url: continue
 
+        elif url.endswith('.jpg'): continue
+
         ses += 1
 
         if url.startswith("//"): url = 'https:' + url
@@ -396,8 +398,6 @@ def play(item):
 
     if item.server == 'directo':
         if '/fkplayer.xyz' in url:
-            return 'Servidor [COLOR plum]NO Soportado[/COLOR]'
-        elif '/peytonepre.' in url:
             return 'Servidor [COLOR plum]NO Soportado[/COLOR]'
 
         elif '.mundodrama.' in url:

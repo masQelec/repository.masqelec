@@ -290,8 +290,6 @@ def list_list(item):
 
     matches = scrapertools.find_multiple_matches(bloque, "<span class='text-muted'>(.*?)<br>")
 
-    logger.info("check-00-mayches: %s" % matches)
-
     for match in matches:
         url = scrapertools.find_single_match(match, "<a href='(.*?)'")
         title = scrapertools.find_single_match(match, "class='text-primary'>(.*?)</a>")
@@ -503,6 +501,16 @@ def findvideos(item):
             except:
                return itemlist
 
+    qlty = scrapertools.find_single_match(data, "<b>Formato.*?</b>(.*?)<br>").strip()
+    if not qlty: qlty = scrapertools.find_single_match(data, ">Formato.*?</b>(.*?)<").strip()
+
+    qlty = qlty.replace('&nbsp;', '').strip()
+
+    size = scrapertools.find_single_match(data, "<b>Tamaño.*?</b>(.*?)<br>").strip()
+    if not size: size = scrapertools.find_single_match(data, ">Tamaño.*?</b>(.*?)<").strip()
+
+    size = size.replace('&nbsp;', '').strip()
+
     if item.search_type == 'movie':
         hash = scrapertools.find_single_match(data, '<input type="submit" value="Descargar".*?name="id_post">.*?<input type="hidden".*?value="(.*?)"')
     else:
@@ -518,17 +526,11 @@ def findvideos(item):
             if item.url.endswith('.torrent'): url = item.url
 
         if url:
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language=lang, quality=qlty, other=size ))
 
         return itemlist
 
-    qlty = scrapertools.find_single_match(data, "<b>Formato.*?</b>(.*?)<br>").strip()
-    qlty = qlty.replace('&nbsp;', '').strip()
-
-    size = scrapertools.find_single_match(data, "<b>Tamaño.*?</b>(.*?)<br>").strip()
-    size = size.replace('&nbsp;', '').strip()
-
-    itemlist.append(Item( channel = item.channel, action = 'play', title = '', hash = hash, server = 'torrent', language = lang, quality = qlty, other = size ))
+    itemlist.append(Item( channel = item.channel, action = 'play', title = '', hash = hash, server = 'torrent', language=lang, quality=qlty, other=size ))
 
     return itemlist
 

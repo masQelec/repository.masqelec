@@ -49,6 +49,7 @@ except:
 
 
 dominios = [
+         'https://hdfull.monster/',
          'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
@@ -59,8 +60,6 @@ dominios = [
          'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
-         'https://hd-full.lol/',
-         'https://hd-full.co/',
          'https://hdfull.quest/',
          'https://hdfull.today/',
          'https://hd-full.biz/',
@@ -82,7 +81,8 @@ ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
              'https://hdfull.gdn/', 'https://hdfull.cloud/', 'https://hdfull.video/',
              'https://hdfull.work/', 'https://hdfull.life/', 'https://hdfull.digital/',
              'https://hdfull.store/', 'https://hd-full.in/', 'https://hdfull.icu/',
-             'https://hd-full.im/', 'https://hd-full.one/', 'https://hdfull.link/']
+             'https://hd-full.im/', 'https://hd-full.one/', 'https://hdfull.link/',
+             'https://hd-full.co/', 'https://hd-full.lol/',]
 
 
 if host in str(ant_hosts): config.set_setting('dominio', dominios[0], 'hdfull')
@@ -479,7 +479,7 @@ def acciones(item):
 
     itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('hdfull'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_hdfull', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='hdfull', folder=False, text_color='chartreuse' ))
@@ -505,7 +505,7 @@ def acciones(item):
             itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales' ))
             itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('hdfull'), text_color='crimson' ))
         else:
-            itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+            itemlist.append(Item( channel='helper', action='show_help_register', title='Información para [COLOR violet][B]Registrarse[/B][/COLOR]', desde_el_canal = True, channel_id='hdfull', thumbnail=config.get_thumb('hdfull'), text_color='green' ))
 
             itemlist.append(item.clone( title = '[COLOR crimson][B]Credenciales cuenta[/B][/COLOR]', action = 'login' ))
 
@@ -560,8 +560,8 @@ def mainlist(item):
                                     plot = 'Indicar el Nombre y Apellido/s del director (lo más exacto posible).'))
 
         itemlist.append(item.clone( title = 'Búsqueda en listas populares:', action = '', folder=False, text_color='greenyellow' ))
-        itemlist.append(item.clone( title = ' - Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all',
-                                    plot = 'Debe indicarse el título de la lista (ó parte del mismo).'))
+        itemlist.append(item.clone( title = ' - Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop',
+                                    plot = 'Indicar el título de la lista (ó parte del mismo).'))
 
     return itemlist
 
@@ -586,7 +586,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', text_color = 'greenyellow' ))
+        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop', text_color = 'greenyellow' ))
 
         itemlist.append(item.clone( action='list_all', title='Catálogo', url = dominio + 'peliculas', search_type = 'movie' ))
 
@@ -622,7 +622,7 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', text_color = 'greenyellow' ))
+        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop', text_color = 'greenyellow' ))
 
         itemlist.append(item.clone( action='list_all', title='Catálogo', url = dominio + 'series', search_type = 'tvshow' ))
 
@@ -1397,6 +1397,9 @@ def search(item, texto):
     if not config.get_setting('dominio', 'hdfull'): config.set_setting('dominio', dominio, 'hdfull')
 
     try:
+        if item.search_type == 'all':
+            if item.search_pop: config.set_setting('search_last_list', texto)
+
         if item.group:
             item.url = dominio + 'buscar' + '/' + item.group + '/' + texto.replace(' ', '+')
 

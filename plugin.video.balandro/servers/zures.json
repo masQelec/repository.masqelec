@@ -222,7 +222,7 @@
       },
       {
         "pattern": "https://bigwarp.io/([0-9a-zA-Z]+)",
-        "url": "\\1"
+        "url": "https://bigwarp.io/\\1"
       },
       {
         "pattern": "(https://vidtube.)(?:pro|cam|one)/(?:embed-|d/)([0-9a-zA-Z]+)",

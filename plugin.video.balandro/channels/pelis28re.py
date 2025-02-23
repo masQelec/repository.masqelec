@@ -77,7 +77,8 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
-    text_color = 'moccasin'
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
 
     if item.search_type == 'movie':
         itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'genero/castellano/', search_type = 'movie', text_color = text_color ))
@@ -85,7 +86,7 @@ def idiomas(item):
         itemlist.append(item.clone( title = 'En inglés', action = 'list_all', url = host + 'genero/ingles/', search_type = 'movie', text_color = text_color ))
         itemlist.append(item.clone( title = 'Subtituladas', action = 'list_all', url = host + 'genero/subtituladas/', search_type = 'movie', text_color = text_color ))
 
-        itemlist.append(item.clone( title = 'Otros', action = 'list_all', url = host + 'genero/peliculas-en-ingles/', search_type = 'movie', text_color = text_color ))
+        itemlist.append(item.clone( title = 'Otros idiomas', action = 'list_all', url = host + 'genero/peliculas-en-ingles/', search_type = 'movie', text_color = text_color ))
     else:
         itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'genero/series-en-castellano/', search_type = 'tvshow', text_color = text_color ))
         itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'genero/series-audio-latino/', search_type = 'tvshow', text_color = text_color ))

@@ -366,6 +366,8 @@ def last_epis(item):
         elif ' (' in title: SerieName = title.split(" (")[0]
         else: SerieName = title
 
+        title = title.replace('Vose', '[COLOR red][B]Vose[/B][/COLOR]').replace('Subtitulado', '[COLOR red][B]Vos[/B][/COLOR]')
+
         titulo = str(season) + 'x' + str(epis) + ' ' + title.replace('(' + str(season) + 'X' + str(epis) + ')', '')
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
@@ -508,9 +510,9 @@ def corregir_servidor(servidor):
 
     servidor = servidor.replace('.com', '').replace('.org', '').replace('.co', '').replace('.cc', '').replace('.net', '').replace('.to', '').replace('.sx', '')
     servidor = servidor.replace('.ru', '').replace('.tv', '').replace('my.', '').replace('.info', '').replace('.re', '').replace('.xx', '').replace('.click', '')
-    servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').replace('.uno', '').replace('.io', '')
+    servidor = servidor.replace('v2.', '').replace('.veoh', '').replace('.sh', '').replace('.nz', '').replace('.site', '').replace('.uno', '').replace('.io', '').replace('.pl', '')
     servidor = servidor.replace('.link', '').replace('.club', '').replace('.red', '').replace('.download', '').replace('.vip', '').replace('.space', '').replace('.name', '')
-    servidor = servidor.replace('.xyz', '').replace('.me', '').replace('.li', '').replace('.one', '').replace('.hu', '').replace('.fun', '').replace('.work', '').strip()
+    servidor = servidor.replace('.xyz', '').replace('.gl', '').replace('.me', '').replace('.eu', '').replace('.li', '').replace('.la', '').replace('.pm', '').replace('.ws', '').replace('.wf', '').replace('.one', '').replace('.hu', '').replace('.fun', '').replace('.work', '').replace('.cloud', '').replace('.google', '').strip()
 
     return servidor
 
@@ -580,6 +582,11 @@ def findvideos(item):
             elif 'buzzheavier' in _server: continue
             elif 'guccihide' in _server: continue
             elif 'rapidgator' in _server: continue
+            elif 'earn4files' in _server: continue
+            elif 'uploadrive' in _server: continue
+            elif 'uploadbuzz' in _server: continue
+            elif 'filescdn' in _server: continue
+            elif 'uploaded' in _server: continue
 
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
@@ -681,6 +688,11 @@ def findvideos(item):
             elif 'buzzheavier' in _server: continue
             elif 'guccihide' in _server: continue
             elif 'rapidgator' in _server: continue
+            elif 'earn4files' in _server: continue
+            elif 'uploadrive' in _server: continue
+            elif 'uploadbuzz' in _server: continue
+            elif 'filescdn' in _server: continue
+            elif 'uploaded' in _server: continue
 
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
@@ -766,6 +778,11 @@ def findvideos(item):
             elif 'buzzheavier' in servidor: continue
             elif 'guccihide' in servidor: continue
             elif 'rapidgator' in servidor: continue
+            elif 'earn4files' in servidor: continue
+            elif 'uploadrive' in servidor: continue
+            elif 'uploadbuzz' in servidor: continue
+            elif 'filescdn' in servidor: continue
+            elif 'uploaded' in servidor: continue
 
             if 'hqq' in servidor or 'netu' in servidor or 'waaw' in servidor: servidor = 'waaw'
             elif 'dood' in servidor: servidor = 'doodstream'
@@ -848,6 +865,11 @@ def findvideos(item):
             elif '1fichier' in servidor: continue
             elif 'turbobit' in servidor: continue
             elif 'katfile' in servidor: continue
+            elif 'earn4files' in servidor: continue
+            elif 'uploadrive' in servidor: continue
+            elif 'uploadbuzz' in servidor: continue
+            elif 'filescdn' in servidor: continue
+            elif 'uploaded' in servidor: continue
 
             if 'hqq' in servidor or 'netu' in servidor or 'waaw' in servidor: servidor = 'waaw'
             elif 'dood' in servidor: servidor = 'doodstream'
@@ -903,6 +925,11 @@ def findvideos(item):
             elif '1fichier' in srv: continue
             elif 'turbobit' in srv: continue
             elif 'katfile' in srv: continue
+            elif 'earn4files' in srv: continue
+            elif 'uploadrive' in srv: continue
+            elif 'uploadbuzz' in srv: continue
+            elif 'filescdn' in srv: continue
+            elif 'uploaded' in srv: continue
 
             if lang == 'Latino': lang = 'Lat'
             elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
@@ -948,6 +975,11 @@ def findvideos(item):
         elif '1fichier' in srv: continue
         elif 'turbobit' in srv: continue
         elif 'katfile' in srv: continue
+        elif 'earn4files' in srv: continue
+        elif 'uploadrive' in srv: continue
+        elif 'uploadbuzz' in srv: continue
+        elif 'filescdn' in srv: continue
+        elif 'uploaded' in srv: continue
 
         if lang == 'Latino': lang = 'Lat'
         elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
@@ -1048,26 +1080,6 @@ def play(item):
         if url.startswith('https://player.pepeliculas.org/'): url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
         elif url.startswith('https://hqq.tv/player/embed_player.php?'): url = url.replace('https://hqq.tv/player/embed_player.php?', 'https://waaw.to/watch_video.php?v=')
 
-    if url:
-        if item.other.startswith("Sb"):
-            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
-
-        elif 'streamsb' in url or 'playersb' in url:
-            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
-
-        elif 'uptobox' in url:
-            return 'Servidor [COLOR goldenrod]Fuera de Servicio[/COLOR]'
-
-        elif '.fembed.' in url:
-            return 'Servidor [COLOR red]Fuera de Servicio[/COLOR]'
-
-        elif '/powv1deo.' in url or '/streamp1ay.' in url:
-            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
-
-        elif '.pepeliculas.' in url or'-pepeliculas.' in url: url = ''
-
-        elif '.googleapis.' in url: url = ''
-
     if url.endswith('.torrent'):
         if config.get_setting('proxies', item.channel, default=''):
             if PY3:
@@ -1090,11 +1102,41 @@ def play(item):
         return itemlist
 
     if url:
-        if '.fembed.' in url:
+        if item.other.startswith("Sb"):
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif 'streamsb' in url or 'playersb' in url:
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif 'openload' in url or 'streamango' in url or 'vidlox' in url or 'jetload' in url or 'verystream' in url or 'streamcherry' in url or 'gounlimited' in url or 'streamix' in url or 'viewsb' in url or 'flix555' in url or '.stormo.' in url or '.spruto.' in url or '/biter.' in url or '/streamin.' in url or '/filebebo.' in url or '/streamcloud.' in url or '/videofiles.' in url or '/kingvid.' in url or '/allvid.' in url or '/goo.' in url:
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif 'uptobox' in url:
+            return 'Servidor [COLOR goldenrod]Fuera de Servicio[/COLOR]'
+
+        elif '.fembed.' in url:
+            return 'Servidor [COLOR red]Fuera de Servicio[/COLOR]'
+
+        elif '/powv1deo.' in url or '/powvibeo.' in url or '/pouvideo.' in url or '/povw1deo.' in url or '/powvldeo.' in url or '/pomvideo.' in url or '/streamp1ay.' in url or '/slreamplay.' in url or '/stemplay.' in url or '/steamplay.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        elif '.rapidvideo.' in url or '.filefactory.' in url or '.owndrives.' in url or '/rapidcloud.' in url or '/ul.' in url or '/fileflares.' in url or '/rockfile.' in url or '/estream.' in url or '/uploadrocket.' in url or '/uploading.' in url or '/ddownload.' in url or '/uploadz.' in url or '/fikper.' in url or '/www.datafile.' in url or '/filerice.' in url or '/thevideo.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        elif '/chomikuj.' in url: url = ''
+
+        elif '.pepeliculas.' in url or '-pepeliculas.' in url: url = ''
+        elif '.googleapis.' in url or '.google.' in url: url = ''
+        elif '/gateway.zsprotect.' in url: url = ''
+
+    if url:
+        if '.fembed.' in url or '/feurl.' in url:
             return 'Servidor [COLOR red]Fuera de Servicio[/COLOR]'
 
         elif '/powv1deo.' in url or '/streamp1ay.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        if '/noblocktape.com/' in url: url = url.replace('/noblocktape.com/', '/streamtape.com/').replace('/3/', '/v/')
 
         url = url.replace('http://', 'https://')
 

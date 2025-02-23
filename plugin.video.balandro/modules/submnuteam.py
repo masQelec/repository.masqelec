@@ -518,7 +518,7 @@ def submnu_addons_info(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='', title='[COLOR green][B]INFORMACIÓN[/COLOR] [COLOR yellowgreen]ADD-ONS:[/COLOR][/B]' ))
+    itemlist.append(item.clone( action='', title='[COLOR yellowgreen][B]INFORMACIÓN ADD-ONS:[/COLOR][/B]' ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_vias', title= 'Vía alternativa [COLOR goldenrod][B]ResolveUrl[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
     itemlist.append(item.clone( channel='helper', action='show_help_vias', title= 'Vía alternativa [COLOR goldenrod][B]Youtube[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
@@ -526,7 +526,7 @@ def submnu_addons_info(item):
     itemlist.append(item.clone( channel='helper', action='show_help_torrents', title= '¿ Dónde obtener los Add-Ons para [COLOR gold][B]Clientes/Motores[/B][/COLOR] torrents ?', thumbnail=config.get_thumb('tools') ))
     itemlist.append(item.clone( channel='helper', action='show_clients_torrent', title= 'Clientes/Motores externos torrent [COLOR gold][B]Soportados[/B][/COLOR]', thumbnail=config.get_thumb('cloud') ))
 
-    itemlist.append(item.clone( action='', title='[B]Balandro[/B] [I]ADD-ONS EXTERNOS y VIAS ALTERNATIVAS:[/I]', thumbnail=config.get_thumb('kodiaddons'), text_color='yellowgreen' ))
+    itemlist.append(item.clone( action='', title='[COLOR yellowgreen][B][I]ADD-ONS y VIAS ALTERNATIVAS:[/B][/I][/COLOR] (Gestión desde Balandro)', thumbnail=config.get_thumb('kodiaddons') ))
 
     if config.get_setting('mnu_torrents', default=True):
         cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
@@ -569,7 +569,7 @@ def submnu_addons_info(item):
 
     itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_mr + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
 
-    itemlist.append(item.clone( action='', title='[B]Balandro[/B] [I]ADD-ONS EXTERNOS REPOSITORIOS:[/I]', thumbnail=config.get_thumb('kodiaddons'), text_color='yellowgreen' ))
+    itemlist.append(item.clone( action='', title='[COLOR yellowgreen][B][I]REPOSITORIOS:[/B][/I][/COLOR] (Gestión desde Balandro)', thumbnail=config.get_thumb('kodiaddons') ))
 
     if xbmc.getCondVisibility('System.HasAddon("repository.resolveurl")'):
         cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
@@ -593,25 +593,57 @@ def submnu_addons_info(item):
 
         itemlist.append(item.clone( action = '', title= ' - [COLOR gold][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('elementum') ))
 
-    itemlist.append(item.clone( action='submnu_resto_addons', title='[I]ADD-ONS y SCRIPTS CON DATOS[/I]', thumbnail=config.get_thumb('kodiaddons'), text_color='yellowgreen' ))
+    if not item._help:
+        itemlist.append(item.clone( action='submnu_all_addons', title='[COLOR limegreen][B][I]ADD-ONS INSTALADOS[/I][/B][/COLOR]', thumbnail=config.get_thumb('kodiaddons') ))
+
+        itemlist.append(item.clone( action='submnu_resto_addons', title='[COLOR yellowgreen][B][I]ADD-ONS INSTALADOS CON DATOS[/I][/B][/COLOR]', thumbnail=config.get_thumb('kodiaddons') ))
 
     return itemlist
+
+
+def submnu_all_addons(item):
+    logger.info()
+    itemlist = []
+
+    item.all_addons = True
+
+    submnu_resto_addons(item)
 
 
 def submnu_resto_addons(item):
     logger.info()
     itemlist = []
 
-    path = translatePath(os.path.join('special://home/userdata/addon_data', ''))
+    if item.all_addons:
+        path = translatePath(os.path.join('special://home/addons/', ''))
+    else:
+        path = translatePath(os.path.join('special://home/userdata/addon_data', ''))
 
     addons = filetools.listdir(path)
 
     txt = ''
 
     for addon in addons:
-        txt += '  ' + str(addon) + '[CR][CR]'
+        if item.all_addons:
+           if addon == 'packages': continue
+           elif addon == 'temp': continue
 
-    platformtools.dialog_textviewer('Add-Ons con Datos', txt)
+        addon = addon.replace('plugin', '[COLOR yellow]plugin[/COLOR]')
+        addon = addon.replace('repository', '[COLOR cyan]repository[/COLOR]')
+        addon = addon.replace('script', '[COLOR orange]script[/COLOR]')
+        addon = addon.replace('skin', '[COLOR aquamarine]skin[/COLOR]')
+        addon = addon.replace('service', '[COLOR violet]service[/COLOR]')
+        addon = addon.replace('resource', '[COLOR magenta]resource[/COLOR]')
+
+        addon = addon.replace('inputstream', '[COLOR coral]inputstream[/COLOR]')
+
+        if item.all_addons: txt += '  ' + str(addon) + '[CR]'
+        else: txt += '  ' + str(addon) + '[CR][CR]'
+
+    if item.all_addons: tex_cab = 'Add-Ons Instalados'
+    else: tex_cab = 'Add-Ons Instalados con Datos'
+
+    platformtools.dialog_textviewer(tex_cab, txt)
 
 
 def submnu_sistema(item):
@@ -742,6 +774,8 @@ def submnu_sistema_info(item):
 
         itemlist.append(item.clone( channel='helper', action='show_last_fix', title= ' - [COLOR green][B]Información[/B][/COLOR] Fix instalado', thumbnail=config.get_thumb('news') ))
         itemlist.append(item.clone( channel='actions', action='manto_last_fix', title= " - Eliminar fichero control 'Fix'", thumbnail=config.get_thumb('news'), text_color='red' ))
+
+    itemlist.append(item.clone( channel='helper',  action='show_sets', title= 'Visualizar sus [COLOR chocolate][B]Ajustes[/B][/COLOR] Personalizados', thumbnail=config.get_thumb('folder') ))
 
     return itemlist
 
@@ -946,13 +980,20 @@ def submnu_canales(item):
     itemlist.append(item.clone( action='submnu_canales_info', title=' - [COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='test_all_webs', title=' - Posibles [B][COLOR gold]Insatisfactorios[/B][/COLOR]', unsatisfactory = True ))
-    itemlist.append(item.clone( action='test_alfabetico', title=' - [COLOR gold]Insatisfactorios[/COLOR] desde un canal [B][COLOR powderblue]letra inicial[/B][/COLOR]', unsatisfactory = True ))
 
-    itemlist.append(item.clone( action='test_all_webs', title=' - Todos' ))
+    itemlist.append(item.clone( action='test_all_webs', title=' - Posibles [COLOR gold]Insatisfactorios[/COLOR] Solo los canales [B][COLOR aquamarine]Sugeridos[/B][/COLOR]', extra='sugeridos', thumbnail=config.get_thumb('suggested'), unsatisfactory = True ))
 
-    itemlist.append(item.clone( action='test_one_channel', title=' - Un canal concreto' ))
+    itemlist.append(item.clone( action='test_all_webs', title=' - Posibles [COLOR gold]Insatisfactorios[/COLOR] Solo los canales que sean [B][COLOR turquoise]Clones[/B][/COLOR]', extra='clones', unsatisfactory = True  ))
 
-    itemlist.append(item.clone( action='test_one_channel', title= ' - Temporalmente [B][COLOR mediumaquamarine]Inactivos[/B][/COLOR]', temp_no_active = True ))
+    itemlist.append(item.clone( action='test_all_webs', title=' - Posibles [COLOR gold]Insatisfactorios[/COLOR] Excepto los canales que sean [B][COLOR turquoise]Clones[/B][/COLOR]', extra='no_clones', unsatisfactory = True ))
+
+    itemlist.append(item.clone( action='test_alfabetico', title=' - Posibles [COLOR gold]Insatisfactorios[/COLOR] desde un Canal [B][COLOR powderblue]Letra inicial[/B][/COLOR]', unsatisfactory = True ))
+
+    itemlist.append(item.clone( action='test_all_webs', title=' - Todos los canales' ))
+
+    itemlist.append(item.clone( action='test_one_channel', title=' - Un canal Concreto' ))
+
+    itemlist.append(item.clone( action='test_one_channel', title= ' - Canales Temporalmente [B][COLOR springgreen]Inactivos[/B][/COLOR]', temp_no_active = True ))
 
     return itemlist
 
@@ -1000,11 +1041,12 @@ def submnu_servidores(item):
     itemlist.append(item.clone( action='submnu_servidores_info', title=' - [COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='test_all_srvs', title=' - Posibles [B][COLOR fuchsia]Insatisfactorios[/B][/COLOR]', unsatisfactory = True ))
-    itemlist.append(item.clone( action='test_alfabetico', title=' - [COLOR fuchsia]Insatisfactorios[/COLOR] desde un servidor [B][COLOR powderblue]letra inicial[/B][/COLOR]', unsatisfactory = True ))
 
-    itemlist.append(item.clone( action='test_all_srvs', title=' - Todos' ))
+    itemlist.append(item.clone( action='test_alfabetico', title=' - Posibles [COLOR fuchsia]Insatisfactorios[/COLOR] desde un Servidor [B][COLOR powderblue]Letra inicial[/B][/COLOR]', unsatisfactory = True ))
 
-    itemlist.append(item.clone( action='test_one_server', title=' - Un servidor concreto' ))
+    itemlist.append(item.clone( action='test_all_srvs', title=' - Todos los servidores' ))
+
+    itemlist.append(item.clone( action='test_one_server', title=' - Un servidor Concreto' ))
 
     return itemlist
 
@@ -1357,7 +1399,10 @@ def test_all_webs(item):
     config.set_setting('user_test_channel', '')
 
     if not item.letra:
-        if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Canales [B][COLOR gold]Insatisfactorios[/B][/COLOR] ?'
+        if item.extra == 'sugeridos': text = '¿ Iniciar Test Web Solo de los Canales [B][COLOR aquamarine]Sugeridos[/B][/COLOR] ?'
+        elif item.extra == 'clones': text = '¿ Iniciar Test Web Solo de los Canales que sean [B][COLOR turquoise]Clones[/B][/COLOR] ?'
+        elif item.extra == 'no_clones': text = '¿ Iniciar Test Web de los Canales Excepto los que sean [B][COLOR turquoise]Clones[/B][/COLOR] ?'
+        elif item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Canales [B][COLOR gold]Insatisfactorios[/B][/COLOR] ?'
         else: text = '¿ Iniciar Test Web de [B][COLOR gold]TODOS[/B][/COLOR] los Canales ?'
 
         if not platformtools.dialog_yesno(config.__addon_name, text): return
@@ -1379,6 +1424,13 @@ def test_all_webs(item):
     i = 0
 
     for ch in ch_list:
+        if item.extra == 'sugeridos':
+            if not 'suggested' in ch['clusters']: continue
+        elif item.extra == 'clones':
+            if not 'clone' in ch['clusters']: continue
+        elif item.extra == 'no_clones':
+            if 'clone' in ch['clusters']: continue
+
         if config.get_setting('mnu_simple', default=False):
             if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
             elif 'exclusivamente al dorama' in ch['notes'].lower(): continue
@@ -1868,6 +1920,15 @@ def show_addons(item):
     txt = '[COLOR gold][B]' + item.tipo + ':[/B][/COLOR][CR]'
 
     for addons in item.addons:
+        addons = addons.replace('plugin', '[COLOR yellow]plugin[/COLOR]')
+        addons = addons.replace('repository', '[COLOR cyan]repository[/COLOR]')
+        addons = addons.replace('script', '[COLOR orange]script[/COLOR]')
+        addons = addons.replace('skin', '[COLOR aquamarine]skin[/COLOR]')
+        addons = addons.replace('service', '[COLOR violet]service[/COLOR]')
+        addons = addons.replace('resource', '[COLOR magenta]resource[/COLOR]')
+
+        addons = addons.replace('inputstream', '[COLOR coral]inputstream[/COLOR]')
+
         txt += '  ' + str(addons) + '[CR][CR]'
 
     titulo = 'Información Add-ons '
@@ -2571,6 +2632,7 @@ def show_help_alternativas(item):
     txt += '   [COLOR yellow]Dailymotion[/COLOR][CR]'
     txt += '   [COLOR yellow]Doodstream[/COLOR][CR]'
     txt += '   [COLOR yellow]Flashx[/COLOR][CR]'
+    txt += '   [COLOR yellow]Gamovideo[/COLOR][CR]'
     txt += '   [COLOR yellow]Gofile[/COLOR][CR]'
     txt += '   [COLOR yellow]MegaUp[/COLOR][CR]'
     txt += '   [COLOR yellow]Mixdrop[/COLOR][CR]'
@@ -2615,7 +2677,7 @@ def show_help_adicionales(item):
 
     txt += '[CR][COLOR gold]ResolveUrl Script:[/COLOR]  %s' % tex_mr
 
-    txt += '[CR][CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR gold][B]Various[/B] [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
+    txt += '[CR][CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR yellowgreen][B]Various[/COLOR][/B] [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
 
     txt += '   [COLOR yellow]Azipcdn[/COLOR][CR]'
     txt += '   [COLOR yellow]Bembed[/COLOR][CR]'
@@ -2662,7 +2724,7 @@ def show_help_adicionales(item):
     txt += '   [COLOR yellow]Yandex[/COLOR][CR]'
     txt += '   [COLOR yellow]Youdbox[/COLOR]'
 
-    txt += '[CR][CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR gold][B]Zures[/B] [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
+    txt += '[CR][CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR yellowgreen][B]Zures[/COLOR][/B] [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
 
     txt += '   [COLOR yellow]Allviid[/COLOR][CR]'
     txt += '   [COLOR yellow]Amdahost[/COLOR][CR]'

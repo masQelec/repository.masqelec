@@ -37,7 +37,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por alfabético', action = 'listas', url= host + 'p/peliculas.html', search_type='movie' ))
 
-    itemlist.append(item.clone( title = 'Por categorias', action = 'categorias', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
@@ -384,6 +384,9 @@ def play(item):
     itemlist = []
 
     url = item.url
+
+    if '/playlist?list=' in url:
+        return 'YouTube Play List [COLOR goldenrod]No Soportada[/COLOR]'
 
     if item.server == 'directo':
         data = do_downloadpage(url)

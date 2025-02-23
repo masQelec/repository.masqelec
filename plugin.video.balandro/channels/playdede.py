@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://playdede.me/'
+host = 'https://www1.playdede.link/'
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
@@ -53,7 +53,8 @@ host = 'https://playdede.me/'
 
 # ~ por si viene de enlaces guardados posteriores
 ant_hosts = ['https://playdede.com/', 'https://playdede.org/', 'https://playdede.nu/',
-             'https://playdede.to/', 'https://playdede.us/', 'https://playdede.eu/']
+             'https://playdede.to/', 'https://playdede.us/', 'https://playdede.eu/',
+             'https://playdede.me/', 'https://playdede.in/']
 
 
 domain = config.get_setting('dominio', 'playdede', default='')
@@ -413,6 +414,10 @@ def do_downloadpage(url, post=None, headers=None, referer=None):
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
 
+    if not data:
+        if '?genre=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlayDede Error', '[COLOR cyan]Espere y Re-intentelo otra vez[/COLOR]')
+
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         if BR or BR2:
             try:
@@ -457,7 +462,7 @@ def acciones(item):
 
     itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('playdede'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_playdede', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='playdede', folder=False, text_color='chartreuse' ))
@@ -483,7 +488,7 @@ def acciones(item):
             itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales' ))
             itemlist.append(Item( channel='domains', action='del_datos_playdede', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('playdede'), text_color='crimson' ))
         else:
-            itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+            itemlist.append(Item( channel='helper', action='show_help_register', title='Información para [COLOR violet][B]Registrarse[/B][/COLOR]', desde_el_canal = True, channel_id='playdede', thumbnail=config.get_thumb('playdede'), text_color='green' ))
 
             itemlist.append(item.clone( title = '[COLOR crimson][B]Credenciales cuenta[/B][/COLOR]', action = 'login' ))
 
@@ -495,7 +500,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(item.clone( title = '[COLOR aquamarine][B]Aviso[/COLOR] [COLOR violet][B]Ubicacióm[/B][/COLOR] Media Center', action = 'show_media_center', thumbnail=config.get_thumb('mediacenter') ))
+    itemlist.append(Item( channel='helper', action = 'show_help_playdede_media_center', title = '[COLOR aquamarine][B]Aviso[/COLOR] [COLOR violet][B]Ubicación[/B][/COLOR] Media Center',  thumbnail=config.get_thumb('mediacenter') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_playdede_bloqueo', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras', thumbnail=config.get_thumb('playdede') ))
 
     itemlist.append(Item( channel='helper', action='show_help_playdede', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('playdede') ))
 
@@ -527,8 +534,8 @@ def mainlist(item):
             itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
         itemlist.append(item.clone( title = 'Búsqueda en listas populares:', action = '', folder=False, text_color='greenyellow' ))
-        itemlist.append(item.clone( title = ' - Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all',
-                                    plot = 'Debe indicarse el título de la lista (ó parte del mismo).'))
+        itemlist.append(item.clone( title = ' - Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop',
+                                    plot = 'Indicar el título de la lista (ó parte del mismo).'))
 
     return itemlist
 
@@ -547,7 +554,7 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', text_color = 'greenyellow' ))
+        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop', text_color = 'greenyellow' ))
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
 
@@ -589,7 +596,7 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', text_color = 'greenyellow' ))
+        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop', text_color = 'greenyellow' ))
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
 
@@ -638,7 +645,7 @@ def mainlist_animes(item):
 
         itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
-        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', text_color = 'greenyellow' ))
+        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop', text_color = 'greenyellow' ))
 
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes/', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
 
@@ -783,12 +790,6 @@ def generos(item):
         genre = '?genre=' + genre
 
         itemlist.append(item.clone( title = title, action = 'list_all', genre = genre, text_color = text_color ))
-
-    if itemlist:
-        if item.search_type == 'movie':
-            itemlist.append(item.clone( title = 'Aventura', action = 'list_all', genre = '?genre=aventura', text_color = text_color ))
-            itemlist.append(item.clone( title = 'Fantasía', action = 'list_all', genre = '?genre=fantasia', text_color = text_color ))
-            itemlist.append(item.clone( title = 'Historia', action = 'list_all', genre = '?genre=historia', text_color = text_color ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -1874,23 +1875,13 @@ def show_credenciales(item):
     platformtools.dialog_ok(config.__addon_name + ' PlayDede - Credenciales', 'User..:  [COLOR yellow][B]' + username, '[/B][/COLOR]Pass.:  [COLOR yellow][B]' + password + '[/B][/COLOR]')
 
 
-def show_media_center(item):
-    logger.info()
-
-    txt = 'Si el Canal [COLOR plum][B] NO Obtiene Resultados[/B][/COLOR] y la Ubicación de su Media Center [COLOR violet][B]NO es España[/B][/COLOR]:[CR]'
-
-    txt += 'Necesitará Obligatoriamnete [COLOR red][B]Configurar Proxies a usar ...[/B][/COLOR] en este canal.[CR][CR]'
-
-    txt += '[COLOR cyan][B]Aviso del Web Master de este canal:[/B][/COLOR][CR]'
-
-    txt += '[COLOR yellow][B]Debido a la situación actual, hemos tenido que tomar medidas de seguridad adicionales. Por esta razón, el acceso a nuestra web está limitado a países hispanohablantes. Recomendamos utilizar una VPN de un país de habla hispana para continuar disfrutando de nuestro contenido. Entendemos que esto pueda causar inconvenientes, pero es necesario si queremos permanecer activos durante más tiempo.[/B][/COLOR]'
-
-    platformtools.dialog_textviewer('Información Aviso Ubicacióm Media Center', txt)
-
-
 def search(item, texto):
     logger.info()
+
     try:
+        if item.search_type == 'all':
+            if item.search_pop: config.set_setting('search_last_list', texto)
+
         if item.target_action == 'top':
             item.url = host + 'listas?q=' + texto.replace(" ", "+")
             return list_listas(item)

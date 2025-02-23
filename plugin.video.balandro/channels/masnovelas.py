@@ -257,10 +257,12 @@ def paises(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'tv_shows_cat/novelas-argentinas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'tv_shows_cat/novelas-colombianas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'tv_shows_cat/novelas-mexicanas', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'tv_shows_cat/series-turcas/', text_color='moccasin' ))
+    text_color = 'hotpink'
+
+    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'tv_shows_cat/novelas-argentinas/', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'tv_shows_cat/novelas-colombianas/', text_color=text_color ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'tv_shows_cat/novelas-mexicanas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'tv_shows_cat/series-turcas/', text_color=text_color ))
 
     return itemlist
 
@@ -497,7 +499,7 @@ def episodios(item):
 
         if not url or not title: continue
 
-        url = url.replace('\\/', '/')
+        url = url.replace('\\/', '/').replace('\/', '/')
 
         if not 'http' in url: url = 'https:' + url
 
@@ -575,6 +577,42 @@ def findvideos(item):
             data1 = data1.replace('=\\', '=').replace('\\"', '/"')
 
         url = scrapertools.find_single_match(str(data1), ' src="(.*?)"')
+
+        if url:
+            url = url.replace('\\/', '/')
+
+            if not 'http' in url: url = 'https:' + url
+
+            if '.disney.' in url: continue
+            elif '/short.' in url: continue
+
+            if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
+
+            elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
+
+            elif 'api.mycdn.moe/dl/?uptobox=' in url: url = url.replace('api.mycdn.moe/dl/?uptobox=', 'uptobox.com/')
+
+            elif url.startswith('http://vidmoly/'): url = url.replace('http://vidmoly/w/', 'https://vidmoly/embed-').replace('http://vidmoly/', 'https://vidmoly/')
+
+            elif url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+            elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
+            elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
+            elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
+            elif url.startswith('https://novelas360.cyou/'): url = url.replace('/novelas360.cyou/', '/waaw.to/')
+
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(url)
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other))
+
+    # ~ iframes
+    matches = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
+
+    for url in matches:
+        ses += 1
 
         if url:
             url = url.replace('\\/', '/')

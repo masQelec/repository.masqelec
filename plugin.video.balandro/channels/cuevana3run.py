@@ -141,7 +141,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Lista general', action = 'listado', url = host + 'catalogo-peliculas/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Lista general', action = 'listado', url = host + 'catalogo-peliculas/', search_type = 'movie', text_color='moccasin' ))
 
     return itemlist
 

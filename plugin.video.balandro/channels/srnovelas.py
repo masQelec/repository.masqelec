@@ -206,12 +206,12 @@ def paises(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'novelas-americanas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'novelas-brasilenas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'novelas-chilenas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'novelas-colombianas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'novelas-mexicanas/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Turquía', action = 'list_all', url = host + 'novelas-turcas/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'novelas-americanas/', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'novelas-brasilenas/', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'novelas-chilenas/', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'novelas-colombianas/', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'novelas-mexicanas/', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Turquía', action = 'list_all', url = host + 'novelas-turcas/', text_color='hotpink' ))
 
     return itemlist
 
@@ -490,8 +490,6 @@ def findvideos(item):
 
         if '/likessb.' in url: continue
 
-        elif '/peytonepre' in url: continue
-
         if url.startswith('//'): url = 'https:' + url
 
         if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
@@ -547,8 +545,6 @@ def findvideos(item):
         for url in matches:
             if '/wp-admin/' in url: continue
 
-            elif '/peytonepre' in url: continue
-
             if url.startswith('//'): url = 'https:' + url
 
             elif 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
@@ -603,8 +599,6 @@ def findvideos(item):
 
            if '/wp-admin/' in u_link: u_link = ''
 
-           elif '/peytonepre' in u_link: u_link = ''
-
            if u_link:
                if u_link.startswith('https://sr.ennovelas.net/'): u_link = u_link.replace('/sr.ennovelas.net/', '/waaw.to/')
                elif u_link.startswith('https://video.ennovelas.net/'): u_link = u_link.replace('/video.ennovelas.net/', '/waaw.to/')
@@ -637,8 +631,6 @@ def findvideos(item):
         ses += 1
 
         if '/wp-admin/' in url: continue
-
-        elif '/peytonepre' in url: continue
 
         if url.startswith('//'): url = 'https:' + url
 
