@@ -190,7 +190,8 @@ def listas(item):
         if not '&p=' in item.url:
             last_search = config.get_setting('search_last_' + item.search_type, default='')
 
-            if item.search_type == 'person': texto = 'Nombre de la persona a buscar'
+            if item.search_type == 'documentary': texto = 'Texto a buscar para Documentales'
+            elif item.search_type == 'person': texto = 'Nombre de la persona a buscar'
             else: texto = 'Texto a buscar'
 
             tecleado = platformtools.dialog_input(last_search, texto)
@@ -456,13 +457,22 @@ def anios(item):
 
     text_color = 'moccasin'
 
-    if item.search_type == 'movie': text_color = 'deepskyblue'
-    elif item.search_type == 'tvshow': text_color = 'hotpink'
+    if item.search_type == 'movie':
+        top_year = 1909
+        text_color = 'deepskyblue'
+    elif item.search_type == 'tvshow':
+        top_year = 1939
+        text_color = 'hotpink'
 
-    for x in range(current_year, 1909, -1):
+    for x in range(current_year, top_year, -1):
         anyo = str(x)
 
-        itemlist.append(item.clone( title = anyo, action='list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', fromyear = anyo, toyear = anyo, text_color = text_color ))
+        url = host + ruta_sel
+
+        if item.search_type == 'movie': url = url + '&notvse=1&nodoc=1'
+        else: url = url + 'nodoc=1'
+
+        itemlist.append(item.clone( title = anyo, action='list_sel', url = url, fromyear = anyo, toyear = anyo, text_color = text_color ))
 
     return itemlist
 
@@ -618,10 +628,13 @@ def list_oscars(item):
 
     for year, title, premios in matches:
         title = title.strip()
+
         premios = premios.replace('Oscar', '').strip()
 
         if len(premios) == 2: titulo = '[COLOR tan][B]' + premios + '[/B][/COLOR]  ' + title
         else: titulo = '[COLOR tan][B]  ' + premios + '[/B][/COLOR]  ' + title
+
+        titulo = titulo.replace('<b>', '').replace('</b>', '').strip()
 
         itemlist.append(item.clone( action = 'find_search', title = titulo, search_type = 'movie', name = title, contentTitle = title, infoLabels = {'year': year} ))
 
@@ -645,9 +658,10 @@ def oscars_ediciones(item):
 
     for url, title, anyo in matches:
         title = title.strip()
+
         if not title: title = 'Premios Oscars ' + anyo
 
-        itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo, text_color = text_color ))
+        itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo, edition = 'any_oscars', text_color = text_color ))
 
     return sorted(itemlist, key = lambda it: it.anyo, reverse = True)
 
@@ -658,12 +672,23 @@ def list_premios_anyo(item):
 
     premiadas = []
 
+    first = False
+    first_person = False
+
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     if not item.anyo: item.anyo = '-'
 
-    bloque = scrapertools.find_single_match(data, '<h1(.*?)</div></li></ul></div></div>')
+    if item.edition == 'any_oscars':
+        bloque = scrapertools.find_single_match(data, '<h1(.*?)</i> Edición anterior')
+        if not bloque: bloque = scrapertools.find_single_match(data, '<h1(.*?)Todas las nominaciones y premios')
+    elif item.edition == 'any_emmys':
+        bloque = scrapertools.find_single_match(data, '<h1(.*?)</i> Edición anterior')
+        if not bloque: bloque = scrapertools.find_single_match(data, '<h1(.*?)Todas las nominaciones y premios')
+        if not bloque: bloque = scrapertools.find_single_match(data, '<h1(.*?)>Mejor Telefilm<')
+    else:
+        bloque = scrapertools.find_single_match(data, '<h1(.*?)</div></li></ul></div></div>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title="(.*?)".*?src="(.*?)"')
 
@@ -671,6 +696,9 @@ def list_premios_anyo(item):
         title = title.strip()
 
         if 'Edición de los Oscar' in title: continue
+
+        if item.edition == 'any_oscars' or item.edition == 'any_emmys':
+            if 'Todas las nominaciones' in title: continue	
 
         thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
 
@@ -700,9 +728,70 @@ def list_premios_anyo(item):
                     _search_type = 'tvshow'
 
                 if _search_type == 'movie':
-                    itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': item.anyo} ))
+                    if not first:
+                        first = True
+
+                        itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': item.anyo} ))
+                        continue
+
+                    if not '&movie-id=' in url:
+                        if not first_person:
+                            first_person = True
+
+                            itemlist.append(item.clone( action = '', title = '[COLOR tan][B]Personas Premiadas:[/B][/COLOR]' ))
+
+                        search_type = _search_type
+                        if item.edition == 'any_oscars': _search_type = 'movie'
+                        elif item.edition == 'any_emmys': _search_type = 'tvshow'
+
+                        thumb = scrapertools.find_single_match(bloque, 'title="' + title + '".*?data-srcset="(.*?).jpg')
+                        thumb = thumb.replace('-msmall', '-large') + '.jpg' + '|User-Agent=Mozilla/5.0'
+
+                        title = '[COLOR goldenrod][B]' + title + '[/B][/COLOR]'
+                        itemlist.append(item.clone( action = 'list_names_anyo', title = title, url = url, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name ))
+
+                    else:
+                        itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': item.anyo} ))
                 else:
                     itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', name = name, contentSerieName = name, infoLabels={'year': item.anyo} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+def list_names_anyo(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    if not item.anyo: item.anyo = '-'
+
+    matches = scrapertools.find_multiple_matches(data, '<li><div class="poster">.*?<a href="(.*?)".*?title="(.*?)".*?src="(.*?)"')
+
+    for url, title, thumb in matches:
+        search_type = 'movie'
+
+        if '(Serie de TV)' in title or '(Miniserie de TV)' in title:
+            search_type = 'tvshow'
+
+            title = title.replace('(Serie de TV)', '[COLOR hotpink](TV)[/COLOR]').replace('(Miniserie de TV)', '[COLOR hotpink](TV)[/COLOR]')
+        elif '(TV)' in title:
+            search_type = 'tvshow'
+
+            title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+
+        elif '(C)' in title: title = title.replace('(C)', '[COLOR moccasin](C)[/COLOR]')
+
+        title = title.replace('&amp;', '&').strip()
+
+        thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
+
+        name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(TV)', '').replace('(C)', '')
+
+        itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = search_type, name = name, contentTitle = name, infoLabels = {'year': item.anyo} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -726,7 +815,7 @@ def emmy_ediciones(item):
         title = title.strip()
         if not title: title = 'Premios Emmy ' + anyo
 
-        itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo, text_color = text_color ))
+        itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo, edition = 'any_emmys', text_color = text_color ))
 
     return sorted(itemlist, key = lambda it: it.anyo, reverse = True)
 
@@ -861,7 +950,7 @@ def list_sel(item):
                cod_genre = '%2B' + item.cod_genre
 
     if item.fromyear: fromyear = item.fromyear
-    else: fromyear = '1874'
+    else: fromyear = '1900'
 
     if item.toyear: toyear = item.toyear
     else: toyear = str(current_year)
@@ -870,7 +959,12 @@ def list_sel(item):
 
     if item.cod_genre == 'TV_SE': url = url + '&chv=1&orderby=avg&movietype=serie%7C&ratingcount=3&runtimemin=0&runtimemax=4'
     elif item.cod_genre == 'DO': url = url + '&chv=1&orderby=avg&movietype=documentary%7C&ratingcount=3&runtimemin=0&runtimemax=8'
-    else: url = url + '&chv=1&orderby=avg&movietype=movie%7C&ratingcount=3&runtimemin=0&runtimemax=4'
+    else:
+       movietype = 'movie'
+
+       if item.search_type == 'tvshow': movietype = 'serie'
+
+       url = url + '&chv=1&orderby=avg&movietype=' + movietype + '%7C&ratingcount=3&runtimemin=0&runtimemax=4'
 
     post = {'from': item.page}
     data = httptools.downloadpage(url, post = post).data

@@ -130,7 +130,7 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados ó bloqueos Play)[/COLOR]', text_color='goldenrod' ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -144,7 +144,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados ó bloqueos Play)[/COLOR]', text_color='goldenrod' ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -164,7 +164,7 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados ó bloqueos Play)[/COLOR]', text_color='goldenrod' ))
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -381,7 +381,8 @@ def findvideos(item):
        elif idioma == 'LA': lang = 'Lat'
        elif idioma == 'EN': lang = 'VO'
 
-    qlty = scrapertools.find_single_match(data, '>Formato:.*?<p>(.*?)</p>')
+    qlty = scrapertools.find_single_match(data, '>Calidad:.*?<p>(.*?)</p>')
+    if not qlty: qlty = scrapertools.find_single_match(data, '>Formato:.*?<p>(.*?)</p>')
 
     if item.url.endswith('.torrent'):
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent', language = lang, quality = qlty))
@@ -403,6 +404,7 @@ def findvideos(item):
         if link.startswith('??'): continue
 
         other = ''
+
         if not link.startswith('http'):
             if link.startswith('/'): link = host[:-1] + link
             else: other = 'Directo'

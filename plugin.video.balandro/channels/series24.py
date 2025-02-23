@@ -7,8 +7,6 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-# ~ 14/8/24 Peliculas solo hay 26
-
 host = 'https://wc5n.series24.cc/'
 
 

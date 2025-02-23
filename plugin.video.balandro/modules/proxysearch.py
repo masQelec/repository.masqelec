@@ -56,6 +56,7 @@ if txt_status:
 
 
 dominioshdfull = [
+         'https://hdfull.monster/',
          'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
@@ -66,8 +67,6 @@ dominioshdfull = [
          'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
-         'https://hd-full.lol/',
-         'https://hd-full.co/',
          'https://hdfull.quest/',
          'https://hdfull.today/',
          'https://hd-full.biz/',
@@ -77,16 +76,9 @@ dominioshdfull = [
          'https://new.hdfull.one/'
          ]
 
-dominiosnextdede = [
-         'https://nextdede.us',
-         'https://nextdede.tv',
-         'https://nextdede.top'
-         ]
-
 dominiosplaydede = [
-         'https://playdede.me/'
+         'https://www1.playdede.link/'
          ]
-
 
 channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
@@ -735,26 +727,15 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
                   except:
                      host = dominioshdfull[0]
 
-              elif channel_id == 'nextdede':
-                  try:
-                     data = httptools.downloadpage('https://dominiosnextdede.com/').data
-
-                     sel_domain = scrapertools.find_single_match(data, '>Dominio actual.*?<a href="(.*?)"')
-
-                     if sel_domain:
-                         if not sel_domain.endswith('/'): sel_domain = sel_domain + '/'
-
-                         if sel_domain in str(dominiosnextdede):
-                             host = sel_domain
-
-                  except:
-                     host = dominiosnextdede[0]
-
               elif channel_id == 'playdede':
                   try:
                      data = httptools.downloadpage('https://privacidad.me/@playdede/').data
 
-                     sel_domain = scrapertools.find_single_match(data, '>Web:(.*?)</a>').strip()
+                     sel_domain = scrapertools.find_single_match(data, '>Dirección actual:(.*?)</a>').strip()
+
+                     if sel_domain:
+                         sel_domain = sel_domain.lower()
+                         if not 'playdede' in sel_domain: sel_domain = ''
 
                      if sel_domain:
                          if not 'https' in sel_domain: sel_domain = 'https://' + sel_domain

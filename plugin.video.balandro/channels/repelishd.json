@@ -1,9 +1,9 @@
 {
   "id": "repelishd",
   "name": "RePelisHd",
-  "thumbnail": "repelishd.png",
+  "thumbnail": "repelishd.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,8 +11,8 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["current", "notice", "languages", "rankings", "years", "lists", "producers", "kids", "docs", "vos", "anime"],
+  "clusters": ["languages", "countries", "years", "kids", "docs", "vos"],
 
-  "notes": "Web ANULADA. Películas por idioma, géneros y año. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas por géneros y año. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 
 }

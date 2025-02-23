@@ -199,7 +199,9 @@ def configurar_proxies_canal(canal, url):
 
                 if not proxies_iniciales:
                     provider = config.get_setting('proxytools_provider', canal, default=default_provider)
-                    if not provider == all_providers:
+                    if not provider:
+                        if proxies_list: provider_auto = private_list
+                    elif not provider == all_providers:
                         if proxies_list: provider_auto = private_list
 
                 proxies_nuevos = ''

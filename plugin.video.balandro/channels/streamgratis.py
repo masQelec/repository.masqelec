@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://streamgratis.lol/'
+host = 'https://www.streamgratis.lol/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://streamgratis.lol/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -184,7 +190,7 @@ def last_epis(item):
 
         titulo = '%s - %s' % (title, epis)
 
-        titulo = title.replace('Temporada', '[COLOR coral]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
+        titulo = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
         titulo = titulo.replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
@@ -263,22 +269,22 @@ def episodios(item):
         if config.get_setting('channels_charges', default=True):
             item.perpage = sum_parts
             if sum_parts >= 100:
-                platformtools.dialog_notification('PGratisHd', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                platformtools.dialog_notification('StreamGratis', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
-                platformtools.dialog_notification('PGratisHd', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                platformtools.dialog_notification('StreamGratis', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
             item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('PGratisHd', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    platformtools.dialog_notification('StreamGratis', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
                     item.perpage = 500
 
             elif sum_parts >= 500:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('PGratisHd', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    platformtools.dialog_notification('StreamGratis', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
                     item.perpage = 250
 
             elif sum_parts >= 250:
@@ -302,7 +308,7 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
-        titulo = titulo.replace('temporada', '[COLOR coral]Temp.[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+        titulo = titulo.replace('temporada', '[COLOR tan]Temp.[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
         titulo = titulo.replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 

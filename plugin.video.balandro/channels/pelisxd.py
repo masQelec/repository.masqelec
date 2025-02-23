@@ -263,7 +263,6 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(srv)
 
         if servidor == 'embed': continue
-        elif servidor == 'peytonepre': continue
 
         elif servidor == 'player': servidor = 'directo'
         elif servidor == 'd000d': servidor = 'doodstream'

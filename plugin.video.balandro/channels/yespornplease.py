@@ -42,7 +42,7 @@ def mainlist_pelis(item):
         from modules import actions
         if actions.adults_password(item) == False: return
 
-    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
+    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
@@ -112,6 +112,7 @@ def pornstars(item):
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='orange' ))
 
@@ -227,6 +228,8 @@ def play(item):
 def search(item, texto):
     logger.info()
     try:
+        config.set_setting('search_last_video', texto)
+
         item.url =  host + '?s=%s' % (texto.replace(" ", "+"))
         return list_all(item)
     except:

@@ -216,7 +216,7 @@ def list_all(item):
         if item.group == 'temp':
             tempo = scrapertools.find_single_match(match, '<h3>.*?class="local-link">(.*?)</a>')
 
-            titulo = titulo + ' ' + tempo.replace('Temporada', '[COLOR goldenrod]Temporada[/COLOR]')
+            titulo = titulo + ' ' + tempo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='temporadas', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))

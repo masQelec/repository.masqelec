@@ -8,12 +8,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://kissasian.com.mx/'
+host = 'https://kissasian.org.es/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://kiriasian.com/', 'https://kissasians.bar/', 'https://kissasians.vin/']
+    ant_hosts = ['https://kiriasian.com/', 'https://kissasians.bar/', 'https://kissasians.vin/',
+                 'https://kissasian.com.mx/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

@@ -13,7 +13,7 @@ except:
     pass
 
 
-host = 'https://zz.cuevana3.vip'
+host = 'https://gx.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
@@ -27,7 +27,8 @@ ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://w
              'https://iv3.cuevana3.vip', 'https://lm3.cuevana3.vip', 'https://ww3v.cuevana3.vip',
              'https://ww3u.cuevana3.vip', 'https://wl3v.cuevana3.vip', 'https://wv3n.cuevana3.vip',
              'https://wl3r.cuevana3.vip', 'https://me3.cuevana3.vip', 'https://me4.cuevana3.vip',
-             'https://mia.cuevana3.vip', 'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip']
+             'https://mia.cuevana3.vip', 'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip',
+             'https://zz.cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')

@@ -236,6 +236,13 @@ def resolve_video_urls_for_playing(server, url, url_referer=''):
                 logger.error(errmsg)
                 return [], False, errmsg
             else:
+                txt_srv = server_name
+                txt_srv = txt_srv.replace('Https://', '').replace('Http://', '')
+
+                txt_srv = txt_srv.split('/')[0]
+
+                errmsg = '[COLOR red]Falta el Servidor[/COLOR] %s' % txt_srv
+
                 platformtools.dialog_notification(config.__addon_name, '[COLOR gold]' + errmsg)
                 return [], False, ''
 
@@ -459,7 +466,7 @@ def corregir_servidor(servidor):
     elif servidor in ['streamz', 'streamzz']: return 'streamz'
     elif servidor in ['vevio', 'vev']: return 'vevio'
     elif servidor in ['vsmobi', 'v-s']: return 'vsmobi'
-    elif servidor in ['doodstream', 'dood', 'dooood', 'ds2play', 'doods', 'ds2video', 'd0o0d', 'do0od', 'd0000d', 'd000d']: return 'doodstream'
+    elif servidor in ['doodstream', 'dood', 'dooood', 'ds2play', 'doods', 'ds2video', 'd0o0d', 'do0od', 'd0000d', 'd000d', 'dooodster']: return 'doodstream'
     elif servidor in ['archiveorg', 'archive.org', 'archive']: return 'archiveorg'
     elif servidor in ['youtube', 'youtu']: return 'youtube'
     elif servidor in ['mp4upload', 'mp4up']: return 'mp4upload'
@@ -477,7 +484,7 @@ def corregir_servidor(servidor):
 
     elif servidor == 'uptostream': return 'uptobox'
 
-    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'hexload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lulu', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'qiwi', 'swdyu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'iplayerhls', 'hlsflast', 'wish', 'stblion', 'terabox', 'dhtpre', 'dramacool']: return 'various'
+    elif servidor in ['tubeload', 'mvidoo', 'rutube', 'filemoon', 'moonplayer', 'streamhub', 'uploadever', 'videowood', 'yandex', 'yadi.', 'fastupload', 'dropload', 'streamwish', 'krakenfiles', 'hexupload', 'hexload', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lulu', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'peytonepre', 'ryderjet', 'qiwi', 'swdyu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'iplayerhls', 'hlsflast', 'ghbrisk', 'wish', 'stblion', 'terabox', 'dhtpre', 'dramacool']: return 'various'
 
     elif servidor in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'fastplay', 'filegram', 'gostream', 'letsupload', 'liivideo', 'myupload', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'turbovid', 'tusfiles', 'uploadba', 'uploadflix', 'uploady', 'veev', 'doods', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vido.', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub', 'amdahost', 'updown', 'videa', 'asianplay', 'swiftload', 'udrop', 'vidtube', 'bigwarp']: return 'zures'
 
@@ -511,11 +518,11 @@ def corregir_other(srv):
     elif 'moonplayer' in srv: srv = 'Moonplayer'
     elif 'yadi' in srv: srv = 'Yandex'
 
-    elif 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv or 'wishfast' in srv or 'doodporn' in srv or 'sfastwish' in srv or 'flaswish' in srv or 'obeywish' in srv or 'cdnwish' in srv or 'asnwish' in srv or 'flastwish' in srv or 'jodwish' in srv or 'swhoi' in srv or 'fsdcmo' in srv or 'swdyu' in srv or 'wishonly' in srv or 'playerwish' in srv or 'hlswish' in srv or 'iplayerhls' in srv or 'hlsflast' in srv or 'wish' in srv: srv = 'Streamwish'
+    elif 'streamwish' in srv or 'strwish' in srv or 'embedwish' in srv or 'wishembed' in srv or 'awish' in srv or 'dwish' in srv or 'mwish' in srv or 'wishfast' in srv or 'doodporn' in srv or 'sfastwish' in srv or 'flaswish' in srv or 'obeywish' in srv or 'cdnwish' in srv or 'asnwish' in srv or 'flastwish' in srv or 'jodwish' in srv or 'swhoi' in srv or 'fsdcmo' in srv or 'swdyu' in srv or 'wishonly' in srv or 'playerwish' in srv or 'hlswish' in srv or 'iplayerhls' in srv or 'hlsflast' in srv or 'ghbrisk' in srv or 'wish' in srv: srv = 'Streamwish'
 
     elif 'desiupload' in srv: srv = 'Desiupload'
 
-    elif 'filelions' in srv or 'azipcdn' in srv or 'alions' in srv or 'dlions' in srv or 'mlions' in srv or 'lion' in srv or 'fviplions' in srv or 'javlion' in srv or 'fdewsdc' in srv: srv = 'Filelions'
+    elif 'filelions' in srv or 'azipcdn' in srv or 'alions' in srv or 'dlions' in srv or 'mlions' in srv or 'lion' in srv or 'fviplions' in srv or 'javlion' in srv or 'fdewsdc' in srv or 'peytonepre' in srv or 'ryderjet' in srv: srv = 'Filelions'
 
     elif 'youdbox' in srv or 'yodbox' in srv or 'youdboox' in srv: srv = 'Youdbox'
 

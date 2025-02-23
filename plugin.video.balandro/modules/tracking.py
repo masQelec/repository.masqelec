@@ -69,9 +69,9 @@ def addFavourite(item):
     if item.contentType not in ['movie', 'tvshow', 'season', 'episode']:
         notification_d_ok = config.get_setting('notification_d_ok', default=True)
         if notification_d_ok:
-            platformtools.dialog_ok(config.__addon_name, 'Sólo películas, series, temporadas ó capítulos')
+            platformtools.dialog_ok(config.__addon_name, 'Sólo Películas, Series, Temporadas ó Episodios')
         else:
-            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sólo películas, series, temporadas ó capítulos[/COLOR][/B]' % color_avis)
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sólo Películas, Series, Temporadas ó Episodios[/COLOR][/B]' % color_avis)
         return False
 
     # ~ Si no está definido tmdb_id seleccionar

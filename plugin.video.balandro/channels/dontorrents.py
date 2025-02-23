@@ -15,7 +15,7 @@ from core import httptools, scrapertools, tmdb
 
 host = 'https://4144-don.mirror.pm/'
 
-# ~ 19/12/24 last domain  'https://dontorrent.auction/'
+# ~ 29/1/25 last domain  'https://dontorrent.wiki/'
 
 
 try:
@@ -79,7 +79,7 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.education/', 'https://dontorrent.exposed/', 'https://dontorrent.faith/',
              'https://dontorrent.gratis/', 'https://dontorrent.equipment/', 'https://dontorrent.fashion/',
              'https://dontorrent.gallery/', 'https://dontorrent.yoga/', 'https://dontorrent.foundation/',
-             'https://dontorrent.co/']
+             'https://dontorrent.co/', 'https://dontorrent.auction/', 'https://dontorrent.football/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -169,6 +169,8 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='manto_domain_dontorrents', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', thumbnail=config.get_thumb('dontorrents'), text_color='turquoise' ))
 
     itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'dontorrents', thumbnail=config.get_thumb('dontorrents') ))
 

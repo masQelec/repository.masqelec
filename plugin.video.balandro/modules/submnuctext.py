@@ -213,8 +213,7 @@ def submnu_special(item):
         itemlist.append(item.clone( action='', title = '[COLOR deepskyblue][B]Películas[COLOR goldenrod] Recomendadas:[/B][/COLOR]', thumbnail=config.get_thumb('movie'), folder=False ))
 
         thumb_cinedeantes = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'cinedeantes.jpg')
-        itemlist.append(item.clone( channel='cinedeantes', action='list_all', title='[COLOR cyan] - Joyas del cine clásico[/COLOR]', url = 'https://cinedeantes2.weebly.com/joyas-del-cine.html', thumbnail=thumb_cinedeantes, search_type = 'movie' ))
-        itemlist.append(item.clone( channel='cinedeantes', action='list_sel', title='[COLOR moccasin] - Seleccion cinema[/COLOR]', url = 'https://pastebin.com/raw/QW0A0mzx', thumbnail=thumb_cinedeantes, search_type = 'movie' ))
+        itemlist.append(item.clone( channel='cinedeantes', action='list_all', title='[COLOR dodgerblue] - Joyas del cine clásico[/COLOR]', url = 'https://cinedeantes2.weebly.com/joyas-del-cine.html', thumbnail=thumb_cinedeantes, search_type = 'movie' ))
 
         thumb_cinequinqui = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'cinequinqui.jpg')
         itemlist.append(item.clone( channel='cinequinqui', action='list_all', title='[COLOR greenyellow] - Cine QuinQui[/COLOR]', url = 'https://cinekinkitv.freesite.host/?post_type=movies', thumbnail=thumb_cinequinqui, search_type = 'movie' ))
@@ -606,12 +605,6 @@ def _dominios(item):
         item.channel = 'hdfull'
         hdfull.configurar_dominio(item)
 
-    elif item.from_channel == 'nextdede':
-        from channels import nextdede
-
-        item.channel = 'nextdede'
-        nextdede.configurar_dominio(item)
-
     else:
         _dominio_memorizado(item)
 
@@ -626,8 +619,6 @@ def _dominio_vigente(item):
     elif item.from_channel == 'hdfull': domains.last_domain_hdfull(item)
 
     elif item.from_channel == 'hdfullse': domains.last_domain_hdfullse(item)
-
-    elif item.from_channel == 'nextdede': domains.last_domain_nextdede(item)
 
     elif item.from_channel == 'playdede': domains.last_domain_playdede(item)
 
@@ -698,8 +689,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'mitorrent': domains.manto_domain_mitorrent(item)
 
-    elif item.from_channel == 'nextdede': domains.manto_domain_nextdede(item)
-
     elif item.from_channel == 'novelastop': domains.manto_domain_novelastop(item)
 
     elif item.from_channel == 'peliculaspro': domains.manto_domain_peliculaspro(item)
@@ -709,8 +698,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
 
     elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
-
-    elif item.from_channel == 'pelispedia2me': domains.manto_domain_pelispedia2me(item)
 
     elif item.from_channel == 'pelispediaws': domains.manto_domain_pelispediaws(item)
 
@@ -722,8 +709,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'pelisplushdnz': domains.manto_domain_pelisplushdnz(item)
 
-    elif item.from_channel == 'pelispluslat': domains.manto_domain_pelispluslat(item)
-
     elif item.from_channel == 'playdede': domains.manto_domain_playdede(item)
 
     elif item.from_channel == 'poseidonhd2': domains.manto_domain_poseidonhd2(item)
@@ -732,9 +717,9 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'serieskao': domains.manto_domain_serieskao(item)
 
-    elif item.from_channel == 'seriesmetro': domains.manto_domain_seriesmetro(item)
-
     elif item.from_channel == 'seriespapayato': domains.manto_domain_seriespapayato(item)
+
+    elif item.from_channel == 'seriesplus': domains.manto_domain_seriesplus(item)
 
     elif item.from_channel == 'srnovelas': domains.manto_domain_srnovelas(item)
 
@@ -750,8 +735,6 @@ def _dominio_memorizado(item):
 
 def _credenciales(item):
     if item.from_channel == 'hdfull': _credenciales_hdfull(item)
-
-    elif item.from_channel == 'nextdede': _credenciales_nextdede(item)
 
     elif item.from_channel == 'playdede': _credenciales_playdede(item)
 
@@ -795,46 +778,6 @@ def _credenciales_hdfull(item):
 
     if result: platformtools.dialog_notification(config.__addon_name + ' - HdFull', '[COLOR %s][B]Login Correcto [/COLOR][/B]' % color_avis)
     else: platformtools.dialog_notification(config.__addon_name + ' - HdFull', '[COLOR %s][B]Login Incorrecto [/COLOR][/B]' % color_alert)
-
-    _refresh_menu(item)
-
-
-def _credenciales_nextdede(item):
-    logger.info()
-
-    from core import jsontools
-
-    channel_json = 'nextdede.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name + ' - NextDede', el_canal + '[/COLOR][/B]')
-       return
-
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    from channels import nextdede
-
-    item.channel = 'nextdede'
-
-    if config.get_setting('nextdede_login', 'nextdede', default=False): nextdede.logout(item)
-
-    result = nextdede.login('')
-
-    if result: platformtools.dialog_notification(config.__addon_name + ' - NextDede', '[COLOR %s][B]Login Correcto [/COLOR][/B]' % color_avis)
-    else: platformtools.dialog_notification(config.__addon_name + ' - NextDede', '[COLOR %s][B]Login Incorrecto [/COLOR][/B]' % color_alert)
 
     _refresh_menu(item)
 
@@ -1087,12 +1030,12 @@ def _proxies(item):
 
         if config.get_setting('channel_gnula24h_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'gnulatop':
-        from channels import gnulatop
-        item.channel = 'gnulatop'
-        gnulatop.configurar_proxies(item)
+    elif item.from_channel == 'gnulacenter':
+        from channels import gnulacenter
+        item.channel = 'gnulacenter'
+        gnulacenter.configurar_proxies(item)
 
-        if config.get_setting('channel_gnulatop_proxies') is None: refrescar = False
+        if config.get_setting('channel_gnulacenter_proxies') is None: refrescar = False
 
     elif item.from_channel == 'grantorrent':
         from channels import grantorrent
@@ -1192,13 +1135,6 @@ def _proxies(item):
 
         if config.get_setting('channel_mundodonghua_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'nextdede':
-        from channels import nextdede
-        item.channel = 'nextdede'
-        nextdede.configurar_proxies(item)
-
-        if config.get_setting('channel_nextdede_proxies') is None: refrescar = False
-
     elif item.from_channel == 'naranjatorrent':
         from channels import naranjatorrent
         item.channel = 'naranjatorrent'
@@ -1219,13 +1155,6 @@ def _proxies(item):
         papayaseries.configurar_proxies(item)
 
         if config.get_setting('channel_papayaseries_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'peliplayhd':
-        from channels import peliplayhd
-        item.channel = 'peliplayhd'
-        peliplayhd.configurar_proxies(item)
-
-        if config.get_setting('channel_peliplayhd_proxies') is None: refrescar = False
 
     elif item.from_channel == 'peliculaspro':
         from channels import peliculaspro
@@ -1283,13 +1212,6 @@ def _proxies(item):
 
         if config.get_setting('channel_pelisplushdnz_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'pelispluslat':
-        from channels import pelispluslat
-        item.channel = 'pelispluslat'
-        pelispluslat.configurar_proxies(item)
-
-        if config.get_setting('channel_pelispluslat_proxies') is None: refrescar = False
-
     elif item.from_channel == 'pelisxd':
         from channels import pelisxd
         item.channel = 'pelisxd'
@@ -1332,12 +1254,12 @@ def _proxies(item):
 
         if config.get_setting('channel_reinventorrent_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'repelisre':
-        from channels import repelisre
-        item.channel = 'repelisre'
-        repelisre.configurar_proxies(item)
+    elif item.from_channel == 'repelishd':
+        from channels import repelishd
+        item.channel = 'repelishd'
+        repelishd.configurar_proxies(item)
 
-        if config.get_setting('channel_repelisre_proxies') is None: refrescar = False
+        if config.get_setting('channel_repelishd_proxies') is None: refrescar = False
 
     elif item.from_channel == 'rojotorrent':
         from channels import rojotorrent
@@ -1374,19 +1296,19 @@ def _proxies(item):
 
         if config.get_setting('channel_seriespapayato_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'seriesretro':
-        from channels import seriesretro
-        item.channel = 'seriesretro'
-        seriesretro.configurar_proxies(item)
-
-        if config.get_setting('channel_seriesretro_proxies') is None: refrescar = False
-
     elif item.from_channel == 'seriesplus':
         from channels import seriesplus
         item.channel = 'seriesplus'
         seriesplus.configurar_proxies(item)
 
         if config.get_setting('channel_seriesplus_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'seriesretro':
+        from channels import seriesretro
+        item.channel = 'seriesretro'
+        seriesretro.configurar_proxies(item)
+
+        if config.get_setting('channel_seriesretro_proxies') is None: refrescar = False
 
     elif item.from_channel == 'seriestv':
         from channels import seriestv
@@ -1443,13 +1365,6 @@ def _proxies(item):
         ultrapelis.configurar_proxies(item)
 
         if config.get_setting('channel_ultrapelis_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'uphd':
-        from channels import uphd
-        item.channel = 'uphd'
-        uphd.configurar_proxies(item)
-
-        if config.get_setting('channel_uphd_proxies') is None: refrescar = False
 
     elif item.from_channel == 'verdetorrent':
         from channels import verdetorrent

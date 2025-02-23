@@ -420,8 +420,6 @@ def findvideos(item):
                 if new_url: url = new_url
 
                 if '/tioplayer.' in url: continue
-                elif '/peytonepre.' in url: continue
-
                 elif '.tiodonghua.' in url: continue
 
                 if 'http:' in url: url = url.replace('http:', 'https:')
@@ -485,7 +483,6 @@ def findvideos(item):
         elif '.animefenix.' in url: continue
         elif '.tiodonghua.' in url: continue
         elif '/odysee.' in url: continue
-        elif '/peytonepre.' in url: continue
 
         if 'http:' in url: url = url.replace('http:', 'https:')
 

@@ -205,6 +205,10 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://ghbrisk.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://(?:wish.(.*))/(?:e/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
@@ -258,6 +262,14 @@
       },
       {
         "pattern": "https://fdewsdc.sbs/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://peytonepre.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://ryderjet.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://filelions.to/f/\\1"
       },
       {
@@ -353,7 +365,7 @@
         "url": "https://emturbovid.com/t/\\1"
       },
       {
-        "pattern": "https://streamsilk.com/(?:d/|p/)([0-9a-zA-Z]+)",
+        "pattern": "https://streamsilk.com/(?:d/|p/|v/)([0-9a-zA-Z]+)",
         "url": "https://streamsilk.com/\\1"
       },
       {

@@ -101,7 +101,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por año', action = 'anios', slug = 'series', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', slug = 'series', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por país', action = 'paises', slug = 'series', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -126,7 +125,6 @@ def mainlist_animes(item):
     itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'anime', slug = 'animes', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', group = 'anime', slug = 'animes', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por país', action = 'paises', group = 'anime', slug = 'animes', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -235,19 +233,11 @@ def paises(item):
     logger.info()
     itemlist = []
 
-    if item.slug == 'animes': text_color = 'springgreen'
-    else:
-       if item.search_type == 'movie': text_color = 'deepskyblue'
-       else: text_color = 'hotpink'
+    text_color = 'deepskyblue'
 
-    if item.group == 'anime': url_paises = host + 'animacion/'
-    else:
-        if item.search_type == 'movie': url_paises = host + 'peliculas/'
-        else: url_paises = host + 'seriesa/'
+    url_paises = host + 'peliculas/'
 
-    url = url_paises
-
-    data = do_downloadpage(url)
+    data = do_downloadpage(url_paises)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '>SELECCIONAR PAÍS<(.*?)</div>')

@@ -105,7 +105,7 @@ def findvideos(item):
         if url.startswith("//"): url = 'https:' + url
         elif url.startswith("/"): url = host[:-1] + url
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = 'Esp' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = 'Esp', quality = 'DVDRip' ))
 
     return itemlist
 

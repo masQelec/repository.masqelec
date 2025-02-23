@@ -467,6 +467,16 @@ def show_help_parameters(item):
 
             txt += '[CR]   [COLOR plum][B]Personas:[/B][/COLOR]  ' + config.get_setting('search_last_person')
 
+        if config.get_setting('search_last_list', default=''):
+            hay_lastest = True
+
+            txt += '[CR]   [COLOR greenyellow][B]Listas:[/B][/COLOR]  ' + config.get_setting('search_last_list')
+
+        if config.get_setting('search_last_video', default=''):
+            hay_lastest = True
+
+            txt += '[CR]   [COLOR orange][B]Vídeos:[/B][/COLOR]  ' + config.get_setting('search_last_video')
+
         if not hay_lastest: txt += '[CR]   [COLOR cyan][B]Sin textos memorizados[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información sobre sus parámetros de búsquedas', txt)
@@ -481,20 +491,25 @@ def show_help(item):
         txt += '[COLOR gold][B]Por Defecto[/B][/COLOR]:[CR]'
         txt += ' Está [COLOR coral][B]Des-Habilitada[/B][/COLOR] la opción del Menú principal y Sub-Menús [B][COLOR violet]Búsquedas Especiales (Listas TMDB, etc.)[/COLOR][/B][CR][CR]'
 
-        txt += '[COLOR gold][B]Explicaciones[/B][/COLOR]:[CR]'
+        txt += '[CR]'
+
+    txt += 'Las opciones de búsquedas:[CR]'
+    txt += '  [COLOR yellow][B]Películas y/ó Series[/B][/COLOR] y [COLOR hotpink][B]Series[/B][/COLOR][CR]'
+    txt += '  abarcan también buscar en [COLOR limegreen][B] Novelas[/B][/COLOR] y en [COLOR goldenrod][B]Programas de Televisión[/B][/COLOR].[CR][CR]'
 
     txt += 'Desde los Ajustes [COLOR yellow][B]categoría Buscar[/B][/COLOR] se puede definir [COLOR chartreuse][B] los Resultados que se Previsualizan para cada canal[/B][/COLOR].'
     txt += ' Si por ejemplo el canal devuelve 15 resultados y se previsualizan 2, entrar en el enlace del [COLOR gold][B]Nombre del canal[/B][/COLOR] de la búsqueda para verlos todos.'
 
-    txt += '[CR][CR]En cada web/canal el [COLOR cyan][B]Tiempo de Respuesta[/B][/COLOR] puede ser elevado y más aún si tiene Proxies Configurados.'
+    txt += '[CR][CR]En cada web/canal el [COLOR cyan][B]Tiempo de Respuesta[/B][/COLOR] puede ser elevado y más aún si tiene [COLOR red][B]Proxies Configurados[/B][/COLOR].'
 
-    txt += '[CR][CR]Según cada web/canal su buscador puede permitir diferenciar por [COLOR teal][B]Películas y/ó Series ó No[/B][/COLOR].'
+    txt += '[CR][CR]Según cada web/canal su buscador puede permitir diferenciar por [COLOR yellow][B]Películas y/ó Series[/B][/COLOR] [COLOR teal]ó No[/B][/COLOR].'
 
     txt += '[CR][CR][COLOR yellowgreen][B]También es variable la sensibilidad de la búsqueda (si busca sólo en el Título ó también en la Sinopsis, el tratamiento si hay varias palabras, si devuelve muchos ó pocos resultados, etc.)[/B][/COLOR]'
 
-    txt += '[CR][CR]Desde cualquier [COLOR teal][B]Película ó Serie[/B][/COLOR], se puede acceder al [COLOR yellow][B]Menú contextual[/B][/COLOR] para buscar esa misma referencia en los demás canales.'
+    txt += '[CR][CR]Desde cualquier [COLOR deepskyblue][B]Película[/B][/COLOR] ó [COLOR hotpink][B]Serie[/B][/COLOR], se puede acceder al [COLOR yellow][B]Menú contextual[/B][/COLOR] para buscar esa misma referencia en los demás canales.'
 
-    txt += '[CR][CR]Desde cualquier [COLOR teal][B]Película ó Serie[/B][/COLOR] guardada en [COLOR tan][B]Preferidos[/B][/COLOR], si al acceder se produce un error en la web, se ofrece un diálogo para volver a buscar esa referencia ([COLOR gold][B]Misma/Parecida/Similar[/B][/COLOR]) en los demás canales ó en el mismo canal (por si los enlaces ya no funcionan).'
+    if config.get_setting('tracking_weberror_dialog', default=True):
+        txt += '[CR][CR]Desde cualquier [COLOR deepskyblue][B]Película[/B][/COLOR] ó [COLOR hotpink][B]Serie[/B][/COLOR] guardada en [COLOR tan][B]Preferidos[/B][/COLOR], si al acceder se produce un error en la web, se ofrece un diálogo para volver a buscar esa referencia ([COLOR gold][B]Misma/Parecida/Similar[/B][/COLOR]) en los demás canales ó en el mismo canal (por si los enlaces ya no funcionan).'
 
     platformtools.dialog_textviewer('Información sobre búsquedas', txt)
 
@@ -846,7 +861,7 @@ def do_search(item, tecleado):
 
                     if 'inestable' in ch['clusters']: name += '[I][COLOR plum] (inestable) [/COLOR][/I]'
                     if 'problematic' in ch['clusters']: name += '[I][COLOR darkgoldenrod] (problemático) [/COLOR][/I]'
-                    if 'clone' in ch['clusters']: name += '[I][COLOR turquoise] (clon)[/COLOR][/I]'
+                    if 'clone' in ch['clusters']: name += '[I][COLOR turquoise] (clon) [/COLOR][/I]'
 
                     if no_accesibles:
                         if ch['name'] in str(no_accesibles):

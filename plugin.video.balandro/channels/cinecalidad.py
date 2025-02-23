@@ -187,6 +187,8 @@ def acciones(item):
 
     itemlist.append(Item( channel='helper', action='show_help_cinecalidad', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('cinecalidad') ))
 
+    itemlist.append(Item( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', thumbnail=config.get_thumb('cinecalidad'), text_color='turquoise' ))
+
     itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'cinecalidad', thumbnail=config.get_thumb('cinecalidad') ))
 
     platformtools.itemlist_refresh()

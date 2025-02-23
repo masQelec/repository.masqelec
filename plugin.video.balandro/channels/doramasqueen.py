@@ -232,8 +232,6 @@ def findvideos(item):
 
         url = url.replace('\\/', '/')
 
-        if '/peytonepre.' in url: continue
-
         if url.startswith('//'): url = 'https:' + url
 
         servidor = servertools.get_server_from_url(url)
