@@ -1,7 +1,7 @@
-# Channel table for Picada Café - RS - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2171
+# Channel table for Picada CafÃ© - RS - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2171
 
-# Physical channel 35 (virtual 12.1)
+# Physical channel 35
 [RBS TV]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

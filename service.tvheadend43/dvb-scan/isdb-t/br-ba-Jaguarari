@@ -1,7 +1,7 @@
 # Channel table for Jaguarari - BA - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=673
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=673
 
-# Physical channel 30 (virtual 2.1)
+# Physical channel 30
 [TV São Francisco]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

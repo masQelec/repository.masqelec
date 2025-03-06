@@ -1,9 +1,9 @@
 #----------------------------------------------------------------------------------------------
 # Auto-generated from:
-# <https://www.freeview.co.uk/help/coverage-checker/detailed-view/download/B75 5JJ>
+# <http://www.digitaluk.co.uk/coveragechecker/main/tradeexport/B75 5JJ/NA/0/>
 #----------------------------------------------------------------------------------------------
 # location and provider: UK, Sutton Coldfield
-# date (yyyy-mm-dd)    : 2023-02-10
+# date (yyyy-mm-dd)    : 2014-03-25
 #
 #----------------------------------------------------------------------------------------------
 [C43 BBC A]
@@ -30,9 +30,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C40+ BBC B]
+[C33 COM7 HD]
 	DELIVERY_SYSTEM = DVBT2
-	FREQUENCY = 626167000
+	FREQUENCY = 570000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -79,9 +79,22 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C36 L-BRM]
+[C40+ BBC B HD]
+	DELIVERY_SYSTEM = DVBT2
+	FREQUENCY = 626167000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/256
+	TRANSMISSION_MODE = 32K
+	GUARD_INTERVAL = 1/128
+	HIERARCHY = NONE
+	STREAM_ID = 0
+	INVERSION = AUTO
+
+[C51 L-BRM]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 594000000
+	FREQUENCY = 714000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE

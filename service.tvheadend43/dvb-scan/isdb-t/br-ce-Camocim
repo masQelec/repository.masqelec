@@ -1,7 +1,7 @@
 # Channel table for Camocim - CE - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=545
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=545
 
-# Physical channel 33 (virtual 10.1)
+# Physical channel 33
 [TV Verdes Mares]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

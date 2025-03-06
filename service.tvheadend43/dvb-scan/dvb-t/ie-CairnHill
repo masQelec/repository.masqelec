@@ -1,5 +1,5 @@
 # Ireland, Cairn Hill
-# Generated from https://www.2rn.ie/wp-content/uploads/2019/09/2RN-DTT-Television-Transmission-Network-Sept-2019-Rev.1.2.pdf
+# Generated from http://www.comreg.ie/_fileupload/Broadcast_Technical_Parameters.xlsx
 [CH47: Saorview MUX1]
 	DELIVERY_SYSTEM = DVBT
 	FREQUENCY = 682000000

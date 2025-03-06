@@ -1,7 +1,7 @@
 # Channel table for Dobrada - SP - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2746
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2746
 
-# Physical channel 26 (virtual 7.1)
+# Physical channel 26
 [EPTV Ribeirão]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

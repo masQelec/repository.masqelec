@@ -1,7 +1,7 @@
 # Kodi Media Center language file
 # Addon Name: tvheadend43
 # Addon id: service.tvheadend43
-# Addon Provider: Team LibreELEC
+# Addon Provider: Team CoreELEC
 msgid ""
 msgstr ""
 
@@ -171,4 +171,12 @@ msgstr ""
 
 msgctxt "#30041"
 msgid "Could not extract zip files"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Download Scan-Tables"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Extract Scan-Tables"
 msgstr ""

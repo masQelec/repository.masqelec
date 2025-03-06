@@ -1,7 +1,7 @@
 # Channel table for Raul Soares - MG - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2915
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2915
 
-# Physical channel 26 (virtual 41.1)
+# Physical channel 26
 [Rede Século 21]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

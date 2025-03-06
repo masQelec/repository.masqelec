@@ -1,7 +1,7 @@
 # Channel table for Ouvidor - GO - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=665
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=665
 
-# Physical channel 34 (virtual 7.1)
+# Physical channel 34
 [TV Anhanguera Catalão]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
@@ -30,7 +30,7 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 39 (virtual 54.1)
+# Physical channel 39
 [TV Serra Dourada]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

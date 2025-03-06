@@ -1,7 +1,7 @@
 # Channel table for Condado - PB - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2458
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2458
 
-# Physical channel 19 (virtual 9.1)
+# Physical channel 19
 [TV Paraíba]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

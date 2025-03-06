@@ -1,9 +1,9 @@
 #----------------------------------------------------------------------------------------------
 # Auto-generated from:
-# <https://www.freeview.co.uk/help/coverage-checker/detailed-view/download/TF6 5AL>
+# <http://www.digitaluk.co.uk/coveragechecker/main/tradeexport/TF6 5AH/NA/0/>
 #----------------------------------------------------------------------------------------------
 # location and provider: UK, The Wrekin
-# date (yyyy-mm-dd)    : 2023-02-10
+# date (yyyy-mm-dd)    : 2014-03-25
 #
 #----------------------------------------------------------------------------------------------
 [C26 BBC A]
@@ -28,19 +28,6 @@
 	TRANSMISSION_MODE = 8K
 	GUARD_INTERVAL = 1/32
 	HIERARCHY = NONE
-	INVERSION = AUTO
-
-[C30- BBC B]
-	DELIVERY_SYSTEM = DVBT2
-	FREQUENCY = 545833000
-	BANDWIDTH_HZ = 8000000
-	CODE_RATE_HP = 2/3
-	CODE_RATE_LP = NONE
-	MODULATION = QAM/256
-	TRANSMISSION_MODE = 32K
-	GUARD_INTERVAL = 1/128
-	HIERARCHY = NONE
-	STREAM_ID = 0
 	INVERSION = AUTO
 
 [C41+ SDN]
@@ -77,5 +64,18 @@
 	TRANSMISSION_MODE = 8K
 	GUARD_INTERVAL = 1/32
 	HIERARCHY = NONE
+	INVERSION = AUTO
+
+[C30- BBC B HD]
+	DELIVERY_SYSTEM = DVBT2
+	FREQUENCY = 545833000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/256
+	TRANSMISSION_MODE = 32K
+	GUARD_INTERVAL = 1/128
+	HIERARCHY = NONE
+	STREAM_ID = 0
 	INVERSION = AUTO
 

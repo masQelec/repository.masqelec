@@ -1,8 +1,8 @@
-# Channel table for Salvador Do Sul - RS - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1912
+# Channel table for Salvador do Sul - RS - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1912
 
-# Physical channel 17 (virtual 16.3)
-[Rede Vida, Rede Vida Educação]
+# Physical channel 17
+[Rede Vida]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 491142857
@@ -30,7 +30,7 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 21 (virtual 2.1)
+# Physical channel 21
 [Record RS]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
@@ -59,7 +59,7 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 28 (virtual 5.1)
+# Physical channel 28
 [SBT RS]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
@@ -88,7 +88,7 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 32 (virtual 10.1)
+# Physical channel 32
 [Band RS]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
@@ -117,7 +117,7 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 34 (virtual 12.1)
+# Physical channel 34
 [RBS TV]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

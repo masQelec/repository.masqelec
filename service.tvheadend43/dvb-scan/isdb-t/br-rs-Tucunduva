@@ -1,8 +1,8 @@
 # Channel table for Tucunduva - RS - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=558
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=558
 
-# Physical channel 34 (virtual 6.1)
-[RBS Santa Rosa]
+# Physical channel 34
+[RBS TV]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 593142857

@@ -1,7 +1,7 @@
 # Channel table for Santa Ernestina - SP - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2749
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2749
 
-# Physical channel 26 (virtual 7.1)
+# Physical channel 26
 [EPTV Ribeirão]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
@@ -30,8 +30,8 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 28 (virtual 13.1)
-[Record Interior SP]
+# Physical channel 28
+[Record Interior]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 557142857

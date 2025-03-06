@@ -1,7 +1,7 @@
-# Channel table for Alo‚ndia - GO - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1713
+# Channel table for Alo√¢ndia - GO - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1713
 
-# Physical channel 27 (virtual 49.1)
+# Physical channel 27
 [TV Serra Dourada]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

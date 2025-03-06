@@ -1,7 +1,7 @@
 # Channel table for Itaqui - RS - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=685
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=685
 
-# Physical channel 28 (virtual 28.2)
+# Physical channel 28
 [TVE RS]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
@@ -30,8 +30,8 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 33 (virtual 3.1)
-[RBS Uruguaiana]
+# Physical channel 33
+[RBS TV]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 587142857

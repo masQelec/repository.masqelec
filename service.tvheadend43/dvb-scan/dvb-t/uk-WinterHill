@@ -1,14 +1,14 @@
 #----------------------------------------------------------------------------------------------
 # Auto-generated from:
-# <https://www.freeview.co.uk/help/coverage-checker/detailed-view/download/BL6 6SL>
+# <http://www.digitaluk.co.uk/coveragechecker/main/tradeexport/BL6 6SL/NA/0/>
 #----------------------------------------------------------------------------------------------
 # location and provider: UK, Winter Hill
-# date (yyyy-mm-dd)    : 2023-02-10
+# date (yyyy-mm-dd)    : 2014-03-25
 #
 #----------------------------------------------------------------------------------------------
-[C32 BBC A]
+[C50 BBC A]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 562000000
+	FREQUENCY = 706000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -18,9 +18,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C34 D3&4]
+[C59 D3&4]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 578000000
+	FREQUENCY = 778000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -30,9 +30,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C35 BBC B]
+[C31 COM7 HD]
 	DELIVERY_SYSTEM = DVBT2
-	FREQUENCY = 586000000
+	FREQUENCY = 554000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -43,9 +43,9 @@
 	STREAM_ID = 0
 	INVERSION = AUTO
 
-[C29 SDN]
+[C58 SDN]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 538000000
+	FREQUENCY = 770000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
@@ -55,9 +55,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C31 ARQ A]
+[C49 ARQ A]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 554000000
+	FREQUENCY = 698000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
@@ -67,9 +67,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C37 ARQ B]
+[C55 ARQ B]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 602000000
+	FREQUENCY = 746000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
@@ -79,15 +79,16 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C40 L-PTN]
-	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 626000000
+[C54- BBC B HD]
+	DELIVERY_SYSTEM = DVBT2
+	FREQUENCY = 737833000
 	BANDWIDTH_HZ = 8000000
-	CODE_RATE_HP = 3/4
+	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
-	MODULATION = QPSK
-	TRANSMISSION_MODE = 8K
-	GUARD_INTERVAL = 1/32
+	MODULATION = QAM/256
+	TRANSMISSION_MODE = 32K
+	GUARD_INTERVAL = 1/128
 	HIERARCHY = NONE
+	STREAM_ID = 0
 	INVERSION = AUTO
 

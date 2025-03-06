@@ -1,7 +1,7 @@
-# Channel table for Cedro De S„o Jo„o - SE - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=289
+# Channel table for Cedro de S√£o Jo√£o - SE - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=289
 
-# Physical channel 16 (virtual 2.1)
+# Physical channel 16
 [Rede S√©culo 21]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

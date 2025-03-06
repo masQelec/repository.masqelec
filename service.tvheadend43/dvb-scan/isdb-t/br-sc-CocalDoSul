@@ -1,8 +1,8 @@
-# Channel table for Cocal Do Sul - SC - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=3321
+# Channel table for Cocal do Sul - SC - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=3321
 
-# Physical channel 30 (virtual 25.2)
-[NDTV Criciúma, TV Inova SC]
+# Physical channel 30
+[RIC SC]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 569142857
@@ -30,8 +30,8 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 34 (virtual 9.1)
-[NSC Criciúma]
+# Physical channel 34
+[RBS SC]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 593142857
@@ -59,8 +59,8 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 46 (virtual 23.1)
-[SCC SBT]
+# Physical channel 46
+[SBT SC]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 665142857
@@ -88,7 +88,7 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 50 (virtual 12.1)
+# Physical channel 50
 [TV Primavera]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

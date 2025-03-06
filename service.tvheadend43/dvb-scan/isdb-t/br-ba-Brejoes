@@ -1,7 +1,7 @@
-# Channel table for Brejıes - BA - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1374
+# Channel table for Brej√µes - BA - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1374
 
-# Physical channel 21 (virtual 10.1)
+# Physical channel 21
 [Record Bahia]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

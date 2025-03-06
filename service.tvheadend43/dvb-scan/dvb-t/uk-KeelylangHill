@@ -1,9 +1,9 @@
 #----------------------------------------------------------------------------------------------
 # Auto-generated from:
-# <https://www.freeview.co.uk/help/coverage-checker/detailed-view/download/KW15 1SF>
+# <http://www.digitaluk.co.uk/coveragechecker/main/tradeexport/KW15 1SF/NA/0/>
 #----------------------------------------------------------------------------------------------
 # location and provider: UK, Keelylang Hill
-# date (yyyy-mm-dd)    : 2023-02-10
+# date (yyyy-mm-dd)    : 2014-03-25
 #
 #----------------------------------------------------------------------------------------------
 [C46 BBC A]
@@ -28,19 +28,6 @@
 	TRANSMISSION_MODE = 8K
 	GUARD_INTERVAL = 1/32
 	HIERARCHY = NONE
-	INVERSION = AUTO
-
-[C40+ BBC B]
-	DELIVERY_SYSTEM = DVBT2
-	FREQUENCY = 626167000
-	BANDWIDTH_HZ = 8000000
-	CODE_RATE_HP = 2/3
-	CODE_RATE_LP = NONE
-	MODULATION = QAM/256
-	TRANSMISSION_MODE = 32K
-	GUARD_INTERVAL = 1/128
-	HIERARCHY = NONE
-	STREAM_ID = 0
 	INVERSION = AUTO
 
 [C42 SDN]
@@ -77,5 +64,18 @@
 	TRANSMISSION_MODE = 8K
 	GUARD_INTERVAL = 1/32
 	HIERARCHY = NONE
+	INVERSION = AUTO
+
+[C40+ BBC B HD]
+	DELIVERY_SYSTEM = DVBT2
+	FREQUENCY = 626167000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/256
+	TRANSMISSION_MODE = 32K
+	GUARD_INTERVAL = 1/128
+	HIERARCHY = NONE
+	STREAM_ID = 0
 	INVERSION = AUTO
 

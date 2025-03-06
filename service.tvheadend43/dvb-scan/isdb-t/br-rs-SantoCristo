@@ -1,8 +1,8 @@
 # Channel table for Santo Cristo - RS - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=3381
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=3381
 
-# Physical channel 24 (virtual 6.1)
-[RBS Santa Rosa]
+# Physical channel 24
+[RBS TV]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 533142857

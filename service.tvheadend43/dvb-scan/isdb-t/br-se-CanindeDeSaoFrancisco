@@ -1,7 +1,7 @@
-# Channel table for Canindé De São Francisco - SE - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=636
+# Channel table for CanindÃ© de SÃ£o Francisco - SE - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=636
 
-# Physical channel 32 (virtual 11.1)
+# Physical channel 32
 [TV Sergipe]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

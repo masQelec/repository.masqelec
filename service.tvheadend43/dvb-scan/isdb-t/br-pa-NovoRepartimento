@@ -1,7 +1,7 @@
 # Channel table for Novo Repartimento - PA - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2684
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2684
 
-# Physical channel 25 (virtual 8.1)
+# Physical channel 25
 [TV Floresta]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

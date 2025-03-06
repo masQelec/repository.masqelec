@@ -3,34 +3,9 @@
 #  Budapest, Dorog, Hatvan, Kiskunhalas, Debrecen, Szekesfehervar, Pecs,
 #  Veszprem, Dunaujvaros, Miskolc, Gyongyos, Tatabanya, Varpalota, Nagykanizsa,
 #  Salgotarjan, Batonyterenye, Szolnok, Szentistvan, Nyiregyhaza, Gyor,
-#  Szazhalombatta, Bekescsaba, Bekes, Eger, Komlo, Oroszlany,
-#  Szigetszentmiklos
+#  Szazhalombatta, Bekescsaba, Bekes, Eger, Komlo, Oroszlany
 # In some of the cities not all the frequencies are available.
 # freq sr fec mod
-[CHANNEL]
-       DELIVERY_SYSTEM = DVBC/ANNEX_A
-       FREQUENCY = 114500000
-       SYMBOL_RATE = 6000000
-       INNER_FEC = NONE
-       MODULATION = QAM/256
-       INVERSION = AUTO
-
-[CHANNEL]
-       DELIVERY_SYSTEM = DVBC/ANNEX_A
-       FREQUENCY = 121500000
-       SYMBOL_RATE = 6000000
-       INNER_FEC = NONE
-       MODULATION = QAM/256
-       INVERSION = AUTO
-
-[CHANNEL]
-       DELIVERY_SYSTEM = DVBC/ANNEX_A
-       FREQUENCY = 128500000
-       SYMBOL_RATE = 6000000
-       INNER_FEC = NONE
-       MODULATION = QAM/256
-       INVERSION = AUTO
-
 [CHANNEL]
 	DELIVERY_SYSTEM = DVBC/ANNEX_A
 	FREQUENCY = 121000000

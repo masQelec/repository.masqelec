@@ -1,7 +1,7 @@
-# Channel table for Santa Maria Da Vitória - BA - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1352
+# Channel table for Santa Maria da VitÃ³ria - BA - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1352
 
-# Physical channel 28 (virtual 10.1)
+# Physical channel 28
 [TV Oeste]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

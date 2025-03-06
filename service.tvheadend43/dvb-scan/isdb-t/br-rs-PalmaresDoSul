@@ -1,7 +1,7 @@
-# Channel table for Palmares Do Sul - RS - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2148
+# Channel table for Palmares do Sul - RS - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2148
 
-# Physical channel 23 (virtual 13.1)
+# Physical channel 23
 [RBS TV]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

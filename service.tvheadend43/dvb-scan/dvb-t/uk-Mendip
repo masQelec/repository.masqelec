@@ -1,14 +1,15 @@
 #----------------------------------------------------------------------------------------------
 # Auto-generated from:
-# <https://www.freeview.co.uk/help/coverage-checker/detailed-view/download/BA5 3LB>
+# <http://www.digitaluk.co.uk/coveragechecker/main/tradeexport/BA5 3LB/NA/0/>
+# Updated due to changes in MUX frequency 9 March 2018
 #----------------------------------------------------------------------------------------------
 # location and provider: UK, Mendip
-# date (yyyy-mm-dd)    : 2023-02-10
+# date (yyyy-mm-dd)    : 2018-03-09
 #
 #----------------------------------------------------------------------------------------------
-[C32 BBC A]
+[C49 BBC A]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 562000000
+	FREQUENCY = 698000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -18,9 +19,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C34 D3&4]
+[C54 D3&4]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 578000000
+	FREQUENCY = 738000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -30,9 +31,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C35 BBC B]
+[C33 COM7 HD]
 	DELIVERY_SYSTEM = DVBT2
-	FREQUENCY = 586000000
+	FREQUENCY = 594000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -55,7 +56,7 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C33 ARQ A]
+[C56 ARQ A]
 	DELIVERY_SYSTEM = DVBT
 	FREQUENCY = 570000000
 	BANDWIDTH_HZ = 8000000
@@ -67,9 +68,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C36 ARQ B]
+[C52 ARQ B]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 594000000
+	FREQUENCY = 722000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
@@ -79,15 +80,16 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C30 L-BSL]
-	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 546000000
+[C58 BBC B HD]
+	DELIVERY_SYSTEM = DVBT2
+	FREQUENCY = 770000000
 	BANDWIDTH_HZ = 8000000
-	CODE_RATE_HP = 3/4
+	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
-	MODULATION = QPSK
-	TRANSMISSION_MODE = 8K
-	GUARD_INTERVAL = 1/32
+	MODULATION = QAM/256
+	TRANSMISSION_MODE = 32K
+	GUARD_INTERVAL = 1/128
 	HIERARCHY = NONE
+	STREAM_ID = 0
 	INVERSION = AUTO
 

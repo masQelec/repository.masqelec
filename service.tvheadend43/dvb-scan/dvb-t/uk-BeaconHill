@@ -1,14 +1,14 @@
 #----------------------------------------------------------------------------------------------
 # Auto-generated from:
-# <https://www.freeview.co.uk/help/coverage-checker/detailed-view/download/TQ3 1RT>
+# <http://www.digitaluk.co.uk/coveragechecker/main/tradeexport/TQ3 1RT/NA/0/>
 #----------------------------------------------------------------------------------------------
 # location and provider: UK, Beacon Hill
-# date (yyyy-mm-dd)    : 2023-02-10
+# date (yyyy-mm-dd)    : 2015-01-17
 #
 #----------------------------------------------------------------------------------------------
-[C44 BBC A]
+[C60- BBC A]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 658000000
+	FREQUENCY = 785833000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -18,9 +18,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C41 D3&4]
+[C53+ D3&4]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 634000000
+	FREQUENCY = 730167000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -30,9 +30,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C47 BBC B]
+[C33 COM7 HD]
 	DELIVERY_SYSTEM = DVBT2
-	FREQUENCY = 682000000
+	FREQUENCY = 570000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -67,9 +67,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C40 ARQ B]
+[C51 ARQ B]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 626000000
+	FREQUENCY = 714000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
@@ -77,5 +77,18 @@
 	TRANSMISSION_MODE = 8K
 	GUARD_INTERVAL = 1/32
 	HIERARCHY = NONE
+	INVERSION = AUTO
+
+[C57+ BBC B HD]
+	DELIVERY_SYSTEM = DVBT2
+	FREQUENCY = 762167000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/256
+	TRANSMISSION_MODE = 32K
+	GUARD_INTERVAL = 1/128
+	HIERARCHY = NONE
+	STREAM_ID = 0
 	INVERSION = AUTO
 

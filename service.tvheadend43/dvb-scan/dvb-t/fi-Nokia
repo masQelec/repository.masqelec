@@ -1,22 +1,22 @@
 # 2014-04-18 Antti Palosaari <crope@iki.fi>
 # generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
 
-[Nokia-A]
+[Nokia]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 538000000
+	FREQUENCY = 714000000
 	BANDWIDTH_HZ = 8000000
 
-[Nokia-B]
-	DELIVERY_SYSTEM = DVBT2
-	FREQUENCY = 634000000
+[Nokia]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 746000000
 	BANDWIDTH_HZ = 8000000
 
-[Nokia-C]
+[Nokia]
 	DELIVERY_SYSTEM = DVBT
 	FREQUENCY = 530000000
 	BANDWIDTH_HZ = 8000000
 
-[Nokia-E]
+[Nokia]
 	DELIVERY_SYSTEM = DVBT
 	FREQUENCY = 690000000
 	BANDWIDTH_HZ = 8000000
