@@ -1,0 +1,64 @@
+# Slovenia / Ljubljana - center
+# MULTIPLEX A
+#------------------------------------------
+# i believe this is the old specification. keeping in case I am wrong.
+# po mojem so to stare frekvence. puščam notri v kolikor nimam prav.
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 602000000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/64
+	TRANSMISSION_MODE = 8K
+	GUARD_INTERVAL = 1/4
+	HIERARCHY = NONE
+	INVERSION = AUTO
+
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 514000000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/64
+	TRANSMISSION_MODE = 8K
+	GUARD_INTERVAL = 1/8
+	HIERARCHY = NONE
+	INVERSION = AUTO
+
+# Slovenia / Ljubljana - center
+# reference: https://dvb-t.svetidej.com/drzave/slovenija.html
+
+# MULTIPLEX A - national stations:
+#   SLO 1 HD, SLO 2 HD, SLO 3 HD, TV Maribor, TV Koper, Vaš kanal
+
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 562000000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/64
+	TRANSMISSION_MODE = 8K
+	GUARD_INTERVAL = 1/8
+	HIERARCHY = NONE
+	INVERSION = AUTO
+
+
+# MULTIPLEX C - commercial stations:
+#   TV3 Medias, Golica TV, Nora24TV
+
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 610000000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/64
+	TRANSMISSION_MODE = 8K
+	GUARD_INTERVAL = 1/8
+	HIERARCHY = NONE
+	INVERSION = AUTO
+
+

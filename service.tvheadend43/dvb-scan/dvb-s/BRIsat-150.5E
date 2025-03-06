@@ -1,0 +1,12 @@
+# Channel table for BRIsat at 150.5°E
+# Source: http://www.lyngsat.com/BRIsat.html
+
+[Bricast]
+	DELIVERY_SYSTEM = DVBS2
+	FREQUENCY = 3532000
+	POLARIZATION = HORIZONTAL
+	SYMBOL_RATE = 13330000
+	MODULATION = PSK/8
+	INNER_FEC = AUTO
+	INVERSION = AUTO
+

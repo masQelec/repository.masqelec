@@ -1,0 +1,12 @@
+# Channel table for Anik G1 at 107.3°W
+# Source: http://www.lyngsat.com/Anik-G1.html
+
+[Tuku TV]
+	DELIVERY_SYSTEM = DVBS2
+	FREQUENCY = 12017000
+	POLARIZATION = VERTICAL
+	SYMBOL_RATE = 2500000
+	MODULATION = QPSK
+	INNER_FEC = AUTO
+	INVERSION = AUTO
+

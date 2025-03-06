@@ -1,0 +1,11 @@
+# Channel table for SES 15 at 129.0°W
+# Source: http://www.lyngsat.com/SES-15.html
+
+[Reuters Live]
+	DELIVERY_SYSTEM = DVBS
+	FREQUENCY = 12122000
+	POLARIZATION = HORIZONTAL
+	SYMBOL_RATE = 17000000
+	INNER_FEC = AUTO
+	INVERSION = AUTO
+
