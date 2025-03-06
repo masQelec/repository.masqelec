@@ -42,7 +42,7 @@ url = config.get('locations', 'url')
 # Script settings:
 ask_for_exit_input = False  # asks user to press enter to exit the information window (stdout)
 overwrite_existing = True  # this will overwrite existing zip files in output directory
-rename_old = True  # will rename older zip files in output directory
+rename_old = False  # will rename older zip files in output directory
 copy_additional = True  # will copy additional files such as changelog.txt, icon.png, fanart.jpg
 replace_ampersand = True  # will replace solo ampersands (&) with &amp; in order to pass xml validation
 compress = True  # Setting this to True will compress with ZIP_DEFLATED method, if False it will use ZIP_STORED
