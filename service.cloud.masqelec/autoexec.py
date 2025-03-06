@@ -80,7 +80,7 @@ def update_version():
             print(f"Nueva actualización disponible: {name_str_url} VS {name_str_file}")
             copy("update/" + ver_url + ".tar")
             subprocess.run('kodi-send --action="Notification(Kodi va a reiniciar para actualizar, espere.."', shell=True, check=True)
-        	os.system('reboot')
+            os.system('reboot')
         else:
             print("No hay nuevas actualizaciones")
     
