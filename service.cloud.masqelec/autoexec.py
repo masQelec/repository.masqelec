@@ -23,57 +23,69 @@ def copy(name_file):
     print(f"Copying {remote}:{remote_path} to {local_path} using rclone")
     copy_file_with_rclone(remote, remote_path, local_path)
 
-def get_ver_file(name_file):
-    # Abre el archivo
-    with open(name_file, 'r') as archivo:
-        # Lee el archivo linea por linea
-        for linea in archivo:
-            # Busca la palabra "VERSION" en la linea
-            if "VERSION" in linea:
-                # Si la encuentra, extrae el texto entre comillas
-                resultado = re.findall(r'"(.*?)"', linea)
-                return resultado
-
-    # Si no encuentra ninguna linea con "VERSION", devuelve None
-    return None
-
-def get_ver_txt(txt):
-    # Divide el texto en l neas
-    lineas = txt.split('\n')
-
-    for linea in lineas:
-        # Busca la palabra "VERSION" en la l nea
-        if "VERSION" in linea:
-            # Si la encuentra, extrae el texto entre comillas
-            resultado = re.findall(r'"(.*?)"', linea)
-            return resultado
-
-    # Si no encuentra ninguna linea con "VERSION", devuelve Nonee
-    return None
-    
-def get_txt_url(url):
-    # Abre la URL
-    with urllib.request.urlopen(url) as txt_url:
-        # Lee el contenido y lo decodifica a txt
-        txt = txt_url.read().decode()
-    return txt
-
-# Función para actualizar la verison de kodi
-def update_version():
+def get_ver_file(name_file, ide):
+    """ Obtiene la versión desde un archivo local buscando 'VERSION' """
     try:
-        name_str_file = get_ver_file('/etc/os-release')
-        print(name_str_file[0])
+        with open(name_file, 'r') as archivo:
+            for linea in archivo:
+                if ide in linea:
+                    resultado = re.findall(r'"(.*?)"', linea)
+                    return resultado[0] if resultado else None
+    except FileNotFoundError:
+        print(f"Error: No se encontró el archivo {name_file}")
+    return None
+
+def get_ver_txt(txt, ide):
+    """ Obtiene la versión desde un texto en memoria """
+    for linea in txt.split('\n'):
+        if ide in linea:
+            resultado = re.findall(r'"(.*?)"', linea)
+            return resultado[0] if resultado else None
+    return None
+
+def get_txt_url(url):
+    """ Descarga el contenido de un archivo de texto desde una URL """
+    try:
+        with urllib.request.urlopen(url) as txt_url:
+            return txt_url.read().decode()
+    except Exception as e:
+        print(f"Error al obtener datos de la URL: {e}")
+        return None
+
+def update_version():
+    """ Verifica si hay una actualización y notifica si hay una nueva versión disponible """
+    try:
+        # Obtener versión local
+        #name_str_file = get_ver_file('/etc/os-release')
+        name_str_file = get_ver_file('/etc/os-release', 'VERSION_ID')
+        if not name_str_file:
+            print("No se pudo obtener la versión local.")
+            return
         
-        name_str_url = get_ver_txt(get_txt_url("https://docs.google.com/uc?export=download&id=1jYfAGe_peaZJvhhTgXhDWBrQIX8yeAPv"))
+        # Obtener versión remota desde la URL
+        url_content = get_txt_url('https://docs.google.com/uc?export=download&id=1jYfAGe_peaZJvhhTgXhDWBrQIX8yeAPv')
+        if not url_content:
+            print("No se pudo obtener la versión remota.")
+            return
         
-        if name_str_file[0] != name_str_url[0]:
-        	print("Nueva actualizacion " + name_str_url[0])
-        	copy("update/" + name_str_url[0] + ".tar")
-        	subprocess.call(["kodi-send", "-action='Notification(MANTENIMIENTO,'Kodi va a reiniciar para actualizar, espere..')'"])
-        	os.system('reboot')
+        name_str_url = get_ver_txt(url_content, 'VERSION_ID')
+        if not name_str_url:
+            print("No se encontró la versión en el archivo remoto.")
+            return
+        else:
+        	ver_url = get_ver_txt(url_content, 'VERSION')
         	
-    except subprocess.CalledProcessError as e:
-        print(f"Error during copy: {e}")
+        # Comparar versiones
+        if name_str_file < name_str_url:
+            print(f"Nueva actualización disponible: {name_str_url} VS {name_str_file}")
+            copy("update/" + ver_url + ".tar")
+            subprocess.run('kodi-send --action="Notification(Kodi va a reiniciar para actualizar, espere.."', shell=True, check=True)
+        	os.system('reboot')
+        else:
+            print("No hay nuevas actualizaciones")
+    
+    except Exception as e:
+        print(f"Error durante la verificación de actualización: {e}")
     
 # Función para verificar si un directorio existe y descomprimir en memoria
 def verificar_directorio_y_descargar_en_memoria(url, ruta_directorio):
@@ -145,17 +157,17 @@ def reload_rclone():
 
         subprocess.call(["systemctl", "daemon-reload"])
         
-        subprocess.call(["systemctl", "start", "rclone_tvshows_1"])
         subprocess.call(["systemctl", "enable", "rclone_tvshows_1"])
+        subprocess.call(["systemctl", "start", "rclone_tvshows_1"])
         
-        subprocess.call(["systemctl", "start", "rclone_tvshows_2"])
         subprocess.call(["systemctl", "enable", "rclone_tvshows_2"])
+        subprocess.call(["systemctl", "start", "rclone_tvshows_2"])
         
-        subprocess.call(["systemctl", "start", "rclone_videos_1"])
         subprocess.call(["systemctl", "enable", "rclone_videos_1"])
+        subprocess.call(["systemctl", "start", "rclone_videos_1"])
         
-        subprocess.call(["systemctl", "start", "rclone_videos_2"])
         subprocess.call(["systemctl", "enable", "rclone_videos_2"])
+        subprocess.call(["systemctl", "start", "rclone_videos_2"])
         
 
     except:
