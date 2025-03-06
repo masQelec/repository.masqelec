@@ -1,8 +1,8 @@
 # Channel table for Ibema - PR - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2347
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2347
 
-# Physical channel 16 (virtual 16.3)
-[Rede Vida, Rede Vida Educação]
+# Physical channel 16
+[Rede Vida]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 485142857
@@ -30,7 +30,7 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 32 (virtual 10.1)
+# Physical channel 32
 [RPC Cascavel]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
@@ -59,8 +59,8 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 36 (virtual 6.1)
-[TV Tarobá Cascavel]
+# Physical channel 36
+[TV Tarobá]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 605142857

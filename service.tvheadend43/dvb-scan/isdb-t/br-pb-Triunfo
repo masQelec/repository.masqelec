@@ -1,7 +1,7 @@
 # Channel table for Triunfo - PB - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2597
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2597
 
-# Physical channel 19 (virtual 12.1)
+# Physical channel 19
 [TV Paraíba]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

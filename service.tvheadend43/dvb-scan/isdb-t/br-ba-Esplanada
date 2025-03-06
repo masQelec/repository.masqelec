@@ -1,7 +1,7 @@
 # Channel table for Esplanada - BA - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=793
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=793
 
-# Physical channel 27 (virtual 7.1)
+# Physical channel 27
 [TV Bahia]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

@@ -1,7 +1,7 @@
 # Channel table for Prata - MG - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2144
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2144
 
-# Physical channel 28 (virtual 4.1)
+# Physical channel 28
 [TV Paranaíba]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

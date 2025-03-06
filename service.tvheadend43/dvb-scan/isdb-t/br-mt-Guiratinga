@@ -1,8 +1,8 @@
 # Channel table for Guiratinga - MT - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1413
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1413
 
-# Physical channel 19 (virtual 15.3)
-[Rede Vida, Rede Vida Educação]
+# Physical channel 19
+[Rede Vida]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 503142857

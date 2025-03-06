@@ -1,8 +1,8 @@
 # Channel table for Claraval - MG - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=3241
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=3241
 
-# Physical channel 20 (virtual 25.3)
-[Rede Vida, Rede Vida Educação]
+# Physical channel 20
+[Rede Vida]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 509142857

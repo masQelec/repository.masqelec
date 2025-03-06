@@ -1,8 +1,8 @@
-# Channel table for Três De Maio - RS - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1882
+# Channel table for TrÃªs de Maio - RS - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1882
 
-# Physical channel 34 (virtual 6.1)
-[RBS Santa Rosa]
+# Physical channel 34
+[RBS TV]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 593142857

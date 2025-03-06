@@ -1,9 +1,9 @@
 #----------------------------------------------------------------------------------------------
 # Auto-generated from:
-# <https://www.freeview.co.uk/help/coverage-checker/detailed-view/download/LN8 6JT>
+# <http://www.digitaluk.co.uk/coveragechecker/main/tradeexport/LN8 6JT/NA/0/>
 #----------------------------------------------------------------------------------------------
 # location and provider: UK, Belmont
-# date (yyyy-mm-dd)    : 2023-02-10
+# date (yyyy-mm-dd)    : 2014-03-25
 #
 #----------------------------------------------------------------------------------------------
 [C22 BBC A]
@@ -30,9 +30,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C28 BBC B]
+[C33 COM7 HD]
 	DELIVERY_SYSTEM = DVBT2
-	FREQUENCY = 530000000
+	FREQUENCY = 570000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -55,9 +55,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C23 ARQ A]
+[C53 ARQ A]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 490000000
+	FREQUENCY = 730000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
@@ -67,9 +67,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C26 ARQ B]
+[C60- ARQ B]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 514000000
+	FREQUENCY = 785833000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
@@ -79,15 +79,16 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C32 L-GMB]
-	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 562000000
+[C28 BBC B HD]
+	DELIVERY_SYSTEM = DVBT2
+	FREQUENCY = 530000000
 	BANDWIDTH_HZ = 8000000
-	CODE_RATE_HP = 3/4
+	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
-	MODULATION = QPSK
-	TRANSMISSION_MODE = 8K
-	GUARD_INTERVAL = 1/32
+	MODULATION = QAM/256
+	TRANSMISSION_MODE = 32K
+	GUARD_INTERVAL = 1/128
 	HIERARCHY = NONE
+	STREAM_ID = 0
 	INVERSION = AUTO
 

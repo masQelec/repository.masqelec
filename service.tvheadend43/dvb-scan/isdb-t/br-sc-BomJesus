@@ -1,8 +1,8 @@
 # Channel table for Bom Jesus - SC - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2199
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2199
 
-# Physical channel 23 (virtual 27.1)
-[SCC SBT]
+# Physical channel 23
+[SBT SC]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 527142857

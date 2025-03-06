@@ -1,7 +1,7 @@
-# Channel table for S�o Francisco De Sales - MG - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2145
+# Channel table for São Francisco de Sales - MG - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2145
 
-# Physical channel 29 (virtual 25.1)
+# Physical channel 29
 [TV Paranaíba]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

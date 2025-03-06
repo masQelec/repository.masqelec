@@ -1,7 +1,7 @@
 # Channel table for Itapaci - GO - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2664
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2664
 
-# Physical channel 20 (virtual 8.1)
+# Physical channel 20
 [TV Serra Dourada]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

@@ -1,7 +1,7 @@
-# Channel table for Santa Cruz Da Esperan�a - SP - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2829
+# Channel table for Santa Cruz da Esperança - SP - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2829
 
-# Physical channel 16 (virtual 9.1)
+# Physical channel 16
 [TV Clube Ribeirão Preto]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
@@ -30,7 +30,7 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 24 (virtual 5.1)
+# Physical channel 24
 [SBT Ribeirão Preto]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
@@ -59,11 +59,11 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 25 (virtual 7.1)
+# Physical channel 42
 [EPTV Ribeirão]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
-	FREQUENCY = 539142857
+	FREQUENCY = 641142857
 	INVERSION = AUTO
 	GUARD_INTERVAL = AUTO
 	TRANSMISSION_MODE = AUTO

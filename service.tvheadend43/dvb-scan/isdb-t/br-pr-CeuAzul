@@ -1,7 +1,7 @@
-# Channel table for C�u Azul - PR - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=265
+# Channel table for Céu Azul - PR - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=265
 
-# Physical channel 32 (virtual 10.1)
+# Physical channel 32
 [RPC Cascavel]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
@@ -30,8 +30,8 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 36 (virtual 6.1)
-[TV Tarobá Cascavel]
+# Physical channel 36
+[TV Tarobá]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 605142857
@@ -59,8 +59,8 @@
 	ISDBT_LAYERC_SEGMENT_COUNT = 0
 	ISDBT_LAYERC_TIME_INTERLEAVING = 0
 
-# Physical channel 38 (virtual 7.1)
-[RIC tv Oeste]
+# Physical channel 38
+[RIC TV]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 617142857

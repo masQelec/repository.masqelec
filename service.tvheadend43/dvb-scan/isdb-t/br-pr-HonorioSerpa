@@ -1,7 +1,7 @@
-# Channel table for Hon�rio Serpa - PR - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1754
+# Channel table for Honório Serpa - PR - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1754
 
-# Physical channel 41 (virtual 19.1)
+# Physical channel 41
 [RPC Foz do Iguaçu]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

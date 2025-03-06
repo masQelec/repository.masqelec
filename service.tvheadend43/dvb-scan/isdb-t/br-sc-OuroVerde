@@ -1,8 +1,8 @@
 # Channel table for Ouro Verde - SC - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2186
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2186
 
-# Physical channel 23 (virtual 27.1)
-[SCC SBT]
+# Physical channel 23
+[SBT SC]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 527142857

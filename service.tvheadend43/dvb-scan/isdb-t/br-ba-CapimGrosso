@@ -1,8 +1,8 @@
 # Channel table for Capim Grosso - BA - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1285
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1285
 
-# Physical channel 27 (virtual 6.1)
-[TV São Francisco]
+# Physical channel 27
+[TV Bahia]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 551142857

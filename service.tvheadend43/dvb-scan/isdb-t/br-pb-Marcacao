@@ -1,7 +1,7 @@
-# Channel table for Marcação - PB - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2642
+# Channel table for MarcaÃ§Ã£o - PB - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2642
 
-# Physical channel 19 (virtual 7.1)
+# Physical channel 19
 [TV Cabo Branco]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

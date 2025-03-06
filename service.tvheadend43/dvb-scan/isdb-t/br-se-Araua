@@ -1,7 +1,7 @@
-# Channel table for Arau· - SE - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2313
+# Channel table for Arau√° - SE - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2313
 
-# Physical channel 34 (virtual 43.1)
+# Physical channel 34
 [TV Sergipe]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

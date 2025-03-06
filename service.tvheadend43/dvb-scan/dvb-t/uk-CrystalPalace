@@ -1,9 +1,9 @@
 #----------------------------------------------------------------------------------------------
 # Auto-generated from:
-# <https://www.freeview.co.uk/help/coverage-checker/detailed-view/download/SE19 1UE>
+# <http://www.digitaluk.co.uk/coveragechecker/main/tradeexport/SE19 1UE/NA/0/>
 #----------------------------------------------------------------------------------------------
 # location and provider: UK, Crystal Palace
-# date (yyyy-mm-dd)    : 2023-02-10
+# date (yyyy-mm-dd)    : 2014-03-25
 #
 #----------------------------------------------------------------------------------------------
 [C23 BBC A]
@@ -30,9 +30,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C30- BBC B]
+[C33 COM7 HD]
 	DELIVERY_SYSTEM = DVBT2
-	FREQUENCY = 545833000
+	FREQUENCY = 570000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -79,15 +79,16 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C35 L-LON]
-	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 586000000
+[C30- BBC B HD]
+	DELIVERY_SYSTEM = DVBT2
+	FREQUENCY = 545833000
 	BANDWIDTH_HZ = 8000000
-	CODE_RATE_HP = 3/4
+	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
-	MODULATION = QPSK
-	TRANSMISSION_MODE = 8K
-	GUARD_INTERVAL = 1/32
+	MODULATION = QAM/256
+	TRANSMISSION_MODE = 32K
+	GUARD_INTERVAL = 1/128
 	HIERARCHY = NONE
+	STREAM_ID = 0
 	INVERSION = AUTO
 

@@ -1,19 +1,23 @@
 # 2014-04-18 Antti Palosaari <crope@iki.fi>
 # generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
 
-[Lohja-A]
+[Lohja]
 	DELIVERY_SYSTEM = DVBT
 	FREQUENCY = 690000000
 	BANDWIDTH_HZ = 8000000
 
-[Lohja-C]
+[Lohja]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 594000000
+	FREQUENCY = 746000000
 	BANDWIDTH_HZ = 8000000
 
-[Lohja-E]
+[Lohja]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 514000000
+	FREQUENCY = 754000000
 	BANDWIDTH_HZ = 8000000
 
+[Lohja]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 786000000
+	BANDWIDTH_HZ = 8000000
 

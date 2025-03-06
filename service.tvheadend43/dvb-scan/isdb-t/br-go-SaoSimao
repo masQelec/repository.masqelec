@@ -1,7 +1,7 @@
-# Channel table for S„o Sim„o - GO - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1644
+# Channel table for S√£o Sim√£o - GO - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1644
 
-# Physical channel 20 (virtual 6.1)
+# Physical channel 20
 [TV Serra Dourada]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

@@ -1,14 +1,14 @@
 #----------------------------------------------------------------------------------------------
 # Auto-generated from:
-# <https://www.freeview.co.uk/help/coverage-checker/detailed-view/download/LE14 4AJ>
+# <http://www.digitaluk.co.uk/coveragechecker/main/tradeexport/LE14 4AJ/NA/0/>
 #----------------------------------------------------------------------------------------------
 # location and provider: UK, Waltham
-# date (yyyy-mm-dd)    : 2023-02-10
+# date (yyyy-mm-dd)    : 2014-03-25
 #
 #----------------------------------------------------------------------------------------------
-[C32 BBC A]
+[C49 BBC A]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 562000000
+	FREQUENCY = 698000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -18,9 +18,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C34 D3&4]
+[C54- D3&4]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 578000000
+	FREQUENCY = 737833000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -30,9 +30,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C35 BBC B]
+[C31 COM7 HD]
 	DELIVERY_SYSTEM = DVBT2
-	FREQUENCY = 586000000
+	FREQUENCY = 554000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 2/3
 	CODE_RATE_LP = NONE
@@ -55,9 +55,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C37 ARQ A]
+[C56 ARQ A]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 602000000
+	FREQUENCY = 754000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
@@ -67,9 +67,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C31 ARQ B]
+[C57 ARQ B]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 554000000
+	FREQUENCY = 762000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
@@ -79,9 +79,22 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[C41 L-NOT]
+[C58 BBC B HD]
+	DELIVERY_SYSTEM = DVBT2
+	FREQUENCY = 770000000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/256
+	TRANSMISSION_MODE = 32K
+	GUARD_INTERVAL = 1/128
+	HIERARCHY = NONE
+	STREAM_ID = 0
+	INVERSION = AUTO
+
+[C26 L-NOT]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 634000000
+	FREQUENCY = 514000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE

@@ -1,7 +1,7 @@
 # Channel table for Nobres - MT - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=704
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=704
 
-# Physical channel 23 (virtual 3.1)
+# Physical channel 23
 [Rede Século 21]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

@@ -1,8 +1,8 @@
-# Channel table for Baraúna - RN - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1204
+# Channel table for BaraÃºna - RN - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1204
 
-# Physical channel 24 (virtual 24.1)
-[Band RN]
+# Physical channel 24
+[Band Natal]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 533142857

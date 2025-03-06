@@ -1,8 +1,8 @@
 # Channel table for Serra Alta - SC - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2216
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2216
 
-# Physical channel 33 (virtual 12.1)
-[NSC Chapecó]
+# Physical channel 33
+[RBS SC]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 587142857

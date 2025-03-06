@@ -1,8 +1,8 @@
-# Channel table for Imaru� - SC - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=2204
+# Channel table for Imaruí - SC - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=2204
 
-# Physical channel 35 (virtual 13.1)
-[NSC Criciúma]
+# Physical channel 35
+[RBS SC]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000
 	FREQUENCY = 599142857

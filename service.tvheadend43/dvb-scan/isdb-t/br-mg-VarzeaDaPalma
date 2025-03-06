@@ -1,7 +1,7 @@
-# Channel table for Várzea Da Palma - MG - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=3441
+# Channel table for VÃ¡rzea da Palma - MG - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=3441
 
-# Physical channel 20 (virtual 9.1)
+# Physical channel 20
 [InterTV Grande Minas]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

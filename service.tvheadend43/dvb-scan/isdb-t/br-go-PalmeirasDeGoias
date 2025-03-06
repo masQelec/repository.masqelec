@@ -1,7 +1,7 @@
-# Channel table for Palmeiras De Goi·s - GO - Brazil
-# Source: https://portalbsd.com.br/terrestres_channels.php?cidade=1257
+# Channel table for Palmeiras de Goi√°s - GO - Brazil
+# Source: http://www.portalbsd.com.br/terrestres_channels.php?channels=1257
 
-# Physical channel 27 (virtual 5.1)
+# Physical channel 27
 [TV Serra Dourada]
 	DELIVERY_SYSTEM = ISDBT
 	BANDWIDTH_HZ = 6000000

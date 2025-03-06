@@ -1,8 +1,8 @@
 # Ireland, Holywell Hill
-# Generated from https://www.2rn.ie/wp-content/uploads/2019/09/2RN-DTT-Television-Transmission-Network-Sept-2019-Rev.1.2.pdf
-[CH22: Saorview MUX1]
+# Generated from http://www.comreg.ie/_fileupload/Broadcast_Technical_Parameters.xlsx
+[CH30: Saorview MUX1]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 482000000
+	FREQUENCY = 546000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
@@ -12,9 +12,9 @@
 	HIERARCHY = NONE
 	INVERSION = AUTO
 
-[CH25: Saorview MUX2]
+[CH33: Saorview MUX2]
 	DELIVERY_SYSTEM = DVBT
-	FREQUENCY = 506000000
+	FREQUENCY = 570000000
 	BANDWIDTH_HZ = 8000000
 	CODE_RATE_HP = 3/4
 	CODE_RATE_LP = NONE
