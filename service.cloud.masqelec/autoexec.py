@@ -157,17 +157,17 @@ def reload_rclone():
 
         subprocess.call(["systemctl", "daemon-reload"])
         
-        subprocess.call(["systemctl", "start", "rclone_tvshows_1"])
         subprocess.call(["systemctl", "enable", "rclone_tvshows_1"])
+        subprocess.call(["systemctl", "start", "rclone_tvshows_1"])
         
-        subprocess.call(["systemctl", "start", "rclone_tvshows_2"])
         subprocess.call(["systemctl", "enable", "rclone_tvshows_2"])
+        subprocess.call(["systemctl", "start", "rclone_tvshows_2"])
         
-        subprocess.call(["systemctl", "start", "rclone_videos_1"])
         subprocess.call(["systemctl", "enable", "rclone_videos_1"])
+        subprocess.call(["systemctl", "start", "rclone_videos_1"])
         
-        subprocess.call(["systemctl", "start", "rclone_videos_2"])
         subprocess.call(["systemctl", "enable", "rclone_videos_2"])
+        subprocess.call(["systemctl", "start", "rclone_videos_2"])
         
 
     except:
