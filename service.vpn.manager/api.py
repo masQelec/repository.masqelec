@@ -22,6 +22,7 @@
 import xbmcaddon
 import xbmcvfs
 import string
+import random
 from libs.common import setAPICommand, clearAPICommand, getAPICommand
 from libs.utility import debugTrace, errorTrace, infoTrace, newPrint, getID
 
@@ -54,7 +55,8 @@ if not getID() == "":
             c = int(connection)
             addon = xbmcaddon.Addon(getID())
             # Adjust the 11 below to change conn_max
-            if c > 0 and c < 11:
+            if c >= 0 and c < 11: 
+                if c == 0:  c = random.randint(1, 10)
                 connection = addon.getSetting(str(c) + "_vpn_validated")
                 if not connection == "":
                     setAPICommand(connection)

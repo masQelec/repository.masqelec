@@ -50,7 +50,7 @@
 
 <addon id="service.vpn.manager"
        name="VPN Manager for OpenVPN"
-       version="7.0.3"
+       version="7.0.4"
        provider-name="Zomboided">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
