@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="repository.masQelec"
 		name="masQelec Add-ons"
-		version="20.1"
+		version="21.1"
 		provider-name="masQelec">
 	<extension point="xbmc.addon.repository"
 		name="masQelec Add-ons">
 		<dir>
-			 <info compressed="false">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_20/addons/1.0/Amlogic/arm/addons.xml</info>
-           		 <checksum>https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_20/addons/1.0/Amlogic/arm/addons.xml.md5</checksum>
-            		 <datadir zip="true">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_20/addons/1.0/Amlogic/arm/</datadir>
+			 <info compressed="false">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_21/addons/1.0/Amlogic/arm/addons.xml</info>
+           		 <checksum>https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_21/addons/1.0/Amlogic/arm/addons.xml.md5</checksum>
+            		 <datadir zip="true">https://raw.githubusercontent.com/masQelec/repository.masQelec/masqelec_21/addons/1.0/Amlogic/arm/</datadir>
            		 <hashes>false</hashes>
 		</dir>
 	</extension>
