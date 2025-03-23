@@ -120,41 +120,35 @@ def update_version():
 def reload_rclone():
     try:
         key = get_key_from_authorized_keys()
-        
         file_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone.conf.enc"
         download_and_decrypt_file(file_url, "/storage/.config/rclone/rclone.conf", key)
-
-        urllib.request.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone_tvshows_1.service",
-                                   filename="/storage/.config/system.d/rclone_tvshows_1.service")
-
-        urllib.request.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone_tvshows_2.service",
-                                   filename="/storage/.config/system.d/rclone_tvshows_2.service")
-
-        urllib.request.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone_videos_1.service",
-                                   filename="/storage/.config/system.d/rclone_videos_1.service")
-
-        urllib.request.urlretrieve("https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone_videos_2.service",
-                                   filename="/storage/.config/system.d/rclone_videos_2.service")
-
-
+        
+        services = [
+            "rclone_tvshows_1.service",
+            "rclone_tvshows_2.service",
+            "rclone_videos_1.service",
+            "rclone_videos_2.service"
+        ]
+        
+        for service in services:
+            url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/" + service
+            dest = "/storage/.config/system.d/" + service
+            try:
+                urllib.request.urlretrieve(url, filename=dest)
+            except Exception as e:
+                print("Error descargando: {e}")
+        
         subprocess.call(["systemctl", "daemon-reload"])
         
-        subprocess.call(["systemctl", "enable", "rclone_tvshows_1"])
-        subprocess.call(["systemctl", "start", "rclone_tvshows_1"])
+        for service in services:
+            name = service.replace(".service", "")
+            subprocess.call(["systemctl", "enable", name])
+            subprocess.call(["systemctl", "start", name])
         
-        subprocess.call(["systemctl", "enable", "rclone_tvshows_2"])
-        subprocess.call(["systemctl", "start", "rclone_tvshows_2"])
+        print("rclone recargado exitosamente.")
+    except Exception as e:
+        print(f"Error en reload_rclone: {e}")
         
-        subprocess.call(["systemctl", "enable", "rclone_videos_1"])
-        subprocess.call(["systemctl", "start", "rclone_videos_1"])
-        
-        subprocess.call(["systemctl", "enable", "rclone_videos_2"])
-        subprocess.call(["systemctl", "start", "rclone_videos_2"])
-        
-
-    except:
-        reload_rclone()
-
 # Llamar a la función
 reload_rclone()
 
