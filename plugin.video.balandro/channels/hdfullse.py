@@ -154,17 +154,17 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone(channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_hdfullse', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='hdfullse', folder=False, text_color='chartreuse' ))
 
-    itemlist.append(Item( channel='domains', action='operative_domains_hdfullse', title='Comprobar [B]Dominio Operativo Vigente' + '[COLOR dodgerblue] https://hdfull.pm[/B][/COLOR]',
+    itemlist.append(item.clone( channel='domains', action='operative_domains_hdfullse', title='Comprobar [B]Dominio Operativo Vigente' + '[COLOR dodgerblue] hdfull.pm[/B][/COLOR]',
                           desde_el_canal = True, thumbnail=config.get_thumb('hdfullse'), text_color='mediumaquamarine' ))
 
-    itemlist.append(Item( channel='domains', action='last_domain_hdfullse', title='[B]Comprobar último dominio vigente[/B]',
+    itemlist.append(item.clone( channel='domains', action='last_domain_hdfullse', title='[B]Comprobar último dominio vigente[/B]',
                           desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('hdfullse'), text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
@@ -174,9 +174,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_hdfullse', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('hdfullse') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_hdfullse', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('hdfullse') ))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'hdfullse', thumbnail=config.get_thumb('hdfullse') ))
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'hdfullse', thumbnail=config.get_thumb('hdfullse') ))
 
     platformtools.itemlist_refresh()
 

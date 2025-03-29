@@ -50,6 +50,7 @@ color_adver = config.get_setting('notification_adver_color', default='violet')
 color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 
+
 channels_unsatisfactory = config.get_setting('developer_test_channels', default='')
 servers_unsatisfactory = config.get_setting('developer_test_servers', default='')
 
@@ -57,6 +58,7 @@ servers_unsatisfactory = config.get_setting('developer_test_servers', default=''
 srv_pending = ''
 con_incidencias = ''
 no_accesibles = ''
+con_problemas = ''
 
 try:
     with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
@@ -65,6 +67,7 @@ except:
     except: txt_status = ''
 
 if txt_status:
+    # ~ Pending
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION SERVIDORES(.*?)SITUACION CANALES')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -74,6 +77,7 @@ if txt_status:
 
         if '[COLOR orchid]' in match: srv_pending += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ Incidencias
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -83,6 +87,7 @@ if txt_status:
 
         if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ No Accesibles
     bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -91,6 +96,16 @@ if txt_status:
         match = match.strip()
 
         if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ Con Problemas
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES CON PROBLEMAS(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
 
 
 txt_provs = '[COLOR plum][B]Obtenga Nuevos Proxies desde[/B][/COLOR] [COLOR yellow][B]All-providers[/B][/COLOR], [COLOR yellow][B]Proxyscrape.com[/B][/COLOR], [COLOR yellow][B]Us-proxy.com[/B][/COLOR] ó los [COLOR magenta][B]Recomendados[/B][/COLOR][CR]'
@@ -114,37 +129,33 @@ timeout = config.get_setting('httptools_timeout', default=15)
 espera = config.get_setting('servers_waiting', default=6)
 
 dominioshdfull = [
+         'https://hdfull.blog/',
+         'https://hdfull.today/',
+         'https://hd-full.biz/',
+         'https://hdfull.sbs/',
+
+         'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
-         'https://hdfull.blog/',
-         'https://hd-full.info/',
-         'https://hd-full.sbs/',
-         'https://hd-full.life/',
-         'https://hd-full.fit/',
-         'https://hd-full.me/',
-         'https://hd-full.vip/',
-         'https://hdfull.quest/',
-         'https://hdfull.today/',
-         'https://hd-full.biz/',
-         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
+
          'https://new.hdfull.one/'
          ]
 
 dominiosplaydede = [
-         'https://www1.playdede.link/'
+         'https://www9.playdede.link/'
          ]
 
 channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
-channels_despised = ['beeg', 'cam4', 'cuevana3in', 'hdfullse', 'pelisplushdlat', 'ytsmx']
+channels_despised = ['beeg', 'cam4', 'hdfullse', 'pelisplushdlat', 'ytsmx']
 
-servers_poe = [ 'directo', 'm3u8hls', 'torrent' ]
+servers_poe = ['directo', 'm3u8hls', 'torrent']
 
 
 def test_channel(channel_name):
@@ -536,12 +547,30 @@ def test_channel(channel_name):
 
         if 'clons' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
-            txt_diag  += 'clones: ' + '[COLOR turquoise][B]Canal Principal com Más Canales Clones Asociados[/B][/COLOR]'
+
+            txt_diag  += 'principal: ' + '[COLOR turquoise][B]Canal com Más Canales Clones Asociados[/B][/COLOR]'
+
+            txt_clons = ''
+            if channel_id == 'cuevana2esp': txt_clons = 'Cuevana2'
+
+            elif channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrentsIn, EliteDivx, LilaTorrent, MasTorrents, MejorTorrentApp, NaranjaTorrent, ReinvenTorrent, RojoTorrent, TomaDivx, TodoTorrents, VerdeTorrent'
+
+            elif channel_id == 'homecine': txt_clons = 'PelisPediaIs, SeriesMetroN'
+
+            elif channel_id == 'elitetorrent': txt_clons = 'EliteTorrentNz'
+            elif channel_id == 'gnula24': txt_clons = 'Gnula24h, Series24'
+
+            elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesEs, SeriesOnline, SeriesTv, Star'
+
+            elif channel_id == 'zonapelis': txt_clons = 'TorrenFlix'
+
+            if txt_clons:
+                txt_diag  += '[CR]clones: [COLOR gold][B]' + txt_clons + '[/B][/COLOR]'
 
         if 'clone' in str(params['clusters']):
             txt_clones = ''
-            if channel_id == 'cinecalidadla': txt_clones = 'CineCalidad'
-            elif channel_id == 'cuevana2': txt_clones = 'Cuevana2Esp'
+
+            if channel_id == 'cuevana2': txt_clones = 'Cuevana2Esp'
             elif channel_id == 'divxatope': txt_clones = 'DonTorrents'
             elif channel_id == 'dontorrentsin': txt_clones = 'DonTorrents'
             elif channel_id == 'elitedivx': txt_clones = 'DonTorrents'
@@ -552,20 +581,22 @@ def test_channel(channel_name):
             elif channel_id == 'mejortorrentapp': txt_clones = 'DonTorrents'
             elif channel_id == 'naranjatorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'onlinetv': txt_clones = 'VerOnline'
+            elif channel_id == 'pelispediais': txt_clones = 'HomeCine'
             elif channel_id == 'reinventorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'rojotorrent': txt_clones = 'DonTorrents'
-            elif channel_id == 'series24': txt_clones = 'Series24'
+            elif channel_id == 'series24': txt_clones = 'Gnula24'
             elif channel_id == 'serieses': txt_clones = 'VerOnline'
+            elif channel_id == 'seriesmetron': txt_clones = 'HomeCine'
             elif channel_id == 'seriesonline': txt_clones = 'VerOnline'
-            elif channel_id == 'seriesplus': txt_clones = 'VerOnline'
             elif channel_id == 'seriestv': txt_clones = 'VerOnline'
             elif channel_id == 'star': txt_clones = 'VerOnline'
             elif channel_id == 'tomadivx': txt_clones = 'DonTorrents'
             elif channel_id == 'todotorrents': txt_clones = 'DonTorrents'
+            elif channel_id == 'torrenflix': txt_clones = 'ZonaPelis'
             elif channel_id == 'verdetorrent': txt_clones = 'DonTorrents'
 
-            if txt_diag: txt_diag += '[CR]'
-            txt_diag  += 'clone: ' + '[COLOR turquoise][B]Clon del Canal Principal[/COLOR][COLOR gold] ' + txt_clones + '[/B][/COLOR]'
+            if txt_clones:
+                txt_diag  += '[CR]clone: ' + '[COLOR turquoise][B]Clon del Canal Principal[/COLOR][COLOR gold] ' + txt_clones + '[/B][/COLOR]'
 
         if 'onlyone' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
@@ -586,13 +617,14 @@ def test_channel(channel_name):
                           if txt_diag: txt_diag += '[CR]'
                           txt_diag  += 'motor: ' + '[COLOR gold][B]' + tex_tor + '[/B][/COLOR]'
                 else:
-                    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-                        cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
-                        tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
-                    else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
+                    if channel_id in ['areadocumental', 'ciberdocumetales', 'mundodesconocido', 'documentaryheaven', 'documentarystorm', 'topdocumentaryfilms', 'youtubedocs']:
+                        if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+                            cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+                            tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+                        else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
-                    if txt_diag: txt_diag += '[CR]'
-                    txt_diag  += 'youtube: ' + '[COLOR gold][B]' + tex_yt + '[/B][/COLOR]'
+                        if txt_diag: txt_diag += '[CR]'
+                        txt_diag  += 'youtube: ' + '[COLOR gold][B]' + tex_yt + '[/B][/COLOR]'
 
         if 'suggested' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
@@ -877,9 +909,16 @@ def test_channel(channel_name):
                     txt += '[COLOR mediumaquamarine][B]' + ant_host[1] + '[/B][/COLOR][CR]'
 
     if config.get_setting('user_test_channel', default=''):
-        if config.get_setting('user_test_channel') == 'host_channel': config.set_setting('user_test_channel', host)
-        elif config.get_setting('user_test_channel') == 'localize': config.set_setting('user_test_channel', 'localized')
-        return ''
+        if config.get_setting('user_test_channel', default='') == 'host_channel':
+            config.set_setting('user_test_channel', host)
+            return host
+
+        elif config.get_setting('user_test_channel', default='') == 'localize':
+            config.set_setting('user_test_channel', 'localized')
+            return ''
+        else:
+            config.set_setting('user_test_channel', host)
+            return host
 
     avis_causas = ''
 
@@ -905,6 +944,20 @@ def test_channel(channel_name):
         avis_causas = '[COLOR moccasin][B]El canal No es Accesible.[/B]'
         if '[B]No Accesible:[/B][/COLOR]' in str(txt):
             incidencia = str(txt).split("[B]No Accesible:[/B][/COLOR]")[1]
+            incidencia = incidencia.strip()
+            incidencia = str(incidencia).split("[/B][/COLOR]")[0]
+
+            if incidencia:
+                if len(incidencia) < 99:
+                    avis_causas = avis_causas + ' ' + incidencia
+
+        platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+        avisado = True
+
+    elif 'Con Problema:' in txt:
+        avis_causas = '[COLOR moccasin][B]El canal Tiene un Problema.[/B]'
+        if '[B]Con Problema:[/B][/COLOR]' in str(txt):
+            incidencia = str(txt).split("[B]Con Problema:[/B][/COLOR]")[1]
             incidencia = incidencia.strip()
             incidencia = str(incidencia).split("[/B][/COLOR]")[0]
 
@@ -1225,6 +1278,27 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[COLOR tan][B]' + incidencia + '[/B][/COLOR][CR]'
 
+        if con_problemas:
+            host_problem = host.replace('https://', '').replace('http://', '').replace('/', '')
+
+            if host_problem in str(con_problemas):
+                problema = ''
+
+                txt += '[CR][CR][COLOR darkcyan][B]Con Problema:[/B][/COLOR] '
+                problems = scrapertools.find_multiple_matches(str(con_problemas), '[COLOR moccasin](.*?)[/B][/COLOR]')
+
+                for problem in problems:
+                    if not host_problem in problem: continue
+
+                    problema = scrapertools.find_single_match(str(problem), '[COLOR lime].*?' + host_problem + '(.*?)$').strip()
+                    problema = problema.replace('[I][COLOR olivedrab]', '').replace('[I]', '').replace('[/I][/B][', '').strip()
+                    break
+
+                if not problema: problema = 'vea Últimos Cambios de Dominios en la Ayuda'
+                else: problema = problema + '[/COLOR]'
+
+                txt += '[COLOR tan][B]' + problema + '[/B][/COLOR][CR]'
+
     if follow_redirects == False: txt += '[CR][CR][COLOR moccasin][B]Acceso: ' + txt_dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
     else: txt += '[CR][CR][COLOR moccasin][B]Redirect: ' + txt_dominio + ' ' + text_with_proxies + '[/B][/COLOR][CR]'
 
@@ -1318,7 +1392,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             elif 'Renew Now' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
 
             if len(response.data) < 1100:
-                 if '.js"></script>' in str(response.data): txt += "[CR]web: [COLOR red][B]No Sponsors[/B][/COLOR]"
+                 if '.js"></script>' in str(response.data): txt += "[CR]web: [COLOR red][B]No Sponsors / Expired[/B][/COLOR]"
 
             if new_web:
                 if str(response.code) == '300' or str(response.code) == '301' or str(response.code) == '302' or str(response.code) == '303' or str(response.code) == '304' or str(response.code) == '307' or str(response.code) == '308':
@@ -1745,7 +1819,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             txt += txt_routs
 
     if config.get_setting('user_test_channel', default=''):
-        if config.get_setting('user_test_channel') == 'localized': config.set_setting('user_test_channel', '')
+        if config.get_setting('user_test_channel', default='') == 'localized': config.set_setting('user_test_channel', '')
 
         if 'Nuevo Dominio Permanente' in str(txt) or 'Nuevo Dominio Temporal' in str(txt):
             if new_web: config.set_setting('user_test_channel', new_web)

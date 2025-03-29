@@ -3,7 +3,7 @@
   "name": "ILoveNovelas",
   "thumbnail": "ilovenovelas.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["tales"],
+  "clusters": ["temporary", "tales"],
 
   "notes": "Web dedicada principalmente en Novelas."
 }

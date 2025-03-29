@@ -53,7 +53,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'novelas-completas/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'capitulos-completos/', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'home/', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
@@ -598,6 +598,8 @@ def findvideos(item):
 
         data1 = do_downloadpage(link, post = post, headers = {'Referer': item.url} )
 
+        data1 = data1.replace('a.src=', 'a.brc=')
+
         matches = scrapertools.find_multiple_matches(data1, "<iframe.*?src='(.*?)'")
         if not matches: matches = scrapertools.find_multiple_matches(data1, '<iframe.*?src="(.*?)"')
 
@@ -727,6 +729,28 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if url:
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"): servidor = new_server
+
+        if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url or 'wishfast' in url or 'sfastwish' in url or 'doodporn' in url or 'flaswish' in url or 'obeywish' in url or 'cdnwish' in url or 'asnwish' in url or 'flastwish' in url or 'jodwish' in url or 'swhoi' in url or 'fsdcmo' in url or 'swdyu' in url or 'wishonly' in url or 'playerwish' in url or 'hlswish' in url or 'wish' in url or 'iplayerhls' in url or 'hlsflast' in url or 'ghbrisk' in url:
+            url += "|Referer=" + host
+
+        itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
 

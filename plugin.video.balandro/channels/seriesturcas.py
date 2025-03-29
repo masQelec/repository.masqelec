@@ -320,6 +320,9 @@ def play(item):
         url = scrapertools.find_single_match(data, 'data-hash="(.*?)"')
 
     if url:
+        if '/cdn4.turboviplay.com/data1/' in url:
+            url = url.replace('/cdn4.turboviplay.com/data1/', '/cdn4.turboviplay.com/data2/')
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

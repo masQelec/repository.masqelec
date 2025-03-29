@@ -116,7 +116,7 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Recently added<(.*?)<strong>Mega1Link</strong>')
+    bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)<strong>Mega1Link</strong>')
     if not bloque: bloque = scrapertools.find_single_match(data, '<h1(.*?)<strong>Mega1Link</strong>')
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
@@ -156,6 +156,8 @@ def list_all(item):
         if "DVDrip" in PeliTitle: PeliTitle = PeliTitle.split("DVDrip")[0]
         if " HD " in PeliTitle: PeliTitle = PeliTitle.split(" HD ")[0]
         if " hd " in PeliTitle: PeliTitle = PeliTitle.split(" hd ")[0]
+        if " HD" in PeliTitle: PeliTitle = PeliTitle.split(" HD")[0]
+        if " hd" in PeliTitle: PeliTitle = PeliTitle.split(" hd")[0]
 
         tipo = 'tvshow' if '/series/' in url else 'movie'
 
@@ -304,13 +306,6 @@ def episodios(item):
     return itemlist
 
 
-def puntuar_calidad(txt):
-    txt = txt.replace(' ', '').replace('-', '').lower()
-    orden = ['tscam', 'brscreener', 'dvdrip', 'hd720p', 'hd1080p']
-    if txt not in orden: return 0
-    else: return orden.index(txt) + 1
-
-
 def findvideos(item):
     logger.info()
     itemlist = []
@@ -322,9 +317,7 @@ def findvideos(item):
     ses = 0
 
     # Video Soources
-    matches = re.compile('<tr id=(.*?)</tr>', re.DOTALL).findall(data)
-
-    matches = scrapertools.find_multiple_matches(data, 'id="player-option-(.*?)</li>')
+    matches: matches = scrapertools.find_multiple_matches(data, 'id="player-option-(.*?)</li>')
     if not matches: matches = scrapertools.find_multiple_matches(data, "id='player-option-(.*?)</li>")
 
     for match in matches:
@@ -407,7 +400,9 @@ def findvideos(item):
 
                                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
 
-    # Enlaces en descargas
+    # Descargas
+    i = 0
+
     matches = re.compile('<tr id=(.*?)</tr>', re.DOTALL).findall(data)
 
     for lin in matches:
@@ -424,11 +419,72 @@ def findvideos(item):
 
         if servidor == 'soon': continue
         elif servidor == 'uii': continue
-        elif servidor == 'pastedvdrip': continue
         elif servidor == 'rinku': continue
         elif servidor == 'koramaup': continue
 
-        if 'drive' in servidor: servidor = 'gvideo'
+        if servidor == 'pastedvdrip':
+            if '/links/' in url:
+               i += 1
+
+               if i > 1: continue
+
+               if config.get_setting('channels_charges', default=True):
+                   platformtools.dialog_notification('Mega1Link', '[COLOR blue]Cargando enlaces[/COLOR]')
+
+               data1 = do_downloadpage(url)
+
+               matches1 = scrapertools.find_multiple_matches(data1, 'href="(.*?)"')
+
+               for match in matches1:
+                   data2 = httptools.downloadpage(match).data
+
+                   links = scrapertools.find_multiple_matches(data2, '<a target=.*?href="(.*?)"')
+
+                   for link in links:
+                       if not '/pastedvdrip.' in link: continue
+
+                       try:
+                           new_url = httptools.downloadpage(link, follow_redirects=False).headers['location']
+                       except: continue
+
+                       if new_url:
+                           if '/1fichier.' in new_url: continue
+                           elif '/koramaup.' in new_url: continue
+                           elif '/akirabox.' in new_url: continue
+
+                           url = new_url
+
+                           servidor = servertools.get_server_from_url(url)
+                           servidor = servertools.corregir_servidor(servidor)
+
+                           url = servertools.normalize_url(servidor, url)
+
+                           if servertools.is_server_available(servidor):
+                               if not servertools.is_server_enabled(servidor): continue
+                           else:
+                               if not config.get_setting('developer_mode', default=False): continue
+
+                           if url.startswith('//'): url = 'https:' + url
+
+                           qlty = scrapertools.find_single_match(lin, "<strong class='quality'>(.*?)</strong>").replace('mp4', '').strip()
+
+                           lang = scrapertools.find_single_match(lin, "<td>([^<]+)")
+
+                           other = ''
+                           if servidor == 'various': other = servertools.corregir_other(url)
+                           elif servidor == 'directo':
+                              if '/mega.' in url: other = 'Mega'
+                              elif '/cybervynx.' in url: other = 'Cybervynx'
+
+                           url = url.replace('/Smoothpre.', '/smoothpre.')
+
+                           itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url=url, 
+                                                 language=IDIOMAS.get(lang, lang), quality=qlty, quality_num=puntuar_calidad(qlty), other=other ))
+
+
+               continue  
+
+        elif 'drive' in servidor: servidor = 'gvideo'
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
@@ -437,15 +493,15 @@ def findvideos(item):
 
         if url.startswith('//'): url = 'https:' + url
 
-        qlty = scrapertools.find_single_match(lin, '<strong class=quality>(.*?)</strong>').replace('mp4', '').strip()
+        qlty = scrapertools.find_single_match(lin, "<strong class='quality'>(.*?)</strong>").replace('mp4', '').strip()
 
         lang = scrapertools.find_single_match(lin, "<td>([^<]+)")
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(servidor)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
-                              language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url=url, 
+                              language=IDIOMAS.get(lang, lang), quality=qlty, quality_num=puntuar_calidad(qlty), other=other ))
 
     if not itemlist:
         if not ses == 0:
@@ -455,37 +511,60 @@ def findvideos(item):
     return itemlist
 
 
+def puntuar_calidad(txt):
+    txt = txt.replace(' ', '').replace('-', '').lower()
+    orden = ['tscam', 'hdts', 'brscreener', 'dvdrip', 'hd720p', 'hd1080p']
+    if txt not in orden: return 0
+    else: return orden.index(txt) + 1
+
+
 def play(item):
     logger.info()
     itemlist = []
 
+    url = item.url
+
+    if item.server == 'uptobox':
+        return 'Servidor [COLOR goldenrod]Fuera de Servicio[/COLOR]'
+
     if item.url.startswith(host):
-        data = do_downloadpage(item.url)
+        if '/links/' in item.url:
+            new_url = ''
+            try:
+                new_url = httptools.downloadpage(item.url, follow_redirects=False).headers['location']
+            except: pass
 
-        url = scrapertools.find_single_match(data, '<a id=.*?href="(.*?)"')
+        if new_url: url = new_url
+        else:
+            data = do_downloadpage(item.url)
 
-        if url:
-            if 'url=' in url: url = scrapertools.find_single_match(url, 'url=(.*?)$')
-
-            url = url.replace('&amp;', '&')
+            url = scrapertools.find_single_match(data, '<a id=.*?href="(.*?)"')
 
             if url:
-                if '/uii.' in url:
-                    return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+                if 'url=' in url: url = scrapertools.find_single_match(url, 'url=(.*?)$')
 
-                servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
+                url = url.replace('&amp;', '&')
 
-                if servidor == 'directo':
-                    new_server = servertools.corregir_other(url).lower()
-                    if new_server.startswith("http"): servidor = new_server
+    if url:
+        if '/uii.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
-                url = servertools.normalize_url(servidor, url)
+        url = url.replace('/Smoothpre.', '/smoothpre.')
 
-                if servidor != 'directo':
-                    itemlist.append(item.clone(url=url, server=servidor ))
-    else:
-        itemlist.append(item.clone())
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"): servidor = new_server
+
+        if '/mega.' in url: servidor = 'mega'
+        elif '/cybervynx.' in url: servidor = 'various'
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor != 'directo':
+            itemlist.append(item.clone(url=url, server=servidor ))
 
     return itemlist
 

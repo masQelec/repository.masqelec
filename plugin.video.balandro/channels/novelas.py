@@ -75,6 +75,10 @@ def list_lst(item):
         if 'Temporada' in SerieName: SerieName = SerieName.split("Temporada")[0]
         if 'temporada' in SerieName: SerieName = SerieName.split("temporada")[0]
 
+        SerieName = SerieName.strip()
+
+        SerieName = SerieName.replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u')
+
         title = title.replace('Temporada', '[COLOR goldenrod]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='list_all', url = url, title = title, cat = True,
@@ -124,7 +128,12 @@ def list_all(item):
         if not url or not title: continue
 
         if not title_ser in url:
-           if not '-bb' in title_ser: continue
+            c_year = scrapertools.find_single_match(title_ser, '(\d{4})')
+
+            if c_year:
+                title_ser = title_ser.replace(c_year, '').strip()
+
+                if not title_ser in url: continue
 
         title = title.replace('&#8211;', '').replace('Ver ', '').strip()
 

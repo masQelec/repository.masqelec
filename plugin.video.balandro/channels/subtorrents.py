@@ -196,7 +196,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = ' - [COLOR cyan]Estrenos[/COLOR]', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = '[B]Otros idiomas:[/B]', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = '[B]Idiomas:[/B]', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=audio-latino', search_type = 'movie' ))
 

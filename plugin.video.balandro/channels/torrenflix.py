@@ -10,12 +10,6 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://www.torrenflix.com/'
 
 
-_players = ['.torrenflix.']
-
-
-perpage = 24
-
-
 IDIOMAS = {'Español': 'Esp', 'Latino': 'Lat', 'Subtitulado': 'Vose', 'V.O.S.E': 'Vose', 'Inglés': 'Ing'}
 
 

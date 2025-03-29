@@ -7,11 +7,10 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.srnovelashd.cc/'
-
+host = 'https://www.srnovelas.onl/'
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.srnovelas.top/', 'https://imu.srnovelas.top/']
+ant_hosts = ['https://www.srnovelas.top/', 'https://imu.srnovelas.top/', 'https://www.srnovelashd.cc/']
 
 domain = config.get_setting('dominio', 'novelastop', default='')
 
@@ -71,9 +70,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'telenovela/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'novelas/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'novela/', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ver-novela/', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Temporadas', action = 'list_all', url = host + 'temporada/', group = 'temp', search_type = 'tvshow' ))
 

@@ -360,6 +360,8 @@ def findvideos(item):
     for url in matches:
         if url == 'about:blank': continue
 
+        elif 'data:image' in url: continue
+
         elif '/googleads.' in url: continue
 
         elif url.endswith('.jpg'): continue

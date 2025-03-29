@@ -182,12 +182,12 @@ def calidades(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'En 4K 2160p', action = 'list_all', url = host + 'quality/4k-2160p/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'En 1080p dual', action = 'list_all', url = host + 'quality/1080p-dual/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'En 1080p', action = 'list_all', url = host + 'quality/1080p/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'En 720p', action = 'list_all', url = host + 'quality/720p/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En 4K 2160p', action = 'list_all', url = host + 'calidad/4k-2160p/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En 1080p dual', action = 'list_all', url = host + 'calidad/1080p-dual/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En 1080p', action = 'list_all', url = host + 'calidad/1080p/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En 720p', action = 'list_all', url = host + 'calidad/720p/', text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = 'En Micro HD', action = 'list_all', url = host + 'peliculas-microhd-9/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En Micro HD', action = 'list_all', url = host + 'calidad/microhd/', text_color='moccasin' ))
 
     return itemlist
 
@@ -427,7 +427,8 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Utorrent<(.*?)</table>')
+    bloque = scrapertools.find_single_match(data, '>Torrent<(.*?)</table>')
+    if not bloque: bloque = scrapertools.find_single_match(data, '>Utorrent<(.*?)</table>')
 
     links = scrapertools.find_multiple_matches(bloque, '<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
 
@@ -436,6 +437,12 @@ def findvideos(item):
     if not links: links = scrapertools.find_multiple_matches(data, '>T<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
 
     for qlty, lang, size, link in links:
+        if qlty == 'voe': qlty = ''
+
+        if '>Dual' in lang or '>D' in lang:
+            qlty = lang.replace('>', '').strip()
+            lang = 'Lat'
+
         if 'Castellano' in lang: lang = 'Esp'
         elif 'Latino' in lang: lang = 'Lat'
         elif 'Subitulado' in lang: lang = 'Vose'

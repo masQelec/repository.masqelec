@@ -129,7 +129,7 @@ def list_all(item):
 
             titulo = '[COLOR goldenrod]Epis. [/COLOR]' + title
 
-            titulo = titulo.replace('Season', '[COLOR tan]Season[/COLOR]')
+            titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, infoLabels={'year': '-'},
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = 1))

@@ -262,6 +262,8 @@ def episodios(item):
         title = title.replace('Completos en HD', '').replace('Completos en Hd', '').replace('Completo en HD', '').replace('Completo en Hd', '').strip()
 
         epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
+        if not epis: epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
+
         if not epis: epis = 1
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').strip()

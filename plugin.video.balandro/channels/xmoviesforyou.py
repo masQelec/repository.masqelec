@@ -96,6 +96,8 @@ def findvideos(item):
 
             url = servertools.normalize_url(servidor, url)
 
+            if '/bigwarp.' in url or '/bgwp.' in url: servidor = 'zures'
+
             itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server = servidor, language = 'Vo') )
 
     if not itemlist:

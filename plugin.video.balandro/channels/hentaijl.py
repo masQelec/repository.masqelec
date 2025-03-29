@@ -169,6 +169,8 @@ def findvideos(item):
     for url in matches:
         ses += 1
 
+        url = url.replace('/Smoothpre.', '/smoothpre.')
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

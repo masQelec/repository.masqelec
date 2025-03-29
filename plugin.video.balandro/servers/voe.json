@@ -207,6 +207,10 @@
       {
         "pattern": "https://maxfinishseveral.com/(?:e/|)([A-z0-9]+)",
         "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://chuckle-tube.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
       }
     ]
   }
