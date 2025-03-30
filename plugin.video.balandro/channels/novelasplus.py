@@ -168,6 +168,12 @@ def list_all(item):
         if "(En Español)" in SerieName: SerieName = SerieName.split("(En Español)")[0]
         if "(en español)" in SerieName: SerieName = SerieName.split("(en español)")[0]
 
+        if "En Espanol" in SerieName: SerieName = SerieName.split("En Espanol")[0]
+        if "en espanol" in SerieName: SerieName = SerieName.split("en espanol")[0]
+
+        if "(En Espanol)" in SerieName: SerieName = SerieName.split("(En Espanol)")[0]
+        if "(en espanol)" in SerieName: SerieName = SerieName.split("(en espanol)")[0]
+
         SerieName = SerieName.strip()
 
         thumb = scrapertools.find_single_match(match, 'data-img="(.*?)"')
@@ -382,6 +388,8 @@ def findvideos(item):
         url = url.strip()
 
         if '/likessb.' in url: continue
+        elif '/scripts/' in url: continue
+        elif 'data:image' in url: continue
 
         if host[:-1] in url: continue
 
@@ -400,6 +408,8 @@ def findvideos(item):
         elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
         elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
         elif url.startswith('https://novelas360.cyou/'): url = url.replace('/novelas360.cyou/', '/waaw.to/')
+        elif url.startswith('https://w.ennovelas.io/'): url = url.replace('/w.ennovelas.io/', '/waaw.to/')
+        elif url.startswith('https://sr.ennovelas.io/'): url = url.replace('/sr.ennovelas.io/', '/waaw.to/')
 
         url = url.replace('&amp;', '&')
 
@@ -439,6 +449,8 @@ def findvideos(item):
 
         for url in matches:
             if '/wp-admin/' in url: continue
+            elif '/scripts/' in url: continue
+            elif 'data:image' in url: continue
 
             if host[:-1] in url: continue
 
@@ -457,6 +469,8 @@ def findvideos(item):
             elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
             elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
             elif url.startswith('https://novelas360.cyou/'): url = url.replace('/novelas360.cyou/', '/waaw.to/')
+            elif url.startswith('https://w.ennovelas.io/'): url = url.replace('/w.ennovelas.io/', '/waaw.to/')
+            elif url.startswith('https://sr.ennovelas.io/'): url = url.replace('/sr.ennovelas.io/', '/waaw.to/')
 
             url = url.replace('&amp;', '&')
 
@@ -495,6 +509,8 @@ def findvideos(item):
            if u_link.startswith('//'): u_link = 'https:' + u_link
 
            if '/wp-admin/' in u_link: u_link = ''
+           elif '/scripts/' in u_link: u_link = ''
+           elif 'data:image' in u_link: u_link = ''
 
            if u_link:
                if u_link.startswith('https://sr.ennovelas.net/'): u_link = u_link.replace('/sr.ennovelas.net/', '/waaw.to/')
@@ -502,6 +518,8 @@ def findvideos(item):
                elif u_link.startswith('https://reproductor.telenovelas-turcas.com.es/'): u_link = u_link.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
                elif u_link.startswith('https://novelas360.cyou/player/'): u_link = u_link.replace('/novelas360.cyou/player/', '/waaw.to/')
                elif u_link.startswith('https://novelas360.cyou/'): u_link = u_link.replace('/novelas360.cyou/', '/waaw.to/')
+               elif u_link.startswith('https://w.ennovelas.io/'): u_link = u_link.replace('/w.ennovelas.io/', '/waaw.to/')
+               elif u_link.startswith('https://sr.ennovelas.io/'): u_link = u_link.replace('/sr.ennovelas.io/', '/waaw.to/')
 
                elif u_link.startswith('https://vk.com/'): u_link = u_link.replace('&amp;', '&')
 
@@ -528,6 +546,8 @@ def findvideos(item):
         ses += 1
 
         if '/wp-admin/' in url: continue
+        elif '/scripts/' in url: continue
+        elif 'data:image' in url: continue
 
         if url.startswith('//'): url = 'https:' + url
 
@@ -536,6 +556,8 @@ def findvideos(item):
         elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
         elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
         elif url.startswith('https://novelas360.cyou/'): url = url.replace('/novelas360.cyou/', '/waaw.to/')
+        elif url.startswith('https://w.ennovelas.io/'): url = url.replace('/w.ennovelas.io/', '/waaw.to/')
+        elif url.startswith('https://sr.ennovelas.io/'): url = url.replace('/sr.ennovelas.io/', '/waaw.to/')
 
         url = url.replace('&amp;', '&')
 
@@ -566,8 +588,12 @@ def play(item):
 
     url = item.url
 
+    if '.strp2p.' in url: url = ''
+
+    elif url == 'https://ennovelas.net/': url = ''
+
     if url:
-        if '/sbplay' in url:
+        if url.startswith("https://sb"):
             return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
 
         elif 'streamsb' in url or 'playersb' in url or 'pelisplay' in url or 'tomatomatela' in url:
@@ -575,6 +601,12 @@ def play(item):
 
         elif '.fembed.' in url or 'fembed' in url:
             return 'Servidor [COLOR red]Fuera de Servicio[/COLOR]'
+
+        elif '/xvideosharing.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        elif '/clonamesta.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         if not 'https' in url: url = url.replace('http', 'https')
 
@@ -586,6 +618,12 @@ def play(item):
             if new_server.startswith("http"): servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
+
+        if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url or 'wishfast' in url or 'sfastwish' in url or 'doodporn' in url or 'flaswish' in url or 'obeywish' in url or 'cdnwish' in url or 'asnwish' in url or 'flastwish' in url or 'jodwish' in url or 'swhoi' in url or 'fsdcmo' in url or 'swdyu' in url or 'wishonly' in url or 'playerwish' in url or 'hlswish' in url or 'wish' in url or 'iplayerhls' in url or 'hlsflast' in url or 'ghbrisk' in url:
+            url += "|Referer=" + host
+
+        elif 'vudeo' in url:
+            url += "|Referer=" + host
 
         itemlist.append(item.clone( url=url, server=servidor ))
 

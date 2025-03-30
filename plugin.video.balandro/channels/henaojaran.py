@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import re
+import ast, re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
-try:
-    from Cryptodome.Cipher import AES
-    from lib import jscrypto
-except:
-    pass
+
+from lib.pyberishaes import GibberishAES
 
 
 host = 'https://vwv.henaojara.net/'
@@ -393,6 +390,8 @@ def findvideos(item):
     # ~ encrypt
     d_encrypt = scrapertools.find_single_match(data, 'data-encrypt="(.*?)"')
 
+    d_bytes = scrapertools.find_single_match(data, 'data-h="(.*?)"')
+
     if d_encrypt:
         post = {'acc': 'opt', 'i': d_encrypt}
 
@@ -409,7 +408,7 @@ def findvideos(item):
 
             if not srv or not encrypt: continue
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', crypto=encrypt,
+            itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', crypto=encrypt, bytes=d_bytes,
                                   language=lang, other=srv ))
 
     # ~ download
@@ -488,19 +487,23 @@ def play(item):
     url = item.url
 
     if item.crypto:
-        logger.info("check-1-crypto: %s" % item.crypto)
-        logger.info("check-2-crypto: %s" % item.bytes)
-        try:
-            ###############url =  AES.decrypt(item.crypto, item.bytes)
-            url = AES.new(item.crypto, AES.MODE_SIV==10)
-            logger.info("check-3-crypto: %s" % url)
+        crypto = str(item.crypto)
+        bytes = str(item.bytes)
 
-            url = jscrypto.new(item.crypto, 2, IV=item.bytes)
-            logger.info("check-4-crypto: %s" % url)
+        try:
+            cripto = ast.literal_eval(cripto)
         except:
+            crypto = str(item.crypto)
+
+        try:
+            url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+        except:
+            url = ''
+
+        if not url:
             return '[COLOR cyan]No se pudo [COLOR red]Desencriptar[/COLOR]'
 
-    if '/?trdownload=' in url:
+    elif '/?trdownload=' in url:
            url = httptools.downloadpage(url, follow_redirects=False, timeout=timeout).headers['location']
 
            url = url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
@@ -519,17 +522,18 @@ def play(item):
                if not url:
                    return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
-    elif '/go.php?v=' in url:
-          url = scrapertools.find_single_match(url, 'v=(.*?)$')
-
     if '/streamium.xyz/' in url: url = ''
     elif '/pelispng.' in url: url = ''
     elif '/pelistop.' in url: url = ''
     elif '/descargas/' in url: url = ''
 
+    if '/go.php?v=' in url:
+          url = scrapertools.find_single_match(url, 'v=(.*?)$')
+
     if url:
         if '.mystream.' in url:
             return 'Servidor [COLOR tan]Cerrado[/COLOR]'
+
         elif '.fembed.' in url:
             return 'Servidor [COLOR tan]Cerrado[/COLOR]'
 

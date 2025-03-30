@@ -3,7 +3,7 @@
   "name": "NovelasPlus",
   "thumbnail": "novelasplus.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["lasts", "years", "countries", "vos", "tales"],
+  "clusters": ["temporary", "lasts", "years", "countries", "vos", "tales"],
 
   "notes": "Web dedicada exclusivamente en Novelas. Películas por géneros y Series por Géneros."
 }

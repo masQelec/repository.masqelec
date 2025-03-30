@@ -155,13 +155,10 @@ def list_all(item):
         time = time.replace('hrs.', 'h').strip()
         time = time.replace('mins.', 'm').strip()
 
-        year = scrapertools.find_single_match(match, 'rel="tag">(.*?)</a>')
-        if not year: year = '-'
-
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
         itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb,
-                                    contentType = 'movie', contentTitle = title, contentExtra='adults', infoLabels={'year': year}) )
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, "<div id='pagination'.*?<li class='active'>.*?href='(.*?)'")
@@ -203,6 +200,8 @@ def findvideos(item):
         if '/frdl.' in url: continue
         elif '/snowdayonline.' in url: continue
         elif '/freepopnews.' in url: continue
+        elif '/filepv.' in url: continue
+        elif '/vinovo.' in url: continue
 
         elif '/nitroflare.' in url: continue
         elif 'rapidgator.' in url: continue

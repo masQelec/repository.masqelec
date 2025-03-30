@@ -28,6 +28,7 @@ config.set_setting('proxysearch_process_proxies', '')
 
 con_incidencias = ''
 no_accesibles = ''
+con_problemas = ''
 
 try:
     with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
@@ -36,6 +37,7 @@ except:
     except: txt_status = ''
 
 if txt_status:
+    # ~ Incidencias
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -45,6 +47,7 @@ if txt_status:
 
         if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ No Accesibles
     bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -54,30 +57,36 @@ if txt_status:
 
         if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ Con Problemas
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES CON PROBLEMAS(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
+
 
 dominioshdfull = [
+         'https://hdfull.blog/',
+         'https://hdfull.today/',
+         'https://hd-full.biz/',
+         'https://hdfull.sbs/',
+
+         'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
-         'https://hdfull.blog/',
-         'https://hd-full.info/',
-         'https://hd-full.sbs/',
-         'https://hd-full.life/',
-         'https://hd-full.fit/',
-         'https://hd-full.me/',
-         'https://hd-full.vip/',
-         'https://hdfull.quest/',
-         'https://hdfull.today/',
-         'https://hd-full.biz/',
-         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
+
          'https://new.hdfull.one/'
          ]
 
 dominiosplaydede = [
-         'https://www1.playdede.link/'
+         'https://www9.playdede.link/'
          ]
 
 channels_poe = [
@@ -637,6 +646,9 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
 
         if no_accesibles:
            if channel_name in str(no_accesibles): return
+
+        if con_problemas:
+           if channel_name in str(con_problemas): return
 
     channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
 

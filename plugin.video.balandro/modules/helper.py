@@ -45,8 +45,8 @@ descartar_xxx = config.get_setting('descartar_xxx', default=False)
 descartar_anime = config.get_setting('descartar_anime', default=False)
 
 _foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/ [/I][/B][/COLOR]"
-_source = "[COLOR coral][B][I] https://repobal.github.io/base/ [/I][/B][/COLOR]"
-_scripts = "[COLOR mediumaquamarine][B][I] https://repobal.github.io/base/scripts/ [/I][/B][/COLOR]"
+_source = "[COLOR coral][B][I] repobal.github.io/base/ [/I][/B][/COLOR]"
+_scripts = "[COLOR mediumaquamarine][B][I] repobal.github.io/base/scripts/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 
 _team = "[COLOR hotpink][B][I] t.me/Balandro_team [/I][/B][/COLOR]"
@@ -55,6 +55,7 @@ _team = "[COLOR hotpink][B][I] t.me/Balandro_team [/I][/B][/COLOR]"
 srv_pending = ''
 con_incidencias = ''
 no_accesibles = ''
+con_problemas = ''
 
 try:
     with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
@@ -63,6 +64,7 @@ except:
     except: txt_status = ''
 
 if txt_status:
+    # ~ Pending
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION SERVIDORES(.*?)SITUACION CANALES')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -72,6 +74,7 @@ if txt_status:
 
         if '[COLOR orchid]' in match: srv_pending += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ Incidencias
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -81,6 +84,7 @@ if txt_status:
 
         if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ No Accesibles
     bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -89,6 +93,16 @@ if txt_status:
         match = match.strip()
 
         if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ Con Problemas
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES CON PROBLEMAS(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
 
 
 context_temas = []
@@ -140,7 +154,7 @@ context_ayuda = []
 tit = '[COLOR tan][B]Preferencias Menús[/B][/COLOR]'
 context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_menu_parameters'})
 
-tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
+tit = '[COLOR bisque]Gestión Dominios[/COLOR]'
 context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
 tit = '[COLOR %s][B]Últimos Cambios Dominios[/B][/COLOR]' % color_exec
@@ -265,7 +279,7 @@ context_config = []
 tit = '[COLOR tan][B]Preferencias Canales[/B][/COLOR]'
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_channels_parameters'})
 
-tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
+tit = '[COLOR bisque]Gestión Dominios[/COLOR]'
 context_config.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
 tit = '[COLOR %s][B]Últimos Cambios Dominios[/B][/COLOR]' % color_exec
@@ -373,7 +387,7 @@ context_buscar.append({'title': tit, 'channel': 'search', 'action': 'show_help_p
 tit = '[COLOR darkcyan][B]Preferencias Proxies[/B][/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_prx_parameters'})
 
-tit = '[COLOR %s]Información Dominios[/COLOR]' % color_infor
+tit = '[COLOR bisque]Gestión Dominios[/COLOR]'
 context_buscar.append({'title': tit, 'channel': 'helper', 'action': 'show_help_domains'})
 
 tit = '[COLOR mediumaquamarine][B]Últimos Cambios Dominios[/B][/COLOR]'
@@ -573,6 +587,9 @@ def show_infos(item):
         if no_accesibles:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title='[COLOR gold][B]Canales [COLOR indianred]No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
+        if con_problemas:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title='[COLOR gold][B]Canales [COLOR tomato]Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= 'Resumen [COLOR fuchsia][B]Servidores[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
     if txt_status:
@@ -591,10 +608,10 @@ def submnu_contacto(item):
     itemlist.append(item.clone( action='', title= ' - Foro ' + _foro + ' Instalaciones, Tutoriales, Sugerencias, etc.', thumbnail=config.get_thumb('foro'), folder=False ))
 
     itemlist.append(item.clone( action='', title= ' - Telegram ' + _telegram + ' Asesoramiento, Dudas, Consultas, etc.', thumbnail=config.get_thumb('telegram'), folder=False ))
-    itemlist.append(item.clone( action='', title= '   [COLOR yellow][B]Los Usuarios de Telegram pueden añadir Nuevos Miembros[/B][/COLOR]', thumbnail=config.get_thumb('pencil'), folder=False ))
+    itemlist.append(item.clone( action='', title= '   [COLOR yellow][B]Usuarios Telegram pueden Añadir Miembros[/B][/COLOR]', thumbnail=config.get_thumb('pencil'), folder=False ))
 
     itemlist.append(item.clone( action='', title= ' - Team ' + _team + ' Equipo de Desarrollo', thumbnail=config.get_thumb('team'), folder=False ))
-    itemlist.append(item.clone( action='', title='    [COLOR goldenrod][B]Incorporaciones a Team  solo con Enlace de Invitación[/B][/COLOR]', folder=False, thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( action='', title='    [COLOR goldenrod][B]Incorporaciones a Team con Enlace de Invitación[/B][/COLOR]', folder=False, thumbnail=config.get_thumb('pencil') ))
 
     return itemlist
 
@@ -609,9 +626,10 @@ def submnu_fuente(item):
 
     itemlist.append(item.clone( action='', title= ' - Fuente ' + _scripts, thumbnail=config.get_thumb('addon'), folder=False ))
 
-    itemlist.append(item.clone( action='', title= '   - Carpeta [COLOR yellowgreen][B]Kodi18[/COLOR]: [COLOR gold]Otros repositorios y plugins [/COLOR] hasta [COLOR goldenrod] 18.x[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
-
-    itemlist.append(item.clone( action='', title= '   - Carpeta [COLOR yellowgreen][B]Kodi19[/COLOR]: [COLOR gold]Otros repositorios y plugins [/COLOR] desde [COLOR goldenrod] 19.x[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
+    if not PY3:
+        itemlist.append(item.clone( action='', title= '   - Carpeta [COLOR yellowgreen][B]Kodi18[/COLOR]: [COLOR gold]Otros repositorios y plugins [/COLOR] hasta [COLOR goldenrod] 18.x[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
+    else:
+        itemlist.append(item.clone( action='', title= '   - Carpeta [COLOR yellowgreen][B]Kodi19[/COLOR]: [COLOR gold]Otros repositorios y plugins [/COLOR] desde [COLOR goldenrod] 19.x[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
 
     itemlist.append(item.clone( action='', title= '[B][I]PLUGINS y SCRIPTS:[/I][/B]', text_color='tomato', folder=False, thumbnail=config.get_thumb('kodiaddons') ))
 
@@ -658,12 +676,13 @@ def submnu_fuente(item):
     itemlist.append(item.clone( action='', title= '[B][I]REPOSITORIOS:[/I][/B]', text_color='tomato', folder=False, thumbnail=config.get_thumb('kodiaddons') ))
 
     if config.get_setting('mnu_torrents', default=True):
-        if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
-            cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
-            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
-        else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
+        if not PY3:
+            if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
+                cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
+                tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-        itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]repository.elementum ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('elementum'), folder=False ))
+            itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]repository.elementum ' + tex_rp + '[/B][/COLOR] (hasta K18.x)', thumbnail=config.get_thumb('elementum'), folder=False ))
 
         if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
             cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
@@ -725,6 +744,9 @@ def submnu_info(item):
 
         if no_accesibles:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title=' - [COLOR gold][B]Canales [COLOR indianred]No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+        if con_problemas:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title='[COLOR gold][B]Canales [COLOR tomato]Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= ' - Resumen [COLOR fuchsia][B]Servidores[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
@@ -874,6 +896,9 @@ def show_infos_canales(item):
         if no_accesibles:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= '    - Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]' ))
 
+        if con_problemas:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title='[COLOR gold][B]Canales [COLOR tomato]Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     itemlist.append(item.clone( action='show_help_proxies', title= ' - [COLOR green][B]Información[/B][/COLOR] Uso de [COLOR red][B]Proxies[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='submnu_avisinfo_channels', title= '    - [COLOR aquamarine][B]Avisos[/COLOR] [COLOR green]Información[/B][/COLOR] canales' ))
@@ -893,6 +918,8 @@ def show_help_bloqueos(item):
     txt += '  Ciertas Operadoras pueden [COLOR yellowgreen][B]Bloquear[/B][/COLOR] el acceso a algún Canal.[CR]'
     txt += '  Incluso una misma Operadora puede [COLOR yellowgreen][B]Bloquear[/B][/COLOR] en una [COLOR violet][B]Zona Geográfica [/B][/COLOR]concreta[CR]'
     txt += '  y por el contrario en [COLOR violet][B]Otras Zonas Geográficas No[/B][/COLOR].[CR]'
+
+    txt += '[CR]  [B][COLOR darkcyan]El Uso de una [/COLOR][COLOR yellowgreen]VPN[/COLOR][COLOR darkcyan] jamás se saltará el control del Canal por [/COLOR][COLOR red]CloudFlare[/COLOR][COLOR orangered] Protection[/B][/COLOR][CR]'
 
     txt += '[CR]  [B][COLOR yellow]Los Canales Habitualmente NO Requieren[/COLOR] [COLOR red]Proxies[/COLOR][/B].[CR][CR]'
 
@@ -992,7 +1019,7 @@ def submnu_domains(item):
 
     itemlist.append(item.clone( channel='actions', action='show_latest_domains', title= ' - [COLOR cyan][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( action='show_help_domains', title= ' - [COLOR green][B]Información[/B][/COLOR] Dominios', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='show_help_domains', title= ' - [COLOR bisque][B]Gestión Dominios[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales tienen varios [COLOR gold][B]Dominios[/B][/COLOR]', var_domains = True, thumbnail=config.get_thumb('stack') ))
 
@@ -1021,18 +1048,24 @@ def submnu_cuentas(item):
 
         itemlist.append(item.clone( action='show_help_hdfull', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal', _mnu = True, thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
 
-        itemlist.append(item.clone( channel='domains', action='operative_domains_hdfull', title= ' - [COLOR mediumaquamarine]Dominios Operativos Vigentes[/COLOR][COLOR dodgerblue][B] dominioshdfull.com[/B][/COLOR]', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
+        itemlist.append(item.clone( channel='hdfull', action='diagnosis_domain', title= ' - [COLOR darkgoldenrod][B]Diágnosis Acceso al canal[/B][/COLOR]', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
 
-        itemlist.append(item.clone( channel='domains', action='latest_domains_hdfull', title= ' - [COLOR yellowgreen]Último Dominio Vigente[/COLOR]', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
+        itemlist.append(item.clone( channel='domains', action='operative_domains_hdfull', title= ' - [COLOR mediumaquamarine][B]Dominios Operativos Vigentes[/COLOR][COLOR dodgerblue] dominioshdfull.com[/B][/COLOR]', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
+
+        itemlist.append(item.clone( channel='domains', action='latest_domains_hdfull', title= ' - [COLOR yellowgreen][B]Último Dominio Vigente[/B][/COLOR]', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
+
+        itemlist.append(item.clone( channel='domains', action='last_domain_hdfull', title= ' - [COLOR goldenrod][B]Asociar[/B][/COLOR] último Dominio Vigente [COLOR dodgerblue][B]dominioshdfull.com[/B][/COLOR]', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
 
         cfg_user_channel = 'channel_hdfull_hdfull_username'
         cfg_pass_channel = 'channel_hdfull_hdfull_password'
 
         if not config.get_setting(cfg_user_channel, default='') or not config.get_setting(cfg_pass_channel, default=''):
-            itemlist.append(item.clone( channel='submnuctext', action='_credenciales_hdfull', title= ' - [COLOR yellow]Credenciales cuenta[/COLOR]', thumbnail=config.get_thumb('pencil') ))
+            itemlist.append(item.clone( channel='submnuctext', action='_credenciales_hdfull', title= ' - [COLOR yellow][B]Informar[/B][/COLOR] Credenciales cuenta', thumbnail=config.get_thumb('pencil') ))
         else:
-            itemlist.append(item.clone( channel='hdfull', action='show_credenciales', title= ' - [COLOR springgreen]Ver[/COLOR] las credenciales', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
-            itemlist.append(item.clone( channel='domains', action='del_datos_hdfull', title= ' - [COLOR red]Eliminar[/COLOR] las credenciales', thumbnail=config.get_thumb('pencil') ))
+            itemlist.append(item.clone( channel='submnuctext', action='_credenciales_hdfull', title= ' - Test [COLOR chartreuse][B]Login[/B][/COLOR] Credenciales', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
+
+            itemlist.append(item.clone( channel='hdfull', action='show_credenciales', title= ' - [COLOR springgreen][B]Credenciales[/B][/COLOR]', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
+            itemlist.append(item.clone( channel='domains', action='del_datos_hdfull', title= ' - [COLOR red][B]Eliminar[/B][/COLOR] Credenciales', thumbnail=config.get_thumb('hdfull', 'thumb', 'channels') ))
 
     datos = channeltools.get_channel_parameters('playdede')
     if datos['active']:
@@ -1040,16 +1073,24 @@ def submnu_cuentas(item):
 
         itemlist.append(item.clone( action='show_help_playdede', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR green][B]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
 
-        itemlist.append(item.clone( channel='domains', action='last_domain_playdede', title= ' - [COLOR yellowgreen]Último Dominio Vigente[/COLOR][COLOR dodgerblue][B] privacidad.me/@playdede[/B][/COLOR]', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+        itemlist.append(item.clone( action='show_help_playdede_media_center', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR violet][B]Ubicación[/B][/COLOR] Media Center', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+
+        itemlist.append(item.clone( action='show_help_playdede_bloqueo', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+
+        itemlist.append(item.clone( channel='playdede', action='show_current_domain', title= ' - [COLOR darkgoldenrod][B]Dominio Actual[COLOR dodgerblue] entrarplaydede.com[/B][/COLOR]', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+
+        itemlist.append(item.clone( channel='domains', action='last_domain_playdede', title= ' - [COLOR goldenrod][B]Asociar[/B][/COLOR] dominio actual [COLOR dodgerblue][B]privacidad.me/@playdede[/B][/COLOR]', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
 
         cfg_user_channel = 'channel_playdede_playdede_username'
         cfg_pass_channel = 'channel_playdede_playdede_password'
 
         if not config.get_setting(cfg_user_channel, default='') or not config.get_setting(cfg_pass_channel, default=''):
-            itemlist.append(item.clone( channel='submnuctext', action='_credenciales_playdede', title= ' - [COLOR yellow]Credenciales cuenta[/COLOR]', thumbnail=config.get_thumb('pencil') ))
+            itemlist.append(item.clone( channel='submnuctext', action='_credenciales_playdede', title= ' - [COLOR yellow][B]Informar[/B][/COLOR]  Credenciales cuenta', thumbnail=config.get_thumb('pencil') ))
         else:
-            itemlist.append(item.clone( channel='playdede', action='show_credenciales', title= ' - [COLOR springgreen]Ver[/COLOR] las credenciales', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
-            itemlist.append(item.clone( channel='domains', action='del_datos_playdede', title= ' - [COLOR red]Eliminar[/COLOR] las credenciales', thumbnail=config.get_thumb('pencil') ))
+            itemlist.append(item.clone( channel='submnuctext', action='_credenciales_playdede', title= ' - Test [COLOR chartreuse][B]Login[/B][/COLOR] Credenciales', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+
+            itemlist.append(item.clone( channel='playdede', action='show_credenciales', title= ' - [COLOR springgreen][B]Credenciales[/B][/COLOR]', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+            itemlist.append(item.clone( channel='domains', action='del_datos_playdede', title= ' - [COLOR red][B]Eliminar[/B][/COLOR] Credenciales', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
 
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR goldenrod][B]Cuentas[/B][/COLOR])', thumbnail=config.get_thumb('settings') ))
 
@@ -1158,6 +1199,9 @@ def show_infos_play(item):
         if no_accesibles:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= '    - Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]' ))
 
+        if con_problemas:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title='[COLOR gold][B]Canales [COLOR tomato]Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     itemlist.append(item.clone( action='show_server_report', title= ' - Reportar [COLOR gold][B]Reproducción de lista abortada[/B][/COLOR]', thumbnail=config.get_thumb('megaphone') ))
 
     itemlist.append(item.clone( action='show_not_play', title= ' - ¿ Qué [COLOR goldenrod][B]NO[/B][/COLOR] está contemplado en Balandro ?', thumbnail=config.get_thumb('roadblock') ))
@@ -1189,12 +1233,14 @@ def show_infos_alternativas(item):
 
     itemlist.append(item.clone( action='show_help_vias', title= ' - ¿ Dónde obtener Add-Ons para Vías Alternativas ?', thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( action='show_help_vias', title= ' - [COLOR green][B]Información[/B][/COLOR] vía alternativa [COLOR goldenrod][B]ResolveUrl[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
+    if not xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+        itemlist.append(item.clone( action='show_help_vias', title= ' - [COLOR green][B]Información[/B][/COLOR] vía alternativa [COLOR goldenrod][B]ResolveUrl[/B][/COLOR]', only_resolve=True, thumbnail=config.get_thumb('resolveurl') ))
 
     if not PY3:
         itemlist.append(item.clone( action='show_help_youtube', title= ' - [COLOR red][B]Incompatibilidad[/B][/COLOR] vía alternativa [COLOR goldenrod][B]Youtube[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
     else:
-        itemlist.append(item.clone( action='show_help_vias', title= ' - [COLOR green][B]Información[/B][/COLOR] vía alternativa [COLOR goldenrod][B]Youtube[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
+        if not xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+            itemlist.append(item.clone( action='show_help_vias', title= ' - [COLOR green][B]Información[/B][/COLOR] vía alternativa [COLOR goldenrod][B]Youtube[/B][/COLOR]', only_youtube=True, thumbnail=config.get_thumb('youtube') ))
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
        itemlist.append(item.clone( action='show_servers_list', title= '    - Qué servidores tienen [COLOR yellow][B]Vías Alternativas[/B][/COLOR]', tipo = 'alternativos', thumbnail=config.get_thumb('bolt') ))
@@ -1330,7 +1376,9 @@ def show_infos_torrents(item):
     itemlist.append(item.clone( action='show_clients_torrent', title= ' - Clientes/Motores externos torrent [COLOR gold][B]Soportados[/B][/COLOR]', thumbnail=config.get_thumb('cloud') ))
 
     if config.get_setting('mnu_torrents', default=True):
-        if xbmc.getCondVisibility('System.HasAddon("plugin.video.elementum")'):
+        if not xbmc.getCondVisibility('System.HasAddon("plugin.video.elementum")'):
+            itemlist.append(item.clone( channel='helper', action='show_help_vias', title= ' - [COLOR green][B]Información[/B][/COLOR] Vía alternativa [COLOR goldenrod][B]Elementum[/B][/COLOR]', only_elementum=True, thumbnail=config.get_thumb('elementum') ))
+        else:
             itemlist.append(item.clone( action='show_help_elementum', title= ' - [COLOR green][B]Información[/B][/COLOR] Motor Torrent [COLOR goldenrod][B]Elementum[/B][/COLOR]', thumbnail=config.get_thumb('elementum') ))
 
             itemlist.append(item.clone( action='show_help_semillas', title= ' - [COLOR green][B]Información[/B][/COLOR] archivos Torrent [COLOR gold][B]Semillas[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
@@ -1392,6 +1440,9 @@ def show_infos_buscar(item):
         if no_accesibles:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= '    - Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]' ))
 
+        if con_problemas:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title='[COLOR gold][B]Canales [COLOR tomato]Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     itemlist.append(item.clone( action='show_help_bucle', title = ' - Las Búsquedas hacen [COLOR yellow][B]Bucle [COLOR goldenrod](piden de nuevo el texto a buscar)[/COLOR][/B]', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( channel='search', action='show_help', title = ' - [COLOR green][B]Información[/B][/COLOR] sobre Búsquedas', thumbnail=config.get_thumb('news') ))
@@ -1441,6 +1492,9 @@ def show_infos_preferidos(item):
 
     if no_accesibles:
         itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= ' - [COLOR green][B]Información[/B][/COLOR] Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+    if con_problemas:
+        itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title='[COLOR gold][B]Canales [COLOR tomato]Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
     return itemlist
 
@@ -1735,6 +1789,9 @@ def submnu_version(item):
         if no_accesibles:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= ' -  Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]' ))
 
+        if con_problemas:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title='[COLOR gold][B]Canales [COLOR tomato]Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= ' -  Resumen y Distribución [COLOR fuchsia][B]Servidores[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
     if txt_status:
@@ -1761,7 +1818,7 @@ def submnu_desarrollo(item):
 
     itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]DESARROLLO FUENTES:[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('team') ))
 
-    itemlist.append(item.clone( action='', title= ' - Fuentes [COLOR darkorange][B]https://github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Fuentes [COLOR darkorange][B]github.com/repobal/[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
 
     itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]DESARROLLO TELEGRAM:[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('team') ))
 
@@ -1818,6 +1875,13 @@ def channels_exclusively_adults(item):
 
 def show_channels_list(item):
     logger.info()
+
+    filters.show_channels_list(item)
+
+def show_channels_list_cca(item):
+    logger.info()
+
+    item. cta_register = True
 
     filters.show_channels_list(item)
 
@@ -2003,7 +2067,7 @@ def show_help_miscelanea(item):
 
     txt += '[COLOR yellow][B]BALANDRO:[/B][/COLOR][CR]'
 
-    txt += '  Fuente [COLOR yellow]Balandro[/COLOR]:  [COLOR plum][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
+    txt += '  Fuente [COLOR yellow]Balandro[/COLOR]:  [COLOR plum][B]repobal.github.io/base/[/B][/COLOR][CR]'
     txt += '  para obtener [COLOR yellowgreen]Repositorio, Add-On, Scripts, etc.[/COLOR][CR][CR]'
 
     txt += '  Foro:  [COLOR coral][B]www.mimediacenter.info/foro/[/B][/COLOR][CR]'
@@ -2014,7 +2078,7 @@ def show_help_miscelanea(item):
 
     txt += '[COLOR chocolate][B]DESARROLLO BALANDRO:[/B][/COLOR][CR]'
 
-    txt += '  [COLOR firebrick]Fuentes Desarrollo[/COLOR] [COLOR yellow]Balandro[/COLOR]:  [COLOR darkorange][B]https://github.com/repobal[/B][/COLOR][CR]'
+    txt += '  [COLOR firebrick]Fuentes Desarrollo[/COLOR] [COLOR yellow]Balandro[/COLOR]:  [COLOR darkorange][B]github.com/repobal/[/B][/COLOR][CR]'
     txt += '  para [COLOR orange]Mantenimiento del Add-On, Scripts, etc.[/COLOR][CR][CR]'
 
     txt += '  [COLOR chartreuse]Telegram[/COLOR]:  [COLOR lightblue][B]t.me/Balandro_team[/B][/COLOR][CR]'
@@ -2027,8 +2091,8 @@ def show_help_miscelanea(item):
 
     txt += '[COLOR yellowgreen][B]RECONOCIMIENTOS:[/B][/COLOR][CR]'
 
-    txt += '  A los creadores de Elementum,  InputStream adaptive,[CR]'
-    txt += '  ResolveUrl  y  YouTube Plugin[CR]'
+    txt += '  A los creadores de Elementum,  InputStream adaptive,'
+    txt += '  ResolveUrl  y  YouTube Plugin'
 
     platformtools.dialog_textviewer('Información Miscelánea', txt)
 
@@ -2052,7 +2116,7 @@ def show_pin_parental(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Código Autorización incorrecto[/COLOR][/B]' % color_avis)
         return
 
-    txt = '[COLOR goldenrod][B]PIN:  [COLOR yellow]' + str(config.get_setting('adults_password')) + '[/B][/COLOR][CR]'
+    txt = '[COLOR goldenrod][B]PIN:  [COLOR yellow]' + str(config.get_setting('adults_password')) + '[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información PIN Parental', txt)
 
@@ -2111,8 +2175,8 @@ def show_help_register(item):
         datos = channeltools.get_channel_parameters('playdede')
         if datos['active']:
             txt += '[CR]      [COLOR yellow][B]PlayDede  [/COLOR][COLOR cyan]privacidad.me/@playdede[/B][/COLOR][CR]'
-            txt += '      [COLOR yellow][B]PlayDede  [/COLOR][COLOR gold]Twitter [/COLOR] [COLOR cyan] x.com/playdedesocial[/COLOR][/B][CR]'
-            txt += '      [COLOR yellow][B]PlayDede  [/COLOR][COLOR gold]Telegram[/COLOR] [COLOR cyan] t.me/playdedeinformacion[/COLOR][/B]'
+            txt += '      [COLOR yellow][B]PlayDede  [/COLOR][COLOR cyan]entrarplaydede.com[/COLOR][/B][CR]'
+            txt += '      [COLOR yellow][B]PlayDede  [/COLOR][COLOR gold]X [/COLOR] [COLOR cyan]x.com/playdedesocial[/COLOR][/B]'
 
     txt += '[CR][CR]*) Los datos de [B][COLOR gold]Usuario y/ó Contraseña[/COLOR][/B] No pueden ser Solo Números..'
     txt += '[CR]     Imprescindible tomar buena Nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para la web.'
@@ -2167,8 +2231,16 @@ def show_help_cinecalidad(item):
     item.notice = 'cinecalidad'
     show_help_canales(item)
 
+def show_help_cinecalidadla(item):
+    item.notice = 'cinecalidadla'
+    show_help_canales(item)
+
 def show_help_cinecalidadlol(item):
     item.notice = 'cinecalidadlol'
+    show_help_canales(item)
+
+def show_help_cinemitas(item):
+    item.notice = 'cinemitas'
     show_help_canales(item)
 
 def show_help_cuevana3pro(item):
@@ -2183,8 +2255,16 @@ def show_help_cuevana3video(item):
     item.notice = 'cuevana3video'
     show_help_canales(item)
 
+def show_help_detodo(item):
+    item.notice = 'detodo'
+    show_help_canales(item)
+
 def show_help_doramasyt(item):
     item.notice = 'doramasyt'
+    show_help_canales(item)
+
+def show_help_dpeliculas(item):
+    item.notice = 'dpeliculas'
     show_help_canales(item)
 
 def show_help_entrepeliculasyseries(item):
@@ -2227,6 +2307,10 @@ def show_help_latanime(item):
     item.notice = 'latanime'
     show_help_canales(item)
 
+def show_help_masnovelas(item):
+    item.notice = 'masnovelas'
+    show_help_canales(item)
+
 def show_help_megaserie(item):
     item.notice = 'megaserie'
     show_help_canales(item)
@@ -2257,6 +2341,10 @@ def show_help_pelispanda(item):
 
 def show_help_pelisxd(item):
     item.notice = 'pelisxd'
+    show_help_canales(item)
+
+def show_help_pgratishd(item):
+    item.notice = 'pgratishd'
     show_help_canales(item)
 
 def show_help_playdede(item):
@@ -2291,6 +2379,10 @@ def show_help_subtorrents(item):
     item.notice = 'subtorrents'
     show_help_canales(item)
 
+def show_help_todopeliculas(item):
+    item.notice = 'todopeliculas'
+    show_help_canales(item)
+
 def show_help_tiodonghua(item):
     item.notice = 'tiodonghua'
     show_help_canales(item)
@@ -2314,6 +2406,8 @@ def show_help_canales(item):
             return
 
     txt = ''
+
+    txt += '[B][COLOR darkcyan]El Uso de una [/COLOR][COLOR yellowgreen]VPN[/COLOR][COLOR darkcyan] jamás se saltará el control del Canal por [/COLOR][COLOR red][B]CloudFlare[/COLOR][COLOR orangered] Protection[/COLOR][CR][CR]'
 
     if not item.notice:
         txt += '[CR][B][COLOR yellow]Los Canales Habitualmente NO Requieren[/COLOR] [COLOR red]Proxies[/COLOR][/B][CR][CR]'
@@ -2341,8 +2435,8 @@ def show_help_canales(item):
 
         elif item.notice == 'playdede':
            txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un Navegador de Internet a[/COLOR] [B][COLOR goldenrod]privacidad.me/@playdede[/COLOR][/B][CR]'
-           txt += '[COLOR yellow]  También puede acceder a su [/COLOR][COLOR gold][B]Twitter [/COLOR] [B][COLOR greenyellow] x.com/playdedesocial[/COLOR][/B][CR]'
-           txt += '[COLOR yellow]  ó bien acceder a su[/COLOR][COLOR gold][B] Telegram[/B] [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B][CR]'
+           txt += '[COLOR yellow]  También puede acceder a su[/COLOR][COLOR gold][B] Telegram[/B] [B][COLOR greenyellow]entrarplaydede,com[/COLOR][/B][CR]'
+           txt += '[COLOR yellow]  ó bien acceder a su [/COLOR][COLOR gold][B]X [/COLOR] [B][COLOR greenyellow] x.com/playdedesocial[/COLOR][/B][CR]'
 
     elif item.notice == 'cuevana3pro':
         if config.get_setting('channel_cuevana3pro_proxies', default=''):
@@ -2381,7 +2475,7 @@ def show_help_canales(item):
         txt += '  [COLOR gold][B]Free-proxy-list.anon[/B][/COLOR] Proveedoores Lista Ampliada[CR]'
 
     if config.get_setting('proxies_vias', default=False):
-        txt += '[COLOR violet][B]  Openproxy,  Github[/B][/COLOR] Proveedores Lista Vias Alternativas[CR]'
+        txt += '[COLOR violet][B]  Openproxy,  Github[/B][/COLOR] Proveedores Lista Vias Alternativas'
 
     platformtools.dialog_textviewer('Información canal ' + item.notice.capitalize(), txt)
 
@@ -2431,6 +2525,12 @@ def show_help_playdede_bloqueo(item):
     txt += '[COLOR violet][B]  El resto del link a la web seguirá igual[/COLOR][CR]'
 
     txt += '[COLOR gold][B]  y solo cambiará el Número despues de[/COLOR][COLOR yellowgreen] www?[/B][/COLOR]'
+
+    txt += '[CR][CR][COLOR cyan][B]Otras Formas de Saltarse el Bloqueo de este canal:[/B][/COLOR][CR]'
+
+    txt += '[COLOR goldenrod][B]  Usando una [/B][/COLOR][COLOR limegreen][B] VPN [/B][/COLOR][COLOR goldenrod][B],[CR]'
+    txt += '  ó poniendo el Servidor [/B][/COLOR][COLOR limegreen][B] DNS [/B][/COLOR][COLOR goldenrod][B] de Google en su dispositivo,[CR]'
+    txt += '  Si lo precisa, Busque tutoriales en [/B][/COLOR][COLOR fuchsia][B] YouTube [COLOR goldenrod][B] para hacerlo.[/B][/COLOR]'
 
     platformtools.dialog_textviewer('PlayDede Información Bloqueo Operadoras', txt)
 
@@ -2502,7 +2602,8 @@ def show_help_mega(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El servidor está Inactivo[/B][/COLOR]' % color_avis)
         return
 
-    txt = '*) Si su Media Center es una versión anterior a [COLOR gold][B]19.x[/COLOR][/B] y opera bajo el sistema operativo [COLOR gold][B]Windows[/COLOR][/B], en determinadas ocasiones, puede fallar la Reproducción.[CR][CR]'
+    if not PY3:
+        txt = '*) Al ser su Media Center una versión anterior a [COLOR gold][B]19.x[/COLOR][/B] y si opera bajo el sistema operativo [COLOR gold][B]Windows[/COLOR][/B], en determinadas ocasiones, puede fallar la Reproducción.[CR][CR]'
 
     txt += '*) Para cualquier plataforma de ejecución [COLOR gold][B](Windows, Android, Rasperri, etc.)[/COLOR][/B] deben existir Obligatoriamente los modulos necesarios de [COLOR yellow][B]Cryptografía[/COLOR][/B] ya integrados en su Equipo, si no existieran, puede fallar la Reproducción.'
 
@@ -2551,7 +2652,10 @@ def show_help_youtube(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El servidor está Inactivo[/B][/COLOR]' % color_avis)
         return
 
-    txt = '*) Si su Media Center es una versión anterior a [COLOR gold][B]19.x[/COLOR][/B][CR][CR]'
+    if PY3:
+        return
+
+    txt = '*) Al ser su Media Center una versión anterior a [COLOR gold][B]19.x[/COLOR][/B][CR][CR]'
 
     txt += '*) [COLOR yellow][B]No hay solución para este servidor, y tampoco podrá visualizar Traílers[/B][/COLOR]'
 
@@ -2787,7 +2891,7 @@ def show_help_notice(item):
     txt += '[CR][COLOR darkorange]Conclusión:[/COLOR][CR]'
     txt += '  Somos conscientes, que con el paso del tiempo, el Add-On sufra una degradación y deje de cumplir vuestras expectativas sobre el, pero también debeís tener presente, que nosotros así mismo tenemos nuestras vidas y existe más vida fuera del Media Center Kodi[CR]'
 
-    txt += '[CR]Saludos, Balandro Team[CR]'
+    txt += '[CR]Saludos, Balandro Team'
 
     platformtools.dialog_textviewer('Comunicado Oficial de Balandro', txt)
 
@@ -2797,22 +2901,26 @@ def show_not_contemplated(item):
 
     txt ='[COLOR red][B]¿ Qué temas no están Implementados y/ó Garantizados dentro de Balandro ?[/B][/COLOR][CR]'
 
-    txt += '[CR] - [COLOR pink][B]Media Centers[/COLOR] [COLOR yellow][B]No se pueden Garantizar resultados satisfactorios:[/B][/COLOR][CR]'
-    txt += '    - Si se opera con versiones del Media Center [COLOR darkorange][B]Kodi NO oficiales[/B][/COLOR]. (Mods, Forks, Clons,  etc.)[CR]'
-    txt += '    - Si se usan Versiones anteriores a [COLOR darkorange][B]Kodi 17.x[/B][/COLOR] en su Media Center.[CR]'
-    txt += '    - Ejecución en Media Centers que vengan Pre-instalados en su equipo tipos [COLOR gold][B]KdPlayer, KkPlayer ó similares[/B][/COLOR][CR]'
+    txt += '[CR] - [COLOR pink][B]Media Centers[/COLOR] [COLOR yellow][B]No se puede Garantizar resultados satisfactorios:[/B][/COLOR][CR]'
+    txt += '    - Si opera con versiones de Media Center [COLOR darkorange][B]Kodi [/COLOR][COLOR yellowgreen]NO Oficiales[/B][/COLOR]. ([COLOR yellow][B]Mods, Forks, Clons,  etc.[/B][/COLOR])[CR]'
+    txt += '    - Si usa Versiones anteriores a [COLOR darkorange][B]Kodi 17.x[/B][/COLOR] en su Media Center.[CR]'
+
+    txt += '    - Ejecución en Media Centers que vengan Pre-instalados en su equipo tipos:[CR]'
+    txt += '      [COLOR gold][B]KdPlayer, KkPlayer ó similares[/B][/COLOR][CR]'
+
     txt += '    - Ejecución de Balandro bajo [COLOR goldenrod][B]Builds, Wizards ó Widgets[/B][/COLOR] en su Media Center.[CR]'
 
-    txt += '[CR] - [COLOR limegreen][B]Add-Ons Externos[/COLOR] de [COLOR moccasin][B]Programas[/B][/COLOR] que pueden afectar al funcionamiento de Balandro:[CR]'
+    txt += '[CR] - [COLOR limegreen][B]Add-Ons Externos[/COLOR] de [COLOR yellow][B]Programas[/B][/COLOR] que pueden afectar al funcionamiento de Balandro:[CR]'
     txt += '     [COLOR yellowgreen][B]LimpiarKodi,  LimpiaTuKodi,  EzMaintenace,  Indigo  y  similares[/B][/COLOR].[CR]'
 
     txt += '     Si Alteran el fichero [COLOR gold]AdvancedSettings[/COLOR] con sentencias relativas a la memoria de su Media Center.[CR]'
 
-    txt += '[CR] - [COLOR limegreen][B]Add-Ons Externos[/COLOR] [COLOR yellow][B]No Contemplados:[/B][/COLOR][CR]'
+    txt += '[CR] - [COLOR limegreen][B]Otros Add-Ons Externos[/COLOR] [COLOR yellow][B]No Contemplados:[/B][/COLOR][CR]'
     txt += '    - Motores [COLOR blue][B]Torrent[/B][/COLOR] [COLOR gold][B]Horus / AceStream[/B][/COLOR][CR]'
     txt += '    - Integración con [COLOR gold][B]Trakt.Tv, Simkl, ó similares[/B][/COLOR] seguimiento de Películas y/ó Series[CR]'
 
     txt += '[CR] - [COLOR pink][B]Sistema[/COLOR] [COLOR yellow][B]Integraciones y Sincronizaciones:[/B][/COLOR][CR]'
+    txt += '    - Fichero [COLOR gold]AdvancedSettings[/COLOR] con sentencias relativas a la [COLOR darkcyan]Memoria ó Buffers[/COLOR] de su Media Center.[CR]'
     txt += '    - Integración con la [COLOR goldenrod][B]Videoteca[/B][/COLOR] de su Media Center[CR]'
     txt += '    - Sincronización entre sus Equipos de sus [COLOR chocolate][B]Ajustes[/B][/COLOR] y [COLOR wheat][B]Preferidos[/B][/COLOR][CR]'
 
@@ -2827,12 +2935,13 @@ def show_not_contemplated(item):
     txt += '[CR] - [COLOR fuchsia][B]Play[/COLOR] [COLOR yellow]Servidores:[/B][/COLOR][CR]'
     txt += '    - Cuentas Premium en el servidor [COLOR darkorange][B]Uptobox[/B][/COLOR][CR]'
     txt += '    - Integración con [COLOR powderblue][B]Cuentas[/B][/COLOR] [COLOR gold][B]Alldebrid, Realdebrid, ó similares[/B][/COLOR][CR]'
-    txt += '    - Algunos Servidores que dada su complejidad para efectuar [COLOR orchid][B]Play[/B][/COLOR] [COLOR gold]No están Soportados[/COLOR][CR]'
-    txt += '    - Play archivos con [COLOR red][B]Contraseña[/B][/COLOR][CR]'
+    txt += '    - Algunos Servidores que dada su complejidad para efectuar [COLOR orchid][B]Play[/COLOR] [COLOR gold]No están Soportados[/B][/COLOR][CR]'
+    txt += '    - [COLOR orchid][B]Play[/COLOR] archivos con [COLOR red]Contraseña[/B][/COLOR][CR]'
 
-    txt += '[CR] - [COLOR gold][B]Canales[/COLOR] [COLOR yellow]Listas:[/B][/COLOR][CR]'
+    txt += '[CR] - [COLOR gold][B]Canales[/COLOR] [COLOR yellow]Listas y Otros:[/B][/COLOR][CR]'
     txt += '   - Acceder a [COLOR gold][B]Una Página Concreta[/B][/COLOR] en los listados de las opciones de los canales[CR]'
     txt += '   - Incluir el [COLOR goldenrod][B]Rating[/B][/COLOR] en los listados de las opciones de los canales[CR]'
+    txt += '   - Gestión Integral del [COLOR teal][B]Menú Usuario[/B][/COLOR] en los Canales que tengan esa Opción'
 
     platformtools.dialog_textviewer('¿ Qué NO está contemplado/garantizado en Balandro ?', txt)
 
@@ -2845,7 +2954,7 @@ def show_not_play(item):
     txt += '[CR][COLOR gold][B] - Servidores:[/B][/COLOR][CR]'
     txt += '    - Cuentas Premium en el servidor [COLOR darkorange][B]Uptobox[/B][/COLOR][CR]'
     txt += '    - Integración con [COLOR powderblue][B]Cuentas[/B][/COLOR] [COLOR gold][B]Alldebrid, Realdebrid, ó similares[/B][/COLOR][CR]'
-    txt += '    - Algunos Servidores que dada su complejidad para efectuar [COLOR orchid][B]Play[/B][/COLOR] [COLOR gold]No están Soportados[/COLOR][CR]'
+    txt += '    - Algunos Servidores que dada su complejidad para efectuar [COLOR orchid][B]Play[/B][/COLOR] [COLOR gold]No están Soportados[/COLOR]'
 
     platformtools.dialog_textviewer('¿ Qué NO está contemplado en Balandro ?', txt)
 
@@ -2857,7 +2966,7 @@ def show_not_download(item):
 
     txt += ' - Descargar [COLOR gold]Todos[/COLOR] los Capítulos de una Temporada alunísono[CR]'
     txt += ' - NO se admiten las descargas de ficheros en formatos [COLOR gold]m3u8,  mpd,  rtmp,  torrent[/COLOR][CR]'
-    txt += ' - NO están permitidas las descargas de ficheros en formato Comprimido [COLOR gold]zip,  rar,  etc.[/COLOR][CR]'
+    txt += ' - NO están permitidas las descargas de ficheros en formato Comprimido [COLOR gold]zip,  rar,  etc.[/COLOR]'
 
     platformtools.dialog_textviewer('¿ Qué NO está contemplado en las Descargas ?', txt)
 
@@ -2896,7 +3005,7 @@ def show_preferidos_parameters(item):
 
     txt += '[CR] - [COLOR cyan]Ordenar Series por (por defecto Fecha de Emisión): [/COLOR][COLOR red][B]' + order_episodes + '[/B][/COLOR][CR]'
 
-    txt += ' - [COLOR cyan]Lista de Episodios: Cuantos Episodios por página (por defecto Fecha de Emisión): [/COLOR][COLOR red][B]' + str(config.get_setting('tracking_perpage_episodes', default=10)) + '[/B][/COLOR][CR]'
+    txt += ' - [COLOR cyan]Lista de Episodios: Cuantos Episodios por página (por defecto Fecha de Emisión): [/COLOR][COLOR red][B]' + str(config.get_setting('tracking_perpage_episodes', default=10)) + '[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Ajustes Preferidos', txt)
 
@@ -2998,7 +3107,7 @@ def show_help_descargas(item):
 
     txt += ' - Descargar [COLOR gold]Todos[/COLOR] los Capítulos de una Temporada alunísono[CR]'
     txt += ' - NO se admiten las descargas de ficheros en formatos [COLOR gold]m3u8,  mpd,  rtmp,  torrent[/COLOR][CR]'
-    txt += ' - NO están permitidas las descargas de ficheros en formato Comprimido [COLOR gold]zip,  rar,  etc.[/COLOR][CR]'
+    txt += ' - NO están permitidas las descargas de ficheros en formato Comprimido [COLOR gold]zip,  rar,  etc.[/COLOR]'
 
     platformtools.dialog_textviewer('Descargas y su Funcionamiento', txt)
 
@@ -3015,8 +3124,7 @@ def show_help_usb(item):
     txt += '  desde la opción del menú [COLOR seagreen][B]Descargas[/B][/COLOR] al seleccionar cualquier fichero existente en [COLOR seagreen][B]Descargas[/B][/COLOR].[CR]'
 
     txt += '[CR]También puede [COLOR cyan][B]Obtener una Copia[/B][/COLOR] de su [COLOR seagreen][B]descarga[/B][/COLOR] hacia una [COLOR goldenrod][B]Unidad USB[/B][/COLOR][CR]'
-    txt += 'seleccionando cualquier fichero existente en sus [COLOR seagreen][B]Descargas[/B][/COLOR].[CR]'
-
+    txt += 'seleccionando cualquier fichero existente en sus [COLOR seagreen][B]Descargas[/B][/COLOR].'
 
     platformtools.dialog_textviewer('¿ Se puede Descargar directamente en una Unidad USB ?', txt)
 
@@ -3029,7 +3137,7 @@ def show_help_proxies(item):
     txt += ' Mediante el uso de proxies se puede evitar esa restricción.'
 
     txt += '[CR][CR][COLOR gold][B]¿ En qué canales hay que usar los proxies ?[/B][/COLOR][CR]'
-    txt += 'Depende de la conexión de cada usuario (el país dónde se conecta, con qué operadora, qué dns tiene configurados, si usa ó no vpn, ...).'
+    txt += 'Depende de la conexión de cada usuario (el país desde dónde se conecta, con qué operadora, qué [COLOR limegreen][B]DNS[/COLOR] tiene configurados, si usa ó no [COLOR limegreen][B]VPN[/COLOR], ...).'
     txt += ' Lo más aconsejable es probar primero si funcionan sin necesidad de proxies ya que es lo más cómodo y rápido.'
     txt += ' Aunque un canal tenga la opción de proxies no es obligatorio usarlos, hacerlo solamente si es necesario.'
 
@@ -3506,7 +3614,7 @@ def show_prx_parameters(item):
     if config.get_setting('proxies_maximo', default=True): txt += ' [COLOR cyan][B] Activado[/B][/COLOR]'
     else: txt += ' [COLOR cyan][B] Des-Activado[/B][/COLOR]'
 
-    if config.get_setting('proxies_list', default=False): txt += '[CR][COLOR gold] - Habilitar la selección de su Lista Personalizada:[/COLOR]' + ' [COLOR cyan][B] Activado[/B][/COLOR][CR]'
+    if config.get_setting('proxies_list', default=False): txt += '[CR][COLOR gold] - Habilitar la selección de su Lista Personalizada:[/COLOR]' + ' [COLOR cyan][B] Activado[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Parámetros Actuales en Proxies', txt)
 
@@ -3994,7 +4102,7 @@ def show_help_yourlist(item):
     txt += '     es cuestión de ir probando, cuando no se obtengan proxies, por el método automático ó habitual.[CR]'
 
     txt += '[CR]     Si generaís vuestra lista personalizada, seguir la estructura de 1 proxy por línea,[CR]'
-    txt += '     Ver la composición en el fichero adjunto, una vez descomprimido.[CR]'
+    txt += '     Ver la composición en el fichero adjunto, una vez descomprimido.'
 
     platformtools.dialog_textviewer('Información Gestión fichero Lista-Proxies.txt', txt)
 
@@ -4065,7 +4173,7 @@ def proxies_show_vias(item):
     txt += ' [COLOR cyan][B] 52 [COLOR yellow][B]Proxyscrape https[COLOR lime]  recomendado[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 53 [COLOR yellow][B]Markavale[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 54 [COLOR yellow][B]Proxyscan.io socks4[/B][/COLOR][CR]'
-    txt += ' [COLOR cyan][B] 55 [COLOR yellow][B]Proxyscan.io socks5[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 55 [COLOR yellow][B]Proxyscan.io socks5[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Proveedores Vías Alternativas de proxies', txt)
 
@@ -4609,7 +4717,7 @@ def show_help_adults(item):
     txt += '[CR]*) [COLOR yellowgreen][B]Pero no se puede garantizar con total seguridad,'
     txt += '[CR]    que todo el material de este tipo se filtre correctamente en determinadas ocasiones.[/B][/COLOR][CR]'
 
-    txt += '[CR]*) También puede desactivar esta opción en los Ajustes, [COLOR cyan][B]categorías[/COLOR] [COLOR yellow]Menú y Parental[/B][/COLOR][CR]'
+    txt += '[CR]*) También puede desactivar esta opción en los Ajustes, [COLOR cyan][B]categorías[/COLOR] [COLOR yellow]Menú y Parental[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Control Parental', txt)
 
@@ -4623,7 +4731,9 @@ def show_help_domains(item):
     txt += '  Incluso una misma Operadora puede [COLOR yellowgreen][B]Bloquear[/B][/COLOR] en una [COLOR violet][B]Zona Geográfica [/B][/COLOR]concreta[CR]'
     txt += '  y por el contrario en [COLOR violet][B]Otras Zonas Geográficas No[/B][/COLOR].[CR]'
 
-    txt += '[CR]  [B][COLOR yellow]Este Canal Habitualmente NO Requiere[/COLOR] [COLOR red]Proxies[/COLOR][/B][CR]'
+    if item.category:
+        if not item.category == 'Balandro':
+            txt += '[CR]  [B][COLOR yellow]Este Canal Habitualmente NO Requiere[/COLOR] [COLOR red]Proxies[/COLOR][/B][CR]'
 
     if item.category == 'DonTorrents':
         if config.get_setting('channel_dontorrents_proxies', default=''):
@@ -4658,8 +4768,8 @@ def show_help_domains(item):
 
         txt += '[CR][COLOR chocolate][B]Para conocer el Dominio Vigente:[/COLOR][/B][CR]'
         txt += '  Acceda a través de un Navegador de Internet a [B][COLOR greenyellow]privacidad.me/@playdede[/COLOR][/B][CR]'
-        txt += '  ó acceda a su Twitter [B][COLOR greenyellow] x.com/playdedesocial[/COLOR][/B][CR]'
-        txt += '  ó bien acceda a su Telegram [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B][CR][CR]'
+        txt += '  también puede acceder a [B][COLOR greenyellow] entrarplaydede.com[/COLOR][/B][CR]'
+        txt += '  ó bien acceda a su X [B][COLOR greenyellow] x.com/playdedesocial[/COLOR][/B][CR][CR]'
 
     else:
         if config.get_setting('channel_' + item.category.lower() + '_proxies', default=''):
@@ -4842,18 +4952,23 @@ def show_help_torrents(item):
     txt += '     Puede acceder a su web oficial en [COLOR chartreuse][B]elementum.surge.sh[/B][/COLOR][CR]'
 
     txt += '[CR]     Es recomendable instalar el correspondiente [COLOR limegreen][B]Repositorio[/B][/COLOR] para recibir [COLOR yellow][B]Actualizaciones[/B][/COLOR]:[CR]'
-    txt += '        [COLOR goldenrod][B]repository.elementum[/B][/COLOR]  ó  [COLOR goldenrod][B]repository.elementumorg[/B][/COLOR]'
+
+    if not PY3:
+        txt += '        [COLOR goldenrod][B]repository.elementum[/B][/COLOR]'
+    else:
+        txt += '        [COLOR goldenrod][B]repository.elementumorg[/B][/COLOR]'
 
     txt += '[CR][CR]     Puede obtener estos [COLOR limegreen][B]Repositorios[/B][/COLOR] desde [COLOR chartreuse][B]Nuestra Fuente[/B][/COLOR], carpeta [COLOR gold][B]Scripts[/B][/COLOR].[CR]'
-    txt += '        Fuente  [COLOR darkorange][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
+    txt += '        Fuente  [COLOR darkorange][B]repobal.github.io/base/[/B][/COLOR][CR]'
 
-    txt += '        Scripts  [COLOR mediumaquamarine][B]https://repobal.github.io/base/scripts/[/B][/COLOR][CR]'
+    txt += '        Scripts  [COLOR mediumaquamarine][B]repobal.github.io/base/scripts/[/B][/COLOR][CR]'
 
-    txt += '[CR]         - [COLOR lightblue][B]Carpeta Kodi18:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] hasta 18.x[/B][/COLOR][CR]'
-    txt += '            - [COLOR goldenrod][B] repository.elementum [/B][/COLOR][CR]'
-
-    txt += '[CR]         - [COLOR lightblue][B]Carpeta Kodi19:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] desde 19.x[/B][/COLOR][CR]'
-    txt += '            - [COLOR goldenrod][B] repository.elementumorg [/B][/COLOR][CR]'
+    if not PY3:
+        txt += '[CR]         - [COLOR lightblue][B]Carpeta Kodi18:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] hasta 18.x[/B][/COLOR][CR]'
+        txt += '            - [COLOR goldenrod][B] repository.elementum [/B][/COLOR][CR]'
+    else:
+        txt += '[CR]         - [COLOR lightblue][B]Carpeta Kodi19:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] desde 19.x[/B][/COLOR][CR]'
+        txt += '            - [COLOR goldenrod][B] repository.elementumorg [/B][/COLOR][CR]'
 
     txt += '[CR]*) Para [COLOR gold][B]Otros Motores Torrent[/B][/COLOR], le sugerimos localize tutoriales al respecto en [COLOR cyan][B]YouTube[/B][/COLOR]'
 
@@ -4874,7 +4989,9 @@ def show_help_semillas(item):
 
     txt += '[CR][CR]*) Si [COLOR goldenrod][B]TODAS[/B][/COLOR] las partes no están [COLOR goldenrod][B]ONLINE[/B][/COLOR], [COLOR gold][B]Elememtum[/B][/COLOR] cierra por [COLOR red][B]Time Out[/B][/COLOR], para no perder el tiempo.'
 
-    txt += '[CR]    Por ejemplo, en la pantalla de seguimiento de [COLOR gold][B]Elememtum[/B][/COLOR], comprobar el dato [COLOR goldenrod][B]S:[/B][/COLOR]'
+    txt += '[CR]    Si ese dato contiene un [COLOR red]Número[B][/B][/COLOR], significará que hay [COLOR gold][B]Más de Una Semilla[/B][/COLOR].'
+
+    txt += '[CR][CR]    Por ejemplo, en la pantalla de seguimiento de [COLOR gold][B]Elememtum[/B][/COLOR], comprobar el dato [COLOR goldenrod][B]S:[/B][/COLOR]'
     txt += '[CR]    si ese dato contiene [COLOR red][B]0[/B][/COLOR], significará que no hay [COLOR gold][B]Semillas[/B][/COLOR].'
 
     txt += '[CR][CR]    Si [COLOR red][B]NO[/B][/COLOR] apareciera la pantalla de seguimiento de [COLOR gold][B]Elememtum[/B][/COLOR] [COLOR red][B]No hay ningún usuario Online[/B][/COLOR]'
@@ -4914,12 +5031,13 @@ def show_torrents_parameters(item):
 
     txt += ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_tor + '[/B][/COLOR][CR]'
 
-    if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
-        cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
-        tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
-    else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
+    if not PY3:
+        if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
+            cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
+            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-    txt += ' - [COLOR gold][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
+        txt += ' - [COLOR gold][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + ' (hasta K18.x)[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
         cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
@@ -4929,7 +5047,7 @@ def show_torrents_parameters(item):
     txt += ' - [COLOR gold][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.elementum")'):
-        txt += '[COLOR blue][B]VER[/B][/COLOR] Información Archivos Torrent [COLOR goldenrod][B]SEMILLAS[/B][/COLOR] en la Ayuda de [COLOR blue][B]TORRENTS[/B][/COLOR]'
+        txt += '[COLOR blue][B]VER[/B][/COLOR] Información Archivos Torrent [COLOR goldenrod][B]SEMILLAS[/B][/COLOR] en la Ayuda de [COLOR blue][B]TORRENTS[/B][/COLOR] [COLOR fuchsia][B]Cuestiones Preliminares[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Parámetros Actuales en Torrents', txt)
 
@@ -4953,40 +5071,110 @@ def show_help_centers(item):
     platformtools.dialog_textviewer('¿ Dónde obtener soporte para su Media Center ?', txt)
 
 
+def show_help_vias_elementum(item):
+    item.only_elementum = True
+
+    show_help_vias(item)
+
+def show_help_vias_resolve(item):
+    item.only_resolve = True
+
+    show_help_vias(item)
+
+def show_help_vias_youtube(item):
+    item.only_youtube = True
+
+    show_help_vias(item)
+
 def show_help_vias(item):
     logger.info()
 
     txt = '*) A través de un [COLOR cyan]Navegador de Internet[/COLOR] localize e instale al menos uno de los Add-Ons de la lista que más se adapte a'
     txt += '  sus necesidades y que a su vez sea compatible con su Media Center.'
 
-    txt += '[CR][CR]*) Add-Ons:[CR]'
-    txt += '    - [COLOR yellow][B]inputstream.adaptive[/B][/COLOR][CR]'
-    txt += '    - [COLOR yellow][B]plugin.video.youtube[/B][/COLOR][CR]'
-    txt += '    - [COLOR yellow][B]script.module.resolveurl[/B][/COLOR][CR]'
+    presentar_all = True
 
-    txt += '[CR]'
-    txt += '    - [COLOR yellow][B]repository.elementum[/B][/COLOR][CR]'
-    txt += '    - [COLOR yellow][B]repository.elementumorg[/B][/COLOR][CR]'
-    txt += '    - [COLOR yellow][B]repository.resolveurl[/B][/COLOR][CR]'
+    if not item.only_elementum: presentar_elementum = False
+    else:
+       presentar_all = False
+       presentar_elementum = True
+
+    if not item.only_resolve: presentar_resolve = False
+    else:
+       presentar_all = False
+       presentar_resolve = True
+
+    if not item.only_youtube: presentar_youtube = False
+    else:
+       presentar_all = False
+       presentar_youtube = True
+
+    if presentar_all or presentar_youtube or presentar_resolve:
+        txt += '[CR][CR]*) Add-Ons:[CR]'
+
+    if presentar_all:
+        txt += '    - [COLOR yellow][B]inputstream.adaptive[/B][/COLOR][CR]'
+
+    if presentar_all or presentar_youtube:
+        txt += '    - [COLOR yellow][B]plugin.video.youtube[/B][/COLOR][CR]'
+
+    if presentar_all or presentar_resolve:
+        txt += '    - [COLOR yellow][B]script.module.resolveurl[/B][/COLOR]'
+
+    if presentar_all or presentar_resolve or presentar_elementum:
+        txt += '[CR][CR]*) Repositorios:[CR]'
+
+    if presentar_all or presentar_elementum:
+        if not PY3:
+            txt += '    - [COLOR yellow][B]repository.elementum[/B][/COLOR][CR]'
+        else:
+            txt += '    - [COLOR yellow][B]repository.elementumorg[/B][/COLOR][CR]'
+
+    if presentar_all or presentar_resolve:
+        txt += '    - [COLOR yellow][B]repository.resolveurl[/B][/COLOR][CR]'
 
     txt += '[CR]*) Algunos puede obtenerlos desde [COLOR chartreuse][B]Nuestra Fuente[/B][/COLOR], carpeta [COLOR gold][B]Scripts[/B][/COLOR].[CR]'
-    txt += '    Fuente  [COLOR darkorange][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
+    txt += '    Fuente  [COLOR darkorange][B]repobal.github.io/base/[/B][/COLOR][CR]'
 
-    txt += '    Scripts  [COLOR mediumaquamarine][B]https://repobal.github.io/base/scripts/[/B][/COLOR][CR]'
+    txt += '    Scripts  [COLOR mediumaquamarine][B]repobal.github.io/base/scripts/[/B][/COLOR][CR]'
 
-    txt += '[CR]     - [COLOR lightblue][B]Carpeta Kodi18:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] hasta 18.x[/B][/COLOR][CR]'
-    txt += '        - [COLOR goldenrod][B] plugin.video.youtube [/B][/COLOR][CR]'
-    txt += '        - [COLOR goldenrod][B] repository.elementum [/B][/COLOR][CR]'
-    txt += '        - [COLOR goldenrod][B] repository.resolveurl [/B][/COLOR][CR]'
+    if not PY3:
+        txt += '[CR]     - [COLOR lightblue][B]Carpeta Kodi18:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] hasta 18.x[/B][/COLOR][CR]'
 
-    txt += '[CR]     - [COLOR lightblue][B]Carpeta Kodi19:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] desde 19.x[/B][/COLOR][CR]'
-    txt += '        - [COLOR goldenrod][B] plugin.video.youtube [/B][/COLOR][CR]'
-    txt += '        - [COLOR goldenrod][B] repository.elementumorg [/B][/COLOR][CR]'
-    txt += '        - [COLOR goldenrod][B] repository.resolveurl [/B][/COLOR][CR]'
+        if presentar_all or presentar_youtube:
+            txt += '        - [COLOR goldenrod][B] plugin.video.youtube [/B][/COLOR][CR]'
+
+        if presentar_all or presentar_elementum:
+            txt += '        - [COLOR goldenrod][B] repository.elementum [/B][/COLOR][CR]'
+
+        if presentar_all or presentar_resolve:
+            txt += '        - [COLOR goldenrod][B] repository.resolveurl [/B][/COLOR][CR]'
+
+    else:
+        txt += '[CR]     - [COLOR lightblue][B]Carpeta Kodi19:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] desde 19.x[/B][/COLOR][CR]'
+
+        if presentar_all or presentar_youtube:
+            txt += '        - [COLOR goldenrod][B] plugin.video.youtube [/B][/COLOR][CR]'
+
+        if presentar_all or presentar_elementum:
+            txt += '        - [COLOR goldenrod][B] repository.elementumorg [/B][/COLOR][CR]'
+
+        if presentar_all or presentar_resolve:
+            txt += '        - [COLOR goldenrod][B] repository.resolveurl [/B][/COLOR][CR]'
 
     txt += '[CR]*) Ó bien, le sugerimos localize tutoriales en [COLOR cyan][B]YouTube[/B][/COLOR], para obtener información al respecto.'
 
-    platformtools.dialog_textviewer('¿ Dónde obtener los Add-Ons para Vías Alternativas ?', txt)
+    if presentar_all:
+        platformtools.dialog_textviewer('¿ Dónde obtener los Add-Ons para Vías Alternativas ?', txt)
+
+    elif presentar_elementum:
+        platformtools.dialog_textviewer('¿ Dónde obtener los Add-Ons para Vía Alternativa Elementum ?', txt)
+
+    elif presentar_resolve:
+        platformtools.dialog_textviewer('¿ Dónde obtener los Add-Ons para Vía Alternativa ResolveUrl ?', txt)
+
+    else:
+        platformtools.dialog_textviewer('¿ Dónde obtener los Add-Ons para Vía Alternativa YouTube ?', txt)
 
 
 def show_help_elementum(item):
@@ -4996,9 +5184,12 @@ def show_help_elementum(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún No Instalado[/COLOR][/B]' % color_alert)
         return
 
-    txt = '*) Si su Media Center es una versión posterior a [COLOR gold][B]18.x[/COLOR][/B] y [COLOR yellow][B]NO[/B][/COLOR] opera bajo el sistema operativo [COLOR gold][B]Windows[/COLOR][/B], en determinadas ocasiones, puede fallar la Reproducción, a través de este Motor Torrent.'
+    if not PY3:
+        return
 
-    txt += '[CR][CR]*) Ejemplo: si esta operando bajo [COLOR yellow][B]Android[/B][/COLOR] y su versión de [COLOR gold]Android es superior a 19.x[/COLOR][CR]'
+    txt = '*) Al ser su Media Center una versión posterior a [COLOR gold][B]18.x[/COLOR][/B] y si [COLOR yellow][B]NO[/B][/COLOR] opera bajo el sistema operativo [COLOR gold][B]Windows[/COLOR][/B], en determinadas ocasiones, puede fallar la Reproducción, a través de este Motor Torrent.'
+
+    txt += '[CR][CR]*) Ejemplo: si esta operando bajo [COLOR yellow][B]Android[/B][/COLOR] y su versión de [COLOR gold][B]Kodi[/B][/COLOR] es superior a [COLOR gold][B]18.x[/B][/COLOR][CR]'
     txt += '    Podría necesitar un [COLOR darkorange][B]Media Center Especial Modificado para ello.[/B][/COLOR]'
 
     txt += '[CR][CR]*) Localize tutoriales en [COLOR cyan][B]YouTube[/B][/COLOR], para obtener información al respecto.'

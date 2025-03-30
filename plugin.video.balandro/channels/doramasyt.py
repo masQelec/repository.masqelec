@@ -492,6 +492,12 @@ def findvideos(item):
         elif srv == 'senvid2': srv = 'sendvid'
         elif srv == 'mixdropco' or srv == 'mxdrop': srv = 'mixdrop'
         elif srv == 'mdy48tn97com': srv = 'mixdrop'
+
+        elif srv == 'cybervynx':
+             srv = 'various'
+
+             other = 'Cybervynx'
+
         else:
              if srv == 'vgembedcom': srv = 'vembed'
 
@@ -506,7 +512,7 @@ def findvideos(item):
 
         if not servidor == 'directo':
             if not servidor == 'various': other = ''
-
+            
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose', other = other ))
 
     # download
@@ -559,11 +565,12 @@ def play(item):
         itemlist.append(item.clone( url = item.url, server = item.server ))
         return itemlist
 
-    url = base64.b64decode(item.d_play).decode("utf-8")
+    player = host + 'reproductor?video=' + item.d_play
 
-    if host in url: url = scrapertools.find_single_match(url, 'url=(.*?)$')
-    else:
-       if '?url=' in url: url = scrapertools.find_single_match(url, 'url=(.*?)$')
+    data = do_downloadpage(player)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    url = scrapertools.find_single_match(data, 'var redir = "(.*?)"')
 
     if url:
         servidor = servertools.get_server_from_url(url)

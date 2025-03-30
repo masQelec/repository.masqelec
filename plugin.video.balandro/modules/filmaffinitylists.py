@@ -32,7 +32,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='listas', search_type='person', stype='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
 
-    itemlist.append(item.clone( action='listas', search_type='person', stype='director', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
+    itemlist.append(item.clone( action='listas', search_type='person', stype='name', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
 
     itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen', plot = '' ))
 
@@ -41,6 +41,17 @@ def mainlist(item):
     if not config.get_setting('mnu_simple', default=False):
         if config.get_setting('mnu_documentales', default=True):
             itemlist.append(item.clone( action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]documental[/COLOR] ...', thumbnail=config.get_thumb('documentary'), plot = 'Indicar el título de un documental' ))
+
+    if not config.get_setting('mnu_simple', default=False):
+        itemlist.append(item.clone( action='', title= '[B]Premios y Festivales:[/B]', folder=False, text_color='darkgoldenrod' ))
+
+        itemlist.append(item.clone( action='emmy_ediciones', title=' - Premios Emmy', url = host + 'award_data.php?award_id=emmy&year=', thumbnail = config.get_thumb('emmys'), search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( title = ' - Premios Oscar', action = 'oscars', url = host + 'oscar_data.php', thumbnail=config.get_thumb('oscars'), search_type = 'movie' ))
+
+        itemlist.append(item.clone( title = ' - Festivales', action = 'festivales', url = host + 'all_awards.php', search_type = 'movie' ))
+
+        itemlist.append(item.clone( title = ' - Otros Premios', action = 'festivales', url = host + 'all_awards.php', group = 'awards', search_type = 'movie' ))
 
     por_plataforma = False
     por_tema = False
@@ -68,7 +79,6 @@ def mainlist(item):
         itemlist.append(item.clone( title = ' - Por país', action = 'paises', thumbnail=config.get_thumb('idiomas'), search_type = 'movie' ))
         itemlist.append(item.clone( title = ' - Por año', action = 'anios', thumbnail=config.get_thumb('listyears'), search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = ' - Premios Oscar', action = 'oscars', url = host + 'oscar_data.php', thumbnail=config.get_thumb('oscars'), search_type = 'movie' ))
         itemlist.append(item.clone( title = ' - Sagas y colecciones', action = 'sagas', url = host + 'movie-groups-all.php', page = 1, thumbnail=config.get_thumb('bestsagas'), search_type = 'movie' ))
 
         itemlist.append(item.clone( title = ' - Las mejores', action = 'list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
@@ -89,8 +99,6 @@ def mainlist(item):
         itemlist.append(item.clone( title = '[B]Series:[/B]', action = '', text_color='hotpink', plot = '' ))
 
         itemlist.append(item.clone( title = ' - Las mejores', action = 'list_sel', url = host + ruta_sel + '&nodoc=1', cod_genre = 'TV_SE', thumbnail=config.get_thumb('besttvshows'), search_type = 'tvshow' ))
-
-        itemlist.append(item.clone( title = ' - Premios Emmy', action = 'emmy_ediciones', url = host + 'award_data.php?award_id=emmy&year=', thumbnail=config.get_thumb('emmys'), search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = ' - Por plataforma', action = 'plataformas', thumbnail=config.get_thumb('booklet'), search_type = 'tvshow' ))
         itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'tvshow' ))
@@ -180,14 +188,68 @@ def oscars(item):
     return itemlist
 
 
+def festivales(item):
+    logger.info()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+
+    if item.group == 'awards':
+        bloque = scrapertools.find_single_match(data, '>Premios</h4>(.*?)>Premios de las asociaciones de críticos<')
+    else:
+        bloque = scrapertools.find_single_match(data, '>Festivales<(.*?)>Premios<')
+
+    matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)".*?>(.*?)</a>')
+
+    for festival, title in matches:
+        if item.group == 'awards':
+            if '?award_id=academy_awards' in festival: continue
+            elif '?award_id=emmy' in festival: continue
+
+        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'i').replace('&oacute;', 'o').replace('&uacute;', 'u')
+
+        title = title.replace('(datos prox.)', '').strip()
+
+        itemlist.append(item.clone( action = 'festivales_ediciones', title = title, url = festival, text_color = 'moccasin' ))
+
+    return sorted(itemlist, key=lambda x: x.title)
+
+
+def festivales_ediciones(item):
+    logger.info()
+    itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    elif item.search_type == 'tvshow': text_color = 'hotpink'
+
+    data = httptools.downloadpage(item.url).data
+
+    matches = scrapertools.find_multiple_matches(data, '<td><a href="(.*?)" title="(.*?)">(.*?)</a>')
+
+    for url, title, anyo in matches:
+        title = title.strip()
+
+        if not title:
+           if item.group == 'awards':
+               title = 'Premios ' + anyo
+           else:
+               title = 'Festival ' + anyo
+
+        itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo, edition = 'any_fests', text_color = text_color ))
+
+    return sorted(itemlist, key = lambda it: it.anyo, reverse = True)
+
+
 def listas(item):
     logger.info()
     itemlist = []
 
     if not item.page: item.page = 0
 
+    url = item.url
+
     if item.page == 0:
-        if not '&p=' in item.url:
+        if not '&p=' in url:
             last_search = config.get_setting('search_last_' + item.search_type, default='')
 
             if item.search_type == 'documentary': texto = 'Texto a buscar para Documentales'
@@ -204,38 +266,154 @@ def listas(item):
 
             item.tecleado = tecleado
 
-    if not '&p=' in item.url:
+    if not '&p=' in url:
         url = host + 'search.php?stype=' + item.stype + '&stext=' + item.tecleado
 
-        data = httptools.downloadpage(url).data
+        if item.stype == 'name':
+            url = host + 'search.php?stype=name&stext=' + item.tecleado
+
+        elif item.stype == 'documentary':
+             url = host + 'search.php?stext=' + item.tecleado + '&notvse=1'
+
+    data = httptools.downloadpage(url).data
+
+    if item.stype == 'name':
+        matches = scrapertools.find_multiple_matches(data, '<li class="name-row px-0">(.*?)</li>')
+    elif item.stype == 'cast':
+        matches = scrapertools.find_multiple_matches(data, '<div class="row movie-card movie-card-1"(.*?)<div class="item-search">')
     else:
-        data = httptools.downloadpage(item.url).data
-
-    matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="lists-box">')
-
-    if not matches:
-        if item.stype == 'cast':
-            url = scrapertools.find_single_match(data, '<ul class="main-role">.*?<a href="(.*?)"')
-
-            data = httptools.downloadpage(url).data
-
-            matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="lists-box">')
-
-        elif item.stype == 'director':
-            url = scrapertools.find_single_match(data, '<ul class="main-role">.*?<a href="(.*?)"')
-
-            url = url.replace('&role-cat=cas', '&role-cat=dir')
-
-            data = httptools.downloadpage(url).data
-
-            matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="lists-box">')
+        matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="item-search">')
 
     num_matches = len(matches)
     desde = item.page * perpage
     hasta = desde + perpage
 
     for match in matches[desde:hasta]:
-        title = scrapertools.find_single_match(match, 'title="(.*?)"')
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
+        if title == 'No image': title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+        if '/images/empty.gif' in thumb:
+            thumb = scrapertools.find_single_match(match, 'srcset="(.*?).jpg')
+            if thumb: thumb = thumb + '.jpg'
+
+        thumb = thumb.replace('-mtiny', '-large') + '|User-Agent=Mozilla/5.0'
+
+        name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(C)', '')
+
+        title = title.replace('(Serie de TV)', '(TV)').replace('(Miniserie de TV)', '(TV)')
+
+        if '(Serie de TV)' in title or '(Miniserie de TV)' in title:
+            _search_type = 'tvshow'
+
+            if item.search_type == 'documentary': _search_type = 'all'
+
+            if '(TV)' in title:
+                name = name.replace('(TV)', '').strip()
+
+                title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+
+            if item.stype == 'cast':
+                title =  scrapertools.find_single_match(match, '<div class="credits">.*?title="(.*?)"')
+
+                url = scrapertools.find_single_match(match, '<div class="credits">.*?href="(.*?)"')
+
+                if url:
+                    itemlist.append(item.clone( action = 'list_lst', title=title, url=url, thumbnail=thumb, stype=item.stype, search_type=_search_type ))
+
+            elif item.stype == 'name':
+                url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+                if url:
+                    itemlist.append(item.clone( action = 'list_lst', title=title, url=url, thumbnail=thumb, stype=item.stype, search_type=_search_type ))
+            else:
+                itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentSerieName = name, infoLabels = {'year': '-'} ))
+        else:
+            _search_type = 'movie'
+
+            if '(C)' in title: title = title.replace('(C)', '[COLOR moccasin](C)[/COLOR]')
+
+            elif '(TV)' in title:
+                name = name.replace('(TV)', '').strip()
+
+                title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
+                _search_type = 'tvshow'
+
+            if item.search_type == 'documentary': _search_type = 'all'
+
+            if item.stype == 'cast':
+                title =  scrapertools.find_single_match(match, '<div class="credits">.*?title="(.*?)"')
+
+                url = scrapertools.find_single_match(match, '<div class="credits">.*?href="(.*?)"')
+
+                if url:
+                    itemlist.append(item.clone( action = 'list_lst', title=title, url=url, thumbnail=thumb, stype=item.stype, search_type=_search_type ))
+
+            elif item.stype == 'name':
+                url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+                if url:
+                    itemlist.append(item.clone( action = 'list_lst', title=title, url=url, thumbnail=thumb, stype=item.stype, search_type=_search_type ))
+            else:
+                if _search_type == 'movie':
+                    itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': '-'} ))
+                elif _search_type == 'tvshow':
+                    itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', name = name, contentSerieName = name, infoLabels={'year': '-'} ))
+                else:
+                    itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if num_matches > hasta:
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, tecleado = item.tecleado, stype = item.stype, action = 'listas', text_color='coral' ))
+        else:
+            if '<div class="pager-bar-content">' in data:
+               next_page = scrapertools.find_single_match(data, '<span class="current">.*?</span> <a href="(.*?)"')
+
+               if next_page:
+                   itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'listas', page = 0, stype = item.stype, text_color='coral' ))
+
+    return itemlist
+
+
+def list_lst(item):
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+
+    url = item.url
+
+    data = httptools.downloadpage(url).data
+
+    if item.stype == 'cast':
+        url = scrapertools.find_single_match(data, '<ul class="main-role">.*?<a href="(.*?)"')
+
+        if url:
+            data = httptools.downloadpage(url).data
+
+            matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="lists-box">')
+
+    elif item.stype == 'name':
+        url = scrapertools.find_single_match(data, '<ul class="main-role">.*?<a href="(.*?)"')
+
+        if url:
+            url = url.replace('&role-cat=cas', '&role-cat=dir')
+
+            data = httptools.downloadpage(url).data
+
+            matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="lists-box">')
+
+    else:
+        matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="item-search">')
+
+    num_matches = len(matches)
+    desde = item.page * perpage
+    hasta = desde + perpage
+
+    for match in matches[desde:hasta]:
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
         thumb = thumb.replace('-mtiny', '-large') + '|User-Agent=Mozilla/5.0'
@@ -279,13 +457,13 @@ def listas(item):
 
     if itemlist:
         if num_matches > hasta:
-            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, tecleado = item.tecleado, stype = item.stype, action = 'listas', text_color='coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', page = item.page + 1, tecleado = item.tecleado, stype = item.stype, action = 'list_lst', text_color='coral' ))
         else:
             if '<div class="pager-bar-content">' in data:
                next_page = scrapertools.find_single_match(data, '<span class="current">.*?</span> <a href="(.*?)"')
 
                if next_page:
-                   itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'listas', page = 0, text_color='coral' ))
+                   itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_lst', page = 0, stype = item.stype, text_color='coral' ))
 
     return itemlist
 
@@ -687,20 +865,33 @@ def list_premios_anyo(item):
         bloque = scrapertools.find_single_match(data, '<h1(.*?)</i> Edición anterior')
         if not bloque: bloque = scrapertools.find_single_match(data, '<h1(.*?)Todas las nominaciones y premios')
         if not bloque: bloque = scrapertools.find_single_match(data, '<h1(.*?)>Mejor Telefilm<')
+    elif item.edition == 'any_fests':
+        if item.group == 'awards':
+            bloque = scrapertools.find_single_match(data, '<h1(.*?)</i> Edición anterior')
+            if not bloque: bloque = scrapertools.find_single_match(data, '<h1(.*?)Todas las nominaciones y premios')
+        else:
+            bloque = scrapertools.find_single_match(data, '>Principales premios<(.*?)</i> Edición anterior')
+            if not bloque: bloque = scrapertools.find_single_match(data, '<h1(.*?)Todas las nominaciones y premios')
     else:
         bloque = scrapertools.find_single_match(data, '<h1(.*?)</div></li></ul></div></div>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title="(.*?)".*?src="(.*?)"')
+    if item.group == 'awards':
+        matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title="(.*?)".*?srcset="(.*?).jpg')
+    else:
+        matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title="(.*?)".*?src="(.*?)"')
 
     for url, title, thumb in matches:
         title = title.strip()
 
         if 'Edición de los Oscar' in title: continue
 
-        if item.edition == 'any_oscars' or item.edition == 'any_emmys':
+        if item.edition == 'any_oscars' or item.edition == 'any_emmys' or item.edition == 'any_fests':
             if 'Todas las nominaciones' in title: continue	
 
-        thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
+        if thumb:
+            if not '.jpg' in thumb: thumb = thumb + '.jpg'
+
+            thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
 
         name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(C)', '')
 
@@ -743,15 +934,27 @@ def list_premios_anyo(item):
                         search_type = _search_type
                         if item.edition == 'any_oscars': _search_type = 'movie'
                         elif item.edition == 'any_emmys': _search_type = 'tvshow'
+                        elif item.edition == 'any_festss': _search_type = 'movie'
 
-                        thumb = scrapertools.find_single_match(bloque, 'title="' + title + '".*?data-srcset="(.*?).jpg')
-                        thumb = thumb.replace('-msmall', '-large') + '.jpg' + '|User-Agent=Mozilla/5.0'
+                        if 'data-srcset="' in bloque:
+                            thumb = scrapertools.find_single_match(bloque, 'title="' + title + '".*?data-srcset="(.*?).jpg')
+                        else: thumb = ''
+
+                        if item.edition == 'any_fests':
+                            if not item.group == 'awards':
+                                if 'data-srcset="' in bloque:
+                                    thumb = scrapertools.find_single_match(bloque, '<a class="fa-name-image position-relative type-pers".*?' + '".*?title="' + title + '".*?data-srcset="(.*?).jpg')
+                                else: thumb = ''
+
+                        if thumb:
+                            thumb = thumb.replace('-msmall', '-large') + '.jpg' + '|User-Agent=Mozilla/5.0'
 
                         title = '[COLOR goldenrod][B]' + title + '[/B][/COLOR]'
                         itemlist.append(item.clone( action = 'list_names_anyo', title = title, url = url, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name ))
 
                     else:
-                        itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': item.anyo} ))
+                        if not first_person:
+                            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': item.anyo} ))
                 else:
                     itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', name = name, contentSerieName = name, infoLabels={'year': item.anyo} ))
 

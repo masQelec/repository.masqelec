@@ -130,9 +130,13 @@ def list_all(item):
         SerieName = SerieName.strip()
 
         if 'Capitulo' in SerieName: SerieName = SerieName.split("Capitulo")[0]
+        elif 'Capítulo' in SerieName: SerieName = SerieName.split("Capítulo")[0]
         elif 'capitulo' in SerieName: SerieName = SerieName.split("capitulo")[0]
+        elif 'capìtulo' in SerieName: SerieName = SerieName.split("capítulo")[0]
 
         SerieName = SerieName.strip()
+
+        SerieName = SerieName.replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u')
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -181,9 +185,13 @@ def last_epis(item):
         SerieName = SerieName.strip()
 
         if 'Capitulo' in SerieName: SerieName = SerieName.split("Capitulo")[0]
+        elif 'Capítulo' in SerieName: SerieName = SerieName.split("Capítulo")[0]
         elif 'capitulo' in SerieName: SerieName = SerieName.split("capitulo")[0]
+        elif 'capìtulo' in SerieName: SerieName = SerieName.split("capítulo")[0]
 
         SerieName = SerieName.strip()
+
+        SerieName = SerieName.replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u')
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 

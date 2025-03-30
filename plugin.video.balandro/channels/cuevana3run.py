@@ -258,7 +258,7 @@ def listado(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&amp;', '&').strip()
+        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&#8211;', '').replace('&amp;', '&').strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
@@ -312,7 +312,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&amp;', '&').strip()
+        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&#8211;', '').replace('&amp;', '&').strip()
 
         thumb = scrapertools.find_single_match(article, '<img src="(.*?)"')
 
@@ -378,7 +378,7 @@ def last_epis(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&amp;', '').replace('&#215;', 'x').strip()
+        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&#8211;', '').replace('&#215;', 'x').replace('&amp;', '').strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
@@ -654,7 +654,7 @@ def list_search(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&amp;', '&').strip()
+        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&#8211;', '').replace('&amp;', '&').strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 

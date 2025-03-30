@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w-ww.pelistv.top/'
+host = 'https://www.gnularetro.lat/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.pelispedia.ws/', 'https://ww7.pelispedia.ws/', 'https://www.gnula4.cc/',
-             'https://www.pelistv.top/']
+             'https://www.pelistv.top/', 'https://w-ww.pelistv.top/']
 
 
 domain = config.get_setting('dominio', 'pelispediaws', default='')

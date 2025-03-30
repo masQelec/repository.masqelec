@@ -38,28 +38,52 @@ channels_currents = [
         ]
 
 dominioshdfull = [
+         'https://hdfull.blog/',
+         'https://hdfull.today/',
+         'https://hd-full.biz/',
+         'https://hdfull.sbs/',
+
+         'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
-         'https://hdfull.blog/',
-         'https://hd-full.info/',
-         'https://hd-full.sbs/',
-         'https://hd-full.life/',
-         'https://hd-full.fit/',
-         'https://hd-full.me/',
-         'https://hd-full.vip/',
-         'https://hdfull.quest/',
-         'https://hdfull.today/',
-         'https://hd-full.biz/',
-         'https://hdfull.sbs/',
+         'https://hdfull.one/',
+         'https://hdfull.org/',
+
+         'https://new.hdfull.one/'
+         ]
+
+domains_cloudflare_hdfull = [
+         'https://hdfull.cv/',
+         'https://hdfull.monster/',
+         'https://hdfull.cfd/',
+         'https://hdfull.tel/',
+         'https://hdfull.buzz/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://new.hdfull.one/'
          ]
 
+ant_hosts_hdfull = [
+         'https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
+         'https://hdfull.pro/', 'https://hdfull.la/', 'https://hdfull.tv/',
+         'https://hd-full.cc/', 'https://hdfull.me/', 'https://hdfull.io/',
+         'https://hdfull.lv/', 'https://hdfullcdn.cc/', 'https://hdfull.stream/',
+         'https://hdfull.click/', 'https://hdfull.lol/', 'https://hdfull.fun/',
+         'https://hdfull.top/', 'https://hdfull.vip/', 'https://hdfull.wtf/',
+         'https://hdfull.gdn/', 'https://hdfull.cloud/', 'https://hdfull.video/',
+         'https://hdfull.work/', 'https://hdfull.life/', 'https://hdfull.digital/',
+         'https://hdfull.store/', 'https://hd-full.in/', 'https://hdfull.icu/',
+         'https://hd-full.im/', 'https://hd-full.one/', 'https://hdfull.link/',
+         'https://hd-full.co/', 'https://hd-full.lol/', 'https://hdfull.quest/',
+         'https://hd-full.info/', 'https://hd-full.sbs/', 'https://hd-full.life/',
+         'https://hd-full.fit/', 'https://hd-full.me/', 'https://hd-full.vip/'
+         ]
+
+
 dominiosplaydede = [
-         'https://www1.playdede.link/'
+         'https://www9.playdede.link/'
          ]
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -773,6 +797,11 @@ def last_domain_dontorrents(item):
         platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
         return
 
+    if localize:
+        if localize == domain:
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + localize + '[/B][/COLOR]')
+            return
+
     nom_dom = domain
     txt_dom = 'Último Dominio memorizado incorrecto.'
     if not domain:
@@ -1296,6 +1325,12 @@ def test_domain_grantorrent(item):
 def latest_domains_hdfull(item):
     logger.info()
 
+    domain = config.get_setting('dominio', 'hdfull', default='')
+
+    if not domain:
+        platformtools.dialog_notification(config.__addon_name + '[COLOR yellow][B] HdFull[/B][/COLOR]', '[B][COLOR %s]Falta Configurar el Dominio a usar ...[/COLOR][/B]' % color_alert)
+        return
+
     channel_json = 'hdfull.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
 
@@ -1381,10 +1416,6 @@ def last_domain_hdfull(item):
         platformtools.dialog_notification(config.__addon_name + '[COLOR yellow][B] HdFull[/B][/COLOR]', '[B][COLOR %s]Falta Configurar el Dominio a usar ...[/COLOR][/B]' % color_alert)
         return
 
-    if domain == 'https://new.hdfull.one/':
-        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Dominio especial correcto[/B][/COLOR]' % color_infor)
-        return
-
     platformtools.dialog_notification(config.__addon_name + ' - HdFull', '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
@@ -1424,33 +1455,6 @@ def last_domain_hdfull(item):
         except:
            last_domain = ''
 
-
-    if not last_domain:
-        try:
-           host_domain = 'https://new.hdfull.one/login'
-
-           if item.desde_el_canal:
-               if item.dominios_ret: host_domain = item.dominios_ret + 'login'
-
-           data = httptools.downloadpage(host_domain).data
-
-           last_domain = scrapertools.find_single_match(data, 'location.replace.*?"(.*?)"')
-           if not last_domain: last_domain = scrapertools.find_single_match(data, '<link rel="canonical".*?href="(.*?)"')
-
-           if not last_domain:
-               if config.get_setting('channel_hdfull_proxies', default=''):
-                   data = httptools.downloadpage_proxy('hdfull', host_domain).data
-                   last_domain = scrapertools.find_single_match(data, 'location.replace.*?"(.*?)"')
-                   if not last_domain: last_domain = scrapertools.find_single_match(data, '<link rel="canonical".*?href="(.*?)"')
-
-           if not last_domain: last_domain = dominioshdfull[0]
-
-           if last_domain:
-               if not last_domain.endswith('/'): last_domain = last_domain + '/'
-        except:
-           last_domain = ''
-
-
     if not last_domain:
         if not domain in str(dominioshdfull):
             platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
@@ -1489,6 +1493,20 @@ def last_domain_hdfull(item):
     if domain == last_domain:
         platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
         return
+
+    if localize:
+        if last_domain:
+            if last_domain == domain:
+                platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+                return
+
+        elif localize == domain:
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + localize + '[/B][/COLOR]')
+            return
+    else:
+        if last_domain == domain:
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+            return
 
     nom_dom = domain
     txt_dom = 'Último Dominio memorizado incorrecto.'
@@ -1576,12 +1594,15 @@ def operative_domains_hdfull(item):
 
     if ret == -1: return False
 
-    sel_domain = domains[ret]
+    if domains[ret] in str(ant_hosts_hdfull):
+        platformtools.dialog_ok(config.__addon_name + ' HdFull - Dominios Operativos', '[COLOR red][B]Dominio Obsoleto.[/B][/COLOR]', '[COLOR cyan][B]' + domains[ret] + ' [/B][/COLOR]')
+        return False
 
-    if domain:
-        if domain == 'https://new.hdfull.one/':
-            platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Dominio especial correcto[/B][/COLOR]' % color_infor)
-            return
+    elif domains[ret] in str(domains_cloudflare_hdfull):
+        if not platformtools.dialog_yesno(config.__addon_name + ' HdFull - Dominios Operativos', '[COLOR yellow][B]Este Dominio, probablemente Necesitará[/COLOR] [COLOR red] Proxies[/B][/COLOR]', '[COLOR cyan][B]' + domains[ret] + '[/B][/COLOR][CR][COLOR yellowgreen][B]¿ Confirma el Dominio seleccionado ?[/B][/COLOR]'):
+            return False
+
+    sel_domain = domains[ret]
 
     nom_dom = domain
     txt_dom = 'Dominio memorizado incorrecto.'
@@ -1727,7 +1748,7 @@ def last_domain_hdfullse(item):
     platformtools.dialog_notification(config.__addon_name + ' - HdFullSe', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ web 0)-https://hdfull.pm/
+    # ~ web 0)-https://hdfull.pm/  1)-'https://www.hdfull.it'
 
     last_domain = ''
     latest_domain = ''
@@ -1774,7 +1795,7 @@ def last_domain_hdfullse(item):
         platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
         xbmc.sleep(1000)
-        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://hdfull.pm/  ó  https://www.hdfull.it[/B][/COLOR]')
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]hdfull.pm/  ó  www.hdfull.it[/B][/COLOR]')
         return
 
 
@@ -1808,6 +1829,11 @@ def last_domain_hdfullse(item):
     if domain == last_domain:
         platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
         return
+
+    if localize:
+        if localize == domain:
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + localize + '[/B][/COLOR]')
+            return
 
     nom_dom = domain
     txt_dom = 'Último Dominio memorizado incorrecto.'
@@ -1854,7 +1880,7 @@ def operative_domains_hdfullse(item):
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ web 0)-https://hdfull.pm/
+    # ~ web 0)-https://hdfull.pm/ 1)-'https://www.hdfull.it'
 
     try:
        host_domain = 'https://hdfull.pm/'
@@ -1864,7 +1890,7 @@ def operative_domains_hdfullse(item):
 
        if not data:
            xbmc.sleep(1000)
-           platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]https://hdfull.pm/  ó  https://www.hdfull.it/[/B][/COLOR]')
+           platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para saber el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]hdfull.pm/  ó  www.hdfull.it/[/B][/COLOR]')
            return
 
        operative_domains = scrapertools.find_multiple_matches(data, 'onClick="location.href.*?' + "'(.*?)'")
@@ -2680,7 +2706,7 @@ def last_domain_playdede(item):
     platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ webs  0)-https://privacidad.me/@playdede  1)-Twitter https://x.com/playdedesocial  2)-Telegram https://t.me/playdedeinformacion
+    # ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/playdedesocial
 
     last_domain = ''
     latest_domain = ''
@@ -2705,7 +2731,7 @@ def last_domain_playdede(item):
         platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
         xbmc.sleep(1000)
-        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]privacidad.me/@playdede[/B][/COLOR] ó [B][COLOR greenyellow] x.com/playdedesocial[/COLOR][/B] ó [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B]')
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]privacidad.me/@playdede[/B][/COLOR] ó [B][COLOR greenyellow]entrarplaydede.com[/COLOR][/B] ó [B][COLOR greenyellow]x.com/playdedesocial[/COLOR][/B]')
         return
 
     host_channel = ''
@@ -2750,6 +2776,15 @@ def last_domain_playdede(item):
                     platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
                 return
 
+    if localize:
+        if localize == domain:
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + localize + '[/B][/COLOR]')
+            return
+    else:
+        if last_domain == domain:
+            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+            return
+
     nom_dom = domain
     txt_dom = 'Último Dominio memorizado incorrecto.'
 
@@ -2763,7 +2798,7 @@ def last_domain_playdede(item):
         nom_dom = 'Sin información'
         txt_dom = 'Aún No hay ningún Dominio memorizado.'
 
-    if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Vigente:           [COLOR cyan][B]' + last_domain + '[/B][/COLOR]'): 
+    if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Vigente:           [COLOR cyan][B]' + last_domain + '[/B][/COLOR]'):
         config.set_setting('dominio', last_domain, 'playdede')
 
         if not item.desde_el_canal:
@@ -2800,7 +2835,7 @@ def operative_domains_playdede(item):
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar todos los dominios operativos
-    # ~ webs  0)-https://privacidad.me/@playdede  1)-Twitter https://x.com/playdedesocial  2)-Telegram https://t.me/playdedeinformacion
+    # ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/playdedesocial
 
     sel_domain = ''
 
@@ -3854,12 +3889,12 @@ def manto_domain_common(item, id, name):
     elif id == 'playdede':
         config.set_setting('user_test_channel', '')
 
-        if not domain: domain = 'https://'
+        if not domain: domain = 'https://www'
 
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio PlayDede  -->  [COLOR %s]https://????.playdede.link/[/COLOR]' % color_avis)
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio PlayDede  -->  [COLOR %s]https://www?.playdede.link/[/COLOR]' % color_avis)
 
         if new_domain is None: return
-        elif new_domain == 'https://': return
+        elif new_domain == 'https://www': return
 
     elif id == 'poseidonhd2':
         config.set_setting('user_test_channel', '')

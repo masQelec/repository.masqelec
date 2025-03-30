@@ -547,7 +547,7 @@ def findvideos(item):
 
             if url.startswith('//'): url = 'https:' + url
 
-            elif 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
+            if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 
             elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
 
@@ -671,6 +671,8 @@ def play(item):
     url = item.url
 
     if url:
+        url = url.replace('/Smoothpre.', '/smoothpre.')
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
@@ -679,6 +681,12 @@ def play(item):
             if new_server.startswith("http"): servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
+
+        if 'filelions' in url or 'azipcdn' in url or 'alions' in url or 'dlions' in url or 'mlions' in url or 'fviplions' in url or 'javlion' in url or 'fdewsdc' in url or 'peytonepre' in url or 'ryderjet' in url:
+            url += "|Referer=" + host
+
+        elif 'vidhide' in url or 'stblion' in url or 'dhtpre' in url or 'dramacool' in url:
+            url += "|Referer=" + host
 
         itemlist.append(item.clone( url=url, server=servidor ))
 

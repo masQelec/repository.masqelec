@@ -509,6 +509,15 @@ def play(item):
 
                return itemlist
 
+            else:
+               if url_base64:
+                   new_server = servertools.get_server_from_url(url_base64)
+                   new_server = servertools.corregir_other(new_server)				   
+
+                   if not new_server == 'directo':
+                       url = url_base64
+                       item.server = new_server
+
     if url:
         if '/acortalink.' in url:
            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
