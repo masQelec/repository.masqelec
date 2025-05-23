@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import ast, re
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -448,6 +448,7 @@ def findvideos(item):
 
     ses = 0
 
+    # ~ P1
     matches = scrapertools.find_multiple_matches(data, 'dooplay_player_response_.*?src="(.*?)"')
 
     for stream in matches:
@@ -456,8 +457,10 @@ def findvideos(item):
         if not stream: continue
 
         if not 'http' in stream: continue
+        elif stream.endswith('.js'): continue
 
         data_s = do_downloadpage(stream)
+
 
         if '//embed69.' in stream:
             ses += 1
@@ -468,9 +471,12 @@ def findvideos(item):
             if not dataLink: dataLink = scrapertools.find_single_match(datae, 'dataLink(.*?);')
 
             e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
-            if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "encrypted.*?'(.*?)'")
+            if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "const safeServer =.*?'(.*?)'")
 
             e_links = dataLink.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
+
+            age = ''
+            if not dataLink or not e_bytes: age = 'crypto'
 
             langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
 
@@ -484,6 +490,7 @@ def findvideos(item):
                 if 'SUB' in lang: lang = 'Vose'
                 elif 'LAT' in lang: lang = 'Lat'
                 elif 'ESP' in lang: lang = 'Esp'
+                elif 'JAP' in lang: lang = 'Jap'
                 else: lang = '?'
 
                 for srv, link in links:
@@ -521,10 +528,12 @@ def findvideos(item):
                            other = url.split("/")[2]
                            other = other.replace('https:', '').strip()
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes,
+                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
                                           language=lang, other=other ))
 
-        if '/xupalace.' in stream:
+                continue
+
+        if '//xupalace.' in stream:
             ses += 1
 
             lang = '?'
@@ -552,9 +561,9 @@ def findvideos(item):
             elif '/video/' in stream:
                 datax = do_downloadpage(stream)
 
-                matchesx = scrapertools.find_multiple_matches(datax, "go_to_playerVast.*?'(.*?)'")
+                matchesx = scrapertools.find_multiple_matches(datax, "go_to_playerVast.*?'(.*?)'(.*?)</span>")
 
-                for matchx in matchesx:
+                for matchx, restox in matchesx:
                     if '/embedsito.' in matchx: continue
                     elif '/player-cdn.' in matchx: continue
                     elif '/1fichier.' in matchx: continue
@@ -562,20 +571,28 @@ def findvideos(item):
                     elif '/xupalace.' in matchx: continue
                     elif '/uploadfox.' in matchx: continue
 
+                    if 'data-lang="0"' in restox: lang = 'Lat'
+                    elif 'data-lang="1"' in restox: lang = 'Esp'
+                    elif 'data-lang="2"' in restox: lang = 'Vose'
+                    elif 'data-lang="3"' in restox: lang = 'Jap'
+                    else: lang = '?'
+
                     servidor = servertools.get_server_from_url(matchx)
                     servidor = servertools.corregir_servidor(servidor)
 
                     if servertools.is_server_available(servidor):
                         if not servertools.is_server_enabled(servidor): continue 
                     else:
-                       if not config.get_setting('developer_mode', default=False): continue
+                        if not config.get_setting('developer_mode', default=False): continue
 
-                       url = servertools.normalize_url(servidor, matchx)
+                    url = servertools.normalize_url(servidor, matchx)
 
-                       other = ''
-                       if servidor == 'various': other = servertools.corregir_other(url)
+                    other = ''
+                    if servidor == 'various': other = servertools.corregir_other(url)
 
-                       itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang, other=other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang, other=other ))
+
+                continue
 
         # ~ Otros
         links = scrapertools.find_multiple_matches(data_s, '<li onclick="go_to_playerVast(.*?)>')
@@ -593,6 +610,7 @@ def findvideos(item):
             if 'data-lang="0"' in link: lang = 'Lat'
             elif 'data-lang="1"' in link: lang = 'Esp'
             elif 'data-lang="2"' in link: lang = 'Vose'
+            elif 'data-lang="3"' in link: lang = 'Jap'
             else: lang = '?'
 
             servidor = servertools.get_server_from_url(url)
@@ -616,6 +634,45 @@ def findvideos(item):
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other.capitalize() ))
 
+    # ~ P2
+    match = scrapertools.find_single_match(data, '"dooplay_player_option ".*?<iframe.*?src="(.*?)".*?</iframe>')
+
+    if match:
+        if not '//embed69.' in match:
+            datax = do_downloadpage(match)
+
+            matchesx = scrapertools.find_multiple_matches(datax, "go_to_playerVast.*?'(.*?)'(.*?)</span>")
+
+            for matchx, restox in matchesx:
+                if '/embedsito.' in matchx: continue
+                elif '/player-cdn.' in matchx: continue
+                elif '/1fichier.' in matchx: continue
+                elif '/hydrax.' in matchx: continue
+                elif '/xupalace.' in matchx: continue
+                elif '/uploadfox.' in matchx: continue
+
+                if 'data-lang="0"' in restox: lang = 'Lat'
+                elif 'data-lang="1"' in restox: lang = 'Esp'
+                elif 'data-lang="2"' in restox: lang = 'Vose'
+                elif 'data-lang="3"' in restox: lang = 'Jap'
+                else: lang = '?'
+
+                servidor = servertools.get_server_from_url(matchx)
+                servidor = servertools.corregir_servidor(servidor)
+
+                if servertools.is_server_available(servidor):
+                    if not servertools.is_server_enabled(servidor): continue 
+                else:
+                    if not config.get_setting('developer_mode', default=False): continue
+
+                url = servertools.normalize_url(servidor, matchx)
+
+                other = ''
+                if servidor == 'various': other = servertools.corregir_other(url)
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang, other=other, age='P2' ))
+
+
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
@@ -635,17 +692,19 @@ def play(item):
         bytes = str(item.bytes)
 
         try:
-            cripto = ast.literal_eval(cripto)
-        except:
-            crypto = str(item.crypto)
-
-        try:
             url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
         except:
             url = ''
 
         if not url:
-            return '[COLOR cyan]No se pudo [COLOR red]Desencriptar[/COLOR]'
+            if crypto.startswith("http"):
+                url = crypto.replace('\\/', '/')
+
+            if not url:
+                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+        elif not url.startswith("http"):
+            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     if url:
         if '/xupalace.' in url or '/uploadfox.' in url:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import ast, re
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -408,11 +408,16 @@ def findvideos(item):
 
             if not srv or not encrypt: continue
 
+            if srv in ['lulustream', 'vidguard', 'vidhide']: pass
+            else: continue
+
+            srv = srv.capitalize()
+
             itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', crypto=encrypt, bytes=d_bytes,
-                                  language=lang, other=srv ))
+                                  language=lang, other=srv, age='encrypt' ))
 
     # ~ download
-    bloque = scrapertools.find_single_match(data, 'data-dwn=(.*?)Descargar<')
+    bloque = scrapertools.find_single_match(data, 'data-dwn=(.*?)>Descargar<')
 
     if bloque:
         if '><li' in bloque: bloque = bloque.split("><li")[0]
@@ -428,6 +433,8 @@ def findvideos(item):
         ses += 1
 
         if not option: continue
+
+        option = option.replace('["', '').replace('"]', '')
 
         url = option
 
@@ -445,6 +452,7 @@ def findvideos(item):
         elif 'mega' in url: servidor = 'mega'
         elif 'voe' in url: servidor = 'voe'
         elif 'mixdrop' in url: servidor = 'mixdrop'
+        elif 'mp4upload' in url: servidor = 'mp4upload'
 
         elif 'streamwish' in url or 'wish' in url: servidor = 'various'
         elif 'filelions' in url: servidor = 'various'
@@ -491,17 +499,15 @@ def play(item):
         bytes = str(item.bytes)
 
         try:
-            cripto = ast.literal_eval(cripto)
-        except:
-            crypto = str(item.crypto)
-
-        try:
             url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
         except:
             url = ''
 
         if not url:
-            return '[COLOR cyan]No se pudo [COLOR red]Desencriptar[/COLOR]'
+            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+        elif not url.startswith("http"):
+            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     elif '/?trdownload=' in url:
            url = httptools.downloadpage(url, follow_redirects=False, timeout=timeout).headers['location']

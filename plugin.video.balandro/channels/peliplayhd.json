@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose", "vo"],
 
-  "clusters": ["notice", "years", "docs", "kids", "vos", "tales"],
+  "clusters": ["years", "docs", "kids", "vos", "tales"],
 
-  "notes": "Web ANULADA. Películas por géneros y Series por Géneros. Categoría TeleNovelas. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web ANULADA. Películas por géneros y Series por Géneros."
 }

@@ -155,13 +155,12 @@ def get_video_url(page_url, url_referer=''):
             else:
                return 'Acceso Denegado (2do.), Falta ResolveUrl' # ~ Cloudflare recaptcha
 
-        token = scrapertools.find_single_match(data, '"?token=([^"&]+)')
-        if not token: return video_urls
+        token = scrapertools.find_single_match(data2, '"?token=([^"&]+)')
+        if not token:
+            a = ''.join([random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') for i in range(10)])
+            a += '?token=' + token + '&expiry=' + str(int(time.time()*1000))
 
-        a = ''.join([random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') for i in range(10)])
-        a += '?token=' + token + '&expiry=' + str(int(time.time()*1000))
-
-        video_urls.append(['mp4', data2 + a + '|Referer=%s' % page_url])
+            video_urls.append(['mp4', data2 + a + '|Referer=%s' % page_url])
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):

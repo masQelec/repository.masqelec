@@ -448,6 +448,7 @@ def findvideos(item):
         elif 'fikper' in match.lower(): continue
         elif 'rapidcloud' in match.lower(): continue
         elif 'buzzheavier' in match.lower(): continue
+        elif 'vikingfile' in match.lower(): continue
 
         srv = scrapertools.find_single_match(match, "<img src='.*?/>(.*?)</div>").lower().strip()
 
@@ -487,6 +488,9 @@ def play(item):
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
+
+        if '/bigwarp.' in url or '/bgwp.' in url:
+            servidor = 'zures'
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

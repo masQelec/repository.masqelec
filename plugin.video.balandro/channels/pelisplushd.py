@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww7.pelisplushd.lat/'
+host = 'https://www.pelisplushd.ms/'
 
 
 # ~ por si viene de enlaces guardados
@@ -20,7 +20,8 @@ ant_hosts = ['https://pelisplushd.net/', 'https://pelisplushd.to/', 'https://www
              'https://www17.pelisplushd.lat/', 'https://www18.pelisplushd.lat/', 'https://www19.pelisplushd.lat/',
              'https://www20.pelisplushd.lat/', 'https://www21.pelisplushd.lat/', 'https://ww1.pelisplushd.lat/',
              'https://ww2.pelisplushd.lat/', 'https://ww3.pelisplushd.lat/', 'https://ww4.pelisplushd.lat/',
-             'https://ww5.pelisplushd.lat/', 'https://ww6.pelisplushd.lat/']
+             'https://ww5.pelisplushd.lat/', 'https://ww6.pelisplushd.lat/', 'https://ww7.pelisplushd.lat/',
+             'https://ww8.pelisplushd.lat/']
 
 
 domain = config.get_setting('dominio', 'pelisplushd', default='')
@@ -502,6 +503,8 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    IDIOMAS = {'ESPAÑOL': 'Esp', 'espanola': 'Esp', 'LATINO': 'Lat', 'latino': 'Lat', 'SUBTITULADO': 'Vose', 'SUB': 'Vose', 'subtitle': 'Vose'}
+
     lang = 'Lat'
 
     data = do_downloadpage(item.url)
@@ -594,6 +597,35 @@ def findvideos(item):
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = lang, other = link_other + ' D' ))
 
+    # ~ links
+    bloque = scrapertools.find_single_match(data, '"links"(.*?)},')
+
+    options = scrapertools.find_multiple_matches(str(bloque), '"(.*?)":"(.*?)"')
+
+    if not options:
+        options = scrapertools.find_multiple_matches(data, '<button class="bstd Button">.*?<span>(.*?)<span>.*?data-url="(.*?)"')
+
+    for lang, embed in options:
+        ses += 1
+
+        if not embed: continue
+
+        if '/goodstream.' in embed:
+            if not 'http' in embed: embed = 'https:' + embed
+            url = embed
+        else:
+            url = 'https://goodstream.one/video/embed/' + embed
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        other = ''
+        if servidor == 'various': other = servertools.corregir_other(url)
+
+        itemlist.append(Item(channel = item.channel, action = 'play', server=servidor, title = '', url=url, language=IDIOMAS.get(lang,lang), other=other ))
+
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
@@ -606,6 +638,8 @@ def normalize_other(url):
     if 'pelisplus' in url: link_other = 'plus'
     elif 'damedamehoy' in url: link_other = 'dame'
     elif 'tomatomatela' in url: link_other = 'dame'
+
+    elif 'player.' in url: link_other = 'Player'
 
     elif 'plustream' in url: link_other = ''
 

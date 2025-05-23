@@ -7,19 +7,57 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://aniyt.net/'
+host = 'https://animeytx.com/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://animeyt.moe/', 'https://animeenlatino.moe/', 'https://aniyt.net/',
+             'https://wvw.aniyt.net/']
+
+
+domain = config.get_setting('dominio', 'animeyt', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'animeyt')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'animeyt')
+    else: host = domain
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://animeyt.moe/', 'https://animeenlatino.moe/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post).data
 
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'animeyt', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_animeyt', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='animeyt', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_animeyt', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'animeyt', thumbnail=config.get_thumb('animeyt') ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
@@ -36,28 +74,30 @@ def mainlist_animes(item):
         from modules import actions
         if actions.adults_password(item) == False: return
 
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
+
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'all', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'tv/?page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/?page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'tv/?sub=&order=latest&page=1' , search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'ver/?status=&type=&sub=&order=latest' , search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host + 'tv/?status=&type=&order=update&page=1', search_type = 'tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_all', url = host + 'ver/?status=&type=&order=update&page=1', search_type = 'tvshow', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Actualizados', action = 'list_all', url = host + 'tv/?status=&type=&order=latest&page=1', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'tv/?status=ongoing&page=1', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'tv/?status=completed&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Actualizados', action = 'list_all', url = host + 'ver/?status=&type=&order=latest&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'ver/?status=ongoing&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'ver/?status=completed&page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'tv/?sub=&order=popular&page=1', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'tv/?status=&type=&order=rating&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'ver/?sub=&order=popular&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'ver/?status=&type=&order=rating&page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Proximamente', action = 'list_all', url = host + 'tv/?status=upcoming&page=1', search_type = 'tvshow', text_color='yellowgreen' ))
+    itemlist.append(item.clone( title = 'Proximamente', action = 'list_all', url = host + 'ver/?status=upcoming&page=1', search_type = 'tvshow', text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( title = 'Series', action = 'list_all', url = host + 'tv/?status=&type=tv&order=update&page=1', search_type = 'tvshow', text_color = 'hotpink' ))
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'tv/?status=&type=movie&order=update&page=1', search_type = 'movie', text_color='deepskyblue' ))
+    itemlist.append(item.clone( title = 'Series', action = 'list_all', url = host + 'ver/?status=&type=tv&order=update&page=1', search_type = 'tvshow', text_color = 'hotpink' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'ver/?status=&type=movie&order=update&page=1', search_type = 'movie', text_color='deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Onas', action = 'list_all', url = host + 'tv/?status=&type=ona&order=update&page=1', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'tv/?type=ova&sub=&order=update&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Onas', action = 'list_all', url = host + 'ver/?status=&type=ona&order=update&page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'ver/?type=ova&sub=&order=update&page=1', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
@@ -70,9 +110,9 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'tv/?sub=cast&order=update&page=1', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'tv/?sub=dub&order=update&page=1', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'tv/?sub=sub&order=update&page=1', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'ver/?sub=cast&order=update&page=1', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'ver/?sub=dub&order=update&page=1', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'ver/?sub=sub&order=update&page=1', text_color='moccasin' ))
 
     return itemlist
 
@@ -81,7 +121,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host + 'tv/')
+    data = do_downloadpage(host + 'ver/')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '> Género <(.*?)</ul>')
@@ -89,7 +129,7 @@ def generos(item):
     matches = re.compile('value="(.*?)".*?<label for=.*?">(.*?)</label>').findall(bloque)
 
     for value, title in matches:
-        url = host + 'tv/?genre[]=' + value + '&status=&type=&sub=&order=&page=1'
+        url = host + 'ver/?genre[]=' + value + '&status=&type=&sub=&order=&page=1'
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
 
@@ -166,7 +206,7 @@ def list_all(item):
              else: next_page = scrapertools.find_single_match(bloque, '<a href="(.*?)"')
 
          if next_page:
-             if 'page=' in next_page: next_page = host + 'tv/' + next_page
+             if 'page=' in next_page: next_page = host + 'ver/' + next_page
 
              if 'page=' in next_page or '/page/' in next_page:
                  itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
@@ -378,7 +418,7 @@ def play(item):
 
             new_url = scrapertools.find_single_match(resp.data, '<a href="(.*?)"')
             if 'php?' in new_url:
-                resp = httptools.downloadpage(host[:-1] + new_url, follow_redirects=False)
+                resp = httptools.downloadpage(new_url, follow_redirects=False)
 
             url = scrapertools.find_single_match(resp.data, "window.location.href = '(.*?)'")
 

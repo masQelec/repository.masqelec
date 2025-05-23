@@ -43,6 +43,13 @@ def mainlist(item):
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
+    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
+
+    itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', search_type = 'person',
+                                plot = 'Indicar el nombre y/ó apellido/s del intérprete.'))
+    itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', search_type = 'person',
+                                plot = 'Indicars el nombre y/ó apellido/s del director.'))
+
     return itemlist
 
 
@@ -899,7 +906,7 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         elif '/ouo.' in url:
-            return 'CloudFlare [COLOR red]ReCaptcha[/COLOR]'
+            return 'Servidor con [COLOR red]CloudFlare ReCaptcha[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

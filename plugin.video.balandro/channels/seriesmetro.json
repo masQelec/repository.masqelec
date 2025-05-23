@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["onlyone", "current", "lasts", "kids", "docs", "vos"],
+  "clusters": ["lasts", "kids", "docs", "vos"],
 
   "notes": "Web CERRADA. Series por Géneros."
 }

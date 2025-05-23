@@ -193,6 +193,9 @@ def findvideos(item):
 
             elif '/sb' in url: continue
 
+            if '/Smoothpre.' in url:
+                url = url.replace('/Smoothpre.', '/smoothpre.')
+
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 

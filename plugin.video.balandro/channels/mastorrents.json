@@ -3,7 +3,7 @@
   "name": "MasTorrents",
   "thumbnail": "mastorrents.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow", "torrent"],
   "language": ["cast"],
 
-  "clusters": ["clone", "onlyone", "torrents", "news", "lasts", "years", "qualityes", "kids", "docs", "4k"],
+  "clusters": ["onlyone", "torrents", "news", "lasts", "years", "qualityes", "kids", "docs", "4k"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas, Series y Documentales, por géneros, calidad y año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web CERRADA. Canal con enlaces Torrent exclusivamente. Películas, Series y Documentales, por géneros."
 }

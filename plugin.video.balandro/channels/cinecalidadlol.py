@@ -615,6 +615,7 @@ def findvideos(item):
 
                 if srv == 'vip': continue
                 elif '1fichier' in srv: continue
+                elif 'lamovie' in srv: continue
 
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
@@ -657,6 +658,7 @@ def findvideos(item):
 
                 if srv == 'vip': continue
                 elif '1fichier' in srv: continue
+                elif 'lamovie' in srv: continue
 
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)

@@ -69,6 +69,7 @@ def list_lst(item):
         if not year: year = '-'
         else:
            title = title.replace('(' + year + ')', '').strip()
+           title = title.replace(' ' + year, '').strip()
 
         SerieName = title
 
@@ -141,6 +142,7 @@ def list_all(item):
         if not year: year = '-'
         else:
            title = title.replace('(' + year + ')', '').strip()
+           title = title.replace(' ' + year, '').strip()
 
         SerieName = title
 
@@ -489,6 +491,7 @@ def findvideos(item):
         ses += 1
 
         if '/argtesa.' in url: continue
+        elif '/kstream1.' in url: continue
 
         if url.startswith("//"): url = 'https:' + url
 

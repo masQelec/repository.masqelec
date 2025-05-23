@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://www9.playdede.link/'
+host = 'https://www10.playdede.link/'
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
@@ -57,7 +57,7 @@ ant_hosts = ['https://playdede.com/', 'https://playdede.org/', 'https://playdede
              'https://playdede.me/', 'https://playdede.in/', 'https://playdede.link/',
              'https://www1.playdede.link/', 'https://www2.playdede.link/', 'https://www3.playdede.link/',
              'https://www4.playdede.link/', 'https://www5.playdede.link/', 'https://www6.playdede.link/',
-             'https://www7.playdede.link/', 'https://www8.playdede.link/']
+             'https://www7.playdede.link/', 'https://www8.playdede.link/', 'https://www9.playdede.link/']
 
 
 domain = config.get_setting('dominio', 'playdede', default='')
@@ -69,13 +69,17 @@ if domain:
 
 
 _dynamic = False
-if not config.get_setting('developer_mode', default=False):
-    cur_host = host
-    new_host = dynamic.host(host)
 
-    if not cur_host == new_host:
-        _dynamic = True
-        config.set_setting('dominio', new_host, 'playdede')
+cur_host = host
+new_host = dynamic.host(host)
+
+if not cur_host == new_host:
+    _dynamic = True
+
+    if config.get_setting('developer_mode', default=False):
+        platformtools.dialog_notification(config.__addon_name + ' Playdede', '[COLOR cyan][B]Dominio Dinámico[/B][/COLOR]')
+
+    config.set_setting('dominio', new_host, 'playdede')
 
 
 elepage = 42
@@ -479,8 +483,10 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', text_color='green' ))
 
-    itemlist.append(item.clone( channel='domains', action='test_domain_playdede', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
-                                from_channel='playdede', folder=False, text_color='chartreuse' ))
+    dom_dinamico = ''
+    if _dynamic: dom_dinamico = ' [COLOR dodgerblue] Dinámico'
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_playdede', title='Test Web del canal [COLOR yellow][B] ' + url + dom_dinamico + '[/B][/COLOR]', from_channel='playdede', folder=False, text_color='chartreuse' ))
 
     username = config.get_setting('playdede_username', 'playdede', default='')
 
@@ -524,12 +530,11 @@ def acciones(item):
 
     itemlist.append(item.clone(channel='helper', action = 'show_help_playdede_media_center', title = '[COLOR aquamarine][B]Aviso[/COLOR] [COLOR violet][B]Ubicación[/B][/COLOR] Media Center',  thumbnail=config.get_thumb('mediacenter') ))
 
-    itemlist.append(item.clone( channel='helper', action='show_help_playdede_bloqueo', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_playdede_bloqueo', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras', thumbnail=config.get_thumb('roadblock') ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_playdede', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal' ))
 
-    if not _dynamic:
-        itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'playdede' ))
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'playdede' ))
 
     platformtools.itemlist_refresh()
 

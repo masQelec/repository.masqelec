@@ -134,6 +134,7 @@ dominioshdfull = [
          'https://hd-full.biz/',
          'https://hdfull.sbs/',
 
+         'https://hdfull.help/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
@@ -146,14 +147,14 @@ dominioshdfull = [
          ]
 
 dominiosplaydede = [
-         'https://www9.playdede.link/'
+         'https://www10.playdede.link/'
          ]
 
 channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
-channels_despised = ['beeg', 'cam4', 'hdfullse', 'pelisplushdlat', 'ytsmx']
+channels_despised = ['beeg', 'cam4', 'pelisplushdlat', 'ytsmx']
 
 servers_poe = ['directo', 'm3u8hls', 'torrent']
 
@@ -184,7 +185,16 @@ def test_channel(channel_name):
             platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
             return
 
-    if config.get_setting('developer_mode', default=False): txt = '[COLOR moccasin][B]Internet:[/COLOR]  [COLOR yellow]Status Developer Mode[/B][/COLOR][CR][CR]'
+    generar = False
+
+    if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): generar = True
+    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): generar = True
+    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): generar = True
+
+    if config.get_setting('developer_mode', default=False):
+        if generar:
+            txt = '[COLOR moccasin][B]Internet:[/COLOR]  [COLOR yellow]Status Developer Mode[/B][/COLOR][CR][CR]'
+        else: txt = test_internet()
     else: txt = test_internet()
 
     try: last_ver = updater.check_addon_version()
@@ -217,16 +227,17 @@ def test_channel(channel_name):
     txt += 'categories: ' + str(categories) + '[CR]'
 
     if config.get_setting('developer_mode', default=False):
-        txt += '[CR][COLOR moccasin][B]Desarrollo:[/B][/COLOR]'
+        if generar:
+            txt += '[CR][COLOR moccasin][B]Desarrollo:[/B][/COLOR]'
 
-        sets_clusters = str(params['clusters'])
-        sets_clusters = sets_clusters.replace('[', '').replace(']', '').replace("'", '').strip()
-        txt += '[CR]clusters: ' + sets_clusters
+            sets_clusters = str(params['clusters'])
+            sets_clusters = sets_clusters.replace('[', '').replace(']', '').replace("'", '').strip()
+            txt += '[CR]clusters: ' + sets_clusters
 
-        sets_notes = str(params['notes'])
-        txt += '[CR]notes: ' + sets_notes
+            sets_notes = str(params['notes'])
+            txt += '[CR]notes: ' + sets_notes
 
-        txt += '[CR]'
+            txt += '[CR]'
 
     txt += '[CR][COLOR moccasin][B]Contenidos:[/B][/COLOR][CR]'
 
@@ -273,6 +284,7 @@ def test_channel(channel_name):
     if 'torrents' in clusters: clusters = clusters.replace('torrents,', '').strip()
     if 'notice' in clusters: clusters = clusters.replace('notice,', '').strip()
     if 'languages' in clusters: clusters = clusters.replace('languages,', '').strip()
+    if 'crypto' in clusters: clusters = clusters.replace('crypto,', '').strip()
 
     if 'news' in clusters: clusters = clusters.replace('news,', '').strip()
     if 'news' in clusters: clusters = clusters.replace('news', '').strip()
@@ -553,14 +565,18 @@ def test_channel(channel_name):
             txt_clons = ''
             if channel_id == 'cuevana2esp': txt_clons = 'Cuevana2'
 
-            elif channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrentsIn, EliteDivx, LilaTorrent, MasTorrents, MejorTorrentApp, NaranjaTorrent, ReinvenTorrent, RojoTorrent, TomaDivx, TodoTorrents, VerdeTorrent'
+            elif channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrentsIn, EliteDivx, LilaTorrent, MejorTorrentApp, NaranjaTorrent, ReinvenTorrent, RojoTorrent, TomaDivx, TodoTorrents, VerdeTorrent'
+
+            elif channel_id == 'detodo': txt_clons = 'DPeliculas'
 
             elif channel_id == 'homecine': txt_clons = 'PelisPediaIs, SeriesMetroN'
 
             elif channel_id == 'elitetorrent': txt_clons = 'EliteTorrentNz'
             elif channel_id == 'gnula24': txt_clons = 'Gnula24h, Series24'
 
-            elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesEs, SeriesOnline, SeriesTv, Star'
+            elif channel_id == 'joinclub': txt_clons = 'VerSeries'
+
+            elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesEs, SeriesOnline, Star'
 
             elif channel_id == 'zonapelis': txt_clons = 'TorrenFlix'
 
@@ -573,11 +589,12 @@ def test_channel(channel_name):
             if channel_id == 'cuevana2': txt_clones = 'Cuevana2Esp'
             elif channel_id == 'divxatope': txt_clones = 'DonTorrents'
             elif channel_id == 'dontorrentsin': txt_clones = 'DonTorrents'
+            elif channel_id == 'dpeliculas': txt_clones = 'DeTodo'
             elif channel_id == 'elitedivx': txt_clones = 'DonTorrents'
             elif channel_id == 'elitetorrentnz': txt_clones = 'EliteTorrent'
             elif channel_id == 'gnula24h': txt_clones = 'Gnula24'
+            elif channel_id == 'joinclub': txt_clones = 'VerSeries'
             elif channel_id == 'lilatorrent': txt_clones = 'DonTorrents'
-            elif channel_id == 'mastorrents': txt_clones = 'DonTorrents'
             elif channel_id == 'mejortorrentapp': txt_clones = 'DonTorrents'
             elif channel_id == 'naranjatorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'onlinetv': txt_clones = 'VerOnline'
@@ -588,15 +605,15 @@ def test_channel(channel_name):
             elif channel_id == 'serieses': txt_clones = 'VerOnline'
             elif channel_id == 'seriesmetron': txt_clones = 'HomeCine'
             elif channel_id == 'seriesonline': txt_clones = 'VerOnline'
-            elif channel_id == 'seriestv': txt_clones = 'VerOnline'
             elif channel_id == 'star': txt_clones = 'VerOnline'
             elif channel_id == 'tomadivx': txt_clones = 'DonTorrents'
             elif channel_id == 'todotorrents': txt_clones = 'DonTorrents'
             elif channel_id == 'torrenflix': txt_clones = 'ZonaPelis'
             elif channel_id == 'verdetorrent': txt_clones = 'DonTorrents'
+            elif channel_id == 'verseries': txt_clones = 'JoinClub'
 
             if txt_clones:
-                txt_diag  += '[CR]clone: ' + '[COLOR turquoise][B]Clon del Canal Principal[/COLOR][COLOR gold] ' + txt_clones + '[/B][/COLOR]'
+                txt_diag  += 'clone: ' + '[COLOR turquoise][B]Clon del Canal Principal[/COLOR][COLOR gold] ' + txt_clones + '[/B][/COLOR]'
 
         if 'onlyone' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
@@ -698,6 +715,10 @@ def test_channel(channel_name):
         if 'notice' in str(params['clusters']):
             if txt_diag: txt_diag += '[CR]'
             txt_diag  += 'aviso: ' + '[COLOR indianred][B] CloudFlare [/COLOR][COLOR orangered] Protection[/B][/COLOR]'
+
+        if 'crypto' in str(params['clusters']):
+            if txt_diag: txt_diag += '[CR]'
+            txt_diag  += 'crypto: ' + '[COLOR darksalmon][B] Requiere Descifrar Enlaces[/B][/COLOR]'
 
         if config.get_setting('search_included_all', default=''):
             if "'" + channel_id + "'" in str(config.get_setting('search_included_all')):
@@ -916,6 +937,12 @@ def test_channel(channel_name):
         elif config.get_setting('user_test_channel', default='') == 'localize':
             config.set_setting('user_test_channel', 'localized')
             return ''
+
+        elif 'http' in config.get_setting('user_test_channel', default=''):
+            _new = config.get_setting('user_test_channel', default='')
+            config.set_setting('user_test_channel', _new)
+            return _new
+
         else:
             config.set_setting('user_test_channel', host)
             return host
@@ -1103,17 +1130,19 @@ def info_channel(channel_name, channel_poe, host, dominio, txt, ant_hosts):
     if channel_id == channel_poe: return txt
 
     if response.sucess == False:
-        if not '<urlopen error timed out>' in txt:
-            if not 'Host error' in txt:
-                if not 'Cloudflare' in txt:
-                   if not 'Invisible Captcha' in txt:
-                       if not 'Parece estar Bloqueado' in txt:
-                           if not '<urlopen error' in txt:
-                               if not 'timed out' in txt:
-                                   if not 'getaddrinfo failed' in txt:
-                                       if not 'Denegado' in txt:
-                                           platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
-                                           response, txt = acces_channel(channel_name, host, '', dominio, txt, ant_hosts, follow_redirects=True)
+        if 'HTTP Error' in txt: pass
+        else:
+           if not '<urlopen error timed out>' in txt:
+               if not 'Host error' in txt:
+                   if not 'Cloudflare' in txt:
+                      if not 'Invisible Captcha' in txt:
+                          if not 'Parece estar Bloqueado' in txt:
+                              if not '<urlopen error' in txt:
+                                  if not 'timed out' in txt:
+                                      if not 'getaddrinfo failed' in txt:
+                                          if not 'Denegado' in txt:
+                                              platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
+                                              response, txt = acces_channel(channel_name, host, '', dominio, txt, ant_hosts, follow_redirects=True)
 
     if not dominio:
         dominio = config.get_setting('dominio', channel_id, default='')
@@ -1402,7 +1431,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web or host + 'es/inicio' in new_web or host + 'pro' in new_web:
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'adult/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or (host + 'portal002') in new_web or (host + 'fvh56') in new_web or (host + 'es/inicio') in new_web or (host + 'pro') in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1516,7 +1545,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or host + 'portal002' in new_web or host + 'fvh56' in new_web or host + 'es/inicio' in new_web or host + 'pro' in new_web:
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'adult/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or (host + 'portal002') in new_web or (host + 'fvh56') in new_web or host + 'es/inicio' in new_web or (host + 'pro') in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1854,8 +1883,16 @@ def test_server(server_name):
         platformtools.dialog_notification(config.__addon_name, el_server + 'Falta [COLOR %s] find_videos [/COLOR][/B]' % color_alert)
         return
 
+    generar = False
+
+    if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): generar = True
+    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): generar = True
+    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): generar = True
+
     if config.get_setting('developer_mode', default=False):
-        txt = '[COLOR moccasin][B]Internet:[/COLOR]  [COLOR yellow]Status Developer Mode[/B][/COLOR][CR][CR]'
+        if generar:
+            txt = '[COLOR moccasin][B]Internet:[/COLOR]  [COLOR yellow]Status Developer Mode[/B][/COLOR][CR][CR]'
+        else: txt = test_internet()
     else:
         txt = test_internet()
 
@@ -2006,16 +2043,18 @@ def info_server(server_name, server_poe, url, txt):
     response, txt = acces_server(server_name, url, txt, follow_redirects=False)
 
     if response.sucess == False:
-        if not '<urlopen error timed out>' in txt:
-            if not 'Host error' in txt:
-                if not 'Cloudflare' in txt:
-                   if not 'Invisible Captcha' in txt:
-                       if not '<urlopen error' in txt:
-                           if not 'timed out' in txt:
-                               if not 'getaddrinfo failed' in txt:
-                                   if not 'Denegado' in txt:
-                                       platformtools.dialog_notification(config.__addon_name, el_server + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
-                                       response, txt = acces_server(server_name, url, txt, follow_redirects=True)
+        if 'HTTP Error' in txt: pass
+        else:
+           if not '<urlopen error timed out>' in txt:
+               if not 'Host error' in txt:
+                   if not 'Cloudflare' in txt:
+                      if not 'Invisible Captcha' in txt:
+                          if not '<urlopen error' in txt:
+                              if not 'timed out' in txt:
+                                  if not 'getaddrinfo failed' in txt:
+                                      if not 'Denegado' in txt:
+                                          platformtools.dialog_notification(config.__addon_name, el_server + '[/COLOR][/B][COLOR cyan] Redirect[/COLOR]')
+                                          response, txt = acces_server(server_name, url, txt, follow_redirects=True)
 
     return txt
 

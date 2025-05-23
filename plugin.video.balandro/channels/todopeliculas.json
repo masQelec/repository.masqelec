@@ -3,7 +3,7 @@
   "name": "TodoPeliculas",
   "thumbnail": "todopeliculas.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["notice", "news", "rankings", "kids", "docs", "vos"],
+  "clusters": ["news", "rankings", "kids", "docs", "vos"],
 
-  "notes": "Películas por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web ANULADA. Películas por géneros."
 }

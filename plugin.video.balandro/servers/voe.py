@@ -50,10 +50,21 @@ def get_video_url(page_url, url_referer=''):
     if "Not found" in data or "File not found" in data or "File is no longer available" in data or "Error 404" in data or '404 - No encontrado' in data:
         return "Archivo inexistente ó eliminado"
 
-    video_srcs = scrapertools.find_multiple_matches(data, "mp4': '([^']+)'")
+    elif '<title>Modo mantenimiento</title>' in data:
+        return "Servidor en Mantenimiento"
+
+    if "permanentToken" in data:
+        match = scrapertools.find_single_match(data, "(?i)window\.location\.href\s*=\s*'([^']+)'")
+        data = httptools.downloadpage(match).data
+
+        if '<title>Modo mantenimiento</title>' in data:
+            return "Servidor en Mantenimiento"
+
+    video_srcs = scrapertools.find_multiple_matches(data, "(?:mp4|hls)': '([^']+)'")
 
     if not video_srcs:
         bloque = scrapertools.find_single_match(data, "sources.*?\}")
+
         video_srcs = scrapertools.find_multiple_matches(bloque, ': "([^"]+)')
 
         if not video_srcs:
@@ -61,6 +72,9 @@ def get_video_url(page_url, url_referer=''):
 
     if video_srcs:
         for url in video_srcs:
+            if url.startswith("aHR0"):
+                url = base64.b64decode(url).decode("utf-8")
+
             if 'http' in url:
                 video_urls.append(['mp4', url])
 
@@ -69,8 +83,9 @@ def get_video_url(page_url, url_referer=''):
             vid = scrapertools.find_single_match(data, "(?i)let\s[0-9a-f]+\s=\s'(.*?)'")
             dec_vid = base64.b64decode(vid).decode("utf-8")
             data_json = json.loads(dec_vid[::-1])
+
             video_urls.append(['mp4', data_json['file']])
-        except Exception as error:
+        except Exception:
             pass
 
     if not video_urls:
@@ -84,6 +99,7 @@ def get_video_url(page_url, url_referer=''):
 
                 import resolveurl
                 page_url = ini_page_url
+
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
@@ -116,3 +132,4 @@ def get_video_url(page_url, url_referer=''):
                 return 'Sin Respuesta ResolveUrl'
 
     return video_urls
+

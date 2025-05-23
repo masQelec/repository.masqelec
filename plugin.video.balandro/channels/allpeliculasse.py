@@ -388,6 +388,10 @@ def findvideos(item):
         if '/1fichier.' in url: continue
         elif '/turbobit.' in url: continue
 
+        elif '/lamovie.' in url: continue
+
+        elif '/fembed.' in url: continue
+
         elif '/cloudemb.' in url or '.fembed.' in url or '/fembad.' in url or 'vanfem' in url: continue
         elif '/tubesb.' in url or '/sbsonic.' in url or '/sbrapid.' in url or '/lvturbo.' in url or '/sbface.' in url or '/sbbrisk.' in url or '/sblona.' in url: continue
 
@@ -419,6 +423,8 @@ def findvideos(item):
 
         if '/1fichier.' in match: continue
         elif '/turbobit.' in match: continue
+
+        elif '/lamovie.' in match: continue
 
         elif '/fembed.' in match: continue
 
@@ -519,7 +525,10 @@ def play(item):
                        item.server = new_server
 
     if url:
-        if '/acortalink.' in url:
+        if url.startswith("https://sb"):
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif '/acortalink.' in url:
            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
         if item.server == 'directo':

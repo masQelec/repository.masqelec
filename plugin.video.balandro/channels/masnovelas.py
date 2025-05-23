@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ennovelas.pro/'
+host = 'https://www.ennovelas.pro/'
 
 
 IDIOMAS = {'Latino': 'Lat', 'mx': 'Lat', 'Español': 'Esp', 'es': 'Esp', 'Spanish': 'Esp', 'en': 'Esp', 'English': 'Vose'}
@@ -46,6 +46,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://ennovelas.pro/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     raise_weberror = True
     if '/?years=' in url: raise_weberror = False
 
@@ -276,7 +282,7 @@ def list_all(item):
 
     bloque = scrapertools.find_single_match(data, '<span>Filters</span>(.*?)>Copyright')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<div class="post-media">(.*?)</div></div></div>')
+    matches = scrapertools.find_multiple_matches(bloque, '<div class="post-media"(.*?)</div></div></div>')
 
     if not matches: matches = scrapertools.find_multiple_matches(bloque, '<a class="video-detail"(.*?)</div><div><label>')
     if not matches: matches = scrapertools.find_multiple_matches(bloque, '<a class="videos-play (.*?)</h6>')
@@ -287,7 +293,7 @@ def list_all(item):
         title = scrapertools.find_single_match(match, '<a href=.*?">(.*?)</a>').strip()
         if not title: title = scrapertools.find_single_match(match, "alt='(.*?)'").strip()
 
-        if '<img class=' in title: title = scrapertools.find_single_match(match, '<h5 class="video_title">.*?<a href=.*?">(.*?)</a>').strip()
+        if '<img class=' in title: title = scrapertools.find_single_match(match, '<h6 class="video_title.*?<a href=.*?">(.*?)</a>').strip()
 
         if not url or not title: continue
 
@@ -466,9 +472,11 @@ def episodios(item):
         c_season = scrapertools.find_single_match(url, '-temporada-(.*?)-')
         if c_season:
             if not c_season == season: season = c_season
-	
+
         epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
         if not epis: epis = scrapertools.find_single_match(url, '-capitulo-(.*?)/')
+
+        if not epis: epis = scrapertools.find_single_match(url, '-cap(.*?)/')
 
         if not epis: epis = scrapertools.find_single_match(match, '<span class="episodes-number.*?E(.*?)<')
 
@@ -482,6 +490,8 @@ def episodios(item):
         title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         titulo = str(season) + 'x' + str(epis) + ' ' + title
+
+        titulo = clean_title(titulo)
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
@@ -548,6 +558,7 @@ def findvideos(item):
             elif url.startswith('http://vidmoly/'): url = url.replace('http://vidmoly/w/', 'https://vidmoly/embed-').replace('http://vidmoly/', 'https://vidmoly/')
 
             elif url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+            elif url.startswith('https://sr.ennovelas.watch/'): url = url.replace('/sr.ennovelas.watch/', '/waaw.to/')
             elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
             elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
             elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
@@ -584,6 +595,7 @@ def findvideos(item):
             elif url.startswith('http://vidmoly/'): url = url.replace('http://vidmoly/w/', 'https://vidmoly/embed-').replace('http://vidmoly/', 'https://vidmoly/')
 
             elif url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+            elif url.startswith('https://sr.ennovelas.watch/'): url = url.replace('/sr.ennovelas.watch/', '/waaw.to/')
             elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
             elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
             elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
@@ -613,7 +625,7 @@ def clean_title(title):
     title = title.replace('\\u00eda', 'a').replace('\\u00f3n', 'o').replace('\\u00fal', 'u').replace('\\u00e0', 'a')
     title = title.replace('\\u014d', 'o')
 
-    title = title.replace('\\u00a0', ' ')
+    title = title.replace('\\u00b7', '-').replace('\\u00a0', ' ')
 
     return title
 

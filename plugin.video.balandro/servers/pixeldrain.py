@@ -17,8 +17,8 @@ def get_video_url(page_url, url_referer=''):
         return 'Archivo inexistente ó eliminado'
     elif '.rar ~ pixeldrain' in data:
         return "El archivo está en formato comprimido"
-    elif '"captcha_key"' in data:
-        return "Requiere verificación ReCaptcha"
+    #elif '"captcha_key"' in data:
+    #    return "Requiere verificación ReCaptcha"
 
     vid = scrapertools.find_single_match(page_url, "/u/([^$]+)")
     if not vid: vid = scrapertools.find_single_match(page_url, "/l/([^$]+)")

@@ -394,7 +394,7 @@ def clean_title(title):
     title = title.replace('\\u00f1', 'ñ').replace('\\u00bf', '¿').replace('\\u00a1', '¡').replace('\\u00ba', 'º')
     title = title.replace('\\u00eda', 'a').replace('\\u00f3n', 'o').replace('\\u00fal', 'u').replace('\\u00e0', 'a')
 
-    title = title.replace('\\u2019', "'")
+    title = title.replace('\\u2019', "'").replace('\\u2126', 'Ω')
 
     return title
 

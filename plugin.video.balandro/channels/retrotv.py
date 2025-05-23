@@ -388,9 +388,9 @@ def findvideos(item):
         srv = servertools.corregir_servidor(srv)
 
         if srv == 'various':
-           link_other = servertools.corregir_other(_srv)
+            link_other = servertools.corregir_other(_srv)
 
-        url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src="(.*?)"')
+        url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src="(.*?)".*?</div>')
 
         if url.endswith('.png'): url = ''
 
@@ -419,6 +419,10 @@ def findvideos(item):
         elif srv == 'blenditall':
             link_other = srv
             servidor = 'directo'
+
+        elif srv == 'vkvideo':
+            link_other = srv
+            servidor = 'vk'
 
         lang = lang_qlty
 
@@ -513,7 +517,7 @@ def play(item):
 
     if url:
         if '/ouo.' in url:
-            return 'CloudFlare [COLOR red]ReCaptcha[/COLOR]'
+            return 'Servidor con [COLOR red]CloudFlare ReCaptcha[/COLOR]'
 
         if url.startswith('//') == True: url = 'https:' + url
 

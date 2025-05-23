@@ -1,8 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, time
+import sys
 
-from core import httptools, scrapertools
+if sys.version_info[0] >= 3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
+
+import os, xbmc, time
+
+from core import filetools,httptools, scrapertools
 from platformcode import config, logger, platformtools
 
 
@@ -14,8 +24,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -63,6 +72,12 @@ def get_video_url(page_url, url_referer=''):
             if config.get_setting('servers_time', default=True):
                 platformtools.dialog_notification('Cargando [COLOR cyan][B]Vimeo[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
                 time.sleep(int(espera))
+
+            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'vimeo.py'))
+
+            existe = filetools.exists(path)
+            if not existe:
+                return 'El Plugin No existe en Resolveurl'
 
             try:
                 import_libs('script.module.resolveurl')

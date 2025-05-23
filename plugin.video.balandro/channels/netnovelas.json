@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["all", "movie", "tvshow"],
+  "search_types": ["tvshow"],
 
-  "categories": ["movie", "tvshow"],
+  "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["lasts", "years", "countries", "qualityes", "vos", "tales"],
+  "clusters": ["lasts", "rankings", "countries", "vos", "tales"],
 
-  "notes": "Web dedicada principalmente en Novelas. Películas por géneros y Series por Géneros."
+  "notes": "Web dedicada principalmente en Novelas."
 }

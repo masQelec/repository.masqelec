@@ -11,7 +11,7 @@
   "categories": ["documentary"],
   "language": ["cast"],
 
-  "clusters": ["onlyone", "rankings", "docs"],
+  "clusters": ["rankings", "docs"],
 
   "notes": "Web ANULADA. Documentales en castellano."
 }

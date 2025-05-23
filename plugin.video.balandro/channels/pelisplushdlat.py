@@ -7,15 +7,15 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www23.pelisplushd.to/'
+host = 'https://www18.pelisplushd.to/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://pelisplushd.lat/', 'https://www1.pelisplushd.lat/', 'https://www2.pelisplushd.lat/',
              'https://www.pelisplushd.la/', 'https://ww1.pelisplushd.to/', 'https://www9.pelisplushd.to/',
              'https://www11.pelisplushd.to/', 'https://www15.pelisplushd.to/', 'https://www16.pelisplushd.to/',
-             'https://www17.pelisplushd.to/', 'https://www18.pelisplushd.to/', 'https://www19.pelisplushd.to/',
-             'https://www20.pelisplushd.to/']
+             'https://www17.pelisplushd.to/', 'https://www19.pelisplushd.to/', 'https://www20.pelisplushd.to/',
+             'https://www23.pelisplushd.to/', 'https://www24.pelisplushd.to/']
 
 
 domain = config.get_setting('dominio', 'pelisplushdlat', default='')
@@ -613,6 +613,23 @@ def play(item):
 
     elif item.server == 'directo':
         data = do_downloadpage(url)
+
+        url = scrapertools.find_single_match(data, "var url = '(.*?)'")
+
+        if url:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            url = servertools.normalize_url(servidor, url)
+
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
+
+            if not servidor == 'directo':
+                itemlist.append(item.clone( url = url, server = servidor ))
+
+                return itemlist
 
         urls = scrapertools.find_multiple_matches(data, "sources:\[{file:.*?\'(.*?)\',label")
 

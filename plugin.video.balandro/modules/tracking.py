@@ -20,6 +20,7 @@ color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 con_incidencias = ''
 no_accesibles = ''
+con_problemas = ''
 
 try:
     with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
@@ -28,6 +29,7 @@ except:
     except: txt_status = ''
 
 if txt_status:
+    # ~ Incidencias
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -37,6 +39,7 @@ if txt_status:
 
         if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ No Accesibles
     bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -45,6 +48,16 @@ if txt_status:
         match = match.strip()
 
         if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ Con Problemas
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES CON PROBLEMAS(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
 
 
 # ~ Infolabels
@@ -223,6 +236,9 @@ def show_infos(item):
     if no_accesibles:
         itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= ' - [COLOR green][B]Información[/B][/COLOR] Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
+    if con_problemas:
+        itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title=' - [COLOR green][B]Información[/B][/COLOR] Canales[COLOR tomato][B] Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     return itemlist
 
 
@@ -398,7 +414,7 @@ def serie_temporadas(item):
     rows = db.get_seasons(item.infoLabels['tmdb_id'])
 
     for season, infolabels in rows:
-        titulo = 'Temporada %d' % season
+        titulo = '[COLOR tan]Temporada %d[/COLOR]' % season
         nombre = valor_infolabel('temporada_nombre', infolabels)
 
         if nombre != '' and nombre != titulo and nombre != 'Season %d' % season: titulo += ' ' + nombre

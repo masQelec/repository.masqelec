@@ -683,13 +683,18 @@ def findvideos(item):
 
             data2 = do_downloadpage(url2)
 
-            players = scrapertools.find_single_match(data2, 'src="(.*?)"')
+            player = scrapertools.find_single_match(data2, 'src="(.*?)"')
 
-            if players:
-                players = players.replace('embed.php', 'player.php')
+            if player:
+                player = player.replace('embed.php', 'player.php')
 
-                if '?' in players:
-                    path, queryString = players.split('?', 1)
+                player = player.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&').strip()
+
+                headers = {'Referer': host}
+                if player: headers = {'Referer': player}
+
+                if '?' in player:
+                    path, queryString = player.split('?', 1)
 
                     if '&' in queryString:
                         queries_out = []
@@ -698,21 +703,16 @@ def findvideos(item):
                         for query in queries_in:
                             if '=' in query:
                                 key, val = query.split('=')
-                                val = val+'ionA#as9ng849fg'
                                 val = base64.b64encode(val.encode("utf-8")).decode('utf8')
+
                                 queries_out.append('{}={}'.format(key, val))
                                 queryString = '&'.join(queries_out)
 
-                    players = '{}?{}'.format(path, queryString)
+                    player = '{}?{}'.format(path, queryString)
 
-                    if players:
-                        players = players.replace('', '')
+                player = player.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&').strip()
 
-                players = players.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&').strip()
-
-                headers = {'Referer': host}
-
-                data3 = do_downloadpage(players, headers=headers)
+                data3 = do_downloadpage(player, headers=headers)
 
                 matches3 = scrapertools.find_multiple_matches(data3, "loadVideo.*?'(.*?)'" + '.*?alt="(.*?)"')
 
@@ -832,6 +832,8 @@ def findvideos(item):
         else:
            if servidor == 'directo':
                if not other: other = other + ' D' + str(nro)
+
+               if not config.get_setting('developer_mode', default=False): continue
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 

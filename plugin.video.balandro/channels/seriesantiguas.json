@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["lat"],
 
-  "clusters": ["current", "infantil", "classic", "anime", "kids"],
+  "clusters": ["infantil", "classic", "anime", "kids"],
 
   "notes": "Web CERRADA. Series clásicas en idioma orignal de emisión."
 }

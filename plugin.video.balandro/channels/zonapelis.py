@@ -180,10 +180,10 @@ def list_all(item):
     data = do_downloadpage(item.url)
 
     if item.group:
-        bloque = scrapertools.find_single_match(data, '>Ranking IMDb <span>(.*?)>Popular<')
+        bloque = scrapertools.find_single_match(data, '>Ranking IMDb<(.*?)>Popular')
     else:
-        bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>Popular<')
-        if not bloque: bloque = scrapertools.find_single_match(data, '>Resultados encontrados(.*?)>Popular<')
+        bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>Popular')
+        if not bloque: bloque = scrapertools.find_single_match(data, '>Resultados encontrados(.*?)>Popular')
 
     if item.group:
         matches = re.compile("id='top-(.*?)</div></div>", re.DOTALL).findall(bloque)

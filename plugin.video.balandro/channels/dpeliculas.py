@@ -45,7 +45,7 @@ except:
    except: pass
 
 
-host = 'https://detodopeliculas.nu/'
+host = 'https://detodopeliculas.net/'
 
 
 perpage = 28
@@ -139,8 +139,6 @@ def acciones(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
-
     itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
                                 from_channel='dpeliculas', folder=False, text_color='chartreuse' ))
 
@@ -211,11 +209,11 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(article, '<img src="(.*?)"')
 
+        title = title.replace('&#038;', '').replace('&#215;', 'x').replace('&#8217;s', "'s").replace('&#8217;', "'").replace('&#8211;', '').replace('&#8230;', '...').strip()
+
         year = scrapertools.find_single_match(title, '(\d{4})')
         if not year: year = '-'
         else: title = title.replace('(' + year + ')', '').strip()
-
-        title = title.replace('&#038;', '').replace('&#215;', 'x')
 
         langs = []
         if '/cas.png' in article: langs.append('Esp')
@@ -313,6 +311,10 @@ def findvideos(item):
 
                     other = ''
                     if servidor == 'various': other = servertools.corregir_other(embed)
+                    elif servidor == 'directo':
+                          if '/player/?id=' in embed:
+                              servidor = ''
+                              other = 'Player'
 
                     itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = embed,
                                           language = lang, other = other ))
@@ -336,6 +338,8 @@ def findvideos(item):
 
                 if 'powvideo' in link: continue
                 elif '1fichier' in link: continue
+
+                elif '/multiup.' in link: continue
 
                 enlace = scrapertools.find_single_match(link, "<a href='(.*?)'")
 
@@ -380,6 +384,8 @@ def findvideos(item):
                 if 'powvideo' in link: continue
                 elif '1fichier' in link: continue
 
+                elif '/multiup.' in link: continue
+
                 enlace = scrapertools.find_single_match(link, "<a href='(.*?)'")
 
                 if enlace:
@@ -423,6 +429,8 @@ def findvideos(item):
                 if 'powvideo' in link: continue
                 elif '1fichier' in link: continue
 
+                elif '/multiup.' in link: continue
+
                 enlace = scrapertools.find_single_match(link, "<a href='(.*?)'")
 
                 if enlace:
@@ -460,6 +468,33 @@ def findvideos(item):
     return itemlist
 
 
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if not item.server:
+        data = do_downloadpage(item.url)
+
+        url = scrapertools.find_single_match(data, "var url = '(.*?)'")
+
+    if url:
+        if '/multiup.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
+
+    return itemlist
+
+
 def list_search(item):
     logger.info()
     itemlist = []
@@ -483,11 +518,11 @@ def list_search(item):
 
         thumb = scrapertools.find_single_match(match, '<img src=(.*?)"')
 
+        title = title.replace('&#038;', '').replace('&#215;', 'x').replace('&#8217;s', "'s").replace('&#8217;', "'").replace('&#8211;', '').replace('&#8230;', '...').strip()
+
         year = scrapertools.find_single_match(title, '(\d{4})')
         if not year: year = '-'
         else: title = title.replace('(' + year + ')', '').strip()
-
-        title = title.replace('&#038;', '').replace('&#215;', 'x')
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                     contentType='movie', contentTitle=title, infoLabels={'year': year} ))

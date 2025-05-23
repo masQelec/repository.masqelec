@@ -608,6 +608,9 @@ def mainlist(item):
             tit = '[COLOR %s]Información Fix[/COLOR]' % color_infor
             context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_last_fix'})
 
+            tit = '[COLOR darkcyan][B]Resumen Fix[/B][/COLOR]'
+            context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'resumen_fix'})
+
         tit = '[COLOR %s]Comprobar Actualizaciones Fix[/COLOR]' % color_avis
         context_ayuda.append({'title': tit, 'channel': 'actions', 'action': 'check_addon_updates'})
 

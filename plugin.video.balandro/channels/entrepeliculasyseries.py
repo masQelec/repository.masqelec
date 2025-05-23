@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import ast, re
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -198,20 +198,11 @@ def generos(item):
 
     data = do_downloadpage(host)
 
-    matches = scrapertools.find_multiple_matches(data, '<li class="cat-item cat-.*?<a href="([^"]+)">(.*?)</a>')
+    bloque = scrapertools.find_single_match(data, '>Generos<(.*?)</ul>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
 
     for url, title in matches:
-        if item.search_type == 'movie':
-           if '/series-' in url: continue
-        else:
-           if '/peliculas-' in url: continue
-           elif '/documentales' in url: continue
-
-           if title == 'Series Documentales': title = 'Documentales'
-
-        if config.get_setting('descartar_anime', default=False):
-            if title == 'Anime': continue
-
         if not config.get_setting('mnu_doramas', default=False):
             if title == 'Dorama': continue
 
@@ -250,9 +241,9 @@ def list_all(item):
 
     for match in matches:
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
-        if not title: title = scrapertools.find_single_match(match, '<h2>(.*?)</h2>').strip()
+        if not title: title = scrapertools.find_single_match(match, '<h2 class="title">(.*?)</h2>').strip()
 
-        url = scrapertools.find_single_match(match, 'href="([^"]+)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
         if not title or not url: continue
 
@@ -266,6 +257,13 @@ def list_all(item):
             if year: title = title.replace('(' + year + ')', '').strip()
 
         if not year: year = '-'
+
+        c_year = scrapertools.find_single_match(title, '(\d{4})')
+        if not c_year: c_year = scrapertools.find_single_match(title, '(d{4})')
+
+        if c_year:
+            title = title.replace('(' + c_year + ')', '').strip()
+            title = title.replace(' ' + c_year + ' ', '').strip()
 
         if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
 
@@ -458,9 +456,12 @@ def findvideos(item):
         if not dataLink: dataLink = scrapertools.find_single_match(datae, 'dataLink(.*?);')
 
         e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
-        if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "encrypted.*?'(.*?)'")
+        if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "const safeServer =.*?'(.*?)'")
 
         e_links = dataLink.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
+
+        age = ''
+        if not dataLink or not e_bytes: age = 'crypto'
 
         langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
 
@@ -511,7 +512,7 @@ def findvideos(item):
                        other = url.split("/")[2]
                        other = other.replace('https:', '').strip()
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes,
+                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
                                       language=lang, other=other ))
 
     # ~ Otros
@@ -644,17 +645,19 @@ def play(item):
         bytes = str(item.bytes)
 
         try:
-            cripto = ast.literal_eval(cripto)
-        except:
-            crypto = str(item.crypto)
-
-        try:
             url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
         except:
             url = ''
 
         if not url:
-            return '[COLOR cyan]No se pudo [COLOR red]Desencriptar[/COLOR]'
+            if crypto.startswith("http"):
+                url = crypto.replace('\\/', '/')
+
+            if not url:
+                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+        elif not url.startswith("http"):
+            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     if url:
         if '/xupalace.' in url or '/uploadfox.' in url:

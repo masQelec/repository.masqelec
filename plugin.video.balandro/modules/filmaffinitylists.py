@@ -476,7 +476,7 @@ def list_all(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="movie-poster" data-movie-id=.*?src="(.*?)".*?title="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, '<div class="col" data-movie-id=.*?src="(.*?)".*?alt="(.*?)"')
 
     num_matches = len(matches)
     desde = item.page * perpage

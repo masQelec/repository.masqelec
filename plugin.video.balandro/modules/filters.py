@@ -1252,6 +1252,7 @@ def show_channels_list(item):
 
     else:
         if item.no_active == True or item.temp_no_active == True: filtros = {'active': False}
+        elif item.closed == True or item.voided == True: filtros = {'active': False}
         elif item.no_stable == True: filtros = {'clusters': 'inestable'}
         elif item.cta_register == True: filtros = {'clusters': 'register'}
         elif item.suggesteds == True: filtros = {'clusters': 'suggested'}
@@ -1261,6 +1262,7 @@ def show_channels_list(item):
         elif item.clons == True: filtros = {'clusters': 'clons'}
         elif item.clones == True: filtros = {'clusters': 'clone'}
         elif item.notices == True: filtros = {'clusters': 'notice'}
+        elif item.cryptos == True: filtros = {'clusters': 'crypto'}
         elif item.onlyone == True: filtros = {'clusters': 'onlyone'}
         else: filtros = {}
 
@@ -1277,6 +1279,10 @@ def show_channels_list(item):
             if not 'temporary' in ch['clusters']: continue
         elif item.no_active:
             if 'temporary' in ch['clusters']: continue
+        elif item.closed:
+            if not 'web cerrada' in ch['notes'].lower(): continue
+        elif item.voided:
+            if not 'web anulada' in ch['notes'].lower(): continue
         elif item.var_domains:
             if not 'dominios' in ch['notes'].lower(): continue
         elif item.last_domain:
@@ -1295,6 +1301,8 @@ def show_channels_list(item):
             if not 'clone' in ch['clusters']: continue
         elif item.notices:
             if not 'notice' in ch['clusters']: continue
+        elif item.cryptos:
+            if not 'crypto' in ch['clusters']: continue
         elif item.onlyone:
             if not 'onlyone' in ch['clusters']: continue
 
@@ -1386,6 +1394,8 @@ def show_channels_list(item):
     else:
         if item.no_active == True: cabecera = 'Canales [COLOR yellow]Inactivos[/COLOR]'
         elif item.temp_no_active == True: cabecera = 'Canales [COLOR yellow]Temporalmente Inactivos[/COLOR]'
+        elif item.closed == True: cabecera = 'Canales [COLOR yellow]Cerrados[/COLOR]'
+        elif item.voided == True: cabecera = 'Canales [COLOR yellow]Anulados[/COLOR]'
         elif item.no_stable == True: cabecera = 'Canales [COLOR yellow]Inestables[/COLOR]'
         elif item.cta_register == True: cabecera = 'Canales [COLOR yellow]con Cuenta[/COLOR]'
         elif item.var_domains == True: cabecera = 'Canales [COLOR yellow]con varios Dominios[/COLOR]'
@@ -1399,6 +1409,7 @@ def show_channels_list(item):
         elif item.clons == True: cabecera = 'Canales que son [COLOR yellow]Principales[/COLOR] con Clones Asociados'
         elif item.clones == True: cabecera = 'Canales que son [COLOR yellow]Clones[/COLOR]'
         elif item.notices == True: cabecera = 'Canales con [COLOR yellow]Aviso CloudFlare Protection[/COLOR]'
+        elif item.cryptos == True: cabecera = 'Canales que requieren [COLOR yellow]Descifrar Enlaces[/COLOR]'
         elif item.onlyone == True: cabecera = 'Canales con [COLOR yellow]Un Único Servidor[/COLOR]'
         else: cabecera = 'Canales [COLOR yellow]Disponibles[/COLOR]'
 

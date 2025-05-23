@@ -9,7 +9,7 @@ from platformcode import config, logger, platformtools
 
 color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
-tipos_plus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]
+tipos_plus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61]
 
 
 def plus_proxies(proxies, max_proxies):
@@ -34,11 +34,11 @@ def plus_proxies(proxies, max_proxies):
 
     elif tplus == 3: url_provider = 'https://vpnoverview.com/privacy/anonymous-browsing/free-proxy-servers/'
 
-    elif tplus == 4: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/all/data.txt'
-    elif tplus == 5: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/http/data.txt'
-    elif tplus == 6: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/socks4/data.txt'
-    elif tplus == 7: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/socks5/data.txt'
-    elif tplus == 45: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/https/data.txt'
+    elif tplus == 4: url_provider = 'https://raw.githubusercontent.com/fyvri/fresh-proxy-list/archive/storage/classic/all.txt'
+    elif tplus == 5: url_provider = 'https://raw.githubusercontent.com/fyvri/fresh-proxy-list/archive/storage/classic/http.txt'
+    elif tplus == 6: url_provider = 'https://raw.githubusercontent.com/fyvri/fresh-proxy-list/archive/storage/classic/https.txt'
+    elif tplus == 7: url_provider = 'https://raw.githubusercontent.com/fyvri/fresh-proxy-list/archive/storage/classic/socks4.txt'
+    elif tplus == 56: url_provider = 'https://raw.githubusercontent.com/fyvri/fresh-proxy-list/archive/storage/classic/socks5.txt'
 
     elif tplus == 8: url_provider = 'https://www.netzwelt.de/proxy/index.html'
 
@@ -54,7 +54,7 @@ def plus_proxies(proxies, max_proxies):
 
     elif tplus == 16: url_provider = 'https://list.proxylistplus.com/Fresh-HTTP-Proxy-List-1'
 
-    elif tplus == 17: url_provider = 'https://www.proxy-list.download/api/v1/get?type=https'
+    elif tplus == 17: url_provider = 'https://niek.github.io/free-proxy-list/'
 
     elif tplus == 18: url_provider = 'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt'
 
@@ -97,6 +97,7 @@ def plus_proxies(proxies, max_proxies):
     elif tplus == 38: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/http/data.txt'
     elif tplus == 39: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/socks4/data.txt'
     elif tplus == 40: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/socks5/data.txt'
+    elif tplus == 45: url_provider = 'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/https/data.txt'
 
     elif tplus == 41: url_provider = 'https://raw.githubusercontent.com/ErcinDedeoglu/proxies/main/proxies/http.txt'
     elif tplus == 42: url_provider = 'https://raw.githubusercontent.com/ErcinDedeoglu/proxies/main/proxies/https.txt'
@@ -114,6 +115,13 @@ def plus_proxies(proxies, max_proxies):
     elif tplus == 52: url_provider = 'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=https'
 
     elif tplus == 53: url_provider = 'https://gist.github.com/markavale/c39036066b69fa7f9f346caf6d1fe58a'
+
+    elif tplus == 57: url_provider = 'https://raw.githubusercontent.com/MuRongPIG/Proxy-Master/refs/heads/main/http.txt'
+
+    elif tplus == 58: url_provider = 'https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/http.txt'
+    elif tplus == 59: url_provider = 'https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/https.txt'
+    elif tplus == 60: url_provider = 'https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/socks4.txt'
+    elif tplus == 61: url_provider = 'https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/socks5.txt'
 
     if url_provider:
         resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
@@ -171,17 +179,13 @@ def plus_proxies(proxies, max_proxies):
 
                 proxies_plus.append(prox + ':' + port)
 
-    elif tplus == 4 or tplus == 5 or tplus == 6 or tplus == 7 or tplus == 45:
-        el_provider = '[B][COLOR %s] Proxydb[/B][/COLOR]' % color_exec
+    elif tplus == 4 or tplus == 5 or tplus == 6 or tplus == 7 or tplus == 56:
+        el_provider = '[B][COLOR %s] Fyvri[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
 
         for prox in enlaces:
-            if not ':' in prox: continue
-
-            if '//' in prox: prox = prox.split('//')[1]
-
             prox = prox.strip()
 
             proxies_plus.append(prox)
@@ -290,7 +294,22 @@ def plus_proxies(proxies, max_proxies):
 
             proxies_plus.append(prox)
 
-    elif tplus == 17 or tplus == 24 or tplus == 25:
+    elif tplus == 17:
+        el_provider = '[B][COLOR %s] Niek[/B][/COLOR]' % color_exec
+        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+
+        block = scrapertools.find_single_match(str(resp.data), '<tbody>(.*?)</tbody>')
+
+        enlaces = scrapertools.find_multiple_matches(str(block), '<td><code>(.*?)</code>.*?<td>(.*?)</td>')
+
+        for prox, _on in enlaces:
+            if _on == '❌': continue
+
+            prox = prox.strip()
+
+            proxies_plus.append(prox)
+
+    elif tplus == 24 or tplus == 25:
         el_provider = '[B][COLOR %s] Proxy-list.download[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
 
@@ -301,7 +320,7 @@ def plus_proxies(proxies, max_proxies):
 
             proxies_plus.append(prox)
 
-    elif tplus == 18 or tplus == 26 or tplus == 27 or tplus == 28 or tplus == 29 or tplus == 30 or tplus == 31 or tplus == 32 or tplus == 33 or tplus == 34 or tplus == 35 or tplus == 36:
+    elif tplus == 18 or tplus == 26 or tplus == 27 or tplus == 28 or tplus == 29 or tplus == 30 or tplus == 31 or tplus == 32 or tplus == 33 or tplus == 34 or tplus == 35 or tplus == 36 or tplus == 57 or tplus == 58 or tplus == 59 or tplus == 60 or tplus == 61:
         if tplus == 18: el_provider = '[B][COLOR %s] TheSpeedX/PROXY-List[/B][/COLOR]' % color_exec
         elif tplus == 26: el_provider = '[B][COLOR %s] Monosans[/B][/COLOR]' % color_exec
         elif tplus == 27: el_provider = '[B][COLOR %s] Jetkai[/B][/COLOR]' % color_exec
@@ -314,6 +333,11 @@ def plus_proxies(proxies, max_proxies):
         elif tplus == 34: el_provider = '[B][COLOR %s] Hookzof[/B][/COLOR]' % color_exec
         elif tplus == 35: el_provider = '[B][COLOR %s] ManuGMG[/B][/COLOR]' % color_exec
         elif tplus == 36: el_provider = '[B][COLOR %s] Rdavydov Socks5[/B][/COLOR]' % color_exec
+        elif tplus == 57: el_provider = '[B][COLOR %s] MuRongPIG[/B][/COLOR]' % color_exec
+        elif tplus == 58: el_provider = '[B][COLOR %s] Vakhov http[/B][/COLOR]' % color_exec
+        elif tplus == 59: el_provider = '[B][COLOR %s] Vakhov https[/B][/COLOR]' % color_exec
+        elif tplus == 60: el_provider = '[B][COLOR %s] Vakhov socks4[/B][/COLOR]' % color_exec
+        elif tplus == 61: el_provider = '[B][COLOR %s] Vakhov socks5[/B][/COLOR]' % color_exec
 
         platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
 
@@ -338,10 +362,11 @@ def plus_proxies(proxies, max_proxies):
 
                  proxies_plus.append(prox)
 
-    elif tplus == 38 or tplus == 39 or tplus == 40:
+    elif tplus == 38 or tplus == 39 or tplus == 40 or tplus == 45:
         if tplus == 38: el_provider = '[B][COLOR %s] Proxyfly Http[/B][/COLOR]' % color_exec
         elif tplus == 39: el_provider = '[B][COLOR %s] Proxyfly Socks4[/B][/COLOR]' % color_exec
         elif tplus == 40: el_provider = '[B][COLOR %s] Proxyfly Socks5[/B][/COLOR]' % color_exec
+        elif tplus == 45: el_provider = '[B][COLOR %s] Proxyfly Https[/B][/COLOR]' % color_exec
 
         platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
 

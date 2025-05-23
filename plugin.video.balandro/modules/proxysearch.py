@@ -74,6 +74,7 @@ dominioshdfull = [
          'https://hd-full.biz/',
          'https://hdfull.sbs/',
 
+         'https://hdfull.help/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
@@ -86,7 +87,7 @@ dominioshdfull = [
          ]
 
 dominiosplaydede = [
-         'https://www9.playdede.link/'
+         'https://www10.playdede.link/'
          ]
 
 channels_poe = [

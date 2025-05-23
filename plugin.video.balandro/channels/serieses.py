@@ -53,7 +53,7 @@ def generos(item):
     for url, title in matches:
         title = title.replace('&amp;', '&').strip()
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, genre = title, text_color = 'hotpink' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = 'hotpink' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

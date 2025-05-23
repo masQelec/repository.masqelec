@@ -380,6 +380,7 @@ def findvideos(item):
             elif other == 'streamcloud': continue
             elif other == 'openload': continue
             elif other == 'rapidvideo': continue
+            elif other == 'jetload': continue
 
             if servidor == 'various': other = servertools.corregir_other(url)
 
@@ -403,6 +404,7 @@ def findvideos(item):
             elif srv == 'streamcloud': continue
             elif srv == 'openload': continue
             elif srv == 'rapidvideo': continue
+            elif srv == 'jetload': continue
 
             elif srv == 'uploaded': continue
             elif srv == 'tele': continue
@@ -442,6 +444,7 @@ def findvideos(item):
             elif '/streamcloud.' in url: continue
             elif '/openload.'in url: continue
             elif '/rapidvideo.' in url: continue
+            elif '/jetload.' in url: continue
 
             elif '/1fichier.' in url: continue
             elif '/ul.' in url: continue
@@ -489,6 +492,7 @@ def findvideos(item):
                 elif other == 'streamcloud': continue
                 elif other == 'openload': continue
                 elif other == 'rapidvideo': continue
+                elif other == 'jetload': continue
 
                 elif other == 'uploaded': continue
 
@@ -552,6 +556,7 @@ def findvideos(item):
                 elif '/streamcloud.' in url: continue
                 elif '/openload.'in url: continue
                 elif '/rapidvideo.' in url: continue
+                elif '/jetload.' in url: continue
 
                 elif '/1fichier.' in url: continue
                 elif '/ul.' in url: continue
@@ -586,6 +591,11 @@ def play(item):
 
     url = item.url
 
+    if 'uptobox' in url:
+         return 'Servidor [COLOR goldenrod]Fuera de Servicio[/COLOR]'
+    elif 'jetload' in url:
+         return 'Servidor [COLOR goldenrod]Onsoleto[/COLOR]'
+
     url = url.replace('http://', 'https://')
 
     if '/soon' in url: url = ''
@@ -610,7 +620,12 @@ def play(item):
         url = scrapertools.find_single_match(data, "var url = '(.*?)'")
 
     if url:
-        if '/soon' in url: url = ''
+        if 'uptobox' in url:
+            return 'Servidor [COLOR goldenrod]Fuera de Servicio[/COLOR]'
+        elif 'jetload' in url:
+            return 'Servidor [COLOR goldenrod]Onsoleto[/COLOR]'
+
+        elif '/soon' in url: url = ''
         elif '/powvideo.' in url: url = ''
         elif '/1fichier.' in url: url = ''
         elif '/ul.' in url: url = ''
