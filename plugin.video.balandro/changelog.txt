@@ -4,7 +4,12 @@
 
 [COLOR yellow][B]2025[/B][/COLOR]
 
-[COLOR yellow]4.0.16[/COLOR] [COLOR darkorange] 25 de Marzo de 2025[/COLOR][COLOR cyan] Ultima Version[/COLOR]
+[COLOR yellow]4.0.17[/COLOR] [COLOR darkorange] 20 de Mayo de 2025[/COLOR][COLOR cyan] Ultima Version[/COLOR]
+    Correcciones: Errores detectados
+    Generos: Re-configurados
+    Canales y Servidores: Sin variaciones
+
+4.0.16 [COLOR darkorange] 25 de Marzo de 2025[/COLOR]
     Correcciones: Errores detectados
     Generos: Re-configurados
     Canales y Servidores: Sin variaciones

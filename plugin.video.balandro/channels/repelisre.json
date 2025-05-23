@@ -11,8 +11,8 @@
   "categories": ["movie", "tvshow", "torrent"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["notice", "kids", "docs", "vos"],
+  "clusters": ["kids", "docs", "vos"],
 
-  "notes": "Web ANULADA. Canal con enlaces Streaming y Torrent. Películas por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web ANULADA. Canal con enlaces Streaming y Torrent. Películas por géneros."
 
 }

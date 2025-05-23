@@ -568,6 +568,7 @@ def findvideos(item):
             elif 'youtube' in servidor: continue
             elif 'hackplayer' in servidor: continue
             elif servidor == 'vip': continue
+            elif servidor == 'lamovie': continue
 
             if servidor == 'ok': servidor = 'okru'
 

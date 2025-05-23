@@ -587,6 +587,7 @@ def findvideos(item):
             elif 'uploadbuzz' in _server: continue
             elif 'filescdn' in _server: continue
             elif 'uploaded' in _server: continue
+            elif 'vikingf1le' in _server: continue
 
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
@@ -693,6 +694,7 @@ def findvideos(item):
             elif 'uploadbuzz' in _server: continue
             elif 'filescdn' in _server: continue
             elif 'uploaded' in _server: continue
+            elif 'vikingf1le' in _server: continue
 
             url = host + 'wp-json/dooplayer/v2/%s/%s/%s'  %  (_post, _type, _nume)
 
@@ -783,6 +785,7 @@ def findvideos(item):
             elif 'uploadbuzz' in servidor: continue
             elif 'filescdn' in servidor: continue
             elif 'uploaded' in servidor: continue
+            elif 'vikingf1le' in servidor: continue
 
             if 'hqq' in servidor or 'netu' in servidor or 'waaw' in servidor: servidor = 'waaw'
             elif 'dood' in servidor: servidor = 'doodstream'
@@ -870,6 +873,7 @@ def findvideos(item):
             elif 'uploadbuzz' in servidor: continue
             elif 'filescdn' in servidor: continue
             elif 'uploaded' in servidor: continue
+            elif 'vikingf1le' in servidor: continue
 
             if 'hqq' in servidor or 'netu' in servidor or 'waaw' in servidor: servidor = 'waaw'
             elif 'dood' in servidor: servidor = 'doodstream'
@@ -930,6 +934,7 @@ def findvideos(item):
             elif 'uploadbuzz' in srv: continue
             elif 'filescdn' in srv: continue
             elif 'uploaded' in srv: continue
+            elif 'vikingf1le' in srv: continue
 
             if lang == 'Latino': lang = 'Lat'
             elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
@@ -980,6 +985,7 @@ def findvideos(item):
         elif 'uploadbuzz' in srv: continue
         elif 'filescdn' in srv: continue
         elif 'uploaded' in srv: continue
+        elif 'vikingf1le' in srv: continue
 
         if lang == 'Latino': lang = 'Lat'
         elif lang == 'Castellano' or lang == 'Español': lang = 'Esp'
@@ -1068,17 +1074,19 @@ def play(item):
 
         url = scrapertools.find_single_match(data, '"embed_url":"(.*?)"')
 
-        url = url.replace('\\/', '/')
+        if url == 'about:blank': url = ''
+        else:
+           url = url.replace('\\/', '/')
 
-        if url.startswith('//'): url = 'https:' + url
+           if url.startswith('//'): url = 'https:' + url
 
-        if '/?source=' in url:
-            data = do_downloadpage(url)
+           if '/?source=' in url:
+               data = do_downloadpage(url)
 
-            url = scrapertools.find_single_match(data, 'id="player".*?<source src="(.*?)"')
+               url = scrapertools.find_single_match(data, 'id="player".*?<source src="(.*?)"')
 
-        if url.startswith('https://player.pepeliculas.org/'): url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
-        elif url.startswith('https://hqq.tv/player/embed_player.php?'): url = url.replace('https://hqq.tv/player/embed_player.php?', 'https://waaw.to/watch_video.php?v=')
+           if url.startswith('https://player.pepeliculas.org/'): url = url.replace('/player.pepeliculas.org/', '/waaw.to/')
+           elif url.startswith('https://hqq.tv/player/embed_player.php?'): url = url.replace('https://hqq.tv/player/embed_player.php?', 'https://waaw.to/watch_video.php?v=')
 
     if url.endswith('.torrent'):
         if config.get_setting('proxies', item.channel, default=''):
@@ -1136,6 +1144,9 @@ def play(item):
         elif '/powv1deo.' in url or '/streamp1ay.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
+        elif '/vikingf1le.' in url:
+            return 'Servidor requiere [COLOR red]ReCaptcha[/COLOR]'
+
         if '/noblocktape.com/' in url: url = url.replace('/noblocktape.com/', '/streamtape.com/').replace('/3/', '/v/')
 
         url = url.replace('http://', 'https://')
@@ -1169,12 +1180,16 @@ def list_search(item):
 
         if not url or not title: continue
 
+        title = title.replace('Ver ', '').replace(' Online', '').strip()
+
         title = title.replace('&#038;', '&').replace("&#8217;", "'").replace("&#8211;", "")
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
         if not year: year = '-'
+        else:
+           title = title.replace('(' + year + ')', '').strip()
 
         plot = scrapertools.htmlclean(scrapertools.find_single_match(match, '<p>(.*?)</p>'))
 

@@ -274,13 +274,13 @@ def last_epis(item):
 
         SerieName = corregir_SerieName(title)
 
-        season = scrapertools.find_single_match(title, 'Temporada (.*?) ')
+        season = scrapertools.find_single_match(title, 'Temporada (.*?) ').strip()
         if not season: season = 1
 
         if not epis.lower() in title: titulo = '%s - %s' % (title, epis)
         else: titulo = title
 
-        epis = epis.replace('Episodio', '').replace('Capítulo', '').strip()
+        epis = epis.replace('Episodio', '').replace('episodio', '').replace('Capítulo', '').replace('capítulo', '').strip()
 
         if '/' in epis: epis = scrapertools.find_single_match(epis, '(.*?)/').strip()
 
@@ -462,6 +462,9 @@ def corregir_SerieName(SerieName):
 
     if 'Temporada' in SerieName: SerieName = SerieName.split("Temporada")[0]
     if 'temporada' in SerieName: SerieName = SerieName.split("temporada")[0]
+
+    if 'Episodio' in SerieName: SerieName = SerieName.split("Episodio")[0]
+    if 'episodio' in SerieName: SerieName = SerieName.split("episodio")[0]
 
     if 'Español Latino' in SerieName: SerieName = SerieName.split("Español Latino")[0]
     elif 'Español Latino' in SerieName: SerieName = SerieName.split("español Latino")[0]

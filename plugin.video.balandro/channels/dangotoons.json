@@ -3,7 +3,7 @@
   "name": "DangoToons",
   "thumbnail": "dangotoons.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["infantil", "classic", "rankings", "kids", "anime"],
 
-  "notes": "Series clásicas en idioma orignal de emisión. Series por Géneros."
+  "notes": "Web CERRADA. Series clásicas en idioma orignal de emisión. Series por Géneros."
 }

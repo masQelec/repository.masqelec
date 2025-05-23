@@ -78,7 +78,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.netflix" name="Netflix" version="1.23.3+matrix.1" provider-name="libdev, jojo, asciidisco, caphm, castagnait">
+<addon id="plugin.video.netflix" name="Netflix" version="1.23.4+matrix.1" provider-name="libdev, jojo, asciidisco, caphm, castagnait">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.addon.signals" version="0.0.6+matrix.1"/>
@@ -165,15 +165,15 @@
     <email></email>
     <forum>https://forum.kodi.tv/showthread.php?tid=329767</forum>
     <source>https://github.com/CastagnaIT/plugin.video.netflix</source>
-    <news>v1.23.3 (2024-04-16)
-- Disabled login with e-mail/password (new website protections)
-- Add workaround for missing images to tvshow/movies
-- Fixed login with Auth key due to e-mail parsing problem
+    <news>v1.23.4 (2025-05-15)
+- Fix authUrl not valid error
+- Better InputStream Adaptive support on Kodi 22
+- Other minor fixes
     </news>
   </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="4.0.16" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="Balandro" version="4.0.17" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -193,7 +193,7 @@
       <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.16[/COLOR][COLOR chartreuse]  Marzo de 2025[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.17[/COLOR][COLOR chartreuse]  Mayo de 2025[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]

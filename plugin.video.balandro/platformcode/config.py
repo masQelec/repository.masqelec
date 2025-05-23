@@ -111,16 +111,18 @@ def get_localized_category(categ):
     return categories[categ] if categ in categories else categ
 
 
-# Eliminar tags de color de un texto
 def quitar_colores(texto):
+    # ~ Eliminar tags de color de un texto
     return re.sub(r'\[COLOR [^\]]*\]', '', texto.replace('[/COLOR]', '')).strip()
 
-# Limpiar texto de acentos y otros caracteres para generar nombres de ficheros
+
 def text_clean(txt, disallowed_chars = '[^a-zA-Z0-9\-_()\[\]. ]+', blank_char = ' '):
+    # ~ Limpiar texto de acentos y otros caracteres para generar nombres de ficheros
+
     import unicodedata
     try:
         txt = unicode(txt, 'utf-8')
-    except: # unicode is a default on python 3 
+    except: # ~ unicode is a default on python 3 
         pass
 
     txt = unicodedata.normalize('NFKD', txt).encode('ascii', 'ignore')
@@ -129,7 +131,7 @@ def text_clean(txt, disallowed_chars = '[^a-zA-Z0-9\-_()\[\]. ]+', blank_char = 
     txt = re.sub(disallowed_chars, '', txt)
     return str(txt)
 
-# This function will convert bytes to MB, GB, etc
+# ~ This function will convert bytes to MB, GB, etc
 def format_bytes(num):
     step_unit = 1000.0 #1024 bad the size
     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
@@ -138,7 +140,7 @@ def format_bytes(num):
 
         num /= step_unit
 
-# This function will convert seconds to HhMMm
+# ~ This function will convert seconds to HhMMm
 def format_seconds_to_duration(seconds):
     hours = seconds // (60*60)
     seconds %= (60*60)
@@ -175,22 +177,23 @@ def get_setting(name, channel="", server="", default=None):
 
     value = __settings__.getSetting(name)
     if not value:
+        if default is None: default = ''
         return default
 
-    # Translate Path if start with "special://"
+    # ~ Translate Path if start with "special://"
     if value.startswith("special://"):
         value = translatePath(value)
 
-    # hack para devolver el tipo correspondiente
+    # ~ hack para devolver el tipo correspondiente
     if value == "true":
         return True
     elif value == "false":
         return False
     else:
-        # special case return as str
+        # ~ special case return as str
         if name in ["adult_password", "adult_aux_intro_password", "adult_aux_new_password1", "adult_aux_new_password2"]:
             return value
-        elif name.startswith('search_last_'): # Para los settings de textos buscados no convertir si hay numéros (ej: 007)
+        elif name.startswith('search_last_'): # ~ Para los settings de textos buscados no convertir si hay numéros (ej: 007)
             return str(value)
         elif name.endswith('_color'):
             return quitar_colores(value)

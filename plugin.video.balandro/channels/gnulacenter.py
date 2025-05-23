@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://gnula.center/'
+host = 'https://gnulahd.lat/'
 
 
 def item_configurar_proxies(item):
@@ -43,6 +43,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://gnula.center/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not headers: headers = {'Referer': host}
 
     hay_proxies = False
@@ -180,7 +186,7 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s")
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&amp;', '&')
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -394,6 +400,10 @@ def play(item):
             if not url: url = new_url
             else:
                if item.other == 'Waaw': url = url.replace('/tmdbcdn.lat/', '/waaw.to/')
+
+    if item.other == 'Nupload':
+        if not config.get_setting('developer_mode', default=False): url = ''
+        else: return 'Servidor aún [COLOR goldenrod]NO programado[/COLOR]'
 
     if url:
         servidor = servertools.get_server_from_url(url)

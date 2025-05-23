@@ -1218,22 +1218,30 @@ def _buscar_proxies(canal, url, provider, procesar):
                platformtools.dialog_ok('Búsqueda proxies en [COLOR red][B]' + provider.capitalize() + '[/B][/COLOR]', '[COLOR yellow][B]Sin proxies validos.[/B][/COLOR]', texto_mensaje, '[COLOR coral][B]Seleccione otro Proveedor en los [COLOR cyan][B]Parámetros de Búsquedas.[/B][/COLOR]')
 
     if config.get_setting('developer_mode', default=False):
-        loglevel = config.get_setting('debug', 0) # ~ 0 (error), 1 (error+info), 2 (error+info+debug)
+        generar = False
 
-        if loglevel == 2:
-            proxies_log = os.path.join(config.get_data_path(), 'proxies.log')
+        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): generar = True
+        elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): generar = True
+        elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): generar = True
 
-            txt_log = os.linesep + '%s Buscar proxies en %s para %s' % (time.strftime("%Y-%m-%d %H:%M"), nom_provider, url) + os.linesep
-            if provider != '': txt_log += provider + os.linesep
+        if generar:
+            loglevel = config.get_setting('debug', 0) # ~ 0 (error), 1 (error+info), 2 (error+info+debug)
 
-            num_ok = 0
-            for proxy, info in proxies_info:
-                txt_log += '%s ~ %s ~ %.2f segundos ~ %s ~ %d bytes' % (proxy, info['ok'], info['time'], info['code'], info['len']) + os.linesep
-                if info['ok']: num_ok += 1
+            if loglevel == 2:
+                proxies_log = os.path.join(config.get_data_path(), 'proxies.log')
 
-            txt_log += 'Búsqueda finalizada. Posibles Proxies válidos: %d' % (num_ok) + os.linesep
+                txt_log = os.linesep + '%s Buscar proxies en %s para %s' % (time.strftime("%Y-%m-%d %H:%M"), nom_provider, url) + os.linesep
+                if provider != '': txt_log += provider + os.linesep
 
-            with open(proxies_log, 'wb') as f: f.write(txt_log if not PY3 else txt_log.encode('utf-8')); f.close()
+                num_ok = 0
+
+                for proxy, info in proxies_info:
+                    txt_log += '%s ~ %s ~ %.2f segundos ~ %s ~ %d bytes' % (proxy, info['ok'], info['time'], info['code'], info['len']) + os.linesep
+                    if info['ok']: num_ok += 1
+
+                txt_log += 'Búsqueda finalizada. Posibles Proxies válidos: %d' % (num_ok) + os.linesep
+
+                with open(proxies_log, 'wb') as f: f.write(txt_log if not PY3 else txt_log.encode('utf-8')); f.close()
 
     if not provider == private_list:
         if len(selected) == 0: sin_news_proxies(nom_provider, proxies_actuales, procesar)

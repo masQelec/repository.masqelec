@@ -142,7 +142,7 @@ def list_all(item):
             title = title.replace(' - Ver', '').replace(' - pelicula', '').replace(' idioma', '').replace('pelicula', '').replace(' -', '')
             title = title.replace(' HD', '').replace(' ver', '').replace('( )', '')
 
-            title = title.replace('&#8211;', '').replace('&#8217;s', "'").strip()
+            title = title.replace('&#8211;', '').replace('&#8217;s', "'").replace('&#038;', "&").strip()
 
             title = title.capitalize()
 
@@ -216,7 +216,7 @@ def list_all(item):
             title = title.replace(' - Ver', '').replace(' - pelicula', '').replace(' idioma', '').replace('pelicula', '').replace(' -', '')
             title = title.replace(' HD', '').replace(' ver', '').replace('( )', '')
 
-            title = title.replace('&#8211;', '').replace('&#8217;s', "'").strip()
+            title = title.replace('&#8211;', '').replace('&#8217;s', "'").replace('&#038;', "&").strip()
 
             title = title.capitalize()
 

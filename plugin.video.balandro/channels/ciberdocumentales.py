@@ -50,9 +50,9 @@ def list_all(item):
 
         title = scrapertools.find_single_match(match, 'title="(.*?)"')
 
-        title = title.replace('&#8211;', '').strip()
+        title = title.replace('&#8211;', '').replace('&#8230;', '').strip()
 
-        thumb = scrapertools.find_single_match(match, 'data-srcset="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'srcset="(.*?)"')
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
                                     contentType='movie', infoLabels={"year": '-'}, contentTitle=title, contentExtra='documentary' ))

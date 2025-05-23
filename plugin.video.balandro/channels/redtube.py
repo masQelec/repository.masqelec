@@ -137,15 +137,15 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    data = scrapertools.find_single_match(data,'<em class="premium_tab_icon rt_icon rt_Menu_Star">(.*?)<div class="footer">')
-    data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
+    bloque = scrapertools.find_single_match(data,'<em class="premium_tab_icon rt_icon rt_Menu_Star">(.*?)<div class="footer">')
+    bloque = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', bloque)
 
     patron = '<div class="video_block_wrapper js_mediaBookBounds ">.*?'
-    patron += 'data-o_thumb="([^"]+)".*?'
-    patron += '<span class="duration">(.*?)</a>.*?'
-    patron += '<a title="([^"]+)".*?href="(/\d+)"'
+    patron += 'data-o_thumb="(.*?)".*?'
+    patron += '<div class="duration">(.*?)</a>.*?'
+    patron += '<a title="(.*?)".*?href="(.*?)"'
 
-    matches = re.compile(patron,re.DOTALL).findall(data)
+    matches = re.compile(patron,re.DOTALL).findall(bloque)
 
     for thumb, duration, title, url in matches:
         url = host[:-1] + url

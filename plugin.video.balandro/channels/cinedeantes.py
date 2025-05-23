@@ -286,6 +286,8 @@ def list_all(item):
         if not title:
            order += 1
            title = '¿ Pelicula  ' + str(order) + ' ?'
+           if "The video has been blocked at the copyright owner's request" in data_thumb:
+               title = title + ' [COLOR red]Bloqueado[/COLOR]'
         else:
            if title.endswith(") 0") == True: title = title.replace(' 0', '')
            elif title.endswith(") 1") == True: title = title.replace(' 1', '')

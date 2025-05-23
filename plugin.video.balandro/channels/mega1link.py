@@ -194,7 +194,7 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile("<span class='title'>Season(.*?)<i>", re.DOTALL).findall(data)
+    matches = re.compile("<span class='title'>Temporada(.*?)<i>", re.DOTALL).findall(data)
 
     for numtempo in matches:
         if not numtempo: continue
@@ -229,7 +229,7 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, "<span class='se-t se-o'>" + str(item.contentSeason) + '(.*?)</div></div></div></div>')
+    bloque = scrapertools.find_single_match(data, "<span class='se-t.*?>" + str(item.contentSeason) + '(.*?)</div></div></div></div>')
 
     patron = "<li class='mark-.*?" + '<img src="(.*?)".*?' + "<div class='numerando'>(.*?)</div>.*?a href='(.*?)'.*?>(.*?)</a>"
 
@@ -286,6 +286,10 @@ def episodios(item):
                 else: item.perpage = 50
 
     for thumb, temp_epis, url, title in matches[item.page * item.perpage:]:
+        temp = scrapertools.find_single_match(temp_epis, '(.*?)-').strip()
+
+        if not temp == str(item.contentSeason): continue
+
         if not 'http' in thumb: thumb = 'https:' + thumb
 
         epis = scrapertools.find_single_match(temp_epis, '.*?-(.*?)$').strip()

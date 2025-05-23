@@ -460,7 +460,9 @@ def findvideos(item):
 
         link = link.replace('\\/', '/')
 
-        if 'sbcom' in link: continue
+        if '/lamovie.' in link: continue
+
+        elif 'sbcom' in link: continue
         elif 'lvturbo' in link: continue
         elif 'vanfem' in link: continue
         elif 'fembed' in link: continue
@@ -486,6 +488,8 @@ def findvideos(item):
 
         if '1fichier' in link: continue
         elif 'fireload' in link: continue
+
+        elif '/lamovie.' in link: continue
 
         elif 'sbcom' in link: continue
         elif 'lvturbo' in link: continue

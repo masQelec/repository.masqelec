@@ -3,7 +3,7 @@
   "name": "NovelasTop",
   "thumbnail": "novelastop.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["current", "suggested", "lasts", "rankings", "years", "producers", "vos", "tales", "docs"],
 
-  "notes": "Web dedicada exclusivamente en Novelas. Series por Géneros."
+  "notes": "Web ANULADA. Web dedicada exclusivamente en Novelas. Series por Géneros."
 }

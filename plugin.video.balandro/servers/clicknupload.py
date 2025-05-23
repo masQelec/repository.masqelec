@@ -6,15 +6,21 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
 if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+
     import urllib.parse as urllib
 else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
     import urllib
 
 
-import xbmc, time
+import os, xbmc, time
 
-from core import httptools, scrapertools
 from platformcode import config, logger, platformtools
+from core import filetools, httptools, scrapertools
 
 
 espera = config.get_setting('servers_waiting', default=6)
@@ -25,8 +31,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -90,6 +95,12 @@ def get_video_url(page_url, url_referer=''):
         return video_urls
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+        path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'clicknupload.py'))
+
+        existe = filetools.exists(path)
+        if not existe:
+            return 'El Plugin No existe en Resolveurl'
+
         if config.get_setting('servers_time', default=True):
             platformtools.dialog_notification('Cargando [COLOR cyan][B]Clicknupload[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
             time.sleep(int(espera))

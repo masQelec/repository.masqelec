@@ -212,6 +212,8 @@ def findvideos(item):
 
         if 'trailer' in servidor: continue
 
+        servidor = servertools.corregir_servidor(servidor)
+ 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
         else:

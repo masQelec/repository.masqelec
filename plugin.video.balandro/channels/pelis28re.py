@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import ast, re
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -416,9 +416,12 @@ def findvideos(item):
             if not dataLink: dataLink = scrapertools.find_single_match(datae, 'dataLink(.*?);')
 
             e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
-            if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "encrypted.*?'(.*?)'")
+            if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "const safeServer =.*?'(.*?)'")
 
             e_links = dataLink.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
+
+            age = ''
+            if not dataLink or not e_bytes: age = 'crypto'
 
             langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
 
@@ -469,12 +472,8 @@ def findvideos(item):
                            other = url.split("/")[2]
                            other = other.replace('https:', '').strip()
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes,
+                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
                                           language=lang, other=other ))
-
-
-
-
 
         if item.contentType == 'episode':
             if not vid:
@@ -522,6 +521,9 @@ def findvideos(item):
                             video = scrapertools.find_single_match(url, '/e/(.*?)$').strip()
                             if video: url = 'https://waaw.to/watch_video.php?v=' + video
 
+                        if '/Smoothpre.' in url:
+                            url = url.replace('/Smoothpre.', '/smoothpre.')
+
                         servidor = servertools.get_server_from_url(url)
                         servidor = servertools.corregir_servidor(servidor)
 
@@ -548,6 +550,9 @@ def findvideos(item):
 
                 servidor = servertools.get_server_from_url(lnk)
                 servidor = servertools.corregir_servidor(servidor)
+
+                if '/Smoothpre.' in lnk:
+                    lnk = lnk.replace('/Smoothpre.', '/smoothpre.')
 
                 if servertools.is_server_available(servidor):
                     if not servertools.is_server_enabled(servidor): continue
@@ -586,6 +591,9 @@ def findvideos(item):
                 if 'netu' in lnk or 'waaw' in lnk or 'hqq' in lnk:
                     video = scrapertools.find_single_match(lnk, '/e/(.*?)$').strip()
                     if video: lnk = 'https://waaw.to/watch_video.php?v=' + video
+
+                if '/Smoothpre.' in lnk:
+                    lnk = lnk.replace('/Smoothpre.', '/smoothpre.')
 
                 servidor = servertools.get_server_from_url(lnk)
                 servidor = servertools.corregir_servidor(servidor)
@@ -649,6 +657,9 @@ def findvideos(item):
                 video = scrapertools.find_single_match(url, '/e/(.*?)$').strip()
                 if video: url = 'https://waaw.to/watch_video.php?v=' + video
 
+            if '/Smoothpre.' in url:
+                url = url.replace('/Smoothpre.', '/smoothpre.')
+
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
@@ -689,17 +700,19 @@ def play(item):
         bytes = str(item.bytes)
 
         try:
-            cripto = ast.literal_eval(cripto)
-        except:
-            crypto = str(item.crypto)
-
-        try:
             url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
         except:
             url = ''
 
         if not url:
-            return '[COLOR cyan]No se pudo [COLOR red]Desencriptar[/COLOR]'
+            if crypto.startswith("http"):
+                url = crypto.replace('\\/', '/')
+
+            if not url:
+                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+        elif not url.startswith("http"):
+            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     if url:
         if '/xupalace.' in url or '/uploadfox.' in url:

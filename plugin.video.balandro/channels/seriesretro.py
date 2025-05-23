@@ -562,7 +562,9 @@ def findvideos(item):
 
         if not servidor or not url: continue
 
-        if 'opción' in servidor:
+        if 'lamovie' in servidor: continue
+
+        elif 'opción' in servidor:
             link_other = servidor
             servidor = 'directo'
         elif servidor == 'anavids':

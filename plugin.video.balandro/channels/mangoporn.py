@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools
 
 
-host = 'https://mangoporn.net/'
+host = 'https://mangoporn.co/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://mangoporn.net/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     raise_weberror = True
     if '/year/' in url: raise_weberror = False
 
@@ -37,17 +43,17 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = '[B]Películas:[/B]', folder=False, text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'genres/porn-movies/page/1/' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'adult/genres/porn-movies/' ))
 
-    itemlist.append(item.clone( title = ' - Tendencias', action = 'list_all', url = host + 'adult/trending/page/1/' ))
+    itemlist.append(item.clone( title = ' - Tendencias', action = 'list_all', url = host + 'adult/trending/' ))
 
     itemlist.append(item.clone( title = '[B]Vídeos:[/B]', folder=False, text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'xxxporn/' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'xxxfree/' ))
 
-    itemlist.append(item.clone( title = ' - Tendencias', action = 'list_all', url = host + 'xxxporn/trending/page/1/' ))
+    itemlist.append(item.clone( title = ' - Tendencias', action = 'list_all', url = host + 'xxxfree/trending/' ))
 
-    itemlist.append(item.clone( title = ' - Más valorados', action = 'list_all', url = host + 'ratings/page/1/' ))
+    itemlist.append(item.clone( title = ' - Más valorados', action = 'list_all', url = host + 'xxxfree/ratings/' ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'categorias', url = host, group = 'canales' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host, group = 'categorias'))
@@ -136,7 +142,6 @@ def list_all(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data,'<div class="pagination">.*?<span class="current">.*?' + "<a href='(.*?)'")
-
         if not next_page: next_page = scrapertools.find_single_match(data,'<div class="pagination">.*?<span class="current">.*?<a href="(.*?)"')
 
         if next_page:
@@ -250,7 +255,7 @@ def search(item, texto):
     try:
         config.set_setting('search_last_video', texto)
 
-        item.url =  host + 'xxxporn/page/1/?s=%s' % (texto.replace(" ", "+"))
+        item.url =  host + 'adult/?s=%s' % (texto.replace(" ", "+"))
         return list_all(item)
     except:
         import sys

@@ -274,10 +274,6 @@ def list_all(item):
     return itemlist
 
 
-def tracking_all_episodes(item):
-    return episodios(item)
-
-
 def episodios(item):
     logger.info()
     itemlist = []
@@ -323,6 +319,13 @@ def findvideos(item):
 
         other = ''
         if 'magnet' in link: other = 'Magnet'
+
+        if not other:
+            magnets = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?">Descargar(.*?)</a>')
+
+            for _link, _magnet in magnets:
+                if _link == link:
+                   if 'magnet' in _magnet: other = 'Magnet'
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent',
                               language = item.languages, quality = item.qualities, other = other))

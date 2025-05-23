@@ -134,10 +134,13 @@ def list_all(item):
 
         title = title.replace('&#8230;', '').replace('&#8211;', '')
 
-        thumb = scrapertools.find_single_match(article, 'itemprop="image".*?data-src="(.*?)"')
+        thumb = scrapertools.find_single_match(article, 'itemprop="image".*?srcset"(.*?).jpg')
+
+        if thumb: thumb = thumb + '.jpg'
+
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<p>(.*?)</p>'))
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, plot=plot, infoLabels = {'year': '-'},
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, infoLabels = {'year': '-', 'plot': plot},
                                     contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
     tmdb.set_infoLabels(itemlist)

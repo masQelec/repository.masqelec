@@ -492,6 +492,8 @@ def findvideos(item):
 
         if 'trailer' in servidor: continue
 
+        elif servidor == 'do7go': continue
+
         servidor = servidor.replace('.tv', '').strip()
 
         lang = scrapertools.find_single_match(match, " src='.*?/flags/(.*?).png'")

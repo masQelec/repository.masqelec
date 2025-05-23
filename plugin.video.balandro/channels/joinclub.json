@@ -1,0 +1,17 @@
+{
+  "id": "joinclub",
+  "name": "JoinClub",
+  "thumbnail": "joinclub.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["clons", "onlyone", "years", "kids", "docs", "vos"],
+
+  "notes": "Películas por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+}

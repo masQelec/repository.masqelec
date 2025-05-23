@@ -263,7 +263,11 @@ def listado(item):
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         c_year = scrapertools.find_single_match(title, '(\d{4})')
-        if c_year: title = title.replace('(' + c_year + ')', '').strip()
+        if not c_year: c_year = scrapertools.find_single_match(title, '(d{4})')
+
+        if c_year:
+            title = title.replace('(' + c_year + ')', '').strip()
+            title = title.replace(' ' + c_year + ' ', '').strip()
 
         PeliName = title
 
@@ -325,15 +329,13 @@ def list_all(item):
         tipo = 'tvshow' if '/series/' in url else 'movie'
 
         if tipo == 'movie':
-            if not item.search_type == "all":
-                if item.search_type == "tvshow": continue
+            if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
         if tipo == 'tvshow':
-            if not item.search_type == "all":
-                if item.search_type == "movie": continue
+            if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
@@ -387,6 +389,8 @@ def last_epis(item):
         contentSerieName = scrapertools.find_single_match(title, '(.*?) \d')
 
         titulo = str(season) + 'x' + str(episode) + ' ' + title.replace(str(season) + 'x' + str(episode), '')
+
+        titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail=thumb, url = url,
                                     contentType = 'episode', contentSerieName=contentSerieName, contentSeason = season, contentEpisodeNumber = episode,

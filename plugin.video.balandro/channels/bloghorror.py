@@ -17,6 +17,19 @@ def do_downloadpage(url, post=None, headers=None):
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
+    if '<h1>aaWAF is checking your access</h1>' in data:
+        if not '/?s=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('BlogHorror', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+        timeout = config.get_setting('channels_repeat', default=30)
+
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
+        if '<h1>aaWAF is checking your access</h1>' in data:
+            if not '/?s=' in url:
+                platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection [COLOR yellowgreen]aaWAF[/B][/COLOR]')
+            return ''
+
     return data
 
 
@@ -90,7 +103,7 @@ def list_all(item):
 
     bloque = scrapertools.find_single_match(data, '</h1>(.*?)<div class="covernews-pagination">')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<article id="post-(.*?)</article>')
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')

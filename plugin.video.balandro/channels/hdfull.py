@@ -54,6 +54,7 @@ dominios = [
          'https://hd-full.biz/',
          'https://hdfull.sbs/',
 
+         'https://hdfull.help/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
@@ -377,11 +378,14 @@ def configurar_dominio(item):
     procesar = True
 
     if dominios[ret] in str(domains_cloudflare):
-        if not platformtools.dialog_yesno(config.__addon_name + ' HdFull - Configurar Dominio', '[COLOR yellow][B]Este Dominio, probablemente Necesitará[/COLOR] [COLOR red] Proxies[/B][/COLOR]', '[COLOR cyan][B]' + dominios[ret] + ' [/B][/COLOR]', '[COLOR yellowgreen][B]¿ Confirma el Dominio seleccionado ?[/B][/COLOR]'):
+        if not platformtools.dialog_yesno(config.__addon_name + ' HdFull - Configurar Dominio', '[COLOR yellow][B]Este Dominio, [COLOR plum](si no hay resultados)[/COLOR][COLOR yellow], probablemente Necesitará[/COLOR] [COLOR red] Configurar Proxies [/B][/COLOR]', '[COLOR cyan][B]' + dominios[ret] + ' [/B][/COLOR]', '[COLOR yellowgreen][B]¿ Confirma el Dominio seleccionado ?[/B][/COLOR]'):
             return False
 
-        if not config.get_setting('channel_hdfull_proxies', default=''):
-            procesar = False
+    else:
+        platformtools.dialog_ok(config.__addon_name + ' HdFull - Configurar Dominio', '[COLOR yellow][B]Este Dominio, [COLOR plum](si no hay resultados)[/COLOR][COLOR yellow], Quizás Necesitará[/COLOR] [COLOR red] Configurar Proxies [/B][/COLOR]', '[COLOR cyan][B]' + dominios[ret] + ' [/B][/COLOR]')
+
+    if not config.get_setting('channel_hdfull_proxies', default=''):
+        procesar = False
 
     if procesar:
         if config.get_setting('hdfull_login', 'hdfull', default=False):
@@ -521,7 +525,7 @@ def acciones(item):
     username = config.get_setting('hdfull_username', 'hdfull', default='')
 
     if username:
-        itemlist.append(item.clone( channel='domains', action='operative_domains_hdfull', title='[COLOR mediumaquamarine][B]Dominios Operativos Vigentes' + '[COLOR dodgerblue] dominioshdfull.com[/B][/COLOR]', desde_el_canal = True ))
+        itemlist.append(item.clone( action='operative_domains', title='[COLOR mediumaquamarine][B]Dominios Operativos Vigentes' + '[COLOR dodgerblue] dominioshdfull.com[/B][/COLOR]' ))
 
         itemlist.append(item.clone( channel='domains', action='last_domain_hdfull', title='[B]Comprobar último dominio vigente[/B]',
                                     desde_el_canal = True, host_canal = url, text_color='chocolate' ))
@@ -562,6 +566,25 @@ def acciones(item):
     platformtools.itemlist_refresh()
 
     return itemlist
+
+
+def operative_domains(item):
+    domain_act = config.get_setting('dominio', 'hdfull', default='')
+
+    from modules import domains
+
+    item.desde_el_canal = True
+
+    domains.operative_domains_hdfull(item)
+
+    domain_new = config.get_setting('dominio', 'hdfull', default='')
+
+    if not domain_act == domain_new:
+        logout(item)
+
+        platformtools.dialog_ok(config.__addon_name + ' HdFull', '[COLOR yellow][B]Sesión Cerrada[/B][/COLOR].', 'Por favor, si fuera necesario, [COLOR cyan][B]Retroceda Menús[/B][/COLOR] e [COLOR chartreuse][B]Inicie Sesión[/B][/COLOR] de nuevo.')
+
+        login(item)
 
 
 def mainlist(item):

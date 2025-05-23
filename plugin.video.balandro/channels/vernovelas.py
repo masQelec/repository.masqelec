@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.gnula.onl/'
+host = 'https://wv5n.gnula.onl/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.1ennovelas.top/']
+    ant_hosts = ['https://www.1ennovelas.top/', 'https://www.gnula.onl/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -427,7 +427,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    postid = scrapertools.find_single_match(str(data), 'postid-(.*?)"').strip()
+    postid = scrapertools.find_single_match(str(data), "data-id='(.*?)'")
 
     if not postid: return itemlist
 
@@ -449,7 +449,7 @@ def findvideos(item):
         data1 = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
 
         url = scrapertools.find_single_match(data1, "<iframe.*?src='(.*?)'")
-        if not url: url = scrapertools.find_single_match(datal, '<IFRAME.*?SRC="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data1, '<IFRAME.*?SRC="(.*?)"')
 
         if url:
             if url.startswith('//'): url = 'https:' + url

@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["temporary", "lasts", "countries", "producers", "vos", "tales"],
+  "clusters": ["lasts", "countries", "producers", "vos", "tales"],
 
-  "notes": "Web dedicada exclusivamente en Novelas. Series por Géneros."
+  "notes": "Web CERRADA. Web dedicada exclusivamente en Novelas. Series por Géneros."
 }

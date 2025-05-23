@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import ast, re
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -10,7 +10,19 @@ from core import httptools, scrapertools, servertools, tmdb
 from lib.pyberishaes import GibberishAES
 
 
-host = 'https://app.pelisgratishd.life/'
+host = 'https://ver.cuevanahd.lat/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www.pelisgratishd.life/', 'https://www.pelisgratishd.xyz/', 'https://ver.pelisgratishd.life/',
+             'https://app.pelisgratishd.life/', 'https://neo.pelisgratishd.life/']
+
+domain = config.get_setting('dominio', 'pgratishd', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'pgratishd')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'pgratishd')
+    else: host = domain
 
 
 perpage = 35
@@ -50,13 +62,11 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.pelisgratishd.life/', 'https://www.pelisgratishd.xyz/', 'https://ver.pelisgratishd.life/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
     hay_proxies = False
-    if config.get_setting('channelpgratishd__proxies', default=''): hay_proxies = True
+    if config.get_setting('channel_pgratishd_proxies', default=''): hay_proxies = True
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers).data
@@ -89,12 +99,28 @@ def acciones(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+    domain_memo = config.get_setting('dominio', 'pgratishd', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_pgratishd', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='pgratishd', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_pgratishd', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(Item( channel='helper', action='show_help_pgratishd', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('pgratishd') ))
+
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'pgratishd', thumbnail=config.get_thumb('pgratishd') ))
 
     platformtools.itemlist_refresh()
 
@@ -652,6 +678,8 @@ def episodios(item):
 
         if not title: title = item.contentSerieName
 
+        title = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio','[COLOR goldenrod]Epis.[/COLOR]')
+
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo,
@@ -704,9 +732,12 @@ def findvideos(item):
         if not dataLink: dataLink = scrapertools.find_single_match(datae, 'dataLink(.*?);')
 
         e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
-        if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "encrypted.*?'(.*?)'")
+        if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "const safeServer =.*?'(.*?)'")
 
         e_links = dataLink.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
+
+        age = ''
+        if not dataLink or not e_bytes: age = 'crypto'
 
         langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
 
@@ -758,7 +789,7 @@ def findvideos(item):
                        other = url.split("/")[2]
                        other = other.replace('https:', '').strip()
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes,
+                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
                                       language=lang, other=other ))
 
     # ~ Otros
@@ -873,17 +904,19 @@ def play(item):
         bytes = str(item.bytes)
 
         try:
-            cripto = ast.literal_eval(cripto)
-        except:
-            crypto = str(item.crypto)
-
-        try:
             url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
         except:
             url = ''
 
         if not url:
-            return '[COLOR cyan]No se pudo [COLOR red]Desencriptar[/COLOR]'
+            if crypto.startswith("http"):
+                url = crypto.replace('\\/', '/')
+
+            if not url:
+                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+        elif not url.startswith("http"):
+            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     if url:
         if '/xupalace.' in url or '/uploadfox.' in url:

@@ -494,7 +494,7 @@ def findvideos(item):
 
         if not 'http' in url: continue
 
-        if '/pelisplus.upns.pro' in url: continue
+        if '/pelisplus.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -511,7 +511,7 @@ def findvideos(item):
     if not itemlist:
         if not ses == 0:
             if ses == len(matches):
-                platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B] Sin Localizados [COLOR yellow]Re-Intentelo[/B][/COLOR]')
+                platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Sin Localizar Enlaces [COLOR yellow]Re-Intentelo[/B][/COLOR]')
             else:
                 if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
                     platformtools.dialog_notification(config.__addon_name, '[COLOR yellowgreen][B]Red Saturada [COLOR yellow]Re-Intentelo[/B][/COLOR]')

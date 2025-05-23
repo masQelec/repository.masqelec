@@ -100,7 +100,7 @@ def list_all(item):
         except:
            continue
 
-        thumb = "https://thumbs-015.externulls.com/videos/%s/%s.jpg" % (str(id), str(thumb[0]))
+        thumb = "https://thumbs.externulls.com/videos/%s/%s.jpg" % (str(id), str(thumb[0]))
 
         url = url_api + 'facts/file/' + str(id)
 

@@ -596,6 +596,8 @@ def findvideos(item):
 
             if servidor == 'trailer' or servidor == 'youtube': continue
 
+            elif servidor == 'lamovie': continue
+
             elif servidor == 'veri': continue
             elif servidor == 'player': continue
             elif servidor == 'vip': continue

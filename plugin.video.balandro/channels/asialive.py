@@ -196,6 +196,9 @@ def list_all(item):
 
         title = title.replace('&#8211;', '').replace('&#8217;', "'")
 
+        if year in title:
+           title = title.replace('(' + year +')', '').strip()
+
         tipo = 'movie' if 'Movie' in type else 'tvshow'
 
         sufijo = '' if item.search_type != 'all' else tipo
@@ -405,6 +408,7 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'directo':
                if '/bestomanga/' in url: servidor = 'mailru'
+               elif '/vkvideo.' in url: servidor = 'vk'
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
 
@@ -441,8 +445,13 @@ def play(item):
         url = servertools.normalize_url(servidor, url)
 
         if servidor == 'directo':
-            new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if '/vkvideo.' in url:
+                url = url.replace('/vkvideo.ru/', '/vk.com/')
+
+                servidor = 'vk'
+            else:
+                new_server = servertools.corregir_other(url).lower()
+                if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

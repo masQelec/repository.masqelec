@@ -285,6 +285,7 @@ def findvideos(item):
         elif '/fembuki.' in url:continue
         elif '/esprinahy.' in url: continue
         elif '/argtesa.' in url: continue
+        elif '/aporodiko.' in url: continue
 
         url = url.replace('/netusia.xyz/', '/waaw.to/')
 
@@ -319,10 +320,9 @@ def play(item):
 
         url = scrapertools.find_single_match(data, 'data-hash="(.*?)"')
 
-    if url:
-        if '/cdn4.turboviplay.com/data1/' in url:
-            url = url.replace('/cdn4.turboviplay.com/data1/', '/cdn4.turboviplay.com/data2/')
+    if '.turboviplay.' in url: url = ''
 
+    if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
