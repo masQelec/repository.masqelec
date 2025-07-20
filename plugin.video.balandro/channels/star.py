@@ -89,6 +89,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -253,7 +255,7 @@ def last_epis(item):
 
         if not epis: epis = 1
 
-        title = title.replace(' T ', '[COLOR tan]Temp.[/COLOR]')
+        title = title.replace(' T ', '[COLOR tan] Temp. [/COLOR]')
 
         title = title.replace('Capítulo ', '[COLOR goldenrod]Epis. [/COLOR]')
 

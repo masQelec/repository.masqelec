@@ -7,11 +7,11 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://www1.pelisforte.se/'
+host = 'https://www2.pelisforte.se/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://pelisforte.co/', 'https://pelisforte.nu/']
+ant_hosts = ['https://pelisforte.co/', 'https://pelisforte.nu/','https://www1.pelisforte.se/' ]
 
 domain = config.get_setting('dominio', 'pelisforte', default='')
 
@@ -144,7 +144,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'todas-las-peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Harry Potter', action = 'list_all', url = host + 'sg/harry-potter-1670251190', search_type = 'movie', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'sg/marvel-mcu/', search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
@@ -171,7 +170,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host + 'ultimas-peliculas/')
+    data = do_downloadpage(host + 'portal003/')
 
     bloque = scrapertools.find_single_match(data, '>Géneros<(.*?)</ul>')
 
@@ -220,7 +219,7 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '<h1(.*?)>PELISFORTE Status<')
+    bloque = scrapertools.find_single_match(data, '<h1(.*?)<p class="copy">© PelisForte')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
@@ -246,8 +245,10 @@ def list_all(item):
 
     if itemlist:
         if '>SIGUIENTE' in data:
-            next_page = scrapertools.find_single_match(data, 'class="page-link current".*?class="page-link" .*?href="(.*?)"')
-            if not next_page: next_page = scrapertools.find_single_match(data, 'class="page-link current".*?</a>.*?class=page-link.*?href=(.*?)>')
+            next_page = scrapertools.find_single_match(data, 'class="page-link current".*?class="page-link".*?</a>.*?' + "href='(.*?)'.*?</section>")
+            if not next_page: next_page = scrapertools.find_single_match(data, 'class="page-link current".*?class="page-link".*?</a>.*?href="(.*?)".*?</section>')
+
+            if not next_page: next_page = scrapertools.find_single_match(data, 'class="page-link current".*?</a>.*?class=page-link.*?href=(.*?)>.*?</section>')
 
             if next_page:
                 next_page = next_page.replace('&#038;', '&')
@@ -301,6 +302,7 @@ def findvideos(item):
             other = ''
 
             if srv == 'pf': continue
+            elif srv == 'w1tv': continue
 
             elif srv == 'ok':
                 servidor = 'directo'
@@ -375,16 +377,18 @@ def play(item):
 
                 if item.ref:
                     if not "vgfplay" in url and not "listeamed":
-                        url += "|Referer=" + url
+                        if not '/ok.ru/' in url: url += "|Referer=" + url
                     else:
-                        url += "|Referer=" + host_player
+                        url += "|Referer=https://mp4.nu/"
                 else:
                     if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url or 'wishfast' in url or 'sfastwish' in url or 'doodporn' in url or 'flaswish' in url or 'obeywish' in url or 'cdnwish' in url or 'asnwish' in url or 'flastwish' in url or 'jodwish' in url or 'swhoi' in url or 'fsdcmo' in url or 'swdyu' in url or 'wishonly' in url or 'playerwish' in url or 'hlswish' in url or 'wish' in url or 'iplayerhls' in url or 'hlsflast' in url or 'ghbrisk' in url:
-                        url += "|Referer=" + host_player
+                        url += "|Referer=https://mp4.nu/"
 
                     else:
                        if not "vgfplay" in url and not "listeamed" in url:
-                           url += "|Referer=" + url
+                           if not '/ok.ru/' in url: url += "|Referer=" + url
+                       else:
+                           url += "|Referer=https://mp4.nu/"
 
                 itemlist.append(item.clone(server = servidor, url = url))
                 return itemlist
@@ -432,20 +436,24 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         if item.ref:
             if not "vgfplay" in url and not "listeamed" in url:
-                url += "|Referer=" + url
+                if not '/ok.ru/' in url: url += "|Referer=" + url
             else:
-                url += "|Referer=" + host_player
+                url += "|Referer=https://mp4.nu/"
         else:
             if 'streamwish' in url or 'strwish' in url or 'embedwish' in url or 'wishembed' in url or 'awish' in url or 'dwish' in url or 'mwish' in url or 'wishfast' in url or 'sfastwish' in url or 'doodporn' in url or 'flaswish' in url or 'obeywish' in url or 'cdnwish' in url or 'asnwish' in url or 'flastwish' in url or 'jodwish' in url or 'swhoi' in url or 'fsdcmo' in url or 'swdyu' in url or 'wishonly' in url or 'playerwish' in url or 'hlswish' in url or 'wish' in url or 'iplayerhls' in url or 'hlsflast' in url or 'ghbrisk' in url:
-                url += "|Referer=" + host_player
+                url += "|Referer=https://mp4.nu/"
 
             else:
               if not "vgfplay" in url and not "listeamed" in url:
-                  url += "|Referer=" + url
+                  if not '/ok.ru/' in url: url += "|Referer=" + url
+              else:
+                  url += "|Referer=https://mp4.nu/"
 
         itemlist.append(item.clone(server = servidor, url = url))
 

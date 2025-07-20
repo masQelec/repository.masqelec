@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://www10.playdede.link/'
+host = 'https://www11.playdede.link/'
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
@@ -57,7 +57,8 @@ ant_hosts = ['https://playdede.com/', 'https://playdede.org/', 'https://playdede
              'https://playdede.me/', 'https://playdede.in/', 'https://playdede.link/',
              'https://www1.playdede.link/', 'https://www2.playdede.link/', 'https://www3.playdede.link/',
              'https://www4.playdede.link/', 'https://www5.playdede.link/', 'https://www6.playdede.link/',
-             'https://www7.playdede.link/', 'https://www8.playdede.link/', 'https://www9.playdede.link/']
+             'https://www7.playdede.link/', 'https://www8.playdede.link/', 'https://www9.playdede.link/',
+             'https://www10.playdede.link/']
 
 
 domain = config.get_setting('dominio', 'playdede', default='')
@@ -1631,11 +1632,16 @@ def findvideos(item):
               server = 'various'
               other = 'Lulustream'
 
+        elif 'bigwarp' in server or 'bgwp' in server:
+              server = 'zures'
+              other = 'Bigwarp'
+
         else: other = ''
 
         server = servertools.corregir_servidor(server)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', id = sid, language = lang, quality = qlty, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', id = sid,
+                              language = lang, quality = qlty, other = other.capitalize() ))
 
     # ~ Enlaces
     bloque = scrapertools.find_single_match(data, '<div class="linkSorter">(.*?)<div class="contEP contepID_3">')
@@ -1673,13 +1679,20 @@ def findvideos(item):
               server = 'various'
               other = 'Lulustream'
 
+        elif 'bigwarp' in server or 'bgwp' in server:
+              server = 'zures'
+              other = 'Bigwarp'
+
         else: other = 'E'
 
         server = servertools.corregir_servidor(server)
 
-        if server == 'zures': other = servertools.corregir_zures(url)
+        if not server == 'directo':
+            if server == 'various': other = servertools.corregir_other(url)
+            elif server == 'zures': other = servertools.corregir_zures(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = lang, quality = qlty, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url,
+                              language = lang, quality = qlty, other = other.capitalize() ))
 
     # ~ Descargas
     bloque = scrapertools.find_single_match(data, '<div class="contEP contepID_3">(.*?)$')
@@ -1718,10 +1731,11 @@ def findvideos(item):
         other = 'D'
 
         if not server == 'directo':
-            if server == 'various': other = servertools.corregir_other(server)
-            elif server == 'zures': other = servertools.corregir_zures(url).capitalize()
+            if server == 'various': other = servertools.corregir_other(url)
+            elif server == 'zures': other = servertools.corregir_zures(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = lang, quality = qlty, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url,
+                              language = lang, quality = qlty, other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -1766,7 +1780,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url_play).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(url = url_play, server = servidor))
 

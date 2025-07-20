@@ -639,7 +639,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(server = servidor, url = url))
 
@@ -650,10 +652,8 @@ def search(item, texto):
     # ~ No hay buscador propio en la web, usan el buscador genérico de google.
 
     logger.info()
+    itemlist = []
     itemlist2 = []
-    itemlist3 = []
-    itemlist4 = []
-    itemlist5 = []
 
     try:
         item.filtro_search = texto
@@ -671,31 +671,6 @@ def search(item, texto):
                 for it2 in itemlist2:
                     if it2.url not in [it.url for it in itemlist]:
                         itemlist.append(it2)
-
-                if not itemlist2:
-                    item.url = host
-                    item.group = 'recomendadas'
-                    itemlist3 = list_last(item)
-
-                    for it3 in itemlist3:
-                        if it3.url not in [it.url for it in itemlist]:
-                            itemlist.append(it3)
-
-                    if not itemlist3:
-                        item.url = url_recomendadas
-                        itemlist4 = list_all(item)
-
-                        for it4 in itemlist4:
-                            if it4.url not in [it.url for it in itemlist]:
-                                itemlist.append(it4)
-
-                        if not itemlist4:
-                            item.url = url_recientes
-                            itemlist5 = list_all(item)
-
-                            for it5 in itemlist5:
-                                if it5.url not in [it.url for it in itemlist]:
-                                    itemlist.append(it5)
 
         return itemlist
 

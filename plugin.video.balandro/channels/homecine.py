@@ -156,9 +156,9 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_homecine', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='homecine', folder=False, text_color='chartreuse' ))
@@ -170,9 +170,11 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_homecine', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('homecine') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_homecine', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal' ))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'homecine', thumbnail=config.get_thumb('') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', text_color='turquoise' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'homecine' ))
 
     platformtools.itemlist_refresh()
 
@@ -706,7 +708,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 

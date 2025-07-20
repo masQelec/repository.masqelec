@@ -503,9 +503,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'ESPAÑOL': 'Esp', 'espanola': 'Esp', 'LATINO': 'Lat', 'latino': 'Lat', 'SUBTITULADO': 'Vose', 'SUB': 'Vose', 'subtitle': 'Vose'}
-
-    lang = 'Lat'
+    IDIOMAS = {'ESPAÑOL': 'Esp', 'Español': 'Esp', 'espanola': 'Esp', 'LATINO': 'Lat', 'latino': 'Lat', 'Español Latino': 'Lat', 'SUBTITULADO': 'Vose', 'Subtitulado': 'Vose', 'SUB': 'Vose', 'subtitle': 'Vose'}
 
     data = do_downloadpage(item.url)
 
@@ -539,11 +537,11 @@ def findvideos(item):
 
         if servidor == 'various': link_other = servertools.corregir_other(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Lat', other = link_other ))
 
-    matches = scrapertools.find_multiple_matches(data, 'data-url="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, 'data-url="(.*?)".*?data-name="(.*?)"')
 
-    for url in matches:
+    for url, lng in matches:
         if not url: continue
 
         ses += 1
@@ -559,6 +557,11 @@ def findvideos(item):
         url = servertools.normalize_url(servidor, url)
 
         link_other = ''
+
+        lang = 'Lat'
+
+        if lng == 'Español': lang = 'Esp'
+        elif lng == 'Subtitulado': lang = 'Vose'
 
         if servidor == 'directo':
             link_other = normalize_other(url)
@@ -579,7 +582,7 @@ def findvideos(item):
 
         link_other = srv
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = lang, other = link_other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = 'Lat', other = link_other ))
 
     # ~ downloads
     matches = scrapertools.find_multiple_matches(data, '<span class="Num".*? <!-- -->(.*?)</td>.*?href="(.*?)"')
@@ -595,7 +598,7 @@ def findvideos(item):
 
         link_other = srv
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = lang, other = link_other + ' D' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = 'Lat', other = link_other + ' D' ))
 
     # ~ links
     bloque = scrapertools.find_single_match(data, '"links"(.*?)},')
@@ -699,9 +702,9 @@ def play(item):
 
                 if servidor == 'directo':
                     new_server = servertools.corregir_other(url).lower()
-                    if not new_server.startswith("http"): servidor = new_server
-
-                if servidor == 'directo': continue
+                    if new_server.startswith("http"):
+                        if not config.get_setting('developer_mode', default=False): continue
+                    servidor = new_server 
 
                 itemlist.append(item.clone( url = url, server = servidor ))
 
@@ -713,11 +716,13 @@ def play(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        url = servertools.normalize_url(servidor, url)
-
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

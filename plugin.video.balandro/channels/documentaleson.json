@@ -3,7 +3,7 @@
   "name": "DocumentalesOn",
   "thumbnail": "documentaleson.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["documentary"],
@@ -13,5 +13,5 @@
 
   "clusters": ["categories", "docs"],
 
-  "notes": "Web CERRADA. Documentales en castellano."
+  "notes": "Documentales en castellano."
 }

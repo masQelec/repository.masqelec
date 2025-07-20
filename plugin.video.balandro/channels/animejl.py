@@ -112,9 +112,13 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -288,7 +292,9 @@ def last_epis(item):
 
         titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
-        titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + titulo.replace('episodio', '').strip()
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + titulo.strip()
 
         titulo = titulo.replace('Audio', '[COLOR red]Audio[/COLOR]')
 
@@ -411,6 +417,14 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     if not item.search_type == 'tvshow':
         if not '/episodio' in item.url: item.url = item.url + '/episodio-1'
 
@@ -440,10 +454,13 @@ def findvideos(item):
             if servidor == 'zplayer': url = url + '|' + host
 
             other = ''
+
             if servidor == 'various': other = servertools.corregir_other(url)
+            elif servidor == 'zures': other = servertools.corregir_zures(url)
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                      language = lang, other = other.capitalize() ))
 
     # ~ descargas  no se tratan por anomizador
 
@@ -475,6 +492,8 @@ def corregir_SerieName(SerieName):
     elif 'español' in SerieName: SerieName = SerieName.split("español")[0]
     elif 'Castellano' in SerieName: SerieName = SerieName.split("Castellano")[0]
     elif 'castellano' in SerieName: SerieName = SerieName.split("castellano")[0]
+
+    if ' (Audio' in SerieName: SerieName = SerieName.split(" (Audio")[0]
 
     if '(Sin Censura)' in SerieName: SerieName = SerieName.split("(Sin Censura)")[0]
 

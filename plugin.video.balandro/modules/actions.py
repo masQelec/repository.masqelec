@@ -479,6 +479,7 @@ def manto_params(item):
 
         config.set_setting('channel_todotorrents_dominio', '')
 
+        config.set_setting('channel_vernovelas_dominio', '')
         config.set_setting('channel_veronline_dominio', '')
 
         config.set_setting('autoplay_max_links', '10')
@@ -518,6 +519,9 @@ def manto_params(item):
         config.set_setting('search_last_person', '')
         config.set_setting('search_last_list', '')
         config.set_setting('search_last_video', '')
+        config.set_setting('search_last_torrent', '')
+        config.set_setting('search_last_dorama', '')
+        config.set_setting('search_last_anime', '')
 
         config.set_setting('search_no_work_proxies', False)
         config.set_setting('search_no_results_proxies', True)
@@ -547,9 +551,13 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '136.0.7103.125')  # ~ 20/5/25
+        config.set_setting('chrome_last_version', '138.0.7204.98')  # ~ 9/7/25
 
         config.set_setting('debug', '0')
+
+        config.set_setting('ses_pin', False)
+
+        config.set_setting('httptools_timeout_searching', '')
 
         config.set_setting('developer_mode', False)
         config.set_setting('developer_test_channels', '')
@@ -578,6 +586,9 @@ def manto_textos(item):
     elif config.get_setting('search_last_person', default=''): hay_lastest = True
     elif config.get_setting('search_last_list', default=''): hay_lastest = True
     elif config.get_setting('search_last_video', default=''): hay_lastest = True
+    elif config.get_setting('search_last_torrent', default=''): hay_lastest = True
+    elif config.get_setting('search_last_dorama', default=''): hay_lastest = True
+    elif config.get_setting('search_last_anime', default=''): hay_lastest = True
 
     if not hay_lastest:
          platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay Textos Memorizados[/COLOR][/B]' % color_alert)
@@ -591,6 +602,9 @@ def manto_textos(item):
         config.set_setting('search_last_person', '')
         config.set_setting('search_last_list', '')
         config.set_setting('search_last_video', '')
+        config.set_setting('search_last_torrent', '')
+        config.set_setting('search_last_dorama', '')
+        config.set_setting('search_last_anime', '')
 
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Texos restablecidos[/B][/COLOR]' % color_infor)
 
@@ -1646,6 +1660,10 @@ def opciones_todotorrents(item):
     item.from_channel = 'todotorrents'
     opciones_domains_common(item)
 
+def opciones_vernovelas(item):
+    item.from_channel = 'vernovelas'
+    opciones_domains_common(item)
+
 def opciones_veronline(item):
     item.from_channel = 'veronline'
     opciones_domains_common(item)
@@ -1790,6 +1808,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
 
+            elif item.from_channel == 'vernovelas': domains.manto_domain_vernovelas(item)
+
             elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
 
             else:
@@ -1883,6 +1903,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'subtorrents': domains.test_domain_subtorrents(item)
 
             elif item.from_channel == 'todotorrents': domains.test_domain_todotorrents(item)
+
+            elif item.from_channel == 'vernovelas': domains.test_domain_vernovelas(item)
 
             elif item.from_channel == 'veronline': domains.test_domain_veronline(item)
 

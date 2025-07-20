@@ -8,6 +8,7 @@ from core import httptools, scrapertools, servertools, tmdb
 
 
 from lib.pyberishaes import GibberishAES
+from lib import decrypters
 
 
 host = 'https://entrepeliculasyseries.nz/'
@@ -650,6 +651,9 @@ def play(item):
             url = ''
 
         if not url:
+            url = decrypters.decode_decipher(crypto, bytes)
+
+        if not url:
             if crypto.startswith("http"):
                 url = crypto.replace('\\/', '/')
 
@@ -668,7 +672,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

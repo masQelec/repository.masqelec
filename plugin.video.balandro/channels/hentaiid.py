@@ -24,11 +24,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color='orange' ))
 
@@ -127,6 +128,13 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     videos = []
     downloads = []
 
@@ -183,6 +191,8 @@ def findvideos(item):
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
+
+        if 'sbplay' in url or 'sbplay1' in url or 'sbplay2' in url or 'pelistop' in url or 'sbfast' in url or 'sbfull' in url or 'ssbstream' in url or 'sbthe' in url or 'sbspeed' in url or 'cloudemb' in url or 'tubesb' in url or 'embedsb' in url or 'playersb' in url or 'sbcloud1' in url or 'watchsb' in url  or 'viewsb' in url or 'watchmo' in url or 'streamsss' in url or 'sblanh' in url or 'sbanh' in url or 'sblongvu' in url or 'sbchill' in url or 'sbrity' in url or 'sbhight' in url or 'sbbrisk' in url or 'sbface' in url or 'view345' in url or 'sbone' in url or 'sbasian' in url or 'streaamss' in url or  'lvturbo' in url or 'sbnet' in url or 'sbani' in url or 'sbrapid' in url or 'cinestart' in url or 'vidmoviesb' in url or 'sbsonic' in url or 'sblona' in url or 'likessb' in url: continue
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(url)

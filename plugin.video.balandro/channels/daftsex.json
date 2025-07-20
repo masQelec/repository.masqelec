@@ -3,7 +3,7 @@
   "name": "DaftSex",
   "thumbnail": "daftsex.png",
 
-  "active": false,
+  "active": true,
 
   "searchable": false,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["adults"],
 
-  "notes": "Web CERRADA. Vídeos en versión Original para Adultos +18"
+  "notes": "Vídeos en versión Original para Adultos +18"
 }

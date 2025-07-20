@@ -15,13 +15,14 @@ def do_downloadpage(url, post=None, headers=None):
 
     # ~ 4/7/24
     if str(resp.code) == '404':
-        timeout = config.get_setting('channels_repeat', default=30)
-        if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('NuVid', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
-        resp = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout)
-
-        if str(resp.code) == '404':
-            timeout = 60
+        if not 'search/videos/' in url:
+            timeout = config.get_setting('channels_repeat', default=30)
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('NuVid', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
             resp = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout)
+
+            if str(resp.code) == '404':
+                timeout = 60
+                resp = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout)
 
     return resp.data
 
@@ -34,11 +35,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
@@ -180,6 +182,13 @@ def list_all(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     videos = get_video_url(item.url)
 

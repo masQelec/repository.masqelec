@@ -23,13 +23,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if descartar_xxx: return itemlist
-
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
@@ -161,8 +160,12 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    logger.info()
-    itemlist = []
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     videos = get_video_url(item.url)
 

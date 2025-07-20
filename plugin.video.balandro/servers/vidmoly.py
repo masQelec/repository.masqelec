@@ -113,12 +113,19 @@ def get_video_url(page_url, url_referer=''):
                     trace = traceback.format_exc()
                     if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                         return 'Archivo inexistente ó eliminado'
+
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
+
+                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                    return 'Archivo inexistente'
 
                 elif '<urlopen error' in traceback.format_exc():
                     return 'No se puede establecer la conexión'
 
                 return 'Sin Respuesta ResolveUrl'
+
+        else:
+            return 'Falta ResolveUrl'
 
     return video_urls

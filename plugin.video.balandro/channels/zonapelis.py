@@ -27,9 +27,23 @@ def do_downloadpage(url, post=None, headers=None):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='zonapelis', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', text_color='turquoise' ))
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone ( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -42,6 +56,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -64,6 +80,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone ( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -452,7 +470,9 @@ def play(item):
 
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
-                if new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
             url = servertools.normalize_url(servidor, url)
 

@@ -596,8 +596,6 @@ def findvideos(item):
 
             if servidor == 'trailer' or servidor == 'youtube': continue
 
-            elif servidor == 'lamovie': continue
-
             elif servidor == 'veri': continue
             elif servidor == 'player': continue
             elif servidor == 'vip': continue
@@ -865,9 +863,11 @@ def play(item):
             if not url.startswith('http'): return itemlist
 
             if '/okru.' in url: servidor = 'okru'
-
-            new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            else:
+                new_server = servertools.corregir_other(url).lower()
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
         if servidor == 'zplayer': url = url + '|' + host_player
 

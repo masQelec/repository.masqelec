@@ -65,28 +65,35 @@ def get_video_url(page_url, url_referer=''):
 
     if not data: return video_urls
 
+    logger.info("check-000-data: %s" % data)
+
     if 'File Not Found' in data:
         return 'Archivo inexistente ó eliminado'
 
     url = ''
+
     post = ''
 
     block = scrapertools.find_single_match(data, '(?i)<Form method="POST"(.*?)</Form>')
+
     matches = scrapertools.find_multiple_matches(block, 'input.*?name="([^"]+)".*?value="([^"]*)"')
 
     for name, value in matches:
-        post += name + '=' + value + '&'
+        if name == 'referer':
+            if not value: value = page_url
+
+        post += name + '=' + value.replace('download1', 'download2') + '&'
 
     if post:
-        post = post.replace("download1", "download2")
-
         headers = {'Referer': page_url}
 
         data = httptools.downloadpage(page_url, post=post, headers=headers).data
 
         url = scrapertools.find_single_match(data, "window.open\('([^']+)")
 
-    if url:
+    if not url:
+        return 'Requiere Informar Código de Acceso al Archivo'
+    else:
         url_strip = urllib.quote(url.rsplit('/', 1)[1])
         media_url = url.rsplit('/', 1)[0] + "/" + url_strip
 
@@ -133,16 +140,22 @@ def get_video_url(page_url, url_referer=''):
                 trace = traceback.format_exc()
                 if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                     return 'Archivo inexistente ó eliminado'
+
                 elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                     return 'Fichero sin link al vídeo ó restringido'
 
             elif ' Bad Request' in traceback.format_exc():
-               if '/recaptcha/' in traceback.format_exc():
-                   return 'Fichero de Vídeo con CaptCha'
+               if '/recaptcha/' in traceback.format_exc(): return 'Fichero de Vídeo con CaptCha'
+
+            elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                return 'Archivo inexistente'
 
             elif '<urlopen error' in traceback.format_exc():
                 return 'No se puede establecer la conexión'
 
             return 'Sin Respuesta ResolveUrl'
+
+    else:
+        return 'Falta ResolveUrl'
 
     return video_urls

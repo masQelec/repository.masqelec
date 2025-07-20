@@ -520,6 +520,8 @@ def play(item):
     logger.info()
     itemlist = []
 
+    # ~ 14/11/24 Vidoza  No es pot resoldre redirecciona a otro /?trhide=
+
     domain_memo = config.get_setting('dominio', 'peliculaspro', default='')
 
     if domain_memo: host_player = domain_memo
@@ -596,7 +598,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 

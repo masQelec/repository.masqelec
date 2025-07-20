@@ -108,6 +108,14 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
@@ -315,6 +323,14 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
 
     ses = 0
@@ -464,11 +480,11 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
- 
             if new_server.startswith("http"):
-                servidor = new_server
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
-                if '/nemonicplayer/' in url: servidor = 'directo'
+        if '/nemonicplayer/' in url: servidor = 'directo'
 
         if servidor == 'zplayer': url = url + '|' + host
 

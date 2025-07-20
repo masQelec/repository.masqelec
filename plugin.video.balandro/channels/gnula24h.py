@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w5nv.gnula.cc/'
+host = 'https://cv5w.gnula.cc/'
 
 
 # ~ por si viene de enlaces guardados
@@ -15,14 +15,15 @@ ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/', 'https://w-ww
              'https://ww-w.gnula.cc/', 'https://www1.gnula.cc/', 'https://w-w-w.gnula.cc/',
              'https://wv5n.gnula.cc/', 'https://wv5h.gnula.cc/', 'https://wv5l.gnula.cc/',
              'https://w-v5n.gnula.cc/', 'https://wv-5n.gnula.cc/', 'https://kv5n.gnula.cc/',
-             'https://wv5c.gnula.cc/', 'https://w5nl.gnula.cc/']
+             'https://wv5c.gnula.cc/', 'https://w5nl.gnula.cc/', 'https://w5nv.gnula.cc/',
+             'https://w5cv.gnula.cc/']
 
 
 domain = config.get_setting('dominio', 'gnula24h', default='')
 
 if domain:
     if domain == host: config.set_setting('dominio', '', 'gnula24h')
-    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'gnula2h')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'gnula24h')
     else: host = domain
 
 
@@ -70,11 +71,15 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     hay_proxies = False
     if config.get_setting('channel_gnula24h_proxies', default=''): hay_proxies = True
 
+    timeout = None
+    if host in url:
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
         if hay_proxies:
-            data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+            data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -85,7 +90,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
-                    data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -94,7 +99,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
         else:
             if hay_proxies:
-                data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
             else:
                 data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -115,9 +120,9 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_gnula24h', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='gnula24h', folder=False, text_color='chartreuse' ))
@@ -129,9 +134,11 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_gnula24h', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('gnula24h') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_gnula24h', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal' ))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'gnula24h', thumbnail=config.get_thumb('gnula24h') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'gnula24h' ))
 
     platformtools.itemlist_refresh()
 
@@ -273,6 +280,8 @@ def list_all(item):
         if '/ver-pelicula/' in url: continue
 
         title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
+
+        title = re.sub(r" \(.*?\)| \| .*", "", title)
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -585,7 +594,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 
@@ -610,6 +621,8 @@ def list_search(item):
         title = scrapertools.find_single_match(article, ' alt="(.*?)"')
 
         title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
+
+        title = re.sub(r" \(.*?\)| \| .*", "", title)
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 

@@ -568,7 +568,6 @@ def findvideos(item):
             elif 'youtube' in servidor: continue
             elif 'hackplayer' in servidor: continue
             elif servidor == 'vip': continue
-            elif servidor == 'lamovie': continue
 
             if servidor == 'ok': servidor = 'okru'
 
@@ -577,6 +576,7 @@ def findvideos(item):
             elif servidor == 'google drive': servidor = 'gvideo'
             elif servidor == 'netu' or servidor == 'hqq': servidor = 'waaw'
             elif servidor == 'd0o0d' or servidor == 'do0od' or servidor == 'd0000d' or servidor == 'd000d': servidor = 'doodstream'
+            elif servidor == 'lamovie': servidor = 'clipwatching'
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
@@ -802,9 +802,11 @@ def play(item):
             if not url.startswith('http'): return itemlist
 
             if '/okru.' in url: servidor = 'okru'
-
-            new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            else:
+                new_server = servertools.corregir_other(url).lower()
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
         if servidor == 'zplayer':  url = url + '|' + host_player
 

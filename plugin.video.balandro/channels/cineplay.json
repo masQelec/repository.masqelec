@@ -3,7 +3,7 @@
   "name": "CinePlay",
   "thumbnail": "cineplay.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["years", "docs", "kids", "vos"],
 
-  "notes": "Web CERRADA. Películas por géneros y Series por Géneros."
+  "notes": "Películas por géneros y Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

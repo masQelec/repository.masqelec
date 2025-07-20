@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re, base64
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -322,11 +322,16 @@ def last_epis(item):
 
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
-        title = title.replace('&#039;', '')
+        title = title.replace('&#039;', '').replace('Ver ', '').replace(' Online', '').strip()
 
         title = title.strip()
 
-        if "capitulo" in title: SerieName = title.split("capitulo")[0]
+        SerieName = title
+
+        if "capitulo" in title:SerieName = title.split("capitulo")[0]
+        elif "Capitulo" in title:SerieName = title.split("Capitulo")[0]
+        elif "episodio" in title:SerieName = title.split("episodio")[0]
+        elif "Episodio" in title:SerieName = title.split("Episodio")[0]
         else: titulo = SerieName
 
         SerieName = SerieName.strip()
@@ -337,7 +342,7 @@ def last_epis(item):
 
         if not epis: epis = 1
 
-        titulo = title.replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = title.replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail = thumb, url = url,
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
@@ -433,7 +438,7 @@ def episodios(item):
     for match in matches[item.page * item.perpage:]:
         url = _url + '-episodio-' + match
 
-        title = 'Epis. ' + match
+        title = '[COLOR goldenrod]Epis.[/COLOR] ' + match
 
         if item.search_type == 'movie': titulo = item.contentTitle + ' ' + title
         else: titulo = '1x'+ str(match) + ' ' + title + ' ' + item.contentSerieName
@@ -495,13 +500,15 @@ def findvideos(item):
 
         elif srv == 'cybervynx':
              srv = 'various'
-
              other = 'Cybervynx'
 
         else:
              if srv == 'vgembedcom': srv = 'vembed'
-
-             other = servertools.corregir_other(srv)
+             elif 'com/' in srv:
+                srv = 'various'
+                other = 'Streamwish'
+             else:
+                other = servertools.corregir_other(srv)
 
         servidor = servertools.corregir_servidor(srv)
 
@@ -512,7 +519,7 @@ def findvideos(item):
 
         if not servidor == 'directo':
             if not servidor == 'various': other = ''
-            
+
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose', other = other ))
 
     # download
@@ -565,12 +572,16 @@ def play(item):
         itemlist.append(item.clone( url = item.url, server = item.server ))
         return itemlist
 
-    player = host + 'reproductor?video=' + item.d_play
+    if 'http' in item.d_play:
+        url = item.d_play
+    else:
+        player = host + 'reproductor?video=' + item.d_play
 
-    data = do_downloadpage(player)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+        data = do_downloadpage(player)
+        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    url = scrapertools.find_single_match(data, 'var redir = "(.*?)"')
+        url = scrapertools.find_single_match(data, 'var redir = "(.*?)"')
+        if not url: url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)".*?</iframe>')
 
     if url:
         servidor = servertools.get_server_from_url(url)
@@ -580,7 +591,12 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        if 'jodwish' in url or 'swhoi' in url or 'swdyu' in url or 'strwish' in url or 'playerwish' in url or 'streamwish' in url:
+            url = url + '|Referer=' + url
 
         itemlist.append(item.clone(server = servidor, url = url))
 

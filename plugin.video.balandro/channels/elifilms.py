@@ -460,9 +460,7 @@ def findvideos(item):
 
         link = link.replace('\\/', '/')
 
-        if '/lamovie.' in link: continue
-
-        elif 'sbcom' in link: continue
+        if 'sbcom' in link: continue
         elif 'lvturbo' in link: continue
         elif 'vanfem' in link: continue
         elif 'fembed' in link: continue
@@ -489,8 +487,6 @@ def findvideos(item):
         if '1fichier' in link: continue
         elif 'fireload' in link: continue
 
-        elif '/lamovie.' in link: continue
-
         elif 'sbcom' in link: continue
         elif 'lvturbo' in link: continue
         elif 'vanfem' in link: continue
@@ -509,6 +505,22 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    servidor = item.server
+
+    url = item.url
+
+    if 'jodwish' in url or 'swhoi' in url or 'swdyu' in url or 'strwish' in url or 'playerwish' in url or 'streamwish' in url or 'wish' in url:
+        url = url + '|Referer=' + url
+
+    itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
 

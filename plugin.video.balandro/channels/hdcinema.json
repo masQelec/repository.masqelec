@@ -1,0 +1,17 @@
+{
+  "id": "hdcinema",
+  "name": "HdCinema",
+  "thumbnail": "hdcinema.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["years", "kids", "vos"],
+
+  "notes": "Películas por géneros y años. Series por Géneros."
+}

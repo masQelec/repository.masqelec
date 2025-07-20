@@ -3,7 +3,7 @@
   "name": "YtsTv",
   "thumbnail": "ytstv.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["onlyone", "torrents", "rankings", "qualityes", "countries", "years", "kids", "docs", "3d", "4k"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas por géneros y Series por Géneros. En Versión Original."
+  "notes": "Web CERRADA. Canal con enlaces Torrent exclusivamente. Películas por géneros y Series por Géneros. En Versión Original."
 }

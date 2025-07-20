@@ -265,14 +265,10 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
-            if '/series?' in item.url:
-                ref = host + 'serie/' + url + '/'
-
-                url = host + 'wp-json/wpreact/v1/serie/' + url + '/related/'
-            else:
-                ref = host + 'anime/' + url + '/'
-
+            if '"type":"anime"' in match:
                 url = host + 'wp-json/wpreact/v1/anime/' + url + '/related/'
+            else:
+                url = host + 'wp-json/wpreact/v1/serie/' + url + '/related/'
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))

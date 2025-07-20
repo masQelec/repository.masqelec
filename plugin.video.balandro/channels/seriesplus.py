@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.cinehdplus.cc/'
+host = 'https://wv5n.cinehdplus.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://w-ww.gnula2h.cc/', 'https://wl3v.gnula2h.cc/', 'https://wv3l.gnula2h.cc/',
-             'https://wv7n.gnula2h.cc/']
+             'https://wv7n.gnula2h.cc/', 'https://www.cinehdplus.cc/']
 
 
 domain = config.get_setting('dominio', 'seriesplus', default='')
@@ -97,9 +97,9 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_seriesplus', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='seriesplus', folder=False, text_color='chartreuse' ))
@@ -111,7 +111,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'seriesplus', thumbnail=config.get_thumb('seriesplus') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'seriesplus' ))
 
     platformtools.itemlist_refresh()
 
@@ -492,8 +494,6 @@ def findvideos(item):
 
         if 'trailer' in servidor: continue
 
-        elif servidor == 'do7go': continue
-
         servidor = servidor.replace('.tv', '').strip()
 
         lang = scrapertools.find_single_match(match, " src='.*?/flags/(.*?).png'")
@@ -578,7 +578,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

@@ -8,6 +8,7 @@ from core import httptools, scrapertools, servertools, tmdb
 
 
 from lib.pyberishaes import GibberishAES
+from lib import decrypters
 
 
 host = 'https://sololatino.net/'
@@ -93,6 +94,8 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
+    itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
+
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
@@ -109,6 +112,8 @@ def mainlist_pelis(item):
     itemlist = []
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
+
+    itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -130,6 +135,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
+    itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
+
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
@@ -139,6 +146,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series/mejor-valoradas/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Animación', action = 'list_all', url = host + 'genre_series/toons/', search_type = 'tvshow', text_color = 'greenyellow' ))
+
+    itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'series/filtro/?genre=kdramas&year=', search_type = 'tvshow', text_color = 'firebrick' ))
 
     itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', search_type='tvshow', text_color = 'moccasin' ))
 
@@ -153,6 +162,8 @@ def mainlist_animes(item):
     itemlist = []
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
+
+    itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', search_type = 'all' ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
@@ -247,6 +258,37 @@ def anios(item):
             else: url = host + 'series/filtro/?genre=&year=' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = text_color ))
+
+    return itemlist
+
+
+def list_listas(item):
+    logger.info()
+    itemlist = []
+
+    if not item.url: url_listas = host + 'listas/'
+    else: url_listas = item.url
+
+    url = url_listas
+
+    data = do_downloadpage(url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    matches = re.compile('<article>.*?<a href="(.*?)".*?<h2>(.*?)</h2>').findall(data)
+
+    for url, title in matches:
+        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color='moccasin' ))
+
+    if itemlist:
+        if '<div class="pagMovidy">' in data:
+            if 'Pagina anterior' in data: patron = '<div class="pagMovidy">.*?Pagina anterior.*?<a href="([^"]+)'
+            else: patron = '<div class="pagMovidy">.*?<a href="([^"]+)'
+
+            next_url = scrapertools.find_single_match(data, patron)
+
+            if next_url:
+                if '/page/' in next_url:
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_listas', text_color = 'coral' ))
 
     return itemlist
 
@@ -697,6 +739,9 @@ def play(item):
             url = ''
 
         if not url:
+            url = decrypters.decode_decipher(crypto, bytes)
+
+        if not url:
             if crypto.startswith("http"):
                 url = crypto.replace('\\/', '/')
 
@@ -715,7 +760,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

@@ -9,7 +9,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "http(?:s|)://(?:doodstream.com|doodstream.co|dood.watch|dood.to|dood.so|dood.cx|dood.la|dood.ws|dood.sh|dood.pm|dood.wf|dood.re|dood.yt|dooood.com|dood.stream|ds2play.com|doods.pro|ds2video.com|d0o0d.com|do0od.com|d0000d.com|d000d.com|dood.li|dood.work|dooodster.com|vidply.com|all3do.com|do7go.com)/(?:d/|e/|embed-|)([0-9a-zA-Z]+)",
+        "pattern": "http(?:s|)://(?:doodstream.com|doodstream.co|dood.watch|dood.to|dood.so|dood.cx|dood.la|dood.ws|dood.sh|dood.pm|dood.wf|dood.re|dood.yt|dooood.com|dood.stream|ds2play.com|doods.pro|ds2video.com|d0o0d.com|do0od.com|d0000d.com|d000d.com|dood.li|dood.work|dooodster.com|vidply.com|all3do.com|do7go.com|doodcdn.io|doply.net|vide0.net)/(?:d/|e/|embed-|)([0-9a-zA-Z]+)",
         "url": "https://doodstream.com/e/\\1"
       }
     ]

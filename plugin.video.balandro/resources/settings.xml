@@ -70,7 +70,7 @@
         <setting id="show_play_parameters" type="action" label="Preferencias [COLOR fuchsia][B]Play[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_play_parameters)"/>
         <setting id="show_prx_parameters" type="action" label="Preferencias [COLOR red][B]Proxies[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_prx_parameters)"/>
         <setting id="show_mnu_torrents" type="action" label="Preferencias [COLOR blue][B]Torrents[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_torrents_parameters)"/>
-        <setting id="show_help_parameters" type="action" label="Preferencias [COLOR yellow][B]Buscar[/B][/COLOR]" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=search&action=show_help_parameters)"/>
+        <setting id="show_help_parameters_search" type="action" label="Preferencias [COLOR yellow][B]Buscar[/B][/COLOR]" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_parameters_search)"/>
         <setting id="show_mnu_preferidos" type="action" label="Preferencias [COLOR wheat][B]Preferidos[/B][/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_preferidos_parameters)"/>
         <setting id="show_mnu_descargas" type="action" label="Preferencias [COLOR seagreen][B]Descargas[/B][/COLOR]" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=show_ubicacion)"/>
         <setting id="show_sistema" type="action" label="Preferencias [COLOR teal][B]Sistema[/B][/COLOR]" visible="eq(-12,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=show_sistema)"/>
@@ -102,50 +102,57 @@
         <setting id="show_mnu_parameters1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_menu_parameters)"/>
         <setting id="mnu_simple" type="bool" label="Activar [COLOR tan][B][I]Menú [COLOR yellow]Simplificado[/I][/B][/COLOR]" default="false"/>
 
-        <setting label="Selecciones Menú:" type="lsep"/>
+        <setting label="Selecciones Menú Principal:" type="lsep"/>
 
         <setting id="mnu_opciones" type="bool" label="Opciones" default="false"/>
-        <setting id="mnu_sugeridos" type="bool" label="Añadir opción [COLOR aquamarine][B]Sugeridos[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="true" visible="eq(-1,true)"/>
-        <setting id="channels_link_main" type="bool" label="Añadir opción [COLOR gold][B]Canales[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="true" visible="eq(-2,true)"/>
-        <setting id="channels_mnu_preferidos" type="bool" label="Añadir opción [COLOR coral][B]Canales Preferidos[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="false" visible="eq(-3,true)"/>
-        <setting id="mnu_idiomas" type="bool" label="Añadir opción [COLOR yellowgreen][B]Idiomas[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="true" visible="eq(-4,true)"/>
-        <setting id="mnu_grupos" type="bool" label="Añadir opción [COLOR magenta][B]Grupos[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="true" visible="eq(-5,true)"/>
-        <setting id="mnu_pelis" type="bool" label="Añadir opción [COLOR deepskyblue][B]Películas[/B][/COLOR]" default="true" visible="eq(-6,true)"/>
-        <setting id="mnu_series" type="bool" label="Añadir opción [COLOR hotpink][B]Series[/B][/COLOR]" default="true" visible="eq(-7,true)"/>
-        <setting id="channels_link_pyse" type="bool" label="Añadir opción [COLOR teal][B]Películas y Series[/B][/COLOR] (solo los canales con Ambos Contenidos)" default="false" visible="eq(-8,true)"/>
-        <setting id="mnu_generos" type="bool" label="Añadir opción [COLOR thistle][B]Géneros[/B][/COLOR]" default="true" visible="eq(-9,true)"/>
-        <setting id="mnu_documentales" type="bool" label="Añadir opción [COLOR cyan][B]Documentales[/B][/COLOR]" default="true" visible="eq(-10,true)"/>
-        <setting id="mnu_infantiles" type="bool" label="Añadir opción [COLOR lightyellow][B]Infantiles[/B][/COLOR]" default="true" visible="eq(-11,true)"/>
-        <setting id="mnu_novelas" type="bool" label="Añadir opción [COLOR limegreen][B]Novelas[/B][/COLOR]" default="true" visible="eq(-12,true)"/>
-        <setting id="mnu_torrents" type="bool" label="Añadir opción [COLOR blue][B]Torrents[/B][/COLOR]" default="true" visible="eq(-13,true)"/>
-        <setting id="mnu_doramas" type="bool" label="Añadir opción [COLOR firebrick][B]Doramas[/B][/COLOR]" default="true" visible="eq(-14,true)"/>
-        <setting id="mnu_animes" type="bool" label="Añadir opción [COLOR springgreen][B]Animes[/B][/COLOR]" default="true" visible="eq(-15,true)"/>
-        <setting id="mnu_adultos" type="bool" label="Añadir opción [COLOR orange][B]Adultos[/B][/COLOR]" default="true" visible="eq(-16,true)"/>
-        <setting id="mnu_proxies" type="bool" label="Añadir opción [COLOR red][B]Proxies[/B][/COLOR] (solo los canales con [COLOR darkcyan]Proxies Memorizados[/COLOR])" default="false" visible="eq(-17,true)"/>
-        <setting id="mnu_clones" type="bool" label="Añadir opción [COLOR turquoise][B]Clones[/B][/COLOR] (solo los canales de este Tipo)" default="false" visible="eq(-18,true)"/>
-        <setting id="mnu_problematicos" type="bool" label="Añadir opción [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] (solo los canales Sin enlaces Disponibles/Válidos/No Soportados)" default="false" visible="eq(-19,true)"/>
-        <setting id="mnu_desactivados" type="bool" label="Añadir opción [COLOR gray][B]Desactivados[/B][/COLOR] (solo los canales que tenga [COLOR yellow]Desactivados[/COLOR])" default="false" visible="eq(-20,true)"/>
+        <setting id="mnu_sugeridos" type="bool" label="[COLOR aquamarine][B]Sugeridos[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="true" visible="eq(-1,true)"/>
+        <setting id="channels_link_main" type="bool" label="[COLOR gold][B]Canales[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="true" visible="eq(-2,true)"/>
+        <setting id="channels_mnu_preferidos" type="bool" label="[COLOR coral][B]Canales Preferidos[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="false" visible="eq(-3,true)"/>
+        <setting id="mnu_idiomas" type="bool" label="[COLOR yellowgreen][B]Idiomas[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="true" visible="eq(-4,true)"/>
+        <setting id="mnu_grupos" type="bool" label="[COLOR magenta][B]Grupos[/B][/COLOR] ([COLOR tan][B][I]Menús[/B][/COLOR] [COLOR yellow]Simplificado[/COLOR] y [COLOR tan]Predeterminado[/I][/COLOR])" default="true" visible="eq(-5,true)"/>
+        <setting id="mnu_pelis" type="bool" label="[COLOR deepskyblue][B]Películas[/B][/COLOR]" default="true" visible="eq(-6,true)"/>
+        <setting id="mnu_series" type="bool" label="[COLOR hotpink][B]Series[/B][/COLOR]" default="true" visible="eq(-7,true)"/>
+        <setting id="channels_link_pyse" type="bool" label="[COLOR teal][B]Películas y Series[/B][/COLOR] (solo los canales con Ambos Contenidos)" default="false" visible="eq(-8,true)"/>
+        <setting id="mnu_generos" type="bool" label="[COLOR thistle][B]Géneros[/B][/COLOR]" default="true" visible="eq(-9,true)"/>
+        <setting id="mnu_documentales" type="bool" label="[COLOR cyan][B]Documentales[/B][/COLOR]" default="true" visible="eq(-10,true)"/>
+        <setting id="mnu_infantiles" type="bool" label="[COLOR lightyellow][B]Infantiles[/B][/COLOR]" default="true" visible="eq(-11,true)"/>
+        <setting id="mnu_novelas" type="bool" label="[COLOR limegreen][B]Novelas[/B][/COLOR]" default="true" visible="eq(-12,true)"/>
+        <setting id="mnu_torrents" type="bool" label="[COLOR blue][B]Torrents[/B][/COLOR]" default="true" visible="eq(-13,true)"/>
+        <setting id="mnu_doramas" type="bool" label="[COLOR firebrick][B]Doramas[/B][/COLOR]" default="true" visible="eq(-14,true)"/>
+        <setting id="mnu_animes" type="bool" label="[COLOR springgreen][B]Animes[/B][/COLOR]" default="true" visible="eq(-15,true)"/>
+        <setting id="mnu_adultos" type="bool" label="[COLOR orange][B]Adultos[/B][/COLOR]" default="true" visible="eq(-16,true)"/>
+        <setting id="mnu_proxies" type="bool" label="[COLOR red][B]Proxies[/B][/COLOR] (solo los canales con [COLOR darkcyan]Proxies Memorizados[/COLOR])" default="false" visible="eq(-17,true)"/>
+        <setting id="mnu_clones" type="bool" label="[COLOR turquoise][B]Clones[/B][/COLOR] (solo los canales de este Tipo)" default="false" visible="eq(-18,true)"/>
+        <setting id="mnu_problematicos" type="bool" label="[COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] (solo canales Sin enlaces Disponibles/Válidos/No Soportados)" default="false" visible="eq(-19,true)"/>
+        <setting id="mnu_desactivados" type="bool" label="[COLOR gray][B]Desactivados[/B][/COLOR] (solo los canales que tenga [COLOR yellow]Desactivados[/COLOR])" default="false" visible="eq(-20,true)"/>
 
-        <setting label="Preferidos y Descargas en el Principal:" type="lsep"/>
+        <setting label="Menú Principal Preferidos y Descargas:" type="lsep"/>
 
         <setting id="ord_opciones" type="bool" label="Opciones" default="false"/>
-        <setting id="mnu_preferidos" type="bool" label="Añadir la opción [COLOR wheat][B]Preferidos[/B][/COLOR] ([COLOR tan][B][I]Menú[/B] Predeterminado[/I][/COLOR])" default="true" visible="eq(-1,true)"/>
-        <setting id="ord_preferidos" type="bool" label="Colocar la opción [COLOR wheat][B]Preferidos[/B][/COLOR] antes del [COLOR tan][B]Menú[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
-        <setting id="mnu_desargas" type="bool" label="Añadir la opción [COLOR seagreen][B]Descargas[/B][/COLOR] ([COLOR tan][B][I]Menú[/B] Predeterminado[/I][/COLOR])" default="true" visible="eq(-3,true)"/>
-        <setting id="ord_descargas" type="bool" label="Colocar la opción [COLOR seagreen][B]Descargas[/B][/COLOR] antes del [COLOR tan][B]Menú[/B][/COLOR]" default="false" visible="eq(-4,true)"/>
+        <setting id="mnu_preferidos" type="bool" label="[COLOR wheat][B]Preferidos[/B][/COLOR] ([COLOR tan][B][I]Menú[/B] Predeterminado[/I][/COLOR])" default="true" visible="eq(-1,true)"/>
+        <setting id="ord_preferidos" type="bool" label="[COLOR wheat][B]Preferidos[/B][/COLOR] Antes del [COLOR tan]Menú Predeterminado[/COLOR]" default="false" visible="eq(-2,true)"/>
 
-        <setting label="Otros Accesos en Principal, Menús y Sub-Menús:" type="lsep"/>
+        <setting id="mnu_desargas" type="bool" label="[COLOR seagreen][B]Descargas[/B][/COLOR] ([COLOR tan][B][I]Menú[/B] Predeterminado[/I][/COLOR])" default="true" visible="eq(-3,true)"/>
+        <setting id="ord_descargas" type="bool" label="[COLOR seagreen][B]Descargas[/B][/COLOR] Antes del [COLOR tan]Menú Predeterminado[/COLOR]" default="false" visible="eq(-4,true)"/>
+
+        <setting label="Otras Opciones en Principal, Menús y Sub-Menús:" type="lsep"/>
 
         <setting id="oams_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="mnu_search_proxy_channels" type="bool" label="Añadir acceso al detalle de Buscar [COLOR red][B]Nuevos Proxies[/B][/COLOR] ([COLOR tan][I]Principal y Sub-Menús[/I][/COLOR])" default="false" visible="eq(-1,true)"/>
-        <setting id="search_extra_proxies" type="bool" label="Añadir acceso al detalle de Búsquedas en Canales [COLOR red][B]Con Proxies[/B][/COLOR]" default="true" visible="eq(-2,true)"/>
-        <setting id="sub_mnu_favoritos" type="bool" label="Añadir acceso al detalle de [COLOR plum][B]Favoritos[/B][/COLOR] de su Media Center" default="false" visible="eq(-3,true)"/>
-        <setting id="search_extra_trailers" type="bool" label="Añadir acceso al detalle de [COLOR darkgoldenrod][B]Búsquedas de Tráilers[/B][/COLOR]" default="false" visible="eq(-4,true)"/>
-        <setting id="sub_mnu_news" type="bool" label="Añadir acceso al detalle de [COLOR darksalmon][B]Novedades[/B][/COLOR]" default="true" visible="eq(-5,true)"/>
-        <setting id="search_extra_main" type="bool" label="Añadir acceso al detalle de [COLOR violet][B]Búsquedas Especiales[/B][/COLOR] (Listas TMDB, etc.)" default="false" visible="eq(-6,true)"/>
-        <setting id="sub_mnu_special" type="bool" label="Añadir acceso al detalle de [COLOR darksalmon][B]Especiales[/B][/COLOR]" default="true" visible="eq(-7,true)"/>
+        <setting id="mnu_search_proxy_channels" type="bool" label="[COLOR tan]Principal, Menús y Sub-Menús[/COLOR] Buscar [COLOR red][B]Nuevos Proxies[/B][/COLOR]" default="false" visible="eq(-1,true)"/>
 
-        <setting id="sub_mnu_cfg_search" type="bool" label="Añadir acceso al detalle de [COLOR moccasin][B]Personalizar Búsquedas[/B][/COLOR]" default="true" visible="eq(-8,true)"/>
+        <setting id="search_extra_proxies" type="bool" label="[COLOR tan]Sub-Menús y Buscar[/COLOR] Búsquedas en Canales [COLOR red][B]Con Proxies[/B][/COLOR]" default="true" visible="eq(-2,true)"/>
+
+        <setting id="sub_mnu_favoritos" type="bool" label="[COLOR tan]Principal, Menús y Sub-Menús[/COLOR] [COLOR plum][B]Favoritos[/B][/COLOR] de su Media Center" default="false" visible="eq(-3,true)"/>
+
+        <setting id="sub_mnu_news" type="bool" label="[COLOR tan]Principal, Menús y Sub-Menús[/COLOR] [COLOR darksalmon][B]Novedades[/B][/COLOR]" default="true" visible="eq(-4,true)"/>
+
+        <setting id="sub_mnu_special" type="bool" label="[COLOR tan]Principal, Menús y Sub-Menús[/COLOR] [COLOR pink][B]Especiales[/B][/COLOR]" default="true" visible="eq(-5,true)"/>
+
+        <setting id="sub_mnu_cfg_search" type="bool" label="[COLOR tan]Sub-Menús y Buscar[/COLOR] [COLOR moccasin][B]Personalizar Búsquedas[/B][/COLOR]" default="true" visible="eq(-6,true)"/>
+
+        <setting id="search_extra_trailers" type="bool" label="[COLOR tan]Sub-Menús y Buscar[/COLOR] [COLOR darkgoldenrod][B]Búsqueda de Tráilers[/B][/COLOR]" default="false" visible="eq(-7,true)"/>
+
+        <setting id="search_extra_main" type="bool" label="[COLOR tan]Menús y Sub-Menús[/COLOR] [COLOR violet][B]Búsquedas y Listas[/B][/COLOR] (TMDB, Filmaffinity, etc.)" default="false" visible="eq(-8,true)"/>
     </category>
 
     <category label="Canales">
@@ -163,14 +170,15 @@
         <setting id="show_channels_list" type="action" label="[COLOR gold][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list)"/>
         <setting id="channels_suggesteds" type="action" label="[COLOR aquamarine][B]Sugeridos[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_suggesteds)"/>
         <setting id="search_no_searchables" type="action" label="Canales que [COLOR goldenrod][B]Nunca[/B][/COLOR] intervendrán en las búsquedas" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_no_searchables)"/>
-        <setting id="show_help_bloqueos1" type="action" label="¿ Qué hacer si su Operadora [COLOR yellowgreen][B]Bloquea[/B][/COLOR] algún Canal ?" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_bloqueos)"/>
-        <setting id="show_help_resto1" type="action" label="¿ Qué significa el Aviso [COLOR red][B]CloudFlare[/COLOR][COLOR orangered] Protection[/B][/COLOR] ?" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_resto)"/>
-        <setting id="show_help_notices" type="action" label="Canales con [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_notice)"/>
-        <setting id="channels_with_proxies" type="action" label="Canales que pueden necesitar [COLOR red][B]Proxies[/B][/COLOR]" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
-        <setting id="channels_with_proxies_memorized" type="action" label="Canales con [COLOR darkcyan][B]Proxies Memorizados[/B][/COLOR]" visible="eq(-12,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies_memorized)"/>
-        <setting id="show_help_cryptos" type="action" label="Canales que requieren [COLOR darksalmon][B]Descifrar Enlaces[/B][/COLOR]" visible="eq(-13,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_crypto)"/>
-        <setting id="show_channels_list_temporaries" type="action" label="[COLOR cyan][B][B]Temporalmente[/B][/COLOR] inactivos" visible="eq(-14,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list_temporaries)"/>
-        <setting id="show_channels_list_inactives" type="action" label="[COLOR coral][B]Inactivos[/B][/COLOR]" visible="eq(-15,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list_inactives)"/>
+        <setting id="show_help_tests" type="action" label="Métodos para [COLOR darkorange][B]Efectuar el Test Web[/B][/COLOR] de un canal" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_tests)"/>
+        <setting id="show_help_bloqueos1" type="action" label="¿ Qué hacer si su Operadora [COLOR yellowgreen][B]Bloquea[/B][/COLOR] algún Canal ?" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_bloqueos)"/>
+        <setting id="show_help_resto1" type="action" label="¿ Qué significa el Aviso [COLOR red][B]CloudFlare[/COLOR][COLOR orangered] Protection[/B][/COLOR] ?" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_resto)"/>
+        <setting id="show_help_notices" type="action" label="Canales con [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_notice)"/>
+        <setting id="channels_with_proxies" type="action" label="Canales que pueden necesitar [COLOR red][B]Proxies[/B][/COLOR]" visible="eq(-12,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
+        <setting id="channels_with_proxies_memorized" type="action" label="Canales con [COLOR darkcyan][B]Proxies Memorizados[/B][/COLOR]" visible="eq(-13,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies_memorized)"/>
+        <setting id="show_help_cryptos" type="action" label="Canales que requieren [COLOR darksalmon][B]Descifrar Enlaces[/B][/COLOR]" visible="eq(-14,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_crypto)"/>
+        <setting id="show_channels_list_temporaries" type="action" label="[COLOR cyan][B][B]Temporalmente[/B][/COLOR] inactivos" visible="eq(-15,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list_temporaries)"/>
+        <setting id="show_channels_list_inactives" type="action" label="[COLOR coral][B]Inactivos[/B][/COLOR]" visible="eq(-16,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list_inactives)"/>
 
         <setting label="Canales con Cuenta:" type="lsep"/>
 
@@ -253,16 +261,21 @@
         <setting label="Presentar Canales de Animes:" type="lsep"/>
 
         <setting id="cpan_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="channels_only_anime" type="action" label="Canales que pueden tener contenido de [COLOR springgreen][B]Animes[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_only_animes)"/>
-        <setting id="channels_exclusively_anime" type="action" label="Canales que tienen contenido [COLOR springgreen][B]Exclusivamente de Animes[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_exclusively_animes)"/>
-        <setting id="descartar_anime" type="bool" label="Descartar canales exclusivos de [COLOR springgreen][B]Animes[/B][/COLOR] en las listas de canales" default="false" visible="eq(-3,true)"/>
+        <setting id="animes_password" type="bool" label="[COLOR cyan][B]Solicitar[/B][/COLOR] PIN parental en los canales exclusivos de [COLOR springgreen][B]Animes[/B][/COLOR]" default="true" visible="eq(-1,true)"/>
+        <setting id="channels_only_anime" type="action" label="Canales que Pueden tener contenido de [COLOR springgreen][B]Animes[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_only_animes)"/>
+        <setting id="channels_exclusively_anime" type="action" label="Canales que tienen contenido [COLOR springgreen][B]Exclusivamente de Animes[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_exclusively_animes)"/>
+        <setting id="descartar_anime" type="bool" label="[COLOR goldenrod][B]Descartar[/B][/COLOR] canales exclusivos de [COLOR springgreen][B]Animes[/B][/COLOR] en las listas de canales" default="false" visible="eq(-4,true)"/>
 
-        <setting label="Presentar Canales de Adultos y Listas/Géneros para Adultos:" type="lsep"/>
+        <setting label="Presentar Canales de Adultos:" type="lsep"/>
 
         <setting id="cadu_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="channels_only_adults" type="action" label="Canales que pueden tener contenido para [COLOR orange][B]Adultos[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_only_adults)"/>
-        <setting id="channels_exclusively_adults" type="action" label="Canales que tienen contenido [COLOR orange][B]Exclusivamente para Adultos[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_exclusively_adults)"/>
-        <setting id="descartar_xxx" type="bool" label="Descartar canales exclusivos de [COLOR orange][B]Adultos y Listas/Géneros[/B][/COLOR] con ese contenido" default="false" visible="eq(-3,true)"/>
+        <setting id="channels_exclusively_adults" type="action" label="Canales que tienen contenido [COLOR orange][B]Exclusivamente para Adultos[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_exclusively_adults)"/>
+
+        <setting label="Presentar Canales con Listas/Géneros para Adultos:" type="lsep"/>
+
+        <setting id="cadx_opc" type="bool" label="Opciones" default="false"/>
+        <setting id="channels_only_adults" type="action" label="Canales que Pueden tener contenido para [COLOR orange][B]Adultos[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_only_adults)"/>
+        <setting id="descartar_xxx" type="bool" label="[COLOR goldenrod][B]Descartar[/B][/COLOR] canales con [COLOR orange][B]Listas/Géneros para Adultos[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
     </category>
 
     <category label="Dominios">
@@ -302,7 +315,6 @@
         <setting id="opc_elifilms" type="action" label="[COLOR gold]EliFilms[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_elifilms)"/>
         <setting id="opc_elitetorrent" type="action" label="[COLOR gold]EliteTorrent[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_elitetorrent)"/>
         <setting id="opc_elitetorrentnz" type="action" label="[COLOR gold]EliteTorrentNz[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_elitetorrentnz)"/>
-        <setting id="opc_ennovelas" type="action" label="[COLOR gold]EnNovelas[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_ennovelas)"/>
         <setting id="opc_ennovelas_tv" type="action" label="[COLOR gold]EnNovelasTv[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_ennovelastv)"/>
         <setting id="opc_entrepeliculasyseries" type="action" label="[COLOR gold]EntrePeliculasySeries[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_entrepeliculasyseries)"/>
 
@@ -355,6 +367,7 @@
 
         <setting id="opc_todotorrents" type="action" label="[COLOR gold]TodoTorrents[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_todotorrents)"/>
 
+        <setting id="opc_vernovelas" type="action" label="[COLOR gold]VerNovelas[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_vernovelas)"/>
         <setting id="opc_veronline" type="action" label="[COLOR gold]VerOnline[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_veronline)"/>
     </category>
 
@@ -439,7 +452,7 @@
         <setting id="autoplay_max_links" type="labelenum" label="Número máximo de enlaces para intentar el auto play" values="3|5|10|15|20|25|30" default="10" visible="eq(-2,true)"/>
         <setting id="autoplay_one_link" type="bool" label="Si solo hay [COLOR gold][B]Un enlace[/B][/COLOR] para reproducir efectuar Auto play" default="true" visible="eq(-3,true)"/>
         <setting id="show_servers_list1" type="action" label="Servidores que están [COLOR darkorange][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_servers_list)"/> 
-        <setting id="autoplay_channels_discarded" label="Canales Sin Auto Play (separados por comas)" type="text" default="" visible="eq(-5,true)"/>
+        <setting id="autoplay_channels_discarded" label="Canales [COLOR goldenrod][B]Sin Auto Play[/B][/COLOR] (Nombre de cada Canal separados por coma)" type="text" default="" visible="eq(-5,true)"/>
 
         <setting label="Ordenar y/ó Filtrar por Idioma:" type="lsep"/>
 
@@ -457,9 +470,9 @@
 
         <setting id="pfil_opc" type="bool" label="Opciones" default="false"/>
         <setting id="show_servers_list2" type="action" label="Servidores que están [COLOR darkorange][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_servers_list)"/> 
-        <setting id="servers_preferred" label="Servidores [COLOR darkorange][B]Preferidos[/B][/COLOR] (separados por comas)" type="text" default="" visible="eq(-2,true)"/>
-        <setting id="servers_unfavored" label="Servidores como [COLOR gold][B]Última opción[/B][/COLOR] (separados por comas)" type="text" default="" visible="eq(-3,true)"/>
-        <setting id="servers_discarded" label="Servidores [COLOR cyan][B]Descartados[/B][/COLOR] (separados por comas)" type="text" default="" visible="eq(-4,true)"/>
+        <setting id="servers_preferred" label="Servidores [COLOR darkorange][B]Preferidos[/B][/COLOR] (Nombre de cada Servidos separados por coma)" type="text" default="" visible="eq(-2,true)"/>
+        <setting id="servers_unfavored" label="Servidores como [COLOR gold][B]Última opción[/B][/COLOR] (Nombre de cada Servidos separados por coma)" type="text" default="" visible="eq(-3,true)"/>
+        <setting id="servers_discarded" label="Servidores [COLOR cyan][B]Descartados[/B][/COLOR] (Nombre de cada Servidos separados por coma)" type="text" default="" visible="eq(-4,true)"/>
 
         <setting label="Notificaciones:" type="lsep"/>
 
@@ -497,7 +510,7 @@
         <setting id="proxies_recommended" type="bool" label="Solo tener en cuenta en las Búsquedas los Proveedores [COLOR lime][B]Recomendados[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
         <setting id="proxies_search_extended" type="bool" label="Tratar Primero en las Búsquedas los Proveedores de la [COLOR aqua][B]Lista Ampliada[/B][/COLOR]" default="false" visible="eq(-3,true)"/>
         <setting id="show_help_providers3" type="action" label="Qué Proveedores de Proxies están [COLOR goldenrod][B]Disponibles[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_providers)"/>
-        <setting id="providers_preferred" label="Tratar [COLOR springgreen][B]Solo[/B][/COLOR] los Proveedores [COLOR wheat][B]Preferidos[/B][/COLOR] (separados por comas)" type="text" default="" visible="eq(-5,true)"/>
+        <setting id="providers_preferred" label="Tratar [COLOR springgreen][B]Solo[/B][/COLOR] los Proveedores [COLOR wheat][B]Preferidos[/B][/COLOR] (Nombre de cada Proveedor separados por coma)" type="text" default="" visible="eq(-5,true)"/>
 
         <setting label="Canales:" type="lsep"/>
 
@@ -574,8 +587,8 @@
         <setting label="Información Buscar:" type="lsep"/>
 
         <setting id="ibl_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="show_help_parameters1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=search&action=show_help_parameters)"/>
-        <setting id="show_help_search" type="action" label="Información sobre [COLOR yellow][B]Búsquedas[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=search&action=show_help)"/>
+        <setting id="show_help_parameters_search1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_parameters_search)"/>
+        <setting id="show_help_search" type="action" label="Información sobre [COLOR yellow][B]Búsquedas[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_search)"/>
         <setting id="show_help_audios2" type="action" label="Información [COLOR yellowgreen][B]Idiomas[/COLOR] [COLOR mediumaquamarine](Audios en los Vídeos)[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_audios)"/>
         <setting id="show_help_tmbdblist" type="action" label="Información [COLOR violet][B]búsquedas y Listas en TMDB[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=tmdblists&action=show_help)"/>
         <setting id="show_help_filmaffinitylists" type="action" label="Información [COLOR violet][B]búsquedas y Listas en Filmaffinity[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=filmaffinitylists&action=show_help)"/>
@@ -644,7 +657,7 @@
 
         <setting id="busc_opi" type="bool" label="Opciones" default="false"/>
         <setting id="search_no_channels_inestables" type="action" label="Canales que están [COLOR plum][B]Inestables[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_inestables)"/>
-        <setting id="search_no_inestables" type="bool" label="[COLOR goldenrod][B]Descarta[/B][/COLOR]r las búsquedas en los canales [COLOR plum][B]Inestables[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
+        <setting id="search_no_inestables" type="bool" label="[COLOR goldenrod][B]Descartar[/B][/COLOR] las búsquedas en los canales [COLOR plum][B]Inestables[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
 
         <setting label="Búsquedas en Canales Problemáticos:" type="lsep"/>
 
@@ -669,13 +682,13 @@
         <setting label="Acciones al Procesar:" type="lsep"/>
 
         <setting id="buse_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="sub_mnu_cfg_prox_search" type="bool" label="Añadir acceso al detalle de [COLOR moccasin][B]Personalizar Próximas Búsquedas[/B][/COLOR]" default="true" visible="eq(-1,true)"/>
+        <setting id="sub_mnu_cfg_prox_search" type="bool" label="Añadir acceso a [COLOR moccasin][B]Personalizar Próximas Búsquedas[/B][/COLOR]" default="true" visible="eq(-1,true)"/>
         <setting id="search_dialog" type="bool" label="Activar [COLOR yellow][B]Buscar Exacto ó Parecido[/B][/COLOR] en los resultados de las Búsquedas" default="true" visible="eq(-2,true)"/>
         <setting id="search_no_work_proxies" type="bool" label="[COLOR cyan][B]Notificar[/B][/COLOR] en qué canales No han funcionado los [COLOR red][B]Proxies[/B][/COLOR]" default="false" visible="eq(-3,true)"/>
         <setting id="search_no_results_proxies" type="bool" label="Presentar en qué canales deberá obtener [COLOR red][B]Nuevamente Proxies[/B][/COLOR]" default="true" visible="eq(-4,true)"/>
         <setting id="search_no_results" type="bool" label="Presentar los canales [COLOR coral][B]Sin Resultados[/B][/COLOR] en la Búsqueda" default="false" visible="eq(-5,true)"/>
-        <setting id="search_no_channels" type="bool" label="Notificar y presentar los canales [COLOR goldenrod][B]Ignorados[/B][/COLOR] en la Búsqueda" default="false" visible="eq(-6,true)"/>
-        <setting id="search_multithread" type="bool" label="Activar Multithread" default="true" visible="eq(-7,true)"/>
+        <setting id="search_no_channels" type="bool" label="Notificar y Presentar los canales [COLOR goldenrod][B]Ignorados[/B][/COLOR] en la Búsqueda" default="false" visible="eq(-6,true)"/>
+        <setting id="search_multithread" type="bool" label="Activar [COLOR gold][B]Multi Thread[/B][/COLOR] (ventana acceso Multi Canales)" default="true" visible="eq(-7,true)"/>
     </category>
 
     <category label="Preferidos">
@@ -960,11 +973,21 @@
         <setting id="manto_pro" type="bool" label="Opciones" default="false"/>
         <setting id="erase_cookies" type="bool" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero de [COLOR yellowgreen][B]Cookies[/B][/COLOR] al [COLOR goldenrod][B]Iniciar[/B][/COLOR] su Media Center" default="false" visible="eq(-1,true)"/>
         <setting id="ver_stable_chrome" type="bool" label="[COLOR darkorange][B]Obtener y Usar[/B][/COLOR] la versión más Reciente/Estable de Chrome/Chromium" default="true" visible="eq(-2,true)"/>
-        <setting id="httptools_timeout" type="labelenum" label="Valores para el [COLOR yellow][B]Timeout[/B][/COLOR] (tiempo máximo de espera en accesos)" values="0|5|10|15|20|25|30" default="15" visible="eq(-3,true)"/>
-        <setting id="notification_d_ok" type="bool" label="Confirmar con el Botón pulsar 'OK' en ciertas [COLOR violet][B]Notificaciones[/B][/COLOR]" default="false" visible="eq(-4,true)"/>
-        <setting id="notification_beep" type="bool" label="Emitir un [COLOR springgreen][B]Sonido[/B][/COLOR] al mostrar Avisos/Notificaciones" default="false" visible="eq(-5,true)"/>
-        <setting id="channels_repeat" type="labelenum" label="Tiempo de espera en los [COLOR cyan][B]Reintentos[/B][/COLOR] en el acceso a ciertos [COLOR gold][B]Canales[/B][/COLOR]" values="0|5|10|15|20|25|30|40|50|60" default="30" visible="eq(-6,true)"/>
-        <setting id="servers_waiting" type="labelenum" label="Tiempo de espera en el acceso a ciertos [COLOR gold][B]Servidores[/B][/COLOR]" values="1|2|3|4|5|6|7|8|9" default="6" visible="eq(-7,true)"/>
+
+        <setting id="notification_d_ok" type="bool" label="Confirmar con el Botón pulsar 'OK' en ciertas [COLOR violet][B]Notificaciones[/B][/COLOR]" default="false" visible="eq(-3,true)"/>
+        <setting id="notification_beep" type="bool" label="Emitir un [COLOR springgreen][B]Sonido[/B][/COLOR] al mostrar Avisos/Notificaciones" default="false" visible="eq(-4,true)"/>
+
+        <setting label="Tiempos de Espera:" type="lsep"/>
+
+        <setting id="manto_tde" type="bool" label="Opciones" default="false"/>
+
+        <setting id="httptools_timeout" type="labelenum" label="[COLOR goldenrod][B]Time Out[/B][/COLOR] Accesos [COLOR gold][B]Canales[/B][/COLOR] (tiempo máximo, por defecto 15)" values="0|5|10|15|20|25|30" default="15" visible="eq(-1,true)"/>
+
+        <setting id="search_timeout" type="labelenum" label="[COLOR goldenrod][B]Time Out[/B][/COLOR] Accesos [COLOR yellow][B]Buscar[/B][/COLOR] (tiempo máximo, por defecto 3)" values="1|2|3|4|5|6|7|8|9|10" default="5" visible="eq(-2,true)"/>
+
+        <setting id="channels_repeat" type="labelenum" label="[COLOR goldenrod][B]Time Out[/B][/COLOR] Accesos [COLOR cyan][B]Reintentos[/B][/COLOR] en ciertos [COLOR gold][B]Canales[/B][/COLOR] (tiempo máximo, por defecto 30)" values="5|10|15|20|25|30|35|40|45|50|55|60" default="30" visible="eq(-3,true)"/>
+
+        <setting id="servers_waiting" type="labelenum" label="[COLOR darkorange][B]Time[/B][/COLOR] Accesos a ciertos [COLOR fuchsia][B]Servidores[/B][/COLOR] (tiempo, por defecto 6)" values="1|2|3|4|5|6|7|8|9" default="6" visible="eq(-4,true)"/>
 
         <setting label="Depuración:" type="lsep"/>
 

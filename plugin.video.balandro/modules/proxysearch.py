@@ -87,7 +87,7 @@ dominioshdfull = [
          ]
 
 dominiosplaydede = [
-         'https://www10.playdede.link/'
+         'https://www11.playdede.link/'
          ]
 
 channels_poe = [

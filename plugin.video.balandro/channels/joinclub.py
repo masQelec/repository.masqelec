@@ -83,7 +83,7 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', thumbnail=config.get_thumb('joinclub'), text_color='turquoise' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', text_color='turquoise' ))
 
     platformtools.itemlist_refresh()
 

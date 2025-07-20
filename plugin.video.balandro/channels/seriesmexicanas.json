@@ -1,0 +1,17 @@
+{
+  "id": "seriesmexicanas",
+  "name": "SeriesMexicanas",
+  "thumbnail": "seriesmexicanas.jpg",
+
+  "active": false,
+
+  "searchable": true,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["lasts", "years", "vos", "tales"],
+
+  "notes": "Web ANULADA. Web dedicada exclusivamente en Novelas. Series por Géneros."
+}

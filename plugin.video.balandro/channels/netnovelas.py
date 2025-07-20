@@ -7,10 +7,10 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-# ~ 18/4/25  Las Pelis NO se tratan porque hay pocas y SIN enlaces
+# ~ 19/6/25  Las Pelis NO se tratan porque hay pocas y SIN enlaces válidos
 
 
-host = 'https://ts.ennovelas.net/'
+host = 'https://ennovelas.net/'
 
 
 perpage = 25
@@ -18,7 +18,7 @@ perpage = 25
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://ennovelas.net/', 'https://ennovelas.app/']
+    ant_hosts = ['https://ennovelas.app/', 'https://ts.ennovelas.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -356,7 +356,7 @@ def findvideos(item):
 
             other = ''
 
-            if servidor == 'various': other = servertools.corregir_other(link)
+            if servidor == 'various': other = servertools.corregir_other(url)
 
             itemlist.append(Item( channel=item.channel, action = 'play', server = servidor, url = url, language = lang, other = other.capitalize() ))
 
@@ -364,6 +364,40 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    servidor = item.server
+
+    if url.startswith("https://sb"):
+        return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+    if '.p2pstream.' in url: url = ''
+
+    if '/player.php?h=' in url:
+        data = do_downloadpage(url)
+
+        url = scrapertools.find_single_match(data, "var url = '(.*?)'")
+
+        if url:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+    if url:
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

@@ -484,12 +484,11 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(new_url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
-        if servidor:
-           itemlist.append(item.clone(server = servidor, url = new_url))
-        else:
-           itemlist.append(item.clone(server = 'directo', url = new_url))
+        itemlist.append(item.clone(server = servidor, url = new_url))
 
     return itemlist
 

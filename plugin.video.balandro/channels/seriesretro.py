@@ -562,9 +562,7 @@ def findvideos(item):
 
         if not servidor or not url: continue
 
-        if 'lamovie' in servidor: continue
-
-        elif 'opción' in servidor:
+        if 'opción' in servidor:
             link_other = servidor
             servidor = 'directo'
         elif servidor == 'anavids':
@@ -716,7 +714,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 

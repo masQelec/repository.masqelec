@@ -3,15 +3,15 @@
   "name": "PelisySeries",
   "thumbnail": "pelisyseries.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["movie", "torrent"],
+  "categories": ["movie", "tvshow", "torrent"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["inestable", "notice", "torrents", "rankings", "years", "qualityes", "countries", "kids", "vos", "anime", "4k"],
+  "clusters": ["notice", "torrents", "rankings", "years", "languages", "qualityes", "countries", "producers", "kids", "vos", "anime", "4k"],
 
-  "notes": "Web ANULADA. Canal con enlaces Streaming y Torrent. Películas por géneros, año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Canal con enlaces Streaming y Torrent. Películas por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

@@ -25,9 +25,13 @@ def mainlist_series(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     titulo = 'dorama, anime, ova, manga ...'
     text_color = 'hotpink'
@@ -292,6 +296,14 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, 'Seeds:.*?"stats.*?">(\d+)<.*?Peers:.*?"stats.*?">(\d+)<.*?descargar_torrent.*?href=\'(.*?)\'')
@@ -305,7 +317,11 @@ def findvideos(item):
             if servidor:
                 url = item.url_tor
 
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Vose' ))
+                age = ''
+                if item.url_tor.startswith('magnet:?'): age = 'Magnet'
+
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
+                                      language = 'Vose', age = age ))
 
                 return itemlist
 
@@ -314,8 +330,12 @@ def findvideos(item):
     for seeds, peers, url in matches:
         ses += 1
 
+        age = ''
+
         if url.endswith('.torrent'): servidor = 'torrent'
-        elif url.startswith('magnet:?'): servidor = 'torrent'
+        elif url.startswith('magnet:?'):
+           servidor = 'torrent'
+           age = 'Magnet'
         else:
            servidor = servertools.get_server_from_url(url)
            servidor = servertools.corregir_servidor(servidor)
@@ -324,19 +344,25 @@ def findvideos(item):
 
            if servidor == 'directo': continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Vose' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
+                              language = 'Vose', age = age ))
 
     match = scrapertools.find_single_match(data, 'Magnet Link:.*?<a href="(.*?)"')
 
     if match:
+        age = ''
+
         if match.endswith('.torrent'): servidor = 'torrent'
-        elif match.startswith('magnet:?'): servidor = 'torrent'
+        elif match.startswith('magnet:?'):
+           servidor = 'torrent'
+           age = 'Magnet'
         else: servidor = ''
 
         match = match.replace('&amp;', '&')
 
         if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = match, server = servidor, language = 'Vose' ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = match, server = servidor,
+                                  language = 'Vose', age = age ))
 
     if not itemlist:
         matches = scrapertools.find_multiple_matches(data, 'FlashVars.*?text=https.*?https(.*?)">')

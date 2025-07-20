@@ -34,7 +34,7 @@ channels_currents = [
         'poseidonhd2',
         'series24', 'serieskao', 'seriespapayato', 'seriesplus', 'srnovelas', 'subtorrents',
         'todotorrents',
-        'veronline'
+        'vernovelas', 'veronline'
         ]
 
 dominioshdfull = [
@@ -84,7 +84,7 @@ ant_hosts_hdfull = [
 
 
 dominiosplaydede = [
-         'https://www10.playdede.link/'
+         'https://www11.playdede.link/'
          ]
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -2975,6 +2975,52 @@ def test_domain_todotorrents(item):
         platformtools.dialog_notification(config.__addon_name + ' - TodoTorrents', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
+def manto_domain_vernovelas(item):
+    logger.info()
+
+    channel_json = 'vernovelas.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando VerNovelas[/B][/COLOR]' % color_exec)
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_vernovelas(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('vernovelas')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('VerNovelas')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - VerNovelas', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
 def manto_domain_veronline(item):
     logger.info()
 
@@ -3528,6 +3574,16 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://todotorrents.': return
+
+    elif id == 'vernovelas':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio VerNovelas  -->  [COLOR %s]https://???.???.???/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://': return
 
     elif id == 'veronline':
         config.set_setting('user_test_channel', '')

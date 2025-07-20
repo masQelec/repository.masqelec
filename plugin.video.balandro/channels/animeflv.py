@@ -73,9 +73,13 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -340,6 +344,14 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     if not item.search_type == 'tvshow':
         if not '-1' in item.url: item.url = item.url.replace('/anime/', '/ver/') + '-1'
