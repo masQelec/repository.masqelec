@@ -90,8 +90,7 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(title, '(\d{4})')
-        if not year: year = '-'
-        else: title = title.replace('(' + year + ')', '').strip()
+        title = title.replace('(' + year + ')', '').strip()
 
         SerieName = title
 
@@ -143,8 +142,7 @@ def last_epis(item):
         title = title.replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&amp;', '').replace('amp;', '').replace('quot;', '').strip()
 
         year = scrapertools.find_single_match(title, '(\d{4})')
-        if not year: year = '-'
-        else: title = title.replace('(' + year + ')', '').strip()
+        title = title.replace('(' + year + ')', '').strip()
 
         season = 1
 

@@ -180,6 +180,8 @@ def list_all(item):
                                             contentSerieName=SerieName, contentType='tvshow', infoLabels={'year': year} ))
 
         else:
+            title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                         contentSerieName=SerieName, contentType='tvshow', infoLabels={'year': year} ))
 
@@ -300,7 +302,7 @@ def episodios(item):
         episode = scrapertools.find_single_match(url, '-capitulo-(.*?)/')
         if not episode: episode = 1
 
-        title = str(item.contentSeason) + 'x' + str(episode) + ' ' + item.contentSerieName
+        title = str(item.contentSeason) + 'x' + str(episode) + ' ' + item.contentSerieName.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
         if '-' in episode: episode = episode.replace('-', '').strip()
 

@@ -142,7 +142,10 @@ def episodios(item):
         season = '1'
 
         epi = scrapertools.find_single_match(url, '-episode-(.*?)/')
+        if not epi: epi = scrapertools.find_single_match(url, '-ep-(.*?)/')
         if not epi: epi = '1'
+
+        if '-' in epi: epi = epi.split("-")[0]
 
         title = str(season) + 'x' + str(epi) + ' ' + item.contentSerieName
 
@@ -204,16 +207,22 @@ def findvideos(item):
                 link = servertools.normalize_url(servidor, link)
 
                 other = ''
-                if servidor == 'various': other = servertools.corregir_other(link)
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title='', url=link, language='Vo', other=other ))
+                if servidor == 'various': other = servertools.corregir_other(link)
+                elif servidor == 'zures': other = servertools.corregir_zures(link)
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title='', url=link,
+                                      language='Vo', other=other.capitalize() ))
 
             continue
 
         other = ''
-        if servidor == 'various': other = servertools.corregir_other(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title='', url=url, language='Vo', other=other ))
+        if servidor == 'various': other = servertools.corregir_other(url)
+        elif servidor == 'zures': other = servertools.corregir_zures(url)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title='', url=url,
+                              language='Vo', other=other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -247,7 +256,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

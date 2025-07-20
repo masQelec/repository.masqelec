@@ -10,13 +10,14 @@ from core import httptools, scrapertools, servertools, tmdb
 # ~ pelis No hay 24/12/2023
 
 
-host = 'https://novelashd.ennovelas-tv.com/'
+host = 'https://enn.ennovelas-tv.com/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://c.ennovelas-tv.com/', 'https://d.ennovelas-tv.com/', 'https://e.ennovelas-tv.com/',
              'https://f.ennovelas-tv.com/', 'https://g.ennovelas-tv.com/', 'https://h.ennovelas-tv.com/',
-             'https://i.ennovelas-tv.com/', 'https://j.ennovelas-tv.com/', 'https://k.ennovelas-tv.com/']
+             'https://i.ennovelas-tv.com/', 'https://j.ennovelas-tv.com/', 'https://k.ennovelas-tv.com/',
+             'https://novelashd.ennovelas-tv.com/', 'https://novelass.ennovelas-tv.com/']
 
 
 domain = config.get_setting('dominio', 'ennovelastv', default='')
@@ -747,7 +748,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 

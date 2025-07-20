@@ -9,7 +9,7 @@
   "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["movie", "tvshow"],
-  "language": ["lat", "vose"],
+  "language": ["cast", "lat", "vose"],
 
   "clusters": ["suggested", "current", "news", "rankings", "years", "lasts", "docs", "anime", "dorama", "vos"],
 

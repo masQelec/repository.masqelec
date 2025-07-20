@@ -247,21 +247,24 @@ def play(item):
 
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
-                if not new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
-            if servidor and servidor != 'directo':
-                servidor = servertools.corregir_servidor(servidor)
+            servidor = servertools.corregir_servidor(servidor)
 
-                url = servertools.normalize_url(servidor, url)
+            url = servertools.normalize_url(servidor, url)
 
-                itemlist.append(item.clone( url=url, server=servidor ))
+            itemlist.append(item.clone( url=url, server=servidor ))
 
     else:
         servidor = servertools.get_server_from_url(item.url)
 
         if servidor == 'directo':
-            new_server = servertools.corregir_other(item.url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         if servidor:
             if '.fembed.' in item.url:

@@ -333,7 +333,23 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://hlsflex.com/([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://swiftplayers.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://swiftplayers.com/([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://stbhg.click/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://stbhg.click/([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
@@ -341,7 +357,23 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://dhcplay.com/([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://hlsflex.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://hlsflex.com/([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://gradehgplus.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://gradehgplus.com/([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
@@ -410,6 +442,18 @@
       },
       {
         "pattern": "https://smoothpre.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://movearnpre.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://seraphinap.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://seraphinapl.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://filelions.to/f/\\1"
       },
       {
@@ -622,6 +666,14 @@
       },
       {
         "pattern": "(https://goodstream.)(?:uno|one)/embed-([0-9a-zA-Z]+)",
+        "url": "https://goodstream.uno/\\2"
+      },
+      {
+        "pattern": "(https://goodstream.)(?:uno|one)/e/([0-9a-zA-Z]+)",
+        "url": "https://goodstream.uno/\\2"
+      },
+      {
+        "pattern": "(https://goodstream.)(?:uno|one)/d/([0-9a-zA-Z]+)",
         "url": "https://goodstream.uno/\\2"
       },
       {

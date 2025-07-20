@@ -8,25 +8,26 @@ from core import httptools, scrapertools, servertools, tmdb
 
 
 from lib.pyberishaes import GibberishAES
+from lib import decrypters
 
 
-host = 'https://b1.cuevana3.vip'
+host = 'https://cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://wlv.cuevana3.vip',
              'https://wli3.cuevana3.vip', 'https://wnv3.cuevana3.vip', 'https://wn3.cuevana3.vip',
              'https://wv3i.cuevana3.vip', 'https://wmi.cuevana3.vip', 'https://wi3v.cuevana3.vip',
-             'https://wev3.cuevana3.vip', 'https://wl3n.cuevana3.vip', 'https://cuevana3.vip',
-             'https://wiw3.cuevana3.vip', 'https://wmi3.cuevana3.vip', 'https://wn3l.cuevana3.vip', 
-             'https://imu.cuevana3.vip', 'https://wni3.cuevana3.vip', 'https://mvi.cuevana3.vip',
-             'https://wi3n.cuevana3.vip', 'https://wi3m.cuevana3.vip', 'https://im3.cuevana3.vip',
-             'https://iv3.cuevana3.vip', 'https://lm3.cuevana3.vip', 'https://ww3v.cuevana3.vip',
-             'https://ww3u.cuevana3.vip', 'https://wl3v.cuevana3.vip', 'https://wv3n.cuevana3.vip',
-             'https://wl3r.cuevana3.vip', 'https://me3.cuevana3.vip', 'https://me4.cuevana3.vip',
-             'https://mia.cuevana3.vip', 'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip',
-             'https://zz.cuevana3.vip', 'https://gx.cuevana3.vip', 'https://tv.cuevana3.vip',
-             'https://tv8.cuevana3.vip']
+             'https://wev3.cuevana3.vip', 'https://wl3n.cuevana3.vip', 'https://wiw3.cuevana3.vip', 
+             'https://wmi3.cuevana3.vip', 'https://wn3l.cuevana3.vip', 'https://imu.cuevana3.vip',
+             'https://wni3.cuevana3.vip', 'https://mvi.cuevana3.vip', 'https://wi3n.cuevana3.vip',
+             'https://wi3m.cuevana3.vip', 'https://im3.cuevana3.vip', 'https://iv3.cuevana3.vip',
+             'https://lm3.cuevana3.vip', 'https://ww3v.cuevana3.vip', 'https://ww3u.cuevana3.vip', 
+             'https://wl3v.cuevana3.vip', 'https://wv3n.cuevana3.vip', 'https://wl3r.cuevana3.vip',
+             'https://me3.cuevana3.vip', 'https://me4.cuevana3.vip', 'https://mia.cuevana3.vip',
+             'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip', 'https://zz.cuevana3.vip',
+             'https://gx.cuevana3.vip', 'https://tv.cuevana3.vip', 'https://tv8.cuevana3.vip',
+             'https://b1.cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')
@@ -1026,6 +1027,9 @@ def play(item):
             url = ''
 
         if not url:
+            url = decrypters.decode_decipher(crypto, bytes)
+
+        if not url:
             if crypto.startswith("http"):
                 url = crypto.replace('\\/', '/')
 
@@ -1061,7 +1065,9 @@ def play(item):
 
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
-                if new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
             itemlist.append(item.clone(server = servidor, url = url))
 
@@ -1078,7 +1084,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
     itemlist.append(item.clone(server = servidor, url = url))
 

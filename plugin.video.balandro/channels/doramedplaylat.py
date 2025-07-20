@@ -57,12 +57,12 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'tvshows/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Subtituladas', action = 'list_all', url = sub_host + 'tvshows/', sub_host = True, search_type = 'tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulados', action = 'list_all', url = sub_host + 'tvshows/', sub_host = True, search_type = 'tvshow', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Destacadas', action = 'list_all', url = sub_host + 'ratings/', sub_host = True, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Destacados', action = 'list_all', url = sub_host + 'ratings/', sub_host = True, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias-2/?get=tv', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings-2/?get=tv', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'tendencias-2/?get=tv', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'ratings-2/?get=tv', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 

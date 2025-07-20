@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.17 [/COLOR] [COLOR chartreuse] 20 de Mayo de 2025[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.19 [/COLOR] [COLOR chartreuse] 15 de Julio de 2025[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Tutoriales, Sugerencias, etc.
@@ -50,9 +50,7 @@
  [COLOR yellowgreen][B]CANALES QUE REQUIEREN REGISTRARSE (Cuenta):[/B][/COLOR]
     HdFull,  PlayDede
 
- [COLOR greenyellow][B]CANALES PROBLEMATICOS:[/B][/COLOR]
-    [COLOR springgreen][B]Son en los que Predominan Sin enlaces Disponibles, Invalidos y/o Servidores No Soportados[/B][/COLOR]
-    Mega1Link
+ [COLOR greenyellow][B]CANALES PROBLEMATICOS:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
  [COLOR sienna][B]SITUACION SERVIDORES:[/B][/COLOR]
     [COLOR tomato]Vea la lista en la Ayuda [B]Ultimos Cambios de Dominios[/B][/COLOR]

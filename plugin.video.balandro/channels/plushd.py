@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re, base64
+import re, base64, time
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -42,30 +42,30 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True, timeout=None):
     hay_proxies = False
     if config.get_setting('channel_plushd_proxies', default=''): hay_proxies = True
 
     if '/year/' in url: raise_weberror = False
 
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
         if hay_proxies:
-            data = httptools.downloadpage_proxy('plushd', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+            data = httptools.downloadpage_proxy('plushd', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         else:
-            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
-        if not data:
-            if not 'search?buscar=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+    if not data:
+        if not 'search?buscar=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
-                timeout = config.get_setting('channels_repeat', default=30)
+            timeout = config.get_setting('channels_repeat', default=30)
 
-                if hay_proxies:
-                    data = httptools.downloadpage_proxy('plushd', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                else:
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('plushd', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -476,13 +476,25 @@ def findvideos(item):
 
         data = do_downloadpage(link)
 
+        if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
+            espera = 5
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd [COLOR yellow][B]Saturado[/B][/COLOR]', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+            time.sleep(espera)
+
+            data = do_downloadpage(link, timeout=timeout)
+
+            if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
+                time.sleep(espera)
+
+                data = do_downloadpage(link, timeout=timeout)
+
         url = scrapertools.find_single_match(data, "(?i)Location.href = '([^']+)'")
 
         if not url: continue
-
-        if 'Estas saturando la red se te dará un bloqueo temporal' in str(data) or '&quot;' in str(url):
-            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd Saturado', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-            data = do_downloadpage(link)
 
         if 'up.asdasd' in url:
             url = scrapertools.find_single_match(url, '.site(.*?)$')
@@ -511,10 +523,10 @@ def findvideos(item):
     if not itemlist:
         if not ses == 0:
             if ses == len(matches):
-                platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Sin Localizar Enlaces [COLOR yellow]Re-Intentelo[/B][/COLOR]')
+                platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B]Re-Intentelo[/B] de nuevo[/COLOR]', '[COLOR cyan][B]Sin Localizar Enlaces[/B][/COLOR]')
             else:
                 if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
-                    platformtools.dialog_notification(config.__addon_name, '[COLOR yellowgreen][B]Red Saturada [COLOR yellow]Re-Intentelo[/B][/COLOR]')
+                    platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B]Re-Intentelo[/B] de nuevo[/COLOR]', '[COLOR yellowgreen][B]Red Satura[/B][/COLOR]')
                 else:
                     platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return

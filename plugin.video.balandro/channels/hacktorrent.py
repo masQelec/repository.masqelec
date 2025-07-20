@@ -157,7 +157,7 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
-            if '/series?' in item.url:
+            if '/series?' in item.url or '/serie/':
                 ref = host + 'serie/' + url + '/'
 
                 url = host + 'wp-json/wpreact/v1/serie/' + url + '/related/'
@@ -212,27 +212,33 @@ def temporadas(item):
 
     tot_temps = 0
 
+    first_time = False
+
     for tempo in temporadas:
         tempo = tempo.strip()
 
-        if tempo in seasons:
+        if ("'" + tempo + "'") in str(seasons):
+            tot_temps -= 1
             continue
-
-        if not tempo in seasons:
+        else:
             seasons.append(tempo)
             tot_temps += 1
 
         title = 'Temporada ' + tempo
 
-        if tot_temps == 1:
-            if config.get_setting('channels_seasons', default=True):
-                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+        if first_time:
+            if tot_temps == 1:
+                if config.get_setting('channels_seasons', default=True):
+                    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
+
+            first_time = True
+            continue
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 

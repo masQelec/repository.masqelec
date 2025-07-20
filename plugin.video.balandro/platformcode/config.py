@@ -244,7 +244,7 @@ def set_setting(name, value, channel="", server=""):
 # Obtener y guardar últimas búsquedas
 def get_last_search(search_type):
     if get_setting('search_show_last', default=True):
-        if search_type not in ['all', 'movie', 'tvshow', 'documentary', 'person']: search_type = 'all'
+        if search_type not in ['all', 'movie', 'tvshow', 'documentary', 'person', 'list', 'torrent', 'dorama', 'anime', 'video']: search_type = 'all'
         last_search = get_setting('search_last_' + search_type, default='')
     else:
         last_search = ''
@@ -252,7 +252,8 @@ def get_last_search(search_type):
     return last_search
 
 def set_last_search(search_type, tecleado):
-    if search_type not in ['all', 'movie', 'tvshow', 'documentary', 'person']: search_type = 'all'
+    if search_type not in ['all', 'movie', 'tvshow', 'documentary', 'person', 'list', 'torrent', 'dorama', 'anime', 'video']: search_type = 'all'
+
     set_setting('search_last_' + search_type, tecleado)
 
 

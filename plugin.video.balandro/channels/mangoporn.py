@@ -33,11 +33,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
@@ -157,6 +158,13 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     item.url = item.url.replace('http://', 'https://')
 
     data = do_downloadpage(item.url)
@@ -182,9 +190,11 @@ def findvideos(item):
             other = ''
 
             if servidor == 'various': other = servertools.corregir_other(url)
+            elif servidor == 'zures': other = servertools.corregir_zures(url)
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                      language = 'Vo', other = other.capitalize() ))
 
     # ~  Download
     if '>Download Sources' in data:
@@ -215,9 +225,11 @@ def findvideos(item):
                 other = 'D'
 
                 if servidor == 'various': other = servertools.corregir_other(url) + ' ' + other
+                elif servidor == 'zures': other = servertools.corregir_zures(url) + ' ' + other
 
                 if not servidor == 'directo':
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                          language = 'Vo', other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

@@ -451,7 +451,9 @@ def play(item):
                 servidor = 'vk'
             else:
                 new_server = servertools.corregir_other(url).lower()
-                if new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 
@@ -483,7 +485,7 @@ def corregir_SerieName(SerieName):
 def search(item, texto):
     logger.info()
     try:
-        item.url = host + '/?s=' + texto.replace(" ", "+")
+        item.url = host + '?s=' + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

@@ -343,7 +343,6 @@ def findvideos(item):
         url = url.replace('\\/', '/')
 
         if '/1fichier.' in url: continue
-        elif '/lamovie.' in url: continue
         elif '//cc/' in url: continue
 
         if 'sbplay' in url or 'sbplay1' in url or 'sbplay2' in url or 'pelistop' in url or 'sbfast' in url or 'sbfull' in url or 'ssbstream' in url or  'sbthe' in url or 'sbspeed' in url or 'cloudemb' in url or 'tubesb' in url or 'embedsb' in url or 'playersb' in url or 'sbcloud1' in url or 'watchsb' in url or 'viewsb' in url or 'watchmo' in url or 'streamsss' in url or 'sblanh' in url or 'sbanh' in url or 'sblongvu' in url or 'sbchill' in url or 'sbrity' in url or 'sbhight' in url or 'sbbrisk' in url or 'sbface' in url or 'view345' in url or 'sbone' in url or 'sbasian' in url or 'streaamss' in url or 'lvturbo' in url or 'sbnet' in url or 'sbani' in url or 'sbrapid' in url or 'cinestart' in url or 'vidmoviesb' in url or 'sbsonic' in url or 'sblona' in url or 'likessb' in url: continue
@@ -406,7 +405,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone( url=url, server=servidor ))
 

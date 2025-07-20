@@ -25,11 +25,11 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-    if not config.get_setting('descartar_anime', default=False):
+    if config.get_setting('mnu_animes', default=True):
         itemlist.append(item.clone( title = 'Animes', action = 'list_down', url = host + 'cat/Anime/1/', tipo='tvshow',
                                     search_type = 'tvshow', text_color=' springgreen' ))
 
-    if not config.get_setting('descartar_xxx', default=False):
+    if config.get_setting('mnu_adultos', default=True):
         itemlist.append(item.clone( title = 'Adultos', action = 'list_down', url = host + 'cat/XXX/1/', tipo='movie',
                                     search_type = 'movie', adults='adults', text_color = 'orange' ))
 
@@ -82,6 +82,9 @@ def generos(item):
 
     for value, title in matches:
         if title == 'All': continue
+
+        if title == 'Erotic':
+            if config.get_setting('descartar_xxx', default=False): continue
 
         url = host + 'movie-lib-sort/' + value + '/all/score/desc/all/1/'
 
@@ -167,7 +170,7 @@ def list_all(item):
         if tipo == 'movie':
             PeliName = corregir_Name(title)
 
-            itemlist.append(item.clone( action='list_down', url=url, title=title, thumbnail=thumb, tipo=tipo, contentExtra=item.adults ))
+            itemlist.append(item.clone( action='list_down', url=url, title=title, thumbnail=thumb, tipo=tipo, Extra=item.adults ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<li class="active">.*?</a>.*?href="(.*?)"')
@@ -192,11 +195,12 @@ def list_down(item):
     matches = re.compile('</a><a href="(.*?)".*?>(.*?)</a>', re.DOTALL).findall(bloque)
 
     contentExtra = ''
+    Extra = ''
 
     thumb = item.thumb
 
     if item.adults:
-        contentExtra = 'adults'
+        Extra = 'adults'
         thumb = config.get_thumb('adults')
 
     for url, title in matches:
@@ -227,7 +231,7 @@ def list_down(item):
             SerieName = corregir_Name(title)
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
-                                        contentExtra='3',
+                                        contentExtra='3', Extra=Extra,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
         if tipo == 'movie':
@@ -237,7 +241,7 @@ def list_down(item):
             PeliName = corregir_Name(title)
 
             itemlist.append(item.clone( action = 'findvideos', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
-                                        contentExtra=contentExtra,
+                                        contentExtra=contentExtra, Extra=Extra,
                                         contentType = 'movie', contentTitle = PeliName, infoLabels = {'year': '-'} ))
 
     if not item.adults:
@@ -257,6 +261,14 @@ def list_down(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if item.Extra == 'adults':
+        if not config.get_setting('ses_pin'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+            config.set_setting('ses_pin', True)
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -279,7 +291,8 @@ def findvideos(item):
         else:
            if not '.torrent' in url: url = url + '.torrent'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language=item.languages, other=other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
+                              Extra=item.adults, language=item.languages, other=other ))
 
     return itemlist
 

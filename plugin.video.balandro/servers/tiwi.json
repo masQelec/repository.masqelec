@@ -28,7 +28,7 @@
         "url": "https://pbflux.com/\\1"
       },
       {
-        "pattern": "(https://okhd.nu/(?:embed-|)[a-z0-9]+.html(:?\\|Referer=[A-z0-9./:\\?]+|))",
+        "pattern": "https://okhd.nu/(?:embed-|)([a-z0-9]+.html)",
         "url": "\\1"
       },
       {

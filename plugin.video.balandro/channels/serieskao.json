@@ -9,7 +9,7 @@
   "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["movie", "tvshow"],
-  "language": ["lat", "cast", "vose"],
+  "language": ["cast", "lat", "vose"],
 
   "clusters": ["crypto", "current", "years", "kids", "docs", "vos", "anime", "dorama"],
 

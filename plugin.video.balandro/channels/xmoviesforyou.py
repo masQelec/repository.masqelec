@@ -36,11 +36,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
@@ -76,6 +77,13 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
@@ -98,7 +106,13 @@ def findvideos(item):
 
             if '/bigwarp.' in url or '/bgwp.' in url: servidor = 'zures'
 
-            itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server = servidor, language = 'Vo') )
+            other = ''
+
+            if servidor == 'various': other = servertools.corregir_other(url)
+            elif servidor == 'zures': other = servertools.corregir_zures(url)
+
+            itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server = servidor,
+                                  language = 'Vo', other = other.capitalize()) )
 
     if not itemlist:
         if not ses == 0:

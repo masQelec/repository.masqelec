@@ -3,7 +3,7 @@
   "name": "YoHentai",
   "thumbnail": "yohentai.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": false,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["adults"],
 
-  "notes": "Vídeos de Animación en versión Original para Adultos +18"
+  "notes": "Web CERRADA. Vídeos de Animación en versión Original para Adultos +18"
 }

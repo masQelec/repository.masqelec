@@ -16,6 +16,17 @@ from core.item import Item
 from platformcode.config import WebErrorException
 
 
+txt_pys = '[COLOR yellow]Película y/ó Serie[/COLOR] texto a buscar ...'
+txt_pel = '[COLOR deepskyblue]Película[/COLOR] texto a buscar ...'
+txt_ser = '[COLOR hotpink]Serie[/COLOR] texto a buscar ...'
+txt_doc = '[COLOR cyan]Documental[/COLOR] texto a buscar ...'
+txt_tor = '[COLOR blue]Torrent[/COLOR] [COLOR yellow]Película y/ó Serie[/COLOR] texto a buscar ...'
+txt_dor = '[COLOR firebrick]Dorama[/COLOR] texto a buscar ...'
+txt_ani = '[COLOR springgreen]Anime[/COLOR] texto a buscar ...'
+txt_lis = '[COLOR greenyellow]Lista[/COLOR] texto a buscar ...'
+txt_per = '[COLOR tan]Persona[/COLOR] texto a buscar ...'
+txt_vid = '[COLOR darkorange]+18 Vídeo[/COLOR] texto a buscar ...'
+
 logger.info('[COLOR blue]Starting with %s[/COLOR]' % sys.argv[1])
 
 # ~ Obtener parámetros de lo que hay que ejecutar
@@ -72,38 +83,78 @@ if tipo_channel != '':
                 else:
                     last_search = config.get_last_search(item.search_type)
 
-                    search_type = ''
+                    txt_search = txt_pys
 
                     if item.search_type == 'all':
                         if item.search_pop:
-                            last_search = config.get_setting('search_last_list')
-                            search_type = 'para [COLOR yellow]Listas[/COLOR]'
+                            last_search = config.get_last_search('list')
+                            txt_search = txt_lis
+                        elif item.search_video:
+                            last_search = config.get_last_search('video')
+                            txt_search = txt_vid
+                        elif item.search_special == 'torrent':
+                            last_search = config.get_last_search('torrent')
+                            txt_search = txt_tor
+                        elif item.search_special == 'dorama':
+                            last_search = config.get_last_search('dorama')
+                            txt_search = txt_dor
+                        elif item.search_special == 'anime':
+                            last_search = config.get_last_search('anime')
+                            txt_search = txt_ani
+                        else:
+                            last_search = config.get_last_search('all')
 
                     elif item.search_type == 'movie':
-                        if item.search_video: search_type = 'para [COLOR yellow]Vídeos[/COLOR]'
-                        else: search_type = 'para [COLOR yellow]Películas[/COLOR]'
+                        if item.search_video:
+                            last_search = config.get_last_search('video')
+                            txt_search = txt_vid
+                        else: txt_search = txt_pel
 
-                    elif item.search_type == 'tvshow': search_type = 'para [COLOR yellow]Series[/COLOR]'
+                    elif item.search_type == 'tvshow': txt_search = txt_ser
+                    elif item.search_type == 'documentary': txt_search = txt_doc
+                    elif item.search_type == 'person': txt_search = txt_per
 
-                    elif item.search_type == 'documentary': search_type = 'para [COLOR yellow]Documentales[/COLOR]'
-                    elif item.search_type == 'person': search_type = 'para [COLOR yellow]Personas[/COLOR]'
+                    elif item.search_special == 'torrent': txt_search = txt_tor
+                    elif item.search_special == 'dorama': txt_search = txt_dor
+                    elif item.search_special == 'anime': txt_search = txt_ani
 
-                    elif item.search_special == 'torrent': search_type = 'para [COLOR yellow]Torrents[/COLOR]'
-                    elif item.search_special == 'anime': search_type = 'para [COLOR yellow]Animes[/COLOR]'
-                    elif item.search_special == 'dorama': search_type = 'para [COLOR yellow]Doramas[/COLOR]'
+                    else:
+                        if item.search_video:
+                            last_search = config.get_last_search('video')
+                            txt_search = txt_vid
 
-                    tecleado = platformtools.dialog_input(last_search, 'Texto a buscar ' + search_type)
+                    tecleado = platformtools.dialog_input(last_search, txt_search)
 
                 if tecleado is not None and tecleado != '':
                     itemlist = canal.search(item, tecleado)
 
                     if item.buscando == '':
-                        search_type = item.search_type
+                        last_bus = item.search_type
 
-                        if item.search_pop: search_type = 'search_last_list'
-                        elif item.search_video: search_type = 'search_last_video'
+                        if item.search_type == 'all':
+                            if item.search_pop: last_bus = 'list'
+                            elif item.search_video: last_bus = 'video'
+                            elif item.search_special == 'torrent': last_bus = 'torrent'
+                            elif item.search_special == 'dorama': last_bus = 'dorama'
+                            elif item.search_special == 'anime': last_bus = 'anime'
+                            else:
+                                 last_bus = 'all'
 
-                        config.set_last_search(search_type, tecleado)
+                        elif item.search_type == 'movie':
+                            if item.search_video: last_bus = 'video'
+                            else: last_bus = 'movie'
+
+                        elif item.search_pop: last_bus = 'list'
+
+                        elif item.search_video: last_bus = 'video'
+
+                        elif item.search_type == 'person': last_bus = 'person'
+
+                        elif item.search_special == 'torrent': last_bus = 'torrent'
+                        elif item.search_special == 'dorama': last_bus = 'dorama'
+                        elif item.search_special == 'anime': last_bus = 'anime'
+
+                        if last_bus: config.set_last_search(last_bus, tecleado)
                 else:
                     itemlist = []
                     # ~ (desactivar si provoca ERROR: GetDirectory en el log)

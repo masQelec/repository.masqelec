@@ -193,9 +193,13 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -551,11 +555,13 @@ def episodios(item):
         if not title: title = scrapertools.find_single_match(epi, '<div class="episodiotitle">.*?">(.*?)</a>')
 
         if item.contentSerieName: 
-            titulo = '%sx%s - %s' % (str(item.contentSeason), str(epis), title)
+            titulo = '%sx%s %s' % (str(item.contentSeason), str(epis), title)
 
             titulo = titulo + ' ' + item.contentSerieName
 
         else: titulo = item.title
+
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         if '.' in epis: epis = epis.split(".")[0]
 
@@ -578,6 +584,14 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     data = do_downloadpage(item.url)
 
@@ -625,6 +639,7 @@ def findvideos(item):
             url = scrapertools.find_single_match(dat_server, "to_player.*?'(.*?)'")
 
             if '/saikoudane.' in url: continue
+            elif '/saidochesto.' in url: continue
 
             if url:
                 if url == 'undefined': continue

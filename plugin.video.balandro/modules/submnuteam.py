@@ -34,6 +34,9 @@ color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 
+search_no_accesibles = config.get_setting('search_no_accesibles', default=False)
+
+
 _foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/ [/I][/B][/COLOR]"
 _source = "[COLOR coral][B][I] https://repobal.github.io/base/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
@@ -94,6 +97,10 @@ if txt_status:
         match = match.strip()
 
         if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    if con_problemas:
+        hay_problemas = str(con_problemas).replace('[B][COLOR moccasin]', 'CHANNEL').replace('[COLOR lime]', '/CHANNEL')
+        channels_con_problemas = scrapertools.find_multiple_matches(hay_problemas, "CHANNEL(.*?)/CHANNEL")
 
 
 context_desarrollo = []
@@ -377,7 +384,7 @@ def submnu_team_info(item):
 
     itemlist.append(item.clone( action='', title='[COLOR fuchsia][I][B]SERVIDORES:[/B][/I][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
-    itemlist.append(item.clone( action='resumen_servidores', title=' - Resúmenes y Distribución', thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( action='resumen_servidores', title=' - [COLOR fuchsia][B]Resúmenes y Distribución[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
     if txt_status:
         if srv_pending:
@@ -1123,7 +1130,7 @@ def submnu_servidores(item):
 
     if txt_status:
         if srv_pending:
-            itemlist.append(item.clone( action='resumen_pending', title=' - [COLOR tan][B] - Con Incidencias[/B][/COLOR]' ))
+            itemlist.append(item.clone( action='resumen_pending', title=' - [COLOR tan][B]Con Incidencias[/B][/COLOR]' ))
 
     itemlist.append(item.clone( action='test_all_srvs', title=' - Posibles [B][COLOR fuchsia]Insatisfactorios[/B][/COLOR]', unsatisfactory = True ))
 
@@ -1530,19 +1537,19 @@ def test_all_webs(item):
             if 'clone' in ch['clusters']: continue
 
         if config.get_setting('mnu_simple', default=False):
-            if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
-            elif 'exclusivamente al dorama' in ch['notes'].lower(): continue
-            elif 'exclusivamente al anime' in ch['notes'].lower(): continue
+            if 'enlaces torrent exclusivamente' in ch['notes']: continue
+            elif 'exclusivamente al dorama' in ch['notes']: continue
+            elif 'exclusivamente al anime' in ch['notes']: continue
             elif '+18' in ch['notes']: continue
         else:
             if not config.get_setting('mnu_torrents', default=False) or config.get_setting('search_no_exclusively_torrents', default=False):
-                if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+                if 'enlaces torrent exclusivamente' in ch['notes']: continue
 
             if not config.get_setting('mnu_doramas', default=True):
-                if 'exclusivamente al dorama' in ch['notes'].lower(): continue
+                if 'exclusivamente al dorama' in ch['notes']: continue
 
             if not config.get_setting('mnu_animes', default=True):
-                if 'exclusivamente al anime' in ch['notes'].lower(): continue
+                if 'exclusivamente al anime' in ch['notes']: continue
 
             if not config.get_setting('mnu_adultos', default=True):
                 if '+18' in ch['notes']: continue
@@ -1554,7 +1561,7 @@ def test_all_webs(item):
                 el_canal = ch['id']
 
                 if el_canal[0] < item.letra:
-                    i = i - 1
+                    i -= 1
                     continue
 
             txt = tester.test_channel(ch['name'])
@@ -1853,7 +1860,9 @@ def test_all_webs(item):
                         channels_proxies_memorized = channels_proxies_memorized + ', ' + el_memorizado
                         config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
-    if i > 0:
+    if i == 0:
+        platformtools.dialog_ok(config.__addon_name, 'Sin Canales Testeados')
+    else:
         if not tests_all_webs:
             platformtools.dialog_ok(config.__addon_name, 'Canales Testeados ' + str(i))
         else:
@@ -1913,8 +1922,8 @@ def test_all_srvs(item):
 
     if item.unsatisfactory: config.set_setting('developer_test_servers', 'unsatisfactory')
 
-    from core import jsontools
 
+    from core import jsontools
     from modules import tester
 
     path = os.path.join(config.get_runtime_path(), 'servers')
@@ -1960,7 +1969,7 @@ def test_all_srvs(item):
                 el_servidor = el_servidor.lower()
 
                 if el_servidor[0] < item.letra:
-                    i = i - 1
+                    i -= 1
                     continue
 
             txt = tester.test_server(dict_server['name'])
@@ -2233,8 +2242,6 @@ def show_sistema(item):
 
     if config.get_setting('chrome_last_version', default=''): txt += '[CR][COLOR yellow][B] - Versión Chrome/Chromium: [/COLOR][COLOR cyan]' + config.get_setting('chrome_last_version') + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B] - Timeout [/B](tiempo máximo de espera en los Accesos, por defecto 15)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
-
     txt += '[CR] - Confirmar con el Botón pulsar [OK] en ciertas Notificaciones: '
 
     if config.get_setting('notification_d_ok', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
@@ -2245,9 +2252,13 @@ def show_sistema(item):
     if config.get_setting('notification_beep', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
     else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B] - Tiempo de espera en los Reintentos [/B](en el acceso a ciertos Canales, por defecto 30)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera Accesos a CANALES, por defecto 15)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B] - Tiempo de espera [/B](en el acceso a ciertos Servidores, por defecto 6)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('search_timeout', default='3'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera Accesos BUSCAR, por defecto 5)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('search_timeout')) + ' [/B][/COLOR][CR]'
+
+    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera al Reintentar acceder a ciertos Canales, por defecto 30)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
+
+    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B] - Time[/B] Tiempo de espera (en el acceso a ciertos Servidores, por defecto 6)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
 
     txt += '[CR][COLOR goldenrod][B]PREFERENCIAS NOTIFICACIONES CANALES:[/B][/COLOR][CR]'
 
@@ -2396,12 +2407,12 @@ def resumen_canales(item):
     dominios = 0
     currents = 0
     onlyones = 0
-    searchables = 0
+    nosearchables = 0
     status_access = 0
     status_problems = 0
     con_proxies = 0
 
-    bus_pelisyseries = 0
+    bus_pelisyoseries = 0
     bus_pelis = 0
     bus_series = 0
     bus_documentaryes = 0
@@ -2411,6 +2422,7 @@ def resumen_canales(item):
     bus_torrents = 0
     bus_doramas = 0
     bus_animes = 0
+    bus_trailers = 0
 
     disponibles = 0
     suggesteds = 0
@@ -2426,9 +2438,12 @@ def resumen_canales(item):
     doramas = 0
     animes = 0
     adults = 0
+    trailers = 0
     privates = 0
     others = 0
     no_actives = 0
+
+    temas_adults = 0
 
     filtros = {'active': False}
     ch_list = channeltools.get_channels_list(filtros=filtros)
@@ -2486,96 +2501,219 @@ def resumen_canales(item):
         if 'onlyone' in ch['clusters']: onlyones += 1
         if 'suggested' in ch['clusters']: suggesteds += 1
 
-        if ch['searchable'] == False: searchables += 1
+        if ch['searchable'] == False: nosearchables += 1
 
-        tipos = ch['categories']
+        tipos = ch['search_types']
 
-        if not 'tráilers' in ch['notes'].lower():
-            if not '+18' in ch['notes']:
+        tipos_torrent = ch['categories']
 
-                if not 'exclusivamente al dorama' in ch['notes'].lower():
-                    if not 'exclusivamente al anime' in ch['notes'].lower():
-                        if 'movie' in tipos:
-                            peliculas += 1
-                            if ch['searchable']: bus_pelis += 1
+        if 'exclusivamente a los tráilers' in ch['notes']:
+            trailers += 1
+            bus_trailers += 1
+        else:
+            if '+18' in ch['notes']: pass
+            elif 'exclusivamente al dorama' in ch['notes']: pass
+            elif 'exclusivamente al anime' in ch['notes']: pass
+            else:
+                if 'movie' in tipos:
+                    peliculas += 1
 
-                        if 'tvshow' in tipos:
-                            if not 'animes, ovas, doramas y mangas' in ch['notes'].lower():
-                               series += 1
-                               if ch['searchable']: bus_series += 1
+                    if ch['searchable']:
+                        bus_pelis += 1
+
+                        if not search_no_accesibles:
+                            if no_accesibles:
+                                if ch['name'] in str(no_accesibles): bus_pelis -= 1
+                            if con_problemas:
+                                if ch['name'] in str(con_problemas): bus_pelis -= 1
+
+                if 'tvshow' in tipos:
+                    if not 'mangas' in ch['notes'].lower():
+                        series += 1
+
+                        if ch['searchable']:
+                            bus_series += 1
+
+                            if not search_no_accesibles:
+                                if no_accesibles:
+                                    if ch['name'] in str(no_accesibles): bus_series -= 1
+                                if con_problemas:
+                                    if ch['name'] in str(con_problemas): bus_series -= 1
 
             if 'movie' in tipos:
                 if 'tvshow' in tipos:
-                    pelisyseries += 1
-                    if ch['searchable']: bus_pelisyseries += 1
+                    if not 'documentary' in tipos:
+                        pelisyseries += 1
+
+            if 'movie' in tipos:
+                if ch['searchable']:
+                    bus_pelisyoseries += 1
+
+                    if not search_no_accesibles:
+                        if no_accesibles:
+                            if ch['name'] in str(no_accesibles): bus_pelisyoseries -= 1
+                        if con_problemas:
+                            if ch['name'] in str(con_problemas): bus_pelisyoseries -= 1
+
+            elif 'tvshow' in tipos:
+                if ch['searchable']:
+                    bus_pelisyoseries += 1
+
+                    if not search_no_accesibles:
+                        if no_accesibles:
+                            if ch['name'] in str(no_accesibles): bus_pelisyoseries -= 1
+                        if con_problemas:
+                            if ch['name'] in str(con_problemas): bus_pelisyoseries -= 1
 
         if 'documentary' in tipos:
             documentarys += 1
-            bus_documentaryes += 1
+
+            if ch['searchable']:
+                bus_documentaryes += 1
+
+                if not search_no_accesibles:
+                    if no_accesibles:
+                        if ch['name'] in str(no_accesibles): bus_documentaryes -= 1
+                    if con_problemas:
+                        if ch['name'] in str(con_problemas): bus_documentaryes -= 1
+
         else:
            if 'docs' in ch['clusters']:
-               if ch['searchable']: bus_documentales += 1
+               if ch['searchable']:
+                   bus_documentales += 1 
 
-        if 'infantil' in ch['clusters']: infantiles += 1
+                   if not search_no_accesibles:
+                       if no_accesibles:
+                           if ch['name'] in str(no_accesibles): bus_documentales -= 1
+                       if con_problemas:
+                           if ch['name'] in str(con_problemas): bus_documentales -= 1
+
+        if 'infantil' in ch['clusters']:
+             infantiles += 1
+
+             if ch['searchable']:
+                 bus_infantiles += 1
+
+                 if not search_no_accesibles:
+                     if no_accesibles:
+                         if ch['name'] in str(no_accesibles): bus_infantiles -= 1
+                     if con_problemas:
+                         if ch['name'] in str(con_problemas): bus_infantiles -= 1
+
         else:
             if 'kids' in ch['clusters']:
-               if ch['searchable']: bus_kids += 1
+                if ch['searchable']:
+                    bus_kids += 1
+
+                    if not search_no_accesibles:
+                        if no_accesibles:
+                            if ch['name'] in str(no_accesibles): bus_kids -= 1
+                        if con_problemas:
+                            if ch['name'] in str(con_problemas): bus_kids -= 1
 
         if 'tales' in ch['clusters']: tales += 1
 
         if 'bibles' in ch['clusters']: bibles += 1
 
-        if 'torrent' in tipos:
-            torrents += 1
-            bus_torrents += 1
+        if 'torrent' in tipos_torrent:
+            if not 'Streaming y Torrent' in ch['notes']: torrents += 1
+
+            if ch['searchable']: 
+                bus_torrents += 1
+
+                if not search_no_accesibles:
+                    if no_accesibles:
+                        if ch['name'] in str(no_accesibles): bus_torrents -= 1
+                    if con_problemas:
+                        if ch['name'] in str(con_problemas): bus_torrents -= 1
+
         else:
            if 'torrents' in ch['clusters']:
-               if ch['searchable']: bus_torrents += 1
+               if ch['searchable']:
+                   bus_torrents += 1
 
-        if 'exclusivamente al dorama' in ch['notes'].lower():
+                   if not search_no_accesibles:
+                       if no_accesibles:
+                           if ch['name'] in str(no_accesibles): bus_torrents -= 1
+                       if con_problemas:
+                           if ch['name'] in str(con_problemas): bus_torrents -= 1
+
+        if 'exclusivamente al dorama' in ch['notes']:
             doramas += 1
+
             bus_doramas += 1
-        elif 'exclusivamente' in ch['notes'].lower():
-            if 'doramas' in ch['notes'].lower():
-                doramas += 1
-                bus_doramas += 1
-        else:
-           if 'dorama' in ch['clusters']: bus_doramas += 1
 
-        if 'exclusivamente al anime' in ch['notes'].lower():
+            if not search_no_accesibles:
+                if no_accesibles:
+                    if ch['name'] in str(no_accesibles): bus_doramas -= 1
+                if con_problemas:
+                    if ch['name'] in str(con_problemas): bus_doramas -= 1
+
+        else:
+            if 'dorama' in ch['clusters']:
+                if 'Animes, Ovas, Doramas y Mangas' in ch['notes']: doramas += 1
+
+                if ch['searchable']:
+                    bus_doramas += 1
+
+                    if not search_no_accesibles:
+                        if no_accesibles:
+                            if ch['name'] in str(no_accesibles): bus_doramas -= 1
+                        if con_problemas:
+                            if ch['name'] in str(con_problemas): bus_doramas -= 1
+
+        if 'exclusivamente al anime' in ch['notes']:
             animes += 1
-            bus_animes += 1
-        elif 'exclusivamente' in ch['notes'].lower():
-            if 'animes' in ch['notes'].lower():
-                animes += 1
-                bus_animes += 1
-        else:
-           if 'anime' in ch['clusters']: bus_animes += 1
 
-        if '+18' in ch['notes']: adults += 1
+            bus_animes += 1
+
+            if not search_no_accesibles:
+                if no_accesibles:
+                    if ch['name'] in str(no_accesibles): bus_animes -= 1
+                if con_problemas:
+                    if ch['name'] in str(con_problemas): bus_animes -= 1
+
+        else:
+            if 'anime' in ch['clusters']:
+                if 'Animes, Ovas, Doramas y Mangas' in ch['notes']: animes += 1
+
+                if ch['searchable']:
+                    bus_animes += 1
+
+                    if not search_no_accesibles:
+                        if no_accesibles:
+                            if ch['name'] in str(no_accesibles): bus_animes -= 1
+                        if con_problemas:
+                            if ch['name'] in str(con_problemas): bus_animes -= 1
+
+        if config.get_setting('mnu_adultos', default=True):
+            if '+18' in ch['notes']: adults += 1
+
+        if 'adults' in ch['clusters']:
+            if not config.get_setting('descartar_xxx', default=False): temas_adults += 1
 
         if 'privates' in ch['clusters']:
             el_canal = ch['id']
             if os.path.exists(os.path.join(config.get_runtime_path(), 'channels', el_canal + '.py')): privates += 1
 
-    txt = '[COLOR yellow][B]RESÚMENES CANALES:[/B][/COLOR][CR]'
+    txt = '[COLOR yellow][B]RESUMEN SITUACIÓN CANALES:[/B][/COLOR][CR]'
 
-    txt += '  ' + str(total) + ' [COLOR darkorange][B]Canales[/B][/COLOR][CR][CR]'
+    txt += '  ' + str(total) + ' [COLOR darkorange][B]Canales[/B][/COLOR][CR]'
 
     if not inactives == 0:
-        txt += '     ' + str(inactives) + ' [COLOR coral][B]Inactivos[/B][/COLOR][CR]'
+        txt += '          ' + str(inactives) + ' [COLOR coral][B]Inactivos[/B][/COLOR][CR]'
 
     if not cerrados == 0:
-        txt += '            ' + str(cerrados) + ' [COLOR coral]Cerrados[/COLOR][CR]'
+        txt += '                  ' + str(cerrados) + ' [COLOR coral]Cerrados[/COLOR][CR]'
 
     if not anulados == 0:
-        txt += '            ' + str(anulados) + ' [COLOR coral]Anulados[/COLOR][CR]'
+        txt += '                  ' + str(anulados) + ' [COLOR coral]Anulados[/COLOR][CR]'
 
-    if not privates == 0: txt += '              ' + str(privates) + '  [COLOR grey]Privados[/COLOR][CR]'
+    if not privates == 0: txt += '                    ' + str(privates) + '  [COLOR grey]Privados[/COLOR][CR]'
 
-    if not others == 0: txt += '              ' + str(others) + ' [COLOR coral]Otros[/COLOR][CR]'
+    if not others == 0: txt += '                    ' + str(others) + ' [COLOR coral]Otros[/COLOR][CR]'
 
-    if not temporarys == 0: txt += '              ' + str(temporarys) + ' [COLOR mediumaquamarine]Temporalmente[/COLOR][CR]'
+    if not temporarys == 0: txt += '                    ' + str(temporarys) + ' [COLOR mediumaquamarine]Temporalmente[/COLOR][CR]'
 
     activos = (total - inactives)
 
@@ -2612,7 +2750,7 @@ def resumen_canales(item):
 
     if not onlyones == 0: txt += '     ' + str(onlyones) + ' [COLOR fuchsia]Un Único Servidor[/COLOR][CR]'
 
-    if not searchables == 0: txt += '     ' + str(searchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
+    if not nosearchables == 0: txt += '     ' + str(nosearchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
 
     if txt_status:
         if no_accesibles:
@@ -2662,54 +2800,99 @@ def resumen_canales(item):
 
         if con_proxies > 0: txt += '          [COLOR red][B]Con Proxies Informados[/COLOR] ' +  str(con_proxies) + '[/B][CR]'
 
-    txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN CANALES DISPONIBLES:[/B][/COLOR][CR]'
+    txt += '[CR][COLOR dodgerblue][B]CANALES DISPONIBLES:[/B][/COLOR]'
 
-    txt += '    ' + str(suggesteds) + ' [COLOR moccasin]Sugeridos[/COLOR][CR]'
+    if config.get_setting('mnu_sugeridos', default=True):
+        txt += '[CR]    ' + str(suggesteds) + ' [COLOR moccasin]Sugeridos[/COLOR][CR]'
 
-    txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+    if config.get_setting('mnu_simple', default=False):
+        canales = (disponibles - no_actives)
+        txt += '[CR]  ' + str(canales) + ' [COLOR aqua][B]Canales[/B][/COLOR][CR]'
+    else:
+        if config.get_setting('mnu_pelis', default=True):
+            txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
 
-    txt += '  ' + str(series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+        if config.get_setting('mnu_series', default=True):
+            txt += '  ' + str(series) + ' [COLOR hotpink]Series[/COLOR][CR]'
 
-    txt += '    ' + str(pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
+        if config.get_setting('channels_link_pyse', default=False):
+            txt += '    ' + str(pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
 
-    txt += '[CR]    ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
-    txt += '      ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
+        if config.get_setting('mnu_generos', default=True):
+            txt += '[CR]    ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
 
-    if not infantiles == 0: txt += '      ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
+        if config.get_setting('mnu_documentales', default=True):
+            txt += '    ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
 
-    txt += '    ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
+        if config.get_setting('mnu_infantiles', default=True):
+            if not infantiles == 0: txt += '      ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
 
-    if not bibles == 0: txt += '      ' + str(bibles) + '  [COLOR tan]Bíblicos[/COLOR][CR]'
+        if config.get_setting('mnu_novelas', default=True):
+            txt += '    ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
 
-    txt += '    ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
-    txt += '      ' + str(doramas) + '  [COLOR firebrick]Doramas[/COLOR][CR]'
-    txt += '    ' + str(animes) + '  [COLOR springgreen]Animes[/COLOR][CR]'
-    txt += '    ' + str(adults) + '  [COLOR orange]Adultos[/COLOR][CR]'
+        if not bibles == 0: txt += '      ' + str(bibles) + '  [COLOR tan]Bíblicos[/COLOR][CR]'
 
-    txt += '[CR][COLOR powderblue][B]DISTRIBUCIÓN CANALES DISPONIBLES PARA BÚSQUEDAS:[/B][/COLOR][CR]'
+        if config.get_setting('mnu_torrents', default=True):
+            txt += '    ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
 
-    txt += '   ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
-    txt += '   ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
-    txt += '     ' + str(bus_pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
+        if config.get_setting('mnu_doramas', default=True):
+            txt += '      ' + str(doramas) + '  [COLOR firebrick]Doramas[/COLOR][CR]'
 
-    txt += '[CR]'
-    txt += '       ' + str(bus_documentaryes) + ' [COLOR cyan]Documentales[/COLOR][CR]'
+        if config.get_setting('mnu_animes', default=True):
+            if not config.get_setting('descartar_anime', default=False):
+                txt += '    ' + str(animes) + '  [COLOR springgreen]Animes[/COLOR][CR]'
+
+        if not trailers == 0: txt += '       ' + str(trailers) + ' [COLOR darkgoldenrod]Traílers[/COLOR][CR]'
+
+        if config.get_setting('mnu_adultos', default=True):
+            if not adults == 0: txt += '    ' + str(adults) + '  [COLOR orange]Adultos[/COLOR][CR]'
+
+    txt += '[CR][COLOR powderblue][B]BÚSQUEDAS POR TÍTULO EN CANALES DISPONIBLES:[/B][/COLOR][CR]'
+
+    txt += '   ' + str(bus_pelisyoseries) + ' [COLOR yellow]Películas y/ó Series[/COLOR][CR]'
 
     bus_tematica_documentales = bus_documentales + bus_documentaryes
-    txt += '   ' + str(bus_tematica_documentales) + ' [COLOR darkcyan]Temática Documental[/COLOR][CR]'
+    txt += '           ' + str(bus_tematica_documentales) + ' [COLOR darkcyan]Temática Documental[/COLOR][CR]'
 
-    txt += '[CR]'
     bus_tematica_infantil = bus_kids + bus_infantiles
-    txt += '     ' + str(bus_tematica_infantil) + ' [COLOR lightyellow]Temática Infantil[/COLOR][CR]'
+    txt += '           ' + str(bus_tematica_infantil) + ' [COLOR lightyellow]Temática Infantil[/COLOR][CR]'
 
-    txt += '[CR]'
-    txt += '     ' + str(bus_torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
-    txt += '[CR]'
+    if not bus_torrents == 0: txt += '           ' + str(bus_torrents) + ' [COLOR blue]Contenido Torrent[/COLOR][CR]'
 
-    txt += '     ' + str(bus_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
-    txt += '     ' + str(bus_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
+    bus_tematica_doramas = bus_doramas + doramas
+    if not bus_tematica_doramas == 0: txt += '           ' + str(bus_tematica_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
 
-    platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución', txt)
+    bus_tematica_animes = bus_animes + animes
+    if not bus_tematica_animes == 0:
+        if not config.get_setting('descartar_anime', default=True):
+            txt += '           ' + str(bus_tematica_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
+
+    if not temas_adults == 0: txt += '           ' + str(temas_adults) + ' [COLOR orange]Temática Adultos[/COLOR][CR]'
+
+    if config.get_setting('mnu_pelis', default=True):
+        txt += '[CR]      ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+
+    if config.get_setting('mnu_series', default=True):
+        txt += '    ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+
+    if config.get_setting('mnu_documentales', default=True):
+        txt += '[CR]      ' + str(bus_tematica_documentales) + ' [COLOR cyan]Documentales[/COLOR][CR]'
+
+    if config.get_setting('mnu_torrents', default=True):
+        txt += '      ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
+
+    if config.get_setting('mnu_doramas', default=True):
+        if not bus_tematica_doramas == 0: txt += '      ' + str(bus_tematica_doramas) + ' [COLOR firebrick]Doramas[/COLOR][CR]'
+
+    if config.get_setting('mnu_animes', default=True):
+        if not config.get_setting('descartar_anime', default=True):
+            if not bus_tematica_animes == 0: txt += '      ' + str(bus_tematica_animes) + ' [COLOR springgreen]Animes[/COLOR][CR]'
+
+    if not bus_trailers == 0:
+        if config.get_setting('search_extra_trailers', default=False):
+           txt += '      ' + str(bus_trailers) + ' [COLOR darkgoldenrod]Traílers[/COLOR]'
+
+    platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución (según sus Ajustes)', txt)
 
 
 def resumen_incidencias(item):
@@ -2788,7 +2971,7 @@ def resumen_servidores(item):
 
     aditionals = 0
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-         aditionals = 97  # ~ 44 Various  y  53 Zures
+         aditionals = 100  # ~ 44 Various  y  56 Zures
 
     pending = 0
 
@@ -2821,9 +3004,9 @@ def resumen_servidores(item):
         if not dict_server['name'] in ['Various', 'Youtube', 'Zures']:
             if "alternative" in notes.lower(): alternatives += 1
 
-    txt = '[COLOR yellow][B]RESÚMENES SERVIDORES:[/B][/COLOR][CR]'
+    txt = '[COLOR yellow][B]RESUMEN SITUACIÓN SERVIDORES:[/B][/COLOR][CR]'
 
-    txt += '  ' + str(total) + ' [COLOR darkorange][B]Servidores[/B][/COLOR][CR][CR]'
+    txt += '  ' + str(total) + ' [COLOR darkorange][B]Servidores[/B][/COLOR][CR]'
 
     inactivos = (inactives + notsuported + outservice)
 
@@ -2837,51 +3020,68 @@ def resumen_servidores(item):
 
     disponibles = (total - inactivos)
 
-    txt += '[CR]     ' + str(disponibles) + ' [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
+    txt += '[CR]     ' + str(disponibles) + ' [COLOR cyan][B]Activos[/B][/COLOR][CR]'
 
-    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
-        tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+    presentar = False
 
-        txt += '[CR][COLOR goldenrod][B]RESOLVEURL:[/B][/COLOR][CR]'
-
-        txt += '    Versión' + tex_mr + '[CR]'
-
-        txt += '    ' + str(alternatives) + '  [COLOR green]Vías alternativas[/COLOR][CR]'
-        txt += '    ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
-
-    cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
-
-    if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno': tex_tor = cliente_torrent
+    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'): presentar = True
+    elif xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'): presentar = True
     else:
-       tex_tor = cliente_torrent
-       cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
-       if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-           cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
-           tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+       cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
 
-    if not cliente_torrent == 'Ninguno':
-        txt += '[CR][COLOR goldenrod][B]TORRENTS:[/B][/COLOR][CR]'
+       if not cliente_torrent == 'Ninguno':  presentar = True
 
-        txt += '      1' + '   [COLOR fuchsia]' + tex_tor + '[/COLOR][CR]'
+    if presentar:
+        txt += '[COLOR yellow][B][CR]SERVIDORES VÍAS ALTERNATIVAS, ADICIONALES, TORRENTS, YOUTUBE:[/B][/COLOR]'
 
-        aditionals += 1
+        if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+            tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
 
-    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-        cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
-        tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            txt += '[CR]  [COLOR goldenrod][B]Resolveurl:[/B][/COLOR][CR]'
 
-        txt += '[CR][COLOR goldenrod][B]YOUTUBE:[/B][/COLOR][CR]'
+            txt += '      Versión' + tex_mr + '[CR]'
 
-        txt += '      1' + '   [COLOR green]Vía alternativa[/COLOR]' + tex_yt + '[CR]'
+            txt += '        ' + str(alternatives) + '  [COLOR green]Vías alternativas[/COLOR][CR]'
+            txt += '      ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
 
-        aditionals += 1
+        cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
 
-    txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN SERVIDORES DISPONIBLES:[/B][/COLOR]'
+        if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno': tex_tor = cliente_torrent
+        else:
+           tex_tor = cliente_torrent
+           cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+
+           if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
+               cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+               tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+        if not cliente_torrent == 'Ninguno':
+            txt += '[CR]  [COLOR goldenrod][B]Torrents:[/B][/COLOR][CR]'
+
+            txt += '       1' + '   [COLOR fuchsia]' + tex_tor + '[/COLOR][CR]'
+
+            aditionals += 1
+
+        if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+            cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+            tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+            txt += '[CR]  [COLOR goldenrod][B]Youtube:[/B][/COLOR][CR]'
+
+            txt += '       1' + '   [COLOR green]Vía alternativa[/COLOR]' + tex_yt + '[CR]'
+
+            aditionals += 1
 
     accesibles = (disponibles + aditionals + alternatives)
 
-    txt += '[CR]  ' + str(accesibles) + '  [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
+    txt += '[CR][COLOR cyan][B]SERVIDORES DISPONIBLES[/B][/COLOR][CR]'
+
+    txt += '  ' + str(accesibles) + '  [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR dodgerblue][B]SERVIDORES ACCESIBLES:[/B][/COLOR][CR]'
+
+    txt += '  ' + str(accesibles) + '  [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
 
     if txt_status:
         if srv_pending:
@@ -2892,7 +3092,13 @@ def resumen_servidores(item):
 
                 txt += '           [COLOR tan][B]Con Incidencias[/COLOR] ' + str(status) + '[/B][CR]'
 
-    platformtools.dialog_textviewer('Resúmenes Servidores y su Distribución', txt)
+    servers_discarded = config.get_setting('servers_discarded', default='')
+
+    if servers_discarded:
+        txt += '[CR][COLOR cyan][B]Descartados:[/B][/COLOR][CR]'
+        txt += '   ' + str(servers_discarded)
+
+    platformtools.dialog_textviewer('Resúmenes Servidores y su Distribución  (según sus Ajustes)', txt)
 
 
 def resumen_pending(item):
@@ -3054,12 +3260,14 @@ def show_help_adicionales(item):
         txt += '   [COLOR yellow]Oneupload[/COLOR][CR]'
         txt += '   [COLOR yellow]Pandafiles[/COLOR][CR]'
         txt += '   [COLOR yellow]Rovideo[/COLOR][CR]'
+        txt += '   [COLOR yellow]Savefiles[/COLOR][CR]'
         txt += '   [COLOR yellow]Send[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamable[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamdav[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamcool[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamgzzz[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamoupload[/COLOR][CR]'
+        txt += '   [COLOR yellow]Streamup[/COLOR][CR]'
         txt += '   [COLOR yellow]SwiftLoad[/COLOR][CR]'
         txt += '   [COLOR yellow]Turbovid[/COLOR][CR]'
         txt += '   [COLOR yellow]Tusfiles[/COLOR][CR]'
@@ -3072,8 +3280,9 @@ def show_help_adicionales(item):
         txt += '   [COLOR yellow]Upvid[/COLOR][CR]'
         txt += '   [COLOR yellow]Veev[/COLOR][CR]'
         txt += '   [COLOR yellow]Veoh[/COLOR][CR]'
-        txt += '   [COLOR yellow]Videa[/COLOR][CR]'
+        txt += '   [COLOR yellow]Vidbasic[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidbob[/COLOR][CR]'
+        txt += '   [COLOR yellow]Videa[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidlook[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidmx[/COLOR][CR]'
         txt += '   [COLOR yellow]Vido[/COLOR][CR]'

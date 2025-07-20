@@ -49,6 +49,7 @@ def get_video_url(page_url, url_referer=''):
     ini_page_url = page_url
 
     if '/mixdrop.co/' in page_url: page_url = page_url.replace('/mixdrop.co/', '/mixdrop.ag/')
+    elif '/mixdrop.my/' in page_url: page_url = page_url.replace('/mixdrop.my/', '/mixdrop.ag/')
 
     headers = {'Referer': page_url.replace('/e/', '/f/')}
 
@@ -59,9 +60,10 @@ def get_video_url(page_url, url_referer=''):
 
     url = scrapertools.find_single_match(data, 'window\.location\s*=\s*"([^"]+)')
     if url:
-        if 'http' in url:
-            if url.startswith('/e/'): url = 'https://mixdrop.ag' + url
-            data = httptools.downloadpage(url).data
+        if not '+e+' in url:
+            if not 'http' in url:
+                if url.startswith('/e/'): url = 'https://mixdrop.ag' + url
+                data = httptools.downloadpage(url).data
  
     packed = scrapertools.find_multiple_matches(data, r'(eval.*?)</script>')
 
@@ -74,6 +76,8 @@ def get_video_url(page_url, url_referer=''):
     for url in urls:
         if '/' not in url: continue
         elif url.endswith('.jpg'): continue
+
+        elif not url.endswith('.mp4'): continue
 
         if url.startswith('//'):
             url = 'https' + url
@@ -114,12 +118,19 @@ def get_video_url(page_url, url_referer=''):
                     trace = traceback.format_exc()
                     if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                         return 'Archivo inexistente ó eliminado'
+
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
+
+                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                    return 'Archivo inexistente'
 
                 elif '<urlopen error' in traceback.format_exc():
                     return 'No se puede establecer la conexión'
 
                 return 'Sin Respuesta ResolveUrl'
+
+        else:
+            return 'Falta ResolveUrl'
 
     return video_urls

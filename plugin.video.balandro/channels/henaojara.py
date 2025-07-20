@@ -5,7 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import re, base64
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -200,9 +200,13 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -210,11 +214,11 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animeonline/category/categorias/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'animeonline/category/estrenos/', search_type = 'tvshow', text_color = 'greenyellow' ))
-
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
+
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'animeonline/category/estrenos/', search_type = 'tvshow', text_color = 'greenyellow' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animeonline/category/emision/', search_type = 'tvshow' ))
 
@@ -306,6 +310,8 @@ def list_all(item):
                 if item.search_type == "movie": continue
 
             titulo = title + nro_season
+
+            titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
             itemlist.append(item.clone( action = 'temporadas', url= url, title=titulo, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
@@ -643,6 +649,14 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
@@ -686,31 +700,10 @@ def findvideos(item):
             player = scrapertools.find_single_match(data2, 'src="(.*?)"')
 
             if player:
-                player = player.replace('embed.php', 'player.php')
-
                 player = player.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&').strip()
 
                 headers = {'Referer': host}
                 if player: headers = {'Referer': player}
-
-                if '?' in player:
-                    path, queryString = player.split('?', 1)
-
-                    if '&' in queryString:
-                        queries_out = []
-                        queries_in = queryString.split('&')
-
-                        for query in queries_in:
-                            if '=' in query:
-                                key, val = query.split('=')
-                                val = base64.b64encode(val.encode("utf-8")).decode('utf8')
-
-                                queries_out.append('{}={}'.format(key, val))
-                                queryString = '&'.join(queries_out)
-
-                    player = '{}?{}'.format(path, queryString)
-
-                player = player.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&').strip()
 
                 data3 = do_downloadpage(player, headers=headers)
 
@@ -720,6 +713,8 @@ def findvideos(item):
                     srv = srv.strip().lower()
 
                     servidor = srv
+
+                    other = ''
 
                     if srv == 'fembed': continue
                     elif srv == 'streamsb': continue
@@ -736,6 +731,10 @@ def findvideos(item):
                     elif srv == 'vidhide': servidor = 'various'
                     elif srv == 'lulustream': servidor = 'various'
 
+                    elif srv == 'savefiles':
+                          servidor = 'zures'
+                          other = srv
+
                     elif srv == 'ok': servidor = 'okru'
                     elif srv == 'dood': servidor = 'doodstream'
 
@@ -746,11 +745,12 @@ def findvideos(item):
                            if not config.get_setting('developer_mode', default=False): continue
                            servidor = 'directo'
 
-                    other = ''
-                    if servidor == 'various': other = servertools.corregir_other(srv).capitalize()
-                    elif not servidor == 'directo': other = ''
+                    if not servidor == 'zures':
+                        if servidor == 'various': other = servertools.corregir_other(srv)
+                        elif not servidor == 'directo': other = ''
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = player, language = lang, other = other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = player,
+                                          language = lang, other = other.capitalize() ))
 
         else:
             servidor = other
@@ -768,6 +768,9 @@ def findvideos(item):
             elif other == 'vidhide': servidor = 'various'
             elif other == 'lulustream': servidor = 'various'
 
+            elif other == 'savefiles':
+                  servidor = 'zures'
+
             elif other == 'ok': servidor = 'okru'
             elif other == 'dood': servidor = 'doodstream'
 
@@ -778,10 +781,12 @@ def findvideos(item):
                    if not config.get_setting('developer_mode', default=False): continue
                    servidor = 'directo'
 
-            if servidor == 'various': other = servertools.corregir_other(other)
-            elif not servidor == 'directo': other = ''
+            if not servidor == 'zures':
+                if servidor == 'various': other = servertools.corregir_other(other)
+                elif not servidor == 'directo': other = ''
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
+                                  language = lang, other = other.capitalize() ))
 
     # Descargas
     matches = re.compile('<td><span class="Num">(.*?)</span>.*?href="(.*?)".*?alt="Descargar(.*?)"', re.DOTALL).findall(data)
@@ -808,6 +813,10 @@ def findvideos(item):
         elif srv == 'vidhide': servidor = 'various'
         elif srv == 'lulustream': servidor = 'various'
 
+        elif srv == 'savefiles':
+              servidor = 'zures'
+              other = srv
+
         elif srv == 'ok': servidor = 'okru'
         elif srv == 'dood': servidor = 'doodstream'
 
@@ -824,6 +833,10 @@ def findvideos(item):
                elif srv == 'vidhide': servidor = 'various'
                elif srv == 'lulustream': servidor = 'various'
 
+               elif srv == 'savefiles':
+                     servidor = 'zures'
+                     other = srv
+
                else:
                   servidor = 'directo'
                   other = 'D' + str(nro)
@@ -835,7 +848,8 @@ def findvideos(item):
 
                if not config.get_setting('developer_mode', default=False): continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
+                              language = lang, other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -951,7 +965,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone( url=url, server=servidor))
 

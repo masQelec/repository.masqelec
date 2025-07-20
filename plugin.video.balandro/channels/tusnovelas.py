@@ -270,6 +270,8 @@ def episodios(item):
 
         titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
+        titulo = titulo.replace('Completo HD', '')
+
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo,
                                     contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epis ))
 
@@ -300,6 +302,8 @@ def findvideos(item):
     matches = scrapertools.find_multiple_matches(data, 'data-server="(.*?)"')
 
     for url in matches:
+        if not url: continue
+
         ses += 1
 
         url = url.strip()

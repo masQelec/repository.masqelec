@@ -9,7 +9,7 @@
   "search_types": ["tvshow"],
 
   "categories": ["tvshow"],
-  "language": ["vose", "vo", "lat", "cast"],
+  "language": ["cast", "lat", "vose", "vo"],
 
   "clusters": ["current", "notice", "anime"],
 

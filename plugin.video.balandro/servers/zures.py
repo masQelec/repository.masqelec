@@ -48,8 +48,7 @@ def get_video_url(page_url, url_referer=''):
 
     ini_page_url = page_url
 
-    if not xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        return 'Falta ResolveUrl'
+    if not xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'): return 'Falta ResolveUrl'
 
     txt_server = 'Unknow'
 
@@ -62,8 +61,11 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/bigwarp.io/d/', '/bigwarp.io/dl?op=embed&file_code=').replace('/bigwarp.io/e/', '/bigwarp.io/dl?op=embed&file_code=').replace('/bigwarp.io/v/', '/bigwarp.io/dl?op=embed&file_code=').replace('/bigwarp.io/embed-', '/bigwarp.io/dl?op=embed&file_code=')
 
+          page_url = page_url.replace('/bigwarp.cc/d/', '/bigwarp.io/dl?op=embed&file_code=').replace('/bigwarp.cc/e/', '/bigwarp.io/dl?op=embed&file_code=').replace('/bigwarp.cc/v/', '/bigwarp.io/dl?op=embed&file_code=').replace('/bigwarp.cc/embed-', '/bigwarp.io/dl?op=embed&file_code=')
+
           if not '/dl?op=embed&file_code=' in page_url:
               page_url = page_url.replace('/bigwarp.io/', '/bigwarp.io/dl?op=embed&file_code=')
+              page_url = page_url.replace('/bigwarp.cc/', '/bigwarp.io/dl?op=embed&file_code=')
 
           if '.html' in page_url: page_url = page_url.replace('.html', '')
 
@@ -86,12 +88,30 @@ def get_video_url(page_url, url_referer=''):
     elif 'oneupload' in page_url: txt_server = 'Oneupload'
     elif 'pandafiles' in page_url: txt_server = 'Pandafiles'
     elif 'rovideo' in page_url: txt_server = 'Rovideo'
+
+    elif 'savefiles' in page_url:
+          txt_server = 'Savefiles'
+
+          page_url = page_url.replace('/savefiles.top/', '/savefiles.com/')
+          page_url = page_url.replace('/streamhls.to/', '/savefiles.com/')
+
+          ini_page_url = page_url
+
     elif 'send' in page_url: txt_server = 'Send'
     elif 'streamable' in page_url: txt_server = 'Streamable'
     elif 'streamdav' in page_url: txt_server = 'Streamdav'
     elif 'streamcool' in page_url: txt_server = 'Streamcool'
     elif 'streamgzzz' in page_url: txt_server = 'Streamgzzz'
     elif 'streamoupload' in page_url: txt_server = 'Streamoupload'
+
+    elif 'streamup' in page_url or 'strmup' in page_url:
+          txt_server = 'Streamup'
+
+          page_url = page_url.replace('/streamup.to/', '/streamup.ws/').replace('/streamup.wf/', '/streamup.ws/')
+          page_url = page_url.replace('/strmup.to/', '/streamup.ws/').replace('/strmup.wf/', '/streamup.ws/')
+
+          ini_page_url = page_url
+
     elif 'turbovid' in page_url: txt_server = 'Turbovid'
     elif 'tusfiles' in page_url: txt_server = 'Tusfiles'
     elif 'updown' in page_url: txt_server = 'Updown'
@@ -123,6 +143,7 @@ def get_video_url(page_url, url_referer=''):
     elif 'swiftload' in page_url: txt_server = 'SwiftLoad'
     elif 'vidtube' in page_url: txt_server = 'Vidtube'
     elif 'wecima' in page_url: txt_server = 'Wecima'
+    elif 'vidbasic' in page_url: txt_server = 'Vidbasic'
 
     elif txt_server == 'Unknow': return 'Desconocido'
 
@@ -133,8 +154,7 @@ def get_video_url(page_url, url_referer=''):
     path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', txt_server.lower() + '.py'))
 
     existe = filetools.exists(path)
-    if not existe:
-        return 'El Plugin No existe en Resolveurl'
+    if not existe: return 'El Plugin No existe en Resolveurl'
 
     try:
         import_libs('script.module.resolveurl')
@@ -144,7 +164,8 @@ def get_video_url(page_url, url_referer=''):
         resuelto = resolveurl.resolve(page_url)
 
         if resuelto:
-            if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
+            if '.zip' in resuelto or '.rar' in resuelto: return "El archivo está en formato comprimido"
+            elif '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
             elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
             else: video_urls.append(['', resuelto])
             return video_urls
@@ -179,7 +200,7 @@ def get_video_url(page_url, url_referer=''):
             elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace or 'Not Found' in trace:
                 return 'Fichero sin link al vídeo ó restringido'
 
-        elif 'HTTP Error 404: Not Found' in traceback.format_exc():
+        elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
             return 'Archivo inexistente'
 
         elif '<urlopen error' in traceback.format_exc():

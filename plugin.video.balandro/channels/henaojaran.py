@@ -8,6 +8,7 @@ from core import httptools, scrapertools, servertools, tmdb
 
 
 from lib.pyberishaes import GibberishAES
+from lib import decrypters
 
 
 host = 'https://vwv.henaojara.net/'
@@ -44,9 +45,13 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'all', text_color='springgreen' ))
 
@@ -368,6 +373,14 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
 
     if item._peli:
@@ -408,8 +421,12 @@ def findvideos(item):
 
             if not srv or not encrypt: continue
 
-            if srv in ['lulustream', 'vidguard', 'vidhide']: pass
+            if srv in ['lulustream', 'vidguard', 'vidhide', 'savefiles']: pass
             else: continue
+
+            if srv == 'savefiles':
+                servidor = 'zures'
+                other = srv
 
             srv = srv.capitalize()
 
@@ -454,13 +471,15 @@ def findvideos(item):
         elif 'mixdrop' in url: servidor = 'mixdrop'
         elif 'mp4upload' in url: servidor = 'mp4upload'
 
-        elif 'streamwish' in url or 'wish' in url: servidor = 'various'
+        elif 'streamwish' in url or 'wish' in url or 'dhcplay' in url: servidor = 'various'
         elif 'filelions' in url: servidor = 'various'
         elif 'filemoon' in url: servidor = 'various'
         elif 'streamvid' in url: servidor = 'various'
         elif 'vidhide' in url: servidor = 'various'
-        elif 'lulustream' in url: servidor = 'various'
+        elif 'lulustream' in url or 'lulu' in url: servidor = 'various'
         elif 'listeamed' in url or 'vidguard' in url: servidor = 'various'
+        elif 'goodstream' in url: servidor = 'various'
+        elif 'smoothpre' in url or 'movearnpre' in url: servidor = 'various'
 
         elif 'ok' in url: servidor = 'okru'
         elif 'dood' in url: servidor = 'doodstream'
@@ -502,6 +521,9 @@ def play(item):
             url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
         except:
             url = ''
+
+        if not url:
+            url = decrypters.decode_decipher(crypto, bytes)
 
         if not url:
             return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
@@ -554,7 +576,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone( url=url, server=servidor))
 

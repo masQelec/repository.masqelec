@@ -615,7 +615,6 @@ def findvideos(item):
 
                 if srv == 'vip': continue
                 elif '1fichier' in srv: continue
-                elif 'lamovie' in srv: continue
 
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
@@ -632,6 +631,7 @@ def findvideos(item):
                     if srv == 'streamtape': servidor = 'streamtape'
                     elif srv == 'voe': servidor = 'voe'
                     elif srv == 'doods' or srv == 'doostream': servidor = 'doodstream'
+                    elif srv == 'lamovie': servidor = 'clipwatching'
 
                     elif srv == 'netu' or servidor == 'hqq': servidor = 'waaw'
 
@@ -658,7 +658,6 @@ def findvideos(item):
 
                 if srv == 'vip': continue
                 elif '1fichier' in srv: continue
-                elif 'lamovie' in srv: continue
 
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
@@ -681,6 +680,7 @@ def findvideos(item):
                     if srv == 'streamtape': servidor = 'streamtape'
                     elif srv == 'voe': servidor = 'voe'
                     elif srv == 'doods' or srv == 'doostream': servidor = 'doodstream'
+                    elif srv == 'lamovie': servidor = 'clipwatching'
 
                     elif srv == 'netu' or servidor == 'hqq': servidor = 'waaw'
 
@@ -866,9 +866,11 @@ def play(item):
             if not url.startswith('http'): return itemlist
 
             if '/okru.' in url: servidor = 'okru'
-
-            new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            else:
+                new_server = servertools.corregir_other(url).lower()
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
         if servidor == 'zplayer': url = url + '|' + host_player
 

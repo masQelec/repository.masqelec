@@ -479,6 +479,8 @@ def play(item):
     url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
+    es_wish = False
+
     if item.other == 'Indeterminado' or item.other == 'Peliplaywish' or item.other == 'Mivideoplay' or item.other == 'Peliplaymoon' or item.other == 'Fmoonembed' or item.other == 'Embedmoon' or item.other == 'Jodwish' or item.other == 'Swhoi' or item.other == 'Swdyu' or item.other == 'Strwish' or item.other == 'Vidhidepre' or item.other == 'Playerwish' or item.other == 'Streamwish' or item.other == 'Vidhidepro' or item.other == 'Fastream':
         if '/?trembed' in url:
             data = do_downloadpage(url)
@@ -486,6 +488,9 @@ def play(item):
             url = scrapertools.find_single_match(str(data), 'link: "(.*?)"')
             if not url: url = scrapertools.find_single_match(str(data), "location.href = '(.*?)'")
             if not url: url = scrapertools.find_single_match(str(data), 'sources:.*?file:.*?"(.*?)"')
+
+        if url:
+            if 'jodwish' in url or 'swhoi' in url or 'swdyu' in url or 'strwish' in url or 'playerwish' in url or 'streamwish' in url: es_wish = True
 
     if url:
         if '//e/' in url: url = url.replace('//e/', '/e/')
@@ -495,9 +500,13 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
+
+        if es_wish: url = url + '|Referer=' + url
 
         itemlist.append(item.clone(server = servidor, url = url))
 

@@ -20,11 +20,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color='orange' ))
 
@@ -53,7 +54,7 @@ def categorias(item):
     for url, title in matches:
         if title == 'audio latino': continue
         elif title == 'Audio Castellano': continue
-        elif title == 'Calida Full HD': continue
+        elif title == 'Calidad Full HD': continue
 
         title = title.replace('&ntilde;', 'ñ')
 
@@ -130,8 +131,14 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
+        config.set_setting('ses_pin', True)
+
+    data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>||<br/>', "", data)
 
     data = scrapertools.find_single_match(data, 'var videos =(.*?)\}')

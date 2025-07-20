@@ -3,7 +3,7 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigwarp,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Videa,  Vidbob,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vidtube,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigwarp,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vidtube,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -225,6 +225,10 @@
         "url": "https://bigwarp.io/\\1"
       },
       {
+        "pattern": "https://bigwarp.cc/(?:d/|e/|v/|embed-)([0-9a-zA-Z]+)",
+        "url": "https://bigwarp.io/\\1"
+      },
+      {
         "pattern": "https://bgwp.cc/(?:d/|e/|v/|embed-)([0-9a-zA-Z]+)",
         "url": "https://bigwarp.io/\\1"
       },
@@ -245,12 +249,36 @@
         "url": "https://upvid.co/\\2"
       },
       {
-        "pattern": "(https://wecima.)(?:show|movie|stream|watch|film|tube)/([0-9a-zA-Z]+)",
+        "pattern": "(https://wecima.)(?:show|movie|stream|watch|film|tube|video)/([0-9a-zA-Z]+)",
         "url": "https://wecima.show/\\2"
       },
       {
         "pattern": "https://asianload.cfd/watch?v=([0-9a-zA-Z]+)",
         "url": "https://asianload.cfd/watch?v=\\2"
+      },
+      {
+        "pattern": "https://savefiles.com/(?:embed-|e/|)([0-9a-zA-Z]+)",
+        "url": "https://savefiles.com/e/\\1"
+      },
+      {
+        "pattern": "https://savefiles.top/(?:embed-|e/|)([0-9a-zA-Z]+)",
+        "url": "https://savefiles.com/e/\\1"
+      },
+      {
+        "pattern": "https://streamhls.to/(?:embed-|e/|)([0-9a-zA-Z]+)",
+        "url": "https://savefiles.com/e/\\1"
+      },
+      {
+        "pattern": "https://vidbasic.top/(?:embed/|)([0-9a-zA-Z]+)",
+        "url": "https://vidbasic.top/embed/\\1"
+      },
+      {
+        "pattern": "(https://streamup.)(?:to|wf|ws)/([0-9a-zA-Z]+)",
+        "url": "https://streamup.ws/\\2"
+      },
+      {
+        "pattern": "(https://strmup.)(?:to|wf|ws)/([0-9a-zA-Z]+)",
+        "url": "https://streamup.ws/\\2"
       }
     ]
   }

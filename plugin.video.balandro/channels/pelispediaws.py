@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.gnularetro.lat/'
+host = 'https://wc5n.gnularetro.lat/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.pelispedia.ws/', 'https://ww7.pelispedia.ws/', 'https://www.gnula4.cc/',
-             'https://www.pelistv.top/', 'https://w-ww.pelistv.top/']
+             'https://www.pelistv.top/', 'https://w-ww.pelistv.top/', 'https://www.gnularetro.lat/']
 
 
 domain = config.get_setting('dominio', 'pelispediaws', default='')
@@ -265,7 +265,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

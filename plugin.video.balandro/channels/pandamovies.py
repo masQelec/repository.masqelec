@@ -26,11 +26,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
@@ -53,15 +54,17 @@ def escenas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Repertorio', action = 'list_all', url = host  + 'xxxscenes/movies' ))
+    itemlist.append(item.clone( title = 'ESCENAS:', action='', text_color = 'pink' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host  + 'xxxscenes/#movie-featured' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host  + 'xxxscenes/movies' ))
 
-    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host  + 'xxxscenes/#topview-today' ))
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host  + 'xxxscenes/#top-rating' ))
+    itemlist.append(item.clone( title = ' - Últimas', action = 'list_all', url = host  + 'xxxscenes/#movie-featured' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'canales', url = host + 'xxxscenes/' ))
-    itemlist.append(item.clone( title = 'Por estudio', action = 'categorias', url = host + 'xxxscenes/'))
+    itemlist.append(item.clone( title = ' - Más vistas', action = 'list_all', url = host  + 'xxxscenes/#topview-today' ))
+    itemlist.append(item.clone( title = ' - Más valoradas', action = 'list_all', url = host  + 'xxxscenes/#top-rating' ))
+
+    itemlist.append(item.clone( title = ' - Por género', action = 'canales', url = host + 'xxxscenes/' ))
+    itemlist.append(item.clone( title = ' - Por estudio', action = 'categorias', url = host + 'xxxscenes/'))
 
     return itemlist
 
@@ -149,7 +152,8 @@ def list_all(item):
 
         title = title.replace('&#038;', '&').replace('&#8217;s', "'s").replace('&#8217;', "'s").replace('&#8211;', '').replace('&amp;', '')
 
-        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'data-lazy-src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         time = scrapertools.find_single_match(match, '<span class="mli-info1">(.*?)</span>').strip()
         time = time.replace('hrs.', 'h').strip()
@@ -173,6 +177,13 @@ def list_all(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
@@ -214,8 +225,10 @@ def findvideos(item):
         other = ''
 
         if servidor == 'various': other = servertools.corregir_other(url)
+        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-        itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server=servidor, language = 'Vo', other = other.capitalize()) )
+        itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server=servidor,
+                              language = 'Vo', other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

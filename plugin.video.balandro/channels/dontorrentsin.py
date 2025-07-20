@@ -12,7 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www19.dontorrent.link/'
+host = 'https://www21.dontorrent.link/'
 
 
 # ~ por si viene de enlaces guardados
@@ -22,7 +22,8 @@ ant_hosts = ['https://dontorrent.in/', 'https://dontorrent.tv/', 'https://www1.d
              'https://www8.dontorrent.fr/', 'https://www9.dontorrent.link/', 'https://www10.dontorrent.link/',
              'https://www11.dontorrent.link/', 'https://www12.dontorrent.link/', 'https://www13.dontorrent.link/',
              'https://www14.dontorrent.link/', 'https://www15.dontorrent.link/', 'https://www16.dontorrent.link/',
-             'https://www17.dontorrent.link/', 'https://www18.dontorrent.link/']
+             'https://www17.dontorrent.link/', 'https://www18.dontorrent.link/', 'https://www19.dontorrent.link/',
+             'https://www20.dontorrent.link/']
 
 
 domain = config.get_setting('dominio', 'dontorrentsin', default='')
@@ -93,9 +94,9 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_dontorrentsin', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='dontorrentsin', folder=False, text_color='chartreuse' ))
@@ -107,7 +108,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'dontorrentsin', thumbnail=config.get_thumb('dontorrentsin') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'dontorrentsin' ))
 
     platformtools.itemlist_refresh()
 

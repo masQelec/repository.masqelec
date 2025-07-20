@@ -5,7 +5,7 @@
 
   "active": true,
 
-  "searchable": true,
+  "searchable": false,
   "search_types": ["movie"],
 
   "categories": ["torrent", "movie"],

@@ -403,8 +403,10 @@ def play(item):
         if servidor == 'directo':
             if '.wikipedia.' in url or '.wikimedia.' in url: pass
             else:
-               new_server = servertools.corregir_other(url).lower()
-               if new_server.startswith("http"): servidor = new_server
+                new_server = servertools.corregir_other(url).lower()
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

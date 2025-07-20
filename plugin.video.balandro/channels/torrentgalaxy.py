@@ -28,13 +28,13 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-    if not config.get_setting('descartar_anime', default=False):
-        if not no_porns:
-            itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime/', search_type = 'tvshow', text_color=' springgreen' ))
-        else:
-            itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
+    if config.get_setting('mnu_animes', default=True):
+        itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime/', search_type = 'tvshow', text_color=' springgreen' ))
 
-    if not no_porns:
+        if not config.get_setting('descartar_anime', default=False):
+            itemlist.append(item.clone( title = 'Animes xxx', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
+
+    if config.get_setting('mnu_adultos', default=True):
         itemlist.append(item.clone( title = 'Adultos', action = 'mainlist_adults', text_color = 'orange' ))
 
     return itemlist
@@ -89,7 +89,7 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Colecciones', action = 'list_all', url = host + 'get-posts/keywords:Packs:category:TV/', search_type = 'tvshow', text_color='greenyellow' ))
 
-        if not config.get_setting('descartar_anime', default=False):
+        if config.get_setting('mnu_animes', default=True):
             itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime/', search_type = 'tvshow', text_color=' springgreen' ))
 
         itemlist.append(item.clone( title = '[B]Episodios:[/B]', action = '', search_type = 'tvshow', text_color='moccasin' ))
@@ -104,8 +104,9 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Colecciones', action = 'list_all', url = host + 'get-posts/keywords:Packs:category:TV:ncategory:XXX/', search_type = 'tvshow', text_color='greenyellow' ))
 
-        if not config.get_setting('descartar_anime', default=False):
-            itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
+        if config.get_setting('mnu_animes', default=True):
+            if not config.get_setting('descartar_anime', default=False):
+                itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
 
         itemlist.append(item.clone( title = '[B]Episodios:[/B]', action = '', search_type = 'tvshow', text_color='moccasin' ))
 
@@ -166,8 +167,10 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, "src=.?'(.*?)'")
 
         contentExtra = ''
+        Extra = ''
+
         if '<small>XXX' in match:
-            contentExtra = 'adults'
+            Extra = 'adults'
             thumb = config.get_thumb('adults')
 
         lang = scrapertools.find_single_match(match, '<!-- <img class="dim txlight".*?title="(.*?)"')
@@ -195,7 +198,7 @@ def list_all(item):
             SerieName = corregir_Name(title)
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
-                                        contentExtra='3',
+                                        contentExtra='3', Extra=Extra,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
         if tipo == 'movie':
@@ -209,7 +212,7 @@ def list_all(item):
             PeliName = corregir_Name(title)
 
             itemlist.append(item.clone( action = 'findvideos', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
-                                        contentExtra=contentExtra,
+                                        contentExtra=contentExtra, Extra=Extra,
                                         contentType = 'movie', contentTitle = PeliName, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -234,6 +237,14 @@ def list_all(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if item.Extra == 'adults':
+        if not config.get_setting('ses_pin'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+            config.set_setting('ses_pin', True)
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)

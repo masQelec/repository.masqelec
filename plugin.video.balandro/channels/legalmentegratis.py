@@ -204,7 +204,7 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
-        item.url = host + '/?s=' + texto.replace(" ", "+") + '&submit=Search'
+        item.url = host + '?s=' + texto.replace(" ", "+") + '&submit=Search'
         return list_all(item)
     except:
         import sys

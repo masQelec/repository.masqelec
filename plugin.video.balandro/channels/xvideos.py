@@ -27,23 +27,86 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
-    itemlist.append(item.clone( title = 'Más valorados', action = 'list_best', url = host + 'best/' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'bests', url = host + 'best/' ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host + 'channels-index/from/worldwide/top' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars-index/from/worldwide/ever' ))
     itemlist.append(item.clone( title = 'Por modelo', action = 'modelos', url = host + 'erotic-models-index/from/worldwide/ever' ))
     itemlist.append(item.clone( title = 'Por webcam', action = 'webcams', url = host + 'webcam-models-index/from/worldwide/ever' ))
+
+    return itemlist
+
+
+def bests(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '<div class="date-links">(.*?)</div>')
+
+    matches = re.compile('href="(.*?)".*?>(.*?)</a>').findall(bloque)
+
+    for url, title in matches:
+        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'e').replace('&oacute;', 'o').replace('&uacute;', 'u').strip()
+        title = title.replace('Aaacute;', 'a').replace('&Eacute;', 'e').replace('&Iacute;', 'e').replace('&Oacute;', 'o').replace('&Uacute;', 'u').strip()
+
+        title = title.replace('&aacuate;', 'a').replace('&eacuate;', 'e').replace('&iacuate;', 'e').replace('&oacuate;', 'o').replace('&uacuate;', 'u').strip()
+        title = title.replace('&Aacuate;', 'a').replace('&Eacuate;', 'e').replace('&Iacuate;', 'e').replace('&Oacuate;', 'o').replace('&Uacuate;', 'u').strip()
+
+        title = title.replace("&#039;", "'").replace('&quot;', '').replace('&iexcl;', '').replace('&ndash;', '').replace('&ntilde;', 'ñ').replace("&rsquo;", "'").replace("&iquest;", '').strip()
+
+        itemlist.append(item.clone( action = 'list_bests', url = url if url.startswith('http') else host[:-1] + url, title = title ))
+
+    return itemlist
+
+
+def list_bests(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '<div class="video-listing mozaique">(.*?)<div class="pagination ">')
+
+    matches = re.compile('<div id="video-thumb-(.*?)</div></div></div>').findall(bloque)
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+
+        title = scrapertools.find_single_match(match, '<div class="video-title">.*?>(.*?)</a>')
+
+        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'e').replace('&oacute;', 'o').replace('&uacute;', 'u').strip()
+        title = title.replace('Aaacute;', 'a').replace('&Eacute;', 'e').replace('&Iacute;', 'e').replace('&Oacute;', 'o').replace('&Uacute;', 'u').strip()
+
+        title = title.replace('&aacuate;', 'a').replace('&eacuate;', 'e').replace('&iacuate;', 'e').replace('&oacuate;', 'o').replace('&uacuate;', 'u').strip()
+        title = title.replace('&Aacuate;', 'a').replace('&Eacuate;', 'e').replace('&Iacuate;', 'e').replace('&Oacuate;', 'o').replace('&Uacuate;', 'u').strip()
+
+        title = title.replace("&#039;", "'").replace('&quot;', '').replace('&iexcl;', '').replace('&ndash;', '').replace('&ntilde;', 'ñ').replace("&rsquo;", "'").replace("&iquest;", '').strip()
+
+        itemlist.append(item.clone( action = 'findvideos', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail = thumb ))
+
+    if itemlist:
+        next_page = scrapertools.find_single_match(data, '<div class="pagination ">.*?<a class="current".*?</a>.*?href="(.*?)"')
+
+        if next_page:
+            itemlist.append(item.clone( title = 'Siguientes ...', url = next_page if next_page.startswith('http') else host[:-1] + next_page, action = 'list_bests', text_color = 'coral' ))
 
     return itemlist
 
@@ -358,6 +421,7 @@ def list_webcams(item):
     return itemlist
 
 
+
 def list_all(item):
     logger.info()
     itemlist = []
@@ -407,43 +471,21 @@ def list_all(item):
     return itemlist
 
 
-def list_best(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    bloque = scrapertools.find_single_match(data, '<div id="date-links-pagination" class="ordered-label-list">(.*?)<li class="hidden">')
-
-    matches = re.compile('<li>(.*?)</li>').findall(bloque)
-
-    for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-
-        title = scrapertools.find_single_match(match, '">(.*?)</a>')
-
-        title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'e').replace('&oacute;', 'o').replace('&uacute;', 'u').strip()
-        title = title.replace('Aaacute;', 'a').replace('&Eacute;', 'e').replace('&Iacute;', 'e').replace('&Oacute;', 'o').replace('&Uacute;', 'u').strip()
-
-        title = title.replace('&aacuate;', 'a').replace('&eacuate;', 'e').replace('&iacuate;', 'e').replace('&oacuate;', 'o').replace('&uacuate;', 'u').strip()
-        title = title.replace('&Aacuate;', 'a').replace('&Eacuate;', 'e').replace('&Iacuate;', 'e').replace('&Oacuate;', 'o').replace('&Uacuate;', 'u').strip()
-
-        title = title.replace("&#039;", "'").replace('&quot;', '').replace('&iexcl;', '').replace('&ndash;', '').replace('&ntilde;', 'ñ').replace("&rsquo;", "'").replace("&iquest;", '').strip()
-
-        itemlist.append(item.clone( action = 'list_all', url = url if url.startswith('http') else host[:-1] + url, title = title ))
-
-    return itemlist
-
-
 def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
 
     try:
-       m3u8url = re.findall(r"html5player\.setVideoHLS\('([^']+)'", data)[0]
+        m3u8url = re.findall(r"html5player\.setVideoHLS\('([^']+)'", data)[0]
     except:
        return itemlist
 

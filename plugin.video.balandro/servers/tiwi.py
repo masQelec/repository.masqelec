@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+
 import re
 
 from lib import jsunpack
@@ -19,6 +25,9 @@ def get_video_url(page_url, url_referer=''):
         referer = referer.replace('Referer=', '')
         headers = {'Referer': referer}
 
+    if '/okhd.' in page_url:
+        headers = {'Referer': 'https://mp4.nu/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site'} 
+
     resp = httptools.downloadpage(page_url, headers=headers)
 
     if resp.code == 404 or "not found" in resp.data:
@@ -26,18 +35,46 @@ def get_video_url(page_url, url_referer=''):
 
     data = resp.data
 
-    try:
-       enc_data = scrapertools.find_multiple_matches(data, "text/javascript(?:'|\")>(eval.*?)</script>")
-       dec_data = jsunpack.unpack(enc_data[-1])
-    except Exception:
-       dec_data = data
+    if '/okhd.' in page_url:
+        try:
+            enc_data = scrapertools.find_multiple_matches(data, "text/javascript(?:'|\")>(eval.*?)</script>")
+            dec_data = jsunpack.unpack(enc_data[-1])
+        except:
+            dec_data = data
 
-    sources = 'sources\:\s*\[\{(?:file|src):"([^"]+)"'
+        sources = 'sources\:\s*\[\{(?:file|src):"([^"]+)"'
+
+        try:
+            matches = re.compile(sources, re.DOTALL).findall(dec_data)
+            for url in matches:
+                video_urls.append(['m3u8', url])
+        except:
+            pass
+
+        return video_urls
 
     try:
-        matches = re.compile(sources, re.DOTALL).findall(dec_data)
-        for url in matches:
-            video_urls.append(['m3u8', url])
+        pack = scrapertools.find_single_match(data, 'p,a,c,k,e,d.*?</script>')
+        unpacked = jsunpack.unpack(pack)
+
+        m3u8_source = scrapertools.find_single_match(unpacked, '\{(?:file|"hls\d+"|src):"([^"]+)"')
+
+        if "master.m3u8" in m3u8_source:
+            datos = httptools.downloadpage(m3u8_source).data
+
+            if PY3:
+                if isinstance(datos, bytes):
+                    datos = "".join(chr(x) for x in bytes(datos))
+
+            if datos:
+                matches_m3u8 = re.compile('#EXT-X-STREAM-INF.*?RESOLUTION=\d+x(\d*)[^\n]*\n([^\n]*)\n', re.DOTALL).findall(datos)
+                for quality, url in matches_m3u8:
+                    url = m3u8_source
+                    video_urls.append([quality, 'm3u8', url])
+
+        else:
+            video_urls.append(['m3u8', m3u8_source])
+
     except Exception:
         pass
 

@@ -3,7 +3,7 @@
   "name": "TorrenFlix",
   "thumbnail": "torrenflix.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["clone", "torrents", "news", "qualityes", "years", "lasts", "classic", "rankings", "kids", "docs", "4k"],
 
-  "notes": "Canal con enlaces Streaming y Torrent. Películas por géneros, calidad y año. También series por Géneros."
+  "notes": "Web CERRADA. Canal con enlaces Streaming y Torrent. Películas por géneros, calidad y año. También series por Géneros."
 }

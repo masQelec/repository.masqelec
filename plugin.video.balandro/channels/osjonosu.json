@@ -1,0 +1,17 @@
+{
+  "id": "osjonosu",
+  "name": "Osjonosu",
+  "thumbnail": "osjonosu.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast"],
+
+  "clusters": ["onlyone", "years", "infantil", "lists", "docs"],
+
+  "notes": "Películas por géneros y años. Series por Géneros."
+}

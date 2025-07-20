@@ -48,8 +48,7 @@ def get_video_url(page_url, url_referer=''):
 
     ini_page_url = page_url
 
-    if not xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        return 'Falta ResolveUrl'
+    if not xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'): return 'Falta ResolveUrl'
 
     txt_server = 'Unknow'
 
@@ -146,7 +145,7 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('//yadi.ru', '/yadi.sk/').replace('//yadi.com', '/yadi.sk/').replace('//yadi.disk', '/yadi.sk/')
 
-    elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url or 'iplayerhls' in page_url or 'hlsflast' in page_url or 'ghbrisk' in page_url or 'cybervynx' in page_url or 'streamhg' in page_url or 'hlsflex' in page_url:
+    elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url or 'iplayerhls' in page_url or 'hlsflast' in page_url or 'ghbrisk' in page_url or 'cybervynx' in page_url or 'streamhg' in page_url or 'hlsflex' in page_url or 'dhcplay' in page_url or 'stbhg' in page_url or 'gradehgplus' in page_url:
           txt_server = 'Streamwish'
 
           page_url = page_url.replace('/streamwish.com/', '/streamwish.to/').replace('/streamwish.top/', '/streamwish.to/').replace('/streamwish.site/', '/streamwish.to/').replace('/strwish.xyz/', '/streamwish.to/').replace('/strwish.com/', '/streamwish.to/').replace('/embedwish.com/', '/streamwish.to/').replace('/wishembed.pro/', '/streamwish.to/')
@@ -157,16 +156,16 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/iplayerhls.com/', '/streamwish.to/').replace('/hlsflast.com/', '/streamwish.to/').replace('/ghbrisk.com/', '/streamwish.to/')
 
-          page_url = page_url.replace('/cybervynx.com/', '/streamwish.to/').replace('/streamhg.com/', '/streamwish.to/').replace('/hlsflex.com/', '/streamwish.to/')
+          page_url = page_url.replace('/cybervynx.com/', '/streamwish.to/').replace('/streamhg.com/', '/streamwish.to/').replace('/hlsflex.com/', '/streamwish.to/').replace('/swiftplayers.com/', '/streamwish.to/')
 
-          page_url = page_url.replace('/stbhg.click/', '/streamwish.to/').replace('/dhcplay.com/', '/streamwish.to/')
+          page_url = page_url.replace('/stbhg.click/', '/streamwish.to/').replace('/dhcplay.com/', '/streamwish.to/').replace('/gradehgplus/', '/streamwish.to/')
 
     elif 'desiupload' in page_url:
           txt_server = 'Desiupload'
 
           page_url = page_url.replace('/desiupload.to/', '/desiupload.co/').replace('/desiupload.in/', '/desiupload.co/')
 
-    elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url or 'javlion' in page_url or 'fdewsdc' in page_url or 'peytonepre' in page_url or 'ryderjet' in page_url or 'smoothpre' in page_url:
+    elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url or 'javlion' in page_url or 'fdewsdc' in page_url or 'peytonepre' in page_url or 'ryderjet' in page_url or 'smoothpre' in page_url or 'movearnpre' in page_url or 'seraphinap' in page_url or 'seraphinapl' in page_url:
           txt_server = 'Filelions'
 
           page_url = page_url.replace('/embed/', '/')
@@ -175,7 +174,8 @@ def get_video_url(page_url, url_referer=''):
           page_url = page_url.replace('/azipcdn.com/', '/filelions.to/')
           page_url = page_url.replace('/alions.pro/', '/filelions.to/').replace('/dlions.pro/', '/filelions.to/').replace('/mlions.pro/', '/filelions.to/').replace('/fviplions.com/', '/filelions.to/')
           page_url = page_url.replace('/javlion.xyz/', '/filelions.to/').replace('/fdewsdc.sbs/', '/filelions.to/')
-          page_url = page_url.replace('/peytonepre.com/', '/filelions.to/').replace('/ryderjet.com/', '/filelions.to/').replace('/smoothpre.com/', '/filelions.to/')
+          page_url = page_url.replace('/peytonepre.com/', '/filelions.to/').replace('/ryderjet.com/', '/filelions.to/').replace('/smoothpre.com/', '/filelions.to/').replace('/movearnpre.com/', '/filelions.to/')
+          page_url = page_url.replace('/seraphinap.com/', '/filelions.to/').replace('/seraphinapl.com/', '/filelions.to/')
 
     elif 'youdbox' in page_url or 'yodbox' in page_url or 'youdboox' in page_url: 
           txt_server = 'Youdbox'
@@ -265,15 +265,14 @@ def get_video_url(page_url, url_referer=''):
         url = widhide(ini_page_url)
 
         if url:
-            # ~ 27/4/2025  VIDHIDE pq No existe en ResolveUrl
+            # ~ 27/4/2025  VIDHIDE pq ya No existe en ResolveUrl
             video_urls.append(['m3u8', url])
             return video_urls
 
     path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', txt_server.lower() + '.py'))
 
     existe = filetools.exists(path)
-    if not existe:
-        return 'El Plugin No existe en Resolveurl'
+    if not existe: return 'El Plugin No existe en Resolveurl'
 
     if config.get_setting('servers_time', default=True):
         platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
@@ -284,16 +283,25 @@ def get_video_url(page_url, url_referer=''):
 
         import resolveurl
 
-        if "|Referer=" in page_url:
-            page_url = page_url.replace("|Referer=", '$$')
+        # ~ STREAMWISH
+        if txt_server == 'Streamwish':
+            if not "|Referer=" in ini_page_url: 
+                ini_page_url = ini_page_url + "|Referer=" + ini_page_url
+                page_url = ini_page_url
+
+        # ~ FILELIONS
+        if txt_server == 'Filelions':
+            if not "|Referer=" in ini_page_url: 
+                ini_page_url = ini_page_url + "|Referer=" + ini_page_url
+                page_url = ini_page_url
+
+        if "|Referer=" in page_url: page_url = page_url.replace("|Referer=", '$$')
 
         resuelto = resolveurl.resolve(page_url)
 
         if resuelto:
-            if '.zip' in resuelto or '.rar' in resuelto:
-                return "El archivo está en formato comprimido"
-
-            if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
+            if '.zip' in resuelto or '.rar' in resuelto: return "El archivo está en formato comprimido"
+            elif '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
             elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
             else: video_urls.append(['', resuelto])
             return video_urls
@@ -312,22 +320,32 @@ def get_video_url(page_url, url_referer=''):
         logger.error(traceback.format_exc())
 
         if txt_server == 'Streamwish':
-           url = wish(ini_page_url)
+            if not "|Referer=" in ini_page_url: url = url + "|Referer=" + ini_page_url
 
-           if url:
-               # ~ 10/4/2025  WISH pq falla ResolveUrl
-               video_urls.append(['m3u8', url])
-               return video_urls
-
-        elif txt_server == 'Vidspeed':
-            data = httptools.downloadpage(ini_page_url).data
-
-            url = scrapertools.find_single_match(str(data), 'file:"(.*?)"')
+            url = wish(ini_page_url)
 
             if url:
-                # ~ 13/10/2023  Directo pq falla ResolveUrl
-                video_urls = [[url[-4:], url]]
+                # ~ 10/4/2025  WISH pq a veces falla ResolveUrl
+                video_urls.append(['m3u8', url])
                 return video_urls
+
+        elif txt_server == 'Vidspeed':
+             data = httptools.downloadpage(ini_page_url).data
+
+             url = scrapertools.find_single_match(str(data), 'file:"(.*?)"')
+
+             if url:
+                 # ~ 13/10/2023  VIDSPEED --> Directo pq a veces falla ResolveUrl
+                 video_urls = [[url[-4:], url]]
+                 return video_urls
+
+        elif txt_server == 'Hexupload':
+             url = hexupload(ini_page_url)
+
+             if url:
+                 # ~ 23/5/2025  HEXUPLOAD pq a veces falla ResolveUrl
+                 video_urls.append(['mp4', url])
+                 return video_urls
 
         if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
             trace = traceback.format_exc()
@@ -337,7 +355,7 @@ def get_video_url(page_url, url_referer=''):
             elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                 return 'Fichero sin link al vídeo ó restringido'
 
-        elif 'HTTP Error 404: Not Found' in traceback.format_exc():
+        elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
             return 'Archivo inexistente'
 
         elif '<urlopen error' in traceback.format_exc():
@@ -353,9 +371,8 @@ def wish(page_url):
 
     headers = {}
 
-    if "|Referer" in page_url:
-        page_url, referer = page_url.split("|")
-        referer = referer.replace('Referer=', '')
+    if "|Referer=" in page_url:
+        referer = scrapertools.find_single_match(page_url, '|Referer=(.*?)$')
         headers = {'Referer': referer}
 
     try:
@@ -364,6 +381,8 @@ def wish(page_url):
         pass
 
     data = httptools.downloadpage(page_url).data
+
+    if "Not Found" in data or "File was deleted" in data or "is no longer available" in data: return ''
 
     try:
         pack = scrapertools.find_single_match(data, 'p,a,c,k,e,d.*?</script>')
@@ -383,9 +402,8 @@ def widhide(page_url):
 
     headers = {}
 
-    if "|Referer" in page_url:
-        page_url, referer = page_url.split("|")
-        referer = referer.replace('Referer=', '')
+    if "|Referer=" in page_url:
+        referer = scrapertools.find_single_match(page_url, '|Referer=(.*?)$')
         headers = {'Referer': referer}
 
     resp = httptools.downloadpage(page_url, headers=headers)
@@ -406,3 +424,17 @@ def widhide(page_url):
         pass
 
     return m3u8
+
+
+def hexupload(page_url):
+    id = page_url.replace('https://hexupload.net/', '')
+
+    post = {'op': 'download3', 'id': id, 'ajax': '1', 'method_free': '1', 'dataType': 'json'}
+
+    headers = {'Referer': page_url}
+
+    resp = httptools.downloadpage('https://hexload.com/download', post=post, headers=headers)
+
+    mp4 = scrapertools.find_single_match(resp.data, '"url":"(.*?)"')
+
+    return mp4

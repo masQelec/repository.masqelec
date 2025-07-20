@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www3.peliplayhd.org/'
+host = 'https://www1.peliplayhd.org/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.peliplayhd.org/']
+    ant_hosts = ['https://www.peliplayhd.org/', 'https://www3.peliplayhd.org/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -431,7 +431,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 
