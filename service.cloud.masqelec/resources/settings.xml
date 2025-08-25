@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<settings>
+    <!-- Categoría: General -->
+    <category label="30030">
+        <setting label="30031" id="auto_update" type="bool" default="true"/>
+        <setting label="30032" id="update_library" type="bool" default="true"/>
+        <setting label="30033" id="update_pvr" type="bool" default="true"/>
+    </category>
+
+    <!-- Categoría: Registro (solo visible en modo experto) -->
+    <category label="30020" level="2">
+        <setting label="30021" id="activar_log" type="bool" default="true"/>
+        <setting label="30022" id="ver_log" type="action" option="close" action="RunScript(service.ejemplo.notificacion,viewlog)"/>
+    </category>
+</settings>
+

@@ -1,0 +1,61 @@
+# Kodi Media Center language file
+# Addon Name: Notifications Example
+# Addon id: service.ejemplo.notificacion
+# Addon Provider: tu_nombre
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2015-09-21 11:01+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "#30000"
+msgid "Welcome to the notifications addon"
+msgstr ""
+
+msgctxt "#30004"
+msgid "autostart.sh detected"
+msgstr ""
+
+msgctxt "#30005"
+msgid "autostart.sh not found"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Addon log"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Logging"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Enable log in userdata"
+msgstr ""
+
+msgctxt "#30022"
+msgid "View addon log"
+msgstr ""
+
+msgctxt "#30030"
+msgid "General"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Automatically update the system"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Update the library"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Update the PVR"
+msgstr ""
