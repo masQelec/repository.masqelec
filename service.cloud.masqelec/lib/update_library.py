@@ -35,7 +35,6 @@ def fix_videos_db(db_dir="/storage/.kodi/userdata/Database/"):
     Si alguna no cumple las condiciones, la reemplaza descargándola desde el repositorio remoto.
     Devuelve True si todas las bases de datos están en orden.
     """
-    # Las condiciones de la base de datos se definen aquí
     REQUIRED_CONDITIONS = [
         ("/storage/videos/", "movies", "metadata.local"),
         ("/storage/tvshows/1/", "tvshows", "metadata.local"),
@@ -43,38 +42,50 @@ def fix_videos_db(db_dir="/storage/.kodi/userdata/Database/"):
     ]
     
     base_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/"
+    
+    # 1. Busca todos los archivos MyVideos*.db y encuentra el de mayor numeración
     db_files = [f for f in os.listdir(db_dir) if f.startswith("MyVideos") and f.endswith(".db")]
     
-    if not db_files:
-        db_file = "MyVideos131.db"
-        db_path = os.path.join(db_dir, db_file)
-        url = base_url + db_file
+    # Extrae el número de versión de cada archivo y encuentra el más alto
+    highest_version = 0
+    highest_db_file = None
+    for f in db_files:
+        try:
+            version = int(f.replace("MyVideos", "").replace(".db", ""))
+            if version > highest_version:
+                highest_version = version
+                highest_db_file = f
+        except ValueError:
+            continue
+            
+    # 2. Si no se encuentra ningún archivo de base de datos, descarga MyVideos131.db
+    if not highest_db_file:
+        db_file_to_check = "MyVideos131.db"
+        db_path = os.path.join(db_dir, db_file_to_check)
+        url = base_url + db_file_to_check
         
-        utils.write_log(f"No se encontraron bases MyVideos*.db. Descargando {db_file}...")
+        utils.write_log(f"No se encontraron bases MyVideos*.db. Descargando {db_file_to_check}...")
         try:
             urllib.request.urlretrieve(url, db_path)
-            utils.write_log(f"{db_file} descargado y reemplazado correctamente.")
+            utils.write_log(f"{db_file_to_check} descargado y reemplazado correctamente.")
         except Exception as e:
-            utils.write_log(f"No se pudo descargar {db_file}: {e}\n{traceback.format_exc()}", level="ERROR")
+            utils.write_log(f"No se pudo descargar {db_file_to_check}: {e}\n{traceback.format_exc()}", level="ERROR")
             return False
         return False
-        
-    for db_file in db_files:
-        db_path = os.path.join(db_dir, db_file)
-        
-        # Llama a la función de db_utils y se le pasan las condiciones
-        if not db_utils.check_db_paths(db_path, REQUIRED_CONDITIONS):
-            try:
-                utils.write_log(f"Base de datos inválida encontrada: {db_file}. Reemplazando desde el repositorio remoto...")
-                url = base_url + db_file
-                if os.path.exists(db_path):
-                    os.remove(db_path)
-                urllib.request.urlretrieve(url, db_path)
-                utils.write_log(f"{db_file} descargado y reemplazado correctamente.")
-            except Exception as e:
-                utils.write_log(f"No se pudo descargar {db_file}: {e}\n{traceback.format_exc()}", level="ERROR")
-            # Devuelve False inmediatamente después de encontrar y reemplazar un archivo inválido
-            return False
+    
+    # 3. Si se encuentra una base de datos de alta numeración, se verifica
+    db_path = os.path.join(db_dir, highest_db_file)
+    if not db_utils.check_db_paths(db_path, REQUIRED_CONDITIONS):
+        try:
+            utils.write_log(f"La base de datos principal encontrada ({highest_db_file}) no cumple las condiciones. Reemplazando desde el repositorio remoto...")
+            url = base_url + highest_db_file
+            if os.path.exists(db_path):
+                os.remove(db_path)
+            urllib.request.urlretrieve(url, db_path)
+            utils.write_log(f"{highest_db_file} descargado y reemplazado correctamente.")
+        except Exception as e:
+            utils.write_log(f"No se pudo descargar {highest_db_file}: {e}\n{traceback.format_exc()}", level="ERROR")
+        return False
 
     return True
 
